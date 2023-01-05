@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = TopQueryValidator.GetTopQueryValidator(context);
+            Validator = context.GetTopQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = TopQueryValidator.GetTopQueryValidator(context);
+            Validator = context.GetTopQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,

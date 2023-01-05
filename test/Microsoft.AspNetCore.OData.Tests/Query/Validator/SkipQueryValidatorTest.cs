@@ -85,17 +85,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         public void GetSkipQueryValidator_Returns_Validator()
         {
             // Arrange & Act & Assert
-            Assert.NotNull(SkipQueryValidator.GetSkipQueryValidator(null));
+            ODataQueryContext context = null;
+            Assert.NotNull(context.GetSkipQueryValidator());
 
             // Arrange & Act & Assert
-            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
-            Assert.NotNull(SkipQueryValidator.GetSkipQueryValidator(context));
+            context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            Assert.NotNull(context.GetSkipQueryValidator());
 
             // Arrange & Act & Assert
             IServiceProvider services = new ServiceCollection()
                 .AddSingleton<SkipQueryValidator>().BuildServiceProvider();
             context.RequestContainer = services;
-            Assert.NotNull(SkipQueryValidator.GetSkipQueryValidator(context));
+            Assert.NotNull(context.GetSkipQueryValidator());
         }
     }
 }

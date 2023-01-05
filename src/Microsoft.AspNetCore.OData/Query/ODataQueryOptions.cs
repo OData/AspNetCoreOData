@@ -1137,7 +1137,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             BuildQueryOptions(normalizedQueryParameters);
 
-            Validator = ODataQueryValidator.GetODataQueryValidator(context);
+            Validator = context.GetODataQueryValidator();
         }
     }
 }

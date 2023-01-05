@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -121,12 +120,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions);
             }
-        }
-
-        internal static IODataQueryValidator GetODataQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<IODataQueryValidator>()
-                ?? new ODataQueryValidator();
         }
 
         private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)

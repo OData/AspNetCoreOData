@@ -9831,6 +9831,69 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetODataQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetComputeQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetCountQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetFilterQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetOrderByQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSkipQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSkipTokenQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetTopQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSelectExpandQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
             This defines a composite OData query options that can be used to perform query composition.

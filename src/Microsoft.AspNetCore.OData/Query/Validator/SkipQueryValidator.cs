@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -36,11 +35,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             {
                 throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value));
             }
-        }
-
-        internal static ISkipQueryValidator GetSkipQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetService<ISkipQueryValidator>() ?? new SkipQueryValidator();
         }
     }
 }

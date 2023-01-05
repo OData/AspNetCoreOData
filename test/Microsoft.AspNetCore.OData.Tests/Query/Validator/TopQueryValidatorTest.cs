@@ -121,17 +121,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         public void GetTopQueryValidator_Returns_Validator()
         {
             // Arrange & Act & Assert
-            Assert.NotNull(TopQueryValidator.GetTopQueryValidator(null));
+            ODataQueryContext context = null;
+            Assert.NotNull(context.GetTopQueryValidator());
 
             // Arrange & Act & Assert
-            ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
-            Assert.NotNull(TopQueryValidator.GetTopQueryValidator(context));
+            context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+            Assert.NotNull(context.GetTopQueryValidator());
 
             // Arrange & Act & Assert
             IServiceProvider services = new ServiceCollection()
                 .AddSingleton<TopQueryValidator>().BuildServiceProvider();
             context.RequestContainer = services;
-            Assert.NotNull(TopQueryValidator.GetTopQueryValidator(context));
+            Assert.NotNull(context.GetTopQueryValidator());
         }
     }
 }

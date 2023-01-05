@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
@@ -87,16 +86,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     }
                 }
             }
-        }
-
-        internal static IOrderByQueryValidator GetOrderByQueryValidator(ODataQueryContext context)
-        {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new OrderByQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<IOrderByQueryValidator>();
         }
 
         private static bool IsAllowed(ODataValidationSettings validationSettings, string propertyName)

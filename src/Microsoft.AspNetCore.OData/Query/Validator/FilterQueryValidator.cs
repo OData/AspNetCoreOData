@@ -8,7 +8,6 @@
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
@@ -602,12 +601,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             Contract.Assert(settings != null);
 
             ValidateQueryNode(singleResourceCastNode.Source, settings);
-        }
-
-        internal static IFilterQueryValidator GetFilterQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<IFilterQueryValidator>()
-                ?? new FilterQueryValidator();
         }
 
         private void EnterLambda(ODataValidationSettings validationSettings)

@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = CountQueryValidator.GetCountQueryValidator(context);
+            Validator = context.GetCountQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = CountQueryValidator.GetCountQueryValidator(context);
+            Validator = context.GetCountQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
