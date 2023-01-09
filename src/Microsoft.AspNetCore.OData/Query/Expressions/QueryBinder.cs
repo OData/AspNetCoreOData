@@ -1230,12 +1230,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     // we handle enum conversions ourselves
                     convertedExpression = source;
                 }
-#if NET6_0
                 else if (TypeHelper.IsDateOnly(sourceType) || TypeHelper.IsTimeOnly(sourceType))
                 {
                     convertedExpression = source;
                 }
-#endif
                 else
                 {
                     switch (Type.GetTypeCode(sourceType))
