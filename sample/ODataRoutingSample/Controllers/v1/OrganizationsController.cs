@@ -79,9 +79,17 @@ namespace ODataRoutingSample.Controllers.v1
      "@odata.context":"http://localhost/$metadata#Organizations/$deletedEntity",
      "id":"Organizations(12)",
      "reason":"deleted"
-   }
+   },
+   {
+     "@context":"#Organizations/$deletedEntity",
+     "@removed":{"reason":"deleted" },
+     "@id":"Organizations(13)"
+    }
   ]
 } 
+            // The last one is odata v4.01 format, others are 4.0 format.
+            // We should set the version for ODataMessageReaderSettings as 4.01
+            // We should set the request header as : OData-Version:4.01
              */
 
             //changes.ApplyDeleteLink = (l) => { };

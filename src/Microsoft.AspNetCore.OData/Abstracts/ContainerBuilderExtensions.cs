@@ -38,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // ReaderSettings and WriterSettings are registered as prototype services.
             // There will be a copy (if it is accessed) of each prototype for each request.
-            builder.AddServicePrototype(new ODataMessageReaderSettings
+            builder.AddServicePrototype(new ODataMessageReaderSettings(ODataVersion.V401)
             {
                 EnableMessageStreamDisposal = false,
                 MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
@@ -49,6 +49,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
                 // Enable read property name case-insensitive from payload.
                 EnablePropertyNameCaseInsensitive = true
+
+
             });
 
             builder.AddServicePrototype(new ODataMessageWriterSettings
