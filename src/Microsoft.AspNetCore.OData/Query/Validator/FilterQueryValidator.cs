@@ -51,24 +51,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 throw Error.ArgumentNull(nameof(settings));
             }
 
-            if (filterQueryOption.Context.Path != null)
-            {
-                _property = filterQueryOption.Context.TargetProperty;
-                _structuredType = filterQueryOption.Context.TargetStructuredType;
-            }
-
+            _property = filterQueryOption.Context.TargetProperty;
+            _structuredType = filterQueryOption.Context.TargetStructuredType;
             _defaultQuerySettings = filterQueryOption.Context.DefaultQuerySettings;
 
             Validate(filterQueryOption.FilterClause, settings, filterQueryOption.Context.Model);
-        }
-
-        internal virtual void Validate(IEdmProperty property, IEdmStructuredType structuredType,
-            FilterClause filterClause, ODataValidationSettings settings, IEdmModel model, DefaultQuerySettings querySettings)
-        {
-            _property = property;
-            _structuredType = structuredType;
-            _defaultQuerySettings = querySettings;
-            Validate(filterClause, settings, model);
         }
 
         /// <summary>
