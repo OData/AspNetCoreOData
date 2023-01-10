@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using ODataRoutingSample.Models;
 using ODataRoutingSample.OpenApi;
@@ -75,11 +77,18 @@ namespace ODataRoutingSample
                 */
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                     .AddRouteComponents(model0)
-                    .AddRouteComponents("v1", model1)
-                    .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
+                    .AddRouteComponents("v1", model1, services => services.AddTransient(sp => new ODataSimplifiedOptions
+                    {
+                        EnableReadingODataAnnotationWithoutPrefix = true
+                    }))
+                    .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>()
+                        .AddTransient<ODataSimplifiedOptions>(sp => new ODataSimplifiedOptions
+                        {
+                            EnableReadingODataAnnotationWithoutPrefix = true
+                        }))
                     .AddRouteComponents("v3", model3)
                     .Conventions.Add(new MyConvention())
-                );
+                ); ;
 
             services.AddSwaggerGen();
         }

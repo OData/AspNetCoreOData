@@ -92,6 +92,14 @@ namespace ODataRoutingSample.Controllers.v1
             // We should set the request header as : OData-Version:4.01
              */
 
+            /*
+             Or: If we set the following option, you don't need the ODataVersion settings.
+            new ODataSimplifiedOptions
+            {
+                EnableReadingODataAnnotationWithoutPrefix = true
+            }
+             */
+
             //changes.ApplyDeleteLink = (l) => { };
 
             //IList<Organization> originalSet = new List<Organization>();
