@@ -125,6 +125,19 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddRouteComponents(string routePrefix, IEdmModel model, Action<IServiceCollection> configureServices)
         {
+            return AddRouteComponents(routePrefix, model, ODataVersion.V4, configureServices);
+        }
+
+        /// <summary>
+        /// Adds an <see cref="IEdmModel"/> using the service configuration.
+        /// </summary>
+        /// <param name="routePrefix">The model related prefix.</param>
+        /// <param name="model">The <see cref="IEdmModel"/> to add.</param>
+        /// <param name="version">The OData version to be used.</param>
+        /// <param name="configureServices">The sub service configuration action.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions AddRouteComponents(string routePrefix, IEdmModel model, ODataVersion version, Action<IServiceCollection> configureServices)
+        {
             if (model == null)
             {
                 throw Error.ArgumentNull(nameof(model));
@@ -142,9 +155,8 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, sanitizedRoutePrefix);
             }
 
-
             // Consider to use Lazy<IServiceProvider> ?
-            IServiceProvider serviceProvider = BuildRouteContainer(model, configureServices);
+            IServiceProvider serviceProvider = BuildRouteContainer(model, version, configureServices);
             RouteComponents[sanitizedRoutePrefix] = (model, serviceProvider);
             return this;
         }
@@ -286,8 +298,9 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <param name="model">The Edm model.</param>
         /// <param name="setupAction">The setup config.</param>
+        /// <param name="version">The OData version config.</param>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildRouteContainer(IEdmModel model, Action<IServiceCollection> setupAction)
+        private IServiceProvider BuildRouteContainer(IEdmModel model, ODataVersion version, Action<IServiceCollection> setupAction)
         {
             Contract.Assert(model != null);
 
@@ -295,7 +308,7 @@ namespace Microsoft.AspNetCore.OData
             DefaultContainerBuilder builder = new DefaultContainerBuilder();
 
             // Inject the core odata services.
-            builder.AddDefaultODataServices();
+            builder.AddDefaultODataServices(version);
 
             // Inject the default query setting from this options.
             builder.Services.AddSingleton(sp => QuerySettings);

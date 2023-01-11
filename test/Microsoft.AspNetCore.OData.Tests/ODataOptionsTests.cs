@@ -141,6 +141,28 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Theory]
+        [InlineData(ODataVersion.V4, false)]
+        [InlineData(ODataVersion.V401, true)]
+        public void AddRouteComponents_WithVersionAndDependencyInjection_SetModelAndServices(ODataVersion version, bool readingODataPrefixSetting)
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+            IEdmModel edmModel = EdmCoreModel.Instance;
+
+            // Act
+            options.AddRouteComponents("odata", edmModel, version, null);
+
+            // Assert
+            KeyValuePair<string, (IEdmModel, IServiceProvider)> model = Assert.Single(options.RouteComponents);
+            Assert.Equal("odata", model.Key);
+
+            Assert.Same(edmModel, model.Value.Item1);
+            Assert.NotNull(model.Value.Item2);
+            ODataSimplifiedOptions actual = model.Value.Item2.GetService<ODataSimplifiedOptions>();
+            Assert.Equal(readingODataPrefixSetting, actual.EnableReadingODataAnnotationWithoutPrefix);
+        }
+
+        [Theory]
         [InlineData("/odata", "odata")]
         [InlineData("/odata/", "odata")]
         [InlineData("odata/", "odata")]

@@ -652,6 +652,7 @@ Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.I
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.ODataVersion version, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Conventions.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention>
 Microsoft.AspNetCore.OData.ODataOptions.Count() -> Microsoft.AspNetCore.OData.ODataOptions
