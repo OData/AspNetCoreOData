@@ -73,7 +73,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
         /// <summary>
         /// Validates all select and expand items in $select and $expand.
-        /// For example, ~/Customers?$expand=Nav($expand=subNav;$select=Prop;$top=2)&$select=Addresses($select=City;$top=1)
+        /// For example, ~/Customers?$expand=Nav($expand=subNav;$select=Prop;$top=2)&amp;$select=Addresses($select=City;$top=1)
         /// </summary>
         /// <param name="selectExpandClause">The $select and $expand clause.</param>
         /// <param name="validatorContext">The validator context.</param>

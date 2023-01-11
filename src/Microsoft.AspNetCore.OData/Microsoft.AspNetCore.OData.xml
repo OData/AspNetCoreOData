@@ -11892,6 +11892,11 @@
             <param name="orderByOption">The $orderby query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
+            <summary>
+            The base for validator context.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Context">
             <summary>
             The Query context.
@@ -11929,7 +11934,14 @@
             <param name="selectExpandQueryOption">The $select and $expand query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+            <summary>
+            Validates all select and expand items in $select and $expand.
+            For example, ~/Customers?$expand=Nav($expand=subNav;$select=Prop;$top=2)&amp;$select=Addresses($select=City;$top=1)
+            </summary>
+            <param name="selectExpandClause">The $select and $expand clause.</param>
+            <param name="validatorContext">The validator context.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedNavigationSelectItem(Microsoft.OData.UriParser.ExpandedNavigationSelectItem,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates one $expand. For example, ~/Customers?$expand=Nav($expand=subNav;$select=Prop;$top=2)

@@ -9,6 +9,9 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
 {
+    /// <summary>
+    /// The base for validator context.
+    /// </summary>
     public abstract class QueryValidatorContext
     {
         /// <summary>

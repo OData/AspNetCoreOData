@@ -1117,8 +1117,6 @@ Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.ODataQueryValidator() -> void
-Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidatorContext
-Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidatorContext.ODataQueryValidatorContext() -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedArithmeticOperators.get -> Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedArithmeticOperators.set -> void
