@@ -237,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Validates one expand count. For example, ~/Customers?$expand=Nav/$ref
+        /// Validates one expand reference. For example, ~/Customers?$expand=Nav/$ref
         /// </summary>
         /// <param name="expandReferItem">The expand reference item.</param>
         /// <param name="validatorContext">The validator context.</param>
