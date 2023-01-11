@@ -173,11 +173,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 {
                     remainDepth = maxDepth;
                 }
-
-                //if (expandConfiguration.MaxDepth > 0 && currentDepth >= expandConfiguration.MaxDepth)
-                //{
-                //    throw new ODataException(Error.Format(SRResources.MaxExpandDepthExceeded, validationSettings.MaxExpansionDepth, "MaxExpansionDepth"));
-                //}
             }
             else if (!isExpandable)
             {
@@ -199,31 +194,31 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             ValidateSelectExpand(expandItem.SelectAndExpand, subValidatorContext);
 
             // Validate the nested $filter within $expand
-            ValidateFilter(expandItem.FilterOption, subValidatorContext);
+            ValidateNestedFilter(expandItem.FilterOption, subValidatorContext);
 
             // Validate the nested $orderby within $expand
-            ValidateOrderby(expandItem.OrderByOption, subValidatorContext);
+            ValidateNestedOrderby(expandItem.OrderByOption, subValidatorContext);
 
             // Validate the nested $top within $expand
-            ValidateTop(expandItem.TopOption, subValidatorContext);
+            ValidateNestedTop(expandItem.TopOption, subValidatorContext);
 
             // Validate the nested $skip within $expand
-            ValidateSkip(expandItem.SkipOption, subValidatorContext);
+            ValidateNestedSkip(expandItem.SkipOption, subValidatorContext);
 
             // Validate the nested $count within $expand
-            ValidateCount(expandItem.CountOption, subValidatorContext);
+            ValidateNestedCount(expandItem.CountOption, subValidatorContext);
 
             // Validate the nested $search within $expand
-            ValidateSearch(expandItem.SearchOption, subValidatorContext);
+            ValidateNestedSearch(expandItem.SearchOption, subValidatorContext);
 
             // Validate the nested $levels within $expand
-            ValidateLevels(expandItem.LevelsOption, subValidatorContext);
+            ValidateNestedLevels(expandItem.LevelsOption, subValidatorContext);
 
             // Validate the nested $compute within $expand
-            ValidateCompute(expandItem.ComputeOption, subValidatorContext);
+            ValidateNestedCompute(expandItem.ComputeOption, subValidatorContext);
 
             // Validate the nested $apply within $expand
-            ValidateApply(expandItem.ApplyOption, subValidatorContext);
+            ValidateNestedApply(expandItem.ApplyOption, subValidatorContext);
         }
 
         /// <summary>
@@ -249,7 +244,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// Validates $select. For example, ~/Customers?$select=Prop($select=SubProp;$top=2)
         /// </summary>
-        /// <param name="pathSelectItem"></param>
+        /// <param name="pathSelectItem">The $select item.</param>
         /// <param name="validatorContext">The validator context.</param>
         /// <exception cref="ODataException">The thrown exception.</exception>
         protected virtual void ValidatePathSelectItem(PathSelectItem pathSelectItem, SelectExpandValidatorContext validatorContext)
@@ -302,25 +297,25 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             ValidateSelectExpand(pathSelectItem.SelectAndExpand, subValidatorContext);
 
             // Validate the nested $filter within $select
-            ValidateFilter(pathSelectItem.FilterOption, subValidatorContext);
+            ValidateNestedFilter(pathSelectItem.FilterOption, subValidatorContext);
 
             // Validate the nested $orderby within $select
-            ValidateOrderby(pathSelectItem.OrderByOption, subValidatorContext);
+            ValidateNestedOrderby(pathSelectItem.OrderByOption, subValidatorContext);
 
             // Validate the nested $top within $select
-            ValidateTop(pathSelectItem.TopOption, subValidatorContext);
+            ValidateNestedTop(pathSelectItem.TopOption, subValidatorContext);
 
             // Validate the nested $skip within $select
-            ValidateSkip(pathSelectItem.SkipOption, subValidatorContext);
+            ValidateNestedSkip(pathSelectItem.SkipOption, subValidatorContext);
 
             // Validate the nested $count within $select
-            ValidateCount(pathSelectItem.CountOption, subValidatorContext);
+            ValidateNestedCount(pathSelectItem.CountOption, subValidatorContext);
 
             // Validate the nested $search within $select
-            ValidateSearch(pathSelectItem.SearchOption, subValidatorContext);
+            ValidateNestedSearch(pathSelectItem.SearchOption, subValidatorContext);
 
             // Validate the nested $compute within $select
-            ValidateCompute(pathSelectItem.ComputeOption, subValidatorContext);
+            ValidateNestedCompute(pathSelectItem.ComputeOption, subValidatorContext);
         }
 
         /// <summary>
@@ -368,7 +363,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="filterClause">The nested $filter clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateFilter(FilterClause filterClause, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedFilter(FilterClause filterClause, SelectExpandValidatorContext validatorContext)
         {
             if (filterClause == null)
             {
@@ -398,7 +393,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="orderByClause">The nested $orderby clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateOrderby(OrderByClause orderByClause, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedOrderby(OrderByClause orderByClause, SelectExpandValidatorContext validatorContext)
         {
             if (orderByClause != null)
             {
@@ -416,7 +411,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="topOption">The nested $top clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateTop(long? topOption, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedTop(long? topOption, SelectExpandValidatorContext validatorContext)
         {
             if (topOption != null)
             {
@@ -440,7 +435,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="skipOption">The nested $skip clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateSkip(long? skipOption, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedSkip(long? skipOption, SelectExpandValidatorContext validatorContext)
         {
             // Nothing here.
         }
@@ -450,7 +445,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="countOption">The nested $count clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateCount(bool? countOption, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedCount(bool? countOption, SelectExpandValidatorContext validatorContext)
         {
             if (countOption != null && countOption.Value)
             {
@@ -469,9 +464,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// Validates $levels within $expand
         /// </summary>
-        /// <param name="countOption">The nested $levels clause.</param>
+        /// <param name="levelsClause">The nested $levels clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateLevels(LevelsClause levelsClause, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedLevels(LevelsClause levelsClause, SelectExpandValidatorContext validatorContext)
         {
             if (levelsClause == null)
             {
@@ -514,7 +509,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="searchClause">The nested $search clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateSearch(SearchClause searchClause, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedSearch(SearchClause searchClause, SelectExpandValidatorContext validatorContext)
         {
             // Add logics here to verify nested $search. So far, No default validation logic here.
         }
@@ -524,7 +519,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="computeClause">The nested $compute clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateCompute(ComputeClause computeClause, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedCompute(ComputeClause computeClause, SelectExpandValidatorContext validatorContext)
         {
             // Add logics here to verify nested $compute. So far, No default validation logic here.
         }
@@ -534,7 +529,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </summary>
         /// <param name="applyClause">The nested $apply clause.</param>
         /// <param name="validatorContext">The validator context.</param>
-        protected virtual void ValidateApply(ApplyClause applyClause, SelectExpandValidatorContext validatorContext)
+        protected virtual void ValidateNestedApply(ApplyClause applyClause, SelectExpandValidatorContext validatorContext)
         {
             // Add logics here to verify nested $apply. So far, No default validation logic here.
         }

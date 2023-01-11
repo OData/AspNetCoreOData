@@ -11947,7 +11947,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedReferenceSelectItem(Microsoft.OData.UriParser.ExpandedReferenceSelectItem,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
-            Validates one expand count. For example, ~/Customers?$expand=Nav/$ref
+            Validates one expand reference. For example, ~/Customers?$expand=Nav/$ref
             </summary>
             <param name="expandReferItem">The expand reference item.</param>
             <param name="validatorContext">The validator context.</param>
@@ -11956,7 +11956,7 @@
             <summary>
             Validates $select. For example, ~/Customers?$select=Prop($select=SubProp;$top=2)
             </summary>
-            <param name="pathSelectItem"></param>
+            <param name="pathSelectItem">The $select item.</param>
             <param name="validatorContext">The validator context.</param>
             <exception cref="T:Microsoft.OData.ODataException">The thrown exception.</exception>
         </member>
@@ -11976,63 +11976,63 @@
             <param name="validatorContext">The validator context.</param>
             <exception cref="T:Microsoft.OData.ODataException">The thrown exception.</exception>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateFilter(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedFilter(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $filter within $select or $expand
             </summary>
             <param name="filterClause">The nested $filter clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateOrderby(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedOrderby(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $orderby within $select or $expand
             </summary>
             <param name="orderByClause">The nested $orderby clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateTop(System.Nullable{System.Int64},Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedTop(System.Nullable{System.Int64},Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $top within $select or $expand
             </summary>
             <param name="topOption">The nested $top clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSkip(System.Nullable{System.Int64},Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedSkip(System.Nullable{System.Int64},Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $skip within $select or $expand
             </summary>
             <param name="skipOption">The nested $skip clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateCount(System.Nullable{System.Boolean},Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedCount(System.Nullable{System.Boolean},Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $count within $select or $expand
             </summary>
             <param name="countOption">The nested $count clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateLevels(Microsoft.OData.UriParser.LevelsClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedLevels(Microsoft.OData.UriParser.LevelsClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $levels within $expand
             </summary>
-            <param name="countOption">The nested $levels clause.</param>
+            <param name="levelsClause">The nested $levels clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSearch(Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedSearch(Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $search within $select or $expand
             </summary>
             <param name="searchClause">The nested $search clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateCompute(Microsoft.OData.UriParser.ComputeClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedCompute(Microsoft.OData.UriParser.ComputeClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $compute within $expand
             </summary>
             <param name="computeClause">The nested $compute clause.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateApply(Microsoft.OData.UriParser.Aggregation.ApplyClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedApply(Microsoft.OData.UriParser.Aggregation.ApplyClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates $apply within $expand
             </summary>
