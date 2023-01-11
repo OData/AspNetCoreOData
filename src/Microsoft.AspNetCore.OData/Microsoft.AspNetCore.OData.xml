@@ -1094,20 +1094,6 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -6193,6 +6179,16 @@
             <param name="configureServices">The sub service configuration action.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataVersion,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> using the service configuration.
+            </summary>
+            <param name="routePrefix">The model related prefix.</param>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to add.</param>
+            <param name="version">The OData version to be used.</param>
+            <param name="configureServices">The sub service configuration action.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.GetRouteServices(System.String)">
             <summary>
             Get the root service provider for a given route (prefix) name.
@@ -6262,12 +6258,13 @@
             Gets the query setting.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildRouteContainer(Microsoft.OData.Edm.IEdmModel,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildRouteContainer(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataVersion,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
             <summary>
             Build the container.
             </summary>
             <param name="model">The Edm model.</param>
             <param name="setupAction">The setup config.</param>
+            <param name="version">The OData version config.</param>
             <returns>The built service provider.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SanitizeRoutePrefix(System.String)">
