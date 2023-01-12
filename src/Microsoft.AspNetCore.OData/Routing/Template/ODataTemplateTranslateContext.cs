@@ -95,7 +95,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
         /// <returns>The parameter alias name.</returns>
         public string GetParameterAliasOrSelf(string alias)
         {
-            return GetParameterAliasOrSelf(alias, new HashSet<string>());
+            var set = new HashSet<string>();
+            string value = GetParameterAliasOrSelf(alias, set);
+            if (set.Count > 1)
+            {
+                // Since it returns from query, should unescape the string.
+                return Uri.UnescapeDataString(value);
+            }
+
+            return value;
         }
 
         private string GetParameterAliasOrSelf(string alias, ISet<string> visited)
