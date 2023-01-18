@@ -102,6 +102,9 @@ namespace Microsoft.AspNetCore.OData.Query
         {
         }
 
+        internal ODataQueryContext()
+        { }
+
         /// <summary>
         /// Gets the given <see cref="DefaultQuerySettings"/>.
         /// </summary>
@@ -123,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets the given <see cref="IEdmModel"/> that contains the EntitySet.
         /// </summary>
-        public IEdmModel Model { get; private set; }
+        public IEdmModel Model { get; internal set; }
 
         /// <summary>
         /// Gets the <see cref="IEdmType"/> of the element.
@@ -156,11 +159,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
         internal HttpRequest Request { get; set; }
 
-        internal IEdmProperty TargetProperty { get; private set; }
+        internal IEdmProperty TargetProperty { get; set; }
 
-        internal IEdmStructuredType TargetStructuredType { get; private set; }
+        internal IEdmStructuredType TargetStructuredType { get; set; }
 
-        internal string TargetName { get; private set; }
+        internal string TargetName { get; set; }
 
         private static IEdmNavigationSource GetNavigationSource(IEdmModel model, IEdmType elementType, ODataPath odataPath)
         {

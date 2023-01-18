@@ -1143,8 +1143,27 @@ Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxTop.set ->
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.ODataValidationSettings() -> void
 Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.OrderByQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Context.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.CurrentDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.CurrentDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Property.get -> Microsoft.OData.Edm.IEdmProperty
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Property.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.QueryValidatorContext() -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.StructuredType.get -> Microsoft.OData.Edm.IEdmStructuredType
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.StructuredType.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.ValidationSettings.get -> Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.ValidationSettings.set -> void
 Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.SelectExpandQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.Clone() -> Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.RemainingDepth.get -> int?
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.RemainingDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.SelectExpand.get -> Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.SelectExpand.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.SelectExpandValidatorContext() -> void
 Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.SkipQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator
@@ -1881,6 +1900,22 @@ virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate
 virtual Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedCountSelectItem(Microsoft.OData.UriParser.ExpandedCountSelectItem expandCountItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedNavigationSelectItem(Microsoft.OData.UriParser.ExpandedNavigationSelectItem expandItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedReferenceSelectItem(Microsoft.OData.UriParser.ExpandedReferenceSelectItem expandReferItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNamespaceQualifiedWildcardSelectItem(Microsoft.OData.UriParser.NamespaceQualifiedWildcardSelectItem namespaceQualifiedWildcardSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedApply(Microsoft.OData.UriParser.Aggregation.ApplyClause applyClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedCompute(Microsoft.OData.UriParser.ComputeClause computeClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedCount(bool? countOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedFilter(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedLevels(Microsoft.OData.UriParser.LevelsClause levelsClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedOrderby(Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedSearch(Microsoft.OData.UriParser.SearchClause searchClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedSkip(long? skipOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedTop(long? topOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidatePathSelectItem(Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSelectExpand(Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateWildcardSelectItem(Microsoft.OData.UriParser.WildcardSelectItem wildCardSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void

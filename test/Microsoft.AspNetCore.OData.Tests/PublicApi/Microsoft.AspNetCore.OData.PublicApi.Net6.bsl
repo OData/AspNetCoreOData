@@ -2875,6 +2875,16 @@ public interface Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator {
 	void Validate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
+public abstract class Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext {
+	protected QueryValidatorContext ()
+
+	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; public set; }
+	int CurrentDepth  { public get; public set; }
+	Microsoft.OData.Edm.IEdmProperty Property  { public get; public set; }
+	Microsoft.OData.Edm.IEdmStructuredType StructuredType  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings ValidationSettings  { public get; public set; }
+}
+
 public class Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator : IComputeQueryValidator {
 	public ComputeQueryValidator ()
 
@@ -2892,7 +2902,6 @@ public class Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator : I
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	public virtual void Validate (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model)
-	internal virtual void Validate (Microsoft.OData.Edm.IEdmProperty property, Microsoft.OData.Edm.IEdmStructuredType structuredType, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings querySettings)
 	protected virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateArithmeticOperator (Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
@@ -2947,6 +2956,31 @@ public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidat
 	public SelectExpandQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+	protected virtual void ValidateExpandedCountSelectItem (Microsoft.OData.UriParser.ExpandedCountSelectItem expandCountItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateExpandedNavigationSelectItem (Microsoft.OData.UriParser.ExpandedNavigationSelectItem expandItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateExpandedReferenceSelectItem (Microsoft.OData.UriParser.ExpandedReferenceSelectItem expandReferItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNamespaceQualifiedWildcardSelectItem (Microsoft.OData.UriParser.NamespaceQualifiedWildcardSelectItem namespaceQualifiedWildcardSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedApply (Microsoft.OData.UriParser.Aggregation.ApplyClause applyClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedCompute (Microsoft.OData.UriParser.ComputeClause computeClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedCount (System.Nullable`1[[System.Boolean]] countOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedFilter (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedLevels (Microsoft.OData.UriParser.LevelsClause levelsClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedOrderby (Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedSearch (Microsoft.OData.UriParser.SearchClause searchClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedSkip (System.Nullable`1[[System.Int64]] skipOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateNestedTop (System.Nullable`1[[System.Int64]] topOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidatePathSelectItem (Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateSelectExpand (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+	protected virtual void ValidateWildcardSelectItem (Microsoft.OData.UriParser.WildcardSelectItem wildCardSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
+}
+
+public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext : Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext {
+	public SelectExpandValidatorContext ()
+
+	System.Nullable`1[[System.Int32]] RemainingDepth  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption SelectExpand  { public get; public set; }
+
+	public Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext Clone ()
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator : ISkipQueryValidator {
