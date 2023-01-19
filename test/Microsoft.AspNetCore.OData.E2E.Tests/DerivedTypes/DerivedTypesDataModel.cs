@@ -21,6 +21,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
         public string LoyaltyCardNo { get; set; }
     }
 
+    public class GoldCustomer : VipCustomer
+    {
+        public List<Order> BulkOrders { get; set; }
+    }
+
     public class Order
     {
         public int Id { get; set; }

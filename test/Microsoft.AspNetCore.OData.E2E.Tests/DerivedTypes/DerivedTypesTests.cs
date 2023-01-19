@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
@@ -134,6 +135,38 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
             string expectedContent = "\"Id\":2,\"Name\":\"Customer 2\",\"LoyaltyCardNo\":\"9876543210\"," +
                 "\"Orders\":[{\"Id\":2,\"Amount\":230},{\"Id\":3,\"Amount\":150}]";
             Assert.Contains(expectedContent, await response.Content.ReadAsStringAsync());
+        }
+
+        [Theory]
+        [InlineData("Customers(4)")]
+        [InlineData("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer")]
+        [InlineData("Customers/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer(4)")]
+        public async Task DerivedTypeNavPropertyLink_FullMetadata(string pathAndQuery)
+        {
+            // Arrange: Key preceeds name of the derived type
+            string requestUri = $"/odata/{pathAndQuery}";
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=full"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+
+            string expectedContent = "{\"@odata.context\":\"http://localhost/odata/$metadata#Customers/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer/$entity\"," + 
+                "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer\"," + 
+                "\"@odata.id\":\"http://localhost/odata/Customers(4)\"," + 
+                "\"@odata.editLink\":\"Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer\"," + 
+                "\"Id\":4,\"Name\":\"Customer 4\",\"LoyaltyCardNo\":\"9876543211\"," + 
+                "\"Orders@odata.associationLink\":\"http://localhost/odata/Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer/Orders/$ref\"," + 
+                "\"Orders@odata.navigationLink\":\"http://localhost/odata/Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer/Orders\"," + 
+                "\"BulkOrders@odata.associationLink\":\"http://localhost/odata/Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer/BulkOrders/$ref\"," + 
+                "\"BulkOrders@odata.navigationLink\":\"http://localhost/odata/Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer/BulkOrders\"}";
+            
+            Assert.Equal(expectedContent, await response.Content.ReadAsStringAsync());
         }
     }
 }

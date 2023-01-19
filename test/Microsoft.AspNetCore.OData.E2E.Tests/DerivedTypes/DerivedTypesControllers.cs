@@ -47,6 +47,20 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
                     {
                         new Order { Id = 4, Amount = 170M }
                     }
+                },
+                new GoldCustomer {
+                    Id = 4,
+                    Name = "Customer 4",
+                    LoyaltyCardNo = "9876543211",
+                    Orders = new List<Order>
+                    {
+                        new Order { Id = 5, Amount = 2230M },
+                        new Order { Id = 6, Amount = 1150M }
+                    },
+                    BulkOrders = new List<Order>
+                    {
+                        new Order { Id = 7, Amount = 66832M }
+                    }
                 }
             };
         }
@@ -59,6 +73,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
 
         [EnableQuery]
         [HttpGet("odata/Customers/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.VipCustomer({key})")] // convention routing doesn't create this template.
+        [HttpGet("odata/Customers/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.GoldCustomer({key})")] // convention routing doesn't create this template.
         public IActionResult Get(int key)
         {
             var customer = Customers.FirstOrDefault(c => c.Id == key);
@@ -83,6 +98,27 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
         public IActionResult GetVipCustomer([FromODataUri] int key)
         {
             var vipCustomer = Customers.OfType<VipCustomer>().SingleOrDefault(d => d.Id.Equals(key));
+
+            if (vipCustomer == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(vipCustomer);
+        }
+
+        // Handles /entityset/cast path template
+        [EnableQuery]
+        public IActionResult GetFromGoldCustomer()
+        {
+            return Ok(Customers.OfType<GoldCustomer>());
+        }
+
+        // Handles /entityset/key/cast and /entityset/cast/key path templates
+        [EnableQuery]
+        public IActionResult GetGoldCustomer([FromODataUri] int key)
+        {
+            var vipCustomer = Customers.OfType<GoldCustomer>().SingleOrDefault(d => d.Id.Equals(key));
 
             if (vipCustomer == null)
             {
