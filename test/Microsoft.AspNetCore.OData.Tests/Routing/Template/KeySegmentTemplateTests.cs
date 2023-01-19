@@ -497,7 +497,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             EdmEntitySet customers = container.AddEntitySet("Customers", customerType);
             model.AddElement(container);
-            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { First = "'Zhang'", Last = "'Gan%2Fnng%23%20T'" });
+            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { First = "'Zhang'", Last = "'Gan%2Fnng# T'" });
             IDictionary<string, string> keys = new Dictionary<string, string>
             {
                 { "FirstName", "{first}" },

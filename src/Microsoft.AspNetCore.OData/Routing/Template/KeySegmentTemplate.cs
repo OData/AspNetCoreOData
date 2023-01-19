@@ -173,8 +173,10 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     IEdmTypeReference edmType = keyProperty.Type;
                     string strValue = rawValue as string;
 
-                    // rawValue from Request route values, it's unescaped.
                     string newStrValue = context.GetParameterAliasOrSelf(strValue);
+
+                    // rawValue from Request route values, it's unescaped except the back-slash.
+                    newStrValue = newStrValue.UnescapeBackSlashUriString();
                     if (newStrValue != strValue)
                     {
                         updateValues[templateName] = newStrValue;

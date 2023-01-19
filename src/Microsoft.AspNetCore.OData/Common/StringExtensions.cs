@@ -12,6 +12,22 @@ namespace Microsoft.AspNetCore.OData.Common
     internal static class StringExtensions
     {
         /// <summary>
+        /// Unescape Uri string for %2F
+        /// See details at: https://github.com/dotnet/aspnetcore/issues/14170#issuecomment-533342396
+        /// </summary>
+        /// <param name="uriString">The Uri string.</param>
+        /// <returns>Unescaped back slash Uri string.</returns>
+        public static string UnescapeBackSlashUriString(this string uriString)
+        {
+            if (uriString == null)
+            {
+                return null;
+            }
+
+            return uriString.Replace("%2f", "%2F").Replace("%2F", "/");
+        }
+
+        /// <summary>
         /// Normalize the http method.
         /// </summary>
         /// <param name="method">The http method.</param>
