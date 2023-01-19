@@ -1047,6 +1047,14 @@
             <returns>a fast getter.</returns>
             <remarks>This method is more memory efficient than a dynamically compiled lambda, and about the same speed.</remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.UnescapeBackSlashUriString(System.String)">
+            <summary>
+            Unescape Uri string for %2F
+            See details at: https://github.com/dotnet/aspnetcore/issues/14170#issuecomment-533342396
+            </summary>
+            <param name="uriString">The Uri string.</param>
+            <returns>Unescaped back slash Uri string.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.NormalizeHttpMethod(System.String)">
             <summary>
             Normalize the http method.
