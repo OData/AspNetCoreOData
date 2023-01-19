@@ -57,6 +57,11 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
             });
 
+            builder.AddServicePrototype(new ODataSimplifiedOptions
+            {
+                EnableReadingODataAnnotationWithoutPrefix = true,
+            });
+
             // QueryValidators.
             builder.AddService<ICountQueryValidator, CountQueryValidator>(ServiceLifetime.Singleton);
 
