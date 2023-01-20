@@ -344,7 +344,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             if (navigationProperty.ContainsTarget)
             {
-                return navigationSource;
+                return navigationSource.FindNavigationTarget(navigationProperty);
             }
 
             IEnumerable<IEdmNavigationPropertyBinding> bindings =
