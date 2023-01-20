@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Theory]
-        [InlineData(ODataVersion.V4, false)]
+        [InlineData(ODataVersion.V4, true)]
         [InlineData(ODataVersion.V401, true)]
         public void AddRouteComponents_WithVersionAndDependencyInjection_SetModelAndServices(ODataVersion version, bool readingODataPrefixSetting)
         {
