@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -89,6 +90,74 @@ namespace ODataRoutingSample.Controllers.v1
             //IList<Organization> originalSet = new List<Organization>();
 
             // changes.Patch(originalSet);
+
+            return Ok();
+        }
+
+        [HttpPatch]
+        [EnableQuery]
+        public IActionResult Patch(int key, Delta<Organization> delta)
+        {
+            /* Send a PATCH request to: http://localhost:5000/v1/Organizations/1
+             * using the following payload (v4.01 format, should enable the EnableReadingODataAnnotationWithoutPrefix on ODataSimplifiedOptions)
+{
+   "Departs@delta": [
+    {
+     "@removed":{"reason":"deleted" },
+     "@id":"Departments(13)"
+    },
+    {
+      "@id":"Departments(42)",
+      "Name":"Microsoft"
+   }
+  ]
+}
+     */
+
+            // Or using the following payload (v4.0 format)
+            /*
+{
+   "Departs@delta": [
+    {
+     "@odata.context":"http://localhost:5000/v1/$metadata#Departments/$deletedEntity",
+     "id":"Departments(13)",
+     "reason":"deleted"
+    },
+    {
+      "@odata.id":"Departments(42)",
+      "Name":"Microsoft"
+   }
+  ]
+}
+
+            Be noted: the "id" should go before "reason", otherwise we can't read the "id" value.
+            It's a bug in ODL side.
+             */
+
+            if (delta != null && delta.TryGetPropertyValue("Departs", out object value))
+            {
+                if (value is DeltaSet<Department> departs)
+                {
+                    IList<string> sb = new List<string>();
+                    foreach (var setItem in departs)
+                    {
+                        if (setItem is IDeltaDeletedResource deletedResource)
+                        {
+                            sb.Add($"   |-> A DeletedResource Id = {deletedResource.Id}");
+                        }
+                        else if (setItem is IDelta deltaResource)
+                        {
+                            sb.Add($"   |-> A Delta Resource With ChangedProperties = {string.Join(",", deltaResource.GetChangedPropertyNames())}");
+                        }
+                        else
+                        {
+                            sb.Add($"   |-> Not fully supported: {setItem.Kind}");
+                        }
+                    }
+
+                    return Ok(sb);
+                }
+            }
 
             return Ok();
         }
