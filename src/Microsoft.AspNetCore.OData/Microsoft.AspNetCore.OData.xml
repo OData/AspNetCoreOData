@@ -11469,9 +11469,6 @@
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" /> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
             </summary>
-            <remarks>
-            Please note this class is not thread safe.
-            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
@@ -11479,22 +11476,15 @@
             </summary>
             <param name="filterQueryOption">The $filter query.</param>
             <param name="settings">The validation settings.</param>
-            <remarks>
-            Please note this method is not thread safe.
-            </remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,Microsoft.OData.Edm.IEdmModel)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateFilter(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Validates a <see cref="T:Microsoft.OData.UriParser.FilterClause" />.
             </summary>
             <param name="filterClause">The <see cref="T:Microsoft.OData.UriParser.FilterClause" />.</param>
-            <param name="settings">The validation settings.</param>
-            <param name="model">The EdmModel.</param>
-            <remarks>
-            Please note this method is not thread safe.
-            </remarks>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAllNode(Microsoft.OData.UriParser.AllNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAllNode(Microsoft.OData.UriParser.AllNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to restrict the 'all' query inside the filter query.
             </summary>
@@ -11503,9 +11493,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="allNode">The all node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAnyNode(Microsoft.OData.UriParser.AnyNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAnyNode(Microsoft.OData.UriParser.AnyNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to restrict the 'any' query inside the filter query.
             </summary>
@@ -11514,9 +11504,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="anyNode">The any node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             override this method to restrict the binary operators inside the filter query. That includes all the logical operators except 'not' and all math operators.
             </summary>
@@ -11525,9 +11515,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="binaryOperatorNode">The binary operator node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateLogicalOperator(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateLogicalOperator(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate the LogicalOperators such as 'eq', 'ne', 'gt', 'ge', 'lt', 'le', 'and', 'or'.
             
@@ -11538,9 +11528,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="binaryNode">The binary operator node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateArithmeticOperator(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateArithmeticOperator(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method for the Arithmetic operators, including add, sub, mul, div, mod.
             </summary>
@@ -11549,9 +11539,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="binaryNode">The binary operator node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConstantNode(Microsoft.OData.UriParser.ConstantNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConstantNode(Microsoft.OData.UriParser.ConstantNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to restrict the 'constant' inside the filter query.
             </summary>
@@ -11560,9 +11550,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="constantNode">The constant node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to restrict the 'cast' inside the filter query.
             </summary>
@@ -11571,16 +11561,16 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="convertNode">The convert node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to restrict the '$count' inside the filter query.
             </summary>
             <param name="countNode">The count node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode,Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method for the navigation property node.
             </summary>
@@ -11590,9 +11580,9 @@
             </remarks>
             <param name="sourceNode">The source node to validate.</param>
             <param name="navigationProperty">The navigation property.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateRangeVariable(Microsoft.OData.UriParser.RangeVariable,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateRangeVariable(Microsoft.OData.UriParser.RangeVariable,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate the parameter used in the filter query.
             </summary>
@@ -11601,9 +11591,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="rangeVariable">The range variable node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate property accessors.
             </summary>
@@ -11612,9 +11602,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="propertyAccessNode">The single value property access node.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate single complex property accessors.
             </summary>
@@ -11623,9 +11613,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="singleComplexNode">The single complex node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate collection property accessors.
             </summary>
@@ -11634,9 +11624,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="propertyAccessNode">The collection property access node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate collection complex property accessors.
             </summary>
@@ -11645,9 +11635,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="collectionComplexNode">The collection complex node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate Function calls, such as 'length', 'year', etc.
             </summary>
@@ -11656,21 +11646,21 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="node">The single value function call node to validate.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate single resource function calls, such as 'cast'.
             </summary>
             <param name="node">The node to validate.</param>
-            <param name="settings">The settings to use while validating.</param>
+            <param name="validatorContext">The validation context.</param>
             <remarks>
             This method is intended to be called from method overrides in subclasses. This method also supports unit
             testing scenarios and is not intended to be called from user code. Call the Validate method to validate a
             <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" /> instance.
             </remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method to validate the Not operator.
             </summary>
@@ -11679,20 +11669,20 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="unaryOperatorNode">The unary operator node.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
-            Override this method if you want to visit each query node. 
+            Override this method if you want to visit each query node.
             </summary>
             <remarks>
             This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="node">The query node.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method if you want to validate casts on resource collections.
             </summary>
@@ -11701,9 +11691,9 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="collectionResourceCastNode">The collection resource cast node.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             Override this method if you want to validate casts on single resource.
             </summary>
@@ -11712,14 +11702,64 @@
             Call the Validate method to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption"/> instance.
             </remarks>
             <param name="singleResourceCastNode">The single resource cast node.</param>
-            <param name="settings">The validation settings.</param>
+            <param name="validatorContext">The validation context.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueNode(Microsoft.OData.UriParser.SingleValueNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionNode(Microsoft.OData.UriParser.CollectionNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
+            <summary>
+            The recursive method that validate most of the query node type is of CollectionNode type.
+            </summary>
+            <param name="node">The single value node.</param>
+            <param name="validatorContext">The validator context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueNode(Microsoft.OData.UriParser.SingleValueNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
             The recursive method that validate most of the query node type is of SingleValueNode type.
             </summary>
-            <param name="node"></param>
-            <param name="settings"></param>
+            <param name="node">The single value node.</param>
+            <param name="validatorContext">The validator context.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext">
+            <summary>
+            The metadata context for $filter validator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Filter">
+            <summary>
+            The top level $filter query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentNodeCount">
+            <summary>
+            Gets current node count.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentAnyAllExpressionDepth">
+            <summary>
+            Gets current any and all expression depth.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Clone">
+            <summary>
+            Clone the context.
+            </summary>
+            <returns>The cloned context.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.IncrementNodeCount">
+            <summary>
+            Increment node count.
+            </summary>
+            <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterLambda">
+            <summary>
+            Enter lambda expression.
+            </summary>
+            <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitLambda">
+            <summary>
+            Exit lambda expression.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator">
             <summary>
@@ -11982,6 +12022,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.CurrentDepth">
             <summary>
             The current depth.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Model">
+            <summary>
+            Gets the Edm model.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator">
