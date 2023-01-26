@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
@@ -108,14 +109,32 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 
         private static Func<object, object> CreatePropertyGetter(Type type, string propertyName)
         {
-            PropertyInfo property = type.GetProperty(propertyName);
+            PropertyInfo propertyInfo = null;
+            var properties = type.GetProperties().Where(p => p.Name == propertyName).ToArray();
+            if (properties.Length <= 0)
+            {
+                propertyInfo = null;
+            }
+            else if (properties.Length == 1)
+            {
+                propertyInfo = properties[0];
+            }
+            else
+            {
+                // resolve 'new' modifier
+                propertyInfo = properties.FirstOrDefault(p => p.DeclaringType == type);
+                if (propertyInfo == null)
+                {
+                    propertyInfo = properties[0];
+                }
+            }
 
-            if (property == null)
+            if (propertyInfo == null)
             {
                 return null;
             }
 
-            var helper = new PropertyHelper(property);
+            var helper = new PropertyHelper(propertyInfo);
 
             return helper.GetValue;
         }

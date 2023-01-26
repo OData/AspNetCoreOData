@@ -1226,6 +1226,21 @@ public sealed class Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtens
 	public static ETag`1 GetETag (Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.Net.Http.Headers.EntityTagHeaderValue entityTagHeaderValue)
 }
 
+[
+ExtensionAttribute(),
+]
+public sealed class Microsoft.AspNetCore.OData.Query.IQueryableODataExtension {
+	[
+	ExtensionAttribute(),
+	]
+	public static IEnumerable`1 OCast (System.Linq.IQueryable source, params Microsoft.AspNetCore.OData.Query.ODataCastOptions options)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static TResult OCast (object source, params Microsoft.AspNetCore.OData.Query.ODataCastOptions options)
+}
+
 public class Microsoft.AspNetCore.OData.Query.ApplyQueryOption {
 	public ApplyQueryOption (string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser)
 
@@ -1347,6 +1362,12 @@ public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
+public class Microsoft.AspNetCore.OData.Query.ODataCastOptions {
+	public ODataCastOptions ()
+
+	System.Func`3[[Microsoft.OData.Edm.IEdmModel],[Microsoft.OData.Edm.IEdmStructuredType],[Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper]] MapProvider  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
