@@ -47,6 +47,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
                     {
                         new Order { Id = 4, Amount = 170M }
                     }
+                },
+                new EnterpriseCustomer
+                {
+                    Id = 4,
+                    Name = "Customer 4",
+                    Orders = new List<Order>
+                    {
+                        new Order { Id = 5, Amount = 190M}
+                    },
+                    RelationshipManager = new Employee { Id = 1, Name = "Employee 1" }
                 }
             };
         }
@@ -90,6 +100,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
             }
 
             return Ok(vipCustomer);
+        }
+
+        [EnableQuery]
+        public IActionResult GetEnterpriseCustomer([FromRoute] int key)
+        {
+            var enterpriseCustomer = Customers.OfType<EnterpriseCustomer>().SingleOrDefault(d => d.Id.Equals(key));
+
+            if (enterpriseCustomer == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(enterpriseCustomer);
         }
     }
 }
