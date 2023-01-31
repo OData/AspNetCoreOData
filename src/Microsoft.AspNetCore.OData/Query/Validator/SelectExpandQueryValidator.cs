@@ -280,7 +280,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 }
 
                 property = propertySegment.Property;
-                structuredType = GetStructuredType(propertySegment.Property.Type);
+                structuredType = propertySegment.Property.Type.ToStructuredType();
             }
             else
             {
@@ -576,32 +576,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     nodesToVisit.Push(Tuple.Create(depth, expandItem.SelectAndExpand));
                 }
             }
-        }
-
-        private static IEdmStructuredType GetStructuredType(IEdmTypeReference typeRef)
-        {
-            if (typeRef == null)
-            {
-                return null;
-            }
-
-            EdmTypeKind kind = typeRef.TypeKind();
-            if (kind == EdmTypeKind.Collection)
-            {
-                return GetStructuredType(typeRef.AsCollection().ElementType());
-            }
-
-            if (kind == EdmTypeKind.Entity)
-            {
-                return ((IEdmEntityTypeReference)typeRef).StructuredDefinition();
-            }
-
-            if (kind == EdmTypeKind.Complex)
-            {
-                return ((IEdmComplexTypeReference)typeRef).StructuredDefinition();
-            }
-
-            return null;
         }
     }
 }
