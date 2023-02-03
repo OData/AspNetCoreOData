@@ -931,6 +931,8 @@ Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default = 0 -> Micr
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.False = 2 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.True = 1 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions
+Microsoft.AspNetCore.OData.Query.IODataQueryOptionsProvider
+Microsoft.AspNetCore.OData.Query.IODataQueryOptionsProvider.GetQueryOptions(Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext context) -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
@@ -1041,6 +1043,12 @@ Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuting(Micros
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider.Order.get -> int
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilter.get -> Microsoft.AspNetCore.Mvc.Filters.IActionFilter
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilterProvider(Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter) -> void
+Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext
+Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.ActionContext.get -> Microsoft.AspNetCore.Mvc.ActionContext
+Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.ActionContext.set -> void
+Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.HttpContext.get -> Microsoft.AspNetCore.Http.HttpContext
+Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.HttpContext.set -> void
+Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.QueryOptionsProviderContext() -> void
 Microsoft.AspNetCore.OData.Query.SearchQueryOption
 Microsoft.AspNetCore.OData.Query.SearchQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.SearchQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
@@ -1654,6 +1662,7 @@ static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetETagHandle
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetModel(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.Edm.IEdmModel
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetNextPageLink(this Microsoft.AspNetCore.Http.HttpRequest request, int pageSize, object instance, System.Func<object, string> objectToSkipTokenValue) -> System.Uri
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetODataVersion(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataVersion
+static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetQueryOptionsProvider(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Query.IODataQueryOptionsProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetReaderSettings(this Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.OData.ODataMessageReaderSettings
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetRouteServices(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.IServiceProvider
 static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(this Microsoft.AspNetCore.Http.HttpRequest request) -> System.TimeZoneInfo

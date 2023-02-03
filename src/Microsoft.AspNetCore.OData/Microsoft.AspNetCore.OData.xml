@@ -2931,6 +2931,13 @@
             <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetQueryOptionsProvider(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.
+            </summary>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryOptionsProvider"/> from the request container.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the <see cref="T:System.TimeZoneInfo"/> setting.
@@ -9595,6 +9602,33 @@
             <summary>
             Gets a value representing the total count of the collection.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext">
+            <summary>
+            The context for OData query options provider.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.HttpContext">
+            <summary>
+            The HttpContext.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext.ActionContext">
+            <summary>
+            The Action context.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryOptionsProvider">
+            <summary>
+            Exposes the ability to create <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions" /> for a certain request on a certain action.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryOptionsProvider.GetQueryOptions(Microsoft.AspNetCore.OData.Query.QueryOptionsProviderContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>
+            </summary>
+            <param name="context">The query option provider context.</param>
+            <returns>The OData query options created.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser">
             <summary>

@@ -72,6 +72,23 @@ namespace Microsoft.AspNetCore.OData.Query
                     throw Error.Argument("actionContext", SRResources.ActionContextMustHaveDescriptor);
                 }
 
+                IODataQueryOptionsProvider queryProvider = request.GetQueryOptionsProvider();
+                if (queryProvider != null)
+                {
+                    QueryOptionsProviderContext providerContext = new QueryOptionsProviderContext
+                    {
+                        HttpContext = bindingContext.HttpContext,
+                        ActionContext = bindingContext.ActionContext
+                    };
+
+                    ODataQueryOptions queryOptions = queryProvider.GetQueryOptions(providerContext);
+                    if (queryOptions != null)
+                    {
+                        bindingContext.Result = ModelBindingResult.Success(queryOptions);
+                        return Task.CompletedTask;
+                    }
+                }
+
                 // Get the parameter description of the parameter to bind.
                 ParameterDescriptor paramDescriptor = bindingContext.ActionContext.ActionDescriptor.Parameters
                     .Where(p => p.Name == bindingContext.FieldName)

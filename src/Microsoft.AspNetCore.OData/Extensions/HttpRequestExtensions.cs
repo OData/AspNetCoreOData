@@ -87,6 +87,28 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <summary>
+        /// Gets the <see cref="IEdmModel"/> from the request container.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <returns>The <see cref="IODataQueryOptionsProvider"/> from the request container.</returns>
+        public static IODataQueryOptionsProvider GetQueryOptionsProvider(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                throw Error.ArgumentNull(nameof(request));
+            }
+
+            IODataQueryOptionsProvider provider = request.GetRouteServices().GetService<IODataQueryOptionsProvider>();
+            if (provider == null)
+            {
+                // delegate to the global service container if we can't find.
+                provider = request.HttpContext.RequestServices.GetService<IODataQueryOptionsProvider>();
+            }
+
+            return provider;
+        }
+
+        /// <summary>
         /// Gets the <see cref="TimeZoneInfo"/> setting.
         /// </summary>
         /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
