@@ -37,7 +37,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
             _queryContext = new ODataQueryContext(model.Model, typeof(Customer), null);
             _queryContext.RequestContainer = new MockServiceProvider();
-            _queryContext.DefaultQuerySettings.EnableExpand = true;
+            _queryContext.DefaultQueryConfigurations.EnableExpand = true;
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             CustomersModelWithInheritance model = new CustomersModelWithInheritance();
             model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
             ODataQueryContext queryContext = new ODataQueryContext(model.Model, typeof(Customer));
-            queryContext.DefaultQuerySettings.EnableExpand = true;
+            queryContext.DefaultQueryConfigurations.EnableExpand = true;
             queryContext.RequestContainer = new MockServiceProvider();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
             selectExpandQueryOption.LevelsMaxLiteralExpansionDepth = 1;
@@ -130,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             builder.EntitySet<ODataLevelsTest.LevelsEntity>("Entities");
             IEdmModel model = builder.GetEdmModel();
             var context = new ODataQueryContext(model, typeof(ODataLevelsTest.LevelsEntity));
-            context.DefaultQuerySettings.EnableExpand = true;
+            context.DefaultQueryConfigurations.EnableExpand = true;
             context.RequestContainer = new MockServiceProvider();
             var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, context);
             selectExpandQueryOption.LevelsMaxLiteralExpansionDepth = 1;
@@ -161,7 +161,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             builder.EntitySet<ODataLevelsTest.LevelsEntity>("Entities");
             IEdmModel model = builder.GetEdmModel();
             var context = new ODataQueryContext(model, typeof(ODataLevelsTest.LevelsEntity));
-            context.DefaultQuerySettings.EnableExpand = true;
+            context.DefaultQueryConfigurations.EnableExpand = true;
             context.RequestContainer = new MockServiceProvider();
             var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, context);
 
@@ -182,7 +182,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             builder.EntitySet<ODataLevelsTest.LevelsEntity>("Entities");
             IEdmModel model = builder.GetEdmModel();
             var context = new ODataQueryContext(model, typeof(ODataLevelsTest.LevelsEntity));
-            context.DefaultQuerySettings.EnableExpand = true;
+            context.DefaultQueryConfigurations.EnableExpand = true;
             context.RequestContainer = new MockServiceProvider();
             var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, context);
             selectExpandQueryOption.LevelsMaxLiteralExpansionDepth = 4;
@@ -208,7 +208,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             builder.EntitySet<ODataLevelsTest.LevelsEntity>("Entities");
             IEdmModel model = builder.GetEdmModel();
             var context = new ODataQueryContext(model, typeof(ODataLevelsTest.LevelsEntity));
-            context.DefaultQuerySettings.EnableExpand = true;
+            context.DefaultQueryConfigurations.EnableExpand = true;
             context.RequestContainer = new MockServiceProvider();
             var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, context);
 
@@ -256,7 +256,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             builder.EntitySet<ODataLevelsTest.LevelsEntity>("Entities");
             IEdmModel model = builder.GetEdmModel();
             var context = new ODataQueryContext(model, typeof(ODataLevelsTest.LevelsEntity));
-            context.DefaultQuerySettings.EnableExpand = true;
+            context.DefaultQueryConfigurations.EnableExpand = true;
             context.RequestContainer = new MockServiceProvider();
             var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, context);
             selectExpandQueryOption.LevelsMaxLiteralExpansionDepth = levelsMaxLiteralExpansionDepth;
@@ -274,8 +274,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             string expand = "Orders($top=4)";
             SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
-            _queryContext.DefaultQuerySettings.EnableExpand = true;
-            _queryContext.DefaultQuerySettings.MaxTop = 2;
+            _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+            _queryContext.DefaultQueryConfigurations.MaxTop = 2;
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
             // Act & Assert
@@ -290,8 +290,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             string expand = "Orders($count=true)";
             SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
-            _queryContext.DefaultQuerySettings.EnableExpand = true;
-            _queryContext.DefaultQuerySettings.EnableCount = false;
+            _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+            _queryContext.DefaultQueryConfigurations.EnableCount = false;
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
             // Act & Assert
@@ -306,8 +306,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             string expand = "Orders($orderby=Amount)";
             SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
-            _queryContext.DefaultQuerySettings.EnableExpand = true;
-            _queryContext.DefaultQuerySettings.EnableOrderBy = false;
+            _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+            _queryContext.DefaultQueryConfigurations.EnableOrderBy = false;
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
             // Act & Assert
@@ -322,8 +322,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             string expand = "Orders($filter=Amount eq 42)";
             SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
-            _queryContext.DefaultQuerySettings.EnableExpand = true;
-            _queryContext.DefaultQuerySettings.EnableFilter = false;
+            _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+            _queryContext.DefaultQueryConfigurations.EnableFilter = false;
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
             // Act & Assert
@@ -338,7 +338,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             string expand = "Orders($expand=Customer($expand=Orders($expand=Customer($expand=Orders($expand=Customer)))))";
             SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
-            _queryContext.DefaultQuerySettings.EnableExpand = true;
+            _queryContext.DefaultQueryConfigurations.EnableExpand = true;
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
             // Act & Assert
@@ -356,7 +356,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             CustomersModelWithInheritance model = new CustomersModelWithInheritance();
             model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
             ODataQueryContext queryContext = new ODataQueryContext(model.Model, typeof(Customer));
-            queryContext.DefaultQuerySettings.EnableExpand = true;
+            queryContext.DefaultQueryConfigurations.EnableExpand = true;
             queryContext.RequestContainer = new MockServiceProvider();
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
             IEdmStructuredType customerType =

@@ -137,10 +137,10 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         public static bool IsTopLimitExceeded(IEdmProperty property, IEdmStructuredType structuredType,
-           IEdmModel edmModel, int top, DefaultQuerySettings defaultQuerySettings, out int maxTop)
+           IEdmModel edmModel, int top, DefaultQueryConfigurations defaultQueryConfs, out int maxTop)
         {
             maxTop = 0;
-            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType, defaultQuerySettings);
+            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType, defaultQueryConfs);
             if (querySettings != null && top > querySettings.MaxTop)
             {
                 maxTop = querySettings.MaxTop.Value;
@@ -339,14 +339,14 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         public static ModelBoundQuerySettings GetModelBoundQuerySettings(this IEdmModel edmModel, IEdmProperty property,
-           IEdmStructuredType structuredType, DefaultQuerySettings defaultQuerySettings = null)
+           IEdmStructuredType structuredType, DefaultQueryConfigurations defaultQueryConfs = null)
         {
             if (edmModel == null)
             {
                 throw Error.ArgumentNull(nameof(edmModel));
             }
 
-            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(structuredType, defaultQuerySettings);
+            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(structuredType, defaultQueryConfs);
             if (property == null)
             {
                 return querySettings;
@@ -354,12 +354,12 @@ namespace Microsoft.AspNetCore.OData.Edm
             else
             {
                 // Settings on property is higher priority than the ones on type.
-                ModelBoundQuerySettings propertyQuerySettings = edmModel.GetModelBoundQuerySettings(property, defaultQuerySettings);
+                ModelBoundQuerySettings propertyQuerySettings = edmModel.GetModelBoundQuerySettings(property, defaultQueryConfs);
                 return GetMergedPropertyQuerySettings(propertyQuerySettings, querySettings);
             }
         }
 
-        private static ModelBoundQuerySettings GetModelBoundQuerySettings<T>(this IEdmModel edmModel, T key, DefaultQuerySettings defaultQuerySettings = null)
+        private static ModelBoundQuerySettings GetModelBoundQuerySettings<T>(this IEdmModel edmModel, T key, DefaultQueryConfigurations defaultQueryConfs = null)
             where T : IEdmElement
         {
             if (key == null)
@@ -372,10 +372,10 @@ namespace Microsoft.AspNetCore.OData.Edm
                 if (querySettings == null)
                 {
                     querySettings = new ModelBoundQuerySettings();
-                    if (defaultQuerySettings != null &&
-                        (!defaultQuerySettings.MaxTop.HasValue || defaultQuerySettings.MaxTop > 0))
+                    if (defaultQueryConfs != null &&
+                        (!defaultQueryConfs.MaxTop.HasValue || defaultQueryConfs.MaxTop > 0))
                     {
-                        querySettings.MaxTop = defaultQuerySettings.MaxTop;
+                        querySettings.MaxTop = defaultQueryConfs.MaxTop;
                     }
                 }
 

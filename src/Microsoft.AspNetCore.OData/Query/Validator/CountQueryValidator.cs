@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 string name = countQueryOption.Context.TargetName;
                 if (EdmHelpers.IsNotCountable(property, structuredType,
                     countQueryOption.Context.Model,
-                    countQueryOption.Context.DefaultQuerySettings.EnableCount))
+                    countQueryOption.Context.DefaultQueryConfigurations.EnableCount))
                 {
                     if (property == null)
                     {

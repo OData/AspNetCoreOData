@@ -176,7 +176,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
             else if (!isExpandable)
             {
-                if (!validatorContext.Context.DefaultQuerySettings.EnableExpand ||
+                if (!validatorContext.Context.DefaultQueryConfigurations.EnableExpand ||
                     (expandConfiguration != null && expandConfiguration.ExpandType == SelectExpandType.Disabled))
                 {
                     throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand, property.Name));
@@ -255,7 +255,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
 
             IEdmModel edmModel = validatorContext.Context.Model;
-            bool enableSelect = validatorContext.Context.DefaultQuerySettings.EnableSelect;
+            bool enableSelect = validatorContext.Context.DefaultQueryConfigurations.EnableSelect;
             ODataPathSegment segment = pathSelectItem.SelectedPath.LastSegment;
 
             IEdmProperty property = validatorContext.Property;
@@ -338,7 +338,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             foreach (var property in structuredType.StructuralProperties())
             {
                 if (EdmHelpers.IsNotSelectable(property, pathProperty, structuredType, edmModel,
-                    validatorContext.Context.DefaultQuerySettings.EnableSelect))
+                    validatorContext.Context.DefaultQueryConfigurations.EnableSelect))
                 {
                     throw new ODataException(Error.Format(SRResources.NotSelectablePropertyUsedInSelect, property.Name));
                 }
@@ -400,7 +400,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 // TODO: OrderByModelLimitationsValidator is used already. but we should use IOrderbyQueryValidator to validate.
                 // Should change it later.
                 OrderByModelLimitationsValidator orderByQueryValidator =
-                   new OrderByModelLimitationsValidator(validatorContext.Context, validatorContext.Context.DefaultQuerySettings.EnableOrderBy);
+                   new OrderByModelLimitationsValidator(validatorContext.Context, validatorContext.Context.DefaultQueryConfigurations.EnableOrderBy);
 
                 orderByQueryValidator.TryValidate(validatorContext.Property, validatorContext.StructuredType, orderByClause, false);
             }
@@ -420,10 +420,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 IEdmModel edmModel = validatorContext.Context.Model;
                 IEdmProperty property = validatorContext.Property;
                 IEdmStructuredType structuredType = validatorContext.StructuredType;
-                DefaultQuerySettings settings = validatorContext.Context.DefaultQuerySettings;
+                DefaultQueryConfigurations configs = validatorContext.Context.DefaultQueryConfigurations;
 
                 int maxTop;
-                if (EdmHelpers.IsTopLimitExceeded(property, structuredType, edmModel, (int)topOption.Value, settings, out maxTop))
+                if (EdmHelpers.IsTopLimitExceeded(property, structuredType, edmModel, (int)topOption.Value, configs, out maxTop))
                 {
                     throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop, AllowedQueryOptions.Top, topOption.Value));
                 }
@@ -452,9 +452,9 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 IEdmModel edmModel = validatorContext.Context.Model;
                 IEdmProperty property = validatorContext.Property;
                 IEdmStructuredType structuredType = validatorContext.StructuredType;
-                DefaultQuerySettings settings = validatorContext.Context.DefaultQuerySettings;
+                DefaultQueryConfigurations configs = validatorContext.Context.DefaultQueryConfigurations;
 
-                if (EdmHelpers.IsNotCountable(property, structuredType, edmModel, settings.EnableCount))
+                if (EdmHelpers.IsNotCountable(property, structuredType, edmModel, configs.EnableCount))
                 {
                     throw new ODataException(Error.Format(SRResources.NotCountablePropertyUsedForCount, property.Name));
                 }
@@ -496,7 +496,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
             else
             {
-                if (!validatorContext.Context.DefaultQuerySettings.EnableExpand ||
+                if (!validatorContext.Context.DefaultQueryConfigurations.EnableExpand ||
                     (expandConfiguration != null && expandConfiguration.ExpandType == SelectExpandType.Disabled))
                 {
                     throw new ODataException(Error.Format(SRResources.NotExpandablePropertyUsedInExpand, property.Name));

@@ -644,9 +644,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             HttpRequest request = RequestFactory.Create("Get", "http://localhost/?" + query);
 
             var context = new ODataQueryContext(_model, typeof(QCustomer));
-            context.DefaultQuerySettings.EnableFilter = true;
-            context.DefaultQuerySettings.EnableOrderBy = true;
-            context.DefaultQuerySettings.MaxTop = null;
+            context.DefaultQueryConfigurations.EnableFilter = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.MaxTop = null;
             var options = new ODataQueryOptions(context, request);
 
             // Act & Assert

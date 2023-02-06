@@ -34,8 +34,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             if (skipToken.Context != null)
             {
-                DefaultQuerySettings defaultSetting = skipToken.Context.DefaultQuerySettings;
-                if (!defaultSetting.EnableSkipToken)
+                DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
+                if (!defaultConfigs.EnableSkipToken)
                 {
                     throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
                 }

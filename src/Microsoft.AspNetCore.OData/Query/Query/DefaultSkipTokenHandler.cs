@@ -64,8 +64,8 @@ namespace Microsoft.AspNetCore.OData.Query
             ExpandedReferenceSelectItem expandedItem = context.CurrentSelectItem as ExpandedReferenceSelectItem;
             IEdmModel model = context.Model;
 
-            DefaultQuerySettings settings = context.QueryContext.DefaultQuerySettings;
-            if (settings.EnableSkipToken)
+            DefaultQueryConfigurations queryConfigs = context.QueryContext.DefaultQueryConfigurations;
+            if (queryConfigs.EnableSkipToken)
             {
                 if (expandedItem != null)
                 {

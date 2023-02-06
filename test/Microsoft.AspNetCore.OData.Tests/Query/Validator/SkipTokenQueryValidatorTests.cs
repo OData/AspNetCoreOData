@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             ODataValidationSettings settings = new ODataValidationSettings();
 
             ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int), null);
-            context.DefaultQuerySettings.EnableSkipToken = false;
+            context.DefaultQueryConfigurations.EnableSkipToken = false;
             SkipTokenQueryOption query = new SkipTokenQueryOption("abc", context);
 
             SkipTokenQueryValidator validator = new SkipTokenQueryValidator();

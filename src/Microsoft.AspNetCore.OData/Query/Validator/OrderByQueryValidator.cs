@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 }
             }
 
-            bool enableOrderBy = orderByOption.Context.DefaultQuerySettings.EnableOrderBy;
+            bool enableOrderBy = orderByOption.Context.DefaultQueryConfigurations.EnableOrderBy;
             OrderByModelLimitationsValidator validator = new OrderByModelLimitationsValidator(orderByOption.Context, enableOrderBy);
             bool explicitAllowedProperties = validationSettings.AllowedOrderByProperties.Count > 0;
 
