@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     {
         private int _currentAnyAllExpressionDepth;
         private int _currentNodeCount;
-        private DefaultQuerySettings _defaultQuerySettings;
+        private DefaultQueryConfigurations _defaultQueryConfigs;
         private IEdmProperty _property;
         private IEdmStructuredType _structuredType;
 
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             _property = filterQueryOption.Context.TargetProperty;
             _structuredType = filterQueryOption.Context.TargetStructuredType;
-            _defaultQuerySettings = filterQueryOption.Context.DefaultQuerySettings;
+            _defaultQueryConfigs = filterQueryOption.Context.DefaultQueryConfigurations;
 
             Validate(filterQueryOption.FilterClause, settings, filterQueryOption.Context.Model);
         }
@@ -301,7 +301,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             // Check whether the property is not filterable
             if (EdmHelpers.IsNotFilterable(navigationProperty, _property, _structuredType, _model,
-                _defaultQuerySettings.EnableFilter))
+                _defaultQueryConfigs.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter,
                     navigationProperty.Name));
@@ -352,18 +352,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     SingleNavigationNode singleNavigationNode = propertyAccessNode.Source as SingleNavigationNode;
                     notFilterable = EdmHelpers.IsNotFilterable(property, singleNavigationNode.NavigationProperty,
                         singleNavigationNode.NavigationProperty.ToEntityType(), _model,
-                        _defaultQuerySettings.EnableFilter);
+                        _defaultQueryConfigs.EnableFilter);
                 }
                 else if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleComplexNode)
                 {
                     SingleComplexNode singleComplexNode = propertyAccessNode.Source as SingleComplexNode;
                     notFilterable = EdmHelpers.IsNotFilterable(property, singleComplexNode.Property,
-                        property.DeclaringType, _model, _defaultQuerySettings.EnableFilter);
+                        property.DeclaringType, _model, _defaultQueryConfigs.EnableFilter);
                 }
                 else
                 {
                     notFilterable = EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                        _defaultQuerySettings.EnableFilter);
+                        _defaultQueryConfigs.EnableFilter);
                 }
             }
 
@@ -392,7 +392,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // Check whether the property is filterable.
             IEdmProperty property = singleComplexNode.Property;
             if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                _defaultQuerySettings.EnableFilter))
+                _defaultQueryConfigs.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }
@@ -417,7 +417,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // Check whether the property is filterable.
             IEdmProperty property = propertyAccessNode.Property;
             if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                _defaultQuerySettings.EnableFilter))
+                _defaultQueryConfigs.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }
@@ -442,7 +442,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // Check whether the property is filterable.
             IEdmProperty property = collectionComplexNode.Property;
             if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                _defaultQuerySettings.EnableFilter))
+                _defaultQueryConfigs.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }

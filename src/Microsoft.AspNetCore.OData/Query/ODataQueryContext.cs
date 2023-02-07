@@ -16,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
@@ -26,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Query
     /// </summary>
     public class ODataQueryContext
     {
-        private DefaultQuerySettings _defaultQuerySettings;
+        private DefaultQueryConfigurations _defaultQueryConfigurations;
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext"/> with <see cref="IEdmModel" />, element CLR type,
@@ -106,20 +105,20 @@ namespace Microsoft.AspNetCore.OData.Query
         { }
 
         /// <summary>
-        /// Gets the given <see cref="DefaultQuerySettings"/>.
+        /// Gets the given <see cref="DefaultQueryConfigurations"/>.
         /// </summary>
-        public DefaultQuerySettings DefaultQuerySettings
+        public DefaultQueryConfigurations DefaultQueryConfigurations
         {
             get
             {
-                if (_defaultQuerySettings == null)
+                if (_defaultQueryConfigurations == null)
                 {
-                    _defaultQuerySettings = RequestContainer == null
+                    _defaultQueryConfigurations = RequestContainer == null
                         ? GetDefaultQuerySettings()
-                        : RequestContainer.GetRequiredService<DefaultQuerySettings>();
+                        : RequestContainer.GetRequiredService<DefaultQueryConfigurations>();
                 }
 
-                return _defaultQuerySettings;
+                return _defaultQueryConfigurations;
             }
         }
 
@@ -200,20 +199,20 @@ namespace Microsoft.AspNetCore.OData.Query
             }
         }
 
-        private DefaultQuerySettings GetDefaultQuerySettings()
+        private DefaultQueryConfigurations GetDefaultQuerySettings()
         {
             if (Request is null)
             {
-                return new DefaultQuerySettings();
+                return new DefaultQueryConfigurations();
             }
 
             IOptions<ODataOptions> odataOptions = Request.HttpContext?.RequestServices?.GetService<IOptions<ODataOptions>>();
             if (odataOptions is  null || odataOptions.Value is null)
             {
-                return new DefaultQuerySettings();
+                return new DefaultQueryConfigurations();
             }
 
-            return odataOptions.Value.QuerySettings;
+            return odataOptions.Value.QueryConfigurations;
         }
     }
 }

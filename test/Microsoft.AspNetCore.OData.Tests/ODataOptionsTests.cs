@@ -284,13 +284,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.Equal(0, options.QuerySettings.MaxTop); // Guard
+            Assert.Equal(0, options.QueryConfigurations.MaxTop); // Guard
 
             // Act
             options.SetMaxTop(2);
 
             // Assert
-            Assert.Equal(2, options.QuerySettings.MaxTop.Value);
+            Assert.Equal(2, options.QueryConfigurations.MaxTop.Value);
         }
 
         [Fact]
@@ -298,13 +298,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.False(options.QuerySettings.EnableExpand); // Guard
+            Assert.False(options.QueryConfigurations.EnableExpand); // Guard
 
             // Act
             options.Expand();
 
             // Assert
-            Assert.True(options.QuerySettings.EnableExpand);
+            Assert.True(options.QueryConfigurations.EnableExpand);
         }
 
         [Fact]
@@ -312,13 +312,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.False(options.QuerySettings.EnableSelect); // Guard
+            Assert.False(options.QueryConfigurations.EnableSelect); // Guard
 
             // Act
             options.Select();
 
             // Assert
-            Assert.True(options.QuerySettings.EnableSelect);
+            Assert.True(options.QueryConfigurations.EnableSelect);
         }
 
         [Fact]
@@ -326,13 +326,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.False(options.QuerySettings.EnableFilter); // Guard
+            Assert.False(options.QueryConfigurations.EnableFilter); // Guard
 
             // Act
             options.Filter();
 
             // Assert
-            Assert.True(options.QuerySettings.EnableFilter);
+            Assert.True(options.QueryConfigurations.EnableFilter);
         }
 
         [Fact]
@@ -340,13 +340,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.False(options.QuerySettings.EnableOrderBy); // Guard
+            Assert.False(options.QueryConfigurations.EnableOrderBy); // Guard
 
             // Act
             options.OrderBy();
 
             // Assert
-            Assert.True(options.QuerySettings.EnableOrderBy);
+            Assert.True(options.QueryConfigurations.EnableOrderBy);
         }
 
         [Fact]
@@ -354,13 +354,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.False(options.QuerySettings.EnableCount); // Guard
+            Assert.False(options.QueryConfigurations.EnableCount); // Guard
 
             // Act
             options.Count();
 
             // Assert
-            Assert.True(options.QuerySettings.EnableCount);
+            Assert.True(options.QueryConfigurations.EnableCount);
         }
 
         [Fact]
@@ -368,13 +368,13 @@ namespace Microsoft.AspNetCore.OData.Tests
         {
             // Arrange
             ODataOptions options = new ODataOptions();
-            Assert.False(options.QuerySettings.EnableSkipToken); // Guard
+            Assert.False(options.QueryConfigurations.EnableSkipToken); // Guard
 
             // Act
             options.SkipToken();
 
             // Assert
-            Assert.True(options.QuerySettings.EnableSkipToken);
+            Assert.True(options.QueryConfigurations.EnableSkipToken);
         }
         #endregion
 

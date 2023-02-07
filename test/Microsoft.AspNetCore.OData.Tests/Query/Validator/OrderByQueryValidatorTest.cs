@@ -237,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             IEdmModel model = GetEdmModel();
             IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == edmTypeName);
             ODataQueryContext context = new ODataQueryContext(model, edmType);
-            context.DefaultQuerySettings.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
             OrderByQueryOption option = new OrderByQueryOption(query, context);
             ODataValidationSettings settings = new ODataValidationSettings();
 
@@ -289,7 +289,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             IEdmEntitySet entitySet = model.FindDeclaredEntitySet("LimitedEntities");
             Assert.NotNull(entitySet);
             ODataQueryContext context = new ODataQueryContext(model, edmType);
-            context.DefaultQuerySettings.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
 
             OrderByQueryOption option = new OrderByQueryOption(
                 "@p,@q desc",

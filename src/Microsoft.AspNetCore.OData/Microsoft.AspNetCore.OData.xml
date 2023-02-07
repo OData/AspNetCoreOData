@@ -6275,9 +6275,9 @@
             Gets or sets whether or not the OData system query options should be prefixed with '$'.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QueryConfigurations">
             <summary>
-            Gets the query setting.
+            Gets the query configurations.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.BuildRouteContainer(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataVersion,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
@@ -8011,6 +8011,49 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest)">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations">
+            <summary>
+            This class describes the default configurations to use during query composition.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand">
+            <summary>
+            Gets or sets a value indicating whether navigation property can be expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSelect">
+            <summary>
+            Gets or sets a value indicating whether property can be selected.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableCount">
+            <summary>
+            Gets or sets a value indicating whether entity set and property can apply $count.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableOrderBy">
+            <summary>
+            Gets or sets a value indicating whether property can apply $orderby.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableFilter">
+            <summary>
+            Gets or sets a value indicating whether property can apply $filter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxTop">
+            <summary>
+            Gets or sets the max value of $top that a client can request.
+            </summary>
+            <value>
+            The max value of $top that a client can request, or <c>null</c> if there is no limit.
+            </value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSkipToken">
+            <summary>
+            Gets or sets a value indicating whether the service will use skiptoken or not.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute">
             <summary>
@@ -9776,9 +9819,9 @@
             <param name="elementType">The EDM type of the element of the collection being queried.</param>
             <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.</param>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings">
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQueryConfigurations">
             <summary>
-            Gets the given <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings"/>.
+            Gets the given <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQueryConfigurations"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model">

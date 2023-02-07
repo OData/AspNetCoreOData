@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         public FilterQueryValidatorTests()
         {
             _context = ValidationTestHelper.CreateCustomerContext();
-            _context.DefaultQuerySettings.EnableFilter = true;
+            _context.DefaultQueryConfigurations.EnableFilter = true;
 
             _productContext = ValidationTestHelper.CreateDerivedProductsContext();
             _validator = new MyFilterValidator();

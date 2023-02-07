@@ -272,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Query
             bool levelsEncountered;
             bool isMaxLevel;
             ModelBoundQuerySettings querySettings = Context.Model.GetModelBoundQuerySettings(Context.TargetProperty,
-                Context.TargetStructuredType, Context.DefaultQuerySettings);
+                Context.TargetStructuredType, Context.DefaultQueryConfigurations);
             return ProcessLevels(SelectExpandClause,
                 LevelsMaxLiteralExpansionDepth < 0 ? ODataValidationSettings.DefaultMaxExpansionDepth : LevelsMaxLiteralExpansionDepth,
                 querySettings,

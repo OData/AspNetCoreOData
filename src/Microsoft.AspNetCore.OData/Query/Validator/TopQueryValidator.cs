@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 property,
                 structuredType,
                 topQueryOption.Context.Model,
-                topQueryOption.Value, topQueryOption.Context.DefaultQuerySettings,
+                topQueryOption.Value, topQueryOption.Context.DefaultQueryConfigurations,
                 out maxTop))
             {
                 throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
