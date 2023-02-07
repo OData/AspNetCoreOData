@@ -65,9 +65,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             // QueryValidators.
             builder.AddService<ICountQueryValidator, CountQueryValidator>(ServiceLifetime.Singleton);
 
-            // FilterQueryValidator should be scoped, otherwise some instance field (for example:_currentNodeCount) should be a problem.
-            builder.AddService<IFilterQueryValidator, FilterQueryValidator>(ServiceLifetime.Scoped);
-
+            builder.AddService<IFilterQueryValidator, FilterQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<IODataQueryValidator, ODataQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<IOrderByQueryValidator, OrderByQueryValidator>(ServiceLifetime.Singleton);
             builder.AddService<ISelectExpandQueryValidator, SelectExpandQueryValidator>(ServiceLifetime.Singleton);

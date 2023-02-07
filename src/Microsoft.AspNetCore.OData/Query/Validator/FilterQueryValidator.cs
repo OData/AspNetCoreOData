@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -18,27 +17,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="FilterQueryOption" /> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    /// <remarks>
-    /// Please note this class is not thread safe.
-    /// </remarks>
     public class FilterQueryValidator : IFilterQueryValidator
     {
-        private int _currentAnyAllExpressionDepth;
-        private int _currentNodeCount;
-        private DefaultQueryConfigurations _defaultQueryConfigs;
-        private IEdmProperty _property;
-        private IEdmStructuredType _structuredType;
-
-        private IEdmModel _model;
-
         /// <summary>
         /// Validates a <see cref="FilterQueryOption" />.
         /// </summary>
         /// <param name="filterQueryOption">The $filter query.</param>
         /// <param name="settings">The validation settings.</param>
-        /// <remarks>
-        /// Please note this method is not thread safe.
-        /// </remarks>
         public virtual void Validate(FilterQueryOption filterQueryOption, ODataValidationSettings settings)
         {
             if (filterQueryOption == null)
@@ -51,34 +36,29 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 throw Error.ArgumentNull(nameof(settings));
             }
 
-            _property = filterQueryOption.Context.TargetProperty;
-            _structuredType = filterQueryOption.Context.TargetStructuredType;
-            _defaultQueryConfigs = filterQueryOption.Context.DefaultQueryConfigurations;
+            FilterValidatorContext validatorContext = new FilterValidatorContext
+            {
+                Filter = filterQueryOption,
+                Context = filterQueryOption.Context,
+                ValidationSettings = settings,
+                Property = filterQueryOption.Context.TargetProperty,
+                StructuredType = filterQueryOption.Context.TargetStructuredType,
+                CurrentDepth = 0
+            };
 
-            Validate(filterQueryOption.FilterClause, settings, filterQueryOption.Context.Model);
+            ValidateFilter(filterQueryOption.FilterClause, validatorContext);
         }
 
         /// <summary>
         /// Validates a <see cref="FilterClause" />.
         /// </summary>
         /// <param name="filterClause">The <see cref="FilterClause" />.</param>
-        /// <param name="settings">The validation settings.</param>
-        /// <param name="model">The EdmModel.</param>
-        /// <remarks>
-        /// Please note this method is not thread safe.
-        /// </remarks>
-        public virtual void Validate(FilterClause filterClause, ODataValidationSettings settings, IEdmModel model)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateFilter(FilterClause filterClause, FilterValidatorContext validatorContext)
         {
-            if (filterClause == null)
-            {
-                throw Error.ArgumentNull(nameof(filterClause));
-            }
+            Contract.Assert(filterClause != null);
 
-            _currentAnyAllExpressionDepth = 0;
-            _currentNodeCount = 0;
-            _model = model;
-
-            ValidateQueryNode(filterClause.Expression, settings);
+            ValidateQueryNode(filterClause.Expression, validatorContext);
         }
 
         /// <summary>
@@ -89,23 +69,23 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="allNode">The all node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateAllNode(AllNode allNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateAllNode(AllNode allNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(allNode != null);
 
-            ValidateFunction("all", settings);
-            EnterLambda(settings);
+            ValidateFunction("all", validatorContext);
+            validatorContext.EnterLambda();
 
             try
             {
-                ValidateQueryNode(allNode.Source, settings);
+                ValidateQueryNode(allNode.Source, validatorContext);
 
-                ValidateQueryNode(allNode.Body, settings);
+                ValidateQueryNode(allNode.Body, validatorContext);
             }
             finally
             {
-                ExitLambda();
+                validatorContext.ExitLambda();
             }
         }
 
@@ -117,26 +97,26 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="anyNode">The any node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateAnyNode(AnyNode anyNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateAnyNode(AnyNode anyNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(anyNode != null);
 
-            ValidateFunction("any", settings);
-            EnterLambda(settings);
+            ValidateFunction("any", validatorContext);
+            validatorContext.EnterLambda();
 
             try
             {
-                ValidateQueryNode(anyNode.Source, settings);
+                ValidateQueryNode(anyNode.Source, validatorContext);
 
                 if (anyNode.Body != null && anyNode.Body.Kind != QueryNodeKind.Constant)
                 {
-                    ValidateQueryNode(anyNode.Body, settings);
+                    ValidateQueryNode(anyNode.Body, validatorContext);
                 }
             }
             finally
             {
-                ExitLambda();
+                validatorContext.ExitLambda();
             }
         }
 
@@ -148,8 +128,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="binaryOperatorNode">The binary operator node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(binaryOperatorNode != null);
 
@@ -166,11 +146,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 case BinaryOperatorKind.Or:
                 case BinaryOperatorKind.Has:
                     // binary logical operators
-                    ValidateLogicalOperator(binaryOperatorNode, settings);
+                    ValidateLogicalOperator(binaryOperatorNode, validatorContext);
                     break;
                 default:
                     // math operators
-                    ValidateArithmeticOperator(binaryOperatorNode, settings);
+                    ValidateArithmeticOperator(binaryOperatorNode, validatorContext);
                     break;
             }
         }
@@ -185,23 +165,23 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="binaryNode">The binary operator node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateLogicalOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateLogicalOperator(BinaryOperatorNode binaryNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(binaryNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             AllowedLogicalOperators logicalOperator = ToLogicalOperator(binaryNode);
 
-            if ((settings.AllowedLogicalOperators & logicalOperator) != logicalOperator)
+            if ((validatorContext.ValidationSettings.AllowedLogicalOperators & logicalOperator) != logicalOperator)
             {
                 // this means the given logical operator is not allowed
                 throw new ODataException(Error.Format(SRResources.NotAllowedLogicalOperator, logicalOperator, "AllowedLogicalOperators"));
             }
 
             // recursion case goes here
-            ValidateQueryNode(binaryNode.Left, settings);
-            ValidateQueryNode(binaryNode.Right, settings);
+            ValidateQueryNode(binaryNode.Left, validatorContext);
+            ValidateQueryNode(binaryNode.Right, validatorContext);
         }
 
         /// <summary>
@@ -212,23 +192,23 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="binaryNode">The binary operator node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(binaryNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             AllowedArithmeticOperators arithmeticOperator = ToArithmeticOperator(binaryNode);
 
-            if ((settings.AllowedArithmeticOperators & arithmeticOperator) != arithmeticOperator)
+            if ((validatorContext.ValidationSettings.AllowedArithmeticOperators & arithmeticOperator) != arithmeticOperator)
             {
                 // this means the given logical operator is not allowed
                 throw new ODataException(Error.Format(SRResources.NotAllowedArithmeticOperator, arithmeticOperator, "AllowedArithmeticOperators"));
             }
 
             // recursion case goes here
-            ValidateQueryNode(binaryNode.Left, settings);
-            ValidateQueryNode(binaryNode.Right, settings);
+            ValidateQueryNode(binaryNode.Left, validatorContext);
+            ValidateQueryNode(binaryNode.Right, validatorContext);
         }
 
         /// <summary>
@@ -239,8 +219,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="constantNode">The constant node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateConstantNode(ConstantNode constantNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateConstantNode(ConstantNode constantNode, FilterValidatorContext validatorContext)
         {
             // No default validation logic here.
         }
@@ -253,35 +233,35 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="convertNode">The convert node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateConvertNode(ConvertNode convertNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateConvertNode(ConvertNode convertNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(convertNode != null);
 
             // Validate child nodes but not the ConvertNode itself.
-            ValidateQueryNode(convertNode.Source, settings);
+            ValidateQueryNode(convertNode.Source, validatorContext);
         }
 
         /// <summary>
         /// Override this method to restrict the '$count' inside the filter query.
         /// </summary>
         /// <param name="countNode">The count node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateCountNode(CountNode countNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateCountNode(CountNode countNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(countNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
-            ValidateQueryNode(countNode.Source, settings);
+            ValidateQueryNode(countNode.Source, validatorContext);
 
             if (countNode.FilterClause != null)
             {
-                ValidateQueryNode(countNode.FilterClause.Expression, settings);
+                ValidateQueryNode(countNode.FilterClause.Expression, validatorContext);
             }
 
             if (countNode.SearchClause != null)
             {
-                ValidateQueryNode(countNode.SearchClause.Expression, settings);
+                ValidateQueryNode(countNode.SearchClause.Expression, validatorContext);
             }
         }
 
@@ -294,14 +274,17 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// </remarks>
         /// <param name="sourceNode">The source node to validate.</param>
         /// <param name="navigationProperty">The navigation property.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, FilterValidatorContext validatorContext)
         {
             Contract.Assert(navigationProperty != null);
 
             // Check whether the property is not filterable
-            if (EdmHelpers.IsNotFilterable(navigationProperty, _property, _structuredType, _model,
-                _defaultQueryConfigs.EnableFilter))
+            if (EdmHelpers.IsNotFilterable(navigationProperty,
+                validatorContext.Property,
+                validatorContext.StructuredType,
+                validatorContext.Model,
+                validatorContext.Context.DefaultQueryConfigurations.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter,
                     navigationProperty.Name));
@@ -310,7 +293,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // recursion
             if (sourceNode != null)
             {
-                ValidateQueryNode(sourceNode, settings);
+                ValidateQueryNode(sourceNode, validatorContext);
             }
         }
 
@@ -322,8 +305,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="rangeVariable">The range variable node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateRangeVariable(RangeVariable rangeVariable, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateRangeVariable(RangeVariable rangeVariable, FilterValidatorContext validatorContext)
         {
             // No default validation logic here.
         }
@@ -336,11 +319,14 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="propertyAccessNode">The single value property access node.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(propertyAccessNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
+
+            IEdmModel model = validatorContext.Model;
+            var defaultQueryConfigs = validatorContext.Context.DefaultQueryConfigurations;
 
             // Check whether the property is filterable.
             IEdmProperty property = propertyAccessNode.Property;
@@ -350,20 +336,28 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleNavigationNode)
                 {
                     SingleNavigationNode singleNavigationNode = propertyAccessNode.Source as SingleNavigationNode;
-                    notFilterable = EdmHelpers.IsNotFilterable(property, singleNavigationNode.NavigationProperty,
-                        singleNavigationNode.NavigationProperty.ToEntityType(), _model,
-                        _defaultQueryConfigs.EnableFilter);
+                    notFilterable = EdmHelpers.IsNotFilterable(property,
+                        singleNavigationNode.NavigationProperty,
+                        singleNavigationNode.NavigationProperty.ToEntityType(),
+                        model,
+                        defaultQueryConfigs.EnableFilter);
                 }
                 else if (propertyAccessNode.Source.Kind == QueryNodeKind.SingleComplexNode)
                 {
                     SingleComplexNode singleComplexNode = propertyAccessNode.Source as SingleComplexNode;
-                    notFilterable = EdmHelpers.IsNotFilterable(property, singleComplexNode.Property,
-                        property.DeclaringType, _model, _defaultQueryConfigs.EnableFilter);
+                    notFilterable = EdmHelpers.IsNotFilterable(property,
+                        singleComplexNode.Property,
+                        property.DeclaringType,
+                        model,
+                        defaultQueryConfigs.EnableFilter);
                 }
                 else
                 {
-                    notFilterable = EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                        _defaultQueryConfigs.EnableFilter);
+                    notFilterable = EdmHelpers.IsNotFilterable(property,
+                        validatorContext.Property,
+                        validatorContext.StructuredType,
+                        model,
+                        defaultQueryConfigs.EnableFilter);
                 }
             }
 
@@ -372,7 +366,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }
 
-            ValidateQueryNode(propertyAccessNode.Source, settings);
+            ValidateQueryNode(propertyAccessNode.Source, validatorContext);
         }
 
         /// <summary>
@@ -383,21 +377,24 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="singleComplexNode">The single complex node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(singleComplexNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = singleComplexNode.Property;
-            if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                _defaultQueryConfigs.EnableFilter))
+            if (EdmHelpers.IsNotFilterable(property,
+                validatorContext.Property,
+                validatorContext.StructuredType,
+                validatorContext.Model,
+                validatorContext.Context.DefaultQueryConfigurations.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }
 
-            ValidateQueryNode(singleComplexNode.Source, settings);
+            ValidateQueryNode(singleComplexNode.Source, validatorContext);
         }
 
         /// <summary>
@@ -408,21 +405,24 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="propertyAccessNode">The collection property access node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(propertyAccessNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = propertyAccessNode.Property;
-            if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                _defaultQueryConfigs.EnableFilter))
+            if (EdmHelpers.IsNotFilterable(property,
+                validatorContext.Property,
+                validatorContext.StructuredType,
+                validatorContext.Model,
+                validatorContext.Context.DefaultQueryConfigurations.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }
 
-            ValidateQueryNode(propertyAccessNode.Source, settings);
+            ValidateQueryNode(propertyAccessNode.Source, validatorContext);
         }
 
         /// <summary>
@@ -433,21 +433,23 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="collectionComplexNode">The collection complex node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(collectionComplexNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             // Check whether the property is filterable.
             IEdmProperty property = collectionComplexNode.Property;
-            if (EdmHelpers.IsNotFilterable(property, _property, _structuredType, _model,
-                _defaultQueryConfigs.EnableFilter))
+            if (EdmHelpers.IsNotFilterable(property, validatorContext.Property,
+                validatorContext.StructuredType,
+                validatorContext.Model,
+                validatorContext.Context.DefaultQueryConfigurations.EnableFilter))
             {
                 throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
             }
 
-            ValidateQueryNode(collectionComplexNode.Source, settings);
+            ValidateQueryNode(collectionComplexNode.Source, validatorContext);
         }
 
         /// <summary>
@@ -458,17 +460,17 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="node">The single value function call node to validate.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, FilterValidatorContext validatorContext)
         {
             Contract.Assert(node != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
-            ValidateFunction(node.Name, settings);
+            ValidateFunction(node.Name, validatorContext);
 
             foreach (QueryNode argumentNode in node.Parameters)
             {
-                ValidateQueryNode(argumentNode, settings);
+                ValidateQueryNode(argumentNode, validatorContext);
             }
         }
 
@@ -476,21 +478,22 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Override this method to validate single resource function calls, such as 'cast'.
         /// </summary>
         /// <param name="node">The node to validate.</param>
-        /// <param name="settings">The settings to use while validating.</param>
+        /// <param name="validatorContext">The validation context.</param>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit
         /// testing scenarios and is not intended to be called from user code. Call the Validate method to validate a
         /// <see cref="FilterQueryOption" /> instance.
         /// </remarks>
-        protected virtual void ValidateSingleResourceFunctionCallNode(SingleResourceFunctionCallNode node, ODataValidationSettings settings)
+        protected virtual void ValidateSingleResourceFunctionCallNode(SingleResourceFunctionCallNode node, FilterValidatorContext validatorContext)
         {
             Contract.Assert(node != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
-            ValidateFunction(node.Name, settings);
+            ValidateFunction(node.Name, validatorContext);
+
             foreach (QueryNode argumentNode in node.Parameters)
             {
-                ValidateQueryNode(argumentNode, settings);
+                ValidateQueryNode(argumentNode, validatorContext);
             }
         }
 
@@ -502,19 +505,19 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="unaryOperatorNode">The unary operator node.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(unaryOperatorNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
-            ValidateQueryNode(unaryOperatorNode.Operand, settings);
+            ValidateQueryNode(unaryOperatorNode.Operand, validatorContext);
 
             switch (unaryOperatorNode.OperatorKind)
             {
                 case UnaryOperatorKind.Negate:
                 case UnaryOperatorKind.Not:
-                    if ((settings.AllowedLogicalOperators & AllowedLogicalOperators.Not) != AllowedLogicalOperators.Not)
+                    if ((validatorContext.ValidationSettings.AllowedLogicalOperators & AllowedLogicalOperators.Not) != AllowedLogicalOperators.Not)
                     {
                         throw new ODataException(Error.Format(SRResources.NotAllowedLogicalOperator, unaryOperatorNode.OperatorKind, "AllowedLogicalOperators"));
                     }
@@ -526,17 +529,17 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// Override this method if you want to visit each query node. 
+        /// Override this method if you want to visit each query node.
         /// </summary>
         /// <remarks>
         /// This method is intended to be called from method overrides in subclasses. This method also supports unit-testing scenarios and is not intended to be called from user code.
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="node">The query node.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateQueryNode(QueryNode node, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateQueryNode(QueryNode node, FilterValidatorContext validatorContext)
         {
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
@@ -544,15 +547,15 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             SingleValueNode singleNode = node as SingleValueNode;
             CollectionNode collectionNode = node as CollectionNode;
 
-            IncrementNodeCount(settings);
+            validatorContext.IncrementNodeCount();
 
             if (singleNode != null)
             {
-                ValidateSingleValueNode(singleNode, settings);
+                ValidateSingleValueNode(singleNode, validatorContext);
             }
             else if (collectionNode != null)
             {
-                ValidateCollectionNode(collectionNode, settings);
+                ValidateCollectionNode(collectionNode, validatorContext);
             }
         }
 
@@ -564,13 +567,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="collectionResourceCastNode">The collection resource cast node.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateCollectionResourceCastNode(CollectionResourceCastNode collectionResourceCastNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateCollectionResourceCastNode(CollectionResourceCastNode collectionResourceCastNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(collectionResourceCastNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
-            ValidateQueryNode(collectionResourceCastNode.Source, settings);
+            ValidateQueryNode(collectionResourceCastNode.Source, validatorContext);
         }
 
         /// <summary>
@@ -581,64 +584,41 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Call the Validate method to validate a <see cref="FilterQueryOption"/> instance.
         /// </remarks>
         /// <param name="singleResourceCastNode">The single resource cast node.</param>
-        /// <param name="settings">The validation settings.</param>
-        protected virtual void ValidateSingleResourceCastNode(SingleResourceCastNode singleResourceCastNode, ODataValidationSettings settings)
+        /// <param name="validatorContext">The validation context.</param>
+        protected virtual void ValidateSingleResourceCastNode(SingleResourceCastNode singleResourceCastNode, FilterValidatorContext validatorContext)
         {
             Contract.Assert(singleResourceCastNode != null);
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
-            ValidateQueryNode(singleResourceCastNode.Source, settings);
+            ValidateQueryNode(singleResourceCastNode.Source, validatorContext);
         }
 
-        private void EnterLambda(ODataValidationSettings validationSettings)
-        {
-            Contract.Assert(validationSettings != null);
-
-            if (_currentAnyAllExpressionDepth >= validationSettings.MaxAnyAllExpressionDepth)
-            {
-                throw new ODataException(Error.Format(SRResources.MaxAnyAllExpressionLimitExceeded, validationSettings.MaxAnyAllExpressionDepth, "MaxAnyAllExpressionDepth"));
-            }
-
-            _currentAnyAllExpressionDepth++;
-        }
-
-        private void ExitLambda()
-        {
-            Contract.Assert(_currentAnyAllExpressionDepth > 0);
-            _currentAnyAllExpressionDepth--;
-        }
-
-        private void IncrementNodeCount(ODataValidationSettings validationSettings)
-        {
-            if (_currentNodeCount >= validationSettings.MaxNodeCount)
-            {
-                throw new ODataException(Error.Format(SRResources.MaxNodeLimitExceeded, validationSettings.MaxNodeCount, "MaxNodeCount"));
-            }
-
-            _currentNodeCount++;
-        }
-
-        private void ValidateCollectionNode(CollectionNode node, ODataValidationSettings settings)
+        /// <summary>
+        /// The recursive method that validate most of the query node type is of CollectionNode type.
+        /// </summary>
+        /// <param name="node">The single value node.</param>
+        /// <param name="validatorContext">The validator context.</param>
+        protected virtual void ValidateCollectionNode(CollectionNode node, FilterValidatorContext validatorContext)
         {
             switch (node.Kind)
             {
                 case QueryNodeKind.CollectionPropertyAccess:
                     CollectionPropertyAccessNode propertyAccessNode = node as CollectionPropertyAccessNode;
-                    ValidateCollectionPropertyAccessNode(propertyAccessNode, settings);
+                    ValidateCollectionPropertyAccessNode(propertyAccessNode, validatorContext);
                     break;
 
                 case QueryNodeKind.CollectionComplexNode:
                     CollectionComplexNode collectionComplexNode = node as CollectionComplexNode;
-                    ValidateCollectionComplexNode(collectionComplexNode, settings);
+                    ValidateCollectionComplexNode(collectionComplexNode, validatorContext);
                     break;
 
                 case QueryNodeKind.CollectionNavigationNode:
                     CollectionNavigationNode navigationNode = node as CollectionNavigationNode;
-                    ValidateNavigationPropertyNode(navigationNode.Source, navigationNode.NavigationProperty, settings);
+                    ValidateNavigationPropertyNode(navigationNode.Source, navigationNode.NavigationProperty, validatorContext);
                     break;
 
                 case QueryNodeKind.CollectionResourceCast:
-                    ValidateCollectionResourceCastNode(node as CollectionResourceCastNode, settings);
+                    ValidateCollectionResourceCastNode(node as CollectionResourceCastNode, validatorContext);
                     break;
 
                 case QueryNodeKind.CollectionFunctionCall:
@@ -653,71 +633,71 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// The recursive method that validate most of the query node type is of SingleValueNode type.
         /// </summary>
-        /// <param name="node"></param>
-        /// <param name="settings"></param>
-        private void ValidateSingleValueNode(SingleValueNode node, ODataValidationSettings settings)
+        /// <param name="node">The single value node.</param>
+        /// <param name="validatorContext">The validator context.</param>
+        protected virtual void ValidateSingleValueNode(SingleValueNode node, FilterValidatorContext validatorContext)
         {
             switch (node.Kind)
             {
                 case QueryNodeKind.BinaryOperator:
-                    ValidateBinaryOperatorNode(node as BinaryOperatorNode, settings);
+                    ValidateBinaryOperatorNode(node as BinaryOperatorNode, validatorContext);
                     break;
 
                 case QueryNodeKind.Constant:
-                    ValidateConstantNode(node as ConstantNode, settings);
+                    ValidateConstantNode(node as ConstantNode, validatorContext);
                     break;
 
                 case QueryNodeKind.Convert:
-                    ValidateConvertNode(node as ConvertNode, settings);
+                    ValidateConvertNode(node as ConvertNode, validatorContext);
                     break;
 
                 case QueryNodeKind.Count:
-                    ValidateCountNode(node as CountNode, settings);
+                    ValidateCountNode(node as CountNode, validatorContext);
                     break;
 
                 case QueryNodeKind.ResourceRangeVariableReference:
-                    ValidateRangeVariable((node as ResourceRangeVariableReferenceNode).RangeVariable, settings);
+                    ValidateRangeVariable((node as ResourceRangeVariableReferenceNode).RangeVariable, validatorContext);
                     break;
 
                 case QueryNodeKind.NonResourceRangeVariableReference:
-                    ValidateRangeVariable((node as NonResourceRangeVariableReferenceNode).RangeVariable, settings);
+                    ValidateRangeVariable((node as NonResourceRangeVariableReferenceNode).RangeVariable, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleValuePropertyAccess:
-                    ValidateSingleValuePropertyAccessNode(node as SingleValuePropertyAccessNode, settings);
+                    ValidateSingleValuePropertyAccessNode(node as SingleValuePropertyAccessNode, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleComplexNode:
-                    ValidateSingleComplexNode(node as SingleComplexNode, settings);
+                    ValidateSingleComplexNode(node as SingleComplexNode, validatorContext);
                     break;
 
                 case QueryNodeKind.UnaryOperator:
-                    ValidateUnaryOperatorNode(node as UnaryOperatorNode, settings);
+                    ValidateUnaryOperatorNode(node as UnaryOperatorNode, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleValueFunctionCall:
-                    ValidateSingleValueFunctionCallNode(node as SingleValueFunctionCallNode, settings);
+                    ValidateSingleValueFunctionCallNode(node as SingleValueFunctionCallNode, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleResourceFunctionCall:
-                    ValidateSingleResourceFunctionCallNode((SingleResourceFunctionCallNode)node, settings);
+                    ValidateSingleResourceFunctionCallNode((SingleResourceFunctionCallNode)node, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleNavigationNode:
                     SingleNavigationNode navigationNode = node as SingleNavigationNode;
-                    ValidateNavigationPropertyNode(navigationNode.Source, navigationNode.NavigationProperty, settings);
+                    ValidateNavigationPropertyNode(navigationNode.Source, navigationNode.NavigationProperty, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleResourceCast:
-                    ValidateSingleResourceCastNode(node as SingleResourceCastNode, settings);
+                    ValidateSingleResourceCastNode(node as SingleResourceCastNode, validatorContext);
                     break;
 
                 case QueryNodeKind.Any:
-                    ValidateAnyNode(node as AnyNode, settings);
+                    ValidateAnyNode(node as AnyNode, validatorContext);
                     break;
 
                 case QueryNodeKind.All:
-                    ValidateAllNode(node as AllNode, settings);
+                    ValidateAllNode(node as AllNode, validatorContext);
                     break;
 
                 case QueryNodeKind.SingleValueOpenPropertyAccess:
@@ -739,12 +719,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        private static void ValidateFunction(string functionName, ODataValidationSettings settings)
+        private static void ValidateFunction(string functionName, FilterValidatorContext validatorContext)
         {
-            Contract.Assert(settings != null);
+            Contract.Assert(validatorContext != null);
 
             AllowedFunctions convertedFunction = ToODataFunction(functionName);
-            if ((settings.AllowedFunctions & convertedFunction) != convertedFunction)
+            if ((validatorContext.ValidationSettings.AllowedFunctions & convertedFunction) != convertedFunction)
             {
                 // this means the given function is not allowed
                 throw new ODataException(Error.Format(SRResources.NotAllowedFunction, functionName, "AllowedFunctions"));

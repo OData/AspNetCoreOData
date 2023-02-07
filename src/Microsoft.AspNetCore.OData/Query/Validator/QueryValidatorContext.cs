@@ -38,5 +38,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// The current depth.
         /// </summary>
         public int CurrentDepth { get; set; }
+
+        /// <summary>
+        /// Gets the Edm model.
+        /// </summary>
+        public IEdmModel Model => Context.Model;
     }
 }
