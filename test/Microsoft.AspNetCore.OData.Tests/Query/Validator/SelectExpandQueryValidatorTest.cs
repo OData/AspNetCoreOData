@@ -490,7 +490,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange & Act & Assert
             IServiceProvider services = new ServiceCollection()
                 .AddSingleton<ISelectExpandQueryValidator, SelectExpandQueryValidator>()
-                .AddSingleton<DefaultQuerySettings>().BuildServiceProvider();
+                .AddSingleton<DefaultQueryConfigurations>().BuildServiceProvider();
             context.RequestContainer = services;
             Assert.NotNull(context.GetSelectExpandQueryValidator());
         }

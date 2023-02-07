@@ -102,7 +102,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
-	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
+	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	[
 	TupleElementNamesAttribute(),
 	]
@@ -1271,6 +1271,18 @@ public class Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser : I
 	public virtual System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
+public class Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations {
+	public DefaultQueryConfigurations ()
+
+	bool EnableCount  { public get; public set; }
+	bool EnableExpand  { public get; public set; }
+	bool EnableFilter  { public get; public set; }
+	bool EnableOrderBy  { public get; public set; }
+	bool EnableSelect  { public get; public set; }
+	bool EnableSkipToken  { public get; public set; }
+	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
+}
+
 public class Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler : Microsoft.AspNetCore.OData.Query.SkipTokenHandler {
 	public DefaultSkipTokenHandler ()
 
@@ -1353,7 +1365,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryContext {
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.Edm.IEdmType elementType, Microsoft.OData.UriParser.ODataPath path)
 	public ODataQueryContext (Microsoft.OData.Edm.IEdmModel model, System.Type elementClrType, Microsoft.OData.UriParser.ODataPath path)
 
-	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings DefaultQuerySettings  { public get; }
+	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations DefaultQueryConfigurations  { public get; }
 	System.Type ElementClrType  { public get; }
 	Microsoft.OData.Edm.IEdmType ElementType  { public get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }

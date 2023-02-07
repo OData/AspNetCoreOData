@@ -5640,7 +5640,18 @@
             The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
             </summary>
         </member>
-   .Value.IEdmDeltaLinkBase">
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject.Reason">
+            <summary>
+            Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLink">
+            <summary>
+            Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
+            Holds the properties necessary to create the ODataDeltaLink.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaLinkBase">
             <summary>
             Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
             Holds the properties necessary to create either ODataDeltaLink or ODataDeltaDeletedLink.
@@ -14844,22 +14855,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
