@@ -8014,7 +8014,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations">
             <summary>
-            This class describes the default settings to use during query composition.
+            This class describes the default configurations to use during query composition.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand">

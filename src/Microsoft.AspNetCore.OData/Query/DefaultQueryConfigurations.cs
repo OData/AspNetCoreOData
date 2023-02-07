@@ -8,7 +8,7 @@
 namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
-    /// This class describes the default settings to use during query composition.
+    /// This class describes the default configurations to use during query composition.
     /// </summary>
     public class DefaultQueryConfigurations
     {
