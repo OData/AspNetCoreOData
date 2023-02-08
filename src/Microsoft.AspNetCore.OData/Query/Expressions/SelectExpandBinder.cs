@@ -99,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Type elementType;
             bool isCollection = TypeHelper.IsCollection(source.Type, out elementType);
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
-            if (computeClause != null)
+            if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
             {
                 subContext.AddComputedProperties(computeClause.ComputedItems);
             }
@@ -253,7 +253,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Type nullablePropertyType = TypeHelper.ToNullable(propertyValue.Type);
             Expression nullablePropertyValue = ExpressionHelpers.ToNullable(propertyValue);
 
-            if (filterClause != null)
+            if (filterClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Filter))
             {
                 bool isCollection = edmProperty.Type.IsCollection();
 
@@ -1098,7 +1098,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private Expression AddOrderByQueryForSource(QueryBinderContext context, Expression source, OrderByClause orderbyClause, Type elementType)
         {
-            if (orderbyClause != null)
+            if (orderbyClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.OrderBy))
             {
                 // TODO: Implement proper support for $select/$expand after $apply
                 ODataQuerySettings newSettings = new ODataQuerySettings();
@@ -1228,14 +1228,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
             }
 
-            if (hasSkipvalue)
+            if (hasSkipvalue && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Skip))
             {
                 Contract.Assert(skipOption.Value <= Int32.MaxValue);
                 source = ExpressionHelpers.Skip(source, (int)skipOption.Value, elementType,
                     settings.EnableConstantParameterization);
             }
 
-            if (hasTopValue)
+            if (hasTopValue && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Top))
             {
                 Contract.Assert(topOption.Value <= Int32.MaxValue);
                 source = ExpressionHelpers.Take(source, (int)topOption.Value, elementType,
@@ -1339,6 +1339,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 return expression;
             }
+        }
+
+        private static bool IsAvailableODataQueryOption(ODataQuerySettings querySettings, AllowedQueryOptions queryOptionFlag)
+        {
+            return (querySettings.IgnoredNestedQueryOptions & queryOptionFlag) == AllowedQueryOptions.None;
         }
 
         // returns all the derived types (direct and indirect) of baseType ordered according to their depth. The direct children

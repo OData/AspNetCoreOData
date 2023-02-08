@@ -43,8 +43,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private ODataQueryOptionParser _queryOptionParser;
 
-        private AllowedQueryOptions _ignoreQueryOptions = AllowedQueryOptions.None;
-
         private ETag _etagIfMatch;
 
         private bool _etagIfMatchChecked;
@@ -311,8 +309,9 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions)
         {
-            _ignoreQueryOptions = ignoreQueryOptions;
             ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            querySettings.IgnoredQueryOptions = ignoreQueryOptions;
+
             return ApplyTo(query, querySettings);
         }
 
@@ -323,10 +322,12 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings,
-            AllowedQueryOptions ignoreQueryOptions)
+        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
         {
-            _ignoreQueryOptions = ignoreQueryOptions;
+            ODataQuerySettings settings = new ODataQuerySettings();
+            settings.CopyFrom(querySettings);
+            settings.IgnoredQueryOptions = ignoreQueryOptions;
+
             return ApplyTo(query, querySettings);
         }
 
@@ -356,7 +357,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             // First apply $apply
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
-            if (IsAvailableODataQueryOption(Apply, AllowedQueryOptions.Apply))
+            if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
             {
                 result = Apply.ApplyTo(result, querySettings);
                 odataFeature.ApplyClause = Apply.ApplyClause;
@@ -365,9 +366,9 @@ namespace Microsoft.AspNetCore.OData.Query
 
             // TODO: need pass the result from $compute to the remaining query options
             // Construct the actual query and apply them in the following order: filter, orderby, skip, top
-            if (IsAvailableODataQueryOption(Filter, AllowedQueryOptions.Filter))
+            if (IsAvailableODataQueryOption(Filter, querySettings, AllowedQueryOptions.Filter))
             {
-                if (IsAvailableODataQueryOption(Compute, AllowedQueryOptions.Compute))
+                if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
                 {
                     Filter.Compute = Compute;
                 }
@@ -377,12 +378,12 @@ namespace Microsoft.AspNetCore.OData.Query
 
             // If both $search and $filter are specified in the same request, only those items satisfying both criteria are returned
             // apply $search
-            if (IsAvailableODataQueryOption(Search, AllowedQueryOptions.Search))
+            if (IsAvailableODataQueryOption(Search, querySettings, AllowedQueryOptions.Search))
             {
                 result = Search.ApplyTo(result, querySettings);
             }
 
-            if (IsAvailableODataQueryOption(Count, AllowedQueryOptions.Count))
+            if (IsAvailableODataQueryOption(Count, querySettings, AllowedQueryOptions.Count))
             {
                 if (odataFeature.TotalCountFunc == null)
                 {
@@ -406,8 +407,8 @@ namespace Microsoft.AspNetCore.OData.Query
             // If either is present in the query and we have permission,
             // generate an $orderby that will produce a stable sort.
             if (querySettings.EnsureStableOrdering &&
-                (IsAvailableODataQueryOption(Skip, AllowedQueryOptions.Skip) ||
-                 IsAvailableODataQueryOption(Top, AllowedQueryOptions.Top) ||
+                (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip) ||
+                 IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top) ||
                  querySettings.PageSize.HasValue))
             {
                 // If there is no OrderBy present, we manufacture a default.
@@ -419,9 +420,9 @@ namespace Microsoft.AspNetCore.OData.Query
                 orderBy = GenerateStableOrder();
             }
 
-            if (IsAvailableODataQueryOption(orderBy, AllowedQueryOptions.OrderBy))
+            if (IsAvailableODataQueryOption(orderBy, querySettings, AllowedQueryOptions.OrderBy))
             {
-                if (IsAvailableODataQueryOption(Compute, AllowedQueryOptions.Compute))
+                if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
                 {
                     orderBy.Compute = Compute;
                 }
@@ -429,7 +430,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 result = orderBy.ApplyTo(result, querySettings);
             }
 
-            if (IsAvailableODataQueryOption(SkipToken, AllowedQueryOptions.SkipToken))
+            if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
             {
                 result = SkipToken.ApplyTo(result, querySettings, this);
             }
@@ -445,12 +446,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
             }
 
-            if (IsAvailableODataQueryOption(Skip, AllowedQueryOptions.Skip))
+            if (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip))
             {
                 result = Skip.ApplyTo(result, querySettings);
             }
 
-            if (IsAvailableODataQueryOption(Top, AllowedQueryOptions.Top))
+            if (IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top))
             {
                 result = Top.ApplyTo(result, querySettings);
             }
@@ -571,7 +572,10 @@ namespace Microsoft.AspNetCore.OData.Query
         /// query options.</remarks>
         public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
         {
-            _ignoreQueryOptions = ignoreQueryOptions;
+            ODataQuerySettings settings = new ODataQuerySettings();
+            settings.CopyFrom(querySettings);
+            settings.IgnoredQueryOptions = ignoreQueryOptions;
+
             return ApplyTo(entity, querySettings);
         }
 
@@ -1037,17 +1041,18 @@ namespace Microsoft.AspNetCore.OData.Query
             }
         }
 
-        private bool IsAvailableODataQueryOption(object queryOption, AllowedQueryOptions queryOptionFlag)
+        private static bool IsAvailableODataQueryOption(object queryOption, ODataQuerySettings querySettings, AllowedQueryOptions queryOptionFlag)
         {
-            return ((queryOption != null) && ((_ignoreQueryOptions & queryOptionFlag) == AllowedQueryOptions.None));
+            return (queryOption != null) &&
+                ((querySettings.IgnoredQueryOptions & queryOptionFlag) == AllowedQueryOptions.None);
         }
 
         private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings)
         {
             var result = default(T);
-            bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, AllowedQueryOptions.Compute);
-            bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, AllowedQueryOptions.Select);
-            bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, AllowedQueryOptions.Expand);
+            bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
+            bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, querySettings, AllowedQueryOptions.Select);
+            bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, querySettings, AllowedQueryOptions.Expand);
             if (selectAvailable || expandAvailable)
             {
                 if ((!selectAvailable && SelectExpand.RawSelect != null) ||
