@@ -928,7 +928,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             else
             {
                 // create the serializer context for the complex and expanded item.
-                ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, null /*resourceContext.SerializerContext.QueryContext*/, selectItem);
+                ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, resourceContext.SerializerContext.QueryContext, selectItem);
 
                 // write object.
                 IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
