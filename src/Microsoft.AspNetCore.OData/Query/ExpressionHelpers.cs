@@ -281,11 +281,8 @@ namespace Microsoft.AspNetCore.OData.Query
 
         public static LambdaExpression GetPropertyAccessLambda(Type type, string propertyName)
         {
-            var dataMemberProps = type.GetProperties().Where(p => Attribute.IsDefined(p, typeof(DataMemberAttribute)));
-            var actualPropName = dataMemberProps
-                                    .SingleOrDefault(p => ((DataMemberAttribute)Attribute.GetCustomAttribute(p, typeof(DataMemberAttribute))).Name?.ToLower() == propertyName.ToLower())?.Name ?? propertyName;
             ParameterExpression odataItParameter = Expression.Parameter(type, "$it");
-            MemberExpression propertyAccess = Expression.Property(odataItParameter, actualPropName);
+            MemberExpression propertyAccess = Expression.Property(odataItParameter, propertyName);
             return Expression.Lambda(propertyAccess, odataItParameter);
         }
     }

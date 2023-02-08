@@ -1205,7 +1205,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         bool alreadyOrdered = false;
                         foreach (var prop in properties)
                         {
-                            source = ExpressionHelpers.OrderByPropertyExpression(source, prop.Name, elementType,
+                            string propertyName = context.Model.GetClrPropertyName(prop);
+                            source = ExpressionHelpers.OrderByPropertyExpression(source, propertyName, elementType,
                                 alreadyOrdered);
                             if (!alreadyOrdered)
                             {
