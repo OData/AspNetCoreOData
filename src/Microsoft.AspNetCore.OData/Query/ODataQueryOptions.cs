@@ -328,7 +328,7 @@ namespace Microsoft.AspNetCore.OData.Query
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, querySettings);
+            return ApplyTo(query, settings);
         }
 
         /// <summary>
@@ -576,7 +576,7 @@ namespace Microsoft.AspNetCore.OData.Query
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(entity, querySettings);
+            return ApplyTo(entity, settings);
         }
 
         /// <summary>

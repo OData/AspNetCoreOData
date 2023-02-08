@@ -10330,6 +10330,16 @@
             </summary>
             <value>The default value is <c>false</c>.</value>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions">
+            <summary>
+            Gets or sets a value indicating which query options should be ignored when applying queries.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredNestedQueryOptions">
+            <summary>
+            Gets or sets a value indicating which nested query options should be ignored typically within select and expand.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.PageSize">
             <summary>
             Gets or sets the maximum number of query results to return.

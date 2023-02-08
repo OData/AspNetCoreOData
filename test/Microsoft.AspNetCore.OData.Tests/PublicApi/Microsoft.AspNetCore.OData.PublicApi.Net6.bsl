@@ -1445,6 +1445,8 @@ public class Microsoft.AspNetCore.OData.Query.ODataQuerySettings {
 	bool EnsureStableOrdering  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption HandleNullPropagation  { public get; public set; }
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions IgnoredNestedQueryOptions  { public get; public set; }
+	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions IgnoredQueryOptions  { public get; public set; }
 	System.Nullable`1[[System.Int32]] PageSize  { public get; public set; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 }
