@@ -37,7 +37,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
 
             services.ConfigureControllers(typeof(CustomersController),
                 typeof(PeopleController),
-                typeof(NormalOrdersController));
+                typeof(NormalOrdersController),
+                typeof(EnableQueryMenusController),
+                typeof(QueryOptionsOfTMenusController));
 
             services.AddControllers().AddOData(opt =>
                 opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select().AddRouteComponents("autoexpand", edmModel));
@@ -392,6 +394,33 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
                 "\"CountryOrRegion\":{\"Id\":109,\"Name\":\"C and R 109\"}," +
                 "\"ZipCode\":{\"Id\":2009,\"Code\":\"Code 9\"}" +
               "}", payload);
+        }
+
+        [Theory]
+        [InlineData("EnableQueryMenus")]
+        [InlineData("QueryOptionsOfTMenus")]
+        public async Task NonDefaultMaxExpansionDepthAppliesToAutoExpand(string entitySet)
+        {
+            // Arrange
+            var request = new HttpRequestMessage(HttpMethod.Get, $"autoexpand/{entitySet}");
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Equal(
+                "{" +
+                $"\"@odata.context\":\"http://localhost/autoexpand/$metadata#{entitySet}(Tabs(Items(Notes())))\"," +
+                "\"value\":[{\"Id\":1,\"Tabs\":[{\"Id\":1,\"Items\":[{\"Id\":1,\"Notes\":[{\"Id\":1}]}]}]}]" +
+                "}",
+                content);
         }
     }
 }

@@ -5,9 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
@@ -72,6 +74,84 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             }
 
             return Ok(n);
+        }
+    }
+
+    public class EnableQueryMenusController : ODataController
+    {
+        private static readonly List<Menu> menus = new List<Menu>
+        {
+            new Menu
+            {
+                Id = 1,
+                Tabs = new List<Tab>
+                {
+                    new Tab
+                    {
+                        Id = 1,
+                        Items = new List<Item>
+                        {
+                            new Item
+                            {
+                                Id = 1,
+                                Notes = new List<Note>
+                                {
+                                    new Note { Id = 1 }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        [EnableQuery(MaxExpansionDepth = 4)]
+        public ActionResult Get()
+        {
+            return Ok(menus);
+        }
+    }
+
+    public class QueryOptionsOfTMenusController : ODataController
+    {
+        private static readonly List<Menu> menus = new List<Menu>
+        {
+            new Menu
+            {
+                Id = 1,
+                Tabs = new List<Tab>
+                {
+                    new Tab
+                    {
+                        Id = 1,
+                        Items = new List<Item>
+                        {
+                            new Item
+                            {
+                                Id = 1,
+                                Notes = new List<Note>
+                                {
+                                    new Note { Id = 1 }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        public ActionResult Get(ODataQueryOptions<Menu> queryOptions)
+        {
+            var validationSettings = new ODataValidationSettings
+            {
+                MaxExpansionDepth = 4
+            };
+
+            queryOptions.Validate(validationSettings);
+
+            var result = queryOptions.ApplyTo(menus.AsQueryable());
+            
+            return Ok(result);
         }
     }
 }
