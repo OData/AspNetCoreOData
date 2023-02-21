@@ -16,7 +16,6 @@ using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Abstracts
 {
-
     /// <summary>
     /// Provide the interface for the details of a given OData request.
     /// </summary>
@@ -99,7 +98,5 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// </summary>
         /// <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
         IDictionary<string, object> RoutingConventionsStore { get; }
-
     }
-
 }

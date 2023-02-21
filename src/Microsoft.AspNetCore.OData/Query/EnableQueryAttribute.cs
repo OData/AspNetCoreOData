@@ -62,108 +62,19 @@ namespace Microsoft.AspNetCore.OData.Query
 
             actionExecutingContext.HttpContext.Items.TryAdd(nameof(RequestQueryData), requestQueryData);
 
-            HttpRequest request = actionExecutingContext.HttpContext.Request;
-            ODataPath path = request.ODataFeature().Path;
-
-            _querySettings.TimeZone = request.GetTimeZoneInfo();
-
-            ODataQueryContext queryContext;
-
-            // For OData based controllers.
-            if (path != null)
+            ODataQueryOptions queryOptions = CreateQueryOptionsOnExecuting(actionExecutingContext);
+            if (queryOptions == null)
             {
-                IEdmType edmType = path.GetEdmType();
-
-                // When $count is at the end, the return type is always int. Trying to instead fetch the return type of the actual type being counted on.
-                if (request.IsCountRequest())
-                {
-                    ODataPathSegment[] pathSegments = path.ToArray();
-                    edmType = pathSegments[pathSegments.Length - 2].EdmType;
-                }
-
-                IEdmType elementType = edmType.AsElementType();
-
-                IEdmModel edmModel = request.GetModel();
-
-                // For Swagger metadata request. elementType is null.
-                if (elementType == null || edmModel == null)
-                {
-                    return;
-                }
-
-                Type clrType = edmModel.GetClrType(elementType.ToEdmTypeReference(isNullable: false));
-
-                // CLRType can be missing if untyped registrations were made.
-                if (clrType != null)
-                {
-                    queryContext = new ODataQueryContext(edmModel, clrType, path);
-                }
-                else
-                {
-                    // In case where CLRType is missing, $count, $expand verifications cannot be done.
-                    // More importantly $expand required ODataQueryContext with clrType which cannot be done
-                    // If the model is untyped. Hence for such cases, letting the validation run post action.
-                    return;
-                }
-            }
-            else
-            {
-                // For non-OData Json based controllers.
-                // For these cases few options are supported like IEnumerable<T>, Task<IEnumerable<T>>, T, Task<T>
-                // Other cases where we cannot determine the return type upfront, are not supported
-                // Like IActionResult, SingleResult. For such cases, the validation is run in OnActionExecuted
-                // When we have the result.
-                ControllerActionDescriptor controllerActionDescriptor = actionExecutingContext.ActionDescriptor as ControllerActionDescriptor;
-
-                if (controllerActionDescriptor == null)
-                {
-                    return;
-                }
-
-                Type returnType = controllerActionDescriptor.MethodInfo.ReturnType;
-                Type elementType;
-
-                // For Task<> get the base object.
-                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    returnType = returnType.GetGenericArguments().First();
-                }
-
-                // For NetCore2.2+ new type ActionResult<> was created which encapsulates IActionResult and T result.
-                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
-                {
-                    returnType = returnType.GetGenericArguments().First();
-                }
-
-                if (TypeHelper.IsCollection(returnType))
-                {
-                    elementType = TypeHelper.GetImplementedIEnumerableType(returnType);
-                }
-                else if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    elementType = returnType.GetGenericArguments().First();
-                }
-                else
-                {
-                    return;
-                }
-
-                IEdmModel edmModel = GetModel(
-                    elementType,
-                    request,
-                    controllerActionDescriptor);
-
-                queryContext = new ODataQueryContext(
-                    edmModel,
-                    elementType);
+                return; // skip validation
             }
 
             // Create and validate the query options.
             requestQueryData.QueryValidationRunBeforeActionExecution = true;
-            requestQueryData.ProcessedQueryOptions = new ODataQueryOptions(queryContext, request);
+            requestQueryData.ProcessedQueryOptions = queryOptions;
 
             try
             {
+                HttpRequest request = actionExecutingContext.HttpContext.Request;
                 ValidateQuery(request, requestQueryData.ProcessedQueryOptions);
             }
             catch (ArgumentOutOfRangeException e)
@@ -191,6 +102,111 @@ namespace Microsoft.AspNetCore.OData.Query
                     Error.Format(SRResources.UriQueryStringInvalid, e.Message),
                     e);
             }
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataQueryOptions"/> for action executing validation.
+        /// </summary>
+        /// <param name="actionExecutingContext">The action executing context.</param>
+        /// <returns>The created <see cref="ODataQueryOptions"/> or null if we can't create it during action executing.</returns>
+        protected virtual ODataQueryOptions CreateQueryOptionsOnExecuting(ActionExecutingContext actionExecutingContext)
+        {
+            if (actionExecutingContext == null)
+            {
+                throw new ArgumentNullException(nameof(actionExecutingContext));
+            }
+
+            HttpRequest request = actionExecutingContext.HttpContext.Request;
+            ODataPath path = request.ODataFeature().Path;
+
+            _querySettings.TimeZone = request.GetTimeZoneInfo();
+
+            ODataQueryContext queryContext;
+
+            // For OData based controllers.
+            if (path != null)
+            {
+                IEdmType edmType = path.GetEdmType();
+
+                // When $count is at the end, the return type is always int. Trying to instead fetch the return type of the actual type being counted on.
+                if (request.IsCountRequest())
+                {
+                    ODataPathSegment[] pathSegments = path.ToArray();
+                    edmType = pathSegments[pathSegments.Length - 2].EdmType;
+                }
+
+                IEdmType elementType = edmType.AsElementType();
+
+                IEdmModel edmModel = request.GetModel();
+
+                // For Swagger metadata request. elementType is null.
+                if (elementType == null || edmModel == null)
+                {
+                    return null;
+                }
+
+                Type clrType = edmModel.GetClrType(elementType.ToEdmTypeReference(isNullable: false));
+
+                // CLRType can be missing if untyped registrations were made.
+                if (clrType != null)
+                {
+                    queryContext = new ODataQueryContext(edmModel, clrType, path);
+                }
+                else
+                {
+                    // In case where CLRType is missing, $count, $expand verifications cannot be done.
+                    // More importantly $expand required ODataQueryContext with clrType which cannot be done
+                    // If the model is untyped. Hence for such cases, letting the validation run post action.
+                    return null;
+                }
+            }
+            else
+            {
+                // For non-OData Json based controllers.
+                // For these cases few options are supported like IEnumerable<T>, Task<IEnumerable<T>>, T, Task<T>
+                // Other cases where we cannot determine the return type upfront, are not supported
+                // Like IActionResult, SingleResult. For such cases, the validation is run in OnActionExecuted
+                // When we have the result.
+                ControllerActionDescriptor controllerActionDescriptor = actionExecutingContext.ActionDescriptor as ControllerActionDescriptor;
+                if (controllerActionDescriptor == null)
+                {
+                    return null;
+                }
+
+                Type returnType = controllerActionDescriptor.MethodInfo.ReturnType;
+                Type elementType;
+
+                // For Task<> get the base object.
+                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    returnType = returnType.GetGenericArguments().First();
+                }
+
+                // For NetCore2.2+ new type ActionResult<> was created which encapsulates IActionResult and T result.
+                if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
+                {
+                    returnType = returnType.GetGenericArguments().First();
+                }
+
+                if (TypeHelper.IsCollection(returnType))
+                {
+                    elementType = TypeHelper.GetImplementedIEnumerableType(returnType);
+                }
+                else if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+                {
+                    elementType = returnType.GetGenericArguments().First();
+                }
+                else
+                {
+                    return null;
+                }
+
+                IEdmModel edmModel = GetModel(elementType, request, controllerActionDescriptor);
+                queryContext = new ODataQueryContext(edmModel, elementType);
+            }
+
+            // Create and validate the query options.
+            return new ODataQueryOptions(queryContext, request);
         }
 
         /// <summary>
@@ -533,17 +549,29 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Create and validate a new instance of <see cref="ODataQueryOptions"/> from a query and context.
+        /// Create and validate a new instance of <see cref="ODataQueryOptions"/> from a query and context during action executed.
+        /// Developers can override this virtual method to provide its own <see cref="ODataQueryOptions"/>.
         /// </summary>
         /// <param name="request">The incoming request.</param>
         /// <param name="queryContext">The query context.</param>
-        /// <returns></returns>
-        private ODataQueryOptions CreateAndValidateQueryOptions(HttpRequest request, ODataQueryContext queryContext)
+        /// <returns>The created <see cref="ODataQueryOptions"/>.</returns>
+        protected virtual ODataQueryOptions CreateAndValidateQueryOptions(HttpRequest request, ODataQueryContext queryContext)
         {
+            if (request == null)
+            {
+                throw Error.ArgumentNull("request");
+            }
+
+            if (queryContext == null)
+            {
+                throw Error.ArgumentNull("queryContext");
+            }
+
             RequestQueryData requestQueryData = request.HttpContext.Items[nameof(RequestQueryData)] as RequestQueryData;
 
             if (requestQueryData != null && requestQueryData.QueryValidationRunBeforeActionExecution)
             {
+                // processed, just return the query option and skip validation.
                 return requestQueryData.ProcessedQueryOptions;
             }
 
