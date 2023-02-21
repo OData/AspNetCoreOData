@@ -234,7 +234,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
-        public void OnActionExecuted_Throws_Null_Context()
+        public void OnActionExecuted_Throws_Null_ActionExecutedContext()
         {
             ExceptionAssert.ThrowsArgumentNull(() => new EnableQueryAttribute().OnActionExecuted(null), "actionExecutedContext");
         }
@@ -355,13 +355,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             }
         }
 
-#if NETCORE // Following functionality is only supported in NetCore.
         [Fact]
-        public void OnActionExecuting_Throws_Null_Context()
+        public void OnActionExecuting_Throws_Null_ActionExecutingContext()
         {
-            ExceptionAssert.ThrowsArgumentNull(() => new EnableQueryAttribute().OnActionExecuting(null), "context");
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => new EnableQueryAttribute().OnActionExecuting(null), "actionExecutingContext");
         }
-#endif
+
+        [Fact]
+        public void OnActionExecuting_Calls_CreateQueryOptionsOnExecuting()
+        {
+            // Arrange
+            OverridQueryOptionEnableQueryAttribute enableQueryAttribute = new OverridQueryOptionEnableQueryAttribute();
+
+            ActionExecutingContext context = CreateDefaultActionExecutingContext();
+
+            // Act
+            Assert.False(enableQueryAttribute.Called); // Guard
+            enableQueryAttribute.OnActionExecuting(context);
+
+            // Assert
+            Assert.True(enableQueryAttribute.Called);
+        }
+
+        private class OverridQueryOptionEnableQueryAttribute : EnableQueryAttribute
+        {
+            public bool Called { get; set; } = false;
+
+            protected override ODataQueryOptions CreateQueryOptionsOnExecuting(ActionExecutingContext actionExecutingContext)
+            {
+                Called = true;
+                return null;
+            }
+        }
 
 #if false // TODO #939: Enable these test on AspNetCore.
         [Fact]
@@ -1278,6 +1304,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             return actionExecutedContext;
         }
 #endif
+        private static ActionExecutedContext CreateActionExecutedContext(ActionExecutingContext context)
+        {
+            return new ActionExecutedContext(context, context.Filters, context.Controller)
+            {
+                Result = context.Result,
+            };
+        }
+
+        private static ActionExecutingContext CreateDefaultActionExecutingContext()
+        {
+            return new ActionExecutingContext(
+                CreateActionContext(),
+                new List<IFilterMetadata>(),
+                new Dictionary<string, object>(),
+                controller: new object());
+        }
+
+        private static ActionContext CreateActionContext()
+        {
+            return new ActionContext(new DefaultHttpContext(), new RouteData(), new ActionDescriptor());
+        }
+
         private static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();

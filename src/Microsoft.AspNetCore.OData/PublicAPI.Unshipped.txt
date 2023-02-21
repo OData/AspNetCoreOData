@@ -1830,6 +1830,8 @@ virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvid
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ApplyQuery(object entity, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> object
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ApplyQuery(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable
+virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateAndValidateQueryOptions(Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.OData.Query.ODataQueryContext queryContext) -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
+virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext actionExecutingContext) -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModel(System.Type elementClrType, Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor actionDescriptor) -> Microsoft.OData.Edm.IEdmModel
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ValidateQuery(Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> void
 virtual Microsoft.AspNetCore.OData.Query.ETag.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable

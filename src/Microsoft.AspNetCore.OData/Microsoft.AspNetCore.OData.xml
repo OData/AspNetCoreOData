@@ -8225,6 +8225,13 @@
             </summary>
             <param name="actionExecutingContext">The action executing context.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> for action executing validation.
+            </summary>
+            <param name="actionExecutingContext">The action executing context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> or null if we can't create it during action executing.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext)">
             <summary>
             Performs the query composition after action is executed. It first tries to retrieve the IQueryable from the
@@ -8315,11 +8322,12 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateAndValidateQueryOptions(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
-            Create and validate a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> from a query and context.
+            Create and validate a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> from a query and context during action executed.
+            Developers can override this virtual method to provide its own <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.
             </summary>
             <param name="request">The incoming request.</param>
             <param name="queryContext">The query context.</param>
-            <returns></returns>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.SingleOrDefault(System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)">
             <summary>
