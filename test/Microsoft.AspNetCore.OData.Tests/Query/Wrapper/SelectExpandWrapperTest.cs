@@ -254,9 +254,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
-        public void ToDictionary_Throws_IfMappingIsNullOrEmpty_ForAGivenProperty(string propertyMapping)
+        public void ToDictionary_Throws_IfMappingIsEmpty_ForAGivenProperty(string propertyMapping)
         {
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "Name");
@@ -282,38 +281,65 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
             // Act & Assert
             ExceptionAssert.Throws<InvalidOperationException>(() =>
                 testWrapper.ToDictionary(mapperProvider), 
-                "The key mapping for the property 'SampleProperty' can't be null or empty.");
+                "The key mapping for the property 'SampleProperty' can't be empty.");
         }
 
         [Fact]
-        public void ToDictionary_AppliesMappingToAllProperties_IfInstanceIsNotNull()
+        public void ToDictionary_AppliesMappingToAllProperties_IfInstanceIsNotNull_IfPropertyIsRenamed()
         {
             // Arrange
-            EdmEntityType entityType = new EdmEntityType("NS", "Name");
-            entityType.AddStructuralProperty("SampleProperty", EdmPrimitiveTypeKind.Int32);
-            
-            EdmModel model = new EdmModel();
-            model.AddElement(entityType);
-            model.SetAnnotationValue(entityType, new ClrTypeAnnotation(typeof(TestEntity)));
-            IEdmTypeReference edmType = new EdmEntityTypeReference(entityType, isNullable: false);
-            
-            SelectExpandWrapper<TestEntity> testWrapper = new SelectExpandWrapper<TestEntity>
-            {
-                Instance = new TestEntity { SampleProperty = 42 },
-                Model = model,
-                UseInstanceForProperties = true,
-            };
-            
-            Mock<IPropertyMapper> mapperMock = new Mock<IPropertyMapper>();
-            mapperMock.Setup(m => m.MapProperty("SampleProperty")).Returns("Sample");
-            Func<IEdmModel, IEdmStructuredType, IPropertyMapper> mapperProvider =
-                (IEdmModel m, IEdmStructuredType t) => mapperMock.Object;
+            var testWrapper = GetSamplePropertyTestWrapper();
+            var mapperProvider = GetMapperProvider("SampleProperty", "Sample");
 
             // Act
             var result = testWrapper.ToDictionary(mapperProvider);
 
             // Assert
             Assert.Equal(42, result["Sample"]);
+        }
+
+        [Fact]
+        public void ToDictionary_AppliesMappingToAllProperties_IfInstanceIsNotNull_IfPropertyIsIgnored()
+        {
+            // Arrange
+            var testWrapper = GetSamplePropertyTestWrapper();
+            var mapperProvider = GetMapperProvider("SampleProperty", null);
+
+            // Act
+            var result = testWrapper.ToDictionary(mapperProvider);
+
+            // Assert
+            Assert.False(result.ContainsKey("SampleProperty"));
+        }
+
+        private Func<IEdmModel, IEdmStructuredType, IPropertyMapper> GetMapperProvider(string mapFrom, string mapTo)
+        {
+            Mock<IPropertyMapper> mapperMock = new Mock<IPropertyMapper>();
+            mapperMock.Setup(m => m.MapProperty(mapFrom)).Returns(mapTo);
+            Func<IEdmModel, IEdmStructuredType, IPropertyMapper> mapperProvider =
+                (IEdmModel m, IEdmStructuredType t) => mapperMock.Object;
+
+            return mapperProvider;
+        }
+
+        private SelectExpandWrapper<TestEntity> GetSamplePropertyTestWrapper()
+        {
+            EdmEntityType entityType = new EdmEntityType("NS", "Name");
+            entityType.AddStructuralProperty("SampleProperty", EdmPrimitiveTypeKind.Int32);
+
+            EdmModel model = new EdmModel();
+            model.AddElement(entityType);
+            model.SetAnnotationValue(entityType, new ClrTypeAnnotation(typeof(TestEntity)));
+            IEdmTypeReference edmType = new EdmEntityTypeReference(entityType, isNullable: false);
+
+            SelectExpandWrapper<TestEntity> testWrapper = new SelectExpandWrapper<TestEntity>
+            {
+                Instance = new TestEntity { SampleProperty = 42 },
+                Model = model,
+                UseInstanceForProperties = true,
+            };
+
+            return testWrapper;
         }
 
         private class TestEntity

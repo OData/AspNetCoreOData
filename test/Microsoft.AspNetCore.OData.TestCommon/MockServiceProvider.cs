@@ -7,9 +7,9 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.TestCommon
@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon
 
             odataContainerBuilder.AddDefaultODataServices();
 
-            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => new DefaultQuerySettings());
+            odataContainerBuilder.AddService(ServiceLifetime.Singleton, sp => new DefaultQueryConfigurations());
 
             odataContainerBuilder.AddService(ServiceLifetime.Singleton, typeof(ODataUriResolver),
                 sp => new UnqualifiedODataUriResolver { EnableCaseInsensitive = true });

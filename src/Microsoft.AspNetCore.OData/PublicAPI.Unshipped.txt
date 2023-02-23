@@ -652,6 +652,7 @@ Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.I
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.OData.ODataVersion version, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.Conventions.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Routing.Conventions.IODataControllerActionConvention>
 Microsoft.AspNetCore.OData.ODataOptions.Count() -> Microsoft.AspNetCore.OData.ODataOptions
@@ -659,7 +660,7 @@ Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableAttributeRouting.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableContinueOnErrorHeader.set -> void
-Microsoft.AspNetCore.OData.ODataOptions.ConfigureServiceCollection(System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.ConfigureServiceCollection(Microsoft.OData.ODataVersion version, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.get -> bool
 Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.EnableQueryFeatures(int? maxTopValue = null) -> Microsoft.AspNetCore.OData.ODataOptions
@@ -668,7 +669,7 @@ Microsoft.AspNetCore.OData.ODataOptions.Filter() -> Microsoft.AspNetCore.OData.O
 Microsoft.AspNetCore.OData.ODataOptions.GetRouteServices(string routePrefix) -> System.IServiceProvider
 Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
-Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
+Microsoft.AspNetCore.OData.ODataOptions.QueryConfigurations.get -> Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
 Microsoft.AspNetCore.OData.ODataOptions.RouteComponents.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel EdmModel, System.IServiceProvider ServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.RouteOptions.get -> Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
 Microsoft.AspNetCore.OData.ODataOptions.Select() -> Microsoft.AspNetCore.OData.ODataOptions
@@ -694,9 +695,9 @@ Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators.Subtract = 2 -> Micr
 Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.All = 268435456 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllDateTimeFunctions = Microsoft.AspNetCore.OData.Query.AllowedFunctions.Year | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Date | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Month | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Time | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Day | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Hour | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Minute | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Second | Microsoft.AspNetCore.OData.Query.AllowedFunctions.FractionalSeconds -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
-Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllFunctions = Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Cast | Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllDateTimeFunctions | Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllMathFunctions | Microsoft.AspNetCore.OData.Query.AllowedFunctions.IsOf | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Any | Microsoft.AspNetCore.OData.Query.AllowedFunctions.All -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
+Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllFunctions = Microsoft.AspNetCore.OData.Query.AllowedFunctions.Cast | Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllDateTimeFunctions | Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllMathFunctions | Microsoft.AspNetCore.OData.Query.AllowedFunctions.IsOf | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Any | Microsoft.AspNetCore.OData.Query.AllowedFunctions.All | Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllMathFunctions = Microsoft.AspNetCore.OData.Query.AllowedFunctions.Round | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Floor | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Ceiling -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
-Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions = Microsoft.AspNetCore.OData.Query.AllowedFunctions.StartsWith | Microsoft.AspNetCore.OData.Query.AllowedFunctions.EndsWith | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Contains | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Length | Microsoft.AspNetCore.OData.Query.AllowedFunctions.IndexOf | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Concat | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Substring | Microsoft.AspNetCore.OData.Query.AllowedFunctions.ToLower | Microsoft.AspNetCore.OData.Query.AllowedFunctions.ToUpper | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Trim -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
+Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions = Microsoft.AspNetCore.OData.Query.AllowedFunctions.StartsWith | Microsoft.AspNetCore.OData.Query.AllowedFunctions.EndsWith | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Contains | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Length | Microsoft.AspNetCore.OData.Query.AllowedFunctions.IndexOf | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Concat | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Substring | Microsoft.AspNetCore.OData.Query.AllowedFunctions.ToLower | Microsoft.AspNetCore.OData.Query.AllowedFunctions.ToUpper | Microsoft.AspNetCore.OData.Query.AllowedFunctions.Trim | Microsoft.AspNetCore.OData.Query.AllowedFunctions.MatchesPattern -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.Any = 134217728 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.Cast = 1024 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.Ceiling = 33554432 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
@@ -711,6 +712,7 @@ Microsoft.AspNetCore.OData.Query.AllowedFunctions.Hour = 131072 -> Microsoft.Asp
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.IndexOf = 16 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.IsOf = 67108864 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.Length = 8 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
+Microsoft.AspNetCore.OData.Query.AllowedFunctions.MatchesPattern = 536870912 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.Minute = 524288 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.Month = 8192 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
 Microsoft.AspNetCore.OData.Query.AllowedFunctions.None = 0 -> Microsoft.AspNetCore.OData.Query.AllowedFunctions
@@ -766,6 +768,9 @@ Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ComputeQueryOption(string ra
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ResultClrType.get -> System.Type
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator
+Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper.MapProperty(string propertyName) -> string
 Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection
@@ -801,13 +806,29 @@ Microsoft.AspNetCore.OData.Query.CountQueryOption.CountQueryOption(string rawVal
 Microsoft.AspNetCore.OData.Query.CountQueryOption.GetEntityCount(System.Linq.IQueryable query) -> long?
 Microsoft.AspNetCore.OData.Query.CountQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.CountQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator
+Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator
 Microsoft.AspNetCore.OData.Query.CountQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.CountQueryOption.Value.get -> bool
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.DefaultODataQueryRequestParser() -> void
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.DefaultQueryConfigurations() -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableCount.get -> bool
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableCount.set -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand.get -> bool
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand.set -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableFilter.get -> bool
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableFilter.set -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableOrderBy.get -> bool
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableOrderBy.set -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSelect.get -> bool
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSelect.set -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSkipToken.get -> bool
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSkipToken.set -> void
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxTop.get -> int?
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxTop.set -> void
 Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler
 Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.DefaultSkipTokenHandler() -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute
@@ -920,7 +941,7 @@ Microsoft.AspNetCore.OData.Query.FilterQueryOption.FilterClause.get -> Microsoft
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.FilterQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator
+Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator
 Microsoft.AspNetCore.OData.Query.FilterQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default = 0 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
@@ -931,7 +952,7 @@ Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
 Microsoft.AspNetCore.OData.Query.ODataQueryContext
-Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
+Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQueryConfigurations.get -> Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.ElementClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.ElementType.get -> Microsoft.OData.Edm.IEdmType
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.Model.get -> Microsoft.OData.Edm.IEdmModel
@@ -956,7 +977,7 @@ Microsoft.AspNetCore.OData.Query.ODataQueryOptions.SelectExpand.get -> Microsoft
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Skip.get -> Microsoft.AspNetCore.OData.Query.SkipQueryOption
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.SkipToken.get -> Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Top.get -> Microsoft.AspNetCore.OData.Query.TopQueryOption
-Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator
+Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.IfMatch.get -> Microsoft.AspNetCore.OData.Query.ETag<TEntity>
@@ -1029,7 +1050,7 @@ Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByNodes.get -> System.C
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.OrderByQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
+Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.OrderByQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider
 Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext context) -> void
@@ -1057,7 +1078,7 @@ Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.RawSelect.get -> string
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.SelectExpandClause.get -> Microsoft.OData.UriParser.SelectExpandClause
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.SelectExpandQueryOption(string select, string expand, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator
+Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.SkipQueryOption
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
@@ -1066,7 +1087,7 @@ Microsoft.AspNetCore.OData.Query.SkipQueryOption.Context.get -> Microsoft.AspNet
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.SkipQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator
+Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.SkipQueryOption.Value.get -> int
 Microsoft.AspNetCore.OData.Query.SkipTokenHandler
@@ -1077,7 +1098,7 @@ Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Handler.get -> Microsoft.A
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.SkipTokenQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context) -> void
 Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator
+Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator
 Microsoft.AspNetCore.OData.Query.TopQueryOption
 Microsoft.AspNetCore.OData.Query.TopQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 Microsoft.AspNetCore.OData.Query.TopQueryOption.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IOrderedQueryable<T>
@@ -1085,13 +1106,43 @@ Microsoft.AspNetCore.OData.Query.TopQueryOption.Context.get -> Microsoft.AspNetC
 Microsoft.AspNetCore.OData.Query.TopQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.TopQueryOption.TopQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
-Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator
+Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.TopQueryOption.Value.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator.ComputeQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.CountQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.FilterQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Clone() -> Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentAnyAllExpressionDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentNodeCount.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterLambda() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitLambda() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Filter.get -> Microsoft.AspNetCore.OData.Query.FilterQueryOption
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Filter.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.FilterValidatorContext() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.IncrementNodeCount() -> void
+Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.ODataQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
@@ -1119,8 +1170,28 @@ Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxTop.set ->
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.ODataValidationSettings() -> void
 Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.OrderByQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Context.get -> Microsoft.AspNetCore.OData.Query.ODataQueryContext
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Context.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.CurrentDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.CurrentDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Model.get -> Microsoft.OData.Edm.IEdmModel
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Property.get -> Microsoft.OData.Edm.IEdmProperty
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.Property.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.QueryValidatorContext() -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.StructuredType.get -> Microsoft.OData.Edm.IEdmStructuredType
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.StructuredType.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.ValidationSettings.get -> Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
+Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.ValidationSettings.set -> void
 Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.SelectExpandQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.Clone() -> Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.RemainingDepth.get -> int?
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.RemainingDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.SelectExpand.get -> Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.SelectExpand.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext.SelectExpandValidatorContext() -> void
 Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.SkipQueryValidator() -> void
 Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator
@@ -1133,8 +1204,26 @@ Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.TryGetPropertyValue(
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary(System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> propertyMapperProvider) -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.AspNetCore.OData.Results.BadRequestODataResult
+Microsoft.AspNetCore.OData.Results.BadRequestODataResult.BadRequestODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNetCore.OData.Results.BadRequestODataResult.BadRequestODataResult(string message) -> void
+Microsoft.AspNetCore.OData.Results.BadRequestODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNetCore.OData.Results.ConflictODataResult
+Microsoft.AspNetCore.OData.Results.ConflictODataResult.ConflictODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNetCore.OData.Results.ConflictODataResult.ConflictODataResult(string message) -> void
+Microsoft.AspNetCore.OData.Results.ConflictODataResult.Error.get -> Microsoft.OData.ODataError
 Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>
 Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.CreatedODataResult(T entity) -> void
+Microsoft.AspNetCore.OData.Results.IODataErrorResult
+Microsoft.AspNetCore.OData.Results.IODataErrorResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNetCore.OData.Results.NotFoundODataResult
+Microsoft.AspNetCore.OData.Results.NotFoundODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNetCore.OData.Results.NotFoundODataResult.NotFoundODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNetCore.OData.Results.NotFoundODataResult.NotFoundODataResult(string message) -> void
+Microsoft.AspNetCore.OData.Results.ODataErrorResult
+Microsoft.AspNetCore.OData.Results.ODataErrorResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNetCore.OData.Results.ODataErrorResult.ODataErrorResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNetCore.OData.Results.ODataErrorResult.ODataErrorResult(string errorCode, string message) -> void
 Microsoft.AspNetCore.OData.Results.PageResult
 Microsoft.AspNetCore.OData.Results.PageResult.Count.get -> long?
 Microsoft.AspNetCore.OData.Results.PageResult.NextPageLink.get -> System.Uri
@@ -1149,6 +1238,14 @@ Microsoft.AspNetCore.OData.Results.SingleResult.SingleResult(System.Linq.IQuerya
 Microsoft.AspNetCore.OData.Results.SingleResult<T>
 Microsoft.AspNetCore.OData.Results.SingleResult<T>.Queryable.get -> System.Linq.IQueryable<T>
 Microsoft.AspNetCore.OData.Results.SingleResult<T>.SingleResult(System.Linq.IQueryable<T> queryable) -> void
+Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult
+Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.UnauthorizedODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.UnauthorizedODataResult(string message) -> void
+Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult
+Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.Error.get -> Microsoft.OData.ODataError
+Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.UnprocessableEntityODataResult(Microsoft.OData.ODataError odataError) -> void
+Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.UnprocessableEntityODataResult(string message) -> void
 Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>
 Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.UpdatedODataResult(T entity) -> void
 Microsoft.AspNetCore.OData.Routing.Attributes.ODataAttributeRoutingAttribute
@@ -1211,6 +1308,7 @@ Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention
 Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.SingletonRoutingConvention() -> void
 Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata
+Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.IsConventional.get -> bool
 Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Model.get -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Prefix.get -> string
 Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata.Template.get -> Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
@@ -1244,6 +1342,8 @@ Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationC
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.ODataRouteOptions() -> void
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata
+Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.IsConventional.get -> bool
+Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.IsConventional.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Model.get -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.ODataRoutingMetadata(string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate template) -> void
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.Prefix.get -> string
@@ -1437,8 +1537,14 @@ override Microsoft.AspNetCore.OData.Query.ETag.TrySetMember(System.Dynamic.SetMe
 override Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
+override Microsoft.AspNetCore.OData.Results.BadRequestODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNetCore.OData.Results.ConflictODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNetCore.OData.Results.NotFoundODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNetCore.OData.Results.ODataErrorResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Results.PageResult<T>.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
+override Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
+override Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 override Microsoft.AspNetCore.OData.Routing.Conventions.ActionRoutingConvention.IsOperationParameterMatched(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.Mvc.ApplicationModels.ActionModel action) -> bool
@@ -1619,7 +1725,6 @@ static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQuery
 static Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> void
 static Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> bool
 static Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateErrorResponse(string message, System.Exception exception = null) -> Microsoft.AspNetCore.Mvc.SerializableError
-static Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModel(System.Type elementClrType, Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor actionDescriptor) -> Microsoft.OData.Edm.IEdmModel
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder binder, System.Collections.IEnumerable query, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Collections.IEnumerable
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder binder, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder binder, System.Linq.IQueryable query, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.IQueryable
@@ -1703,7 +1808,9 @@ virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerialize
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.CreateODataEnumValue(object graph, Microsoft.OData.Edm.IEdmEnumTypeReference enumType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataEnumValue
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.CreateODataPrimitiveValue(object graph, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataPrimitiveValue
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.AppendDynamicProperties(Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> void
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComplexNestedResourceInfo(Microsoft.OData.Edm.IEdmStructuralProperty complexProperty, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComputedProperty(string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataProperty
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDynamicComplexNestedResourceInfo(string propertyName, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateETag(Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> string
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateNavigationLink(Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateODataAction(Microsoft.OData.Edm.IEdmAction action, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataAction
@@ -1720,6 +1827,7 @@ virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvid
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ApplyQuery(object entity, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> object
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ApplyQuery(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable
+virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModel(System.Type elementClrType, Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor actionDescriptor) -> Microsoft.OData.Edm.IEdmModel
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ValidateQuery(Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> void
 virtual Microsoft.AspNetCore.OData.Query.ETag.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 virtual Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindCollectionConstantNode(Microsoft.OData.UriParser.CollectionConstantNode node) -> System.Linq.Expressions.Expression
@@ -1754,6 +1862,7 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindIndexOf(Mic
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindInNode(Microsoft.OData.UriParser.InNode inNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindIsOf(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindLength(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindMatchesPattern(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, string propertyPath, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindNow(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
@@ -1792,38 +1901,69 @@ virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IfNoneMatch.get -> Mi
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable
 virtual Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable<T>
+virtual Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.Validate(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings, Microsoft.OData.Edm.IEdmModel model) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAllNode(Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAnyNode(Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateArithmeticOperator(Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConstantNode(Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode countNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateLogicalOperator(Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateRangeVariable(Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
-virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAllNode(Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateAnyNode(Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateArithmeticOperator(Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionNode(Microsoft.OData.UriParser.CollectionNode node, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConstantNode(Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode countNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateFilter(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateLogicalOperator(Microsoft.OData.UriParser.BinaryOperatorNode binaryNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateRangeVariable(Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValueNode(Microsoft.OData.UriParser.SingleValueNode node, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedCountSelectItem(Microsoft.OData.UriParser.ExpandedCountSelectItem expandCountItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedNavigationSelectItem(Microsoft.OData.UriParser.ExpandedNavigationSelectItem expandItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateExpandedReferenceSelectItem(Microsoft.OData.UriParser.ExpandedReferenceSelectItem expandReferItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNamespaceQualifiedWildcardSelectItem(Microsoft.OData.UriParser.NamespaceQualifiedWildcardSelectItem namespaceQualifiedWildcardSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedApply(Microsoft.OData.UriParser.Aggregation.ApplyClause applyClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedCompute(Microsoft.OData.UriParser.ComputeClause computeClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedCount(bool? countOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedFilter(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedLevels(Microsoft.OData.UriParser.LevelsClause levelsClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedOrderby(Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedSearch(Microsoft.OData.UriParser.SearchClause searchClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedSkip(long? skipOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateNestedTop(long? topOption, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidatePathSelectItem(Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSelectExpand(Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateWildcardSelectItem(Microsoft.OData.UriParser.WildcardSelectItem wildCardSelectItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 virtual Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.Entity.get -> T
 virtual Microsoft.AspNetCore.OData.Results.UpdatedODataResult<T>.Entity.get -> T
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.BadRequest(Microsoft.OData.ODataError odataError) -> Microsoft.AspNetCore.OData.Results.BadRequestODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.BadRequest(string message) -> Microsoft.AspNetCore.OData.Results.BadRequestODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Conflict(Microsoft.OData.ODataError odataError) -> Microsoft.AspNetCore.OData.Results.ConflictODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Conflict(string message) -> Microsoft.AspNetCore.OData.Results.ConflictODataResult
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Created<TEntity>(TEntity entity) -> Microsoft.AspNetCore.OData.Results.CreatedODataResult<TEntity>
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.NotFound(Microsoft.OData.ODataError odataError) -> Microsoft.AspNetCore.OData.Results.NotFoundODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.NotFound(string message) -> Microsoft.AspNetCore.OData.Results.NotFoundODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.ODataErrorResult(Microsoft.OData.ODataError odataError) -> Microsoft.AspNetCore.OData.Results.ODataErrorResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.ODataErrorResult(string errorCode, string message) -> Microsoft.AspNetCore.OData.Results.ODataErrorResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Unauthorized(Microsoft.OData.ODataError odataError) -> Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Unauthorized(string message) -> Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.UnprocessableEntity(Microsoft.OData.ODataError odataError) -> Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult
+virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.UnprocessableEntity(string message) -> Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult
 virtual Microsoft.AspNetCore.OData.Routing.Controllers.ODataController.Updated<TEntity>(TEntity entity) -> Microsoft.AspNetCore.OData.Results.UpdatedODataResult<TEntity>
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.AttributeRoutingConvention.AppliesToController(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context) -> bool

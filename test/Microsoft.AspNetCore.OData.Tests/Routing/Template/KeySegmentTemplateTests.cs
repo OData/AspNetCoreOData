@@ -485,6 +485,53 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
         }
 
         [Fact]
+        public void TryTranslateKeySegmentTemplate_WorksWithKeyValue_UsingEscapedString()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+            EdmEntityType customerType = new EdmEntityType("NS", "Customer");
+            EdmStructuralProperty firstName = customerType.AddStructuralProperty("FirstName", EdmPrimitiveTypeKind.String);
+            EdmStructuralProperty lastName = customerType.AddStructuralProperty("LastName", EdmPrimitiveTypeKind.String);
+            customerType.AddKeys(firstName, lastName);
+            model.AddElement(customerType);
+            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+            EdmEntitySet customers = container.AddEntitySet("Customers", customerType);
+            model.AddElement(container);
+            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { First = "'Zhang'", Last = "'Gan%2Fnng# T'" });
+            IDictionary<string, string> keys = new Dictionary<string, string>
+            {
+                { "FirstName", "{first}" },
+                { "LastName", "{last}" }
+            };
+            KeySegmentTemplate template = new KeySegmentTemplate(keys, customerType, customers);
+
+            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
+            {
+                RouteValues = routeValueDictionary,
+                Model = model
+            };
+
+            // Act
+            bool ok = template.TryTranslate(context);
+
+            // Assert
+            Assert.True(ok);
+            ODataPathSegment actual = Assert.Single(context.Segments);
+            KeySegment keySegment = Assert.IsType<KeySegment>(actual);
+            Assert.Collection(keySegment.Keys,
+                e =>
+                {
+                    Assert.Equal("FirstName", e.Key);
+                    Assert.Equal("Zhang", e.Value);
+                },
+                e =>
+                {
+                    Assert.Equal("LastName", e.Key);
+                    Assert.Equal("Gan/nng# T", e.Value);
+                });
+        }
+
+        [Fact]
         public void CreateKeySegmentKeySegmentTemplate_ThrowsArgumentNull_EntityType()
         {
             // Arrange & Act & Assert

@@ -10,6 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -104,7 +105,15 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            context.Segments.Add(Segment);
+            if (NavigationSource != null)
+            {
+                context.Segments.Add(Segment);
+                return true;
+            }
+
+            IEdmNavigationSource navigationSource = SegmentTemplateHelpers.GetNavigationSourceFromEdmOperation(context.Model, Action);
+            OperationSegment actionSegment = new OperationSegment(Action, navigationSource as IEdmEntitySetBase);
+            context.Segments.Add(actionSegment);
             return true;
         }
     }

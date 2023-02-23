@@ -1146,6 +1146,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         }
 
         [Fact]
+        public void StringFunctions_StringMatchesPattern()
+        {
+            // Arrange & Act & Assert
+            var filters = BindFilterAndVerify<Product>(
+                "matchesPattern(ProductName, 'A\\wc')",
+                "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript)",
+                NotTesting);
+
+            // Arrange & Act & Assert
+            InvokeFiltersAndThrows(filters, new Product { ProductName = null }, (typeof(ArgumentNullException), false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (true, true));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Abd" }, (false, false));
+
+            InvokeFiltersAndVerify(filters, new Product { ProductName = "Aθd" }, (false, false)); // ECMAScript has strict matching of \w
+        }
+
+        [Fact]
         public void StringFunctions_RecursiveMethodCall()
         {
             // Arrange & Act & Assert

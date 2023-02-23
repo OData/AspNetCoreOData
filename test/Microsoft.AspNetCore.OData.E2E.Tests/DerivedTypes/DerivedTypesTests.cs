@@ -5,12 +5,16 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
@@ -32,8 +36,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<Customer>("Customers");
+            builder.EntitySet<Customer>("Employees");
             builder.EntityType<Order>();
             builder.EntityType<VipCustomer>().DerivesFrom<Customer>();
+            builder.EntityType<EnterpriseCustomer>().DerivesFrom<Customer>();
             return builder.GetEdmModel();
         }
 
@@ -134,6 +140,120 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
             string expectedContent = "\"Id\":2,\"Name\":\"Customer 2\",\"LoyaltyCardNo\":\"9876543210\"," +
                 "\"Orders\":[{\"Id\":2,\"Amount\":230},{\"Id\":3,\"Amount\":150}]";
             Assert.Contains(expectedContent, await response.Content.ReadAsStringAsync());
+        }
+
+        [Theory]
+        [InlineData("Customers(4)")]
+        [InlineData("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer")]
+        public async Task RequestFullMetadataForDerivedTypeInstance(string odataPath)
+        {
+            // Arrange
+            var requestUri = $"/odata/{odataPath}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=full"));
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            var enterpriseCustomer = await response.Content.ReadAsObject<JObject>();
+
+            Assert.Equal(10, enterpriseCustomer.Count);
+
+            var odataContext = enterpriseCustomer.Value<string>("@odata.context");
+            var odataType = enterpriseCustomer.Value<string>("@odata.type");
+            var odataId = enterpriseCustomer.Value<string>("@odata.id");
+            var odataEditLink = enterpriseCustomer.Value<string>("@odata.editLink");
+            var id = enterpriseCustomer.Value<int?>("Id");
+            var name = enterpriseCustomer.Value<string>("Name");
+            var relationshipManagerAssociationLink = enterpriseCustomer.Value<string>("RelationshipManager@odata.associationLink");
+            var relationshipManagerNavigationLink = enterpriseCustomer.Value<string>("RelationshipManager@odata.navigationLink");
+
+            Assert.NotNull(odataContext);
+            Assert.NotNull(odataType);
+            Assert.NotNull(odataId);
+            Assert.NotNull(odataEditLink);
+            Assert.NotNull(id);
+            Assert.NotNull(name);
+            Assert.NotNull(relationshipManagerAssociationLink);
+            Assert.NotNull(relationshipManagerNavigationLink);
+
+            Assert.EndsWith("$metadata#Customers/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer/$entity", odataContext);
+            Assert.Equal("#Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer", odataType);
+            Assert.EndsWith("Customers(4)", odataId);
+            Assert.EndsWith("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer", odataEditLink);
+            Assert.Equal(4, id);
+            Assert.Equal("Customer 4", name);
+            Assert.EndsWith("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer/RelationshipManager/$ref", relationshipManagerAssociationLink);
+            Assert.EndsWith("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer/RelationshipManager", relationshipManagerNavigationLink);
+        }
+
+        [Theory]
+        [InlineData("Customers(4)", 4)]
+        [InlineData("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer", 3)]
+        public async Task RequestMinimalMetadataForDerivedTypeInstance(string odataPath, int propertyCount)
+        {
+            // Arrange
+            var requestUri = $"/odata/{odataPath}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            var enterpriseCustomer = await response.Content.ReadAsObject<JObject>();
+
+            Assert.Equal(propertyCount, enterpriseCustomer.Count);
+
+            var odataContext = enterpriseCustomer.Value<string>("@odata.context");
+            var id = enterpriseCustomer.Value<int?>("Id");
+            var name = enterpriseCustomer.Value<string>("Name");
+
+            Assert.NotNull(odataContext);
+            Assert.NotNull(id);
+            Assert.NotNull(name);
+
+            Assert.EndsWith("$metadata#Customers/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer/$entity", odataContext);
+            Assert.Equal(4, id);
+            Assert.Equal("Customer 4", name);
+        }
+
+        [Theory]
+        [InlineData("Customers(4)")]
+        [InlineData("Customers(4)/Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes.EnterpriseCustomer")]
+        public async Task RequestNoMetadataForDerivedTypeInstance(string odataPath)
+        {
+            // Arrange
+            var requestUri = $"/odata/{odataPath}";
+
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            var enterpriseCustomer = await response.Content.ReadAsObject<JObject>();
+
+            Assert.Equal(2, enterpriseCustomer.Count);
+
+            var id = enterpriseCustomer.Value<int?>("Id");
+            var name = enterpriseCustomer.Value<string>("Name");
+
+            Assert.NotNull(id);
+            Assert.NotNull(name);
+
+            Assert.Equal(4, id);
+            Assert.Equal("Customer 4", name);
         }
     }
 }

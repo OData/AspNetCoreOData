@@ -74,4 +74,32 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             _context.SaveChanges();
         }
     }
+
+    public class EmployeesController : ODataController
+    {
+        private static readonly List<Employee> employees = new List<Employee>
+        {
+            new Employee
+            {
+                Id = 1,
+                NextOfKin = new NextOfKin { Name = "NoK 1", PhysicalAddress = new Location { City = "Redmond" } }
+            },
+            new Employee
+            {
+                Id = 2,
+                NextOfKin = new NextOfKin { Name = "NoK 2", PhysicalAddress = new Location { City = "Nairobi" } }
+            },
+            new Employee
+            {
+                Id = 3,
+                NextOfKin = new NextOfKin { Name = "NoK 3", PhysicalAddress = new Location { City = "Redmond" } }
+            }
+        };
+
+        [EnableQuery]
+        public IQueryable<Employee> Get()
+        {
+            return employees.AsQueryable();
+        }
+    }
 }

@@ -13,6 +13,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
@@ -198,6 +199,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 case ClrCanonicalFunctions.ConcatFunctionName:
                     return BindConcat(node);
+
+                case ClrCanonicalFunctions.MatchesPatternFunctionName:
+                    return BindMatchesPattern(node);
 
                 case ClrCanonicalFunctions.YearFunctionName:
                 case ClrCanonicalFunctions.MonthFunctionName:
@@ -543,6 +547,21 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
 
             return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.Concat, QuerySettings, arguments);
+        }
+
+        private Expression BindMatchesPattern(SingleValueFunctionCallNode node)
+        {
+            Contract.Assert("matchesPattern" == node.Name);
+
+            Expression[] arguments = BindArguments(node.Parameters);
+            ValidateAllStringArguments(node.Name, arguments);
+
+            Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
+
+            //add argument that must be ECMAScript compatible regex
+            arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript) };
+
+            return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesMattern, QuerySettings, arguments);
         }
 
         private Expression BindTrim(SingleValueFunctionCallNode node)

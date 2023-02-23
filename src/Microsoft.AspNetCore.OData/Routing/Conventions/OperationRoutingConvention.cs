@@ -20,9 +20,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// Conventions for <see cref="IEdmAction"/> and <see cref="IEdmFunction"/>.
     /// Get ~/entityset|singleton/function,  ~/entityset|singleton/cast/function
-    /// Get ~/entityset|singleton/key/function, ~/entityset|singleton/key/cast/function
+    /// Get ~/entityset/key/function, ~/entityset/key/cast/function
     /// Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
-    /// Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
+    /// Post ~/entityset/key/action,  ~/entityset/key/cast/action
     /// </summary>
     public abstract class OperationRoutingConvention : IODataControllerActionConvention
     {
@@ -65,31 +65,17 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return;
             }
 
-            // OperationNameOnCollectionOfEntityType
-            string operationName = SplitActionName(actionName, out string cast, out bool isOnCollection);
-
+            bool isOnCollection = false;
             IEdmEntityType castTypeFromActionName = null;
-            if (cast != null)
-            {
-                if (cast.Length == 0)
-                {
-                    // Early return for the following cases:
-                    // - {OperationName}On
-                    // - {OperationName}OnCollectionOf
-                    return;
-                }
 
-                castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true) as IEdmEntityType;
-                if (castTypeFromActionName == null)
-                {
-                    return;
-                }
+            IEdmOperation[] candidates = FindCandidates(context, actionName);
+            if (candidates.Length == 0)
+            {
+                // If we can't find any Edm operation using the action name directly,
+                // Let's split the action name and use part of it to search again.
+                candidates = FindCandidates(context, entityType, actionName, out castTypeFromActionName, out isOnCollection);
             }
 
-            // TODO: refactor here
-            // If we have multiple same function defined, we should match the best one?
-            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            IEnumerable<IEdmOperation> candidates = context.Model.SchemaElements.OfType<IEdmOperation>().Where(f => f.IsBound && f.Name.Equals(operationName, actionNameComparison));
             foreach (IEdmOperation edmOperation in candidates)
             {
                 IEdmOperationParameter bindingParameter = edmOperation.Parameters.FirstOrDefault();
@@ -172,14 +158,62 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
         }
 
+        private static IEdmOperation[] FindCandidates(ODataControllerActionContext context, string operationName)
+        {
+            // TODO: refactor here
+            // If we have multiple same function defined, we should match the best one?
+
+            StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ?
+                StringComparison.OrdinalIgnoreCase :
+                StringComparison.Ordinal;
+
+            return context.Model.SchemaElements
+                .OfType<IEdmOperation>()
+                .Where(f => f.IsBound && f.Name.Equals(operationName, actionNameComparison))
+                .ToArray();
+        }
+
+        private static IEdmOperation[] FindCandidates(ODataControllerActionContext context, IEdmEntityType entityType, string actionName,
+            out IEdmEntityType castTypeFromActionName, out bool isOnCollection)
+        {
+            // OperationNameOnCollectionOfEntityType
+            StringComparison caseComparision = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ?
+                StringComparison.OrdinalIgnoreCase :
+                StringComparison.Ordinal;
+
+            string operationName = SplitActionName(actionName, out string cast, out isOnCollection, caseComparision);
+
+            castTypeFromActionName = null;
+            if (cast != null)
+            {
+                if (cast.Length == 0)
+                {
+                    // Early return for the following cases:
+                    // - {OperationName}On
+                    // - {OperationName}OnCollectionOf
+                    return Array.Empty<IEdmOperation>();
+                }
+
+                castTypeFromActionName = entityType.FindTypeInInheritance(context.Model, cast, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true) as IEdmEntityType;
+                if (castTypeFromActionName == null)
+                {
+                    return Array.Empty<IEdmOperation>();
+                }
+            }
+
+            return FindCandidates(context, operationName);
+        }
+
         /// <summary>
         /// Split the action based on supporting pattern.
         /// </summary>
         /// <param name="actionName">The input action name.</param>
         /// <param name="cast">The out of cast type name.</param>
         /// <param name="isOnCollection">The out of collection binding flag.</param>
+        /// <param name="comparison">The case comparision flag.</param>
         /// <returns>The operation name.</returns>
-        internal static string SplitActionName(string actionName, out string cast, out bool isOnCollection)
+        internal static string SplitActionName(string actionName, out string cast, out bool isOnCollection,
+            StringComparison comparison = StringComparison.Ordinal)
         {
             Contract.Assert(actionName != null);
 
@@ -190,7 +224,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             cast = null;
             isOnCollection = false;
             string operation;
-            int index = actionName.IndexOf("OnCollectionOf", StringComparison.Ordinal);
+            int index = actionName.LastIndexOf("OnCollectionOf", comparison);
             if (index > 0)
             {
                 operation = actionName.Substring(0, index);
@@ -199,7 +233,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return operation;
             }
 
-            index = actionName.IndexOf("On", StringComparison.Ordinal);
+            index = actionName.LastIndexOf("On", comparison);
             if (index > 0)
             {
                 operation = actionName.Substring(0, index);

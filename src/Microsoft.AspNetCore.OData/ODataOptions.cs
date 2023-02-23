@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,11 +68,12 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Configures service collection for non-EDM scenario
         /// </summary>
+        /// <param name="version">The OData version to be used.</param>
         /// <param name="configureServices">The configuring action to add the services to the container.</param>
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
-        public ODataOptions ConfigureServiceCollection(Action<IServiceCollection> configureServices)
+        public ODataOptions ConfigureServiceCollection(ODataVersion version, Action<IServiceCollection> configureServices)
         {
-            ServiceProvider = BuildContainer(configureServices);
+            ServiceProvider = BuildRouteContainer(version, configureServices);
             return this;
         }
 
@@ -138,6 +140,19 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions AddRouteComponents(string routePrefix, IEdmModel model, Action<IServiceCollection> configureServices)
         {
+            return AddRouteComponents(routePrefix, model, ODataVersion.V4, configureServices);
+        }
+
+        /// <summary>
+        /// Adds an <see cref="IEdmModel"/> using the service configuration.
+        /// </summary>
+        /// <param name="routePrefix">The model related prefix.</param>
+        /// <param name="model">The <see cref="IEdmModel"/> to add.</param>
+        /// <param name="version">The OData version to be used.</param>
+        /// <param name="configureServices">The sub service configuration action.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions AddRouteComponents(string routePrefix, IEdmModel model, ODataVersion version, Action<IServiceCollection> configureServices)
+        {
             if (model == null)
             {
                 throw Error.ArgumentNull(nameof(model));
@@ -155,9 +170,8 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.InvalidOperation(SRResources.ModelPrefixAlreadyUsed, sanitizedRoutePrefix);
             }
 
-
             // Consider to use Lazy<IServiceProvider> ?
-            IServiceProvider serviceProvider = BuildContainer(configureServices, model);
+            IServiceProvider serviceProvider = BuildRouteContainer(version, configureServices, model);
             RouteComponents[sanitizedRoutePrefix] = (model, serviceProvider);
             return this;
         }
@@ -196,12 +210,12 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions EnableQueryFeatures(int? maxTopValue = null)
         {
-            QuerySettings.EnableExpand = true;
-            QuerySettings.EnableSelect = true;
-            QuerySettings.EnableFilter = true;
-            QuerySettings.EnableOrderBy = true;
-            QuerySettings.EnableCount = true;
-            QuerySettings.EnableSkipToken = true;
+            QueryConfigurations.EnableExpand = true;
+            QueryConfigurations.EnableSelect = true;
+            QueryConfigurations.EnableFilter = true;
+            QueryConfigurations.EnableOrderBy = true;
+            QueryConfigurations.EnableCount = true;
+            QueryConfigurations.EnableSkipToken = true;
             SetMaxTop(maxTopValue);
             return this;
         }
@@ -212,7 +226,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Expand()
         {
-            QuerySettings.EnableExpand = true;
+            QueryConfigurations.EnableExpand = true;
             return this;
         }
 
@@ -222,7 +236,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Select()
         {
-            QuerySettings.EnableSelect = true;
+            QueryConfigurations.EnableSelect = true;
             return this;
         }
 
@@ -232,7 +246,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Filter()
         {
-            QuerySettings.EnableFilter = true;
+            QueryConfigurations.EnableFilter = true;
             return this;
         }
 
@@ -242,7 +256,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions OrderBy()
         {
-            QuerySettings.EnableOrderBy = true;
+            QueryConfigurations.EnableOrderBy = true;
             return this;
         }
 
@@ -252,7 +266,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions Count()
         {
-            QuerySettings.EnableCount = true;
+            QueryConfigurations.EnableCount = true;
             return this;
         }
 
@@ -262,7 +276,7 @@ namespace Microsoft.AspNetCore.OData
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions SkipToken()
         {
-            QuerySettings.EnableSkipToken = true;
+            QueryConfigurations.EnableSkipToken = true;
             return this;
         }
 
@@ -278,7 +292,7 @@ namespace Microsoft.AspNetCore.OData
                 throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxTopValue), maxTopValue, 0);
             }
 
-            QuerySettings.MaxTop = maxTopValue;
+            QueryConfigurations.MaxTop = maxTopValue;
             return this;
         }
 
@@ -288,28 +302,29 @@ namespace Microsoft.AspNetCore.OData
         public bool EnableNoDollarQueryOptions { get; set; } = true;
 
         /// <summary>
-        /// Gets the query setting.
+        /// Gets the query configurations.
         /// </summary>
-        public DefaultQuerySettings QuerySettings { get; } = new DefaultQuerySettings();
+        public DefaultQueryConfigurations QueryConfigurations { get; } = new DefaultQueryConfigurations();
 
         #endregion
 
         /// <summary>
         /// Build the container.
         /// </summary>
+        /// <param name="version">The OData version config.</param>
         /// <param name="setupAction">The setup config.</param>
         /// <param name="model">The Edm model.</param>
         /// <returns>The built service provider.</returns>
-        private IServiceProvider BuildContainer(Action<IServiceCollection> setupAction, IEdmModel model = null)
+        private IServiceProvider BuildRouteContainer(ODataVersion version, Action<IServiceCollection> setupAction, IEdmModel model = null)
         {
             ServiceCollection services = new ServiceCollection();
             DefaultContainerBuilder builder = new DefaultContainerBuilder();
 
             // Inject the core odata services.
-            builder.AddDefaultODataServices();
+            builder.AddDefaultODataServices(version);
 
-            // Inject the default query setting from this options.
-            builder.Services.AddSingleton(sp => QuerySettings);
+            // Inject the default query configuration from this options.
+            builder.Services.AddSingleton(sp => this.QueryConfigurations);
 
             // Inject the default Web API OData services.
             builder.AddDefaultWebApiServices();

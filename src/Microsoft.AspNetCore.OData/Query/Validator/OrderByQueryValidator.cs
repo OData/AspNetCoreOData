@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
@@ -14,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate an <see cref="OrderByQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class OrderByQueryValidator
+    public class OrderByQueryValidator : IOrderByQueryValidator
     {
         /// <summary>
         /// Validates an <see cref="OrderByQueryOption" />.
@@ -44,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 }
             }
 
-            bool enableOrderBy = orderByOption.Context.DefaultQuerySettings.EnableOrderBy;
+            bool enableOrderBy = orderByOption.Context.DefaultQueryConfigurations.EnableOrderBy;
             OrderByModelLimitationsValidator validator = new OrderByModelLimitationsValidator(orderByOption.Context, enableOrderBy);
             bool explicitAllowedProperties = validationSettings.AllowedOrderByProperties.Count > 0;
 
@@ -87,16 +86,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     }
                 }
             }
-        }
-
-        internal static OrderByQueryValidator GetOrderByQueryValidator(ODataQueryContext context)
-        {
-            if (context == null || context.RequestContainer == null)
-            {
-                return new OrderByQueryValidator();
-            }
-
-            return context.RequestContainer.GetRequiredService<OrderByQueryValidator>();
         }
 
         private static bool IsAllowed(ODataValidationSettings validationSettings, string propertyName)

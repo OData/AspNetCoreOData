@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.ModelBuilder.Config;
 
@@ -14,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="SkipTokenQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class SkipTokenQueryValidator
+    public class SkipTokenQueryValidator : ISkipTokenQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="SkipTokenQueryOption" />.
@@ -35,17 +34,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             if (skipToken.Context != null)
             {
-                DefaultQuerySettings defaultSetting = skipToken.Context.DefaultQuerySettings;
-                if (!defaultSetting.EnableSkipToken)
+                DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
+                if (!defaultConfigs.EnableSkipToken)
                 {
                     throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
                 }
             }
-        }
-
-        internal static SkipTokenQueryValidator GetSkipTokenQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<SkipTokenQueryValidator>() ?? new SkipTokenQueryValidator();
         }
     }
 }

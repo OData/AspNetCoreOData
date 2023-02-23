@@ -17,6 +17,8 @@ namespace ODataRoutingSample.Models
 
         public Color FavoriteColor { get; set; }
 
+        public int Amount { get; set; }
+
         public virtual Address HomeAddress { get; set; }
 
         public virtual IList<Address> FavoriteAddresses { get; set; }

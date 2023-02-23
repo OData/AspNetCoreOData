@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -13,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="SkipQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class SkipQueryValidator
+    public class SkipQueryValidator : ISkipQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="SkipQueryOption" />.
@@ -36,11 +35,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             {
                 throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value));
             }
-        }
-
-        internal static SkipQueryValidator GetSkipQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetService<SkipQueryValidator>() ?? new SkipQueryValidator();
         }
     }
 }

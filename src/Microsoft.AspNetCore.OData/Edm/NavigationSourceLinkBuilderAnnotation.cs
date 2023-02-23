@@ -60,12 +60,10 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             // Add navigation link builders for all navigation properties in derived types.
-            bool derivedTypesDefineNavigationProperty = false;
             foreach (IEdmEntityType derivedEntityType in derivedTypes)
             {
                 foreach (IEdmNavigationProperty navigationProperty in derivedEntityType.DeclaredNavigationProperties())
                 {
-                    derivedTypesDefineNavigationProperty = true;
                     Func<ResourceContext, IEdmNavigationProperty, Uri> navigationLinkFactory =
                     (resourceContext, navProperty) => resourceContext.GenerateNavigationPropertyLink(navProperty, includeCast: true);
                     AddNavigationPropertyLinkBuilder(navigationProperty, new NavigationLinkBuilder(navigationLinkFactory, followsConventions: true));
@@ -73,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             Func<ResourceContext, Uri> selfLinkFactory =
-                (resourceContext) => resourceContext.GenerateSelfLink(includeCast: derivedTypesDefineNavigationProperty);
+                (resourceContext) => resourceContext.GenerateSelfLink(includeCast: false);
             IdLinkBuilder = new SelfLinkBuilder<Uri>(selfLinkFactory, followsConventions: true);
         }
 

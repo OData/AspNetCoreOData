@@ -26,4 +26,15 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
         public int Id { get; set; }
         public decimal Amount { get; set; }
     }
+
+    public class EnterpriseCustomer : Customer
+    {
+        public Employee RelationshipManager { get; set; }
+    }
+
+    public class Employee
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
 }

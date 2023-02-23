@@ -1111,9 +1111,9 @@ FlagsAttribute(),
 public enum Microsoft.AspNetCore.OData.Query.AllowedFunctions : int {
 	All = 268435456
 	AllDateTimeFunctions = 7010304
-	AllFunctions = 535494655
+	AllFunctions = 1072365567
 	AllMathFunctions = 58720256
-	AllStringFunctions = 1023
+	AllStringFunctions = 536871935
 	Any = 134217728
 	Cast = 1024
 	Ceiling = 33554432
@@ -1128,6 +1128,7 @@ public enum Microsoft.AspNetCore.OData.Query.AllowedFunctions : int {
 	IndexOf = 16
 	IsOf = 67108864
 	Length = 8
+	MatchesPattern = 536870912
 	Minute = 524288
 	Month = 8192
 	None = 0
@@ -1302,7 +1303,7 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	public virtual System.Linq.IQueryable ApplyQuery (System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
 	public virtual object ApplyQuery (object entity, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
 	public static Microsoft.AspNetCore.Mvc.SerializableError CreateErrorResponse (string message, params System.Exception exception)
-	public static Microsoft.OData.Edm.IEdmModel GetModel (System.Type elementClrType, Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor actionDescriptor)
+	public virtual Microsoft.OData.Edm.IEdmModel GetModel (System.Type elementClrType, Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor actionDescriptor)
 	public virtual void OnActionExecuted (Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext)
 	public virtual void OnActionExecuting (Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext actionExecutingContext)
 	public virtual void ValidateQuery (Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
@@ -1576,6 +1577,10 @@ public sealed class Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingA
 	public ODataQueryParameterBindingAttribute ()
 }
 
+public interface Microsoft.AspNetCore.OData.Results.IODataErrorResult {
+	Microsoft.OData.ODataError Error  { public abstract get; }
+}
+
 [
 DataContractAttribute(),
 ]
@@ -1603,10 +1608,58 @@ public abstract class Microsoft.AspNetCore.OData.Results.SingleResult {
 	public static SingleResult`1 Create (IQueryable`1 queryable)
 }
 
+public class Microsoft.AspNetCore.OData.Results.BadRequestODataResult : Microsoft.AspNetCore.Mvc.BadRequestResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public BadRequestODataResult (Microsoft.OData.ODataError odataError)
+	public BadRequestODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.ConflictODataResult : Microsoft.AspNetCore.Mvc.ConflictResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public ConflictODataResult (Microsoft.OData.ODataError odataError)
+	public ConflictODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
 public class Microsoft.AspNetCore.OData.Results.CreatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
 	public CreatedODataResult`1 (T entity)
 
 	T Entity  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.NotFoundODataResult : Microsoft.AspNetCore.Mvc.NotFoundResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public NotFoundODataResult (Microsoft.OData.ODataError odataError)
+	public NotFoundODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.ODataErrorResult : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult, IODataErrorResult {
+	public ODataErrorResult (Microsoft.OData.ODataError odataError)
+	public ODataErrorResult (string errorCode, string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
 
 	[
 	AsyncStateMachineAttribute(),
@@ -1630,6 +1683,30 @@ public class Microsoft.AspNetCore.OData.Results.PageResult`1 : Microsoft.AspNetC
 	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] ToDictionary ()
 }
 
+public class Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult : Microsoft.AspNetCore.Mvc.UnauthorizedResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public UnauthorizedODataResult (Microsoft.OData.ODataError odataError)
+	public UnauthorizedODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult : Microsoft.AspNetCore.Mvc.UnprocessableEntityResult, IActionResult, IClientErrorActionResult, IStatusCodeActionResult, IODataErrorResult {
+	public UnprocessableEntityODataResult (Microsoft.OData.ODataError odataError)
+	public UnprocessableEntityODataResult (string message)
+
+	Microsoft.OData.ODataError Error  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
+}
+
 public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
 	public UpdatedODataResult`1 (T entity)
 
@@ -1648,6 +1725,7 @@ public sealed class Microsoft.AspNetCore.OData.Results.SingleResult`1 : Microsof
 }
 
 public interface Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata {
+	bool IsConventional  { public abstract get; }
 	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; }
 	string Prefix  { public abstract get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public abstract get; }
@@ -1774,6 +1852,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IODataRoutingMetadata {
 	public ODataRoutingMetadata (string prefix, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate template)
 
+	bool IsConventional  { public virtual get; public set; }
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; }
 	string Prefix  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public virtual get; }
@@ -2139,7 +2218,9 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public ODataResourceSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
 	public virtual void AppendDynamicProperties (Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataNestedResourceInfo CreateComplexNestedResourceInfo (Microsoft.OData.Edm.IEdmStructuralProperty complexProperty, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataProperty CreateComputedProperty (string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataNestedResourceInfo CreateDynamicComplexNestedResourceInfo (string propertyName, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual string CreateETag (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateNavigationLink (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataAction CreateODataAction (Microsoft.OData.Edm.IEdmAction action, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
@@ -2633,6 +2714,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder {
 	public virtual System.Linq.Expressions.Expression BindInNode (Microsoft.OData.UriParser.InNode inNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindIsOf (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindLength (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+	protected virtual System.Linq.Expressions.Expression BindMatchesPattern (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindNavigationPropertyNode (Microsoft.OData.UriParser.QueryNode sourceNode, Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, string propertyPath, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindNow (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindPropertyAccessQueryNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
@@ -2883,7 +2965,19 @@ ODataAttributeRoutingAttribute(),
 public abstract class Microsoft.AspNetCore.OData.Routing.Controllers.ODataController : Microsoft.AspNetCore.Mvc.ControllerBase {
 	protected ODataController ()
 
+	protected virtual Microsoft.AspNetCore.OData.Results.BadRequestODataResult BadRequest (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.BadRequestODataResult BadRequest (string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.ConflictODataResult Conflict (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.ConflictODataResult Conflict (string message)
 	protected virtual CreatedODataResult`1 Created (TEntity entity)
+	protected virtual Microsoft.AspNetCore.OData.Results.NotFoundODataResult NotFound (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.NotFoundODataResult NotFound (string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.ODataErrorResult ODataErrorResult (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.ODataErrorResult ODataErrorResult (string errorCode, string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult Unauthorized (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnauthorizedODataResult Unauthorized (string message)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult UnprocessableEntity (Microsoft.OData.ODataError odataError)
+	protected virtual Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult UnprocessableEntity (string message)
 	protected virtual UpdatedODataResult`1 Updated (TEntity entity)
 }
 

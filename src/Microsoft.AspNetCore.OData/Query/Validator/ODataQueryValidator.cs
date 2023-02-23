@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator
@@ -14,7 +13,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate OData queries based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class ODataQueryValidator
+    public class ODataQueryValidator : IODataQueryValidator
     {
         /// <summary>
         /// Validates the OData query.
@@ -36,18 +35,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             // Validate each query options
             if (options.Compute != null)
             {
-                if (options.Compute.ComputeClause != null)
-                {
-                    ValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions);
-                }
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions);
+                options.Compute.Validate(validationSettings);
             }
 
             if (options.Apply != null)
             {
-                if (options.Apply.ApplyClause != null)
-                {
-                    ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
-                }
+                ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
             }
 
             if (options.Skip != null)
@@ -97,11 +91,13 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             if (options.RawValues.Expand != null)
             {
+                ValidateNotEmptyOrWhitespace(options.RawValues.Expand);
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions);
             }
 
             if (options.RawValues.Select != null)
             {
+                ValidateNotEmptyOrWhitespace(options.RawValues.Select);
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions);
             }
 
@@ -126,17 +122,19 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             }
         }
 
-        internal static ODataQueryValidator GetODataQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<ODataQueryValidator>()
-                ?? new ODataQueryValidator();
-        }
-
         private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)
         {
             if ((queryOption & allowed) == AllowedQueryOptions.None)
             {
                 throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, "AllowedQueryOptions"));
+            }
+        }
+        
+        private static void ValidateNotEmptyOrWhitespace(string rawValue)
+        {
+            if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
+            {
+                throw new ODataException(SRResources.SelectExpandEmptyOrWhitespace);
             }
         }
     }

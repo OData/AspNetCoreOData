@@ -237,7 +237,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             IEdmModel model = GetEdmModel();
             IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == edmTypeName);
             ODataQueryContext context = new ODataQueryContext(model, edmType);
-            context.DefaultQuerySettings.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
             OrderByQueryOption option = new OrderByQueryOption(query, context);
             ODataValidationSettings settings = new ODataValidationSettings();
 
@@ -258,7 +258,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             settings.AllowedOrderByProperties.Add("Value");
 
             // Act & Assert
-            OrderByQueryValidator validator = OrderByQueryValidator.GetOrderByQueryValidator(context);
+            IOrderByQueryValidator validator = context.GetOrderByQueryValidator();
             ExceptionAssert.DoesNotThrow(() => validator.Validate(option, settings));
         }
 
@@ -274,7 +274,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             settings.AllowedOrderByProperties.Add("NotSortableProperty");
 
             // Act & Assert
-            OrderByQueryValidator validator = OrderByQueryValidator.GetOrderByQueryValidator(context);
+            IOrderByQueryValidator validator = context.GetOrderByQueryValidator();
             ExceptionAssert.Throws<ODataException>(() =>
                 validator.Validate(option, settings),
                 "Order by 'Value' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.");
@@ -289,7 +289,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             IEdmEntitySet entitySet = model.FindDeclaredEntitySet("LimitedEntities");
             Assert.NotNull(entitySet);
             ODataQueryContext context = new ODataQueryContext(model, edmType);
-            context.DefaultQuerySettings.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
 
             OrderByQueryOption option = new OrderByQueryOption(
                 "@p,@q desc",

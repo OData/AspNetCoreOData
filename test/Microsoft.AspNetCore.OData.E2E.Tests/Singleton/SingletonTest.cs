@@ -74,6 +74,57 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Singleton
         }
 
         [Fact]
+        public async Task SingletonContainerGeneratesCorrectNextLinks()
+        {
+            // Arrange
+            string requestUri = "odata/MonstersInc/Projects";
+            string nextLinkUri = "odata/MonstersInc/Projects?$skip=2";
+            string nestedNextLinkUri = "odata/MonstersInc/Projects/1/ProjectDetails?$skip=2";
+
+            using (HttpClient client = CreateClient())
+            {
+                // Act & Assert
+                string expectedOriginalResult =
+                        "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
+                            "\"value\":[" +
+                            "{\"Id\":1,\"Title\":\"In Closet Scare\",\"ProjectDetails\":[" +
+                                "{\"Id\":1,\"Comment\":\"The original scare\"}," +
+                                "{\"Id\":2,\"Comment\":\"Leaving the door open is the worst mistake any employee can make\"}]," +
+                                "\"ProjectDetails@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects/1/ProjectDetails?$skip=2\"}," +
+                            "{\"Id\":2,\"Title\":\"Under Bed Scare\",\"ProjectDetails\":[" +
+                                "{\"Id\":5,\"Comment\":\"Tried and true\"}," +
+                                "{\"Id\":6,\"Comment\":\"Tip: grab a foot\"}]}]," +
+                            "\"@odata.nextLink\":\"http://localhost/odata/MonstersInc/Projects?$skip=2\"" +
+                        "}";
+                await RequestYieldsExpectedResult(client, requestUri, expectedOriginalResult);
+
+                string expectedNextResult =
+                        "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(ProjectDetails())\"," +
+                            "\"value\":[{\"Id\":3,\"Title\":\"Midnight Snack in Kitchen Scare\",\"ProjectDetails\":[]}]}";
+                await RequestYieldsExpectedResult(client, nextLinkUri, expectedNextResult);
+
+                string expectedNestedNextResult =
+                        "{\"@odata.context\":\"http://localhost/odata/$metadata#MonstersInc/Projects(1)/ProjectDetails\"," +
+                            "\"value\":[" +
+                            "{\"Id\":3,\"Comment\":\"Leaving the door open could let it not only a draft, but a child\"}," +
+                            "{\"Id\":4,\"Comment\":\"Has led to the intrusion of a young girl, Boo\"}]}";
+                await RequestYieldsExpectedResult(client, nestedNextLinkUri, expectedNestedNextResult);
+            }
+        }
+
+        private async Task RequestYieldsExpectedResult(HttpClient client, string requestUri, string expectedResult)
+        {
+            // Act
+            using (HttpResponseMessage response = await client.GetAsync(requestUri))
+            {
+                // Assert
+                string result = await response.Content.ReadAsStringAsync();
+                response.EnsureSuccessStatusCode();
+                Assert.Equal(expectedResult, result);
+            }
+        }
+
+        [Fact]
         public async Task NotCountable()
         {
             // Arrange

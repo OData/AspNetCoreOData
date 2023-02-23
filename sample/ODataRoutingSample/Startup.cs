@@ -5,22 +5,21 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Routing.Conventions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Routing.Conventions;
-using Microsoft.AspNetCore.OData;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.OData;
 using ODataRoutingSample.Models;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using System.Reflection;
-using System.Linq;
+using ODataRoutingSample.OpenApi;
 
 namespace ODataRoutingSample
 {
@@ -97,7 +96,7 @@ namespace ODataRoutingSample
             app.UseODataRouteDebug();
 
             // If you want to use /$openapi, enable the middleware.
-            //app.UseODataOpenApi();
+            app.UseODataOpenApi();
 
             // Add OData /$query middleware
             app.UseODataQueryRequest();
@@ -109,6 +108,7 @@ namespace ODataRoutingSample
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
+                c.SwaggerEndpoint("/$openapi", "OData raw OpenAPI");
             });
 
             app.UseRouting();

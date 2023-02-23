@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<ComputeCustomer>("Customers");
+            builder.EntitySet<ComputeSale>("Sales");
             IEdmModel model = builder.GetEdmModel();
             return model;
         }

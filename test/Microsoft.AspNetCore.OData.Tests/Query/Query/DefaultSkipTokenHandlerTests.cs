@@ -301,7 +301,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmType edmType = entitySet.Type;
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
             ODataQueryContext queryContext = new ODataQueryContext(model, edmType, path);
-            queryContext.DefaultQuerySettings.EnableSkipToken = enableSkipToken;
+            queryContext.DefaultQueryConfigurations.EnableSkipToken = enableSkipToken;
 
             var request = RequestFactory.Create(opt => opt.AddRouteComponents(model));
             ResourceContext resource = new ResourceContext();

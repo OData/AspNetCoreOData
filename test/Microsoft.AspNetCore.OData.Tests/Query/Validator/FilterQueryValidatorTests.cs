@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         public FilterQueryValidatorTests()
         {
             _context = ValidationTestHelper.CreateCustomerContext();
-            _context.DefaultQuerySettings.EnableFilter = true;
+            _context.DefaultQueryConfigurations.EnableFilter = true;
 
             _productContext = ValidationTestHelper.CreateDerivedProductsContext();
             _validator = new MyFilterValidator();
@@ -556,6 +556,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                     { AllowedFunctions.StartsWith, "startswith(null, 'Name')", "startswith" },
                     { AllowedFunctions.StartsWith, "startswith(ProductName,'Name')", "startswith" },
                     { AllowedFunctions.StartsWith, "startswith(ProductName, 'Name')", "startswith" },
+                    { AllowedFunctions.MatchesPattern, "matchesPattern(null,'Name')", "matchesPattern" },
+                    { AllowedFunctions.MatchesPattern, "matchesPattern(null, 'Name')", "matchesPattern" },
+                    { AllowedFunctions.MatchesPattern, "matchesPattern(ProductName,'Name')", "matchesPattern" },
+                    { AllowedFunctions.MatchesPattern, "matchesPattern(ProductName, 'Name')", "matchesPattern" },
                     { AllowedFunctions.Substring, "substring(null,1) eq 'Name'", "substring" },
                     { AllowedFunctions.Substring, "substring(null, 1) eq 'Name'", "substring" },
                     { AllowedFunctions.Substring, "substring(ProductName,1) eq 'Name'", "substring" },
@@ -1349,94 +1353,94 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                 base.Validate(filterQueryOption, settings);
             }
 
-            protected override void ValidateAllNode(AllNode allQueryNode, ODataValidationSettings settings)
+            protected override void ValidateAllNode(AllNode allQueryNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateAllQueryNode");
-                base.ValidateAllNode(allQueryNode, settings);
+                base.ValidateAllNode(allQueryNode, context);
             }
 
-            protected override void ValidateAnyNode(AnyNode anyQueryNode, ODataValidationSettings settings)
+            protected override void ValidateAnyNode(AnyNode anyQueryNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateAnyQueryNode");
-                base.ValidateAnyNode(anyQueryNode, settings);
+                base.ValidateAnyNode(anyQueryNode, context);
             }
 
-            protected override void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
+            protected override void ValidateArithmeticOperator(BinaryOperatorNode binaryNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateArithmeticOperator");
-                base.ValidateArithmeticOperator(binaryNode, settings);
+                base.ValidateArithmeticOperator(binaryNode, context);
             }
 
-            protected override void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, ODataValidationSettings settings)
+            protected override void ValidateBinaryOperatorNode(BinaryOperatorNode binaryOperatorNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateBinaryOperatorQueryNode");
-                base.ValidateBinaryOperatorNode(binaryOperatorNode, settings);
+                base.ValidateBinaryOperatorNode(binaryOperatorNode, context);
             }
 
-            protected override void ValidateConstantNode(ConstantNode constantNode, ODataValidationSettings settings)
+            protected override void ValidateConstantNode(ConstantNode constantNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateConstantQueryNode");
-                base.ValidateConstantNode(constantNode, settings);
+                base.ValidateConstantNode(constantNode, context);
             }
 
-            protected override void ValidateConvertNode(ConvertNode convertQueryNode, ODataValidationSettings settings)
+            protected override void ValidateConvertNode(ConvertNode convertQueryNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateConvertQueryNode");
-                base.ValidateConvertNode(convertQueryNode, settings);
+                base.ValidateConvertNode(convertQueryNode, context);
             }
 
-            protected override void ValidateLogicalOperator(BinaryOperatorNode binaryNode, ODataValidationSettings settings)
+            protected override void ValidateLogicalOperator(BinaryOperatorNode binaryNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateLogicalOperator");
-                base.ValidateLogicalOperator(binaryNode, settings);
+                base.ValidateLogicalOperator(binaryNode, context);
             }
 
-            protected override void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, ODataValidationSettings settings)
+            protected override void ValidateNavigationPropertyNode(QueryNode sourceNode, IEdmNavigationProperty navigationProperty, FilterValidatorContext context)
             {
                 IncrementCount("ValidateNavigationPropertyNode");
-                base.ValidateNavigationPropertyNode(sourceNode, navigationProperty, settings);
+                base.ValidateNavigationPropertyNode(sourceNode, navigationProperty, context);
             }
 
-            protected override void ValidateRangeVariable(RangeVariable rangeVariable, ODataValidationSettings settings)
+            protected override void ValidateRangeVariable(RangeVariable rangeVariable, FilterValidatorContext context)
             {
                 IncrementCount("ValidateParameterQueryNode");
-                base.ValidateRangeVariable(rangeVariable, settings);
+                base.ValidateRangeVariable(rangeVariable, context);
             }
 
-            protected override void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
+            protected override void ValidateSingleValuePropertyAccessNode(SingleValuePropertyAccessNode propertyAccessNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateSingleValuePropertyAccessNode");
-                base.ValidateSingleValuePropertyAccessNode(propertyAccessNode, settings);
+                base.ValidateSingleValuePropertyAccessNode(propertyAccessNode, context);
             }
 
-            protected override void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, ODataValidationSettings settings)
+            protected override void ValidateSingleComplexNode(SingleComplexNode singleComplexNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateSingleComplexNode");
-                base.ValidateSingleComplexNode(singleComplexNode, settings);
+                base.ValidateSingleComplexNode(singleComplexNode, context);
             }
 
-            protected override void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, ODataValidationSettings settings)
+            protected override void ValidateCollectionPropertyAccessNode(CollectionPropertyAccessNode propertyAccessNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateCollectionPropertyAccessNode");
-                base.ValidateCollectionPropertyAccessNode(propertyAccessNode, settings);
+                base.ValidateCollectionPropertyAccessNode(propertyAccessNode, context);
             }
 
-            protected override void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, ODataValidationSettings settings)
+            protected override void ValidateCollectionComplexNode(CollectionComplexNode collectionComplexNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateCollectionComplexNode");
-                base.ValidateCollectionComplexNode(collectionComplexNode, settings);
+                base.ValidateCollectionComplexNode(collectionComplexNode, context);
             }
 
-            protected override void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, ODataValidationSettings settings)
+            protected override void ValidateSingleValueFunctionCallNode(SingleValueFunctionCallNode node, FilterValidatorContext context)
             {
                 IncrementCount("ValidateSingleValueFunctionCallQueryNode");
-                base.ValidateSingleValueFunctionCallNode(node, settings);
+                base.ValidateSingleValueFunctionCallNode(node, context);
             }
 
-            protected override void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorQueryNode, ODataValidationSettings settings)
+            protected override void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorQueryNode, FilterValidatorContext context)
             {
                 IncrementCount("ValidateUnaryOperatorQueryNode");
-                base.ValidateUnaryOperatorNode(unaryOperatorQueryNode, settings);
+                base.ValidateUnaryOperatorNode(unaryOperatorQueryNode, context);
             }
 
             private void IncrementCount(string functionName)

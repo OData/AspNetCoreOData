@@ -17,11 +17,11 @@ namespace ODataAlternateKeySample.Models
         {
             // Customers
             var names = new[] { "Tom", "Jerry", "Mike", "Ben", "Sam", "Peter" };
-            _customers = Enumerable.Range(1, 5).Select(e => new Customer
+            _customers = Enumerable.Range(1, 5).Select((e, i) => new Customer
             {
                 Id = e,
                 Name = names[e - 1],
-                SSN = "SSN-" + e + "-" + (100 + e),
+                SSN = i % 2 == 0 ? "SSN-" + e + "-" + (100 + e) : "SSN-%25-" + e + "-" + (100 + e),
                 Titles = new string[] { "abc", null, "efg" }
             }).ToList();
 

@@ -50,7 +50,8 @@ namespace ODataAlternateKeySample.Controllers
         }
 
         // Alternate key: SSN
-        [HttpGet("odata/Customers(SSN={ssn})")]
+        [HttpGet("odata/Customers(SSN={ssn})")] // use community alternate key
+        [HttpGet("odata/Customers(CoreSN={ssn})")] // use core alternate key
         public IActionResult GetCustomerBySSN(string ssn)
         {
             var c = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssn);
@@ -62,7 +63,8 @@ namespace ODataAlternateKeySample.Controllers
             return Ok(c);
         }
 
-        [HttpPatch("odata/Customers(SSN={ssnKey})")]
+        [HttpPatch("odata/Customers(SSN={ssnKey})")] // use community alternate key
+        [HttpPatch("odata/Customers(CoreSN={ssnKey})")] // use core alternate key
         public IActionResult PatchCustomerBySSN(string ssnKey, Delta<Customer> delta)
         {
             var originalCustomer = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssnKey);

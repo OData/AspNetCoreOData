@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -15,7 +14,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// <summary>
     /// Represents a validator used to validate a <see cref="TopQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class TopQueryValidator
+    public class TopQueryValidator : ITopQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="TopQueryOption" />.
@@ -48,17 +47,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 property,
                 structuredType,
                 topQueryOption.Context.Model,
-                topQueryOption.Value, topQueryOption.Context.DefaultQuerySettings,
+                topQueryOption.Value, topQueryOption.Context.DefaultQueryConfigurations,
                 out maxTop))
             {
                 throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, maxTop,
                     AllowedQueryOptions.Top, topQueryOption.Value));
             }
-        }
-
-        internal static TopQueryValidator GetTopQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetService<TopQueryValidator>() ?? new TopQueryValidator();
         }
     }
 }

@@ -41,7 +41,8 @@ namespace ODataAlternateKeySample.Controllers
             return Ok(c);
         }
 
-        [HttpGet("odata/People(c_or_r={cr},passport={passport})")]
+        [HttpGet("odata/People(c_or_r={cr},passport={passport})")] // use community alternate key
+        [HttpGet("odata/People(core_c_r={cr},core_passport={passport})")] // use core alternate key
         public IActionResult FindPeopleByCountryAndPassport(string cr, string passport)
         {
             var c = _repository.GetPeople().FirstOrDefault(c => c.CountryOrRegion == cr && c.Passport == passport);

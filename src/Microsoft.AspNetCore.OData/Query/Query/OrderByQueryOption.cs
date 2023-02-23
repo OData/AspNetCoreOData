@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData;
@@ -53,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = OrderByQueryValidator.GetOrderByQueryValidator(context);
+            Validator = context.GetOrderByQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -76,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = OrderByQueryValidator.GetOrderByQueryValidator(context);
+            Validator = context.GetOrderByQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -101,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = OrderByQueryValidator.GetOrderByQueryValidator(context);
+            Validator = context.GetOrderByQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -148,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the OrderBy Query Validator.
         /// </summary>
-        public OrderByQueryValidator Validator { get; set; }
+        public IOrderByQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ComputeQueryOption"/>.

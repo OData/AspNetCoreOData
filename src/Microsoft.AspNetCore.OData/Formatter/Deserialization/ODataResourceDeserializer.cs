@@ -14,7 +14,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -22,6 +24,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Parser;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -33,6 +36,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
     /// </summary>
     public class ODataResourceDeserializer : ODataEdmTypeDeserializer
     {
+        private static readonly Regex ContentIdReferencePattern = new Regex(@"\$\d", RegexOptions.Compiled);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataResourceDeserializer"/> class.
         /// </summary>
@@ -258,20 +263,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
                 if (readContext.IsDeltaOfT || readContext.IsDeltaDeleted)
                 {
-                    IEnumerable<string> structuralProperties = structuredType.StructuralProperties()
-                        .Select(edmProperty => model.GetClrPropertyName(edmProperty));
+                    IEnumerable<string> updatablePoperties = model.GetAllProperties(structuredType.StructuredDefinition());
 
                     if (structuredType.IsOpen())
                     {
                         PropertyInfo dynamicDictionaryPropertyInfo = model.GetDynamicPropertyDictionary(
                             structuredType.StructuredDefinition());
 
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, structuralProperties,
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties,
                             dynamicDictionaryPropertyInfo);
                     }
                     else
                     {
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, structuralProperties);
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties);
                     }
                 }
                 else
@@ -376,7 +380,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             IList<ODataItemWrapper> nestedItems;
-            var referenceLinks = resourceInfoWrapper.NestedItems.OfType<ODataEntityReferenceLinkWrapper>().ToArray();
+            ODataEntityReferenceLinkWrapper[] referenceLinks = resourceInfoWrapper.NestedItems.OfType<ODataEntityReferenceLinkWrapper>().ToArray();
             if (referenceLinks.Length > 0)
             {
                 // Be noted:
@@ -578,7 +582,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             IEdmStructuredTypeReference structuredType = edmType.AsStructured();
 
-            var nestedReadContext = new ODataDeserializerContext
+            ODataDeserializerContext nestedReadContext = new ODataDeserializerContext
             {
                 Path = readContext.Path,
                 Model = readContext.Model,
@@ -797,7 +801,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             resource.Properties = CreateKeyProperties(refLink.EntityReferenceLink.Url, readContext) ?? Array.Empty<ODataProperty>();
             ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(resource);
 
-            foreach (var instanceAnnotation in refLink.EntityReferenceLink.InstanceAnnotations)
+            foreach (ODataInstanceAnnotation instanceAnnotation in refLink.EntityReferenceLink.InstanceAnnotations)
             {
                 resource.InstanceAnnotations.Add(instanceAnnotation);
             }
@@ -835,7 +839,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             else
             {
                 IDictionary<string, ODataProperty> newPropertiesDic = resourceWrapper.Resource.Properties.ToDictionary(p => p.Name, p => p);
-                foreach (var key in keys)
+                foreach (ODataProperty key in keys)
                 {
                     // Logic: if we have the key property, try to keep the key property and get rid of the key value from ID.
                     // Need to double confirm whether it is the right logic?
@@ -870,26 +874,35 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             try
             {
-                Uri serviceRootUri = null;
-                if (id.IsAbsoluteUri)
+                IEdmModel model = readContext.Model;
+                HttpRequest request = readContext.Request;
+                IServiceProvider requestContainer = request.GetRouteServices();
+                Uri resolvedId = id;
+
+                string idOriginalString = id.OriginalString;
+                if (ContentIdReferencePattern.IsMatch(idOriginalString))
                 {
-                    string serviceRoot = readContext.Request.CreateODataLink();
-                    serviceRootUri = new Uri(serviceRoot, UriKind.Absolute);
+                    // We can expect request.ODataBatchFeature() to not be null
+                    string resolvedUri = ContentIdHelpers.ResolveContentId(
+                        idOriginalString,
+                        request.ODataBatchFeature().ContentIdMapping);
+                    resolvedId = new Uri(resolvedUri, UriKind.RelativeOrAbsolute);
                 }
 
-                var request = readContext.Request;
-                IEdmModel model = readContext.Model;
-
-                // TODO: shall we use the DI to inject the path parser?
-                DefaultODataPathParser pathParser = new DefaultODataPathParser();
+                Uri serviceRootUri = new Uri(request.CreateODataLink());
+                IODataPathParser pathParser = requestContainer?.GetService<IODataPathParser>();
+                if (pathParser == null) // Seems like IODataPathParser is NOT injected into DI container by default
+                {
+                    pathParser = new DefaultODataPathParser();
+                }
 
                 IList<ODataProperty> properties = null;
-                var path = pathParser.Parse(model, serviceRootUri, id, request.GetRouteServices());
+                ODataPath path = pathParser.Parse(model, serviceRootUri, resolvedId, requestContainer);
                 KeySegment keySegment = path.OfType<KeySegment>().LastOrDefault();
                 if (keySegment != null)
                 {
                     properties = new List<ODataProperty>();
-                    foreach (var key in keySegment.Keys)
+                    foreach (KeyValuePair<string, object> key in keySegment.Keys)
                     {
                         properties.Add(new ODataProperty
                         {

@@ -21,7 +21,7 @@ namespace ODataRoutingSample.Controllers
             new Person
             {
                 FirstName = "Goods",
-                LastName = "Zhangg",
+                LastName = "Zha/ngg",
             },
             new Person
             {
@@ -42,6 +42,7 @@ namespace ODataRoutingSample.Controllers
             return Ok(_persons);
         }
 
+        // People(FirstName='Goods',LastName='Zha%2Fngg')
         [HttpGet]
         [EnableQuery]
         public IActionResult Get(string keyFirstName, string keyLastName)

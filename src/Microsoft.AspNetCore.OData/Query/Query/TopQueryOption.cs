@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = TopQueryValidator.GetTopQueryValidator(context);
+            Validator = context.GetTopQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = TopQueryValidator.GetTopQueryValidator(context);
+            Validator = context.GetTopQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the Top Query Validator.
         /// </summary>
-        public TopQueryValidator Validator { get; set; }
+        public ITopQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Apply the $top query to the given IQueryable.

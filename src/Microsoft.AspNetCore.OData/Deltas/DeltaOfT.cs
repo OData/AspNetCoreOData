@@ -144,7 +144,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 }
             }
 
-            if (value is IDelta)
+            if (value is IDelta || value is IDeltaSet)
             {
                 return TrySetNestedResourceInternal(name, value);
             }
@@ -225,6 +225,14 @@ namespace Microsoft.AspNetCore.OData.Deltas
             object deltaNestedResource = _deltaNestedResources[name];
 
             Contract.Assert(deltaNestedResource != null, "deltaNestedResource != null");
+
+            //If DeltaSet collection, we are handling delta collections so the value will be that itself and no need to get instance value
+            if (deltaNestedResource is IDeltaSet)
+            {
+                value = deltaNestedResource;
+                return true;
+            }
+
             Contract.Assert(DeltaHelper.IsDeltaOfT(deltaNestedResource.GetType()));
 
             value = deltaNestedResource;
@@ -339,6 +347,15 @@ namespace Microsoft.AspNetCore.OData.Deltas
             {
                 // Patch for each nested resource changed under this T.
                 dynamic deltaNestedResource = _deltaNestedResources[nestedResourceName];
+
+                if (deltaNestedResource is IDeltaSet)
+                {
+                    // TODO: That's the bulk insert OData Path handler feature,
+                    // See the comments in https://github.com/OData/AspNetCoreOData/issues/748
+                    // So far, Let's skip DeltaSet and figure it out later.
+                    continue;
+                }
+
                 dynamic originalNestedResource = null;
                 if (!TryGetPropertyRef(original, nestedResourceName, out originalNestedResource))
                 {
@@ -705,11 +722,14 @@ namespace Microsoft.AspNetCore.OData.Deltas
                 return false;
             }
 
-            PropertyAccessor<T> cacheHit = _allProperties[name];
-            // Get the Delta<{NestedResourceType}>._instance using Reflection.
-            FieldInfo field = deltaNestedResource.GetType().GetField("_instance", BindingFlags.NonPublic | BindingFlags.Instance);
-            Contract.Assert(field != null, "field != null");
-            cacheHit.SetValue(_instance, field.GetValue(deltaNestedResource));
+            if (!(deltaNestedResource is IDeltaSet))
+            {
+                PropertyAccessor<T> cacheHit = _allProperties[name];
+                // Get the Delta<{NestedResourceType}>._instance using Reflection.
+                FieldInfo field = deltaNestedResource.GetType().GetField("_instance", BindingFlags.NonPublic | BindingFlags.Instance);
+                Contract.Assert(field != null, "field != null");
+                cacheHit.SetValue(_instance, field.GetValue(deltaNestedResource));
+            }
 
             // Add the nested resource in the hierarchy.
             // Note: We shouldn't add the structural properties to the <code>_changedProperties</code>, which

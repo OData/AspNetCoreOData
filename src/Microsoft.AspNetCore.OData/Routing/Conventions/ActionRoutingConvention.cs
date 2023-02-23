@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
     /// <summary>
     /// The convention for <see cref="IEdmAction"/>.
     /// Post ~/entityset|singleton/action,  ~/entityset|singleton/cast/action
-    /// Post ~/entityset|singleton/key/action,  ~/entityset|singleton/key/cast/action
+    /// Post ~/entityset/key/action,  ~/entityset/key/cast/action
     /// </summary>
     public class ActionRoutingConvention : OperationRoutingConvention
     {

@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' >= '17.0'">$(TargetFrameworks);net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <AssemblyName>Microsoft.AspNetCore.OData.Tests</AssemblyName>
     <RootNamespace>Microsoft.AspNetCore.OData.Tests</RootNamespace>
 
@@ -33,11 +32,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net6.bsl" />
     <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
     <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net6.bsl" />
     <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
     <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
   </ItemGroup>

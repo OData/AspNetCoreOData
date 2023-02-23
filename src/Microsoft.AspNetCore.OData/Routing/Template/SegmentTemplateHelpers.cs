@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Routing.Template
@@ -58,6 +59,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 {
                     string strValue = rawValue as string;
                     string newStrValue = context.GetParameterAliasOrSelf(strValue);
+                    newStrValue = Uri.UnescapeDataString(newStrValue);
                     if (newStrValue != strValue)
                     {
                         updatedValues[parameterTemp] = newStrValue;
@@ -171,6 +173,26 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
 
             // 3) now the parsedKeyValues (p1, p3) is not equal to actualParameters (p1, p2, p3)
             return parameterMappings.Count == parsedKeyValues.Count;
+        }
+
+        /// <summary>
+        /// Gets the navigation source from an Edm operation.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="operation">The Edm operation.</param>
+        /// <returns>
+        /// The navigation source or null if the annotation indicating the mapping from an Edm operation to an entity set is not found.
+        /// </returns>
+        internal static IEdmNavigationSource GetNavigationSourceFromEdmOperation(IEdmModel model, IEdmOperation operation)
+        {
+            ReturnedEntitySetAnnotation entitySetAnnotation = model?.GetAnnotationValue<ReturnedEntitySetAnnotation>(operation);
+
+            if (entitySetAnnotation != null)
+            {
+                return model.EntityContainer.FindEntitySet(entitySetAnnotation.EntitySetName);
+            }
+
+            return null;
         }
     }
 }

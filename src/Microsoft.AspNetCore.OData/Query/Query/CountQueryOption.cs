@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = CountQueryValidator.GetCountQueryValidator(context);
+            Validator = context.GetCountQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = CountQueryValidator.GetCountQueryValidator(context);
+            Validator = context.GetCountQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the $count query validator.
         /// </summary>
-        public CountQueryValidator Validator { get; set; }
+        public ICountQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Validate the count query based on the given <paramref name="validationSettings"/>.

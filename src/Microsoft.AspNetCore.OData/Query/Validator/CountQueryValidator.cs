@@ -6,10 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -19,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     /// Represents a validator used to validate a <see cref="CountQueryOption"/> 
     /// based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
-    public class CountQueryValidator
+    public class CountQueryValidator : ICountQueryValidator
     {
         /// <summary>
         /// Validates a <see cref="CountQueryOption" />.
@@ -47,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 string name = countQueryOption.Context.TargetName;
                 if (EdmHelpers.IsNotCountable(property, structuredType,
                     countQueryOption.Context.Model,
-                    countQueryOption.Context.DefaultQuerySettings.EnableCount))
+                    countQueryOption.Context.DefaultQueryConfigurations.EnableCount))
                 {
                     if (property == null)
                     {
@@ -59,12 +56,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     }
                 }
             }
-        }
-
-        internal static CountQueryValidator GetCountQueryValidator(ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<CountQueryValidator>()
-                ?? new CountQueryValidator();
         }
     }
 }

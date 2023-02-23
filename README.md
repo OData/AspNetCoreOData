@@ -87,9 +87,7 @@ That's it.
 
 ### 3.1 Building and Testing in Visual Studio
 
-~~Visual Studio 2019 Preview is necessary to build the project.~~
-
-Since the project introducts the .NET 6 targe framework to support `DateOnly` and `TimeOnly`, Visual Studio 2022 is required to build source project. (Edit at 2/10/2022)
+Visual Studio 2022 is required to build the source project in order to support the `DateOnly` and `TimeOnly` types, which were introduced in .NET 6.
 
 ### 3.2 One-click build and test script in command line
 Coming soon.
@@ -98,11 +96,11 @@ Coming soon.
 
 The symbol package is uploaded to nuget symbol server. 
 
-It supports source link debug. Remember to make `Enable Source Link support` checked if you debug using Visual Studio.
+It supports source link debug. Remember to check `Enable Source Link support` if you debug using Visual Studio.
 
 ### 3.4 Nightly Builds
 
-The nightly build process will upload a NuGet packages for ASP.NET Core OData to:
+The nightly build process will upload NuGet packages for ASP.NET Core OData to:
 
 * https://www.myget.org/gallery/webapinetcore
 
@@ -124,13 +122,13 @@ To connect to webapinightly feed, use this feed URL:
 
 ### 5.1 Contribution
 
-Any contribution, feature request, bug, issue are welcome.
+Any contributions, feature requests, bugs and issues are welcome.
 
 ### 5.2 Support
 
 ### Code of Conduct
 
-This project has adopted the [.NET Foundation Contributor Covenant Code of Conduct](https://dotnetfoundation.org/about/code-of-conduct). For more information see the [Code of Conduct FAQ](https://dotnetfoundation.org/about/faq).
+This project has adopted the [.NET Foundation Contributor Covenant Code of Conduct](https://dotnetfoundation.org/about/policies/code-of-conduct). For more information see the [Code of Conduct FAQ](https://dotnetfoundation.org/about/faq).
 
 ### .NET Foundation
 

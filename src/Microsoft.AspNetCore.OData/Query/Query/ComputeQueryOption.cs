@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -48,6 +49,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             Context = context;
             RawValue = rawValue;
+            Validator = context.GetComputeQueryValidator();
             _queryOptionParser = queryOptionParser;
             ResultClrType = Context.ElementClrType;
         }
@@ -68,6 +70,7 @@ namespace Microsoft.AspNetCore.OData.Query
             Context = context;
             RawValue = rawValue;
 
+            Validator = context.GetComputeQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -106,5 +109,27 @@ namespace Microsoft.AspNetCore.OData.Query
         ///  Gets the raw $compute value.
         /// </summary>
         public string RawValue { get; }
+
+        /// <summary>
+        /// Gets or sets the $compute Query Validator.
+        /// </summary>
+        public IComputeQueryValidator Validator { get; set; }
+
+        /// <summary>
+        /// Validate the $compute query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+        /// </summary>
+        /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        public void Validate(ODataValidationSettings validationSettings)
+        {
+            if (validationSettings == null)
+            {
+                throw Error.ArgumentNull(nameof(validationSettings));
+            }
+
+            if (Validator != null)
+            {
+                Validator.Validate(this, validationSettings);
+            }
+        }
     }
 }

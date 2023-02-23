@@ -35,7 +35,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             RawValue = rawValue;
-            Validator = SkipTokenQueryValidator.GetSkipTokenQueryValidator(context);
+            Validator = context.GetSkipTokenQueryValidator();
             Handler = context.GetSkipTokenHandler();
             Context = context;
         }
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets the SkipToken Query Validator.
         /// </summary>
-        public SkipTokenQueryValidator Validator { get; }
+        public ISkipTokenQueryValidator Validator { get; }
 
         /// <summary>
         /// Gets the skip token handler.

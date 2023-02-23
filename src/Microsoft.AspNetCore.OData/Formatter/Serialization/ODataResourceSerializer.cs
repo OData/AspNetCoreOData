@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private static IEnumerable<ODataProperty> CreateODataPropertiesFromDynamicType(EdmEntityType entityType, object graph,
+        private static IEnumerable<ODataProperty> CreateODataPropertiesFromDynamicType(EdmStructuredType structuredType, object graph,
             Dictionary<IEdmProperty, object> dynamicTypeProperties, ODataSerializerContext writeContext)
         {
             Contract.Assert(dynamicTypeProperties != null);
@@ -267,7 +267,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 foreach (var prop in dynamicObject.Values)
                 {
-                    IEdmProperty edmProperty = entityType?.Properties()
+                    IEdmProperty edmProperty = structuredType?.Properties()
                             .FirstOrDefault(p => p.Name.Equals(prop.Key, StringComparison.Ordinal));
 
                     if (prop.Value != null
@@ -321,21 +321,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataSerializerContext writeContext)
         {
             var dynamicTypeProperties = new Dictionary<IEdmProperty, object>();
-            var entityType = expectedType.Definition as EdmEntityType;
+            var structuredType = expectedType.Definition as EdmStructuredType;
             var resource = new ODataResource()
             {
                 TypeName = expectedType.FullName(),
-                Properties = CreateODataPropertiesFromDynamicType(entityType, graph, dynamicTypeProperties, writeContext)
+                Properties = CreateODataPropertiesFromDynamicType(structuredType, graph, dynamicTypeProperties, writeContext)
             };
 
             resource.IsTransient = true;
             await writer.WriteStartAsync(resource).ConfigureAwait(false);
             foreach (var property in dynamicTypeProperties.Keys)
             {
-                var resourceContext = new ResourceContext(writeContext, expectedType.AsEntity(), graph);
-                if (entityType.NavigationProperties().Any(p => p.Type.Equals(property.Type)) && !(property.Type is EdmCollectionTypeReference))
+                var resourceContext = new ResourceContext(writeContext, expectedType.AsStructured(), graph);
+                if (structuredType.NavigationProperties().Any(p => p.Type.Equals(property.Type)) && !(property.Type is EdmCollectionTypeReference))
                 {
-                    var navigationProperty = entityType.NavigationProperties().FirstOrDefault(p => p.Type.Equals(property.Type));
+                    var navigationProperty = structuredType.NavigationProperties().FirstOrDefault(p => p.Type.Equals(property.Type));
                     var navigationLink = CreateNavigationLink(navigationProperty, resourceContext);
                     if (navigationLink != null)
                     {
@@ -749,16 +749,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (edmTypeReference.IsStructured() ||
                     (edmTypeReference.IsCollection() && edmTypeReference.AsCollection().ElementType().IsStructured()))
                 {
-                    ODataNestedResourceInfo nestedResourceInfo = new ODataNestedResourceInfo
-                    {
-                        IsCollection = edmTypeReference.IsCollection(),
-                        Name = dynamicComplexProperty.Key,
-                    };
+                    ODataNestedResourceInfo nestedResourceInfo
+                        = CreateDynamicComplexNestedResourceInfo(dynamicComplexProperty.Key, dynamicComplexProperty.Value, edmTypeReference, resourceContext);
 
-                    await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
-                    await WriteDynamicComplexPropertyAsync(dynamicComplexProperty.Value, edmTypeReference, resourceContext, writer)
-                        .ConfigureAwait(false);
-                    await writer.WriteEndAsync().ConfigureAwait(false);
+                    if (nestedResourceInfo != null)
+                    {
+                        await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                        await WriteDynamicComplexPropertyAsync(dynamicComplexProperty.Value, edmTypeReference, resourceContext, writer)
+                            .ConfigureAwait(false);
+                        await writer.WriteEndAsync().ConfigureAwait(false);
+                    }
                 }
             }
         }
@@ -834,16 +834,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 IEdmStructuralProperty complexProperty = selectedComplex.Key;
 
-                ODataNestedResourceInfo nestedResourceInfo = new ODataNestedResourceInfo
+                ODataNestedResourceInfo nestedResourceInfo = CreateComplexNestedResourceInfo(complexProperty, selectedComplex.Value, resourceContext);
+                if (nestedResourceInfo != null)
                 {
-                    IsCollection = complexProperty.Type.IsCollection(),
-                    Name = complexProperty.Name
-                };
-
-                await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
-                await WriteComplexAndExpandedNavigationPropertyAsync(complexProperty, selectedComplex.Value, resourceContext, writer)
-                    .ConfigureAwait(false);
-                await writer.WriteEndAsync().ConfigureAwait(false);
+                    await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                    await WriteComplexAndExpandedNavigationPropertyAsync(complexProperty, selectedComplex.Value, resourceContext, writer)
+                        .ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
+                }
             }
         }
 
@@ -930,7 +928,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             else
             {
                 // create the serializer context for the complex and expanded item.
-                ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, null /*resourceContext.SerializerContext.QueryContext*/, selectItem);
+                ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, resourceContext.SerializerContext.QueryContext, selectItem);
 
                 // write object.
                 IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
@@ -958,6 +956,59 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     yield return navigationLink;
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataNestedResourceInfo"/> to be written while writing this dynamic complex property.
+        /// </summary>
+        /// <param name="propertyName">The dynamic property name.</param>
+        /// <param name="propertyValue">The dynamic property value.</param>
+        /// <param name="edmType">The edm type reference.</param>
+        /// <param name="resourceContext">The context for the complex instance being written.</param>
+        /// <returns>The nested resource info to be written. Returns 'null' will omit this serialization.</returns>
+        /// <remarks>It enables customer to get more control by overriding this method. </remarks>
+        public virtual ODataNestedResourceInfo CreateDynamicComplexNestedResourceInfo(string propertyName, object propertyValue, IEdmTypeReference edmType, ResourceContext resourceContext)
+        {
+            ODataNestedResourceInfo nestedInfo = null;
+            if (propertyName != null && edmType != null)
+            {
+                nestedInfo = new ODataNestedResourceInfo
+                {
+                    IsCollection = edmType.IsCollection(),
+                    Name = propertyName,
+                };
+            }
+
+            return nestedInfo;
+        }
+
+        /// <summary>
+        /// Creates the <see cref="ODataNestedResourceInfo"/> to be written while writing this complex property.
+        /// </summary>
+        /// <param name="complexProperty">The complex property for which the nested resource info is being created.</param>
+        /// <param name="pathSelectItem">The corresponding sub select item belongs to this complex property.</param>
+        /// <param name="resourceContext">The context for the complex instance being written.</param>
+        /// <returns>The nested resource info to be written. Returns 'null' will omit this complex serialization.</returns>
+        /// <remarks>It enables customer to get more control by overriding this method. </remarks>
+        public virtual ODataNestedResourceInfo CreateComplexNestedResourceInfo(IEdmStructuralProperty complexProperty, PathSelectItem pathSelectItem, ResourceContext resourceContext)
+        {
+            if (complexProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(complexProperty));
+            }
+
+            ODataNestedResourceInfo nestedInfo = null;
+
+            if (complexProperty.Type != null)
+            {
+                nestedInfo = new ODataNestedResourceInfo
+                {
+                    IsCollection = complexProperty.Type.IsCollection(),
+                    Name = complexProperty.Name
+                };
+            }
+
+            return nestedInfo;
         }
 
         /// <summary>

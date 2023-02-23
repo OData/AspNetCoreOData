@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -173,7 +174,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
             // let's always create new selector model for action.
             // Since the new created selector model is absolute attribute route, the controller attribute route doesn't apply to this selector model.
             bool hasAttributeRouteOnController = action.Controller.Selectors.Any(s => s.AttributeRouteModel != null);
-
+            
+            // Check if CORS attribute is specified on action. New selectors need to be registered with CORS support.
+            bool acceptPreflight = action.Controller.Attributes.OfType<IDisableCorsAttribute>().Any() ||
+                                   action.Controller.Attributes.OfType<IEnableCorsAttribute>().Any() ||
+                                   action.Attributes.OfType<IDisableCorsAttribute>().Any() ||
+                                   action.Attributes.OfType<IEnableCorsAttribute>().Any();
+            
             // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,
             // It will throw "An item with the same key has already been added. Key: GET", in
             // HttpMethodMatcherPolicy.BuildJumpTable(Int32 exitDestination, IReadOnlyList`1 edges)
@@ -189,13 +196,13 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 if (hasAttributeRouteOnController || selectorModel == null)
                 {
                     // Create a new selector model.
-                    selectorModel = CreateSelectorModel(action, methods);
+                    selectorModel = CreateSelectorModel(action, methods, acceptPreflight);
                     action.Selectors.Add(selectorModel);
                 }
                 else
                 {
                     // Update the existing non attribute routing selector model.
-                    selectorModel = UpdateSelectorModel(selectorModel, methods);
+                    selectorModel = UpdateSelectorModel(selectorModel, methods, acceptPreflight);
                 }
 
                 ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
@@ -216,7 +223,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
         }
 
-        internal static SelectorModel UpdateSelectorModel(SelectorModel selectorModel, string[] httpMethods)
+        internal static SelectorModel UpdateSelectorModel(SelectorModel selectorModel, string[] httpMethods, bool acceptPreflight)
         {
             Contract.Assert(selectorModel != null);
 
@@ -257,7 +264,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             // append the http method metadata.
             Contract.Assert(httpMethods.Length >= 1);
             selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
-            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods, acceptPreflight));
 
             // append controller attributes to action selector model? -- NO
             // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
@@ -265,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             return selectorModel;
         }
 
-        internal static SelectorModel CreateSelectorModel(ActionModel actionModel, string[] httpMethods)
+        internal static SelectorModel CreateSelectorModel(ActionModel actionModel, string[] httpMethods, bool acceptPreflight)
         {
             Contract.Assert(actionModel != null);
 
@@ -309,7 +316,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             Contract.Assert(httpMethods.Length >= 1);
             selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
-            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods));
+            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods, acceptPreflight));
 
             // append controller attributes to action selector model? -- NO
             // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75

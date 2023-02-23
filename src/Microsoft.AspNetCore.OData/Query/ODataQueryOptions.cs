@@ -153,7 +153,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the query validator.
         /// </summary>
-        public ODataQueryValidator Validator { get; set; }
+        public IODataQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Check if the given query option is an OData system query option using $-prefix-required theme.
@@ -1017,7 +1017,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
             }
 
-            if (RawValues.Select != null || RawValues.Expand != null)
+            if (!string.IsNullOrWhiteSpace(RawValues.Select) || !string.IsNullOrWhiteSpace(RawValues.Expand))
             {
                 SelectExpand = new SelectExpandQueryOption(RawValues.Select, RawValues.Expand,
                     Context, _queryOptionParser);
@@ -1137,7 +1137,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             BuildQueryOptions(normalizedQueryParameters);
 
-            Validator = ODataQueryValidator.GetODataQueryValidator(context);
+            Validator = context.GetODataQueryValidator();
         }
     }
 }

@@ -29,8 +29,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                 context.RequestContainer = new MockServiceProvider();
             }
 
-            context.DefaultQuerySettings.EnableOrderBy = true;
-            context.DefaultQuerySettings.MaxTop = null;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.MaxTop = null;
             return context;
         }
 
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         {
             ODataQueryContext context = new ODataQueryContext(GetDerivedProductsModel(), typeof(Product), null);
             context.RequestContainer = new MockServiceProvider();
-            context.DefaultQuerySettings.EnableFilter = true;
+            context.DefaultQueryConfigurations.EnableFilter = true;
             return context;
         }
 

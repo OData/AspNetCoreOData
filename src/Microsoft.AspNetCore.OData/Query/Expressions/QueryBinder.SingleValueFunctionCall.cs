@@ -11,6 +11,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
@@ -67,6 +68,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 case ClrCanonicalFunctions.ConcatFunctionName:
                     return BindConcat(node, context);
+
+                case ClrCanonicalFunctions.MatchesPatternFunctionName:
+                    return BindMatchesPattern(node, context);
 
                 case ClrCanonicalFunctions.YearFunctionName:
                 case ClrCanonicalFunctions.MonthFunctionName:
@@ -335,6 +339,27 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
 
             return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.Concat, context.QuerySettings, arguments);
+        }
+
+        /// <summary>
+        /// Binds a 'matchesPattern' function to create a LINQ <see cref="Expression"/>.
+        /// </summary>
+        /// <param name="node">The query node to bind.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+        protected virtual Expression BindMatchesPattern(SingleValueFunctionCallNode node, QueryBinderContext context)
+        {
+            CheckArgumentNull(node, context, "matchesPattern");
+
+            Expression[] arguments = BindArguments(node.Parameters, context);
+            ValidateAllStringArguments(node.Name, arguments);
+
+            Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
+
+            //add argument that must be ECMAScript compatible regex
+            arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript) };
+
+            return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesMattern, context.QuerySettings, arguments);
         }
 
         /// <summary>

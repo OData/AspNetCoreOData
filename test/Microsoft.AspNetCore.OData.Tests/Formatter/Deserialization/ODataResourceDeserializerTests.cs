@@ -715,7 +715,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 Model = _readContext.Model,
                 ResourceType = typeof(Delta<Product>)
             };
-            var structuralProperties = _productEdmType.StructuralProperties().Select(p => p.Name);
+            var structuralProperties = _readContext.Model.GetAllProperties(_productEdmType.StructuredDefinition());
 
             // Act
             Delta<Product> resource = deserializer.CreateResourceInstance(_productEdmType, readContext) as Delta<Product>;

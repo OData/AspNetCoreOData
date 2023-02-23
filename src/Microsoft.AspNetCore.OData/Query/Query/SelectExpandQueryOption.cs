@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -48,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (string.IsNullOrEmpty(select) && string.IsNullOrEmpty(expand))
+            if (string.IsNullOrWhiteSpace(select) && string.IsNullOrWhiteSpace(expand))
             {
                 throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
             }
@@ -60,13 +59,13 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!(context.ElementType is IEdmStructuredType))
             {
-                throw Error.Argument(SRResources.SelectNonStructured, context.ElementType);
+                throw Error.Argument("context", SRResources.SelectNonStructured, context.ElementType.ToTraceString());
             }
 
             Context = context;
             RawSelect = select;
             RawExpand = expand;
-            Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
+            Validator = context.GetSelectExpandQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -82,33 +81,19 @@ namespace Microsoft.AspNetCore.OData.Query
 
         // This constructor is intended for unit testing only.
         internal SelectExpandQueryOption(string select, string expand, ODataQueryContext context)
+            : this(select, expand, context, queryOptionParser: context != null
+                    ? new ODataQueryOptionParser(
+                        context.Model,
+                        context.ElementType,
+                        context.NavigationSource,
+                        new Dictionary<string, string>
+                        {
+                            { "$select", select },
+                            { "$expand", expand }
+                        },
+                        context.RequestContainer)
+                    : null)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            if (string.IsNullOrEmpty(select) && string.IsNullOrEmpty(expand))
-            {
-                throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
-            }
-
-            if (!(context.ElementType is IEdmStructuredType))
-            {
-                throw Error.Argument("context", SRResources.SelectNonStructured, context.ElementType.ToTraceString());
-            }
-
-            Context = context;
-            RawSelect = select;
-            RawExpand = expand;
-            Validator = SelectExpandQueryValidator.GetSelectExpandQueryValidator(context);
-
-            _queryOptionParser = new ODataQueryOptionParser(
-                context.Model,
-                context.ElementType,
-                context.NavigationSource,
-                new Dictionary<string, string> { { "$select", select }, { "$expand", expand } },
-                context.RequestContainer);
         }
 
         /// <summary>
@@ -134,7 +119,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <summary>
         /// Gets or sets the $select and $expand query validator.
         /// </summary>
-        public SelectExpandQueryValidator Validator { get; set; }
+        public ISelectExpandQueryValidator Validator { get; set; }
 
         /// <summary>
         /// Gets the parsed <see cref="SelectExpandClause"/> for this query option.
@@ -287,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Query
             bool levelsEncountered;
             bool isMaxLevel;
             ModelBoundQuerySettings querySettings = Context.Model.GetModelBoundQuerySettings(Context.TargetProperty,
-                Context.TargetStructuredType, Context.DefaultQuerySettings);
+                Context.TargetStructuredType, Context.DefaultQueryConfigurations);
             return ProcessLevels(SelectExpandClause,
                 LevelsMaxLiteralExpansionDepth < 0 ? ODataValidationSettings.DefaultMaxExpansionDepth : LevelsMaxLiteralExpansionDepth,
                 querySettings,

@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             IEdmModel edmModel = GetEdmModel();
-            services.ConfigureControllers(typeof(ServerSidePagingCustomersController));
+            services.ConfigureControllers(typeof(ServerSidePagingCustomersController), typeof(ServerSidePagingEmployeesController));
             services.AddControllers().AddOData(opt => opt.Expand().AddRouteComponents("{a}", edmModel));
         }
 
@@ -36,6 +37,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             ODataModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<ServerSidePagingOrder>("ServerSidePagingOrders").EntityType.HasRequired(d => d.ServerSidePagingCustomer);
             builder.EntitySet<ServerSidePagingCustomer>("ServerSidePagingCustomers").EntityType.HasMany(d => d.ServerSidePagingOrders);
+
+            var getEmployeesHiredInPeriodFunction = builder.EntitySet<ServerSidePagingEmployee>(
+                "ServerSidePagingEmployees").EntityType.Collection.Function("GetEmployeesHiredInPeriod");
+            getEmployeesHiredInPeriodFunction.Parameter(typeof(DateTime), "fromDate");
+            getEmployeesHiredInPeriodFunction.Parameter(typeof(DateTime), "toDate");
+            getEmployeesHiredInPeriodFunction.ReturnsCollectionFromEntitySet<ServerSidePagingEmployee>("ServerSidePagingEmployees");
+
             return builder.GetEdmModel();
         }
 
@@ -83,6 +91,28 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
                 Assert.True(nextLinkFound);
                 Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$expand=ServerSidePagingOrders&$skip=5", nextLink.GetString());
             }
+        }
+
+        [Fact]
+        public async Task VerifyParametersInNextPageLinkInEdmFunctionResponseBodyAreInSameCaseAsInRequestUrl()
+        {
+            // Arrange
+            var requestUri = "/prefix/ServerSidePagingEmployees/" +
+                "GetEmployeesHiredInPeriod(fromDate=@fromDate,toDate=@toDate)" +
+                "?@fromDate=2023-01-07T00:00:00%2B00:00&@toDate=2023-05-07T00:00:00%2B00:00";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("\"@odata.nextLink\":", content);
+            Assert.Contains(
+                "/prefix/ServerSidePagingEmployees/GetEmployeesHiredInPeriod(fromDate=@fromDate,toDate=@toDate)" +
+                "?%40fromDate=2023-01-07T00%3A00%3A00%2B00%3A00&%40toDate=2023-05-07T00%3A00%3A00%2B00%3A00&$skip=3",
+                content);
         }
     }
 }

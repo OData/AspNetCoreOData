@@ -30,6 +30,13 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         {
             IEdmProperty property = _type.Properties().Single(s => s.Name == propertyName);
             PropertyInfo info = GetPropertyInfo(property);
+
+            JsonIgnoreAttribute jsonIgnore = GetJsonIgnore(info);
+            if (jsonIgnore != null)
+            {
+                return null;
+            }
+
             JsonPropertyNameAttribute jsonProperty = GetJsonProperty(info);
             if (jsonProperty != null && !String.IsNullOrWhiteSpace(jsonProperty.Name))
             {
@@ -62,6 +69,12 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         {
             return property.GetCustomAttributes(typeof(JsonPropertyNameAttribute), inherit: false)
                    .OfType<JsonPropertyNameAttribute>().SingleOrDefault();
+        }
+
+        private static JsonIgnoreAttribute GetJsonIgnore(PropertyInfo property)
+        {
+            return property.GetCustomAttributes(typeof(JsonIgnoreAttribute), inherit: false)
+                   .OfType<JsonIgnoreAttribute>().SingleOrDefault();
         }
     }
 }

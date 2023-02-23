@@ -880,7 +880,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be null or empty..
+        ///   Looks up a localized string similar to The key mapping for the property &apos;{0}&apos; can&apos;t be empty..
         /// </summary>
         internal static string InvalidPropertyMapping {
             get {
@@ -1659,6 +1659,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string SelectExpandEmptyOrNull {
             get {
                 return ResourceManager.GetString("SelectExpandEmptyOrNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;select&apos; and &apos;expand&apos; cannot be empty or whitespace. Omit the parameter from the query if it is not used..
+        /// </summary>
+        internal static string SelectExpandEmptyOrWhitespace {
+            get {
+                return ResourceManager.GetString("SelectExpandEmptyOrWhitespace", resourceCulture);
             }
         }
         

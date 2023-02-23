@@ -318,6 +318,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             return descriptors;
         }
 
+        [Fact]
+        public void Derived_Class_Can_Unit_Test_When_OnActionExecuted_Is_Overridden()
+        {
+            // https://github.com/OData/AspNetCoreOData/issues/239: unit tests for derived classes fail because RequestQueryOptions missing from HttpContext.Items
+            IEdmModel model = new CustomersModelWithInheritance().Model;
+
+            var request = RequestFactory.Create("Get", "http://localhost/Customers?$filter=Id+eq+1", opt => opt.AddRouteComponents("odata", model, services => { }).Filter());
+
+            ODataUriParser parser = new ODataUriParser(model, new Uri("Customers", UriKind.Relative));
+            HttpContext httpContext = request.HttpContext;
+
+            Assert.NotNull(httpContext.RequestServices);
+
+            httpContext.Request.Method = "Get";
+            request.Configure("odata", model, parser.ParsePath());
+            ActionDescriptor actionDescriptor = CreateDescriptors("CustomersController", typeof(CustomersController))
+                                                .First(descriptor => descriptor.ActionName.StartsWith("Get", StringComparison.OrdinalIgnoreCase));
+            ActionContext actionContext = new ActionContext(httpContext, new RouteData(), actionDescriptor);
+
+            ActionExecutedContext context = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), new CustomersController());
+            context.Result = new ObjectResult(new List<Customer>() { new Customer { Id = 1, Name = "John Doe" } }) { StatusCode = 200 };
+
+            MyEnableQueryAttribute attribute = new MyEnableQueryAttribute();
+
+            // Act and Assert
+            ExceptionAssert.DoesNotThrow(() => attribute.OnActionExecuted(context));
+
+        }
+
+        private class MyEnableQueryAttribute : EnableQueryAttribute
+        {
+            public override void OnActionExecuted(ActionExecutedContext actionExecutedContext)
+            {
+                base.OnActionExecuted(actionExecutedContext);
+            }
+        }
+
 #if NETCORE // Following functionality is only supported in NetCore.
         [Fact]
         public void OnActionExecuting_Throws_Null_Context()
@@ -607,9 +644,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             HttpRequest request = RequestFactory.Create("Get", "http://localhost/?" + query);
 
             var context = new ODataQueryContext(_model, typeof(QCustomer));
-            context.DefaultQuerySettings.EnableFilter = true;
-            context.DefaultQuerySettings.EnableOrderBy = true;
-            context.DefaultQuerySettings.MaxTop = null;
+            context.DefaultQueryConfigurations.EnableFilter = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
+            context.DefaultQueryConfigurations.MaxTop = null;
             var options = new ODataQueryOptions(context, request);
 
             // Act & Assert
