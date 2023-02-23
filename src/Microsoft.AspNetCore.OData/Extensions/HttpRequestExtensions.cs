@@ -299,6 +299,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 // non-model scenario with dependency injection non enabled
                 return null;
             }
+
             IServiceProvider requestContainer = requestScope.ServiceProvider;
 
             request.ODataFeature().RequestScope = requestScope;
@@ -345,6 +346,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             {
                 return null;
             }
+
             IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
             // Bind scoping request into the OData container.            
