@@ -11,6 +11,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -163,6 +164,8 @@ namespace Microsoft.AspNetCore.OData.Query
         internal IEdmStructuredType TargetStructuredType { get; set; }
 
         internal string TargetName { get; set; }
+
+        internal ODataValidationSettings ValidationSettings { get; set; }
 
         private static IEdmNavigationSource GetNavigationSource(IEdmModel model, IEdmType elementType, ODataPath odataPath)
         {

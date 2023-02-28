@@ -629,6 +629,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(validationSettings));
             }
 
+            this.Context.ValidationSettings = validationSettings;
+
             if (Validator != null)
             {
                 Validator.Validate(this, validationSettings);
@@ -834,6 +836,10 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (originalSelectExpand != null && originalSelectExpand.LevelsMaxLiteralExpansionDepth > 0)
                 {
                     SelectExpand.LevelsMaxLiteralExpansionDepth = originalSelectExpand.LevelsMaxLiteralExpansionDepth;
+                }
+                else if (Context.ValidationSettings != null && Context.ValidationSettings.MaxExpansionDepth > 0)
+                {
+                    SelectExpand.LevelsMaxLiteralExpansionDepth = Context.ValidationSettings.MaxExpansionDepth;
                 }
             }
         }
