@@ -67,19 +67,20 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             ODataPath path = request.ODataFeature().Path;
             IEdmNavigationSource targetNavigationSource = path.GetNavigationSource();
-            HttpResponse response = request.HttpContext.Response;
+            var responseBody = new MemoryStream();
+            var responseHeaders = request.HttpContext.Response.Headers;
 
             // serialize a response
             string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(requestHeaders);
             string annotationFilter = null;
             if (!string.IsNullOrEmpty(preferHeader))
             {
-                ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(response.Body, response.Headers);
+                ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(responseBody, responseHeaders);
                 messageWrapper.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetRouteServices());
+            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(responseBody), responseHeaders, request.GetRouteServices());
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
@@ -150,6 +151,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 }
 
                 await serializer.WriteObjectAsync(value, type, messageWriter, writeContext).ConfigureAwait(false);
+                await request.HttpContext.Response.Body.WriteAsync(responseBody.ToArray());
+                //await responseBody.CopyToAsync(request.HttpContext.Response.Body);
             }
         }
 
