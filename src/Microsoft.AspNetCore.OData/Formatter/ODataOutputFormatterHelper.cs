@@ -151,7 +151,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 }
 
                 await serializer.WriteObjectAsync(value, type, messageWriter, writeContext).ConfigureAwait(false);
-                await request.HttpContext.Response.Body.WriteAsync(responseBody.ToArray());
+                responseBody.Position = 0;
+                await responseBody.CopyToAsync(response.Body);
             }
         }
 
