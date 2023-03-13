@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.IO;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -31,6 +32,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
 {
     internal static class ODataOutputFormatterHelper
     {
+        private static readonly Lazy<RecyclableMemoryStreamManager> recycleableMemoryStreamManager = new Lazy<RecyclableMemoryStreamManager>();
+
         public static ODataSerializerContext BuildSerializerContext(HttpRequest request)
         {
             if (request == null)
@@ -67,20 +70,20 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             ODataPath path = request.ODataFeature().Path;
             IEdmNavigationSource targetNavigationSource = path.GetNavigationSource();
-            var responseBody = new MemoryStream();
-            var responseHeaders = request.HttpContext.Response.Headers;
+            HttpResponse response = request.HttpContext.Response;
+            MemoryStream responseBody = recycleableMemoryStreamManager.Value.GetStream(nameof(ODataOutputFormatterHelper.WriteToStreamAsync));
 
             // serialize a response
             string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(requestHeaders);
             string annotationFilter = null;
             if (!string.IsNullOrEmpty(preferHeader))
             {
-                ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(responseBody, responseHeaders);
+                ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(responseBody, response.Headers);
                 messageWrapper.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
                 annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
             }
 
-            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(responseBody), responseHeaders, request.GetRouteServices());
+            IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(responseBody), response.Headers, request.GetRouteServices());
             if (annotationFilter != null)
             {
                 responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;
@@ -132,6 +135,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 metadataLevel = ODataMediaTypes.GetMetadataLevel(contentType.MediaType.ToString(), parameters);
             }
 
+            using (responseBody)
             using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
             {
                 ODataSerializerContext writeContext = BuildSerializerContext(request);
