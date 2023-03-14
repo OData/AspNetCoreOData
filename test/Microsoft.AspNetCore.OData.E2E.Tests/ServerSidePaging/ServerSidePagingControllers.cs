@@ -67,4 +67,52 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             return Ok(hiredInPeriod);
         }
     }
+
+    public class SkipTokenPagingS1CustomersController : ODataController
+    {
+        private static readonly List<SkipTokenPagingCustomer> customers = new List<SkipTokenPagingCustomer>
+        {
+            new SkipTokenPagingCustomer { Id = 1, CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 2, CreditLimit = 2 },
+            new SkipTokenPagingCustomer { Id = 3, CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 4, CreditLimit = 30 },
+            new SkipTokenPagingCustomer { Id = 5, CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 6, CreditLimit = 35 },
+            new SkipTokenPagingCustomer { Id = 7, CreditLimit = 5 },
+            new SkipTokenPagingCustomer { Id = 8, CreditLimit = 50 },
+            new SkipTokenPagingCustomer { Id = 9, CreditLimit = 25 },
+        };
+
+        [EnableQuery(PageSize = 2)]
+        public ActionResult<IEnumerable<SkipTokenPagingCustomer>> Get()
+        {
+            return customers;
+        }
+    }
+
+    public class SkipTokenPagingS2CustomersController : ODataController
+    {
+        private readonly List<SkipTokenPagingCustomer> customers = new List<SkipTokenPagingCustomer>
+        {
+            new SkipTokenPagingCustomer { Id = 1, Grade = "A", CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 2, Grade = "B", CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 3, Grade = "A", CreditLimit = 10 },
+            new SkipTokenPagingCustomer { Id = 4, Grade = "C", CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 5, Grade = "A", CreditLimit = 30 },
+            new SkipTokenPagingCustomer { Id = 6, Grade = "C", CreditLimit = null },
+            new SkipTokenPagingCustomer { Id = 7, Grade = "B", CreditLimit = 5 },
+            new SkipTokenPagingCustomer { Id = 8, Grade = "C", CreditLimit = 25 },
+            new SkipTokenPagingCustomer { Id = 9, Grade = "B", CreditLimit = 50 },
+            new SkipTokenPagingCustomer { Id = 10, Grade = "D", CreditLimit = 50 },
+            new SkipTokenPagingCustomer { Id = 11, Grade = "F", CreditLimit = 35 },
+            new SkipTokenPagingCustomer { Id = 12, Grade = "F", CreditLimit = 30 },
+            new SkipTokenPagingCustomer { Id = 13, Grade = "F", CreditLimit = 55 }
+        };
+
+        [EnableQuery(PageSize = 4)]
+        public ActionResult<IEnumerable<SkipTokenPagingCustomer>> Get()
+        {
+            return customers;
+        }
+    }
 }

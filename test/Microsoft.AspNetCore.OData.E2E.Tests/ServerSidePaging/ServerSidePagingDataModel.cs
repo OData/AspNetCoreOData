@@ -32,4 +32,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         public int Id { get; set; }
         public DateTime HireDate { get; set; }
     }
+
+    public class SkipTokenPagingCustomer
+    {
+        public int Id { get; set; }
+        public string Grade { get; set; }
+        public decimal? CreditLimit { get; set; }
+    }
 }
