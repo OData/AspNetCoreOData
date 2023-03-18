@@ -105,6 +105,16 @@ namespace Microsoft.AspNetCore.OData.Query
         public bool EnableCorrelatedSubqueryBuffering { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating which query options should be ignored when applying queries.
+        /// </summary>
+        public AllowedQueryOptions IgnoredQueryOptions { get; set; } = AllowedQueryOptions.None;
+
+        /// <summary>
+        /// Gets or sets a value indicating which nested query options should be ignored typically within select and expand.
+        /// </summary>
+        public AllowedQueryOptions IgnoredNestedQueryOptions { get; set; } = AllowedQueryOptions.None;
+
+        /// <summary>
         /// Gets or sets the maximum number of query results to return.
         /// </summary>
         /// <value>
@@ -144,6 +154,8 @@ namespace Microsoft.AspNetCore.OData.Query
             ModelBoundPageSize = settings.ModelBoundPageSize;
             HandleReferenceNavigationPropertyExpandFilter = settings.HandleReferenceNavigationPropertyExpandFilter;
             EnableCorrelatedSubqueryBuffering = settings.EnableCorrelatedSubqueryBuffering;
+            IgnoredQueryOptions = settings.IgnoredQueryOptions;
+            IgnoredNestedQueryOptions = settings.IgnoredNestedQueryOptions;
         }
     }
 }

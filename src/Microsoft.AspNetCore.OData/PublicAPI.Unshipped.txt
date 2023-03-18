@@ -998,6 +998,10 @@ Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleNullPropagation.get ->
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleNullPropagation.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleReferenceNavigationPropertyExpandFilter.get -> bool
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.HandleReferenceNavigationPropertyExpandFilter.set -> void
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredNestedQueryOptions.get -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredNestedQueryOptions.set -> void
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions.get -> Microsoft.AspNetCore.OData.Query.AllowedQueryOptions
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.ODataQuerySettings() -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.PageSize.get -> int?
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.PageSize.set -> void
