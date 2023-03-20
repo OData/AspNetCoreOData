@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -64,8 +65,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
             {
                 // Special test case for property name case-insensitive
                 Assert.Equal("abc", file.Name);
-                Assert.Equal(DateTimeOffset.Parse("10/28/2021 9:33:26 PM +08:00"), file.CreatedDate);
-                Assert.Equal(DateTimeOffset.Parse("11/1/2021 10:48:12 AM +08:00"), file.DeleteDate);
+                Assert.Equal(new DateTimeOffset(2021, 10, 28, 21, 33, 26, TimeSpan.FromHours(8)), file.CreatedDate);
+                Assert.Equal(new DateTimeOffset(2021, 11, 01, 10, 48, 12, TimeSpan.FromHours(8)), file.DeleteDate);
 
                 // special string used to verify at test case.
                 return Ok("PropertyCaseInsensitive");
