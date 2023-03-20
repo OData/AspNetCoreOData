@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             AddSelector(method, context, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, false);
 
-            if (CanApplyDollarCount(navigationProperty, method))
+            if (CanApplyDollarCount(navigationProperty, method, context.Options?.RouteOptions))
             {
                 AddSelector(method, context, action, navigationSource, declared, declaringEntityType, navigationProperty, hasKeyParameter, true);
             }
@@ -244,11 +244,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return method;
         }
 
-        // OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
-        // the client issues a GET request with /$count appended to the resource path of the collection.
-        private static bool CanApplyDollarCount(IEdmNavigationProperty edmProperty, string method)
+        /// <summary>
+        /// OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
+        /// the client issues a GET request with /$count appended to the resource path of the collection.
+        /// </summary>
+        /// <param name="edmProperty">The property to test.</param>
+        /// <param name="method">The http method.</param>
+        /// <param name="routeOptions">The route options.</param>
+        /// <returns>True/false to identify whether to apply $count.</returns>
+        protected virtual bool CanApplyDollarCount(IEdmNavigationProperty edmProperty, string method, ODataRouteOptions routeOptions)
         {
-            Contract.Assert(edmProperty != null);
+            if(edmProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(edmProperty));
+            }
+
+            if (routeOptions != null && !routeOptions.EnableDollarCountRouting)
+            {
+                return false;
+            }
 
             return method == "Get" && edmProperty.Type.IsCollection();
         }

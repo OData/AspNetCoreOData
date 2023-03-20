@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 return false;
             }
 
-            if (!CanApply(edmProperty, method))
+            if (!CanApply(edmProperty, method, context.Options?.RouteOptions))
             {
                 return false;
             }
@@ -166,12 +166,12 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             AddSelector(method, context, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, false);
 
-            if (CanApplyDollarCount(edmProperty, method))
+            if (CanApplyDollarCount(edmProperty, method, context.Options?.RouteOptions))
             {
                 AddSelector(method, context, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, false, true);
             }
 
-            if (CanApplyDollarValue(edmProperty, method))
+            if (CanApplyDollarValue(edmProperty, method, context.Options?.RouteOptions))
             {
                 AddSelector(method, context, action, navigationSource, (IEdmStructuralProperty)edmProperty, castComplexType, declaringEntityType, true, false);
             }
@@ -282,9 +282,19 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return text;
         }
 
-        private static bool CanApply(IEdmProperty edmProperty, string method)
+        /// <summary>
+        /// Tests whether to apply routings for the given property.
+        /// </summary>
+        /// <param name="edmProperty">The property to test.</param>
+        /// <param name="method">The http method.</param>
+        /// <param name="routeOptions">The route options.</param>
+        /// <returns>True/false to identify whether to apply routings for the given property.</returns>
+        protected virtual bool CanApply(IEdmProperty edmProperty, string method, ODataRouteOptions routeOptions)
         {
-            Contract.Assert(edmProperty != null);
+            if (edmProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(edmProperty));
+            }
 
             bool isCollection = edmProperty.Type.IsCollection();
 
@@ -311,20 +321,48 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return true;
         }
 
-        // OData spec: To retrieve the raw value of a primitive type property, the client sends a GET request to the property value URL.
-        // So, let's apply $value for the "Get" and non-collection primitive property
-        private static bool CanApplyDollarValue(IEdmProperty edmProperty, string method)
+        /// <summary>
+        /// OData spec: To retrieve the raw value of a primitive type property, the client sends a GET request to the property value URL.
+        /// So, let's apply $value for the "Get" and non-collection primitive property
+        /// </summary>
+        /// <param name="edmProperty">The property to test.</param>
+        /// <param name="method">The http method.</param>
+        /// <param name="routeOptions">The route options.</param>
+        /// <returns>True/false to identify whether to apply $value.</returns>
+        protected virtual bool CanApplyDollarValue(IEdmProperty edmProperty, string method, ODataRouteOptions routeOptions)
         {
-            Contract.Assert(edmProperty != null);
+            if (edmProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(edmProperty));
+            }
+
+            if (routeOptions != null && !routeOptions.EnableDollarValueRouting)
+            {
+                return false;
+            }
 
             return method == "Get" && !edmProperty.Type.IsCollection() && (edmProperty.Type.IsPrimitive() || edmProperty.Type.IsEnum());
         }
 
-        // OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
-        // the client issues a GET request with /$count appended to the resource path of the collection.
-        private static bool CanApplyDollarCount(IEdmProperty edmProperty, string method)
+        /// <summary>
+        /// OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
+        /// the client issues a GET request with /$count appended to the resource path of the collection.
+        /// </summary>
+        /// <param name="edmProperty">The property to test.</param>
+        /// <param name="method">The http method.</param>
+        /// <param name="routeOptions">The route options.</param>
+        /// <returns>True/false to identify whether to apply $count.</returns>
+        protected virtual bool CanApplyDollarCount(IEdmProperty edmProperty, string method, ODataRouteOptions routeOptions)
         {
-            Contract.Assert(edmProperty != null);
+            if (edmProperty == null)
+            {
+                throw Error.ArgumentNull(nameof(edmProperty));
+            }
+
+            if (routeOptions != null && !routeOptions.EnableDollarCountRouting)
+            {
+                return false;
+            }
 
             return method == "Get" && edmProperty.Type.IsCollection();
         }

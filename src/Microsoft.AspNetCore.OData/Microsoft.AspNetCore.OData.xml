@@ -1102,20 +1102,6 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -13000,6 +12986,14 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConvention.CanApplyDollarCount(Microsoft.OData.Edm.IEdmEntitySet,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <summary>
+            Tests whether to apply $count on the <see cref="T:Microsoft.OData.Edm.IEdmEntitySet"/>.
+            </summary>
+            <param name="entitySet">The entity set to test.</param>
+            <param name="routeOptions">The route options.</param>
+            <returns>True/false to identify whether to apply $count.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention">
             <summary>
             The convention for <see cref="T:Microsoft.OData.Edm.IEdmFunction"/>.
@@ -13107,6 +13101,16 @@
             <param name="property">The property name (out).</param>
             <param name="declaring">The declaring name (out).</param>
             <returns>The http method name or null.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingConvention.CanApplyDollarCount(Microsoft.OData.Edm.IEdmNavigationProperty,System.String,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <summary>
+            OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
+            the client issues a GET request with /$count appended to the resource path of the collection.
+            </summary>
+            <param name="edmProperty">The property to test.</param>
+            <param name="method">The http method.</param>
+            <param name="routeOptions">The route options.</param>
+            <returns>True/false to identify whether to apply $count.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext">
             <summary>
@@ -13279,6 +13283,35 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConvention.AppliesToAction(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext)">
             <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConvention.CanApply(Microsoft.OData.Edm.IEdmProperty,System.String,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <summary>
+            Tests whether to apply routings for the given property.
+            </summary>
+            <param name="edmProperty">The property to test.</param>
+            <param name="method">The http method.</param>
+            <param name="routeOptions">The route options.</param>
+            <returns>True/false to identify whether to apply routings for the given property.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConvention.CanApplyDollarValue(Microsoft.OData.Edm.IEdmProperty,System.String,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <summary>
+            OData spec: To retrieve the raw value of a primitive type property, the client sends a GET request to the property value URL.
+            So, let's apply $value for the "Get" and non-collection primitive property
+            </summary>
+            <param name="edmProperty">The property to test.</param>
+            <param name="method">The http method.</param>
+            <param name="routeOptions">The route options.</param>
+            <returns>True/false to identify whether to apply $value.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConvention.CanApplyDollarCount(Microsoft.OData.Edm.IEdmProperty,System.String,Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <summary>
+            OData spec: To request only the number of items of a collection of entities or items of a collection-valued property,
+            the client issues a GET request with /$count appended to the resource path of the collection.
+            </summary>
+            <param name="edmProperty">The property to test.</param>
+            <param name="method">The http method.</param>
+            <param name="routeOptions">The route options.</param>
+            <returns>True/false to identify whether to apply $count.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Routing.Conventions.RefRoutingConvention">
             <summary>
@@ -13654,6 +13687,16 @@
         <member name="M:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarCountRouting">
+            <summary>
+            Gets/sets a value indicating whether to enable $count in conventional routing.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarValueRouting">
+            <summary>
+            Gets/sets a value indicating whether to enable $value in conventional routing.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive">
@@ -14918,6 +14961,22 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
+            <param name="segment">The value segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
+            <summary>
+            Gets the value segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
+ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">

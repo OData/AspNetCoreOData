@@ -145,6 +145,37 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
+        [InlineData(typeof(CustomersController), "GetOrders", 2, false)]
+        [InlineData(typeof(CustomersController), "GetOrders", 4, true)]
+        [InlineData(typeof(CustomersController), "GetSubOrdersFromVipCustomer", 2, false)]
+        [InlineData(typeof(CustomersController), "GetSubOrdersFromVipCustomer", 4, true)]
+        public void NavigationRoutingConventionAddDollarCountAsExpectedBasedOnConfiguration(Type controllerType, string actionName, int expectCount, bool enableDollarCount)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+            context.Options.RouteOptions.EnableDollarCountRouting = enableDollarCount;
+
+            // Act
+            bool returnValue = NavigationConvention.AppliesToAction(context);
+            Assert.True(returnValue);
+
+            // Assert
+            Assert.Equal(expectCount, action.Selectors.Count);
+            if (enableDollarCount)
+            {
+                Assert.Contains("/$count", string.Join(",", action.Selectors.Select(s => s.AttributeRouteModel.Template)));
+            }
+            else
+            {
+                Assert.DoesNotContain("/$count", string.Join(",", action.Selectors.Select(s => s.AttributeRouteModel.Template)));
+            }
+        }
+
+        [Theory]
         [InlineData("PostToName")]
         [InlineData("Get")]
         [InlineData("GetSubOrdersFrom")]
