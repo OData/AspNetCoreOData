@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             return ProcessEntitySetAction(actionPrefix, entitySet, castType, context, action);
         }
 
-        private static bool ProcessEntitySetAction(string actionName, IEdmEntitySet entitySet, IEdmStructuredType castType,
+        private bool ProcessEntitySetAction(string actionName, IEdmEntitySet entitySet, IEdmStructuredType castType,
             ODataControllerActionContext context, ActionModel action)
         {
             StringComparison actionNameComparison = context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
@@ -126,21 +126,25 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 ODataPathTemplate template = new ODataPathTemplate(segments);
                 action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
-                // GET ~/Customers/$count or GET ~/Customers/Ns.VipCustomer/$count
-                segments = new List<ODataSegmentTemplate>
+                if (CanApplyDollarCount(entitySet, context.Options?.RouteOptions))
                 {
-                    new EntitySetSegmentTemplate(entitySet)
-                };
+                    // GET ~/Customers/$count or GET ~/Customers/Ns.VipCustomer/$count
+                    segments = new List<ODataSegmentTemplate>
+                    {
+                        new EntitySetSegmentTemplate(entitySet)
+                    };
 
-                if (castType != null)
-                {
-                    segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
+                    if (castType != null)
+                    {
+                        segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
+                    }
+
+                    segments.Add(CountSegmentTemplate.Instance);
+
+                    template = new ODataPathTemplate(segments);
+                    action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 }
 
-                segments.Add(CountSegmentTemplate.Instance);
-
-                template = new ODataPathTemplate(segments);
-                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
                 return true;
             }
             else if (actionName.Equals("Post", actionNameComparison) || actionName.Equals($"Post{entitySet.EntityType().Name}", actionNameComparison))
@@ -183,5 +187,14 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             return false;
         }
+
+        /// <summary>
+        /// Tests whether to apply $count on the <see cref="IEdmEntitySet"/>.
+        /// </summary>
+        /// <param name="entitySet">The entity set to test.</param>
+        /// <param name="routeOptions">The route options.</param>
+        /// <returns>True/false to identify whether to apply $count.</returns>
+        protected virtual bool CanApplyDollarCount(IEdmEntitySet entitySet, ODataRouteOptions routeOptions)
+            => routeOptions != null ? routeOptions.EnableDollarCountRouting : false;
     }
 }

@@ -1860,6 +1860,8 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 
 	bool EnableActionNameCaseInsensitive  { public get; public set; }
 	bool EnableControllerNameCaseInsensitive  { public get; public set; }
+	bool EnableDollarCountRouting  { public get; public set; }
+	bool EnableDollarValueRouting  { public get; public set; }
 	bool EnableKeyAsSegment  { public get; public set; }
 	bool EnableKeyInParenthesis  { public get; public set; }
 	bool EnableNonParenthesisForEmptyParameterFunction  { public get; public set; }
@@ -3159,6 +3161,7 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.EntitySetRoutingConv
 
 	public virtual bool AppliesToAction (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
 	public virtual bool AppliesToController (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
+	protected virtual bool CanApplyDollarCount (Microsoft.OData.Edm.IEdmEntitySet entitySet, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions routeOptions)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.FunctionRoutingConvention : Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention, IODataControllerActionConvention {
@@ -3186,6 +3189,7 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.NavigationRoutingCon
 
 	public virtual bool AppliesToAction (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
 	public virtual bool AppliesToController (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
+	protected virtual bool CanApplyDollarCount (Microsoft.OData.Edm.IEdmNavigationProperty edmProperty, string method, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions routeOptions)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext {
@@ -3218,6 +3222,9 @@ public class Microsoft.AspNetCore.OData.Routing.Conventions.PropertyRoutingConve
 
 	public virtual bool AppliesToAction (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
 	public virtual bool AppliesToController (Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context)
+	protected virtual bool CanApply (Microsoft.OData.Edm.IEdmProperty edmProperty, string method, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions routeOptions)
+	protected virtual bool CanApplyDollarCount (Microsoft.OData.Edm.IEdmProperty edmProperty, string method, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions routeOptions)
+	protected virtual bool CanApplyDollarValue (Microsoft.OData.Edm.IEdmProperty edmProperty, string method, Microsoft.AspNetCore.OData.Routing.ODataRouteOptions routeOptions)
 }
 
 public class Microsoft.AspNetCore.OData.Routing.Conventions.RefRoutingConvention : IODataControllerActionConvention {

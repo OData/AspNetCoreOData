@@ -34,6 +34,16 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
+        /// Gets/sets a value indicating whether to enable $count in conventional routing.
+        /// </summary>
+        public bool EnableDollarCountRouting { get; set; } = true;
+
+        /// <summary>
+        /// Gets/sets a value indicating whether to enable $value in conventional routing.
+        /// </summary>
+        public bool EnableDollarValueRouting { get; set; } = true;
+
+        /// <summary>
         /// Gets/sets a value indicating whether to enable case insensitive for the action name in conventional routing.
         /// </summary>
         public bool EnableActionNameCaseInsensitive { get; set; } = false;

@@ -81,6 +81,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         }
 
         [Theory]
+        [InlineData(typeof(CustomersController), "Get", 1, false)]
+        [InlineData(typeof(CustomersController), "Get", 2, true)]
+        [InlineData(typeof(CustomersController), "GetCustomersFromVipCustomer", 1, false)]
+        [InlineData(typeof(CustomersController), "GetCustomersFromVipCustomer", 2, true)]
+        public void AppliesToActionForGetActionAddDollarCountAsExpectedBasedOnConfiguration(Type controllerType, string actionName, int expectCount, bool enableDollarCount)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel(controllerType, actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+            context.Action = action;
+            context.Options.RouteOptions.EnableDollarCountRouting = enableDollarCount;
+
+            EntitySetRoutingConvention entitySetConvention = ConventionHelpers.CreateConvention<EntitySetRoutingConvention>();
+
+            // Act
+            bool returnValue = entitySetConvention.AppliesToAction(context);
+            Assert.True(returnValue);
+
+            // Assert
+            Assert.Equal(expectCount, action.Selectors.Count);
+            if (enableDollarCount)
+            {
+                Assert.Contains("/$count", string.Join(",", action.Selectors.Select(s => s.AttributeRouteModel.Template)));
+            }
+            else
+            {
+                Assert.DoesNotContain("/$count", string.Join(",", action.Selectors.Select(s => s.AttributeRouteModel.Template)));
+            }
+        }
+
+        [Theory]
         [InlineData(typeof(CustomersController), "Post", "/Customers", false)]
         [InlineData(typeof(CustomersController), "PostFromVipCustomer", "/Customers/NS.VipCustomer", false)]
         [InlineData(typeof(CaseInsensitiveCustomersController), "POST", "/CaseInsensitiveCustomers", true)]
