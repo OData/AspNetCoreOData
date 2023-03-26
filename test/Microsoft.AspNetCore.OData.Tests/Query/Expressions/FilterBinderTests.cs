@@ -2500,7 +2500,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             // Arrange & Act & Assert
             ExceptionAssert.Throws<ArgumentNullException>(() => BindFilterAndVerify<Product>(filter),
-                "Value cannot be null. (Parameter 'qualifiedName')");
+                "Value cannot be null. (Parameter 'typeName')");
         }
 
         [Theory]
