@@ -135,7 +135,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             IEdmModel model = GetEdmModel();
             services.ConfigureControllers(
                 typeof(SkipTokenPagingS1CustomersController),
-                typeof(SkipTokenPagingS2CustomersController));
+                typeof(SkipTokenPagingS2CustomersController),
+                typeof(SkipTokenPagingS3CustomersController));
             services.AddControllers().AddOData(opt => opt.Expand().OrderBy().SkipToken().AddRouteComponents("{a}", model));
         }
 
@@ -144,6 +145,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             ODataModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS1Customers");
             builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS2Customers");
+            builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS3Customers");
 
             return builder.GetEdmModel();
         }
@@ -425,6 +427,153 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             Assert.Equal(13, (pageResult[0] as JObject)["Id"].ToObject<int>());
             Assert.Equal("F", (pageResult[0] as JObject)["Grade"].ToObject<string>());
             Assert.Equal(55, (pageResult[0] as JObject)["CreditLimit"].ToObject<decimal?>());
+            Assert.Null(content.GetValue("@odata.nextLink"));
+        }
+        [Fact]
+        public async Task VerifySkipTokenPagingOrderedByNullableDateTimeProperty()
+        {
+            HttpClient client = CreateClient();
+            HttpRequestMessage request;
+            HttpResponseMessage response;
+            JObject content;
+            JArray pageResult;
+
+            // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
+            // is intentional. The next-link in one response is used in the next request
+            // so we need to control the execution order (unlike Theory attribute where order is random)
+            var skipTokenTestData = new List<Tuple<int, DateTime?, int, DateTime?>>
+            {
+                Tuple.Create<int, DateTime?, int, DateTime?> (1, null, 3, null),
+                Tuple.Create<int, DateTime?, int, DateTime?> (5, null, 2, new DateTime(2023, 1, 2)),
+                Tuple.Create<int, DateTime?, int, DateTime?> (7, new DateTime(2023, 1, 5), 9, new DateTime(2023, 1, 25)),
+                Tuple.Create<int, DateTime?, int, DateTime?>(4, new DateTime(2023, 1, 30), 6, new DateTime(2023, 2, 4))
+            };
+
+            string requestUri = "/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince";
+
+            foreach (var testData in skipTokenTestData)
+            {
+                int idAt0 = testData.Item1;
+                DateTime? customerSinceAt0 = testData.Item2;
+                int idAt1 = testData.Item3;
+                DateTime? customerSinceAt1 = testData.Item4;
+
+                // Arrange
+                request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+                string skipTokenStart = string.Concat(
+                    "$skiptoken=CustomerSince-",
+                    customerSinceAt1 != null ? customerSinceAt1.Value.ToString("yyyy-MM-dd") : "null");
+                string skipTokenEnd = string.Concat(",Id-", idAt1);
+
+                // Act
+                response = await client.SendAsync(request);
+                content = await response.Content.ReadAsObject<JObject>();
+
+                // Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                pageResult = content["value"] as JArray;
+                Assert.NotNull(pageResult);
+                Assert.Equal(2, pageResult.Count);
+                Assert.Equal(idAt0, (pageResult[0] as JObject)["Id"].ToObject<int>());
+                Assert.Equal(customerSinceAt0, (pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
+                Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+                Assert.Equal(customerSinceAt1, (pageResult[1] as JObject)["CustomerSince"].ToObject<DateTime?>());
+
+                string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+                Assert.NotNull(nextPageLink);
+                Assert.Contains("/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince&" + skipTokenStart, nextPageLink);
+                Assert.EndsWith(skipTokenEnd, nextPageLink);
+
+                requestUri = nextPageLink;
+            }
+
+            // Fetch last page
+            request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            response = await client.SendAsync(request);
+
+            content = await response.Content.ReadAsObject<JObject>();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            pageResult = content["value"] as JArray;
+            Assert.NotNull(pageResult);
+            Assert.Single(pageResult);
+            Assert.Equal(8, (pageResult[0] as JObject)["Id"].ToObject<int>());
+            Assert.Equal(new DateTime(2023, 2, 19), (pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
+            Assert.Null(content.GetValue("@odata.nextLink"));
+        }
+
+        [Fact]
+        public async Task VerifySkipTokenPagingOrderedByNullableDateTimePropertyDescending()
+        {
+            HttpClient client = CreateClient();
+            HttpRequestMessage request;
+            HttpResponseMessage response;
+            JObject content;
+            JArray pageResult;
+
+            // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
+            // is intentional. The next-link in one response is used in the next request
+            // so we need to control the execution order (unlike Theory attribute where order is random)
+            var skipTokenTestData = new List<Tuple<int, DateTime?>>
+            {
+                Tuple.Create<int, DateTime ?> (6, new DateTime(2023, 2, 4)),
+                Tuple.Create<int, DateTime?> (9, new DateTime(2023, 1, 25)),
+                Tuple.Create<int, DateTime?> (2, new DateTime(2023, 1, 2)),
+                Tuple.Create<int, DateTime?>(3, null)
+            };
+
+            string requestUri = "/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince desc";
+
+            foreach (var testData in skipTokenTestData)
+            {
+                int idAt1 = testData.Item1;
+                DateTime? customerSinceAt1 = testData.Item2;
+
+                // Arrange
+                request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+                string skipTokenStart = string.Concat(
+                    "$skiptoken=CustomerSince-",
+                    customerSinceAt1 != null ? customerSinceAt1.Value.ToString("yyyy-MM-dd") : "null");
+                string skipTokenEnd = string.Concat(",Id-", idAt1);
+
+                // Act
+                response = await client.SendAsync(request);
+                content = await response.Content.ReadAsObject<JObject>();
+
+                // Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                pageResult = content["value"] as JArray;
+                Assert.NotNull(pageResult);
+                Assert.Equal(2, pageResult.Count);
+                Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+                Assert.Equal(customerSinceAt1, (pageResult[1] as JObject)["CustomerSince"].ToObject<DateTime?>());
+
+                string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+                Assert.NotNull(nextPageLink);
+                Assert.Contains("/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince%20desc&" + skipTokenStart, nextPageLink);
+                Assert.EndsWith(skipTokenEnd, nextPageLink);
+
+                requestUri = nextPageLink;
+            }
+
+            // Fetch last page
+            request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            response = await client.SendAsync(request);
+
+            content = await response.Content.ReadAsObject<JObject>();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            pageResult = content["value"] as JArray;
+            Assert.NotNull(pageResult);
+            Assert.Single(pageResult);
+            Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
+            Assert.Null((pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
             Assert.Null(content.GetValue("@odata.nextLink"));
         }
     }

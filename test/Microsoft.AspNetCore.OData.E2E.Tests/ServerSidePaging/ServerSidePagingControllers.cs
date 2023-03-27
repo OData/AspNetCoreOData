@@ -115,4 +115,26 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             return customers;
         }
     }
+
+    public class SkipTokenPagingS3CustomersController : ODataController
+    {
+        private static readonly List<SkipTokenPagingCustomer> customers = new List<SkipTokenPagingCustomer>
+        {
+            new SkipTokenPagingCustomer { Id = 1, CustomerSince = null },
+            new SkipTokenPagingCustomer { Id = 2, CustomerSince = new DateTime(2023, 1, 2) },
+            new SkipTokenPagingCustomer { Id = 3, CustomerSince = null },
+            new SkipTokenPagingCustomer { Id = 4, CustomerSince = new DateTime(2023, 1, 30) },
+            new SkipTokenPagingCustomer { Id = 5, CustomerSince = null },
+            new SkipTokenPagingCustomer { Id = 6, CustomerSince = new DateTime(2023, 2, 4) },
+            new SkipTokenPagingCustomer { Id = 7, CustomerSince = new DateTime(2023, 1, 5) },
+            new SkipTokenPagingCustomer { Id = 8, CustomerSince = new DateTime(2023, 2, 19) },
+            new SkipTokenPagingCustomer { Id = 9, CustomerSince = new DateTime(2023, 1, 25) },
+        };
+
+        [EnableQuery(PageSize = 2)]
+        public ActionResult<IEnumerable<SkipTokenPagingCustomer>> Get()
+        {
+            return customers;
+        }
+    }
 }

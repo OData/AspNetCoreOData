@@ -266,7 +266,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 directionMap = new Dictionary<string, OrderByDirection>();
             }
 
-            IDictionary<string, Tuple<object, Type>> propertyValuePairs = PopulatePropertyValuePairs(skipTokenRawValue, context);
+            IDictionary<string, (object PropertyValue, Type PropertyType)> propertyValuePairs = PopulatePropertyValuePairs(skipTokenRawValue, context);
 
             if (propertyValuePairs.Count == 0)
             {
@@ -286,14 +286,14 @@ namespace Microsoft.AspNetCore.OData.Query
             Expression lastEquality = null;
             bool firstProperty = true;
 
-            foreach (KeyValuePair<string, Tuple<object, Type>> item in propertyValuePairs)
+            foreach (KeyValuePair<string, (object PropertyValue, Type PropertyType)> item in propertyValuePairs)
             {
                 string key = item.Key;
                 MemberExpression property = Expression.Property(param, key);
 
-                object value = item.Value.Item1;
+                object value = item.Value.PropertyValue;
 
-                Type propertyType = item.Value.Item2 ?? value.GetType();
+                Type propertyType = item.Value.PropertyType ?? value.GetType();
                 bool propertyIsNullable = propertyType.IsNullable();
 
                 Expression compare = null;
@@ -305,6 +305,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 else if (value is ODataNullValue)
                 {
                     value = null;
+                    propertyType = property.Type;
                 }
 
                 Expression constant = parameterizeConstant ? LinqParameterContainer.Parameterize(propertyType, value) : Expression.Constant(value);
@@ -316,7 +317,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         binaryOperator: BinaryOperatorKind.LessThan,
                         left: property,
                         right: constant,
-                        liftToNull: propertyIsNullable ? false : true,
+                        liftToNull: !propertyIsNullable,
                         querySettings: querySettings);
 
                     if (propertyIsNullable && value != null)
@@ -329,7 +330,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         Expression condition = ExpressionBinderHelper.CreateBinaryExpression(
                             binaryOperator: BinaryOperatorKind.Equal,
                             left: property,
-                            right: parameterizeConstant ? LinqParameterContainer.Parameterize(propertyType, null) : Expression.Constant(null),
+                            right: parameterizeConstant ? LinqParameterContainer.Parameterize(property.Type, null) : Expression.Constant(null),
                             liftToNull: false,
                             querySettings: querySettings);
 
@@ -364,7 +365,7 @@ namespace Microsoft.AspNetCore.OData.Query
                             binaryOperator: BinaryOperatorKind.GreaterThan,
                             left: property,
                             right: constant,
-                            liftToNull: propertyIsNullable ? false : true,
+                            liftToNull: !propertyIsNullable,
                             querySettings: querySettings);
                     }
                 }
@@ -375,7 +376,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         binaryOperator: BinaryOperatorKind.Equal,
                         left: property,
                         right: constant,
-                        liftToNull: propertyIsNullable ? false : true,
+                        liftToNull: !propertyIsNullable,
                         querySettings: querySettings);
                     where = compare;
                     firstProperty = false;
@@ -390,7 +391,7 @@ namespace Microsoft.AspNetCore.OData.Query
                             binaryOperator: BinaryOperatorKind.Equal,
                             left: property,
                             right: constant,
-                            liftToNull: propertyIsNullable ? false : true,
+                            liftToNull: !propertyIsNullable,
                             querySettings: querySettings));
                 }
             }
@@ -405,11 +406,11 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="value">The skiptoken string value.</param>
         /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        internal static IDictionary<string, Tuple<object, Type>> PopulatePropertyValuePairs(string value, ODataQueryContext context)
+        internal static IDictionary<string, (object PropertyValue, Type PropertyType)> PopulatePropertyValuePairs(string value, ODataQueryContext context)
         {
             Contract.Assert(context != null);
 
-            IDictionary<string, Tuple<object, Type>> propertyValuePairs = new Dictionary<string, Tuple<object, Type>>();
+            IDictionary<string, (object PropertyValue, Type PropertyType)> propertyValuePairs = new Dictionary<string, (object PropertyValue, Type PropertyType)>();
             IList<string> keyValuesPairs = ParseValue(value, CommaDelimiter);
 
             IEdmStructuredType type = context.ElementType as IEdmStructuredType;
@@ -432,7 +433,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     }
 
                     propValue = ODataUriUtils.ConvertFromUriLiteral(pieces[1], ODataVersion.V401, context.Model, propertyType);
-                    propertyValuePairs.Add(pieces[0], Tuple.Create(propValue, propertyClrType));
+                    propertyValuePairs.Add(pieces[0], (propValue, propertyClrType));
                 }
                 else
                 {
