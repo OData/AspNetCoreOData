@@ -16,7 +16,7 @@ namespace Issue879.Models
         {
             var odataBuilder = new ODataConventionModelBuilder();
 
-            // make sure the entity set name is same as the controller name, (case-sensitive, except you enable case-insensitive)
+            // 1) make sure the entity set name is same as the controller name, (case-sensitive, except you enable case-insensitive)
             odataBuilder.EntitySet<MyTestEntity>("MyTestEntities");
             return odataBuilder.GetEdmModel();
         }

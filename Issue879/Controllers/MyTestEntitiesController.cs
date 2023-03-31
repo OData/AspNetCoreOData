@@ -8,13 +8,15 @@ using System.Net;
 
 namespace Issue879.Controllers
 {
+    // 2) I use conventional routing in this controller, so the controller name is same as the entity set name
     public class MyTestEntitiesController : ODataController
     {
         public MyTestEntitiesController()
         {
         }
 
-
+        // 3) Don't put any attribute template in HttpGet since we are using conventional routing
+        // 4) Make the action name as "Get"
         [HttpGet/*(Name = "ListMyTestEntitiesAsync")*/]
         [EnableQuery]
         public async Task<ActionResult<IEnumerable<MyTestEntity>>>
@@ -27,6 +29,8 @@ namespace Issue879.Controllers
                 var prop = JsonConvert.DeserializeObject<Dictionary<string, object>>(data,
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
+                // 5) OData doesn't know how to serialize 'JToken, JArray', etc. 
+                // So, you'd better to change them to "known" types.
                 foreach (var kv in prop)
                 {
                     if (kv.Value is JArray jArray)
