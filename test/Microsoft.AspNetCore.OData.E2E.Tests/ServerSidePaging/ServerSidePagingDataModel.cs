@@ -38,5 +38,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         public int Id { get; set; }
         public string Grade { get; set; }
         public decimal? CreditLimit { get; set; }
+        public DateTime? CustomerSince { get; set; }
     }
 }
