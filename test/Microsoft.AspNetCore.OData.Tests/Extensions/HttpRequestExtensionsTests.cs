@@ -10,7 +10,10 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
 {
@@ -96,17 +99,52 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             ExceptionAssert.ThrowsArgumentNull(() => request.GetNextPageLink(4, 4, null), "request");
         }
 
-        [Fact]
-        public void GetNextPageLink_Returns_Uri()
+        [InlineData(null, 5)]
+        [InlineData(null, 10)]
+        [InlineData(null, 15)]
+        [InlineData(null, 25)]
+        [InlineData(5, 5)]
+        [InlineData(5, 10)]
+        [InlineData(5, 15)]
+        [InlineData(5, 25)]
+        [InlineData(null, null)]
+        [InlineData(6, null)]
+        [Theory]
+        public void GetNextPageLink_Returns_Uri(int? top, int? pageSize, int defaultPageSize = 5)
         {
             // Arrange & Act & Assert
-            HttpRequest request = RequestFactory.Create("get", "http://localhost");
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.Append("http://localhost");
+
+            if (top != null)
+            {
+                urlBuilder.Append($"?$top={top}");
+            }
+
+            if (pageSize != null && top != null)
+            {
+                urlBuilder.Append($"&$skip={pageSize}");
+            }
+            else if (pageSize != null)
+            {
+                urlBuilder.Append($"?$skip={pageSize}");
+            }
+            
+            HttpRequest request = RequestFactory.Create("get", urlBuilder.ToString());
 
             // Act
-            Uri uri = request.GetNextPageLink(4, 4, null);
+            Uri uri = request.GetNextPageLink(top ?? defaultPageSize, null, null);
+            var calculatedSkip = (pageSize ?? 0) + (top ?? defaultPageSize);
 
             // Assert
-            Assert.Equal(new Uri("http://localhost/?$skip=4"), uri);
+            if (top == null)
+            {
+                Assert.Equal(new Uri($"http://localhost/?$skip={calculatedSkip}"), uri);
+            }
+            else
+            {
+                Assert.Equal(new Uri($"http://localhost/?$top={top}&$skip={calculatedSkip}"), uri);
+            }
         }
 
         [Fact]
