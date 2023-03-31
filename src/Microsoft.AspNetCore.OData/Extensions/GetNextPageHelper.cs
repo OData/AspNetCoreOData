@@ -53,10 +53,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
                             {
                                 value = (top - pageSize).ToString(CultureInfo.InvariantCulture);
                             }
-                            else
-                            {
-                                return null;
-                            }
                         }
                         break;
                     case "$skip":
