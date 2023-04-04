@@ -7,14 +7,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -162,12 +166,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
             // is intentional. The next-link in one response is used in the next request
             // so we need to control the execution order (unlike Theory attribute where order is random)
-            var skipTokenTestData = new List<Tuple<int, decimal?, int, decimal?>>
+            var skipTokenTestData = new List<(int, decimal?, int, decimal?)>
             {
-                Tuple.Create<int, decimal?, int, decimal?> (1, null, 3, null),
-                Tuple.Create<int, decimal?, int, decimal?> (5, null, 2, 2),
-                Tuple.Create<int, decimal?, int, decimal?> (7, 5, 9, 25),
-                Tuple.Create<int, decimal?, int, decimal?>(4, 30, 6, 35)
+                (1, null, 3, null),
+                (5, null, 2, 2),
+                (7, 5, 9, 25),
+                (4, 30, 6, 35)
             };
 
             string requestUri = "/prefix/SkipTokenPagingS1Customers?$orderby=CreditLimit";
@@ -234,12 +238,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
             // is intentional. The next-link in one response is used in the next request
             // so we need to control the execution order (unlike Theory attribute where order is random)
-            var skipTokenTestData = new List<Tuple<int, decimal?>>
+            var skipTokenTestData = new List<(int, decimal?)>
             {
-                Tuple.Create<int, decimal ?> (6, 35),
-                Tuple.Create<int, decimal?> (9, 25),
-                Tuple.Create<int, decimal?> (2, 2),
-                Tuple.Create<int, decimal?>(3, null)
+                (6, 35),
+                (9, 25),
+                (2, 2),
+                (3, null)
             };
 
             string requestUri = "/prefix/SkipTokenPagingS1Customers?$orderby=CreditLimit desc";
@@ -302,11 +306,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
             // is intentional. The next-link in one response is used in the next request
             // so we need to control the execution order (unlike Theory attribute where order is random)
-            var skipTokenTestData = new List<Tuple<int, string, decimal?>>
+            var skipTokenTestData = new List<(int, string, decimal?)>
             {
-                Tuple.Create<int, string, decimal?> (2, "B", null),
-                Tuple.Create<int, string, decimal?> (6, "C", null),
-                Tuple.Create<int, string, decimal?> (11, "F", 35),
+                (2, "B", null),
+                (6, "C", null),
+                (11, "F", 35),
             };
 
             string requestUri = "/prefix/SkipTokenPagingS2Customers?$orderby=Grade,CreditLimit";
@@ -372,11 +376,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
             // is intentional. The next-link in one response is used in the next request
             // so we need to control the execution order (unlike Theory attribute where order is random)
-            var skipTokenTestData = new List<Tuple<int, string, decimal?>>
+            var skipTokenTestData = new List<(int, string, decimal?)>
             {
-                Tuple.Create<int, string, decimal?> (6, "C", null),
-                Tuple.Create<int, string, decimal?> (5, "A", 30),
-                Tuple.Create<int, string, decimal?> (10, "D", 50),
+                (6, "C", null),
+                (5, "A", 30),
+                (10, "D", 50),
             };
 
             string requestUri = "/prefix/SkipTokenPagingS2Customers?$orderby=CreditLimit,Grade";
@@ -441,12 +445,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
             // is intentional. The next-link in one response is used in the next request
             // so we need to control the execution order (unlike Theory attribute where order is random)
-            var skipTokenTestData = new List<Tuple<int, DateTime?, int, DateTime?>>
+            var skipTokenTestData = new List<(int, DateTime?, int, DateTime?)>
             {
-                Tuple.Create<int, DateTime?, int, DateTime?> (1, null, 3, null),
-                Tuple.Create<int, DateTime?, int, DateTime?> (5, null, 2, new DateTime(2023, 1, 2)),
-                Tuple.Create<int, DateTime?, int, DateTime?> (7, new DateTime(2023, 1, 5), 9, new DateTime(2023, 1, 25)),
-                Tuple.Create<int, DateTime?, int, DateTime?>(4, new DateTime(2023, 1, 30), 6, new DateTime(2023, 2, 4))
+                (1, null, 3, null),
+                (5, null, 2, new DateTime(2023, 1, 2)),
+                (7, new DateTime(2023, 1, 5), 9, new DateTime(2023, 1, 25)),
+                (4, new DateTime(2023, 1, 30), 6, new DateTime(2023, 2, 4))
             };
 
             string requestUri = "/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince";
@@ -517,12 +521,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
             // is intentional. The next-link in one response is used in the next request
             // so we need to control the execution order (unlike Theory attribute where order is random)
-            var skipTokenTestData = new List<Tuple<int, DateTime?>>
+            var skipTokenTestData = new List<(int, DateTime?)>
             {
-                Tuple.Create<int, DateTime ?> (6, new DateTime(2023, 2, 4)),
-                Tuple.Create<int, DateTime?> (9, new DateTime(2023, 1, 25)),
-                Tuple.Create<int, DateTime?> (2, new DateTime(2023, 1, 2)),
-                Tuple.Create<int, DateTime?>(3, null)
+                (6, new DateTime(2023, 2, 4)),
+                (9, new DateTime(2023, 1, 25)),
+                (2, new DateTime(2023, 1, 2)),
+                (3, null)
             };
 
             string requestUri = "/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince desc";
@@ -574,6 +578,126 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             Assert.Single(pageResult);
             Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
             Assert.Null((pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
+            Assert.Null(content.GetValue("@odata.nextLink"));
+        }
+    }
+
+    public class SkipTokenPagingEdgeCaseTests : WebApiTestBase<SkipTokenPagingEdgeCaseTests>
+    {
+        public SkipTokenPagingEdgeCaseTests(WebApiTestFixture<SkipTokenPagingEdgeCaseTests> fixture)
+            : base(fixture)
+        {
+        }
+
+        // following the Fixture convention.
+        protected static void UpdateConfigureServices(IServiceCollection services)
+        {
+            IEdmModel model = GetEdmModel();
+            services.ConfigureControllers(
+                typeof(SkipTokenPagingEdgeCase1CustomersController));
+            services.AddControllers().AddOData(opt => opt.Expand().OrderBy().SkipToken().AddRouteComponents("{a}", model));
+        }
+
+        protected static IEdmModel GetEdmModel()
+        {
+            var csdl = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<edmx:Edmx Version=\"4.0\" xmlns:edmx=\"http://docs.oasis-open.org/odata/ns/edmx\">" +
+                "<edmx:DataServices>" +
+                "<Schema Namespace=\"" + typeof(SkipTokenPagingEdgeCase1Customer).Namespace + "\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">" +
+                "<EntityType Name=\"SkipTokenPagingEdgeCase1Customer\">" +
+                "<Key>" +
+                "<PropertyRef Name=\"Id\" />" +
+                "</Key>" +
+                "<Property Name=\"Id\" Type=\"Edm.Int32\" Nullable=\"false\" />" +
+                "<Property Name=\"CreditLimit\" Type=\"Edm.Decimal\" Scale=\"Variable\" Nullable=\"false\" />" + // Property is nullable on CLR type
+                "</EntityType>" +
+                "</Schema>" +
+                "<Schema Namespace=\"Default\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">" +
+                "<EntityContainer Name=\"Container\">" +
+                "<EntitySet Name=\"SkipTokenPagingEdgeCase1Customers\" EntityType=\"" + typeof(SkipTokenPagingEdgeCase1Customer).FullName + "\" />" +
+                "</EntityContainer>" +
+                "</Schema>" +
+                "</edmx:DataServices>" +
+                "</edmx:Edmx>";
+
+            IEdmModel model;
+
+            using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(csdl)))
+            using (var reader = XmlReader.Create(memoryStream))
+            {
+                model = CsdlReader.Parse(reader);
+            }
+
+            return model;
+        }
+
+        [Fact]
+        public async Task VerifySkipTokenPagingForPropertyNullableOnClrTypeButNotNullableOnEdmType()
+        {
+            HttpClient client = CreateClient();
+            HttpRequestMessage request;
+            HttpResponseMessage response;
+            JObject content;
+            JArray pageResult;
+
+            // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
+            // is intentional. The next-link in one response is used in the next request
+            // so we need to control the execution order (unlike Theory attribute where order is random)
+            var skipTokenTestData = new List<(int, decimal?, int, decimal?)>
+            {
+                (2, 2, 7, 5),
+                (9, 25, 4, 30),
+            };
+
+            string requestUri = "/prefix/SkipTokenPagingEdgeCase1Customers?$orderby=CreditLimit";
+
+            foreach (var testData in skipTokenTestData)
+            {
+                int idAt0 = testData.Item1;
+                decimal? creditLimitAt0 = testData.Item2;
+                int idAt1 = testData.Item3;
+                decimal? creditLimitAt1 = testData.Item4;
+
+                // Arrange
+                request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+                string skipToken = string.Concat("$skiptoken=CreditLimit-", creditLimitAt1 != null ? creditLimitAt1.ToString() : "null", ",Id-", idAt1);
+
+                // Act
+                response = await client.SendAsync(request);
+                content = await response.Content.ReadAsObject<JObject>();
+
+                // Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                pageResult = content["value"] as JArray;
+                Assert.NotNull(pageResult);
+                Assert.Equal(2, pageResult.Count);
+                Assert.Equal(idAt0, (pageResult[0] as JObject)["Id"].ToObject<int>());
+                Assert.Equal(creditLimitAt0, (pageResult[0] as JObject)["CreditLimit"].ToObject<decimal?>());
+                Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+                Assert.Equal(creditLimitAt1, (pageResult[1] as JObject)["CreditLimit"].ToObject<decimal?>());
+
+                string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+                Assert.NotNull(nextPageLink);
+                Assert.EndsWith("/prefix/SkipTokenPagingEdgeCase1Customers?$orderby=CreditLimit&" + skipToken, nextPageLink);
+
+                requestUri = nextPageLink;
+            }
+
+            // Fetch last page
+            request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            response = await client.SendAsync(request);
+
+            content = await response.Content.ReadAsObject<JObject>();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            pageResult = content["value"] as JArray;
+            Assert.NotNull(pageResult);
+            Assert.Single(pageResult);
+            Assert.Equal(6, (pageResult[0] as JObject)["Id"].ToObject<int>());
+            Assert.Equal(35, (pageResult[0] as JObject)["CreditLimit"].ToObject<decimal?>());
             Assert.Null(content.GetValue("@odata.nextLink"));
         }
     }

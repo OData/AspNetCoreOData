@@ -137,4 +137,22 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             return customers;
         }
     }
+
+    public class SkipTokenPagingEdgeCase1CustomersController : ODataController
+    {
+        private static readonly List<SkipTokenPagingEdgeCase1Customer> customers = new List<SkipTokenPagingEdgeCase1Customer>
+        {
+            new SkipTokenPagingEdgeCase1Customer { Id = 2, CreditLimit = 2 },
+            new SkipTokenPagingEdgeCase1Customer { Id = 4, CreditLimit = 30 },
+            new SkipTokenPagingEdgeCase1Customer { Id = 6, CreditLimit = 35 },
+            new SkipTokenPagingEdgeCase1Customer { Id = 7, CreditLimit = 5 },
+            new SkipTokenPagingEdgeCase1Customer { Id = 9, CreditLimit = 25 },
+        };
+
+        [EnableQuery(PageSize = 2)]
+        public ActionResult<IEnumerable<SkipTokenPagingEdgeCase1Customer>> Get()
+        {
+            return customers;
+        }
+    }
 }

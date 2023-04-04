@@ -732,4 +732,7 @@
   <data name="SelectExpandEmptyOrWhitespace" xml:space="preserve">
     <value>'select' and 'expand' cannot be empty or whitespace. Omit the parameter from the query if it is not used.</value>
   </data>
+  <data name="SkipTokenProcessingError" xml:space="preserve">
+    <value>Unable to get property values from the skiptoken value.</value>
+  </data>
 </root>

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -250,6 +251,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
         /// <returns></returns>
+        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
         private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IList<OrderByNode> orderByNodes, ODataQueryContext context, string skipTokenRawValue)
         {
             Contract.Assert(query != null);
@@ -270,7 +272,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (propertyValuePairs.Count == 0)
             {
-                throw Error.InvalidOperation("Unable to get property values from the skiptoken value.");
+                throw Error.InvalidOperation(SRResources.SkipTokenProcessingError);
             }
 
             bool parameterizeConstant = querySettings.EnableConstantParameterization;
@@ -294,7 +296,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 object value = item.Value.PropertyValue;
 
                 Type propertyType = item.Value.PropertyType ?? value.GetType();
-                bool propertyIsNullable = propertyType.IsNullable();
+                bool propertyIsNullable = property.Type.IsNullable();
 
                 Expression compare = null;
                 if (value is ODataEnumValue enumValue)
