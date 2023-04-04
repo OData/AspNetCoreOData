@@ -40,4 +40,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
         public decimal? CreditLimit { get; set; }
         public DateTime? CustomerSince { get; set; }
     }
+
+    public class SkipTokenPagingEdgeCase1Customer
+    {
+        public int Id { get; set; }
+        public decimal? CreditLimit { get; set; }
+    }
 }
