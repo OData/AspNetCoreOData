@@ -10,17 +10,22 @@ using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Common
 {
+    public interface IKeyValuePairParser
+    {
+        IDictionary<string, string> Parse(string expression);
+    }
+
     /// <summary>
     /// Parsing function parameters and entity key in paths.
     /// </summary>
-    internal class KeyValuePairParser
+    internal class KeyValuePairParser : IKeyValuePairParser
     {
         /// <summary>
         /// Parse the expression string into key/value pairs
         /// </summary>
         /// <param name="expression">The contents of the key/value pairs.</param>
         /// <returns>true/false</returns>
-        public static IDictionary<string, string> Parse(string expression)
+        public IDictionary<string, string> Parse(string expression)
         {
             if (string.IsNullOrWhiteSpace(expression))
             {

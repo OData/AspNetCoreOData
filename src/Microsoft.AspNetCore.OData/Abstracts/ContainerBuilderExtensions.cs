@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -114,6 +115,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             // HttpRequestScope.
             builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);
             builder.AddService(ServiceLifetime.Scoped, sp => sp.GetRequiredService<HttpRequestScope>().HttpRequest);
+
+            builder.AddService<IKeyValuePairParser, KeyValuePairParser>(ServiceLifetime.Singleton);
+
             return builder;
         }
     }
