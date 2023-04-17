@@ -1331,8 +1331,6 @@ Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensi
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableActionNameCaseInsensitive.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableControllerNameCaseInsensitive.set -> void
-Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableConventionalRoutingIfODataRoutingPresent.get -> bool
-Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableConventionalRoutingIfODataRoutingPresent.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarCountRouting.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarCountRouting.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarValueRouting.get -> bool

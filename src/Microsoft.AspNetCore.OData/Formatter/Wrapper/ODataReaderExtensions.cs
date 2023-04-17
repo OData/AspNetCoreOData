@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// <summary>
         /// Read OData item.
         /// </summary>
-        /// <param name="reader">The odata reader.</param>
+        /// <param name="reader">The OData reader.</param>
         /// <param name="itemsStack">The item stack.</param>
         /// <param name="topLevelItem">The top level item.</param>
         private static void ReadODataItem(ODataReader reader, Stack<ODataItemWrapper> itemsStack, ref ODataItemWrapper topLevelItem)
@@ -225,15 +225,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             {
                 ODataItemWrapper parentItem = itemsStack.Peek();
                 ODataResourceSetWrapper parentResourceSet = parentItem as ODataResourceSetWrapper;
-                ODataDeltaResourceSetWrapper parentDeletaResourceSet = parentItem as ODataDeltaResourceSetWrapper;
+                ODataDeltaResourceSetWrapper parentDeleteResourceSet = parentItem as ODataDeltaResourceSetWrapper;
                 if (parentResourceSet != null)
                 {
                     parentResourceSet.Resources.Add(resourceWrapper);
                 }
-                else if (parentDeletaResourceSet != null)
+                else if (parentDeleteResourceSet != null)
                 {
                     // Delta resource set could have the normal resource
-                    parentDeletaResourceSet.DeltaItems.Add(resourceWrapper);
+                    parentDeleteResourceSet.DeltaItems.Add(resourceWrapper);
                 }
                 else
                 {
