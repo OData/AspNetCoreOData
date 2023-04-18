@@ -257,7 +257,7 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
-        /// Enable $skiptop query option.
+        /// Enable $skiptoken query option.
         /// </summary>
         /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
         public ODataOptions SkipToken()
@@ -286,6 +286,12 @@ namespace Microsoft.AspNetCore.OData
         /// Gets or sets whether or not the OData system query options should be prefixed with '$'.
         /// </summary>
         public bool EnableNoDollarQueryOptions { get; set; } = true;
+
+        /// <summary>
+        /// Gets the query settings.
+        /// </summary>
+        [Obsolete("QuerySettings will be removed in the next major version. Use QueryConfigurations instead.")]
+        public DefaultQuerySettings QuerySettings => QueryConfigurations;
 
         /// <summary>
         /// Gets the query configurations.

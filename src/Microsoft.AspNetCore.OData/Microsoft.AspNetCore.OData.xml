@@ -6245,7 +6245,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SkipToken">
             <summary>
-            Enable $skiptop query option.
+            Enable $skiptoken query option.
             </summary>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
@@ -6259,6 +6259,11 @@
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
             <summary>
             Gets or sets whether or not the OData system query options should be prefixed with '$'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
+            <summary>
+            Gets the query settings.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QueryConfigurations">
@@ -8006,44 +8011,6 @@
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations">
             <summary>
             This class describes the default configurations to use during query composition.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand">
-            <summary>
-            Gets or sets a value indicating whether navigation property can be expanded.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSelect">
-            <summary>
-            Gets or sets a value indicating whether property can be selected.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableCount">
-            <summary>
-            Gets or sets a value indicating whether entity set and property can apply $count.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableOrderBy">
-            <summary>
-            Gets or sets a value indicating whether property can apply $orderby.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableFilter">
-            <summary>
-            Gets or sets a value indicating whether property can apply $filter.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxTop">
-            <summary>
-            Gets or sets the max value of $top that a client can request.
-            </summary>
-            <value>
-            The max value of $top that a client can request, or <c>null</c> if there is no limit.
-            </value>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSkipToken">
-            <summary>
-            Gets or sets a value indicating whether the service will use skiptoken or not.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute">

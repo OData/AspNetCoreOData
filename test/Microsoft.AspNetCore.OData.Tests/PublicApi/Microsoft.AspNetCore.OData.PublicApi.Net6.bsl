@@ -104,6 +104,11 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableNoDollarQueryOptions  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	[
+	ObsoleteAttribute(),
+	]
+	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
+
+	[
 	TupleElementNamesAttribute(),
 	]
 	System.Collections.Generic.IDictionary`2[[System.String],[System.ValueTuple`2[[Microsoft.OData.Edm.IEdmModel],[System.IServiceProvider]]]] RouteComponents  { public get; }
@@ -1271,16 +1276,8 @@ public class Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser : I
 	public virtual System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
 }
 
-public class Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations {
+public class Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations : Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings {
 	public DefaultQueryConfigurations ()
-
-	bool EnableCount  { public get; public set; }
-	bool EnableExpand  { public get; public set; }
-	bool EnableFilter  { public get; public set; }
-	bool EnableOrderBy  { public get; public set; }
-	bool EnableSelect  { public get; public set; }
-	bool EnableSkipToken  { public get; public set; }
-	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler : Microsoft.AspNetCore.OData.Query.SkipTokenHandler {
