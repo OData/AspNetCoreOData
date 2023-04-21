@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -171,7 +172,15 @@ namespace Microsoft.AspNetCore.OData.Results
         private static IEdmEntityTypeReference GetEntityType(IEdmModel model, object entity)
         {
             Type entityType = entity.GetType();
-            IEdmTypeReference edmType = model.GetEdmTypeReference(entityType);
+            IEdmTypeReference edmType;
+            if (entity is IEdmObject edmObject)
+            {
+                edmType = edmObject.GetEdmType();
+            }
+            else
+            {
+                edmType = model.GetEdmTypeReference(entityType);
+            }
             if (edmType == null)
             {
                 throw Error.InvalidOperation(SRResources.ResourceTypeNotInModel, entityType.FullName);
