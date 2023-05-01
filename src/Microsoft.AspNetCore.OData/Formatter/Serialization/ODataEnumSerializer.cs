@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataEnumValue value = CreateODataEnumValue(graph, expectedType.AsEnum(), writeContext);
             if (value == null)
             {
-                return new ODataNullValue();
+                return ODataNullValueExtensions.NullValue;
             }
 
             return value;
