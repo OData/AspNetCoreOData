@@ -286,7 +286,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                             property = new ODataProperty
                             {
                                 Name = prop.Key,
-                                Value = new ODataNullValue()
+                                Value = ODataNullValueExtensions.NullValue
                             };
                         }
                         else
@@ -618,7 +618,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     dynamicProperties.Add(new ODataProperty
                     {
                         Name = dynamicProperty.Key,
-                        Value = new ODataNullValue()
+                        Value = ODataNullValueExtensions.NullValue
                     });
 
                     continue;
