@@ -670,7 +670,6 @@ Microsoft.AspNetCore.OData.ODataOptions.ODataOptions() -> void
 Microsoft.AspNetCore.OData.ODataOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.QueryConfigurations.get -> Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
 Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.get -> Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings
-Microsoft.AspNetCore.OData.ODataOptions.QuerySettings.set -> void
 Microsoft.AspNetCore.OData.ODataOptions.RouteComponents.get -> System.Collections.Generic.IDictionary<string, (Microsoft.OData.Edm.IEdmModel EdmModel, System.IServiceProvider ServiceProvider)>
 Microsoft.AspNetCore.OData.ODataOptions.RouteOptions.get -> Microsoft.AspNetCore.OData.Routing.ODataRouteOptions
 Microsoft.AspNetCore.OData.ODataOptions.Select() -> Microsoft.AspNetCore.OData.ODataOptions
@@ -816,20 +815,6 @@ Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.DefaultODataQuer
 Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
 Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
 Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.DefaultQueryConfigurations() -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableCount.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableCount.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableExpand.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableFilter.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableFilter.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableOrderBy.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableOrderBy.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSelect.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSelect.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSkipToken.get -> bool
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableSkipToken.set -> void
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxTop.get -> int?
-Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxTop.set -> void
 Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler
 Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.DefaultSkipTokenHandler() -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute
