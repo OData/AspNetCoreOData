@@ -22,6 +22,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         public ODataResourceSetWrapper(ODataResourceSet resourceSet)
         {
             Resources = new List<ODataResourceWrapper>();
+            Items = new List<ODataItemWrapper>();
             ResourceSet = resourceSet;
         }
 
@@ -35,5 +36,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// Resource set only contains resources.
         /// </summary>
         public IList<ODataResourceWrapper> Resources { get; }
+
+        /// <summary>
+        /// Gets the nested items of this ResourceSet.
+        /// Since we have 'Resources' to contain ODataResource items in the collection (we have to keep it avoid breaking changes).
+        /// This list is used to hold other items, for example a primitive or a collection, etc.
+        /// In the next major release, we should combine 'Resources' and 'Items' together.
+        /// </summary>
+        public IList<ODataItemWrapper> Items { get; }
     }
 }
