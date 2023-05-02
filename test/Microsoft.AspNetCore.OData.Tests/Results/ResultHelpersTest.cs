@@ -10,6 +10,8 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -42,6 +44,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
             ExceptionAssert.Throws<InvalidOperationException>(
                 () => ResultHelpers.GenerateODataLink(request, _entity, isEntityId: true),
                 "The Id link builder for the entity set 'Customers' returned null. An Id link is required for the OData-EntityId header.");
+        }
+
+        [Fact]
+        public void GenerateODataLink_CanResolveIEdmObject()
+        {
+            // Arrange
+            var model = new CustomersModelWithInheritance();
+            var path = new ODataPath(new EntitySetSegment(model.Customers));
+            var request = RequestFactory.Create(model.Model, path: path);
+            request.ODataFeature().BaseAddress = "http://localhost";
+            var edmEntity = new EdmEntityObject(model.Customer);
+            edmEntity.TrySetPropertyValue("ID", 1);
+
+            // Act & Assert
+            Assert.Equal("http://localhost/Customers(1)",
+                ResultHelpers.GenerateODataLink(request, edmEntity, isEntityId: true).AbsoluteUri);
         }
 
         [Fact]
