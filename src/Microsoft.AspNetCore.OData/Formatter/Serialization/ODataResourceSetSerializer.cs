@@ -163,13 +163,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     //var edmTypeRef = writeContext.GetEdmType(item, item.GetType());
                     var edmTypeRef = InferAndConvert(item, writeContext, out object newValue);
-                    if (edmTypeRef.IsPrimitive())
+                    if (edmTypeRef != null && edmTypeRef.IsPrimitive())
                     {
                         ODataPrimitiveSerializer primitiveSerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeRef) as ODataPrimitiveSerializer;
                         var odataPrimitiveValue = primitiveSerializer.CreateODataPrimitiveValue(newValue, edmTypeRef.AsPrimitive(), writeContext);
                         await writer.WritePrimitiveAsync(odataPrimitiveValue).ConfigureAwait(false);
                     }
-                    else if (edmTypeRef.IsCollection() && edmTypeRef.AsCollection().ElementType().IsStructuredOrUntyped())
+                    else if (edmTypeRef != null && edmTypeRef.IsCollection() && edmTypeRef.AsCollection().ElementType().IsStructuredOrUntyped())
                     {
                         IODataEdmTypeSerializer resourceSetSerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeRef);
                         await resourceSetSerializer.WriteObjectInlineAsync(newValue, edmTypeRef, writer, writeContext).ConfigureAwait(false);
@@ -212,11 +212,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             newValue = converter.Convert(value, converterContext);
 
             edmType = writeContext.TryGetEdmType(newValue, newValue.GetType());
-            if (edmType == null)
-            {
-                throw new ODataException("We can't infer the type.");
-            }
-
             return edmType;
         }
 

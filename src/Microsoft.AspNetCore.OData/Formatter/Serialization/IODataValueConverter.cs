@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="ODataSerializer.cs" company=".NET Foundation">
+// <copyright file="IODataUntypedValueConverter.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -10,23 +10,32 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
-using Microsoft.OData;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
-using Microsoft.OData.Edm.Vocabularies;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
+    /// <summary>
+    /// A context for untyped value converter.
+    /// </summary>
     public class UntypedValueConverterContext
     {
+        /// <summary>
+        /// Gets/sets the Edm model.
+        /// </summary>
         public IEdmModel Model { get; set; }
 
+        /// <summary>
+        /// Gets/sets the Edm property.
+        /// </summary>
         public IEdmStructuralProperty Property { get; set; }
 
+        /// <summary>
+        /// Gets/sets the resource.
+        /// </summary>
         public ResourceContext Resource { get; set; }
     }
 
@@ -43,14 +52,28 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataSerializer"/> class.
         /// </summary>
-        /// <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
+        /// <param name="originalValue">The original value.</param>
+        /// <param name="context">The context.</param>
+        /// <returns>converted value.</returns>
         object Convert(object originalValue, UntypedValueConverterContext context);
     }
 
+    /// <summary>
+    /// The default
+    /// </summary>
     public class DefaultODataUntypedValueConverter : IODataUntypedValueConverter
     {
+        /// <summary>
+        /// Gets the instance
+        /// </summary>
         public static DefaultODataUntypedValueConverter Instance = new DefaultODataUntypedValueConverter();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="originalValue"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public virtual object Convert(object originalValue, UntypedValueConverterContext context)
         {
             if (originalValue == null)
@@ -59,7 +82,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             Type originalType = originalValue.GetType();
-            if (typeof(IEdmObject).IsAssignableFrom(originalType))
+            if (typeof(IEdmObject).IsAssignableFrom(originalType) ||
+                typeof(DynamicTypeWrapper).IsAssignableFrom(originalType))
             {
                 return originalValue;
             }

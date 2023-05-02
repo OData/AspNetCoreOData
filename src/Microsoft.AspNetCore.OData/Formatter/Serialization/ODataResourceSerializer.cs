@@ -845,27 +845,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        public virtual ODataNestedResourceInfo CreateUntypedNestedResourceInfo(IEdmStructuralProperty property, PathSelectItem pathSelectItem, ResourceContext resourceContext)
-        {
-            if (property == null)
-            {
-                throw Error.ArgumentNull(nameof(property));
-            }
-
-            ODataNestedResourceInfo nestedInfo = null;
-
-            if (property.Type != null)
-            {
-                nestedInfo = new ODataNestedResourceInfo
-                {
-                    IsCollection = property.Type.IsCollection(),
-                    Name = property.Name
-                };
-            }
-
-            return nestedInfo;
-        }
-
         private async Task WriteStreamPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
         {
             Contract.Assert(selectExpandNode != null);
@@ -1092,26 +1071,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             return nestedInfo;
         }
 
-        public virtual ODataNestedResourceInfo CreateUntypedNestedResourceInfo(IEdmStructuralProperty property, ResourceContext resourceContext)
-        {
-            if (property == null)
-            {
-                throw Error.ArgumentNull(nameof(property));
-            }
-
-            ODataNestedResourceInfo nestedInfo = null;
-            if (property.Type != null)
-            {
-                nestedInfo = new ODataNestedResourceInfo
-                {
-                    IsCollection = property.Type.IsCollection(),
-                    Name = property.Name
-                };
-            }
-
-            return nestedInfo;
-        }
-
         /// <summary>
         /// Creates the <see cref="ODataNestedResourceInfo"/> to be written while writing this entity.
         /// </summary>
@@ -1181,7 +1140,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         continue;
                     }
 
-                    if (structuralProperty.Type.IsUntyped() || structuralProperty.Type.IsCollectionUntyped())
+                    if (structuralProperty.Type != null &&
+                        (structuralProperty.Type.IsUntyped() || structuralProperty.Type.IsCollectionUntyped()))
                     {
                         continue;
                     }

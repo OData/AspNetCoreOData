@@ -4322,6 +4322,26 @@
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> for the given type.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext">
+            <summary>
+            A context for untyped value converter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext.Model">
+            <summary>
+            Gets/sets the Edm model.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext.Property">
+            <summary>
+            Gets/sets the Edm property.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext.Resource">
+            <summary>
+            Gets/sets the resource.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataUntypedValueConverter">
             <summary>
             Base class for <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> implementations.
@@ -4336,7 +4356,27 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> class.
             </summary>
-            <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
+            <param name="originalValue">The original value.</param>
+            <param name="context">The context.</param>
+            <returns>converted value.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataUntypedValueConverter">
+            <summary>
+            The default
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataUntypedValueConverter.Instance">
+            <summary>
+            Gets the instance
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataUntypedValueConverter.Convert(System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext)">
+            <summary>
+            
+            </summary>
+            <param name="originalValue"></param>
+            <param name="context"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer">
             <summary>
