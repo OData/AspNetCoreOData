@@ -60,7 +60,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     {
                         return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
                     }
-                    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
+                    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex() 
+                        || collectionType.ElementType().IsUntyped())
                     {
                         return _serviceProvider.GetRequiredService<ODataResourceSetSerializer>();
                     }
@@ -71,6 +72,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 case EdmTypeKind.Complex:
                 case EdmTypeKind.Entity:
+                case EdmTypeKind.Untyped:
                     return _serviceProvider.GetRequiredService<ODataResourceSerializer>();
 
                 default:

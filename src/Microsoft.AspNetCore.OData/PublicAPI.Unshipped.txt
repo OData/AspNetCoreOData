@@ -578,6 +578,13 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.IsNullable.get ->
 Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.IsNullable.set -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetDynamicProperties() -> System.Collections.Generic.Dictionary<string, object>
 Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection.EdmUntypedCollection() -> void
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.EdmUntypedObject() -> void
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.TryGetPropertyValue(string propertyName, out object value) -> bool
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject
@@ -601,6 +608,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject.TryGetPropertyValue(string propertyName, out object value) -> bool
+Microsoft.AspNetCore.OData.Formatter.Value.IEdmUntypedObject
 Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject
 Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
 Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.NullEdmComplexObject(Microsoft.OData.Edm.IEdmComplexTypeReference edmType) -> void
@@ -626,10 +634,14 @@ Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedItems.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceInfo.get -> Microsoft.OData.ODataNestedResourceInfo
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.ODataNestedResourceInfoWrapper(Microsoft.OData.ODataNestedResourceInfo nestedInfo) -> void
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.ODataPrimitiveWrapper(Microsoft.OData.ODataPrimitiveValue value) -> void
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.Value.get -> Microsoft.OData.ODataPrimitiveValue
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper.ODataResourceSetBaseWrapper() -> void
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Items.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.ODataResourceSetWrapper(Microsoft.OData.ODataResourceSet resourceSet) -> void
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Resources.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.ResourceSet.get -> Microsoft.OData.ODataResourceSet

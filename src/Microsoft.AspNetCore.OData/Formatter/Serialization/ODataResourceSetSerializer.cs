@@ -161,7 +161,23 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
                 else
                 {
-                    await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
+                    //var edmTypeRef = writeContext.GetEdmType(item, item.GetType());
+                    var edmTypeRef = InferAndConvert(item, writeContext, out object newValue);
+                    if (edmTypeRef.IsPrimitive())
+                    {
+                        ODataPrimitiveSerializer primitiveSerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeRef) as ODataPrimitiveSerializer;
+                        var odataPrimitiveValue = primitiveSerializer.CreateODataPrimitiveValue(newValue, edmTypeRef.AsPrimitive(), writeContext);
+                        await writer.WritePrimitiveAsync(odataPrimitiveValue).ConfigureAwait(false);
+                    }
+                    else if (edmTypeRef.IsCollection() && edmTypeRef.AsCollection().ElementType().IsStructuredOrUntyped())
+                    {
+                        IODataEdmTypeSerializer resourceSetSerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeRef);
+                        await resourceSetSerializer.WriteObjectInlineAsync(newValue, edmTypeRef, writer, writeContext).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await resourceSerializer.WriteObjectInlineAsync(newValue, elementType, writer, writeContext).ConfigureAwait(false);
+                    }
                 }
             }
 
@@ -174,6 +190,34 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             resourceSet.NextPageLink = nextLinkGenerator(lastResource);
 
             await writer.WriteEndAsync().ConfigureAwait(false);
+        }
+
+        private IEdmTypeReference InferAndConvert(object value, ODataSerializerContext writeContext, out object newValue)
+        {
+            newValue = value;
+            Type valueType = value.GetType();
+            IEdmTypeReference edmType = writeContext.TryGetEdmType(value, valueType);
+            if (edmType != null)
+            {
+                // Yes, we have the type defined in the model.
+                return edmType;
+            }
+
+            UntypedValueConverterContext converterContext = new UntypedValueConverterContext
+            {
+                Model = writeContext.Model,
+            };
+
+            IODataUntypedValueConverter converter = writeContext.GetUntypedValueConverter();
+            newValue = converter.Convert(value, converterContext);
+
+            edmType = writeContext.TryGetEdmType(newValue, newValue.GetType());
+            if (edmType == null)
+            {
+                throw new ODataException("We can't infer the type.");
+            }
+
+            return edmType;
         }
 
         /// <summary>
@@ -467,6 +511,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (elementType.IsEntity() || elementType.IsComplex())
                 {
                     return elementType.AsStructured();
+                }
+
+                if (elementType.IsUntyped())
+                {
+                    return EdmUntypedStructuredTypeReference.NullableTypeReference;
                 }
             }
 

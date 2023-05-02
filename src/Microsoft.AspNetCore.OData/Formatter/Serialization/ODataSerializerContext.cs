@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -291,6 +293,26 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             get
             {
                 return EdmProperty as IEdmNavigationProperty;
+            }
+        }
+
+        internal IODataUntypedValueConverter GetUntypedValueConverter()
+        {
+            IODataUntypedValueConverter converter =
+                Request?.GetRouteServices()?.GetService<IODataUntypedValueConverter>();
+
+            return converter ?? DefaultODataUntypedValueConverter.Instance;
+        }
+
+        internal IEdmTypeReference TryGetEdmType(object instance, Type type)
+        {
+            try
+            {
+                return GetEdmType(instance, type);
+            }
+            catch
+            {
+                return null;
             }
         }
 

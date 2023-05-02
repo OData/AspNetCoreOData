@@ -526,6 +526,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
+                // TODO: Do we support the query option on property whose type is 'Edm.Untyped' or 'Collection(Edm.Untyped)'?
+
                 if (SelectedStructuralProperties == null)
                 {
                     SelectedStructuralProperties = new HashSet<IEdmStructuralProperty>();

@@ -90,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Act & Assert
             await ExceptionAssert.ThrowsAsync<ArgumentException>(
                 () => deserializer.ReadAsync(reader, typeof(IList<int>), context),
-                "The argument must be of type 'Complex or Entity'. (Parameter 'edmType')");
+                "The argument must be of type 'Collection of complex, entity or untyped'. (Parameter 'edmType')");
         }
 
         [Fact]
@@ -246,6 +246,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             object city;
             Assert.True(address.TryGetPropertyValue("City", out city));
             Assert.Equal("Redmond", city);
+        }
+
+        [Fact(Skip = "See: https://github.com/OData/odata.net/issues/2662")]
+        public async Task ReadAsync_ReturnsEdmUntypedObjectCollection_UntypedMode()
+        {
+            // Arrange
+            HttpContent content = new StringContent("{ 'value': [42, null,  { 'Any/name' : 'Redmond' } ] }");
+            HeaderDictionary headerDict = new HeaderDictionary
+            {
+                { "Content-Type", "application/json" }
+            };
+
+            IODataRequestMessage request = ODataMessageWrapperHelper.Create(await content.ReadAsStreamAsync(), headerDict);
+            ODataMessageReader reader = new ODataMessageReader(request, new ODataMessageReaderSettings(), _model);
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            ODataDeserializerContext readContext = new ODataDeserializerContext
+            {
+                Model = _model,
+                ResourceType = typeof(IEdmObject),
+                ResourceEdmType = EdmUntypedHelpers.NullableUntypedCollectionReference
+            };
+
+            // Act
+            EdmUntypedCollection result = await deserializer.ReadAsync(reader, typeof(IEdmObject), readContext) as EdmUntypedCollection;
+
+            // Assert
+            Assert.NotNull(result);
+
+            Assert.Equal(3, result.Count);
         }
 
         [Fact]

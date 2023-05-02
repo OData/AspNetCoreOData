@@ -54,9 +54,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(edmType != null);
 
             // TODO: is it OK to read the top level collection of entity?
-            if (!(edmType.IsCollection() && edmType.AsCollection().ElementType().IsStructured()))
+            if (!edmType.IsStructuredOrUntypedStructuredCollection())
             {
-                throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, EdmTypeKind.Complex + " or " + EdmTypeKind.Entity);
+                throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, "Collection of complex, entity or untyped");
             }
 
             ODataReader resourceSetReader = await messageReader.CreateODataResourceSetReaderAsync().ConfigureAwait(false);
@@ -72,20 +72,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return null;
             }
 
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull(nameof(edmType));
-            }
-
-            if (readContext == null)
-            {
-                throw Error.ArgumentNull(nameof(readContext));
-            }
-
-            if (!edmType.IsCollection() || !edmType.AsCollection().ElementType().IsStructured())
-            {
-                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
-            }
+            IEdmTypeReference edmElementType = VerifyAndGetElementType(edmType, readContext);
 
             ODataResourceSetWrapper resourceSet = item as ODataResourceSetWrapper;
             if (resourceSet == null)
@@ -96,9 +83,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
-            IEdmStructuredTypeReference elementType = edmType.AsCollection().ElementType().AsStructured();
+            IEdmStructuredTypeReference elementType = edmElementType.IsUntyped() ?
+                EdmUntypedStructuredTypeReference.NullableTypeReference :
+                edmElementType.AsStructured();
 
             IEnumerable result = ReadResourceSet(resourceSet, elementType, readContext);
+            if (edmElementType.IsUntyped())
+            {
+                EdmUntypedCollection untypedList = new EdmUntypedCollection();
+                foreach (var element in result)
+                {
+                    untypedList.Add(element);
+                }
+
+                return untypedList;
+            }
+
             if (result != null && elementType.IsComplex())
             {
                 if (readContext.IsNoClrType)
@@ -148,8 +148,57 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             foreach (ODataResourceWrapper resourceWrapper in resourceSet.Resources)
             {
-                yield return deserializer.ReadInline(resourceWrapper, elementType, readContext);
+                if (resourceWrapper == null)
+                {
+                    yield return null;
+                }
+                //else if (resourceWrapper is ODataPrimitiveResourceWrapper primitiveResourceWrapper)
+                //{
+                //    yield return primitiveResourceWrapper.Value.Value;
+                //}
+                else
+                {
+                    yield return deserializer.ReadInline(resourceWrapper, elementType, readContext);
+                }
             }
+
+            foreach (ODataItemWrapper wrapper in resourceSet.Items)
+            {
+                if (wrapper is ODataPrimitiveWrapper primitiveResourceWrapper)
+                {
+                    yield return primitiveResourceWrapper.Value.Value;
+                }
+                else if (wrapper is ODataResourceSetWrapper resourceSetWrapper)
+                {
+                    yield return this.ReadInline(resourceSetWrapper, elementType, readContext);
+                }
+            }
+        }
+
+        private IEdmTypeReference VerifyAndGetElementType(IEdmTypeReference edmType, ODataDeserializerContext readContext)
+        {
+            if (edmType == null)
+            {
+                throw Error.ArgumentNull(nameof(edmType));
+            }
+
+            if (readContext == null)
+            {
+                throw Error.ArgumentNull(nameof(readContext));
+            }
+
+            if (!edmType.IsCollection())
+            {
+                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
+            }
+
+            IEdmTypeReference edmElementType = edmType.AsCollection().ElementType();
+            if (!edmElementType.IsStructured() && !edmElementType.IsUntyped())
+            {
+                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
+            }
+
+            return edmElementType;
         }
     }
 }

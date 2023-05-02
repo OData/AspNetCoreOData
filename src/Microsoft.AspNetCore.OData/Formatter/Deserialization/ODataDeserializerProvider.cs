@@ -45,6 +45,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 case EdmTypeKind.Entity:
                 case EdmTypeKind.Complex:
+                case EdmTypeKind.Untyped:
                     return _serviceProvider.GetRequiredService<ODataResourceDeserializer>();
 
                 case EdmTypeKind.Enum:
@@ -60,7 +61,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     }
 
                     IEdmCollectionTypeReference collectionType = edmType.AsCollection();
-                    if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
+                    if (collectionType.ElementType().IsEntity()
+                        || collectionType.ElementType().IsComplex()
+                        || collectionType.ElementType().IsUntyped())
                     {
                         return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
                     }

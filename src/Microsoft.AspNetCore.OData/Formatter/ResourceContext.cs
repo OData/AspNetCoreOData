@@ -138,6 +138,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
         /// <summary>
         /// Gets or sets the dynamic complex or collection of complex properties should be nested in this instance.
+        /// It also contains the declared "Edm.Untyped" property (which value is un-clear) and the declared "Collection(Edm.Untyped)".
         /// </summary>
         /// <remarks>
         /// The key is the dynamic property name.
@@ -258,6 +259,16 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             Contract.Assert(structuredType.IsComplex());
             return new TypedEdmComplexObject(resourceInstance, structuredType.AsComplex(), model);
+        }
+
+        internal void AppendDynamicOrUntypedProperty(string propertyName, object value)
+        {
+            if (DynamicComplexProperties == null)
+            {
+                DynamicComplexProperties = new Dictionary<string, object>();
+            }
+
+            DynamicComplexProperties.Add(propertyName, value);
         }
     }
 }

@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
@@ -191,6 +190,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     linkResourceSetWrapper.DeltaItems.Add(linkBaseWrapper);
                     break;
 
+                case ODataReaderState.Primitive:
+                    Contract.Assert(itemsStack.Count > 0, "The primitive should be a non-null primitive value within an untyped collection.");
+                    // Be noted:
+                    // 1) if a 'null' value or a resource/object in the untyped collection goes to ODataResource flow
+                    // 2) if a collection value in the untyped collection goes to ODataResourceSet flow
+                    // 3) Since it's untyped, there's no logic for 'Enum' value, it means it's treated as primitive value.
+                    ODataResourceSetWrapper resourceSetParentWrapper = (ODataResourceSetWrapper)itemsStack.Peek();
+                    resourceSetParentWrapper.Items.Add(new ODataPrimitiveWrapper((ODataPrimitiveValue)reader.Item));
+                    break;
+
                 default:
                     Contract.Assert(false, "We should never get here, it means the ODataReader reported a wrong state.");
                     break;
@@ -301,11 +310,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             ODataResourceSetWrapper resourceSetWrapper = new ODataResourceSetWrapper(resourceSet);
             if (itemsStack.Count > 0)
             {
-                ODataNestedResourceInfoWrapper parentNestedResourceInfo = (ODataNestedResourceInfoWrapper)itemsStack.Peek();
-                Contract.Assert(parentNestedResourceInfo != null, "this has to be an inner resource set. inner resource sets always have a nested resource info.");
-                Contract.Assert(parentNestedResourceInfo.NestedResourceInfo.IsCollection == true, "Only collection nested properties can contain resource set as their child.");
-                Contract.Assert(parentNestedResourceInfo.NestedItems.Count == 0, "Each nested property can contain only one resource set as its direct child.");
-                parentNestedResourceInfo.NestedItems.Add(resourceSetWrapper);
+                ODataItemWrapper peekWrapper = itemsStack.Peek();
+                if (peekWrapper is ODataNestedResourceInfoWrapper parentNestedResourceInfo)
+                {
+                    Contract.Assert(parentNestedResourceInfo.NestedResourceInfo.IsCollection == true, "Only collection nested properties can contain resource set as their child.");
+                    Contract.Assert(parentNestedResourceInfo.NestedItems.Count == 0, "Each nested property can contain only one resource set as its direct child.");
+                    parentNestedResourceInfo.NestedItems.Add(resourceSetWrapper);
+                }
+                else
+                {
+                    ODataResourceSetWrapper parentResourceSet = (ODataResourceSetWrapper)peekWrapper;
+                    parentResourceSet.Items.Add(resourceSetWrapper);
+                }
             }
             else
             {

@@ -2117,6 +2117,20 @@
             Provides the functionalities related to the Edm type.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsCollectionUntyped(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> is 'Collection(Edm.Untyped)'.
+            </summary>
+            <param name="typeReference">The test type reference.</param>
+            <returns>True/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsUntypedOrCollectionUntyped(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
+            </summary>
+            <param name="typeReference">The test type reference.</param>
+            <returns>True/false</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementTypeOrSelf(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
             Get element type reference if it's collection or return itself
@@ -4177,6 +4191,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.DynamicComplexProperties">
             <summary>
             Gets or sets the dynamic complex or collection of complex properties should be nested in this instance.
+            It also contains the declared "Edm.Untyped" property (which value is un-clear) and the declared "Collection(Edm.Untyped)".
             </summary>
             <remarks>
             The key is the dynamic property name.
@@ -4306,6 +4321,22 @@
             <param name="request">The request for which the response is being serialized.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> for the given type.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataUntypedValueConverter">
+            <summary>
+            Base class for <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> implementations.
+            </summary>
+            <remarks>
+            Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer" />. A CLR type is supported if it is one of
+            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+            Uri[] which maps to ODataReferenceLinks payload, etc.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataUntypedValueConverter.Convert(System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> class.
+            </summary>
+            <param name="payloadKind">The kind of OData payload that this serializer generates.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer">
             <summary>
@@ -4680,6 +4711,17 @@
             <param name="structuralProperty">The EDM structural property being written.</param>
             <param name="resourceContext">The context for the entity instance being written.</param>
             <returns>The <see cref="T:Microsoft.OData.ODataStreamPropertyInfo"/> to write.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateUntypedPropertyValue(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmTypeReference@)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given, declared, "Edm.Untyped" property or collection.
+            </summary>
+            <param name="structuralProperty">The EDM structural property being written.</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <param name="edmTypeReference">The inferred type.</param>
+            <returns>1) return 'null' to skip it
+            2) return 'ODataProperty' to write it as primitive property.
+            3) otherwise, return the inferred value and its type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -5606,6 +5648,25 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetEdmType">
             <inheritdoc/>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of untyped values.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmUntypedObject"/> with no backing Edm type, or its Edm.Untyped.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.GetEdmType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.TryGetPropertyValue(System.String,System.Object@)">
+            <inheritdoc/>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject">
             <summary>
             Represents an instance of an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/>.
@@ -5706,6 +5767,12 @@
             <param name="value">When this method returns, contains the value of the property with the given name, if the property is found;
             otherwise, null. The parameter is passed uninitialized.</param>
             <returns><c>true</c> if the instance contains the property with the given name; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmUntypedObject">
+            <summary>
+            Represents an instance of an untyped structured object.
+            Untyped means this structured Edm type is "Edm.Untyped" or no Edm type.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject">
             <summary>
@@ -5884,6 +5951,22 @@
             Gets the nested items that are part of this nested resource info.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper">
+            <summary>
+            Encapsulates <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> in an Untyped (declared or undeclared) collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.#ctor(Microsoft.OData.ODataPrimitiveValue)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper"/>.
+            </summary>
+            <param name="value">The wrapped primitive value.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.Value">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataPrimitiveValue"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions">
             <summary>
             Extension methods for <see cref="T:Microsoft.OData.ODataReader"/>.
@@ -5967,6 +6050,14 @@
             <summary>
             Gets the nested resources of this ResourceSet.
             Resource set only contains resources.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Items">
+            <summary>
+            Gets the nested items of this ResourceSet.
+            Since we have 'Resources' to contain ODataResource items in the collection (we have to keep it avoid breaking changes).
+            This list is used to hold other items, for example a primitive or a collection, etc.
+            In the next major release, we should combine 'Resources' and 'Items' together.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper">

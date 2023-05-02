@@ -18,6 +18,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
     public class EdmHelpersTests
     {
         [Fact]
+        public void IsUntypedOrCollectionUntyped_ReturnsCorrectly()
+        {
+            // 1) null
+            IEdmTypeReference typeReference = null;
+            Assert.False(typeReference.IsUntypedOrCollectionUntyped());
+
+            // 2) Primitive
+            typeReference = EdmCoreModel.Instance.GetInt16(false);
+            Assert.False(typeReference.IsUntypedOrCollectionUntyped());
+
+            // 3) Edm.Untyped
+            typeReference = EdmCoreModel.Instance.GetUntyped();
+            Assert.True(typeReference.IsUntypedOrCollectionUntyped());
+
+            // 4) Collection(Edm.Untyped)
+            typeReference = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetUntyped()));
+            Assert.True(typeReference.IsUntypedOrCollectionUntyped());
+        }
+
+        [Fact]
         public void GetElementTypeOrSelf_ReturnsCorrectly()
         {
             // 1) null
