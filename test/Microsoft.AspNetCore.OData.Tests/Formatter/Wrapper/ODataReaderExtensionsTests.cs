@@ -18,7 +18,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
 {
-    public class ODataReaderExtensionsTests
+    public partial class ODataReaderExtensionsTests
     {
         private static readonly EdmModel Model;
 
@@ -574,7 +574,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
         }
 
         private async Task<ODataItemWrapper> ReadPayloadAsync(string payload,
-            IEdmModel edmModel, Func<ODataMessageReader, Task<ODataReader>> createReader, ODataVersion version = ODataVersion.V4)
+            IEdmModel edmModel, Func<ODataMessageReader, Task<ODataReader>> createReader, ODataVersion version = ODataVersion.V4,
+            bool readUntypedAsString = false)
         {
             var message = new InMemoryMessage()
             {
@@ -586,6 +587,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             {
                 BaseUri = new Uri("http://localhost/$metadata"),
                 EnableMessageStreamDisposal = true,
+                ReadUntypedAsString = readUntypedAsString,
                 Version = version,
             };
 

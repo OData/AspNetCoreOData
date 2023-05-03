@@ -626,10 +626,14 @@ Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedItems.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.NestedResourceInfo.get -> Microsoft.OData.ODataNestedResourceInfo
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper.ODataNestedResourceInfoWrapper(Microsoft.OData.ODataNestedResourceInfo nestedInfo) -> void
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.ODataPrimitiveWrapper(Microsoft.OData.ODataPrimitiveValue value) -> void
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.Value.get -> Microsoft.OData.ODataPrimitiveValue
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetBaseWrapper.ODataResourceSetBaseWrapper() -> void
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper
+Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Items.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.ODataResourceSetWrapper(Microsoft.OData.ODataResourceSet resourceSet) -> void
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Resources.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.ResourceSet.get -> Microsoft.OData.ODataResourceSet

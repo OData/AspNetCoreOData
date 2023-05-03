@@ -5884,6 +5884,22 @@
             Gets the nested items that are part of this nested resource info.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper">
+            <summary>
+            Encapsulates <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> in an Untyped (declared or undeclared) collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.#ctor(Microsoft.OData.ODataPrimitiveValue)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper"/>.
+            </summary>
+            <param name="value">The wrapped primitive value.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.Value">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataPrimitiveValue"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions">
             <summary>
             Extension methods for <see cref="T:Microsoft.OData.ODataReader"/>.
@@ -5967,6 +5983,15 @@
             <summary>
             Gets the nested resources of this ResourceSet.
             Resource set only contains resources.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper.Items">
+            <summary>
+            Gets the nested items of this ResourceSet.
+            Since we have 'Resources' to contain ODataResource items in the collection (we have to keep it avoid breaking changes).
+            This list is used to hold other items also, for example a primitive or a collection, etc.
+            I assume the order of items does matter, so 'Items' contains all 'Resources' item to keep the same order.
+            In the next major release, we should combine 'Resources' and 'Items' together.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper">
