@@ -5989,7 +5989,8 @@
             <summary>
             Gets the nested items of this ResourceSet.
             Since we have 'Resources' to contain ODataResource items in the collection (we have to keep it avoid breaking changes).
-            This list is used to hold other items, for example a primitive or a collection, etc.
+            This list is used to hold other items also, for example a primitive or a collection, etc.
+            I assume the order of items does matter, so 'Items' contains all 'Resources' item to keep the same order.
             In the next major release, we should combine 'Resources' and 'Items' together.
             </summary>
         </member>

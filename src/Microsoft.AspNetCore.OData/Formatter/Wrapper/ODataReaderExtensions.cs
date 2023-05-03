@@ -238,6 +238,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 if (parentResourceSet != null)
                 {
                     parentResourceSet.Resources.Add(resourceWrapper);
+                    parentResourceSet.Items.Add(resourceWrapper);// in the next major release, we should only use 'Items'.
                 }
                 else if (parentDeleteResourceSet != null)
                 {

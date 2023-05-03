@@ -249,8 +249,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                             });
                     });
 
-                Assert.Equal(2, nestedResourceSetWrapper.Items.Count);
+                Assert.Equal(4, nestedResourceSetWrapper.Items.Count);
                 Assert.Collection(nestedResourceSetWrapper.Items,
+                    p =>
+                    {
+                        Assert.Null(p); // since it's a 'null' value in collection,
+                                        // ODL reads it as ResourceStart, ResourceEnd with null item.
+                    },
+                    p =>
+                    {
+                        ODataResourceWrapper resourceWrapper = Assert.IsType<ODataResourceWrapper>(p);
+                        Assert.Empty(resourceWrapper.NestedResourceInfos);
+                        Assert.NotNull(resourceWrapper.Resource);
+                        Assert.Collection(resourceWrapper.Resource.Properties,
+                            p =>
+                            {
+                                Assert.Equal("Key1", p.Name);
+                                Assert.Equal("Value1", p.Value);
+                            },
+                            p =>
+                            {
+                                Assert.Equal("Key2", p.Name);
+                                Assert.True((bool)p.Value);
+                            });
+                    },
                     p =>
                     {
                         ODataPrimitiveWrapper primitiveWrapper = Assert.IsType<ODataPrimitiveWrapper>(p);

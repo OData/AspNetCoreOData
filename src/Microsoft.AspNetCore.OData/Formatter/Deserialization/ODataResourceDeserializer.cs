@@ -775,6 +775,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 ODataResourceWrapper resourceWrapper = CreateResourceWrapper(elementType, refLinkWrapper, readContext);
                 resourceSetWrapper.Resources.Add(resourceWrapper);
+                resourceSetWrapper.Items.Add(resourceWrapper); // in the next major release, we should only use 'Items'.
             }
 
             return resourceSetWrapper;
