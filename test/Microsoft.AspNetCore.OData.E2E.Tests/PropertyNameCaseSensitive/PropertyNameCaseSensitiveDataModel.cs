@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="EdmUntypedDataModel.cs" company=".NET Foundation">
+// <copyright file="PropertyNameCaseSensitiveDataModel.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -8,7 +8,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
+namespace Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive
 {
     public class Bill
     {

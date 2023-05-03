@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="EdmUntypedTest.cs" company=".NET Foundation">
+// <copyright file="PropertyNameCaseSensitiveTest.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -16,15 +16,15 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
+namespace Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive
 {
     /// <summary>
-    /// EdmUntyped here means the property type is "Edm.Untyped" type.
-    /// All properties defined using "Edm.Untyped" type are un-declared properties.
+    /// This test class contains cases about property name case-senstive or case-insensitive.
+    /// The library supports property name case-insensitive by default.
     /// </summary>
-    public class EdmUntypedTest : WebApiTestBase<EdmUntypedTest>
+    public class PropertyNameCaseSensitiveTest : WebApiTestBase<PropertyNameCaseSensitiveTest>
     {
-        public EdmUntypedTest(WebApiTestFixture<EdmUntypedTest> fixture)
+        public PropertyNameCaseSensitiveTest(WebApiTestFixture<PropertyNameCaseSensitiveTest> fixture)
            : base(fixture)
         {
         }
@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
         }
 
         [Fact]
-        public async Task EdmUntyped_QueryMetadata_WorksAsExpected()
+        public async Task PropertyNameCaseSensitive_QueryMetadata_WorksAsExpected()
         {
             // Arrange
             var requestUri = "odata/$metadata";
@@ -60,14 +60,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
                 string.Format("Response status code, expected: {0}, actual: {1}, request url: {2}",
                 HttpStatusCode.OK, response.StatusCode, requestUri));
 
-            Assert.Contains("<Property Name=\"HomeAddress\" Type=\"Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped.Address\" />", responseString);
-            Assert.Contains("<Property Name=\"Addresses\" Type=\"Collection(Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped.Address)\" />", responseString);
+            Assert.Contains("<Property Name=\"HomeAddress\" Type=\"Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive.Address\" />", responseString);
+            Assert.Contains("<Property Name=\"Addresses\" Type=\"Collection(Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive.Address)\" />", responseString);
         }
 
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task EdmUntyped_Post_UsingDifferentCase_WorksAsExpected(bool caseSensitive)
+        public async Task PropertyNameCaseSensitive_Post_UsingDifferentCase_WorksAsExpected(bool caseSensitive)
         {
             // Arrange
             string id = caseSensitive ? "ID" : "id";
@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task EdmUntyped_Patch_UsingDifferentCase_WorksAsExpected(bool caseSensitive)
+        public async Task PropertyNameCaseSensitive_Patch_UsingDifferentCase_WorksAsExpected(bool caseSensitive)
         {
             // Arrange
             string frequency = caseSensitive ? "Frequency" : "frequency";

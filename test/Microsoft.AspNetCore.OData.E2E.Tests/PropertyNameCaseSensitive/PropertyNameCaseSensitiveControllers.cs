@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="EdmUntypedControllers.cs" company=".NET Foundation">
+// <copyright file="PropertyNameCaseSensitiveControllers.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.EdmUntyped
+namespace Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive
 {
     public class BillsController : ODataController
     {
