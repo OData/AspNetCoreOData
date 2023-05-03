@@ -310,7 +310,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             ODataResourceSetWrapper resourceSetWrapper = new ODataResourceSetWrapper(resourceSet);
             if (itemsStack.Count > 0)
             {
-                ODataItemWrapper peekWrapper = itemsStack.Peek();
+                ODataItemWrapper peekedWrapper = itemsStack.Peek();
                 if (peekWrapper is ODataNestedResourceInfoWrapper parentNestedResourceInfo)
                 {
                     Contract.Assert(parentNestedResourceInfo.NestedResourceInfo.IsCollection == true, "Only collection nested properties can contain resource set as their child.");
