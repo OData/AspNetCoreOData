@@ -311,7 +311,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             if (itemsStack.Count > 0)
             {
                 ODataItemWrapper peekedWrapper = itemsStack.Peek();
-                if (peekWrapper is ODataNestedResourceInfoWrapper parentNestedResourceInfo)
+                if (peekedWrapper is ODataNestedResourceInfoWrapper parentNestedResourceInfo)
                 {
                     Contract.Assert(parentNestedResourceInfo.NestedResourceInfo.IsCollection == true, "Only collection nested properties can contain resource set as their child.");
                     Contract.Assert(parentNestedResourceInfo.NestedItems.Count == 0, "Each nested property can contain only one resource set as its direct child.");
@@ -319,7 +319,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                 }
                 else
                 {
-                    ODataResourceSetWrapper parentResourceSet = (ODataResourceSetWrapper)peekWrapper;
+                    ODataResourceSetWrapper parentResourceSet = (ODataResourceSetWrapper)peekedWrapper;
                     parentResourceSet.Items.Add(resourceSetWrapper);
                 }
             }
