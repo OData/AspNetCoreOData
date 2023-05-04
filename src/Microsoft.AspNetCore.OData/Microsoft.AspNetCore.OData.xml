@@ -5884,6 +5884,22 @@
             Gets the nested items that are part of this nested resource info.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper">
+            <summary>
+            Encapsulates <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> in an Untyped (declared or undeclared) collection.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.#ctor(Microsoft.OData.ODataPrimitiveValue)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper"/>.
+            </summary>
+            <param name="value">The wrapped primitive value.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper.Value">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataPrimitiveValue"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions">
             <summary>
             Extension methods for <see cref="T:Microsoft.OData.ODataReader"/>.
@@ -5974,11 +5990,16 @@
             Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResourceBase)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataItem)">
             <summary>
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/>.
             </summary>
             <param name="resource">The wrapped resource item, it could be null.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Item">
+            <summary>
+            Gets the real item.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource">
             <summary>

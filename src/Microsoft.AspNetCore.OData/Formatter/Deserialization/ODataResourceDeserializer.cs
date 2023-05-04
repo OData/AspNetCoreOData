@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             ODataResourceWrapper resourceWrapper = item as ODataResourceWrapper;
-            if (resourceWrapper == null)
+            if (resourceWrapper == null || !(resourceWrapper.Item is ODataResourceWrapper))
             {
                 throw Error.Argument("item", SRResources.ArgumentMustBeOfType, typeof(ODataResource).Name);
             }

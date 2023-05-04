@@ -2594,6 +2594,12 @@ public class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataEntityReferenceLi
 	Microsoft.OData.ODataEntityReferenceLink EntityReferenceLink  { public get; }
 }
 
+public class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
+	public ODataPrimitiveWrapper (Microsoft.OData.ODataPrimitiveValue value)
+
+	Microsoft.OData.ODataPrimitiveValue Value  { public get; }
+}
+
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaDeletedLinkWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataDeltaLinkBaseWrapper {
 	public ODataDeltaDeletedLinkWrapper (Microsoft.OData.ODataDeltaDeletedLink deltaDeletedLink)
 
@@ -2628,9 +2634,10 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSe
 }
 
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
-	public ODataResourceWrapper (Microsoft.OData.ODataResourceBase resource)
+	public ODataResourceWrapper (Microsoft.OData.ODataItem resource)
 
 	bool IsDeletedResource  { public get; }
+	Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper Item  { public get; }
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper]] NestedResourceInfos  { public get; }
 	Microsoft.OData.ODataResourceBase Resource  { public get; }
 }

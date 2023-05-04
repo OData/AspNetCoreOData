@@ -148,7 +148,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             foreach (ODataResourceWrapper resourceWrapper in resourceSet.Resources)
             {
-                yield return deserializer.ReadInline(resourceWrapper, elementType, readContext);
+                // Simply skip others to avoid break.
+                // In the following change on deserialization, we will update here
+                if (resourceWrapper.Item is ODataResourceWrapper realResourceWrapper)
+                {
+                    yield return deserializer.ReadInline(realResourceWrapper, elementType, readContext);
+                }
             }
         }
     }

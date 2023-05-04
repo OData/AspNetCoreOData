@@ -19,14 +19,36 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// Initializes a new instance of <see cref="ODataResourceWrapper"/>.
         /// </summary>
         /// <param name="resource">The wrapped resource item, it could be null.</param>
-        public ODataResourceWrapper(ODataResourceBase resource)
+        public ODataResourceWrapper(ODataItem resource)
         {
-            Resource = resource;
+            if (resource == null || resource is ODataResourceBase)
+            {
+                Resource = (ODataResourceBase)resource;
 
-            IsDeletedResource = resource != null && resource is ODataDeletedResource;
+                IsDeletedResource = Resource != null && Resource is ODataDeletedResource;
 
-            NestedResourceInfos = new List<ODataNestedResourceInfoWrapper>();
+                NestedResourceInfos = new List<ODataNestedResourceInfoWrapper>();
+
+                Item = this;
+            }
+            else if (resource is ODataPrimitiveValue primitiveValue)
+            {
+                Item = new ODataPrimitiveWrapper(primitiveValue);
+            }
+            else if (resource is ODataResourceSet resourceSet)
+            {
+                Item = new ODataResourceSetWrapper(resourceSet);
+            }
+            else
+            {
+                throw new ODataException("Not allowed!");
+            }
         }
+
+        /// <summary>
+        /// Gets the real item.
+        /// </summary>
+        public ODataItemWrapper Item { get; }
 
         /// <summary>
         /// Gets the wrapped <see cref="ODataResource"/>.
