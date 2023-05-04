@@ -428,7 +428,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         public async Task PostCustomer_AutoExpandNavigationProperties()
         {
             //Arrange
-
             string requestUri = "autoexpand/Customers";
 
             var content = @"{
