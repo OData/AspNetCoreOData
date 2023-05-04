@@ -436,13 +436,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
                     'Friend':{'Id': 99, 'HomeAddress': {'Street': 'Street 1', 'City': 'City 1'}}
                      }";
 
+            HttpClient client = CreateClient();
+
             StringContent stringContent = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json");
 
             var expectedOrder = "Order\":{\"Id\":1,\"Choice\":{\"Id\":101,\"Amount\":10.0}}";
             var expectedFriend = "Friend\":{\"Id\":99,\"HomeAddress\":{\"Street\":\"Street 1\",\"City\":\"City 1\",\"CountryOrRegion\":null},\"Order\":null,\"Friend\":null}";
 
             //Act & Assert
-            using (HttpClient client = CreateClient())
             using (HttpRequestMessage requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = stringContent })
             using (HttpResponseMessage response = await client.SendAsync(requestForPost))
             {
