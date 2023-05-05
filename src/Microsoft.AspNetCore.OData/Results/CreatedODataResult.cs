@@ -22,13 +22,14 @@ namespace Microsoft.AspNetCore.OData.Results
     /// <remarks>This action result handles content negotiation and the HTTP prefer header. It generates a location
     /// header containing the edit link of the created entity and, if response has status code: NoContent, also
     /// generates an OData-EntityId header.</remarks>
-    public class CreatedODataResult<T> : ActionResult
+    public class CreatedODataResult<T> : ObjectResult
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CreatedODataResult{T}"/> class.
         /// </summary>
         /// <param name="entity">The created entity.</param>
         public CreatedODataResult(T entity)
+            : base(entity)
         {
             Entity = entity ?? throw Error.ArgumentNull(nameof(entity));
         }

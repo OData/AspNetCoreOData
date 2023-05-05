@@ -45,6 +45,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
 
             return Ok(c.HomeAddress);
         }
+
+        [EnableQuery]
+        public IActionResult Post([FromBody] Customer customer)
+        {
+            return Created(customer);
+        }
     }
 
     public class PeopleController : ODataController

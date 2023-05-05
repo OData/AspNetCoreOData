@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.TestCommon;
@@ -421,6 +422,36 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
                 "\"value\":[{\"Id\":1,\"Tabs\":[{\"Id\":1,\"Items\":[{\"Id\":1,\"Notes\":[{\"Id\":1}]}]}]}]" +
                 "}",
                 content);
+        }
+
+        [Fact]
+        public async Task PostCustomer_AutoExpandNavigationProperties()
+        {
+            //Arrange
+            string requestUri = "autoexpand/Customers";
+
+            var content = @"{
+                    'Id':88,
+                    'Order':{ 'Id':1, 'Choice' : {'Id': 101, 'Amount': 10}},
+                    'Friend':{'Id': 99, 'HomeAddress': {'Street': 'Street 1', 'City': 'City 1'}}
+                     }";
+
+            HttpClient client = CreateClient();
+
+            StringContent stringContent = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json");
+
+            var expectedOrder = "Order\":{\"Id\":1,\"Choice\":{\"Id\":101,\"Amount\":10.0}}";
+            var expectedFriend = "Friend\":{\"Id\":99,\"HomeAddress\":{\"Street\":\"Street 1\",\"City\":\"City 1\",\"CountryOrRegion\":null},\"Order\":null,\"Friend\":null}";
+
+            //Act & Assert
+            using (HttpRequestMessage requestForPost = new HttpRequestMessage(HttpMethod.Post, requestUri) { Content = stringContent })
+            using (HttpResponseMessage response = await client.SendAsync(requestForPost))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                var json = response.Content.ReadAsStringAsync().Result;
+                Assert.Contains(expectedFriend, json);
+                Assert.Contains(expectedOrder, json);
+            }
         }
     }
 }
