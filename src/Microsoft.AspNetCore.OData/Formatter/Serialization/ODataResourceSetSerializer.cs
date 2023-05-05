@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -115,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmStructuredTypeReference elementType = GetResourceType(resourceSetType);
             ODataResourceSet resourceSet = CreateResourceSet(enumerable, resourceSetType.AsCollection(), writeContext);
 
-            Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(resourceSet, enumerable, writeContext);
+            Func<Func<object, Uri>> nextLinkGenerator = () => GetNextLinkGenerator(resourceSet, enumerable, writeContext);
 
             if (resourceSet == null)
             {
@@ -141,27 +142,30 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.TypeCannotBeSerialized, elementType.FullName()));
             }
 
-            // set the nextpagelink to null to support JSON odata.streaming.
+            // set the nextpagelink to null to support JSON odata.streaming. But we need to preserve the original NextPageLink because the
+            // GetNextLinkGenerator might reuse the original value if it's not null.
+            var originalNexPageLink = resourceSet.NextPageLink;
             resourceSet.NextPageLink = null;
             await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
             object lastResource = null;
-            foreach (object item in enumerable)
-            {
-                lastResource = item;
-                if (item == null || item is NullEdmComplexObject)
-                {
-                    if (elementType.IsEntity())
-                    {
-                        throw new SerializationException(SRResources.NullElementInCollection);
-                    }
 
-                    // for null complex element, it can be serialized as "null" in the collection.
-                    await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
-                    await writer.WriteEndAsync().ConfigureAwait(false);
-                }
-                else
+            if (enumerable is ITruncatedCollection {IsAsyncEnumerationPossible: true} truncatedCollection)
+            {
+                await foreach (var item in truncatedCollection.GetAsyncEnumerable().WithCancellation(writeContext.Request.HttpContext.RequestAborted))
                 {
-                    await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
+                    lastResource = 
+                        await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
+                            .ConfigureAwait(false);
+                }
+            }
+            else
+            {
+                foreach (object item in enumerable)
+                {
+                    writeContext.Request?.HttpContext.RequestAborted.ThrowIfCancellationRequested();
+                    lastResource =
+                        await WriteSingleResultElementAsync(writer, writeContext, item, elementType, resourceSerializer)
+                            .ConfigureAwait(false);
                 }
             }
 
@@ -171,9 +175,38 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // object before calling WriteEnd(), the next page link will be written at the end, as required for
             // odata.streaming=true support.
 
-            resourceSet.NextPageLink = nextLinkGenerator(lastResource);
+            if (originalNexPageLink != null)
+            {
+                resourceSet.NextPageLink = originalNexPageLink;
+            }
+
+            resourceSet.NextPageLink = nextLinkGenerator()(lastResource);
 
             await writer.WriteEndAsync().ConfigureAwait(false);
+        }
+
+        private static async Task<object> WriteSingleResultElementAsync(ODataWriter writer, ODataSerializerContext writeContext,
+            object item, IEdmStructuredTypeReference elementType, IODataEdmTypeSerializer resourceSerializer)
+        {
+            object lastResource;
+            lastResource = item;
+            if (item == null || item is NullEdmComplexObject)
+            {
+                if (elementType.IsEntity())
+                {
+                    throw new SerializationException(SRResources.NullElementInCollection);
+                }
+
+                // for null complex element, it can be serialized as "null" in the collection.
+                await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
+            }
+
+            return lastResource;
         }
 
         /// <summary>
@@ -205,8 +238,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 var odataOperations = CreateODataOperations(operations, resourceSetContext, writeContext);
                 foreach (var odataOperation in odataOperations)
                 {
-                    ODataAction action = odataOperation as ODataAction;
-                    if (action != null)
+                    if (odataOperation is ODataAction action)
                     {
                         resourceSet.AddAction(action);
                     }
@@ -257,13 +289,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <param name="resourceSet">The resource set describing a collection of structured objects.</param>
         /// <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
         /// <param name="writeContext">The serializer context.</param>
-        /// <returns>The function that generates the NextLink from an object.</returns>
+        /// <returns>The function% that generates the NextLink from an object.</returns>
         internal static Func<object, Uri> GetNextLinkGenerator(ODataResourceSetBase resourceSet, IEnumerable resourceSetInstance, ODataSerializerContext writeContext)
         {
             if (resourceSet != null && resourceSet.NextPageLink != null)
             {
                 Uri defaultUri = resourceSet.NextPageLink;
-                return (obj) => { return defaultUri; };
+                return obj => defaultUri;
             }
 
             if (writeContext.ExpandedResource == null)
@@ -271,21 +303,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (writeContext.Request != null && writeContext.QueryContext != null)
                 {
                     SkipTokenHandler handler = writeContext.QueryContext.GetSkipTokenHandler();
-                    return (obj) => { return handler.GenerateNextPageLink(new System.Uri(writeContext.Request.GetEncodedUrl()),
-                        (writeContext.Request.ODataFeature() as ODataFeature).PageSize, obj, writeContext); };
+                    return obj => handler.GenerateNextPageLink(new Uri(writeContext.Request.GetEncodedUrl()),
+                        (writeContext.Request.ODataFeature() as ODataFeature).PageSize(), obj, writeContext);
                 }
             }
             else
             {
                 // nested resourceSet
-                ITruncatedCollection truncatedCollection = resourceSetInstance as ITruncatedCollection;
-                if (truncatedCollection != null && truncatedCollection.IsTruncated)
+                if (resourceSetInstance is ITruncatedCollection truncatedCollection && truncatedCollection.IsTruncated)
                 {
-                    return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj); };
+                    return (obj) => GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj);
                 }
             }
 
-            return (obj) => { return null; };
+            return obj => null;
         }
 
         /// <summary>

@@ -24,14 +24,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
                 return null;
             }
 
-            if (TotalCount == null)
-            {
-                return new TruncatedCollection<T>(Collection, PageSize);
-            }
-            else
-            {
-                return new TruncatedCollection<T>(Collection, PageSize, TotalCount);
-            }
+            return new TruncatedCollection<T>(Collection, PageSize, TotalCount);
         }
     }
 }
