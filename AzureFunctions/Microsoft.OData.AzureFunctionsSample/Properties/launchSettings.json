@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Microsoft.OData.AzureFunctionsSample": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7006",
+      "launchBrowser": false
+    }
+  }
+}

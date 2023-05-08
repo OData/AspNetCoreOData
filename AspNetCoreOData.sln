@@ -27,6 +27,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataSampleCommon", "sample
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataAlternateKeySample", "sample\ODataAlternateKeySample\ODataAlternateKeySample.csproj", "{7B153669-A42F-4511-8BDB-587B3B27B2F3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.OData.AzureFunctions", "AzureFunctions\Microsoft.OData.AzureFunctions\Microsoft.OData.AzureFunctions.csproj", "{D494217D-FFCA-4D4B-9917-B5F18A886F02}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.OData.AzureFunctionsSample", "AzureFunctions\Microsoft.OData.AzureFunctionsSample\Microsoft.OData.AzureFunctionsSample.csproj", "{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryBuilder", "QueryBuilder\QueryBuilder.csproj", "{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +75,18 @@ Global
 		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B153669-A42F-4511-8BDB-587B3B27B2F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D494217D-FFCA-4D4B-9917-B5F18A886F02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D494217D-FFCA-4D4B-9917-B5F18A886F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D494217D-FFCA-4D4B-9917-B5F18A886F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D494217D-FFCA-4D4B-9917-B5F18A886F02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
