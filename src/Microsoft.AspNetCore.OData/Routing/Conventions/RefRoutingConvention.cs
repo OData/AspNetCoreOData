@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // Find the navigation property if have
             IEdmNavigationProperty navigationProperty = null;
-            navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name == property);
+            navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name.Equals(property, StringComparison.OrdinalIgnoreCase));
 
             if (navigationProperty == null)
             {
