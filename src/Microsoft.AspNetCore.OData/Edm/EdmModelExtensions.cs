@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -18,6 +19,44 @@ namespace Microsoft.AspNetCore.OData.Edm
 {
     internal static class EdmModelExtensions
     {
+        /// <summary>
+        /// Resolve the type reference from the type name of <see cref="ODataResourceSetBase"/>
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="resourceSet">The given resource set.</param>
+        /// <returns></returns>
+        public static IEdmCollectionTypeReference ResolveResouceSetType(this IEdmModel model, ODataResourceSetBase resourceSet)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (resourceSet == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceSet));
+            }
+
+            EdmCollectionTypeReference collectionType;
+            if (string.IsNullOrEmpty(resourceSet.TypeName) ||
+                string.Equals(resourceSet.TypeName, "Collection(Edm.Untyped)", StringComparison.OrdinalIgnoreCase))
+            {
+                collectionType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+            }
+            else
+            {
+                string elementTypeName =
+                    DeserializationHelpers.GetCollectionElementTypeName(resourceSet.TypeName,
+                        isNested: false);
+                IEdmSchemaType elementType = model.FindType(elementTypeName);
+
+                IEdmTypeReference edmTypeReference = elementType.ToEdmTypeReference(true);
+                collectionType = new EdmCollectionTypeReference(new EdmCollectionType(edmTypeReference));
+            }
+
+            return collectionType;
+        }
+
         /// <summary>
         /// Get all property names for the given structured type.
         /// </summary>

@@ -189,7 +189,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <summary>
         /// Get all dynamic properties
         /// </summary>
-        public Dictionary<string, object> TryGetDynamicProperties()
+        public virtual Dictionary<string, object> TryGetDynamicProperties()
         {
             if (!_actualEdmType.IsOpen)
             {

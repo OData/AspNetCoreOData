@@ -256,8 +256,23 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return new TypedEdmEntityObject(resourceInstance, structuredType.AsEntity(), model);
             }
 
+            if (structuredType.IsUntyped())
+            {
+                return new TypedEdmUntypedObject(serializerContext, resourceInstance);
+            }
+
             Contract.Assert(structuredType.IsComplex());
             return new TypedEdmComplexObject(resourceInstance, structuredType.AsComplex(), model);
+        }
+
+        internal void AppendDynamicOrUntypedProperty(string propertyName, object value)
+        {
+            if (DynamicComplexProperties == null)
+            {
+                DynamicComplexProperties = new Dictionary<string, object>();
+            }
+
+            DynamicComplexProperties.Add(propertyName, value);
         }
     }
 }

@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.OData.Edm;
+using Microsoft.Spatial;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Value
 {
@@ -57,6 +58,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             }
 
             return (resource is EdmDeltaResourceObject || resource is EdmDeltaComplexObject);
+        }
+
+        public static bool IsUntypedResource(this IEdmObject resource)
+        {
+            if (resource is TypedEdmUntypedObject || resource is EdmUntypedObject)
+            { 
+                return true;
+            }
+
+            return false;
         }
     }
 }

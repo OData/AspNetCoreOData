@@ -8,8 +8,8 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -243,6 +243,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Assert
             Assert.Same(deserializer1, deserializer2);
+        }
+
+        [Fact]
+        public void GetEdmTypeDeserializer_ReturnsCorrectDeserializer_ForEdmUntyped()
+        {
+            // Arrange
+            IEdmTypeReference edmType = EdmUntypedStructuredTypeReference.NullableTypeReference;
+
+            // Act
+            var deserializer = _deserializerProvider.GetEdmTypeDeserializer(edmType);
+
+            // Assert
+            ODataResourceDeserializer resourceSerializer = Assert.IsType<ODataResourceDeserializer>(deserializer);
+            Assert.Equal(ODataPayloadKind.Resource, resourceSerializer.ODataPayloadKind);
+        }
+
+        [Fact]
+        public void GetEdmTypeDeserializer_ReturnsCorrectDeserializer_ForCollectionOfEdmUntyped()
+        {
+            // Arrange
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+
+            // Act
+            var deserializer = _deserializerProvider.GetEdmTypeDeserializer(edmType);
+
+            // Assert
+            ODataResourceSetDeserializer setSerializer = Assert.IsType<ODataResourceSetDeserializer>(deserializer);
+            Assert.Equal(ODataPayloadKind.ResourceSet, setSerializer.ODataPayloadKind);
         }
 
         private static IServiceProvider GetServiceProvider()

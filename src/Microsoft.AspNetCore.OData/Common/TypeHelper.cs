@@ -226,6 +226,12 @@ namespace Microsoft.AspNetCore.OData.Common
                 return false;
             }
 
+            // Since IDictionary<T,T> is a collection of KeyValuePair<T,T>
+            if (clrType.IsGenericType && clrType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+            {
+                return false;
+            }
+
             Type collectionInterface
                 = clrType.GetInterfaces()
                     .Union(new[] { clrType })
@@ -236,6 +242,33 @@ namespace Microsoft.AspNetCore.OData.Common
             if (collectionInterface != null)
             {
                 elementType = collectionInterface.GetGenericArguments().Single();
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static bool IsDictionary(Type clrType, out Type keyType, out Type valueType)
+        {
+            keyType = null;
+            valueType = null;
+            if (clrType == null)
+            {
+                return false;
+            }
+
+            // Do we need conside IDictionary interface? ==> No, let's skip it.
+            Type collectionInterface
+                = clrType.GetInterfaces()
+                    .Union(new[] { clrType })
+                    .FirstOrDefault(
+                        t => t.IsGenericType
+                             && t.GetGenericTypeDefinition() == typeof(IDictionary<,>));
+
+            if (collectionInterface != null)
+            {
+                keyType = collectionInterface.GetGenericArguments()[0];
+                valueType = collectionInterface.GetGenericArguments()[1];
                 return true;
             }
 

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData.ModelBuilder;
@@ -74,6 +75,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
             Assert.True(TypeHelper.IsCollection(collectionType, out type));
             Assert.Equal(elementType, type);
             Assert.True(TypeHelper.IsCollection(collectionType));
+        }
+
+        [Fact]
+        public void IsDictionary_with_Dictionary()
+        {
+            // Arrange & Act & Assert
+            Assert.False(TypeHelper.IsDictionary(typeof(IDictionary), out _, out _));
+
+            // Both are Collection of KeyValuePair<,>.
+            Assert.True(TypeHelper.IsDictionary(typeof(IDictionary<string, object>), out Type keyType, out Type valueType));
+            Assert.Equal(typeof(string), keyType);
+            Assert.Equal(typeof(object), valueType);
+
+            Assert.True(TypeHelper.IsDictionary(typeof(EdmUntypedObject), out keyType, out valueType));
+            Assert.Equal(typeof(string), keyType);
+            Assert.Equal(typeof(object), valueType);
+
+            Assert.True(TypeHelper.IsDictionary(typeof(Dictionary<string, object>), out _, out _));
         }
 
         [Theory]

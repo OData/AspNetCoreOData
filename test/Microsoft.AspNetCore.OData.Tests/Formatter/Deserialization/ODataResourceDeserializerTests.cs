@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Csdl;
@@ -691,6 +692,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void CreateResourceInstance_CreatesEdmUntypedObject_IfUntypedStructured()
+        {
+            // Arrange
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+            IEdmStructuredTypeReference unTypedStructuredTypeRef
+                = EdmUntypedStructuredTypeReference.NullableTypeReference;
+            ODataDeserializerContext readContext = new ODataDeserializerContext
+            {
+                Model = _readContext.Model,
+            };
+
+            // Act & Assert
+            Assert.IsType<EdmUntypedObject>(deserializer.CreateResourceInstance(unTypedStructuredTypeRef, readContext));
+        }
+
+        [Fact]
         public void CreateResourceInstance_CreatesDeltaOfT_IfPatchMode()
         {
             // Arrange
@@ -993,6 +1010,345 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 e => Assert.Equal(5, e.ID),
                 e => Assert.Equal(6, e.ID));
         }
+
+        #region Untyped_NestedResourceInfo
+        public class Person
+        {
+            public int Id { get; set; }
+
+            public object Data { get; set; }
+
+            public IList<object> Sources { get; set; }
+
+            public IDictionary<string, object> Dynamics { get; set; }
+        }
+
+        private static IEdmModel GetUntypedModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Person>("People");
+            return builder.GetEdmModel();
+        }
+
+        private static IEdmModel EdmUntypedModel = GetUntypedModel();
+
+        [Fact]
+        public void ReadResource_Works_ForDeclaredUntypedProperty_Primitive()
+        {
+            // Arrange
+            Func<ODataResourceWrapper> arranges = () =>
+            {
+                return new ODataResourceWrapper(new ODataResource
+                {
+                    TypeName = "Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.Person",
+                    Properties = new ODataProperty[]
+                    {
+                        new ODataProperty { Name = "Data", Value = 42 },
+                        new ODataProperty { Name = "DynamicProperty", Value = 12 }
+                    }
+                });
+            };
+
+            // Assert
+            Action<object> asserts = (s) =>
+            {
+                Assert.NotNull(s);
+                Person p = Assert.IsType<Person>(s);
+                Assert.Equal(42, p.Data);
+                Assert.Equal(12, p.Dynamics["DynamicProperty"]);
+            };
+
+            RunReadResourceUntypedTestAndVerify(arranges, asserts);
+        }
+
+        private void RunReadResourceUntypedTestAndVerify(Func<ODataResourceWrapper> arranges, Action<object> asserts)
+        {
+            // Arrange
+            IEdmModel model = EdmUntypedModel;
+            var personEdmType = model.GetEdmTypeReference(typeof(Person)).AsEntity();
+
+            ODataResourceWrapper resourceWrapper = arranges();
+
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost");
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = model,
+                Request = request
+            };
+
+            // Act
+            object source = new ODataResourceDeserializer(_deserializerProvider)
+                .ReadResource(resourceWrapper, personEdmType, context);
+
+            // Assert
+            asserts(source);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ApplyNestedProperty_Works_ForDeclaredOrUnDeclaredUntypedProperty_NestedResource(bool isDeclared)
+        {
+            // Arrange
+            /*
+            {
+              "Data": {
+                   ......
+               }
+            }
+            */
+            Person aPerson = new Person();
+            Assert.Null(aPerson.Data);
+
+            Func<ODataNestedResourceInfoWrapper> arranges = () =>
+            {
+                string propertyName = isDeclared ? "Data" : "AnyDynamicPropertyName";
+                ODataNestedResourceInfoWrapper nestedResourceInfo =
+                    new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = propertyName });
+                nestedResourceInfo.NestedItems.Add(
+                    new ODataResourceWrapper(
+                        new ODataResource { Properties = new[] { new ODataProperty { Name = "NestedID", Value = 42 } } }));
+                return nestedResourceInfo;
+            };
+
+            // Assert
+            Action asserts = () =>
+            {
+                EdmUntypedObject unTypedData;
+                if (isDeclared)
+                {
+                    unTypedData = Assert.IsType<EdmUntypedObject>(aPerson.Data);
+                }
+                else
+                {
+                    unTypedData = Assert.IsType<EdmUntypedObject>(aPerson.Dynamics["AnyDynamicPropertyName"]);
+                }
+
+                KeyValuePair<string, object> property = Assert.Single(unTypedData);
+                Assert.Equal("NestedID", property.Key);
+                Assert.Equal(42, property.Value);
+            };
+
+            RunUntypedTestAndVerify(aPerson, arranges, asserts);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void ApplyNestedProperty_Works_ForDeclaredOrUndelcaredUntypedProperty_NestedCollection(bool isDeclared)
+        {
+            // Arrange
+            /*
+            {
+              "Data": [
+                  13,
+                  { ... },
+                  null,
+                  { ... }
+               ]
+            }
+            */
+            Person aPerson = new Person();
+            Assert.Null(aPerson.Data);
+
+            Func<ODataNestedResourceInfoWrapper> arranges = () =>
+            {
+                ODataResourceSetWrapper setWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
+                setWrapper.Items.Add(new ODataPrimitiveWrapper(new ODataPrimitiveValue(13)));
+
+                ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(
+                    new ODataResource { Properties = new[] { new ODataProperty { Name = "Data_ID", Value = 42 } } });
+                setWrapper.Items.Add(resourceWrapper);
+                setWrapper.Items.Add(null);
+
+                // Explicitly added into 'Resources' to test.
+                setWrapper.Resources.Add(resourceWrapper);
+                setWrapper.Resources.Add(new ODataResourceWrapper(
+                        new ODataResource { Properties = new[] { new ODataProperty { Name = "Extra_ID", Value = "42" } } }));
+
+                string propertyName = isDeclared ? "Data" : "AnyDynamicPropertyName";
+                ODataNestedResourceInfoWrapper nestedResourceInfo =
+                    new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = propertyName, IsCollection = true });
+                nestedResourceInfo.NestedItems.Add(setWrapper);
+                return nestedResourceInfo;
+            };
+
+            // Assert
+            Action asserts = () =>
+            {
+                EdmUntypedCollection unTypedData;
+                if (isDeclared)
+                {
+                    unTypedData = Assert.IsType<EdmUntypedCollection>(aPerson.Data);
+                }
+                else
+                {
+                    unTypedData = Assert.IsType<EdmUntypedCollection>(aPerson.Dynamics["AnyDynamicPropertyName"]);
+                }
+
+                Assert.Equal(4, unTypedData.Count);
+                Assert.Collection(unTypedData,
+                    e =>
+                    {
+                        Assert.Equal(13, e);
+                    },
+                    e =>
+                    {
+                        EdmUntypedObject unTypedObj = Assert.IsType<EdmUntypedObject>(e);
+                        KeyValuePair<string, object> singleProperty = Assert.Single(unTypedObj);
+                        Assert.Equal("Data_ID", singleProperty.Key);
+                        Assert.Equal(42, singleProperty.Value);
+                    },
+                    e => Assert.Null(e),
+                    e =>
+                    {
+                        EdmUntypedObject unTypedObj = Assert.IsType<EdmUntypedObject>(e);
+                        KeyValuePair<string, object> singleProperty = Assert.Single(unTypedObj);
+                        Assert.Equal("Extra_ID", singleProperty.Key);
+                        Assert.Equal("42", singleProperty.Value);
+                    });
+            };
+
+            RunUntypedTestAndVerify(aPerson, arranges, asserts);
+        }
+
+        [Theory]
+        [InlineData("Data")] // ==> declared Edm.Untyped property
+        [InlineData("Sources")]  // ==> declared Collection(Edm.Untyped) property
+        [InlineData("AnyDynamicPropertyName")] // ==> un-declared (or dynamic) property
+        public void ApplyNestedProperty_Works_ForDeclaredOrUndelcaredUntypedProperty_NestedCollectionofCollection(string propertyName)
+        {
+            // Arrange
+            /*
+            {
+              "Data": [
+                  [
+                     {
+                        "Aws/Name": [
+                           [ true, 15]
+                        ]
+                     }
+                  ],
+                  {
+                     "Aws/Name": [
+                       [ true, 15]
+                     ]
+                  }
+               ]
+            }
+            */
+            Person aPerson = new Person();
+            Assert.Null(aPerson.Data);
+
+            Func<ODataNestedResourceInfoWrapper> arranges = () =>
+            {
+                ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource
+                {
+                    Properties = Enumerable.Empty<ODataProperty>()
+                });
+
+                ODataNestedResourceInfoWrapper awsNameNestedResourceInfo = new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo
+                {
+                    Name = "Aws/Name" // explicitly use '/' in the name.
+                });
+                resourceWrapper.NestedResourceInfos.Add(awsNameNestedResourceInfo);
+
+                ODataResourceSetWrapper setOfAwsNameWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
+                awsNameNestedResourceInfo.NestedItems.Add(setOfAwsNameWrapper);
+
+                ODataResourceSetWrapper setOfSetAwsNameWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
+                setOfSetAwsNameWrapper.Items.Add(new ODataPrimitiveWrapper(new ODataPrimitiveValue(true)));
+                setOfSetAwsNameWrapper.Items.Add(new ODataPrimitiveWrapper(new ODataPrimitiveValue(15)));
+                setOfAwsNameWrapper.Items.Add(setOfSetAwsNameWrapper);
+
+                // first item in 'Data' collection
+                ODataResourceSetWrapper setWrapperOfDataSet = new ODataResourceSetWrapper(new ODataResourceSet());
+                setWrapperOfDataSet.Items.Add(resourceWrapper);
+
+                // Data collection
+                ODataResourceSetWrapper setWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
+                setWrapper.Items.Add(setWrapperOfDataSet);
+                setWrapper.Items.Add(resourceWrapper);
+
+                ODataNestedResourceInfoWrapper nestedResourceInfo =
+                    new ODataNestedResourceInfoWrapper(new ODataNestedResourceInfo { Name = propertyName, IsCollection = true });
+                nestedResourceInfo.NestedItems.Add(setWrapper);
+                return nestedResourceInfo;
+            };
+
+            // Assert
+            Action<EdmUntypedObject> verifyResource = o =>
+            {
+                KeyValuePair<string, object> singleProperty = Assert.Single(o);
+                Assert.Equal("Aws/Name", singleProperty.Key);
+                EdmUntypedCollection aswNameValuecol = Assert.IsType<EdmUntypedCollection>(singleProperty.Value);
+                EdmUntypedCollection colInAwsNameCol = Assert.IsType<EdmUntypedCollection>(Assert.Single(aswNameValuecol));
+                Assert.Equal(2, colInAwsNameCol.Count);
+                Assert.Collection(colInAwsNameCol,
+                    e => Assert.True((bool)e),
+                    e => Assert.Equal(15, e));
+            };
+
+            Action asserts = () =>
+            {
+                IList<object> unTypedData;
+                if (propertyName == "Data")
+                {
+                    Assert.IsType<EdmUntypedCollection>(aPerson.Data);
+                    unTypedData = Assert.IsAssignableFrom<IList<object>>(aPerson.Data);
+                }
+                else if (propertyName == "Sources")
+                {
+                    unTypedData = aPerson.Sources;
+                }
+                else
+                {
+                    EdmUntypedCollection data = Assert.IsType<EdmUntypedCollection>(aPerson.Dynamics["AnyDynamicPropertyName"]);
+                    unTypedData = Assert.IsAssignableFrom<IList<object>>(data);
+                }
+
+                Assert.Equal(2, unTypedData.Count);
+                Assert.Collection(unTypedData,
+                    e =>
+                    {
+                        EdmUntypedCollection nestedCollection = Assert.IsType<EdmUntypedCollection>(e);
+                        EdmUntypedObject nestedObjInNestedCollection = Assert.IsType<EdmUntypedObject>(Assert.Single(nestedCollection));
+
+                        verifyResource(nestedObjInNestedCollection);
+                    },
+                    e =>
+                    {
+                        EdmUntypedObject unTypedObj = Assert.IsType<EdmUntypedObject>(e);
+                        verifyResource(unTypedObj);
+                    });
+            };
+
+            RunUntypedTestAndVerify(aPerson, arranges, asserts);
+        }
+
+        private void RunUntypedTestAndVerify(object source, Func<ODataNestedResourceInfoWrapper> arranges, Action asserts)
+        {
+            // Arrange
+            IEdmModel model = EdmUntypedModel;
+            var personEdmType = model.GetEdmTypeReference(typeof(Person)).AsEntity();
+
+            ODataNestedResourceInfoWrapper resourceInfoWrapper = arranges();
+
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost");
+            ODataDeserializerContext context = new ODataDeserializerContext
+            {
+                Model = model,
+                Request = request
+            };
+
+            // Act
+            new ODataResourceDeserializer(_deserializerProvider)
+                .ApplyNestedProperty(source, resourceInfoWrapper, personEdmType, context);
+
+            // Assert
+            asserts();
+        }
+        #endregion
 
         [Fact(Skip = "This test need to refactor and the ODataResourceDeserializer has the problem for nested resource set.")]
         public void ApplyNestedProperty_Works_ForDeltaResourceSetWrapper()

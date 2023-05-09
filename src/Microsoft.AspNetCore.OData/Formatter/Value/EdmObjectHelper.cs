@@ -18,6 +18,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             Contract.Assert(enumerable != null);
             Contract.Assert(collectionType != null);
 
+            if (enumerable is IEdmObject edmObject)
+            {
+                return edmObject;
+            }
+
             IEdmTypeReference elementType = collectionType.ElementType();
 
             if (elementType.IsEntity())

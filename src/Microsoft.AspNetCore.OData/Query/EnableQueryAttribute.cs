@@ -136,6 +136,13 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
 
                 IEdmType elementType = edmType.AsElementType();
+                if (elementType.IsUntyped())
+                {
+                    // TODO: so far, we don't know how to process query on Edm.Untyped.
+                    // So, if the query data type is Edm.Untyped, or collection of Edm.Untyped,
+                    // Let's simply skip it now.
+                    return null;
+                }
 
                 IEdmModel edmModel = request.GetModel();
 

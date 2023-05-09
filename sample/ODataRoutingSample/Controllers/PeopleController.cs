@@ -5,16 +5,19 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers
 {
-    public class PeopleController : ControllerBase
+    public class PeopleController : ODataController
     {
         private static IList<Person> _persons = new List<Person>
         {
@@ -54,6 +57,68 @@ namespace ODataRoutingSample.Controllers
             }
 
             return Ok(person);
+        }
+
+        [HttpPost]
+        [EnableQuery]
+        public IActionResult Post([FromBody] Person person)
+        {
+            _persons.Add(person);
+
+            EdmUntypedObject odataObject = person.Condition.Properties["StringEqualsIgnoreCase"] as EdmUntypedObject;
+
+            IEnumerable enumerable = odataObject["awsTag"] as IEnumerable;
+            foreach (var a in enumerable)
+            {
+
+            }
+
+            // person.Data = 42; // ODataPrimitiveValue
+            //person.Other = new Address
+            //{
+            //    City = "Redmond",
+            //    Street = "148TH AVE NE"
+            //};
+            person.Other = new Dictionary<string, object>
+            {
+                { "City", "Redmond" },
+                { "Street/A", "1345TH" }
+            };
+
+            // shall we support
+            //person.Other = new Dictionary<string, object>
+            //{
+
+            //}
+
+            person.Sources = new List<object>
+            {
+                null,
+                42,
+                "A string Value",
+                Color.Red,
+                AnyEnum.E1,
+                true,
+                new Address { City = "Issaquah", Street = "Klahanie Way" },
+                new EdmUntypedObject
+                {
+                    { "a1", "abc" }
+                },
+                // So far, it can't support it?
+                new EdmUntypedCollection
+                {
+                    null,
+                    "A string Value",
+                    // The following resources can't work: https://github.com/OData/odata.net/issues/2661
+                    // new Address { City = "Issaquah", Street = "Klahanie Way" }, 
+                    //new Person
+                    //{
+                    //    FirstName = "Kerry", LastName = "Xu"
+                    //}
+                }
+            };
+
+            return Created(person);
         }
     }
 }

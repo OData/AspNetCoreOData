@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
@@ -54,12 +55,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(edmType != null);
 
             // TODO: is it OK to read the top level collection of entity?
-            if (!(edmType.IsCollection() && edmType.AsCollection().ElementType().IsStructured()))
+            if (!edmType.IsStructuredOrUntypedStructuredCollection())
             {
-                throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, EdmTypeKind.Complex + " or " + EdmTypeKind.Entity);
+                throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, "Collection of complex, entity or untyped");
             }
 
-            ODataReader resourceSetReader = await messageReader.CreateODataResourceSetReaderAsync().ConfigureAwait(false);
+            IEdmStructuredType structuredType = edmType.AsCollection().ElementType() as IEdmStructuredType;
+
+            ODataReader resourceSetReader = await messageReader.CreateODataResourceSetReaderAsync(structuredType).ConfigureAwait(false);
             object resourceSet = await resourceSetReader.ReadResourceOrResourceSetAsync().ConfigureAwait(false);
             return ReadInline(resourceSet, edmType, readContext);
         }
@@ -72,20 +75,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return null;
             }
 
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull(nameof(edmType));
-            }
-
-            if (readContext == null)
-            {
-                throw Error.ArgumentNull(nameof(readContext));
-            }
-
-            if (!edmType.IsCollection() || !edmType.AsCollection().ElementType().IsStructured())
-            {
-                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
-            }
+            IEdmTypeReference edmElementType = VerifyAndGetElementType(edmType, readContext);
 
             ODataResourceSetWrapper resourceSet = item as ODataResourceSetWrapper;
             if (resourceSet == null)
@@ -96,9 +86,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             // Recursion guard to avoid stack overflows
             RuntimeHelpers.EnsureSufficientExecutionStack();
 
-            IEdmStructuredTypeReference elementType = edmType.AsCollection().ElementType().AsStructured();
+            IEdmStructuredTypeReference elementType = edmElementType.IsUntyped() ?
+                EdmUntypedStructuredTypeReference.NullableTypeReference :
+                edmElementType.AsStructured();
 
             IEnumerable result = ReadResourceSet(resourceSet, elementType, readContext);
+            if (edmElementType.IsUntyped())
+            {
+                EdmUntypedCollection untypedList = new EdmUntypedCollection();
+                foreach (var element in result)
+                {
+                    untypedList.Add(element);
+                }
+
+                return untypedList;
+            }
+
             if (result != null && elementType.IsComplex())
             {
                 if (readContext.IsNoClrType)
@@ -139,6 +142,59 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(resourceSet));
             }
 
+            IList<ODataItemWrapper> items = GetItems(resourceSet);
+            foreach (ODataItemWrapper wrapper in items)
+            {
+                if (wrapper == null)
+                {
+                    yield return null;
+                }
+                else if (wrapper is ODataPrimitiveWrapper primitiveResourceWrapper)
+                {
+                    yield return ReadPrimitiveItem(primitiveResourceWrapper, elementType, readContext);
+                }
+                else if (wrapper is ODataResourceWrapper resourceWrapper)
+                {
+                    yield return ReadResourceItem(resourceWrapper, elementType, readContext);
+                }
+                else if (wrapper is ODataResourceSetWrapper resourceSetWrapper)
+                {
+                    yield return ReadResourceSetItem(resourceSetWrapper, elementType, readContext);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deserializes the given <paramref name="primitiveWrapper"/> under the given <paramref name="readContext"/>.
+        /// </summary>
+        /// <param name="primitiveWrapper">The primitive item in a set to deserialize.</param>
+        /// <param name="elementType">The element type of the parent resource set being read.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        /// <returns>The deserialized primitive object.</returns>
+        public virtual object ReadPrimitiveItem(ODataPrimitiveWrapper primitiveWrapper, IEdmTypeReference elementType, ODataDeserializerContext readContext)
+        {
+            if (primitiveWrapper == null)
+            {
+                throw Error.ArgumentNull(nameof(primitiveWrapper));
+            }
+
+            return primitiveWrapper.Value.Value;
+        }
+
+        /// <summary>
+        /// Deserializes the given <paramref name="resourceWrapper"/> under the given <paramref name="readContext"/>.
+        /// </summary>
+        /// <param name="resourceWrapper">The resource item in a set to deserialize.</param>
+        /// <param name="elementType">The element type of the parent resource set being read.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        /// <returns>The deserialized resource object.</returns>
+        public virtual object ReadResourceItem(ODataResourceWrapper resourceWrapper, IEdmTypeReference elementType, ODataDeserializerContext readContext)
+        {
+            if (resourceWrapper == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceWrapper));
+            }
+
             IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
             if (deserializer == null)
             {
@@ -146,10 +202,104 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     Error.Format(SRResources.TypeCannotBeDeserialized, elementType.FullName()));
             }
 
-            foreach (ODataResourceWrapper resourceWrapper in resourceSet.Resources)
+            return deserializer.ReadInline(resourceWrapper, elementType, readContext);
+        }
+
+        /// <summary>
+        /// Deserializes the given <paramref name="resourceSetWrapper"/> under the given <paramref name="readContext"/>.
+        /// </summary>
+        /// <param name="resourceSetWrapper">The resource set item in a set to deserialize.</param>
+        /// <param name="elementType">The element type of the parent resource set being read.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        /// <returns>The deserialized resource set object.</returns>
+        public virtual object ReadResourceSetItem(ODataResourceSetWrapper resourceSetWrapper, IEdmTypeReference elementType, ODataDeserializerContext readContext)
+        {
+            if (resourceSetWrapper == null)
             {
-                yield return deserializer.ReadInline(resourceWrapper, elementType, readContext);
+                throw Error.ArgumentNull(nameof(resourceSetWrapper));
             }
+
+            IEdmCollectionTypeReference edmType = readContext.Model.ResolveResouceSetType(resourceSetWrapper.ResourceSet);
+
+            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType);
+            if (deserializer == null)
+            {
+                throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
+            }
+
+            IEdmTypeReference setItemElementType = edmType.AsCollection().ElementType();
+            IEdmStructuredTypeReference structuredType = setItemElementType.ToStructuredTypeReference();
+
+            ODataDeserializerContext nestedReadContext = readContext.CloneWithoutType();
+
+            if (setItemElementType.IsUntyped())
+            {
+                nestedReadContext.ResourceType = typeof(EdmUntypedCollection);
+            }
+            else if (readContext.IsNoClrType)
+            {
+                if (structuredType.IsEntity())
+                {
+                    nestedReadContext.ResourceType = typeof(EdmEntityObjectCollection);
+                }
+                else
+                {
+                    nestedReadContext.ResourceType = typeof(EdmComplexObjectCollection);
+                }
+            }
+            else
+            {
+                Type clrType = readContext.Model.GetClrType(structuredType);
+
+                if (clrType == null)
+                {
+                    throw new ODataException(
+                        Error.Format(SRResources.MappingDoesNotContainResourceType, structuredType.FullName()));
+                }
+
+                nestedReadContext.ResourceType = typeof(List<>).MakeGenericType(clrType);
+            }
+
+            return deserializer.ReadInline(resourceSetWrapper, edmType, nestedReadContext);
+        }
+
+        private static IList<ODataItemWrapper> GetItems(ODataResourceSetWrapper setWrapper)
+        {
+            // Could have extra 'resources' added by customer, since it's very very low possibility.
+            // So, let's use this logic to avoid potential breaking.
+            var extras = setWrapper.Resources.Except(setWrapper.Items).ToList();
+            foreach (ODataItemWrapper itemWrapper in extras)
+            {
+                setWrapper.Items.Add(itemWrapper);
+            }
+
+            return setWrapper.Items;
+        }
+
+        private IEdmTypeReference VerifyAndGetElementType(IEdmTypeReference edmType, ODataDeserializerContext readContext)
+        {
+            if (edmType == null)
+            {
+                throw Error.ArgumentNull(nameof(edmType));
+            }
+
+            if (readContext == null)
+            {
+                throw Error.ArgumentNull(nameof(readContext));
+            }
+
+            if (!edmType.IsCollection())
+            {
+                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
+            }
+
+            IEdmTypeReference edmElementType = edmType.AsCollection().ElementType();
+            if (!edmElementType.IsStructured() && !edmElementType.IsUntyped())
+            {
+                throw Error.Argument(nameof(edmType), SRResources.TypeMustBeResourceSet, edmType.ToTraceString());
+            }
+
+            return edmElementType;
         }
     }
 }
