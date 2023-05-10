@@ -92,6 +92,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                             "/RefCustomers/{key}/Orders({relatedKey})/$ref",
                             "/RefCustomers/{key}/Orders/{relatedKey}/$ref"
                         }
+                    },
+                    {
+                        "CreateRefToorders",
+                        new[]
+                        {
+                            "/RefCustomers({key})/Orders({relatedKey})/$ref",
+                            "/RefCustomers({key})/Orders/{relatedKey}/$ref",
+                            "/RefCustomers/{key}/Orders({relatedKey})/$ref",
+                            "/RefCustomers/{key}/Orders/{relatedKey}/$ref"
+                        }
                     }
                 };
             }
@@ -178,6 +188,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             public string DeleteRefToOrders(int key, int relatedKey, string navigationProperty)
             {
                 return string.Format(CultureInfo.InvariantCulture, "DeleteRef({0})({1})({2})", key, relatedKey, navigationProperty);
+            }
+
+            [HttpPost]
+            public string CreateRefToorders(int key, int relatedKey)
+            {
+                return string.Format(CultureInfo.InvariantCulture, "CreateRef({0})({1})({2})", key, relatedKey);
             }
 
             public void GetRefTo(int key, int relatedKey)
