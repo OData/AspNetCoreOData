@@ -38,7 +38,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
     // These classes are not built into Edm model, just for normal type
     public class NotInModelAddress
     {
-        public string Value { get; set; }
+        public string ZipCode { get; set; }
+        public string Location { get; set; }
     }
 
     public enum NotInModelEnum

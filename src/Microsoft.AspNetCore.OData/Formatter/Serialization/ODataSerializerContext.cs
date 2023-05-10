@@ -194,30 +194,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// </summary>
         public ISet<string> ComputedProperties { get; } = new HashSet<string>();
 
-        private IODataUntypedValueConverter _valueConverter;
-
-        internal IODataUntypedValueConverter UntypedValueConverter
-        {
-            get
-            {
-                if (_valueConverter != null)
-                {
-                    return _valueConverter;
-                }
-
-                _valueConverter = Request?.GetRouteServices()?.GetService<IODataUntypedValueConverter>();
-                _valueConverter = _valueConverter ?? DefaultODataUntypedValueConverter.Instance;
-                return _valueConverter;
-            }
-        }
-
         private IUntypedResourceMapper _valueMapper;
         internal IUntypedResourceMapper UntypedMapper
         {
             get
             {
-                _valueMapper = Request?.GetRouteServices()?.GetService<IUntypedResourceMapper>();
-                _valueMapper = _valueMapper ?? DefaultUntypedResourceMapper.Instance;
+                if (_valueMapper == null)
+                {
+                    _valueMapper = Request?.GetRouteServices()?.GetService<IUntypedResourceMapper>();
+                    _valueMapper = _valueMapper ?? DefaultUntypedResourceMapper.Instance;
+                }
+
                 return _valueMapper;
             }
         }
@@ -323,14 +310,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 return EdmProperty as IEdmNavigationProperty;
             }
-        }
-
-        internal IODataUntypedValueConverter GetUntypedValueConverter()
-        {
-            IODataUntypedValueConverter converter =
-                Request?.GetRouteServices()?.GetService<IODataUntypedValueConverter>();
-
-            return converter ?? DefaultODataUntypedValueConverter.Instance;
         }
 
         internal IEdmTypeReference TryGetEdmType(object instance, Type type)

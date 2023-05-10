@@ -6,11 +6,62 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
 {
     public class UntypedDataSource
     {
+        public static IList<InModelPerson> Managers => new List<InModelPerson>
+        {
+            new InModelPerson
+            {
+                Id = 1,
+                Name = "Sun",
+                Data = new InModelAddress
+                {
+                    City = "Shanghai", Street = "Fengjin RD"
+                },
+                Infos = new object[] { 1, "abc", 3},
+                Containers = new Dictionary<string, object>
+                {
+                    { "D_Data", new InModelAddress { City = "Shanghai", Street = "Fengjin RD" } },
+                    { "D_Infos", new object[] { 1, "abc", 3} },
+                }
+            },
+            new InModelPerson
+            {
+                Id = 2,
+                Name = "Sun",
+                Data = new object[]
+                {
+                    42,
+                    null,
+                    "abc",
+                    new EdmUntypedObject
+                    {
+                        {  "ACity", "Shanghai" },
+                        {  "AData", new EdmUntypedCollection
+                            {
+                                42,
+                                InModelColor.Red
+                            }
+                        }
+                    }
+                },
+                Infos = new EdmUntypedCollection
+                {
+                    42,
+                    InModelColor.Red
+                },
+                Containers = new Dictionary<string, object>
+                {
+                    { "D_Data", new EdmUntypedObject { { "D_City", new EdmUntypedCollection() } } },
+                    { "D_Infos", new EdmUntypedCollection { new Dictionary<string, object> { {"k", "v"} } } }
+                }
+            }
+        };
+
         private static IList<InModelPerson> _people;
 
         public static IList<InModelPerson> GetAllPeople()
@@ -68,12 +119,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
                     {
                         Id = 4,
                         Name = "Wu",
-                        Data = new NotInModelAddress { Value = "<--->" }, // un-declared in the model
-                        Infos = new object[] { new NotInModelAddress { Value = "<===>" } },
+                        Data = new NotInModelAddress { ZipCode = "<--->", Location = "******"}, // un-declared in the model
+                        Infos = new object[] { new NotInModelAddress { ZipCode = "<===>", Location = "Info-Locations" } },
                         Containers = new Dictionary<string, object>
                         {
                             { "ComplexDynamic1",new InModelAddress{ City = "BlackCity", Street = "Shang Rd" } },
-                            { "ComplexDynamic2", new NotInModelAddress { Value = "AnyDynanicValue" } },
+                            { "ComplexDynamic2", new NotInModelAddress { ZipCode = "AnyDynanicValue", Location = "In Dy location." } },
                         }
                     },
 
@@ -88,11 +139,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
                                 42,
                                 new InModelAddress{ City = "Redmond", Street = "134TH AVE" }
                             },
-                        Infos = new object[] { new NotInModelAddress { Value = "<===>" } },
+                        Infos = new object[] { new NotInModelAddress { ZipCode = "<===>", Location = "!@#$" } },
                         Containers = new Dictionary<string, object>
                         {
                             { "AnyDynamic1",new InModelAddress{ City = "RedCity", Street = "Mos Rd" } },
-                            { "AnyDynamic2", new NotInModelAddress { Value = "AnyDynanicValue" } },
+                            { "AnyDynamic2", new NotInModelAddress { ZipCode = "AnyDynanicValue", Location = "Duck Location" } },
                         }
                     },
                 };

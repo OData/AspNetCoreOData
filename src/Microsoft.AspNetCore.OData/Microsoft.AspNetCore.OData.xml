@@ -4363,66 +4363,36 @@
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> for the given type.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IUntypedResourceMapper">
+            <summary>
+            The mapper interface to map a resource to a dictionary of properties.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IUntypedResourceMapper.Map(System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Map the given object to a dictionary.
+            </summary>
+            <param name="resource">The given resource.</param>
+            <param name="context">The serializer context.</param>
+            <returns>The mapped dictionary.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper">
+            <summary>
+            Default implementation of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IUntypedResourceMapper"/>.
+            </summary>
+        </member>
         <member name="F:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper.Instance">
             <summary>
             Gets the instance
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper.Map(System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
-            A context for untyped value converter.
+            Map the given object to a dictionary.
             </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext.Model">
-            <summary>
-            Gets/sets the Edm model.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext.Property">
-            <summary>
-            Gets/sets the Edm property.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext.Resource">
-            <summary>
-            Gets/sets the resource.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataUntypedValueConverter">
-            <summary>
-            Base class for <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> implementations.
-            </summary>
-            <remarks>
-            Each supported CLR type has a corresponding <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer" />. A CLR type is supported if it is one of
-            the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
-            Uri[] which maps to ODataReferenceLinks payload, etc.
-            </remarks>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataUntypedValueConverter.Convert(System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> class.
-            </summary>
-            <param name="originalValue">The original value.</param>
-            <param name="context">The context.</param>
-            <returns>converted value.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataUntypedValueConverter">
-            <summary>
-            The default
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataUntypedValueConverter.Instance">
-            <summary>
-            Gets the instance
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultODataUntypedValueConverter.Convert(System.Object,Microsoft.AspNetCore.OData.Formatter.Serialization.UntypedValueConverterContext)">
-            <summary>
-            
-            </summary>
-            <param name="originalValue"></param>
-            <param name="context"></param>
-            <returns></returns>
+            <param name="resource">The given resource.</param>
+            <param name="context">The serializer context.</param>
+            <returns>The mapped dictionary.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer">
             <summary>
@@ -4762,7 +4732,7 @@
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataNestedResourceInfo"/> to be written while writing this declared untyped property.
             </summary>
-            <param name="property">The declared untyped property for which the nested resource info is being created.</param>
+            <param name="structuralProperty">The declared untyped property for which the nested resource info is being created.</param>
             <param name="propertyValue">The declared property real value.</param>
             <param name="valueType">The resolved edm type of the declared property real value.</param>
             <param name="pathSelectItem">The corresponding sub select item belongs to this untyped property.</param>
@@ -4817,7 +4787,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateUntypedPropertyValue(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmTypeReference@)">
             <summary>
-            Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given, declared, "Edm.Untyped" or collection property.
+            Creates the property value to be written for the given, declared, "Edm.Untyped" or collection property.
             </summary>
             <param name="structuralProperty">The EDM structural property being written.</param>
             <param name="resourceContext">The context for the entity instance being written.</param>
@@ -4866,6 +4836,50 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WritePrimitiveItemAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Write a primitive value into a collection (untyped collection)
+            </summary>
+            <param name="primitiveValue">The primitive value.</param>
+            <param name="primitiveType">The primitive edm type.</param>
+            <param name="parentSetType">The parent collection edm type.</param>
+            <param name="writer">The writer.</param>
+            <param name="writeContext">The writer context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteEnumItemAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Write an enum value into a collection (untyped collection)
+            </summary>
+            <param name="enumValue">The enum value.</param>
+            <param name="enumType">The enum edm type or null if no edm type defined.</param>
+            <param name="parentSetType">The parent collection edm type.</param>
+            <param name="writer">The writer.</param>
+            <param name="writeContext">The writer context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteResourceSetItemAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Write a nested collection value into a collection (untyped collection)
+            </summary>
+            <param name="itemSetValue">The collection value.</param>
+            <param name="itemSetType">The nested collection Edm type.</param>
+            <param name="parentSetType">The parent collection edm type.</param>
+            <param name="writer">The writer.</param>
+            <param name="writeContext">The writer context.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteResourceItemAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Write a nested resource/object into a collection (untyped collection)
+            </summary>
+            <param name="resourceValue">The resource value.</param>
+            <param name="resourceType">The nested resource Edm type.</param>
+            <param name="parentSetType">The parent collection edm type.</param>
+            <param name="writer">The writer.</param>
+            <param name="writeContext">The writer context.</param>
+            <returns>Task.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.CreateResourceSet(System.Collections.IEnumerable,Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>

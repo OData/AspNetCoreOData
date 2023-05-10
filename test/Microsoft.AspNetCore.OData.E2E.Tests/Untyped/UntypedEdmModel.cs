@@ -16,6 +16,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<InModelPerson>("People");
+            builder.EntitySet<InModelPerson>("Managers");
             builder.ComplexType<InModelAddress>();
             builder.EnumType<InModelColor>();
             IEdmModel model = builder.GetEdmModel();

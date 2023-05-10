@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 
         public IDictionary<string, object> GetProperties()
         {
-            IUntypedResourceMapper mapper = _context?.UntypedMapper;
+            IUntypedResourceMapper mapper = _context.UntypedMapper;
             return mapper.Map(Instance, _context);
         }
     }

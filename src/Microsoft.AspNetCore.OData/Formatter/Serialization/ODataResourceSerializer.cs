@@ -25,8 +25,6 @@ using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.Nav
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
-using Microsoft.Extensions.DependencyInjection;
-using System.Runtime.CompilerServices;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -416,8 +414,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private static SelectExpandNode _staticNode = new SelectExpandNode();
-
         /// <summary>
         /// Creates the <see cref="SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
         /// </summary>
@@ -616,8 +612,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             HashSet<string> declaredPropertyNameSet = new HashSet<string>(resource.Properties.Select(p => p.Name));
             List<ODataProperty> dynamicProperties = new List<ODataProperty>();
 
-            IODataUntypedValueConverter converter = GetUntypedValueConverter(resourceContext);
-
             // To test SelectedDynamicProperties == null is enough to filter the dynamic properties.
             // Because if SelectAllDynamicProperties == true, SelectedDynamicProperties should be null always.
             // So `selectExpandNode.SelectedDynamicProperties == null` covers `SelectAllDynamicProperties == true` scenario.
@@ -638,14 +632,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
 
                 object dynamicPropertyValue = dynamicProperty.Value;
-
-                //UntypedValueConverterContext converterContext = new UntypedValueConverterContext
-                //{
-                //    Model = resourceContext.EdmModel,
-                //    Resource = resourceContext,
-                //};
-                //object dynamicPropertyValue = converter.Convert(dynamicProperty.Value, converterContext);
-
                 if (dynamicPropertyValue == null)
                 {
                     dynamicProperties.Add(new ODataProperty
@@ -659,12 +645,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.TryGetEdmType(dynamicPropertyValue,
                     dynamicPropertyValue.GetType());
-                //if (edmTypeReference == null)
-                //{
-                //    throw Error.NotSupported(SRResources.TypeOfDynamicPropertyNotSupported,
-                //        dynamicProperty.Value.GetType().FullName /*use the origin value's type name*/, dynamicProperty.Key);
-                //}
-
                 if (edmTypeReference == null || edmTypeReference.IsStructuredOrUntyped())
                 {
                     resourceContext.AppendDynamicOrUntypedProperty(dynamicProperty.Key, dynamicPropertyValue);
@@ -866,20 +846,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <summary>
         /// Creates the <see cref="ODataNestedResourceInfo"/> to be written while writing this declared untyped property.
         /// </summary>
-        /// <param name="property">The declared untyped property for which the nested resource info is being created.</param>
+        /// <param name="structuralProperty">The declared untyped property for which the nested resource info is being created.</param>
         /// <param name="propertyValue">The declared property real value.</param>
         /// <param name="valueType">The resolved edm type of the declared property real value.</param>
         /// <param name="pathSelectItem">The corresponding sub select item belongs to this untyped property.</param>
         /// <param name="resourceContext">The context for the untyped instance being written.</param>
         /// <returns>The nested resource info to be written. Returns 'null' will omit this untyped serialization.</returns>
         /// <remarks>It enables customer to get more control by overriding this method. </remarks>
-        public virtual ODataNestedResourceInfo CreateUntypedNestedResourceInfo(IEdmStructuralProperty property,
+        public virtual ODataNestedResourceInfo CreateUntypedNestedResourceInfo(IEdmStructuralProperty structuralProperty,
             object propertyValue, IEdmTypeReference valueType,
             PathSelectItem pathSelectItem, ResourceContext resourceContext)
         {
-            if (property == null)
+            if (structuralProperty == null)
             {
-                throw Error.ArgumentNull(nameof(property));
+                throw Error.ArgumentNull(nameof(structuralProperty));
             }
 
             if (valueType != null)
@@ -887,7 +867,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return new ODataNestedResourceInfo
                 {
                     IsCollection = valueType.IsCollection(),
-                    Name = property.Name
+                    Name = structuralProperty.Name
                 };
             }
 
@@ -1192,6 +1172,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     if (structuralProperty.Type != null &&
                         (structuralProperty.Type.IsUntyped() || structuralProperty.Type.IsCollectionUntyped()))
                     {
+                        // skip it here, we use a different method to write all 'declared' untyped properties
                         continue;
                     }
 
@@ -1299,7 +1280,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
-        /// Creates the <see cref="ODataProperty"/> to be written for the given, declared, "Edm.Untyped" or collection property.
+        /// Creates the property value to be written for the given, declared, "Edm.Untyped" or collection property.
         /// </summary>
         /// <param name="structuralProperty">The EDM structural property being written.</param>
         /// <param name="resourceContext">The context for the entity instance being written.</param>
@@ -1772,7 +1753,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (edmType.IsUntyped())
             {
-                return EdmUntypedStructuredTypeReference.NullableTypeReference;
+                return edmType.ToStructuredTypeReference();
             }
 
             if (!edmType.IsStructured())
@@ -1782,14 +1763,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return edmType.AsStructured();
-        }
-
-        private static IODataUntypedValueConverter GetUntypedValueConverter(ResourceContext resourceContext)
-        {
-            IODataUntypedValueConverter converter =
-                resourceContext.SerializerContext?.Request?.GetRouteServices()?.GetService<IODataUntypedValueConverter>();
-
-            return converter ?? DefaultODataUntypedValueConverter.Instance;
         }
     }
 }
