@@ -101,5 +101,10 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// enumeration of Property Names
         /// </summary>
         public abstract IEnumerable<string> GetUnchangedPropertyNames();
+
+        /// <summary>
+        /// Gets the nested resources changed at this level.
+        /// </summary>
+        public abstract IDictionary<string, object> GetNestedProperties();
     }
 }

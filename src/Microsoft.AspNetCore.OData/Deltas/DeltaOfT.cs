@@ -312,6 +312,14 @@ namespace Microsoft.AspNetCore.OData.Deltas
         }
 
         /// <summary>
+        /// Gets the nested resources changed at this level.
+        /// </summary>
+        public override IDictionary<string, object> GetNestedProperties()
+        {
+            return _deltaNestedResources;
+        }
+
+        /// <summary>
         /// Copies the changed property values from the underlying entity (accessible via <see cref="GetInstance()" />)
         /// to the <paramref name="original"/> entity recursively.
         /// </summary>

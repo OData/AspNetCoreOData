@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -159,7 +160,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.EdmObjectNull, typeof(ResourceContext).Name);
             }
 
-            object value;
+            if (SerializerContext.IsDeltaOfT && ResourceInstance is IDelta delta && delta.TryGetPropertyValue(propertyName, out object value))
+            {
+                return value;
+            }
+
             if (EdmObject.TryGetPropertyValue(propertyName, out value))
             {
                 return value;

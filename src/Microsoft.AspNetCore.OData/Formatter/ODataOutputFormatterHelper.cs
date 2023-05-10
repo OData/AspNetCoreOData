@@ -87,7 +87,17 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             ODataMessageWriterSettings writerSettings = request.GetWriterSettings();
             writerSettings.BaseUri = baseAddress;
-            writerSettings.Version = version;
+
+            //use v401 to write delta payloads. 
+            if (serializer.ODataPayloadKind == ODataPayloadKind.Delta)
+            {
+                writerSettings.Version = ODataVersion.V401;
+            }
+            else
+            {
+                writerSettings.Version = version;
+            }
+
             writerSettings.Validations = writerSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
 
             string metadataLink = request.CreateODataLink(MetadataSegment.Instance);
@@ -142,6 +152,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 writeContext.MetadataLevel = metadataLevel;
                 writeContext.QueryOptions = queryOptions;
                 writeContext.SetComputedProperties(queryOptions?.Compute?.ComputeClause);
+                writeContext.Type = type;
 
                 //Set the SelectExpandClause on the context if it was explicitly specified.
                 if (selectExpandDifferentFromQueryOptions != null)
