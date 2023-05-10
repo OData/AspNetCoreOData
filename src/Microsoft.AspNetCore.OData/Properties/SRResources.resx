@@ -739,4 +739,10 @@
     <value>Unable to identify a unique property named '{0}'.</value>
     <comment>{0} = Property Name</comment>
   </data>
+  <data name="InstanceAnnotationNotContain" xml:space="preserve">
+    <value>Instance Annotation name cannot have a '@' as the first character and cannot have a '.' as first or last character.</value>
+  </data>
+  <data name="InstanceAnnotationShouldContain" xml:space="preserve">
+    <value>Instance Annotation should have a '.' in it and should not be the first or last character, usually in a format Namespace.TermName</value>
+  </data>
 </root>
