@@ -27,9 +27,9 @@ namespace Microsoft.AspNetCore.OData.Edm
                 return null;
             }
 
-            if (edmTypeReference is IEdmStructuredTypeReference)
+            if (edmTypeReference is IEdmStructuredTypeReference structuredTypeReference)
             {
-                return (IEdmStructuredTypeReference)edmTypeReference;
+                return structuredTypeReference;
             }
 
             if (edmTypeReference.IsUntyped())
@@ -39,6 +39,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
             return edmTypeReference.AsStructured();
         }
+
         public static bool IsStructuredOrUntypedStructuredCollection(this IEdmTypeReference edmTypeReference)
         {
             if (edmTypeReference == null)

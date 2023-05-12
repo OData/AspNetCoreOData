@@ -77,22 +77,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
             Assert.True(TypeHelper.IsCollection(collectionType));
         }
 
-        [Fact]
-        public void IsDictionary_with_Dictionary()
+        [Theory]
+        [InlineData(typeof(IDictionary), true)]
+        [InlineData(typeof(EdmUntypedObject), true)]
+        [InlineData(typeof(IDictionary<string, object>), true)]
+        [InlineData(typeof(Dictionary<object, object>), true)]
+        [InlineData(typeof(IList<object>), false)]
+        public void IsDictionary_with_Dictionary(Type clrType, bool expected)
         {
             // Arrange & Act & Assert
-            Assert.False(TypeHelper.IsDictionary(typeof(IDictionary), out _, out _));
-
-            // Both are Collection of KeyValuePair<,>.
-            Assert.True(TypeHelper.IsDictionary(typeof(IDictionary<string, object>), out Type keyType, out Type valueType));
-            Assert.Equal(typeof(string), keyType);
-            Assert.Equal(typeof(object), valueType);
-
-            Assert.True(TypeHelper.IsDictionary(typeof(EdmUntypedObject), out keyType, out valueType));
-            Assert.Equal(typeof(string), keyType);
-            Assert.Equal(typeof(object), valueType);
-
-            Assert.True(TypeHelper.IsDictionary(typeof(Dictionary<string, object>), out _, out _));
+            Assert.Equal(expected, TypeHelper.IsDictionary(clrType));
         }
 
         [Theory]

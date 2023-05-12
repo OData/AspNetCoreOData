@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 JsonIgnoreAttribute jsonIgnore = GetJsonIgnore(propInfo);
                 if (jsonIgnore != null)
                 {
-                    return null;
+                    continue;
                 }
 
                 string propertyName = propInfo.Name;

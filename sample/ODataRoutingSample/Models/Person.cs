@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ODataRoutingSample.Models
 {
@@ -27,10 +26,10 @@ namespace ODataRoutingSample.Models
 
         public IList<object> Sources { get; set; } // Collection(Edm.Untyped)
 
-        public AwsCondition Condition { get; set; }
+        public PersonExtraInfo CustomProperties { get; set; }
     }
 
-    public class AwsCondition
+    public class PersonExtraInfo
     {
         /// <summary>
         /// Gets or sets the properties.

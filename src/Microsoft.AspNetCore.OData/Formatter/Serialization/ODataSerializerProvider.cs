@@ -151,12 +151,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 // and the value type is an unknown to OData Edm model.
                 if (path.IsUntypedPropertyPath())
                 {
-                    edmType = TypeHelper.IsDictionary(type, out _, out _) ?
-                        (IEdmTypeReference)EdmUntypedStructuredTypeReference.NullableTypeReference :
-                        (TypeHelper.IsCollection(type) ?
-                            (IEdmTypeReference)EdmUntypedHelpers.NullableUntypedCollectionReference :
-                            (IEdmTypeReference)EdmUntypedStructuredTypeReference.NullableTypeReference);
-
+                    edmType = TypeHelper.GetUntypedEdmType(type);
                     return GetEdmTypeSerializer(edmType);
                 }
 

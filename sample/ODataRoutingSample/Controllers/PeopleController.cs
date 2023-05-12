@@ -63,17 +63,72 @@ namespace ODataRoutingSample.Controllers
         [EnableQuery]
         public IActionResult Post([FromBody] Person person)
         {
-            _persons.Add(person);
-
-            EdmUntypedObject odataObject = person.Condition.Properties["StringEqualsIgnoreCase"] as EdmUntypedObject;
-
-            IEnumerable enumerable = odataObject["awsTag"] as IEnumerable;
-            foreach (var a in enumerable)
+            /* As example: If you send a POST request to: http://localhost:5000/People, you can get all things with 'person' parameter.
+{
+    "firstname": "sam",
+    "lastname": "xu",
+    "data":[[42],{"k1": "abc", "k2": 42, "k3": { "a1": 2, "b2": null}, "k4": [null, 42]}],
+    "infos": [ 42, "str"],
+    "customProperties": {
+        "NullProp": null,
+        "CollectionDynamic": [
             {
+                "P1": "v1",
+                "P2": "v2"
+            },
+            {
+                "Y1": 1,
+                "Y2": true
+            }
+        ],
+        "StringEqualsIgnoreCase": {
+          "IntProp": 42,
+          "awsTag":[
+            null,
+            {
+                "X1": "Red",
+                "Data": {
+                    "D1": 42
+                }
+            },
+            "finance",
+            "hr",
+            "legal",
+            43
+        ]
+      },
+      "key1": "value1",
+      "key2": [
+          "value2",
+          "value3"
+      ],
+      "key3": "value4"
+    }
+}
+             */
 
+            if (person == null || !ModelState.IsValid)
+            {
+                var message = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return BadRequest(message);
             }
 
-            // person.Data = 42; // ODataPrimitiveValue
+            _persons.Add(person);
+            person.CustomProperties.Properties.TryGetValue("StringEqualsIgnoreCase", out var property);
+
+            EdmUntypedObject odataObject = property as EdmUntypedObject;
+            if (odataObject != null)
+            {
+                IEnumerable enumerable = odataObject["awsTag"] as IEnumerable;
+                foreach (var a in enumerable)
+                {
+                    // do thing, just for testing.
+                }
+            }
+
+            // Keep the following codes, it tests
+            // 1) you can use any C# class to create an object and assign it to 'Edm.Untyped' property
+            // 2) you can use dictionary now also.
             //person.Other = new Address
             //{
             //    City = "Redmond",
@@ -84,12 +139,6 @@ namespace ODataRoutingSample.Controllers
                 { "City", "Redmond" },
                 { "Street/A", "1345TH" }
             };
-
-            // shall we support
-            //person.Other = new Dictionary<string, object>
-            //{
-
-            //}
 
             person.Sources = new List<object>
             {
@@ -104,7 +153,6 @@ namespace ODataRoutingSample.Controllers
                 {
                     { "a1", "abc" }
                 },
-                // So far, it can't support it?
                 new EdmUntypedCollection
                 {
                     null,
@@ -118,6 +166,101 @@ namespace ODataRoutingSample.Controllers
                 }
             };
 
+            /* If you keep the above value, you could get the following response (It could be not up-to-date)
+{
+    "@odata.context": "http://localhost:5000/$metadata#People/$entity",
+    "@odata.type": "#ODataRoutingSample.Models.Person",
+    "@odata.id": "http://localhost:5000/People(FirstName='sam',LastName='xu')",
+    "@odata.editLink": "People(FirstName='sam',LastName='xu')",
+    "FirstName": "sam",
+    "LastName": "xu",
+    "Data": [
+        [
+            42
+        ],
+        {
+            "k1": "abc",
+            "k2@odata.type": "#Decimal",
+            "k2": 42,
+            "k3": {
+                "a1@odata.type": "#Decimal",
+                "a1": 2,
+                "b2": null
+            },
+            "k4": [
+                null,
+                42
+            ]
+        }
+    ],
+    "Other": {
+        "City": "Redmond",
+        "Street/A": "1345TH"
+    },
+    "Infos": [
+        42,
+        "str"
+    ],
+    "Sources": [
+        null,
+        42,
+        "A string Value",
+        "Red",
+        "E1",
+        true,
+        {
+            "City": "Issaquah",
+            "Street": "Klahanie Way"
+        },
+        {
+            "a1": "abc"
+        },
+        [
+            null,
+            "A string Value"
+        ]
+    ],
+    "CustomProperties": {
+        "@odata.type": "#ODataRoutingSample.Models.PersonExtraInfo",
+        "NullProp": null,
+        "key1": "value1",
+        "key3": "value4",
+        "CollectionDynamic": [
+            {
+                "P1": "v1",
+                "P2": "v2"
+            },
+            {
+                "Y1@odata.type": "#Decimal",
+                "Y1": 1,
+                "Y2": true
+            }
+        ],
+        "StringEqualsIgnoreCase": {
+            "IntProp@odata.type": "#Decimal",
+            "IntProp": 42,
+            "awsTag": [
+                null,
+                {
+                    "X1": "Red",
+                    "Data": {
+                        "D1@odata.type": "#Decimal",
+                        "D1": 42
+                    }
+                },
+                "finance",
+                "hr",
+                "legal",
+                43
+            ]
+        },
+        "key2": [
+            "value2",
+            "value3"
+        ]
+    }
+}
+             */
             return Created(person);
         }
     }

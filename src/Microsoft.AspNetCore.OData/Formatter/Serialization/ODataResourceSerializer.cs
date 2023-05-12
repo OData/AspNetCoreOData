@@ -56,16 +56,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 throw Error.ArgumentNull(nameof(writeContext));
             }
 
-            IEdmTypeReference edmType;
-            if (writeContext.Path.IsUntypedPropertyPath())
-            {
-                edmType = writeContext.TryGetEdmType(graph, type);
-            }
-            else
-            {
-                edmType = writeContext.GetEdmType(graph, type);
-            }
-
+            bool isUntypedPath = writeContext.Path.IsUntypedPropertyPath();
+            IEdmTypeReference edmType = writeContext.GetEdmType(graph, type, isUntypedPath);
             Contract.Assert(edmType != null);
 
             IEdmNavigationSource navigationSource = writeContext.NavigationSource;
@@ -643,8 +635,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     continue;
                 }
 
-                IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.TryGetEdmType(dynamicPropertyValue,
-                    dynamicPropertyValue.GetType());
+                IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(dynamicPropertyValue,
+                    dynamicPropertyValue.GetType(), true);
                 if (edmTypeReference == null || edmTypeReference.IsStructuredOrUntyped())
                 {
                     resourceContext.AppendDynamicOrUntypedProperty(dynamicProperty.Key, dynamicPropertyValue);
@@ -750,8 +742,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
 
                 IEdmTypeReference edmTypeReference =
-                    resourceContext.SerializerContext.TryGetEdmType(dynamicComplexProperty.Value,
-                        dynamicComplexProperty.Value.GetType());
+                    resourceContext.SerializerContext.GetEdmType(dynamicComplexProperty.Value,
+                        dynamicComplexProperty.Value.GetType(), true);
 
                 if (edmTypeReference.IsStructuredOrUntyped())
                 {
@@ -1325,7 +1317,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // Scenarios:
             // 1) If we can get EdmType from model, Let's use it.
             // 2) If no (aka, we don't have an Edm type associated). So, let's treat it a Untyped.
-            actualType = writeContext.TryGetEdmType(propertyValue, propertyType);
+            actualType = writeContext.GetEdmType(propertyValue, propertyType, true);
             if (actualType.IsStructuredOrUntyped())
             {
                 return propertyValue;
@@ -1748,7 +1740,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(graph != null);
 
-            IEdmTypeReference edmType = writeContext.TryGetEdmType(graph, graph.GetType());
+            IEdmTypeReference edmType = writeContext.GetEdmType(graph, graph.GetType(), true);
             Contract.Assert(edmType != null);
 
             if (edmType.IsUntyped())

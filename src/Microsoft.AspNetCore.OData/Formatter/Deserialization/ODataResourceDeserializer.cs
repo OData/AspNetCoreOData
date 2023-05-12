@@ -713,7 +713,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (elementType.IsUntyped())
             {
-                //
                 nestedReadContext.ResourceType = typeof(EdmUntypedCollection);
             }
             else if (readContext.IsNoClrType)
