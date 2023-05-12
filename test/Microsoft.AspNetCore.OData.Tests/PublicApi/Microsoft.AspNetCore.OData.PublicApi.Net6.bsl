@@ -2462,11 +2462,6 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions
 	ExtensionAttribute(),
 	]
 	public static bool IsDeltaResourceSet (Microsoft.OData.Edm.IEdmType type)
-
-	[
-	ExtensionAttribute(),
-	]
-	public static bool IsUntypedResource (Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject resource)
 }
 
 [
