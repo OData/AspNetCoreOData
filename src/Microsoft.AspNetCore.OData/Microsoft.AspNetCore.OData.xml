@@ -7402,6 +7402,11 @@
               Looks up a localized string similar to The OData formatter must be able to determine the metadata URL for a request in order to serialize the response..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.UnableToIdentifyUniqueProperty">
+            <summary>
+              Looks up a localized string similar to Unable to identify a unique property named &apos;{0}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.UnaryNodeValidationNotSupported">
             <summary>
               Looks up a localized string similar to Validating OData UnaryOperatorNode of kind {0} is not supported by {1}..

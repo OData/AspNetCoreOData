@@ -735,4 +735,8 @@
   <data name="SkipTokenProcessingError" xml:space="preserve">
     <value>Unable to get property values from the skiptoken value.</value>
   </data>
+  <data name="UnableToIdentifyUniqueProperty" xml:space="preserve">
+    <value>Unable to identify a unique property named '{0}'.</value>
+    <comment>{0} = Property Name</comment>
+  </data>
 </root>
