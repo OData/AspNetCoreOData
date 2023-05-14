@@ -8,22 +8,24 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Capabilities.V1;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
@@ -59,7 +61,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             IEdmEntitySetBase entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
 
-            IEdmTypeReference resourceSetType = writeContext.GetEdmType(graph, type);
+            bool isUntypedPath = writeContext.Path.IsUntypedPropertyPath();
+            IEdmTypeReference resourceSetType = writeContext.GetEdmType(graph, type, isUntypedPath);
             Contract.Assert(resourceSetType != null);
 
             IEdmStructuredTypeReference resourceType = GetResourceType(resourceSetType);
@@ -141,6 +144,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.TypeCannotBeSerialized, elementType.FullName()));
             }
 
+            bool isUntypedCollection = resourceSetType.IsCollectionUntyped();
+
             // set the nextpagelink to null to support JSON odata.streaming.
             resourceSet.NextPageLink = null;
             await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
@@ -159,6 +164,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
                     await writer.WriteEndAsync().ConfigureAwait(false);
                 }
+                else if (isUntypedCollection)
+                {
+                    await WriteUntypedResourceSetItemAsync(item, resourceSetType, writer, writeContext).ConfigureAwait(false);
+                }
                 else
                 {
                     await resourceSerializer.WriteObjectInlineAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
@@ -174,6 +183,149 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             resourceSet.NextPageLink = nextLinkGenerator(lastResource);
 
             await writer.WriteEndAsync().ConfigureAwait(false);
+        }
+
+        private async Task WriteUntypedResourceSetItemAsync(object item, IEdmTypeReference parentSetType, ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            Contract.Assert(item != null); // "item == null" is handled.
+
+            Type itemType = item.GetType();
+            IEdmTypeReference itemEdmType = writeContext.GetEdmType(item, itemType, true);
+            Contract.Assert(itemType != null);
+
+            // if the type of value is declared as enum in the edm model, let's use it.
+            if (itemEdmType.IsEnum())
+            {
+                await WriteEnumItemAsync(item, itemEdmType, parentSetType, writer, writeContext).ConfigureAwait(false);
+                return;
+            }
+
+            // the value is an enum whose type is not defined in edm model. Let's write it as string.
+            if (TypeHelper.IsEnum(item.GetType()))
+            {
+                await WriteEnumItemAsync(item, null, parentSetType, writer, writeContext).ConfigureAwait(false);
+                return;
+            }
+
+            // The value is a primitive value, write it as untyped primitive value item.
+            if (itemEdmType.IsPrimitive())
+            {
+                await WritePrimitiveItemAsync(item, itemEdmType, parentSetType, writer, writeContext).ConfigureAwait(false);
+                return;
+            }
+
+            if (itemEdmType.IsCollection())
+            {
+                // If the value is a IList<int>, or other similars, the TryGetEdmType(...) return Collection(Edm.Int32).
+                // But, ODL doesn't support to write ODataCollectionValue.
+                // Let's directly use untyped collection serialization no matter what type this collection is.
+                itemEdmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+                await WriteResourceSetItemAsync(item, itemEdmType, parentSetType, writer, writeContext).ConfigureAwait(false);
+                return;
+            }
+
+            if (itemEdmType.IsStructuredOrUntypedStructured())
+            {
+                await WriteResourceItemAsync(item, itemEdmType, parentSetType, writer, writeContext).ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Write a primitive value into a collection (untyped collection)
+        /// </summary>
+        /// <param name="primitiveValue">The primitive value.</param>
+        /// <param name="primitiveType">The primitive edm type.</param>
+        /// <param name="parentSetType">The parent collection edm type.</param>
+        /// <param name="writer">The writer.</param>
+        /// <param name="writeContext">The writer context.</param>
+        /// <returns>Task.</returns>
+        protected virtual async Task WritePrimitiveItemAsync(object primitiveValue, IEdmTypeReference primitiveType,
+            IEdmTypeReference parentSetType,
+            ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            if (primitiveValue == null)
+            {
+                throw Error.ArgumentNull(nameof(primitiveValue));
+            }
+
+            var odataPrimitiveValue = ODataPrimitiveSerializer.CreatePrimitive(primitiveValue, primitiveType.AsPrimitive(), writeContext);
+            await writer.WritePrimitiveAsync(odataPrimitiveValue).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write an enum value into a collection (untyped collection)
+        /// </summary>
+        /// <param name="enumValue">The enum value.</param>
+        /// <param name="enumType">The enum edm type or null if no edm type defined.</param>
+        /// <param name="parentSetType">The parent collection edm type.</param>
+        /// <param name="writer">The writer.</param>
+        /// <param name="writeContext">The writer context.</param>
+        /// <returns>Task.</returns>
+        protected virtual async Task WriteEnumItemAsync(object enumValue, IEdmTypeReference enumType, IEdmTypeReference parentSetType,
+            ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            IEdmTypeReference edmTypeRef = EdmCoreModel.Instance.GetString(true);
+            if (enumType == null)
+            {
+                // we don't have the Edm enum type in the model, let's write it as string.
+                string enumValueStr = enumValue.ToString();
+                await WritePrimitiveItemAsync(enumValueStr, edmTypeRef, parentSetType, writer, writeContext).ConfigureAwait(false);
+            }
+            else
+            {
+                ODataEnumSerializer enumSerializer = writeContext?.Request?.GetRouteServices()?.GetRequiredService<ODataEnumSerializer>();
+                if (enumSerializer != null)
+                {
+                    ODataEnumValue oDataEnumValue = enumSerializer.CreateODataEnumValue(enumValue, enumType.AsEnum(), writeContext);
+
+                    // We can't write the 'ODataEnumValue' directly by calling write methods on writer.
+                    // Let's switch to use 'string' and write it as primitive value.
+                    // Once ODL supports, let's call the correct writing methods. see issue: https://github.com/OData/odata.net/issues/2659
+                    await WritePrimitiveItemAsync(oDataEnumValue.Value, edmTypeRef, parentSetType, writer, writeContext);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Write a nested collection value into a collection (untyped collection)
+        /// </summary>
+        /// <param name="itemSetValue">The collection value.</param>
+        /// <param name="itemSetType">The nested collection Edm type.</param>
+        /// <param name="parentSetType">The parent collection edm type.</param>
+        /// <param name="writer">The writer.</param>
+        /// <param name="writeContext">The writer context.</param>
+        /// <returns>Task.</returns>
+        protected virtual async Task WriteResourceSetItemAsync(object itemSetValue, IEdmTypeReference itemSetType, IEdmTypeReference parentSetType,
+            ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            if (itemSetType == null)
+            {
+                throw Error.ArgumentNull(nameof(itemSetType));
+            }
+
+            IODataEdmTypeSerializer resourceSetSerializer = SerializerProvider.GetEdmTypeSerializer(itemSetType);
+            await resourceSetSerializer.WriteObjectInlineAsync(itemSetValue, itemSetType, writer, writeContext).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Write a nested resource/object into a collection (untyped collection)
+        /// </summary>
+        /// <param name="resourceValue">The resource value.</param>
+        /// <param name="resourceType">The nested resource Edm type.</param>
+        /// <param name="parentSetType">The parent collection edm type.</param>
+        /// <param name="writer">The writer.</param>
+        /// <param name="writeContext">The writer context.</param>
+        /// <returns>Task.</returns>
+        protected virtual async Task WriteResourceItemAsync(object resourceValue, IEdmTypeReference resourceType, IEdmTypeReference parentSetType,
+            ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            if (resourceType == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceType));
+            }
+
+            IODataEdmTypeSerializer resourceSerializer = SerializerProvider.GetEdmTypeSerializer(resourceType);
+            await resourceSerializer.WriteObjectInlineAsync(resourceValue, resourceType, writer, writeContext).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -461,13 +613,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
         private static IEdmStructuredTypeReference GetResourceType(IEdmTypeReference resourceSetType)
         {
-            if (resourceSetType.IsCollection())
+            if (resourceSetType.IsStructuredOrUntypedStructuredCollection())
             {
                 IEdmTypeReference elementType = resourceSetType.AsCollection().ElementType();
-                if (elementType.IsEntity() || elementType.IsComplex())
-                {
-                    return elementType.AsStructured();
-                }
+                return elementType.ToStructuredTypeReference();
             }
 
             string message = Error.Format(SRResources.CannotWriteType, typeof(ODataResourceSetSerializer).Name, resourceSetType.FullName());

@@ -60,7 +60,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     {
                         return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
                     }
-                    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex())
+                    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex() 
+                        || collectionType.ElementType().IsUntyped())
                     {
                         return _serviceProvider.GetRequiredService<ODataResourceSetSerializer>();
                     }
@@ -71,6 +72,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 case EdmTypeKind.Complex:
                 case EdmTypeKind.Entity:
+                case EdmTypeKind.Untyped:
                     return _serviceProvider.GetRequiredService<ODataResourceSerializer>();
 
                 default:
@@ -143,6 +145,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
+                // Ok, we are here because the value type is not defined in OData Edm model
+                // (Known primitive, known enum, known strucutred or collection are handled above.)
+                // One of such case is that it's an untyped property (or dynamic property) query request
+                // and the value type is an unknown to OData Edm model.
+                if (path.IsUntypedPropertyPath())
+                {
+                    edmType = TypeHelper.GetUntypedEdmType(type);
+                    return GetEdmTypeSerializer(edmType);
+                }
+
                 return null;
             }
         }

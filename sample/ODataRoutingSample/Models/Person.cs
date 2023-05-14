@@ -5,7 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace ODataRoutingSample.Models
 {
@@ -17,5 +17,28 @@ namespace ODataRoutingSample.Models
 
         // [Column(Order = 2)]
         public string LastName { get; set; }
+
+        public object Data { get; set; } // Edm.Untyped
+
+        public object Other { get; set; }
+
+        public IList<object> Infos { get; set; } // Collection(Edm.Untyped)
+
+        public IList<object> Sources { get; set; } // Collection(Edm.Untyped)
+
+        public PersonExtraInfo CustomProperties { get; set; }
+    }
+
+    public class PersonExtraInfo
+    {
+        /// <summary>
+        /// Gets or sets the properties.
+        /// </summary>
+        public Dictionary<string, object> Properties { get; set; } = new();
+    }
+
+    public enum AnyEnum
+    {
+        E1
     }
 }

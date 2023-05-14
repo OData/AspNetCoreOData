@@ -399,6 +399,65 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
+        public async Task WriteObjectInlineAsync_WritesEachResourceSetItemInstance_Untyped()
+        {
+            // Arrange
+            IList<object> lists = new List<object>()
+            {
+                new List<object>{1},
+                new List<object>{2}
+            };
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+
+            Mock<ODataEdmTypeSerializer> customerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.ResourceSet);
+            IODataSerializerProvider provider = ODataTestUtil.GetMockODataSerializerProvider(customerSerializer.Object);
+            var mockWriter = new Mock<ODataWriter>();
+
+            customerSerializer.Setup(s => s.WriteObjectInlineAsync(lists[0], edmType, mockWriter.Object, writeContext)).Verifiable();
+            customerSerializer.Setup(s => s.WriteObjectInlineAsync(lists[1], edmType, mockWriter.Object, writeContext)).Verifiable();
+
+            _serializer = new ODataResourceSetSerializer(provider);
+
+            // Act
+            await _serializer.WriteObjectInlineAsync(lists, edmType, mockWriter.Object, writeContext);
+
+            // Assert
+            customerSerializer.Verify();
+        }
+
+        [Fact]
+        public async Task WriteObjectInlineAsync_WritesEachResourceItemInstance_Untyped()
+        {
+            // Arrange
+            IList<object> lists = new List<object>()
+            {
+                new object(),
+                new object()
+            };
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+            IEdmTypeReference elementType = edmType.AsCollection().ElementType();
+
+            Mock<ODataEdmTypeSerializer> customerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
+            IODataSerializerProvider provider = ODataTestUtil.GetMockODataSerializerProvider(customerSerializer.Object);
+            var mockWriter = new Mock<ODataWriter>();
+
+            customerSerializer.Setup(s => s.WriteObjectInlineAsync(lists[0], elementType, mockWriter.Object, writeContext)).Verifiable();
+            customerSerializer.Setup(s => s.WriteObjectInlineAsync(lists[1], elementType, mockWriter.Object, writeContext)).Verifiable();
+
+            _serializer = new ODataResourceSetSerializer(provider);
+
+            // Act
+            await _serializer.WriteObjectInlineAsync(lists, edmType, mockWriter.Object, writeContext);
+
+            // Assert
+            customerSerializer.Verify();
+        }
+
+        [Fact]
         public async Task WriteObjectInlineAsync_Can_WriteCollectionOfIEdmObjects()
         {
             // Arrange

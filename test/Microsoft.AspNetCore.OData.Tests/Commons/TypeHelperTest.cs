@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.OData.ModelBuilder;
@@ -74,6 +75,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
             Assert.True(TypeHelper.IsCollection(collectionType, out type));
             Assert.Equal(elementType, type);
             Assert.True(TypeHelper.IsCollection(collectionType));
+        }
+
+        [Theory]
+        [InlineData(typeof(IDictionary), true)]
+        [InlineData(typeof(EdmUntypedObject), true)]
+        [InlineData(typeof(IDictionary<string, object>), true)]
+        [InlineData(typeof(Dictionary<object, object>), true)]
+        [InlineData(typeof(IList<object>), false)]
+        public void IsDictionary_with_Dictionary(Type clrType, bool expected)
+        {
+            // Arrange & Act & Assert
+            Assert.Equal(expected, TypeHelper.IsDictionary(clrType));
         }
 
         [Theory]

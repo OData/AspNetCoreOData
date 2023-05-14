@@ -235,6 +235,42 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
+        public async Task WriteObjectInlineAsync_Calls_CreateUntypedPropertyValue_ForUntypedProperty()
+        {
+            // Arrange
+            Mock<IEdmType> untyped = new Mock<IEdmType>();
+            untyped.Setup(u => u.TypeKind).Returns(EdmTypeKind.Untyped);
+
+            Mock<IEdmTypeReference> untypedRef = new Mock<IEdmTypeReference>();
+            untypedRef.Setup(p => p.Definition).Returns(untyped.Object);
+
+            Mock<IEdmStructuralProperty> property1 = new Mock<IEdmStructuralProperty>();
+            property1.Setup(p => p.Type).Returns(untypedRef.Object);
+
+            SelectExpandNode selectExpandNode = new SelectExpandNode
+            {
+                SelectedStructuralProperties = new HashSet<IEdmStructuralProperty>
+                {
+                    property1.Object
+                }
+            };
+
+            Mock<ODataWriter> writer = new Mock<ODataWriter>();
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
+            serializer.CallBase = true;
+            IEdmTypeReference a;
+
+            serializer.Setup(s => s.CreateUntypedPropertyValue(property1.Object, It.IsAny<ResourceContext>(), out a)).Returns("a").Verifiable();
+
+            // Act
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
+
+            // Assert
+            serializer.Verify();
+        }
+
+        [Fact]
         public async Task WriteObjectInlineAsync_Calls_CreateComplexNestedResourceInfo_ForEachSelectedComplexProperty()
         {
             // Arrange
@@ -1256,6 +1292,105 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 "Name",
                 partialMatch: true);
         }
+        [Fact]
+        public void CreateUntypedPropertyValue_ThrowsArgumentNull_StructuralProperty()
+        {
+            // Arrange
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => serializer.CreateUntypedPropertyValue(structuralProperty: null, resourceContext: null, out _),
+                "structuralProperty");
+        }
+
+        [Fact]
+        public void CreateUntypedPropertyValue_ThrowsArgumentNull_ResourceContext()
+        {
+            // Arrange
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+            Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => serializer.CreateUntypedPropertyValue(property.Object, resourceContext: null, out _),
+                "resourceContext");
+        }
+
+        [Fact]
+        public void CreateUntypedPropertyValue_ReturnsNull_ForNonUntypedProperty()
+        {
+            // Arrange
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+            Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
+            property.Setup(p => p.Type).Returns(EdmCoreModel.Instance.GetInt32(true));
+
+            // Act
+            object result = serializer.CreateUntypedPropertyValue(property.Object, new ResourceContext(), out _);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void CreateUntypedPropertyValue_ReturnsRealValue_ForUntypedPropertyWithRealType()
+        {
+            // Arrange
+            Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
+            property.Setup(p => p.Name).Returns("PropertyName");
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>(MockBehavior.Strict);
+            object propertyValue = new List<object>();
+            var entity = new { PropertyName = propertyValue };
+            Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Property);
+            IEdmTypeReference propertyType = EdmUntypedStructuredTypeReference.NullableTypeReference;
+
+            property.Setup(p => p.Type).Returns(propertyType);
+
+            var serializer = new ODataResourceSerializer(serializerProvider.Object);
+            ResourceContext entityContext = new ResourceContext(_writeContext, _customerType, entity);
+
+            // Act
+            object result = serializer.CreateUntypedPropertyValue(property.Object, entityContext, out IEdmTypeReference actualType);
+
+            // Assert
+            innerSerializer.Verify();
+            Assert.Same(propertyValue, result);
+            Assert.Same(EdmUntypedHelpers.NullableUntypedCollectionReference, actualType);
+        }
+
+        [Fact]
+        public void CreateUntypedPropertyValue_Calls_CreateODataValueOnInnerSerializer()
+        {
+            // Arrange
+            Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
+            property.Setup(p => p.Name).Returns("PropertyName");
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>(MockBehavior.Strict);
+            var entity = new { PropertyName = 42 };
+            Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Property);
+            ODataPrimitiveValue propertyValue = new ODataPrimitiveValue(42);
+            IEdmTypeReference propertyType = EdmUntypedStructuredTypeReference.NullableTypeReference;
+            IEdmTypeReference actualType = _writeContext.GetEdmType(propertyValue, typeof(int));
+
+            property.Setup(p => p.Type).Returns(propertyType);
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(actualType)).Returns(innerSerializer.Object);
+            innerSerializer.Setup(s => s.CreateODataValue(42, actualType, _writeContext)).Returns(propertyValue).Verifiable();
+
+            var serializer = new ODataResourceSerializer(serializerProvider.Object);
+            ResourceContext entityContext = new ResourceContext(_writeContext, _customerType, entity);
+
+            // Act
+            object createdProperty = serializer.CreateUntypedPropertyValue(property.Object, entityContext, out _);
+
+            // Assert
+            innerSerializer.Verify();
+            ODataProperty odataProperty = Assert.IsType<ODataProperty>(createdProperty);
+            Assert.Equal("PropertyName", odataProperty.Name);
+            ODataUntypedValue untypedValue = Assert.IsType<ODataUntypedValue>(odataProperty.Value);
+            Assert.Equal("42", untypedValue.RawValue);
+        }
 
         [Fact]
         public void CreateStructuralProperty_ThrowsArgumentNull_StructuralProperty()
@@ -1271,7 +1406,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void CreateStructuralProperty_ThrowsArgumentNull_EntityContext()
+        public void CreateStructuralProperty_ThrowsArgumentNull_ResourceContext()
         {
             // Arrange
             Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
@@ -1340,6 +1475,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(writeContext.Request, instanceContext.Request);
             Assert.Equal(writeContext.SkipExpensiveAvailabilityChecks, instanceContext.SkipExpensiveAvailabilityChecks);
             return true;
+        }
+
+        [Fact]
+        public void CreateUntypedNestedResourceInfo_ThrowsArgumentNull_StructuralProperty()
+        {
+            // Arrange
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => serializer.CreateUntypedNestedResourceInfo(null, null, null, null, resourceContext: _entityContext),
+                "structuralProperty");
+        }
+
+        [Fact]
+        public void CreateUntypedNestedResourceInfo_CreatesCorrectNestedResourceInfo()
+        {
+            // Arrange
+            Mock<IEdmStructuralProperty> property = new Mock<IEdmStructuralProperty>();
+            property.Setup(p => p.Name).Returns("AnyUntypedName");
+
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.CallBase = true;
+
+            // Act
+            ODataNestedResourceInfo untypedNestedResourceInfo
+                = serializer.Object.CreateUntypedNestedResourceInfo(property.Object,
+                It.IsAny<object>(), EdmUntypedHelpers.NullableUntypedCollectionReference, null, _entityContext);
+
+            // Assert
+            Assert.NotNull(untypedNestedResourceInfo);
+            Assert.Equal("AnyUntypedName", untypedNestedResourceInfo.Name);
+            Assert.True(untypedNestedResourceInfo.IsCollection);
         }
 
         [Fact]

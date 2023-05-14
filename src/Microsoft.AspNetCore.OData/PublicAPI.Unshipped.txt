@@ -404,6 +404,8 @@ Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.Request.set -> void
 Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.ResourceSetContext() -> void
 Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.ResourceSetInstance.get -> object
 Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.ResourceSetInstance.set -> void
+Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper
+Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper.DefaultUntypedResourceMapper() -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.CreateODataValue(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataValue
 Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer.WriteObjectInlineAsync(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
@@ -413,6 +415,8 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer.WriteObjectA
 Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider
 Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer
+Microsoft.AspNetCore.OData.Formatter.Serialization.IUntypedResourceMapper
+Microsoft.AspNetCore.OData.Formatter.Serialization.IUntypedResourceMapper.Map(object resource, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context) -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.ODataCollectionSerializer(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer
@@ -578,6 +582,13 @@ Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.IsNullable.get ->
 Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.IsNullable.set -> void
 Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetDynamicProperties() -> System.Collections.Generic.Dictionary<string, object>
 Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection.EdmUntypedCollection() -> void
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedCollection.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.EdmUntypedObject() -> void
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
+Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject.TryGetPropertyValue(string propertyName, out object value) -> bool
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmComplexObject
@@ -601,6 +612,7 @@ Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject
 Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject.TryGetPropertyValue(string propertyName, out object value) -> bool
+Microsoft.AspNetCore.OData.Formatter.Value.IEdmUntypedObject
 Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject
 Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.GetEdmType() -> Microsoft.OData.Edm.IEdmTypeReference
 Microsoft.AspNetCore.OData.Formatter.Value.NullEdmComplexObject.NullEdmComplexObject(Microsoft.OData.Edm.IEdmComplexTypeReference edmType) -> void
@@ -1703,9 +1715,11 @@ static Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter.GetDefaultBaseAd
 static Microsoft.AspNetCore.OData.Formatter.ODataInputFormatterFactory.Create() -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter>
 static Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Uri
 static Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatterFactory.Create() -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter>
+static Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper.Instance -> Microsoft.AspNetCore.OData.Formatter.Serialization.IUntypedResourceMapper
 static Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(Microsoft.OData.ODataCollectionValue value, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> void
 static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResource(this Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject resource) -> bool
 static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResourceSet(this Microsoft.OData.Edm.IEdmType type) -> bool
+static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsUntypedResource(this Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject resource) -> bool
 static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSet(this Microsoft.OData.ODataReader reader) -> Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper
 static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSetAsync(this Microsoft.OData.ODataReader reader) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper>
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataBatching(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
@@ -1794,7 +1808,11 @@ virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeseri
 virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyStructuralProperty(object resource, Microsoft.OData.ODataProperty structuralProperty, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> void
 virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.CreateResourceInstance(Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
 virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ReadResource(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
+virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ReadPrimitiveItem(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataPrimitiveWrapper primitiveWrapper, Microsoft.OData.Edm.IEdmTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
+virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ReadResourceItem(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
 virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ReadResourceSet(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper resourceSet, Microsoft.OData.Edm.IEdmStructuredTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> System.Collections.IEnumerable
+virtual Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceSetDeserializer.ReadResourceSetItem(Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSetWrapper resourceSetWrapper, Microsoft.OData.Edm.IEdmTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext) -> object
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResourceMapper.Map(object resource, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context) -> System.Collections.Generic.IDictionary<string, object>
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.CreateODataCollectionValue(System.Collections.IEnumerable enumerable, Microsoft.OData.Edm.IEdmTypeReference elementType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataCollectionValue
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.WriteCollectionAsync(Microsoft.OData.ODataCollectionWriter writer, object graph, Microsoft.OData.Edm.IEdmTypeReference collectionType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.CreateODataDeltaResourceSet(System.Collections.IEnumerable feedInstance, Microsoft.OData.Edm.IEdmCollectionTypeReference feedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataDeltaResourceSet
@@ -1817,9 +1835,15 @@ virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializ
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStreamProperty(Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataStreamPropertyInfo
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralProperty(Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataProperty
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateUntypedNestedResourceInfo(Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference valueType, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataNestedResourceInfo
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateUntypedPropertyValue(Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext, out Microsoft.OData.Edm.IEdmTypeReference actualType) -> object
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteDeltaObjectInlineAsync(object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.CreateODataOperation(Microsoft.OData.Edm.IEdmOperation operation, Microsoft.AspNetCore.OData.Formatter.ResourceSetContext resourceSetContext, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataOperation
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.CreateResourceSet(System.Collections.IEnumerable resourceSetInstance, Microsoft.OData.Edm.IEdmCollectionTypeReference resourceSetType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> Microsoft.OData.ODataResourceSet
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteEnumItemAsync(object enumValue, Microsoft.OData.Edm.IEdmTypeReference enumType, Microsoft.OData.Edm.IEdmTypeReference parentSetType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WritePrimitiveItemAsync(object primitiveValue, Microsoft.OData.Edm.IEdmTypeReference primitiveType, Microsoft.OData.Edm.IEdmTypeReference parentSetType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteResourceItemAsync(object resourceValue, Microsoft.OData.Edm.IEdmTypeReference resourceType, Microsoft.OData.Edm.IEdmTypeReference parentSetType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.WriteResourceSetItemAsync(object itemSetValue, Microsoft.OData.Edm.IEdmTypeReference itemSetType, Microsoft.OData.Edm.IEdmTypeReference parentSetType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer.WriteObjectAsync(object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetEdmTypeSerializer(Microsoft.OData.Edm.IEdmTypeReference edmType) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer
 virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerProvider.GetODataPayloadSerializer(System.Type type, Microsoft.AspNetCore.Http.HttpRequest request) -> Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer

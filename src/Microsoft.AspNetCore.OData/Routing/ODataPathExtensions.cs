@@ -124,6 +124,23 @@ namespace Microsoft.AspNetCore.OData.Routing
             return handler.PathLiteral;
         }
 
+        internal static bool IsUntypedPropertyPath(this ODataPath path)
+        {
+            if (path == null)
+            {
+                return false;
+            }
+
+            // TODO: do we need take the type cast into consideration?
+            if (path.LastSegment is PropertySegment propertySegment)
+            {
+                return propertySegment.Property.Type.IsUntypedOrCollectionUntyped();
+            }
+
+            // TODO, Shall we take the dynamic property path segment into consideration?
+            return false;
+        }
+
         /// <summary>
         /// Gets the property and structured type from <see cref="ODataPath"/>.
         /// TODO: The logic implenetation is not good and do need refactor it later.

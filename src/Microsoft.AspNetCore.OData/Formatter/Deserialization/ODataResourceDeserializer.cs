@@ -60,6 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(readContext));
             }
 
+            // TODO: any scenarios to read a top-level Edm.Untyped?
             IEdmTypeReference edmType = readContext.GetEdmType(type);
             Contract.Assert(edmType != null);
 
@@ -102,7 +103,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(edmType));
             }
 
-            if (edmType.IsComplex() && item == null)
+            if ((edmType.IsComplex() || edmType.IsUntyped()) && item == null)
             {
                 return null;
             }
@@ -112,9 +113,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(item));
             }
 
-            if (!edmType.IsStructured())
+            if (!edmType.IsStructured() && !edmType.IsUntyped())
             {
-                throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, "Entity or Complex");
+                throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, "Entity, Complex or Untyped");
             }
 
             ODataResourceWrapper resourceWrapper = item as ODataResourceWrapper;
@@ -128,7 +129,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             resourceWrapper = UpdateResourceWrapper(resourceWrapper, readContext);
 
-            return ReadResource(resourceWrapper, edmType.AsStructured(), readContext);
+            return ReadResource(resourceWrapper, edmType.ToStructuredTypeReference(), readContext);
         }
 
         /// <summary>
@@ -234,6 +235,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             if (model == null)
             {
                 throw Error.Argument("readContext", SRResources.ModelMissingFromReadContext);
+            }
+
+            if (structuredType.IsUntyped())
+            {
+                return new EdmUntypedObject();
             }
 
             if (readContext.IsNoClrType)
@@ -536,7 +542,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            object value = ReadNestedResourceInline(resourceWrapper, nestedProperty.Type, readContext);
+            // If the property is declared as "Edm.Untyped" and its value is a resource,
+            // Let's switch to use 'EdmUntypedStructuredTypeReference'.
+            IEdmTypeReference edmType = nestedProperty.Type.IsUntyped() ?
+                EdmUntypedStructuredTypeReference.NullableTypeReference :
+                nestedProperty.Type;
+
+            object value = ReadNestedResourceInline(resourceWrapper, edmType, readContext);
 
             // First resolve Data member alias or annotation, then set the regular
             // or delta resource accordingly.
@@ -554,8 +566,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             object value = null;
             if (resourceWrapper != null)
             {
-                IEdmSchemaType elementType = readContext.Model.FindDeclaredType(resourceWrapper.Resource.TypeName);
-                IEdmTypeReference edmTypeReference = elementType.ToEdmTypeReference(true);
+                IEdmTypeReference edmTypeReference;
+                if (resourceWrapper.Resource.TypeName == null ||
+                    string.Equals(resourceWrapper.Resource.TypeName, "Edm.Untyped", StringComparison.OrdinalIgnoreCase))
+                {
+                    edmTypeReference = EdmUntypedStructuredTypeReference.NullableTypeReference;
+                }
+                else
+                {
+                    IEdmSchemaType elementType = readContext.Model.FindDeclaredType(resourceWrapper.Resource.TypeName);
+                    edmTypeReference = elementType.ToEdmTypeReference(true);
+                }
 
                 value = ReadNestedResourceInline(resourceWrapper, edmTypeReference, readContext);
             }
@@ -580,8 +601,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
             }
 
-            IEdmStructuredTypeReference structuredType = edmType.AsStructured();
-
             ODataDeserializerContext nestedReadContext = new ODataDeserializerContext
             {
                 Path = readContext.Path,
@@ -589,6 +608,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Request = readContext.Request,
                 TimeZone = readContext.TimeZone
             };
+
+            if (edmType.IsUntyped())
+            {
+                nestedReadContext.ResourceType = typeof(EdmUntypedObject);
+                return deserializer.ReadInline(resourceWrapper, edmType, nestedReadContext);
+            }
+
+            IEdmStructuredTypeReference structuredType = edmType.AsStructured();
 
             Type clrType;
             if (readContext.IsNoClrType)
@@ -621,10 +648,27 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            object value = ReadNestedResourceSetInline(resourceSetWrapper, nestedProperty.Type, readContext);
+            // If the property is declared as "Edm.Untyped" and its value could be a collection (resource set).
+            // If the property is declared as "Collection(Edm.Untyped)" and its value must be a resource set.
+            // Let's switch to use Collection of 'EdmUntypedStructuredTypeReference'.
+            IEdmTypeReference edmType = nestedProperty.Type;
+            if (edmType.IsUntypedOrCollectionUntyped())
+            {
+                edmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+            }
+
+            object value = ReadNestedResourceSetInline(resourceSetWrapper, edmType, readContext);
 
             string propertyName = readContext.Model.GetClrPropertyName(nestedProperty);
-            DeserializationHelpers.SetCollectionProperty(resource, nestedProperty, value, propertyName);
+
+            if (nestedProperty.Type.IsUntyped())
+            {
+                DeserializationHelpers.SetDeclaredProperty(resource, EdmTypeKind.Untyped, propertyName, value, nestedProperty, readContext);
+            }
+            else
+            {
+                DeserializationHelpers.SetCollectionProperty(resource, nestedProperty, value, propertyName);
+            }
         }
 
         private void ApplyDynamicResourceSetInNestedProperty(string propertyName, object resource, IEdmStructuredTypeReference structuredType,
@@ -633,25 +677,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            if (string.IsNullOrEmpty(resourceSetWrapper.ResourceSet.TypeName))
-            {
-                string message = Error.Format(SRResources.DynamicResourceSetTypeNameIsRequired, propertyName);
-                throw new ODataException(message);
-            }
-
-            string elementTypeName =
-                DeserializationHelpers.GetCollectionElementTypeName(resourceSetWrapper.ResourceSet.TypeName,
-                    isNested: false);
-            IEdmSchemaType elementType = readContext.Model.FindDeclaredType(elementTypeName);
-
-            IEdmTypeReference edmTypeReference = elementType.ToEdmTypeReference(true);
-            EdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(edmTypeReference));
-
-            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(collectionType);
-            if (deserializer == null)
-            {
-                throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, collectionType.FullName()));
-            }
+            IEdmCollectionTypeReference collectionType = readContext.Model.ResolveResouceSetType(resourceSetWrapper.ResourceSet);
 
             IEnumerable value = ReadNestedResourceSetInline(resourceSetWrapper, collectionType, readContext) as IEnumerable;
             object result = value;
@@ -680,10 +706,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new SerializationException(Error.Format(SRResources.TypeCannotBeDeserialized, edmType.FullName()));
             }
 
-            IEdmStructuredTypeReference structuredType = edmType.AsCollection().ElementType().AsStructured();
+            var elementType = edmType.AsCollection().ElementType();
+            IEdmStructuredTypeReference structuredType = elementType.ToStructuredTypeReference();
+
             ODataDeserializerContext nestedReadContext = readContext.CloneWithoutType();
 
-            if (readContext.IsNoClrType)
+            if (elementType.IsUntyped())
+            {
+                nestedReadContext.ResourceType = typeof(EdmUntypedCollection);
+            }
+            else if (readContext.IsNoClrType)
             {
                 if (structuredType.IsEntity())
                 {
