@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
@@ -140,6 +141,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public IDictionary<string, ComputeExpression> ComputedProperties { get; } = new Dictionary<string, ComputeExpression>();
 
         /// <summary>
+        /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
+        /// </summary>
+        public IDictionary<string, Expression> FlattenedProperties { get; set; } = new Dictionary<string, Expression>();
+
+        /// <summary>
         /// Gets the <see cref="IEdmType"/> of the element type.
         /// </summary>
         public IEdmType ElementType { get; }
@@ -238,6 +244,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 ComputedProperties[property.Alias] = property;
             }
+        }
+
+        internal void EnsureFlattenedProperties(ParameterExpression source, IQueryable query)
+        {
+            TransformationBinderBase binder = new TransformationBinderBase(this.QuerySettings, this.AssembliesResolver, this.ElementClrType, this.Model)
+            {
+                BaseQuery = query
+            };
+
+            this.FlattenedProperties = binder.GetFlattenedProperties(source);
         }
     }
 }
