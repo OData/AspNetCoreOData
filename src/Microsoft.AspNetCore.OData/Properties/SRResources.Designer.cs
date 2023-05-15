@@ -1825,6 +1825,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to identify a unique property named &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnableToIdentifyUniqueProperty {
+            get {
+                return ResourceManager.GetString("UnableToIdentifyUniqueProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Validating OData UnaryOperatorNode of kind {0} is not supported by {1}..
         /// </summary>
         internal static string UnaryNodeValidationNotSupported {

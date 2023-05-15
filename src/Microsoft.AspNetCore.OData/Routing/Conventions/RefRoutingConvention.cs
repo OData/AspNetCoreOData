@@ -101,7 +101,18 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             // Find the navigation property if have
             IEdmNavigationProperty navigationProperty = null;
-            navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name == property);
+            navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name.Equals(property, StringComparison.Ordinal));
+
+            if (navigationProperty is null && (context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))
+            {
+                IEdmNavigationProperty[] navigationProperties = declaringType.DeclaredNavigationProperties().Where(p => p.Name.Equals(property, StringComparison.OrdinalIgnoreCase)).ToArray();
+                if (navigationProperties.Length > 1)
+                {
+                    throw Error.InvalidOperation(SRResources.UnableToIdentifyUniqueProperty, property);
+                }
+
+                navigationProperty = navigationProperties.FirstOrDefault();
+            }
 
             if (navigationProperty == null)
             {

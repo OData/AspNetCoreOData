@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -147,6 +148,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             builder.EntitySet<RefCustomer>("RefCustomers");
             builder.EntitySet<RefOrder>("RefOrders");
 
+            builder.EntitySet<RefAlbum>("RefAlbums");
+            builder.EntitySet<RefArtist>("RefArtists");
+            builder.EntitySet<RefSong>("RefSongs");
+
             return builder.GetEdmModel();
         }
 
@@ -202,6 +207,86 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
 
             public void DeleteRefToSubOrderFrom(int key, int relatedKey)
             {
+            }
+        }
+
+        [Fact]
+        public void RefRoutingConventionIgnoreCaseNotUniquePropertyThrowsException()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<RefAlbumsController>("DeleteRefToSongs");
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, _edmModel, controller);
+            context.Action = controller.Actions.First();
+            context.Options.RouteOptions.EnablePropertyNameCaseInsensitive = true;
+
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => _ = _refConvention.AppliesToAction(context));
+        }
+
+        [Theory]
+        [InlineData("DeleteRefToArtist", false, false)]
+        [InlineData("DeleteRefToArtist", true, true)]
+        [InlineData("DeleteRefToSONGS", false, true)]
+        [InlineData("DeleteRefToSONGS", true, true)]
+        public void RefRoutingConventionIgnoreCaseForTestData(string actionName, bool enablePropertyNameCaseInsensitive, bool expectedResult)
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<RefAlbumsController>(actionName);
+            ActionModel action = controller.Actions.First();
+
+            ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, _edmModel, controller);
+            context.Action = controller.Actions.First();
+            context.Options.RouteOptions.EnablePropertyNameCaseInsensitive = enablePropertyNameCaseInsensitive;
+
+            // Act
+            bool result = _refConvention.AppliesToAction(context);
+
+            // Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        private class RefAlbum
+        {
+            public int Id { get; set; }
+
+            public RefArtist artist { get; set; }
+
+            public RefSong[] SONGS { get; set; }
+
+            public RefSong[] songs { get; set; }
+        }
+
+        private class RefArtist
+        {
+            public int Id { get; set; }
+
+            public string Name { get; set; }
+        }
+
+        private class RefSong
+        {
+            public int Id { get; set; }
+
+            public RefAlbum Album { get; set; }
+        }
+
+        private class RefAlbumsController
+        {
+            public string DeleteRefToArtist(int key)
+            {
+                return string.Format(CultureInfo.InvariantCulture, "DeleteRef({0})", key);
+            }
+
+            public string DeleteRefToSongs(int key, int relatedKey)
+            {
+                return string.Format(CultureInfo.InvariantCulture, "DeleteRef({0})({1})", key, relatedKey);
+            }
+
+            public string DeleteRefToSONGS(int key, int relatedKey)
+            {
+                return string.Format(CultureInfo.InvariantCulture, "DeleteRef({0})({1})", key, relatedKey);
             }
         }
     }
