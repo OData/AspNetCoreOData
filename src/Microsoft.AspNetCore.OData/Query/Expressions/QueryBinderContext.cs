@@ -143,7 +143,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.
         /// </summary>
-        public IDictionary<string, Expression> FlattenedProperties { get; set; } = new Dictionary<string, Expression>();
+        internal IDictionary<string, Expression> FlattenedProperties { get; private set; } = new Dictionary<string, Expression>();
 
         /// <summary>
         /// Gets the <see cref="IEdmType"/> of the element type.

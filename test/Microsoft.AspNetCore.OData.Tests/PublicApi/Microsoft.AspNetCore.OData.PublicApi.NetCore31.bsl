@@ -2896,7 +2896,6 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext {
 	System.Linq.Expressions.ParameterExpression CurrentParameter  { public get; }
 	System.Type ElementClrType  { public get; }
 	Microsoft.OData.Edm.IEdmType ElementType  { public get; }
-	System.Collections.Generic.IDictionary`2[[System.String],[System.Linq.Expressions.Expression]] FlattenedProperties  { public get; public set; }
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; }
