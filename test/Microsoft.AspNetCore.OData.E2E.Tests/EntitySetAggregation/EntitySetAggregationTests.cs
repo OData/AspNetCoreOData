@@ -119,7 +119,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            
             var stringObject = await response.Content.ReadAsStringAsync();
             
             Assert.Equal(expectedResult, stringObject.ToString());
