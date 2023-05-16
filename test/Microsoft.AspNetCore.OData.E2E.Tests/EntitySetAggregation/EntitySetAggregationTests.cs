@@ -103,6 +103,36 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 + 2 + 3 + 4 + 5 + 6, totalId); 
         }
 
+#if NET6_0_OR_GREATER
+
+        [Fact]
+        public async Task GroupByWithAggregationAndOrderByWorks()
+        {
+            // Arrange
+            string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((Name),aggregate(Orders(Price with sum as TotalPrice)))&$orderby=Name desc";
+            string expectedResult = "{\"value\":[{\"Name\":\"Customer1\",\"Orders\":[{\"TotalPrice\":200}]},{\"Name\":\"Customer0\",\"Orders\":[{\"TotalPrice\":400}]}]}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = Client.SendAsync(request).Result;
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var stringObject = await response.Content.ReadAsStringAsync();
+            
+            Assert.Equal(expectedResult, stringObject.ToString());
+
+            var result = await response.Content.ReadAsObject<JObject>();    
+            var value = result["value"];
+            var orders = value.First["Orders"];
+            var totalPrice = orders.First["TotalPrice"].ToObject<int>();
+
+            Assert.Equal(200, totalPrice);
+        }
+
+#endif
+
         [Fact(Skip = "See the comments above")]
         public async Task AggregationOnEntitySetWorksWithPropertyAggregation()
         {

@@ -1101,14 +1101,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>Returns null if no aggregations were used so far</returns>
         protected Expression GetFlattenedPropertyExpression(string propertyPath, QueryBinderContext context)
         {
-            if (context == null || context.ComputedProperties == null || !context.ComputedProperties.Any())
+            if (context == null || context.FlattenedProperties == null || !context.FlattenedProperties.Any())
             {
                 return null;
             }
 
-            if (context.ComputedProperties.TryGetValue(propertyPath, out var expression))
+            if (context.FlattenedProperties.TryGetValue(propertyPath, out var expression))
             {
-                return Bind(expression.Expression, context);
+                return expression;
             }
 
             return null;

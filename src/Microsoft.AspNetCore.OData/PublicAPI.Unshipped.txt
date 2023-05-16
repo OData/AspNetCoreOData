@@ -920,6 +920,8 @@ Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperti
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.CurrentParameter.get -> System.Linq.Expressions.ParameterExpression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementType.get -> Microsoft.OData.Edm.IEdmType
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties.get -> System.Collections.Generic.IDictionary<string, System.Linq.Expressions.Expression>
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties.set -> void
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetParameter(string name) -> System.Linq.Expressions.ParameterExpression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Model.get -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource

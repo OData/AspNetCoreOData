@@ -9530,6 +9530,11 @@
             Gets the compute expressions.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties">
+            <summary>
+            Flattened list of properties from base query, for case when binder is applied for aggregated query.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementType">
             <summary>
             Gets the <see cref="T:Microsoft.OData.Edm.IEdmType"/> of the element type.
