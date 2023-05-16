@@ -1332,23 +1332,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     Error.Format(SRResources.TypeCannotBeSerialized, structuralProperty.Type.FullName()));
             }
 
-            ODataProperty odataProperty =
-                serializer.CreateProperty(propertyValue, actualType, structuralProperty.Name, writeContext);
-
-            // The following codes are not-needed but ODL has the problem to write ODataPrimitiveValue for 'Edm.Untyped' declared property
-            // This's the workaround and when ODL fixes the issue at https://github.com/OData/odata.net/pull/2664,
-            // Let's update the dependency and remove these codes.
-            string untypedValue = ODataUriUtils.ConvertToUriLiteral(odataProperty.Value, ODataVersion.V4, resourceContext.EdmModel);
-
-            return new ODataProperty
-            {
-                Name = odataProperty.Name,
-                Value = new ODataUntypedValue
-                {
-                    RawValue = untypedValue,
-                    TypeAnnotation = new ODataTypeAnnotation(actualType.FullName())
-                }
-            };
+            return serializer.CreateProperty(propertyValue, actualType, structuralProperty.Name, writeContext);
         }
 
         /// <summary>

@@ -1388,8 +1388,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             innerSerializer.Verify();
             ODataProperty odataProperty = Assert.IsType<ODataProperty>(createdProperty);
             Assert.Equal("PropertyName", odataProperty.Name);
-            ODataUntypedValue untypedValue = Assert.IsType<ODataUntypedValue>(odataProperty.Value);
-            Assert.Equal("42", untypedValue.RawValue);
+            Assert.Equal(42, odataProperty.Value);
         }
 
         [Fact]

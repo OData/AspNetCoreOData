@@ -157,12 +157,13 @@ namespace ODataRoutingSample.Controllers
                 {
                     null,
                     "A string Value",
-                    // The following resources can't work: https://github.com/OData/odata.net/issues/2661
-                    // new Address { City = "Issaquah", Street = "Klahanie Way" }, 
-                    //new Person
-                    //{
-                    //    FirstName = "Kerry", LastName = "Xu"
-                    //}
+                    new Address { City = "Issaquah", Street = "Klahanie Way" },
+                    new Person
+                    {
+                        FirstName = "Kerry", LastName = "Xu",
+                        Infos = new List<object> { 1, 2, 3 }, // Collection should have a value.
+                        Sources = new List<object> { } // Collection should have a value.
+                    }
                 }
             };
 
@@ -217,7 +218,27 @@ namespace ODataRoutingSample.Controllers
         },
         [
             null,
-            "A string Value"
+            "A string Value",
+            {
+                "City": "Issaquah",
+                "Street": "Klahanie Way"
+            },
+            {
+                "@odata.type": "#ODataRoutingSample.Models.Person",
+                "@odata.id": "http://localhost:5000/People(FirstName='Kerry',LastName='Xu')",
+                "@odata.editLink": "People(FirstName='Kerry',LastName='Xu')",
+                "FirstName": "Kerry",
+                "LastName": "Xu",
+                "Data": null,
+                "Other": null,
+                "Infos": [
+                    1,
+                    2,
+                    3
+                ],
+                "Sources": [],
+                "CustomProperties": null
+            }
         ]
     ],
     "CustomProperties": {
