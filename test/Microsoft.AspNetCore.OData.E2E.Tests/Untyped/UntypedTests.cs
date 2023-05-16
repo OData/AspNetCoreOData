@@ -325,6 +325,64 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
         }
 
         [Fact]
+        public async Task QuerySinglePeople_WithCollectionInCollection_OnDeclaredUntypedProperty()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync("odata/people/99");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":99," +
+                "\"Name\":\"Chuan\"," +
+                "\"Data\":[" +
+                  "null," +
+                  "[" +
+                    "42," +
+                    "{" +
+                       "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress\"," +
+                       "\"City\":\"Redmond\"," +
+                       "\"Street\":\"134TH AVE\"" +
+                     "}" +
+                   "]" +
+                 "]," +
+                 "\"Infos\":[" +
+                   "[" +
+                     "{\"ZipCode\":\"NoAValidZip\",\"Location\":\"OnEarth\"}," + // a resource whose type is not defined in the Edm model, so there's no @odata.type
+                     "null," +
+                     "[" +
+                       "[" +
+                         "[" +
+                           "{" +
+                             "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress\"," +
+                             "\"City\":\"Issaquah\"," +
+                             "\"Street\":\"80TH ST\"" +
+                           "}" +
+                         "]" +
+                       "]" +
+                     "]" +
+                   "]," +
+                   "42" +
+                 "]," +
+                 "\"Dp\":[" +
+                   "{" +
+                     "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress\"," +
+                     "\"City\":\"BlackCastle\"," +
+                     "\"Street\":\"To Castle Rd\"" +
+                   "}" +
+                 "]" +
+               "}", payloadBody);
+        }
+
+        [Fact]
         public async Task CreatePerson_Works_RoundTrip()
         {
             // Arrange

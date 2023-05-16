@@ -147,6 +147,43 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
                         }
                     },
                 };
+
+                // Collection in collection
+                InModelPerson p = new InModelPerson
+                {
+                    Id = 99, // special Id to test collection in collection
+                    Name = "Chuan",
+                    Data = new object[]
+                        {
+                            null,
+                            new object[] { 42, new InModelAddress { City = "Redmond", Street = "134TH AVE" } }
+                        },
+                    Infos = new object[]
+                    {
+                        new EdmUntypedCollection
+                        {
+                            new NotInModelAddress { ZipCode = "NoAValidZip", Location = "OnEarth" },
+                            null,
+                            new EdmUntypedCollection
+                            {
+                                new EdmUntypedCollection
+                                {
+                                    new object[]
+                                    {
+                                        new InModelAddress { City = "Issaquah", Street = "80TH ST" }
+                                    }
+                                }
+                            }
+                        },
+                        42
+                    },
+                    Containers = new Dictionary<string, object>
+                    {
+                        { "Dp", new object[] { new InModelAddress{ City = "BlackCastle", Street = "To Castle Rd" } } }
+                    }
+                };
+
+                _people.Add(p);
             }
 
             return _people;
