@@ -1719,7 +1719,6 @@ static Microsoft.AspNetCore.OData.Formatter.Serialization.DefaultUntypedResource
 static Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(Microsoft.OData.ODataCollectionValue value, Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel metadataLevel) -> void
 static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResource(this Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject resource) -> bool
 static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsDeltaResourceSet(this Microsoft.OData.Edm.IEdmType type) -> bool
-static Microsoft.AspNetCore.OData.Formatter.Value.EdmTypeExtensions.IsUntypedResource(this Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject resource) -> bool
 static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSet(this Microsoft.OData.ODataReader reader) -> Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper
 static Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataReaderExtensions.ReadResourceOrResourceSetAsync(this Microsoft.OData.ODataReader reader) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper>
 static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataBatching(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
