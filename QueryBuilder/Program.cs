@@ -1,6 +1,6 @@
-﻿namespace QueryBuilder
-{
-    public class MyClass
-    {
-    }
-}
+﻿//namespace QueryBuilder
+//{
+//    public class MyClass
+//    {
+//    }
+//}
