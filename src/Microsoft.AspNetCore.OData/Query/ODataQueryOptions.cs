@@ -364,6 +364,17 @@ namespace Microsoft.AspNetCore.OData.Query
                 this.Context.ElementClrType = Apply.ResultClrType;
             }
 
+            // We need this code to let 'ODataQueryOptionParser' to parse the 'ComputeClause'
+            // By parsing the compute clause, we give the parser opportunity to gather the 'computed' properties
+            // which could be required in $filter, $order and $select, etc.
+            // Without this code, it will be failed when customer only uses 'ODataQueryOptions<T>' as the parameter in action.
+            // It should work if customer uses [EnableQuery], this is because [EnableQuery] calls validators
+            // and the validators parse the 'ComputeClause' already.
+            if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
+            {
+                _ = Compute.ComputeClause;
+            }
+
             // TODO: need pass the result from $compute to the remaining query options
             // Construct the actual query and apply them in the following order: filter, orderby, skip, top
             if (IsAvailableODataQueryOption(Filter, querySettings, AllowedQueryOptions.Filter))

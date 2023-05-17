@@ -20,4 +20,15 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
     {
         public string Id { get; set; }
     }
+
+    public class Weather
+    {
+        public int Id { get; set; }
+
+        public int TemperatureC { get; set; }
+
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+
+        public string Summary { get; set; }
+    }
 }
