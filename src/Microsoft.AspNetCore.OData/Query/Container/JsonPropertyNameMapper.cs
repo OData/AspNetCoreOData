@@ -28,7 +28,14 @@ namespace Microsoft.AspNetCore.OData.Query.Container
 
         public string MapProperty(string propertyName)
         {
-            IEdmProperty property = _type.Properties().Single(s => s.Name == propertyName);
+            IEdmProperty property = _type.Properties().FirstOrDefault(s => s.Name == propertyName);
+            if (property == null)
+            {
+                // If we can't find a property on the Edm type, it could be a dynamic property.
+                // We should simply return the property name.
+                return propertyName;
+            }
+
             PropertyInfo info = GetPropertyInfo(property);
 
             JsonIgnoreAttribute jsonIgnore = GetJsonIgnore(info);

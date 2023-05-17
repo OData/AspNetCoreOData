@@ -128,5 +128,57 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
             Assert.Equal("CustId", customer.Id);
             Assert.Null(customer.Books);
         }
+
+        [Fact]
+        public async Task ActionResult_NonODataPathReturnsComputedProperties_UsedInSelect()
+        {
+            // Arrange
+            string queryUrl = "api/weather?$compute=length(Summary) as len&$select=summary,len&$top=3";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("[" +
+                "{\"Summary\":\"Freezing\",\"len\":8}," +
+                "{\"Summary\":\"Bracing\",\"len\":7}," +
+                "{\"Summary\":\"Chilly\",\"len\":6}]",
+                payload);
+        }
+
+        [Fact]
+        public async Task ActionResult_NonODataPathReturnsComputedProperties_UsedInFilterAndOrderByAndSelect()
+        {
+            // Arrange
+            string queryUrl = "api/weather?$compute=length(Summary) as len,substring(Summary,1,1) as SecondChar&" +
+                "$select=summary,SecondChar&" +
+                "$filter=len eq 4&" +
+                "$orderby=SecondChar";
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("[" +
+                "{\"Summary\":\"Warm\",\"SecondChar\":\"a\"}," +
+                "{\"Summary\":\"Mild\",\"SecondChar\":\"i\"}," +
+                "{\"Summary\":\"Cool\",\"SecondChar\":\"o\"}]",
+                payload);
+        }
     }
 }

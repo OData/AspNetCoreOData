@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -34,6 +35,26 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
                     },
                 },
             });
+        }
+
+        private static readonly string[] Summaries = new[]
+        {
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+        };
+
+        [HttpGet("/api/weather")]
+        public IActionResult Get(ODataQueryOptions<Weather> options)
+        {
+            var data = Enumerable.Range(1, 10).Select(index => new Weather
+            {
+                Id = index,
+                TemperatureC = 22 + index,
+                Summary = Summaries[index - 1]
+            })
+            .ToArray()
+            .AsQueryable();
+
+            return Ok(options.ApplyTo(data));
         }
     }
 }
