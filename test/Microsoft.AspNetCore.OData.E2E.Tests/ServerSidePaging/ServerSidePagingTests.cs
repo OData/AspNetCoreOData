@@ -38,7 +38,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             IEdmModel edmModel = GetEdmModel();
             services.ConfigureControllers(
                 typeof(ServerSidePagingCustomersController),
-                typeof(ServerSidePagingEmployeesController));
+                typeof(ServerSidePagingEmployeesController),
+                typeof(ContainmentPagingCustomersController),
+                typeof(ContainmentPagingCompanyController),
+                typeof(NoContainmentPagingCustomersController),
+                typeof(ContainmentPagingMenusController),
+                typeof(ContainmentPagingRibbonController));
             services.AddControllers().AddOData(opt => opt.Expand().OrderBy().AddRouteComponents("{a}", edmModel));
         }
 
@@ -47,6 +52,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             ODataModelBuilder builder = new ODataConventionModelBuilder();
             builder.EntitySet<ServerSidePagingOrder>("ServerSidePagingOrders").EntityType.HasRequired(d => d.ServerSidePagingCustomer);
             builder.EntitySet<ServerSidePagingCustomer>("ServerSidePagingCustomers").EntityType.HasMany(d => d.ServerSidePagingOrders);
+            builder.EntitySet<ContainmentPagingCustomer>("ContainmentPagingCustomers");
+            builder.Singleton<ContainmentPagingCustomer>("ContainmentPagingCompany");
+            builder.EntitySet<NoContainmentPagingCustomer>("NoContainmentPagingCustomers");
+            builder.EntitySet<NoContainmentPagingOrder>("NoContainmentPagingOrders");
+            builder.EntitySet<NoContainmentPagingOrderItem>("NoContainmentPagingOrderItems");
+            builder.EntitySet<ContainmentPagingMenu>("ContainmentPagingMenus");
+            builder.EntitySet<ContainmentPagingPanel>("ContainmentPagingPanels");
+            builder.Singleton<ContainmentPagingMenu>("ContainmentPagingRibbon");
 
             var getEmployeesHiredInPeriodFunction = builder.EntitySet<ServerSidePagingEmployee>(
                 "ServerSidePagingEmployees").EntityType.Collection.Function("GetEmployeesHiredInPeriod");
@@ -123,6 +136,307 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
                 "/prefix/ServerSidePagingEmployees/GetEmployeesHiredInPeriod(fromDate=@fromDate,toDate=@toDate)" +
                 "?%40fromDate=2023-01-07T00%3A00%3A00%2B00%3A00&%40toDate=2023-05-07T00%3A00%3A00%2B00%3A00&$skip=3",
                 content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForNestedExpandInContainmentScenario()
+        {
+            // Arrange
+            var requestUri = "/prefix/ContainmentPagingCustomers?$expand=Orders($expand=Items)";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("/prefix/ContainmentPagingCustomers/1/Orders/1/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCustomers/1/Orders/2/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCustomers/1/Orders?$expand=Items&$skip=2", content);
+
+            Assert.Contains("/prefix/ContainmentPagingCustomers/2/Orders/4/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCustomers/2/Orders/5/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCustomers/2/Orders?$expand=Items&$skip=2", content);
+
+            Assert.Contains("/prefix/ContainmentPagingCustomers?$expand=Orders", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyAsODataPathSegment()
+        {
+            // Arrange
+            var requestUri = "/prefix/ContainmentPagingCustomers/2/Orders?$expand=Items";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("/prefix/ContainmentPagingCustomers/2/Orders/4/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCustomers/2/Orders/5/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCustomers/2/Orders?$expand=Items&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyInSingletonScenario()
+        {
+            // Arrange
+            var requestUri = "/prefix/ContainmentPagingCompany?$expand=Orders($expand=Items)";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("/prefix/ContainmentPagingCompany/Orders/1/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCompany/Orders/2/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCompany/Orders?$expand=Items&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyAsODataPathSegmentInSingletonScenario()
+        {
+            // Arrange
+            var requestUri = "/prefix/ContainmentPagingCompany/Orders?$expand=Items";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("/prefix/ContainmentPagingCompany/Orders/1/Items?$skip=2", content);
+            Assert.Contains("/prefix/ContainmentPagingCompany/Orders/2/Items?$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForNestedExpandInNoContainmentScenario()
+        {
+            // Arrange
+            var requestUri = "/prefix/NoContainmentPagingCustomers?$expand=Orders($expand=Items)";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("/prefix/NoContainmentPagingOrders/1/Items?$skip=2", content);
+            Assert.Contains("/prefix/NoContainmentPagingOrders/2/Items?$skip=2", content);
+            Assert.Contains("/prefix/NoContainmentPagingCustomers/1/Orders?$expand=Items&$skip=2", content);
+
+            Assert.Contains("/prefix/NoContainmentPagingOrders/4/Items?$skip=2", content);
+            Assert.Contains("/prefix/NoContainmentPagingOrders/5/Items?$skip=2", content);
+            Assert.Contains("/prefix/NoContainmentPagingCustomers/2/Orders?$expand=Items&$skip=2", content);
+
+            Assert.Contains("/prefix/NoContainmentPagingCustomers?$expand=Orders", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForNonContainedNavigationPropertyAsODataPathSegment()
+        {
+            // Arrange
+            var requestUri = "/prefix/NoContainmentPagingCustomers/2/Orders?$expand=Items";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains("/prefix/NoContainmentPagingOrders/4/Items?$skip=2", content);
+            Assert.Contains("/prefix/NoContainmentPagingOrders/5/Items?$skip=2", content);
+            Assert.Contains("/prefix/NoContainmentPagingCustomers/2/Orders?$expand=Items&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyDeclaredOnDerivedType()
+        {
+            // Arrange
+            var extendedMenuTypeName = typeof(ContainmentPagingExtendedMenu).FullName;
+            var extendedTabTypeName = typeof(ContainedPagingExtendedTab).FullName;
+            var extendedItemTypeName = typeof(ContainedPagingExtendedItem).FullName;
+            var menusResourcePath = "/prefix/ContainmentPagingMenus";
+            var menu1ResourcePath = $"/prefix/ContainmentPagingMenus/1/{extendedMenuTypeName}";
+            var menu2ResourcePath = $"/prefix/ContainmentPagingMenus/2/{extendedMenuTypeName}";
+
+            var requestUri = $"{menusResourcePath}?$expand={extendedMenuTypeName}/Tabs($expand={extendedTabTypeName}/Items($expand={extendedItemTypeName}/Notes))";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains($"{menu1ResourcePath}/Tabs/1/{extendedTabTypeName}/Items/1/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/1/{extendedTabTypeName}/Items/2/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/1/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/2/{extendedTabTypeName}/Items/4/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/2/{extendedTabTypeName}/Items/5/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/2/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs?$expand={extendedTabTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+
+            Assert.Contains($"{menu2ResourcePath}/Tabs/4/{extendedTabTypeName}/Items/10/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Tabs/4/{extendedTabTypeName}/Items/11/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Tabs/4/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Tabs/5/{extendedTabTypeName}/Items/13/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Tabs/5/{extendedTabTypeName}/Items/14/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Tabs/5/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Tabs?$expand={extendedTabTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyDeclaredOnDerivedTypeAsODataPathSegment()
+        {
+            // Arrange
+            var extendedMenuTypeName = typeof(ContainmentPagingExtendedMenu).FullName;
+            var extendedTabTypeName = typeof(ContainedPagingExtendedTab).FullName;
+            var extendedItemTypeName = typeof(ContainedPagingExtendedItem).FullName;
+            var menu1ResourcePath = $"/prefix/ContainmentPagingMenus/1/{extendedMenuTypeName}";
+
+            var requestUri = $"{menu1ResourcePath}/Tabs?$expand={extendedTabTypeName}/Items($expand={extendedItemTypeName}/Notes)";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains($"{menu1ResourcePath}/Tabs/1/{extendedTabTypeName}/Items/1/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/1/{extendedTabTypeName}/Items/2/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/1/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/2/{extendedTabTypeName}/Items/4/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/2/{extendedTabTypeName}/Items/5/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs/2/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Tabs?$expand={extendedTabTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyDeclaredOnDerivedTypeInSingletonScenario()
+        {
+            // Arrange
+            var extendedMenuTypeName = typeof(ContainmentPagingExtendedMenu).FullName;
+            var extendedTabTypeName = typeof(ContainedPagingExtendedTab).FullName;
+            var extendedItemTypeName = typeof(ContainedPagingExtendedItem).FullName;
+            var ribbonResourcePath = $"/prefix/ContainmentPagingRibbon";
+
+            var requestUri = $"{ribbonResourcePath}?$expand={extendedMenuTypeName}/Tabs($expand={extendedTabTypeName}/Items($expand={extendedItemTypeName}/Notes))";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs/1/{extendedTabTypeName}/Items/1/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs/1/{extendedTabTypeName}/Items/2/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs/1/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs/2/{extendedTabTypeName}/Items/4/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs/2/{extendedTabTypeName}/Items/5/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs/2/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/{extendedMenuTypeName}/Tabs?$expand={extendedTabTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForContainedNavigationPropertyDeclaredOnDerivedTypeAsODataPathSegmentInSingletonScenario()
+        {
+            // Arrange
+            var extendedMenuTypeName = typeof(ContainmentPagingExtendedMenu).FullName;
+            var extendedTabTypeName = typeof(ContainedPagingExtendedTab).FullName;
+            var extendedItemTypeName = typeof(ContainedPagingExtendedItem).FullName;
+            var ribbonResourcePath = $"/prefix/ContainmentPagingRibbon/{extendedMenuTypeName}";
+
+            var requestUri = $"{ribbonResourcePath}/Tabs?$expand={extendedTabTypeName}/Items($expand={extendedItemTypeName}/Notes)";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains($"{ribbonResourcePath}/Tabs/1/{extendedTabTypeName}/Items/1/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/Tabs/1/{extendedTabTypeName}/Items/2/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/Tabs/1/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/Tabs/2/{extendedTabTypeName}/Items/4/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/Tabs/2/{extendedTabTypeName}/Items/5/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/Tabs/2/{extendedTabTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{ribbonResourcePath}/Tabs?$expand={extendedTabTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForNonContainedNavigationPropertyDeclaredOnDerivedType()
+        {
+            // Arrange
+            var extendedMenuTypeName = typeof(ContainmentPagingExtendedMenu).FullName;
+            var extendedPanelTypeName = typeof(ContainmentPagingExtendedPanel).FullName;
+            var extendedItemTypeName = typeof(ContainedPagingExtendedItem).FullName;
+            var menusResourcePath = $"/prefix/ContainmentPagingMenus";
+            var menu1ResourcePath = $"/prefix/ContainmentPagingMenus/1/{extendedMenuTypeName}";
+            var menu2ResourcePath = $"/prefix/ContainmentPagingMenus/2/{extendedMenuTypeName}";
+
+            var requestUri = $"{menusResourcePath}?$expand={extendedMenuTypeName}/Panels($expand={extendedPanelTypeName}/Items($expand={extendedItemTypeName}/Notes))";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains($"/prefix/ContainmentPagingPanels/1/{extendedPanelTypeName}/Items/1/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/1/{extendedPanelTypeName}/Items/2/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/1/{extendedPanelTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/2/{extendedPanelTypeName}/Items/4/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/2/{extendedPanelTypeName}/Items/5/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/2/{extendedPanelTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Panels?$expand={extendedPanelTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+
+            Assert.Contains($"/prefix/ContainmentPagingPanels/4/{extendedPanelTypeName}/Items/10/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/4/{extendedPanelTypeName}/Items/11/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/4/{extendedPanelTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/5/{extendedPanelTypeName}/Items/13/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/5/{extendedPanelTypeName}/Items/14/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/5/{extendedPanelTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu2ResourcePath}/Panels?$expand={extendedPanelTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
+        }
+
+        [Fact]
+        public async Task VerifyExpectedNextLinksGeneratedForNonContainedNavigationPropertyDeclaredOnDerivedTypeAsODataPathSegment()
+        {
+            // Arrange
+            var extendedMenuTypeName = typeof(ContainmentPagingExtendedMenu).FullName;
+            var extendedPanelTypeName = typeof(ContainmentPagingExtendedPanel).FullName;
+            var extendedItemTypeName = typeof(ContainedPagingExtendedItem).FullName;
+            var menu1ResourcePath = $"/prefix/ContainmentPagingMenus/1/{extendedMenuTypeName}";
+
+            var requestUri = $"{menu1ResourcePath}/Panels?$expand={extendedPanelTypeName}/Items($expand={extendedItemTypeName}/Notes)";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var client = CreateClient();
+
+            // Act
+            var response = await client.SendAsync(request);
+            var content = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Contains($"/prefix/ContainmentPagingPanels/1/{extendedPanelTypeName}/Items/1/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/1/{extendedPanelTypeName}/Items/2/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/1/{extendedPanelTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/2/{extendedPanelTypeName}/Items/4/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/2/{extendedPanelTypeName}/Items/5/{extendedItemTypeName}/Notes?$skip=2", content);
+            Assert.Contains($"/prefix/ContainmentPagingPanels/2/{extendedPanelTypeName}/Items?$expand={extendedItemTypeName}%2FNotes&$skip=2", content);
+            Assert.Contains($"{menu1ResourcePath}/Panels?$expand={extendedPanelTypeName}%2FItems%28%24expand%3D{extendedItemTypeName}%2FNotes%29&$skip=2", content);
         }
     }
 
