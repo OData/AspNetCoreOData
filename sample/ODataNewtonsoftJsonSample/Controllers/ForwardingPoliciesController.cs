@@ -78,10 +78,20 @@ namespace ODataRoutingSample.Controllers.v1
         [EnableQuery]
         public IActionResult Patch(int key, Delta<ForwardingPolicy> delta)
         {
-            
+            /*
+PATCH http://localhost:12197/v1/ForwardingPolicies/320343815
+{
+   "PolicyRules@delta": [
+    {
+        "@odata.type": "Microsoft.Naas.Contracts.ControlPlane.MsGraphModels.Rules.m365ForwardingRule",
+      "Name":"Microsoft"
+   }
+  ]
+}
+            */
 
             // Or using the following payload (v4.0 format)
-            
+
 
             if (delta != null && delta.TryGetPropertyValue("Departs", out object value))
             {
