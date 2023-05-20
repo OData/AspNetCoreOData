@@ -177,6 +177,26 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         }
 
         [Fact]
+        public async Task Gdebruin()
+        {
+            // Arrange
+            string queryUrl = "autoexpand/Customers/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.Finding?$expand=Resource($expand=Service)";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var customer = await response.Content.ReadAsObject<JObject>();
+            Assert.NotNull(customer);
+            VerifyOrderAndChoiceOrder(customer);
+            Assert.Null(customer["Friend"]);
+        }
+
+        [Fact]
         public async Task QueryForAnResource_LevelsWithAutoExpandInSameNavigationProperty()
         {
             // Arrange

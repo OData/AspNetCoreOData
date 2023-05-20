@@ -6,10 +6,16 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OData.E2E.Tests.Routing;
 using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
 {
+    public class Finding : Customer
+    {
+        public AwsResource Resource { get; set; }
+    }
+
     [AutoExpand]
     public class Customer
     {
@@ -20,6 +26,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         public Order Order { get; set; }
 
         public Customer Friend { get; set; }
+    }
+
+    public class Resource
+    {
+        public string Id { get; set; }
+    }
+
+    public class AwsResource : Resource
+    {
+        public Service Service { get; set; }
+    }
+
+    public class Service
+    {
+        public string Id { get; set; }
     }
 
     public class Address

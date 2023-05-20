@@ -30,6 +30,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             builder.EntitySet<Tab>("Tabs");
             builder.EntitySet<Item>("Items");
             builder.EntitySet<Note>("Notes");
+            builder.EntitySet<Resource>("Resources");
+            builder.EntitySet<Service>("Services");
             IEdmModel model = builder.GetEdmModel();
             return model;
         }

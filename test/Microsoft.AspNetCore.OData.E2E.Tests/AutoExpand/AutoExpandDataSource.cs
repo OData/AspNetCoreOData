@@ -59,20 +59,51 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
                 }
 
                 // Order.Id is from 1 ~ 9
-                var customer = new Customer
+                Customer customer;
+
+
+                if (i == 1)
                 {
-                    Id = i,
-                    HomeAddress = address,
-                    Order = new Order
+                    customer = new Finding
                     {
                         Id = i,
-                        Choice = new ChoiceOrder
+                        HomeAddress = address,
+                        Order = new Order
                         {
                             Id = i,
-                            Amount = i * 1000
-                        }
-                    },
-                };
+                            Choice = new ChoiceOrder
+                            {
+                                Id = i,
+                                Amount = i * 1000
+                            }
+                        },
+                        Resource = new AwsResource()
+                        {
+                            Id = "some bucket",
+                            Service = new Service()
+                            {
+                                Id = "s3",
+                            },
+                        },
+                    };
+                }
+                else
+                {
+                    customer = new Customer
+                    {
+                        Id = i,
+                        HomeAddress = address,
+                        Order = new Order
+                        {
+                            Id = i,
+                            Choice = new ChoiceOrder
+                            {
+                                Id = i,
+                                Amount = i * 1000
+                            }
+                        },
+                    };
+                }
 
                 if (i > 1)
                 {
