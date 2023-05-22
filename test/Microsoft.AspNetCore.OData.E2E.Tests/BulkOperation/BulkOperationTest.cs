@@ -12,7 +12,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using static Microsoft.AspNetCore.OData.E2E.Tests.BulkOperation.BulkOperationController;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.BulkOperation
 {

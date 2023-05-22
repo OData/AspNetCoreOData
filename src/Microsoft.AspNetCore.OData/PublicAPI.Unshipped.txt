@@ -3,7 +3,7 @@ abstract Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync
 abstract Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter writer) -> System.Threading.Tasks.Task
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.Clear() -> void
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-abstract Microsoft.AspNetCore.OData.Deltas.Delta.GetNestedProperties() -> System.Collections.Generic.IDictionary<string, object>
+abstract Microsoft.AspNetCore.OData.Deltas.Delta.GetDeltaNestedNavigationProperties() -> System.Collections.Generic.IDictionary<string, object>
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.TryGetPropertyType(string name, out System.Type type) -> bool
@@ -180,7 +180,6 @@ Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta() -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo) -> void
-Microsoft.AspNetCore.OData.Deltas.Delta<T>.DeltaNestedResources.get -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetInstance() -> T
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Patch(T original) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Put(T original) -> void
@@ -207,7 +206,7 @@ Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.StructuredType.get -> System.Type
 Microsoft.AspNetCore.OData.Deltas.IDelta
 Microsoft.AspNetCore.OData.Deltas.IDelta.Clear() -> void
 Microsoft.AspNetCore.OData.Deltas.IDelta.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-Microsoft.AspNetCore.OData.Deltas.IDelta.GetNestedProperties() -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.AspNetCore.OData.Deltas.IDelta.GetDeltaNestedNavigationProperties() -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Deltas.IDelta.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyType(string name, out System.Type type) -> bool
 Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyValue(string name, out object value) -> bool
@@ -1485,7 +1484,7 @@ override Microsoft.AspNetCore.OData.Deltas.Delta.TryGetMember(System.Dynamic.Get
 override Microsoft.AspNetCore.OData.Deltas.Delta.TrySetMember(System.Dynamic.SetMemberBinder binder, object value) -> bool
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.Clear() -> void
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-override Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetNestedProperties() -> System.Collections.Generic.IDictionary<string, object>
+override Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetDeltaNestedNavigationProperties() -> System.Collections.Generic.IDictionary<string, object>
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Deltas.Delta<T>.TryGetPropertyType(string name, out System.Type type) -> bool
@@ -1536,7 +1535,7 @@ override Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaDeletedResourceObjec
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Clear() -> void
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetChangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
-override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetNestedProperties() -> System.Collections.Generic.IDictionary<string, object>
+override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetDeltaNestedNavigationProperties() -> System.Collections.Generic.IDictionary<string, object>
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetUnchangedPropertyNames() -> System.Collections.Generic.IEnumerable<string>
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 override Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.TryGetPropertyType(string name, out System.Type type) -> bool

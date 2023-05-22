@@ -1413,7 +1413,7 @@
             enumeration of Property Names
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetNestedProperties">
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetDeltaNestedNavigationProperties">
             <summary>
             Gets the nested resources changed at this level.
             </summary>
@@ -1699,7 +1699,7 @@
             properties.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetNestedProperties">
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetDeltaNestedNavigationProperties">
             <summary>
             Gets the nested resources changed at this level.
             </summary>
@@ -1773,7 +1773,7 @@
             enumerable of Property Names
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetNestedProperties">
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetDeltaNestedNavigationProperties">
             <summary>
             Gets the nested resources changed at this level.
             </summary>
@@ -5783,7 +5783,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetChangedPropertyNames">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetNestedProperties">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetDeltaNestedNavigationProperties">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetUnchangedPropertyNames">

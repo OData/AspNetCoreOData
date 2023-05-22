@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <summary>
         /// Gets the nested resources changed at this level.
         /// </summary>
-        IDictionary<string, object> GetNestedProperties();
+        IDictionary<string, object> GetDeltaNestedNavigationProperties();
 
         /// <summary>
         /// Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.

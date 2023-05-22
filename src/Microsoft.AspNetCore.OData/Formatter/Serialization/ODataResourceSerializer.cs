@@ -298,7 +298,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             else if (resourceContext.ResourceInstance is IDelta deltaObject)
             {
                 IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
-                IDictionary<string, object> deltaNestedProperties = deltaObject.GetNestedProperties();
+                IDictionary<string, object> deltaNestedProperties = deltaObject.GetDeltaNestedNavigationProperties();
 
                 foreach (IEdmNavigationProperty navigationProperty in navigationProperties)
                 {

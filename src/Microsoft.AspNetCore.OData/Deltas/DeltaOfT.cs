@@ -314,7 +314,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <summary>
         /// Gets the nested resources changed at this level.
         /// </summary>
-        public override IDictionary<string, object> GetNestedProperties()
+        public override IDictionary<string, object> GetDeltaNestedNavigationProperties()
         {
             return _deltaNestedResources;
         }

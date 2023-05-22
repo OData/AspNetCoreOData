@@ -208,7 +208,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <inheritdoc/>
-        public override IDictionary<string, object> GetNestedProperties()
+        public override IDictionary<string, object> GetDeltaNestedNavigationProperties()
         {
             return default;
         }
