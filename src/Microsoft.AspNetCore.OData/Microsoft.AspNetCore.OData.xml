@@ -1647,11 +1647,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
             <inheritdoc/>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.DeltaNestedResources">
-            <summary>
-            Gets the nested resources changed at this level.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.UpdatableProperties">
             <summary>
             The list of property names that can be updated.

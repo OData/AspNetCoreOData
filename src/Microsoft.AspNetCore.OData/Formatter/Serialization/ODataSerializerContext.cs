@@ -84,6 +84,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Items = context.Items;
             ExpandReference = context.ExpandReference;
             TimeZone = context.TimeZone;
+            Type = context.Type;
 
             QueryContext = queryContext;
 
