@@ -210,7 +210,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <inheritdoc/>
         public override IDictionary<string, object> GetNestedProperties()
         {
-            return null;
+            return default;
         }
 
         /// <inheritdoc/>
