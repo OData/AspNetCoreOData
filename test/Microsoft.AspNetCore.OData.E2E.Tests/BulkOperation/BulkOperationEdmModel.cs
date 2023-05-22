@@ -13,20 +13,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BulkOperation
 {
     internal class BulkOperationEdmModel
     {
-        public static IEdmModel GetExplicitModel()
-        {
-            ODataModelBuilder builder = new ODataModelBuilder();
-            var employee = builder.EntityType<Employee>();
-            employee.HasKey(c => c.ID);
-            employee.Property(c => c.Name);
-            employee.CollectionProperty<Friend>(c => c.Friends);
-
-            EntitySetConfiguration<Employee> employees = builder.EntitySet<Employee>("Employees");
-            builder.Namespace = typeof(Employee).Namespace;
-            
-            return builder.GetEdmModel();
-        }
-
         public static IEdmModel GetConventionModel()
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();

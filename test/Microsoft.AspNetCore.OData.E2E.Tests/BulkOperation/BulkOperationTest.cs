@@ -27,9 +27,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.BulkOperation
             services.ConfigureControllers(typeof(EmployeesController));
 
             var edmModel1 = BulkOperationEdmModel.GetConventionModel();
-            var edmModel2 = BulkOperationEdmModel.GetExplicitModel();
-            services.AddControllers().AddOData(opt => opt.AddRouteComponents("convention", edmModel1)
-                .AddRouteComponents("explicit", edmModel2).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+
+            services.AddControllers().AddOData(opt => opt.AddRouteComponents("convention", edmModel1).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
         }
 
         [Fact]
