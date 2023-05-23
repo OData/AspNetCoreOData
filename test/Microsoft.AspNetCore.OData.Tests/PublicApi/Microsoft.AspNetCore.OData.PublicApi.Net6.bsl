@@ -461,6 +461,7 @@ public enum Microsoft.AspNetCore.OData.Deltas.DeltaItemKind : int {
 public interface Microsoft.AspNetCore.OData.Deltas.IDelta : IDeltaSetItem {
 	void Clear ()
 	System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetDeltaNestedNavigationProperties ()
 	System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
 	bool TryGetPropertyType (string name, out System.Type& type)
 	bool TryGetPropertyValue (string name, out System.Object& value)
@@ -491,6 +492,7 @@ public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.D
 
 	public abstract void Clear ()
 	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	public abstract System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetDeltaNestedNavigationProperties ()
 	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
 	public virtual bool TryGetMember (System.Dynamic.GetMemberBinder binder, out System.Object& result)
 	public abstract bool TryGetPropertyType (string name, out System.Type& type)
@@ -517,6 +519,7 @@ public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OD
 	public void CopyChangedValues (T original)
 	public void CopyUnchangedValues (T original)
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetDeltaNestedNavigationProperties ()
 	public T GetInstance ()
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
 	public void Patch (T original)
@@ -2441,6 +2444,7 @@ public abstract class Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredOb
 
 	public virtual void Clear ()
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
+	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetDeltaNestedNavigationProperties ()
 	public virtual Microsoft.OData.Edm.IEdmTypeReference GetEdmType ()
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
 	public System.Collections.Generic.Dictionary`2[[System.String],[System.Object]] TryGetDynamicProperties ()

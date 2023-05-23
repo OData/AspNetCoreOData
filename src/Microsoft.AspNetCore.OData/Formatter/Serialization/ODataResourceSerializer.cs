@@ -25,6 +25,7 @@ using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.Nav
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
+using System.Xml.Linq;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -142,13 +143,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     await writer.WriteStartAsync(resource).ConfigureAwait(false);
                     await WriteDeltaComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    //TODO: Need to add support to write Navigation Links, etc. using Delta Writer
-                    //https://github.com/OData/odata.net/issues/155
-                    //CLEANUP: merge delta logic with regular logic; requires common base between ODataWriter and ODataDeltaWriter
-                    //WriteDynamicComplexProperties(resourceContext, writer);
-                    //WriteNavigationLinks(selectExpandNode.SelectedNavigationProperties, resourceContext, writer);
-                    //WriteExpandedNavigationProperties(selectExpandNode.ExpandedNavigationProperties, resourceContext, writer);
-
+                    await WriteDeltaNavigationPropertiesAsync(selectExpandNode, resourceContext, writer);
                     await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
@@ -168,10 +163,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
             {
-                IDelta deltaObject = resourceContext.EdmObject as IDelta;
-                IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
-
-                complexProperties = complexProperties.Where(p => changedProperties.Contains(p.Name));
+                if (resourceContext.EdmObject is TypedEdmEntityObject obj && obj.Instance is IDelta deltaObject)
+                {
+                    IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
+                    complexProperties = complexProperties.Where(p => changedProperties.Contains(p.Name));
+                }
             }
 
             foreach (IEdmStructuralProperty complexProperty in complexProperties)
@@ -189,8 +185,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private async Task WriteDeltaComplexAndExpandedNavigationPropertyAsync(IEdmProperty edmProperty, SelectExpandClause selectExpandClause,
-            ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteDeltaComplexAndExpandedNavigationPropertyAsync(
+            IEdmProperty edmProperty,
+            SelectExpandClause selectExpandClause,
+            ResourceContext resourceContext,
+            ODataWriter writer,
+            Type navigationPropertyType = null)
         {
             Contract.Assert(edmProperty != null);
             Contract.Assert(resourceContext != null);
@@ -223,7 +223,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 // create the serializer context for the complex and expanded item.
                 ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, selectExpandClause, edmProperty);
-
+                nestedWriteContext.Type = navigationPropertyType;
                 // write object.
 
                 // TODO: enable overriding serializer based on type. Currently requires serializer supports WriteDeltaObjectinline, because it takes an ODataDeltaWriter
@@ -236,14 +236,79 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 if (edmProperty.Type.IsCollection())
                 {
                     ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
-                    await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
-                        .ConfigureAwait(false);
+                    await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext).ConfigureAwait(false);
                 }
                 else
                 {
                     ODataResourceSerializer serializer = new ODataResourceSerializer(SerializerProvider);
-                    await serializer.WriteDeltaObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext)
-                        .ConfigureAwait(false);
+                    await serializer.WriteDeltaObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext).ConfigureAwait(false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes delta navigation properties asynchronously.
+        /// </summary>
+        /// <param name="selectExpandNode">Contains the set of properties and actions to use to select and expand while writing an entity.</param>
+        /// <param name="resourceContext">The resource context for the resource being written.</param>
+        /// <param name="writer">The ODataWriter.</param>
+        /// <returns>A task that represents the asynchronous write operation</returns>
+        internal async Task WriteDeltaNavigationPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+        {
+            Contract.Assert(resourceContext != null, "The ResourceContext cannot be null");
+            Contract.Assert(writer != null, "The ODataWriter cannot be null");
+
+            IEnumerable<KeyValuePair<IEdmNavigationProperty, Type>> navigationProperties = GetNavigationPropertiesToWrite(selectExpandNode, resourceContext);
+
+            foreach (KeyValuePair<IEdmNavigationProperty, Type> navigationProperty in navigationProperties)
+            {
+                ODataNestedResourceInfo nestedResourceInfo = new ODataNestedResourceInfo
+                {
+                    IsCollection = navigationProperty.Key.Type.IsCollection(),
+                    Name = navigationProperty.Key.Name
+                };
+
+                await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
+                await WriteDeltaComplexAndExpandedNavigationPropertyAsync(navigationProperty.Key, null, resourceContext, writer, navigationProperty.Value).ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
+            }
+        }
+
+        private IEnumerable<KeyValuePair<IEdmNavigationProperty, Type>> GetNavigationPropertiesToWrite(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
+        {
+            ISet<IEdmNavigationProperty> navigationProperties = selectExpandNode.SelectedNavigationProperties;
+
+            if (navigationProperties == null)
+            {
+                yield break;
+            }
+
+            if (resourceContext.EdmObject is IDelta changedObject)
+            {
+                IEnumerable<string> changedProperties = changedObject.GetChangedPropertyNames();
+
+                foreach (IEdmNavigationProperty navigationProperty in navigationProperties)
+                {
+                    if (changedProperties != null && changedProperties.Contains(navigationProperty.Name))
+                    {
+                        yield return new KeyValuePair<IEdmNavigationProperty, Type>(navigationProperty, typeof(IEdmChangedObject));
+                    }
+                }
+            }
+            else if (resourceContext.ResourceInstance is IDelta deltaObject)
+            {
+                IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
+                IDictionary<string, object> deltaNestedProperties = deltaObject.GetDeltaNestedNavigationProperties();
+
+                foreach (IEdmNavigationProperty navigationProperty in navigationProperties)
+                {
+                    if (changedProperties != null && changedProperties.Contains(navigationProperty.Name) && deltaNestedProperties.TryGetValue(navigationProperty.Name, out object obj))
+                    {
+                        if (obj != null)
+                        {
+                            yield return new KeyValuePair<IEdmNavigationProperty, Type>(navigationProperty, obj.GetType());
+                        }
+                    }
                 }
             }
         }
@@ -1148,9 +1213,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
                 {
-                    IDelta deltaObject = resourceContext.EdmObject as IDelta;
-                    IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
-                    structuralProperties = structuralProperties.Where(p => changedProperties.Contains(p.Name));
+                    if (resourceContext.EdmObject is TypedEdmEntityObject obj && obj.Instance is IDelta deltaObject)
+                    {
+                        IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
+                        structuralProperties = structuralProperties.Where(p => changedProperties.Contains(p.Name));
+                    }
                 }
 
                 foreach (IEdmStructuralProperty structuralProperty in structuralProperties)

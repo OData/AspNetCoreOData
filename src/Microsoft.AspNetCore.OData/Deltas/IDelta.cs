@@ -28,6 +28,11 @@ namespace Microsoft.AspNetCore.OData.Deltas
         IEnumerable<string> GetUnchangedPropertyNames();
 
         /// <summary>
+        /// Gets the nested resources changed at this level.
+        /// </summary>
+        IDictionary<string, object> GetDeltaNestedNavigationProperties();
+
+        /// <summary>
         /// Attempts to set the Property called <paramref name="name"/> to the <paramref name="value"/> specified.
         /// </summary>
         /// <param name="name">The name of the Property</param>

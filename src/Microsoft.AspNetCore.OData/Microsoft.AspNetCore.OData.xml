@@ -1413,6 +1413,11 @@
             enumeration of Property Names
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.GetDeltaNestedNavigationProperties">
+            <summary>
+            Gets the nested resources changed at this level.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1">
             <summary>
             <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedLink`1" /> allows and tracks changes to delta deleted link.
@@ -1694,6 +1699,11 @@
             properties.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetDeltaNestedNavigationProperties">
+            <summary>
+            Gets the nested resources changed at this level.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyChangedValues(`0)">
             <summary>
             Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
@@ -1761,6 +1771,11 @@
             <summary>
             Returns the Properties that have not been modified through this IDelta as an
             enumerable of Property Names
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.GetDeltaNestedNavigationProperties">
+            <summary>
+            Gets the nested resources changed at this level.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TrySetPropertyValue(System.String,System.Object)">
@@ -4684,6 +4699,15 @@
             <param name="writer">The <see cref="T:Microsoft.OData.ODataDeltaWriter" /> to be used for writing.</param>
             <param name="writeContext">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/>.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteDeltaNavigationPropertiesAsync(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.ODataWriter)">
+            <summary>
+            Writes delta navigation properties asynchronously.
+            </summary>
+            <param name="selectExpandNode">Contains the set of properties and actions to use to select and expand while writing an entity.</param>
+            <param name="resourceContext">The resource context for the resource being written.</param>
+            <param name="writer">The ODataWriter.</param>
+            <returns>A task that represents the asynchronous write operation</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
@@ -5757,6 +5781,9 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetChangedPropertyNames">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetDeltaNestedNavigationProperties">
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmStructuredObject.GetUnchangedPropertyNames">

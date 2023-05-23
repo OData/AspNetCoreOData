@@ -78,9 +78,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Typeless
 
             for (int i=10 ; i < 15 ; i++)
             {
-                string contextUrl = "http://localhost/odata/$metadata#TypelessDeltaCustomers/$deletedEntity";
-                Assert.True(contextUrl.Equals(((dynamic)returnedObject).value[i]["@odata.context"].Value));
-                Assert.True(i.ToString().Equals(((dynamic)returnedObject).value[i]["id"].Value));
+                Assert.True(i.ToString().Equals(((dynamic)returnedObject).value[i]["@id"].Value));
             }
         }
     }

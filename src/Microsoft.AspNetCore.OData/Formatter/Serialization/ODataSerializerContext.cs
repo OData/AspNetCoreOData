@@ -16,6 +16,7 @@ using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Common;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
@@ -29,6 +30,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         private ODataQueryContext _queryContext;
         private SelectExpandClause _selectExpandClause;
         private bool _isSelectExpandClauseSet;
+        internal Type Type { get; set; }
+        private bool? _isDeltaOfT;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
@@ -81,6 +84,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Items = context.Items;
             ExpandReference = context.ExpandReference;
             TimeZone = context.TimeZone;
+            Type = context.Type;
 
             QueryContext = queryContext;
 
@@ -290,6 +294,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
+        internal bool IsDeltaOfT
+        {
+            get
+            {
+                if (_isDeltaOfT == null)
+                {
+                    _isDeltaOfT = Type != null && Type.IsGenericType && (Type.GetGenericTypeDefinition() == typeof(Delta<>) ||
+                        Type.GetGenericTypeDefinition() == typeof(DeltaSet<>) || Type.GetGenericTypeDefinition() == typeof(DeltaDeletedResource<>));
+                }
+
+                return _isDeltaOfT.Value;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the <see cref="ExpandedNavigationSelectItem"/>.
         /// </summary>
@@ -328,6 +346,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
             else
             {
+                if (typeof(IDeltaSet).IsAssignableFrom(type))
+                {
+                    return Model.GetEdmTypeReference(type);
+                }
+
                 if (Model == null && !isUntyped)
                 {
                     throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
@@ -339,7 +362,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     if (edmType == null)
                     {
-                        if (instance != null)
+                        if (instance is ITypedDelta delta)
+                        {
+                            edmType = Model.GetEdmTypeReference(delta.ExpectedClrType);
+                        }
+                        else
                         {
                             edmType = Model.GetEdmTypeReference(instance.GetType());
                         }

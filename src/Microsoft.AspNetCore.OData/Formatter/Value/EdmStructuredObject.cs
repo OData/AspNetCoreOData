@@ -208,6 +208,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         }
 
         /// <inheritdoc/>
+        public override IDictionary<string, object> GetDeltaNestedNavigationProperties()
+        {
+            return default;
+        }
+
+        /// <inheritdoc/>
         public override IEnumerable<string> GetUnchangedPropertyNames()
         {
             return _actualEdmType.Properties().Select(p => p.Name).Except(GetChangedPropertyNames());
