@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
+//using Microsoft.AspNetCore.Http;
 using QueryBuilder.Edm;
 using QueryBuilder.Query.Validator;
 using QueryBuilder.Routing;
@@ -19,7 +19,7 @@ namespace QueryBuilder.Query
     /// </summary>
     public class ODataQueryContext
     {
-        private DefaultQueryConfigurations _defaultQueryConfigurations;
+        // private DefaultQueryConfigurations _defaultQueryConfigurations;
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext"/> with <see cref="IEdmModel" />, element CLR type,
@@ -98,23 +98,21 @@ namespace QueryBuilder.Query
         internal ODataQueryContext()
         { }
 
-        /// <summary>
-        /// Gets the given <see cref="DefaultQueryConfigurations"/>.
-        /// </summary>
-        public DefaultQueryConfigurations DefaultQueryConfigurations
-        {
-            get
-            {
-                if (_defaultQueryConfigurations == null)
-                {
-                    _defaultQueryConfigurations = RequestContainer == null
-                        ? GetDefaultQuerySettings()
-                        : RequestContainer.GetRequiredService<DefaultQueryConfigurations>();
-                }
+        ///// <summary>
+        ///// Gets the given <see cref="DefaultQueryConfigurations"/>.
+        ///// </summary>
+        //public DefaultQueryConfigurations DefaultQueryConfigurations
+        //{
+        //    get
+        //    {
+        //        if (_defaultQueryConfigurations == null)
+        //        {
+        //            _defaultQueryConfigurations = GetDefaultQuerySettings();
+        //        }
 
-                return _defaultQueryConfigurations;
-            }
-        }
+        //        return _defaultQueryConfigurations;
+        //    }
+        //}
 
         /// <summary>
         /// Gets the given <see cref="IEdmModel"/> that contains the EntitySet.
@@ -148,9 +146,11 @@ namespace QueryBuilder.Query
         /// The services container may not be present. See the constructor in this file for
         /// use in stand-alone scenarios.
         /// </remarks>
-        public IServiceProvider RequestContainer { get; internal set; }
+        //public IServiceProvider RequestContainer { get; internal set; }
 
-        internal HttpRequest Request { get; set; }
+        // internal HttpRequest Request { get; set; }
+
+        internal Uri RequestUri { get; set; }
 
         internal IEdmProperty TargetProperty { get; set; }
 

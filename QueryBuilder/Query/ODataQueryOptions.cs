@@ -54,24 +54,25 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// <param name="request">The incoming request message.</param>
-        public ODataQueryOptions(ODataQueryContext context, HttpRequest request)
+        public ODataQueryOptions(ODataQueryContext context, string requestUri)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (request == null)
+            if (requestUri == null || requestUri == "")
             {
-                throw Error.ArgumentNull(nameof(request));
+                throw Error.ArgumentNullOrEmpty(nameof(requestUri));
             }
 
-            Contract.Assert(context.RequestContainer == null);
-            context.RequestContainer = request.GetRouteServices();
-            context.Request = request;
+            //Contract.Assert(context.RequestContainer == null);
+            //context.RequestContainer = request.GetRouteServices();
+
 
             Context = context;
-            Request = request;
+            RequestUri = new Uri(requestUri);
+            context.RequestUri = RequestUri;
 
             Initialize(context);
         }
@@ -79,7 +80,7 @@ namespace QueryBuilder.Query
         /// <summary>
         /// Gets the request message associated with this instance.
         /// </summary>
-        public HttpRequest Request { get; private set; }
+        public Uri RequestUri { get; private set; }
 
         /// <summary>
         ///  Gets the given <see cref="ODataQueryContext"/>
@@ -283,176 +284,176 @@ namespace QueryBuilder.Query
             return IsSystemQueryOption(lowcaseQueryOptionName, this._enableNoDollarSignQueryOptions);
         }
 
-        /// <summary>
-        /// Apply the individual query to the given IQueryable in the right order.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query)
-        {
-            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            return ApplyTo(query, querySettings);
-        }
+        ///// <summary>
+        ///// Apply the individual query to the given IQueryable in the right order.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
+        //public virtual IQueryable ApplyTo(IQueryable query)
+        //{
+        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+        //    return ApplyTo(query, querySettings);
+        //}
 
-        /// <summary>
-        /// Apply the individual query to the given IQueryable in the right order.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions)
-        {
-            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            querySettings.IgnoredQueryOptions = ignoreQueryOptions;
+        ///// <summary>
+        ///// Apply the individual query to the given IQueryable in the right order.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
+        //public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions)
+        //{
+        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+        //    querySettings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, querySettings);
-        }
+        //    return ApplyTo(query, querySettings);
+        //}
 
-        /// <summary>
-        /// Apply the individual query to the given IQueryable in the right order.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">The settings to use in query composition.</param>
-        /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
-        {
-            ODataQuerySettings settings = new ODataQuerySettings();
-            settings.CopyFrom(querySettings);
-            settings.IgnoredQueryOptions = ignoreQueryOptions;
+        ///// <summary>
+        ///// Apply the individual query to the given IQueryable in the right order.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="querySettings">The settings to use in query composition.</param>
+        ///// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
+        //public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
+        //{
+        //    ODataQuerySettings settings = new ODataQuerySettings();
+        //    settings.CopyFrom(querySettings);
+        //    settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, settings);
-        }
+        //    return ApplyTo(query, settings);
+        //}
 
-        /// <summary>
-        /// Apply the individual query to the given IQueryable in the right order.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">The settings to use in query composition.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
-        {
-            if (query == null)
-            {
-                throw Error.ArgumentNull(nameof(query));
-            }
+        ///// <summary>
+        ///// Apply the individual query to the given IQueryable in the right order.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="querySettings">The settings to use in query composition.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
+        //public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
+        //{
+        //    if (query == null)
+        //    {
+        //        throw Error.ArgumentNull(nameof(query));
+        //    }
 
-            if (querySettings == null)
-            {
-                throw Error.ArgumentNull(nameof(querySettings));
-            }
+        //    if (querySettings == null)
+        //    {
+        //        throw Error.ArgumentNull(nameof(querySettings));
+        //    }
 
-            IQueryable result = query;
-            IODataFeature odataFeature = Request.ODataFeature();
+        //    IQueryable result = query;
+        //    IODataFeature odataFeature = Request.ODataFeature();
 
-            // Update the query setting
-            querySettings = Context.UpdateQuerySettings(querySettings, query);
+        //    // Update the query setting
+        //    querySettings = Context.UpdateQuerySettings(querySettings, query);
 
-            // First apply $apply
-            // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
-            if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
-            {
-                result = Apply.ApplyTo(result, querySettings);
-                odataFeature.ApplyClause = Apply.ApplyClause;
-                this.Context.ElementClrType = Apply.ResultClrType;
-            }
+        //    // First apply $apply
+        //    // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
+        //    if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
+        //    {
+        //        result = Apply.ApplyTo(result, querySettings);
+        //        odataFeature.ApplyClause = Apply.ApplyClause;
+        //        this.Context.ElementClrType = Apply.ResultClrType;
+        //    }
 
-            // TODO: need pass the result from $compute to the remaining query options
-            // Construct the actual query and apply them in the following order: filter, orderby, skip, top
-            if (IsAvailableODataQueryOption(Filter, querySettings, AllowedQueryOptions.Filter))
-            {
-                if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
-                {
-                    Filter.Compute = Compute;
-                }
+        //    // TODO: need pass the result from $compute to the remaining query options
+        //    // Construct the actual query and apply them in the following order: filter, orderby, skip, top
+        //    if (IsAvailableODataQueryOption(Filter, querySettings, AllowedQueryOptions.Filter))
+        //    {
+        //        if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
+        //        {
+        //            Filter.Compute = Compute;
+        //        }
 
-                result = Filter.ApplyTo(result, querySettings);
-            }
+        //        result = Filter.ApplyTo(result, querySettings);
+        //    }
 
-            // If both $search and $filter are specified in the same request, only those items satisfying both criteria are returned
-            // apply $search
-            if (IsAvailableODataQueryOption(Search, querySettings, AllowedQueryOptions.Search))
-            {
-                result = Search.ApplyTo(result, querySettings);
-            }
+        //    // If both $search and $filter are specified in the same request, only those items satisfying both criteria are returned
+        //    // apply $search
+        //    if (IsAvailableODataQueryOption(Search, querySettings, AllowedQueryOptions.Search))
+        //    {
+        //        result = Search.ApplyTo(result, querySettings);
+        //    }
 
-            if (IsAvailableODataQueryOption(Count, querySettings, AllowedQueryOptions.Count))
-            {
-                if (odataFeature.TotalCountFunc == null)
-                {
-                    Func<long> countFunc = Count.GetEntityCountFunc(result);
-                    if (countFunc != null)
-                    {
-                        odataFeature.TotalCountFunc = countFunc;
-                    }
-                }
+        //    if (IsAvailableODataQueryOption(Count, querySettings, AllowedQueryOptions.Count))
+        //    {
+        //        if (odataFeature.TotalCountFunc == null)
+        //        {
+        //            Func<long> countFunc = Count.GetEntityCountFunc(result);
+        //            if (countFunc != null)
+        //            {
+        //                odataFeature.TotalCountFunc = countFunc;
+        //            }
+        //        }
 
-                if (Request.IsCountRequest())
-                {
-                    return result;
-                }
-            }
+        //        if (Request.IsCountRequest())
+        //        {
+        //            return result;
+        //        }
+        //    }
 
-            OrderByQueryOption orderBy = OrderBy;
+        //    OrderByQueryOption orderBy = OrderBy;
 
-            // $skip or $top require a stable sort for predictable results.
-            // Result limits require a stable sort to be able to generate a next page link.
-            // If either is present in the query and we have permission,
-            // generate an $orderby that will produce a stable sort.
-            if (querySettings.EnsureStableOrdering &&
-                (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip) ||
-                 IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top) ||
-                 querySettings.PageSize.HasValue))
-            {
-                // If there is no OrderBy present, we manufacture a default.
-                // If an OrderBy is already present, we add any missing
-                // properties necessary to make a stable sort.
-                // Instead of failing early here if we cannot generate the OrderBy,
-                // let the IQueryable backend fail (if it has to).
+        //    // $skip or $top require a stable sort for predictable results.
+        //    // Result limits require a stable sort to be able to generate a next page link.
+        //    // If either is present in the query and we have permission,
+        //    // generate an $orderby that will produce a stable sort.
+        //    if (querySettings.EnsureStableOrdering &&
+        //        (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip) ||
+        //         IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top) ||
+        //         querySettings.PageSize.HasValue))
+        //    {
+        //        // If there is no OrderBy present, we manufacture a default.
+        //        // If an OrderBy is already present, we add any missing
+        //        // properties necessary to make a stable sort.
+        //        // Instead of failing early here if we cannot generate the OrderBy,
+        //        // let the IQueryable backend fail (if it has to).
 
-                orderBy = GenerateStableOrder();
-            }
+        //        orderBy = GenerateStableOrder();
+        //    }
 
-            if (IsAvailableODataQueryOption(orderBy, querySettings, AllowedQueryOptions.OrderBy))
-            {
-                if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
-                {
-                    orderBy.Compute = Compute;
-                }
+        //    if (IsAvailableODataQueryOption(orderBy, querySettings, AllowedQueryOptions.OrderBy))
+        //    {
+        //        if (IsAvailableODataQueryOption(Compute, querySettings, AllowedQueryOptions.Compute))
+        //        {
+        //            orderBy.Compute = Compute;
+        //        }
 
-                result = orderBy.ApplyTo(result, querySettings);
-            }
+        //        result = orderBy.ApplyTo(result, querySettings);
+        //    }
 
-            if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
-            {
-                result = SkipToken.ApplyTo(result, querySettings, this);
-            }
+        //    if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
+        //    {
+        //        result = SkipToken.ApplyTo(result, querySettings, this);
+        //    }
 
-            AddAutoSelectExpandProperties();
+        //    AddAutoSelectExpandProperties();
 
-            if (SelectExpand != null)
-            {
-                var tempResult = ApplySelectExpand(result, querySettings);
-                if (tempResult != default(IQueryable))
-                {
-                    result = tempResult;
-                }
-            }
+        //    if (SelectExpand != null)
+        //    {
+        //        var tempResult = ApplySelectExpand(result, querySettings);
+        //        if (tempResult != default(IQueryable))
+        //        {
+        //            result = tempResult;
+        //        }
+        //    }
 
-            if (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip))
-            {
-                result = Skip.ApplyTo(result, querySettings);
-            }
+        //    if (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip))
+        //    {
+        //        result = Skip.ApplyTo(result, querySettings);
+        //    }
 
-            if (IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top))
-            {
-                result = Top.ApplyTo(result, querySettings);
-            }
+        //    if (IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top))
+        //    {
+        //        result = Top.ApplyTo(result, querySettings);
+        //    }
 
-            result = ApplyPaging(result, querySettings);
+        //    result = ApplyPaging(result, querySettings);
 
-            return result;
-        }
+        //    return result;
+        //}
 
         internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings)
         {
@@ -554,65 +555,65 @@ namespace QueryBuilder.Query
             }
         }
 
-        /// <summary>
-        /// Apply the individual query to the given IQueryable in the right order.
-        /// </summary>
-        /// <param name="entity">The original entity.</param>
-        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
-        /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
-        /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
-        /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
-        {
-            ODataQuerySettings settings = new ODataQuerySettings();
-            settings.CopyFrom(querySettings);
-            settings.IgnoredQueryOptions = ignoreQueryOptions;
+        ///// <summary>
+        ///// Apply the individual query to the given IQueryable in the right order.
+        ///// </summary>
+        ///// <param name="entity">The original entity.</param>
+        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        ///// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+        ///// <returns>The new entity after the $select and $expand query has been applied to.</returns>
+        ///// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+        ///// query options.</remarks>
+        //public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
+        //{
+        //    ODataQuerySettings settings = new ODataQuerySettings();
+        //    settings.CopyFrom(querySettings);
+        //    settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(entity, settings);
-        }
+        //    return ApplyTo(entity, settings);
+        //}
 
-        /// <summary>
-        /// Applies the query to the given entity using the given <see cref="ODataQuerySettings"/>.
-        /// </summary>
-        /// <param name="entity">The original entity.</param>
-        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
-        /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
-        /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings)
-        {
-            if (entity == null)
-            {
-                throw Error.ArgumentNull("entity");
-            }
+        ///// <summary>
+        ///// Applies the query to the given entity using the given <see cref="ODataQuerySettings"/>.
+        ///// </summary>
+        ///// <param name="entity">The original entity.</param>
+        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        ///// <returns>The new entity after the $select and $expand query has been applied to.</returns>
+        ///// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+        ///// query options.</remarks>
+        //public virtual object ApplyTo(object entity, ODataQuerySettings querySettings)
+        //{
+        //    if (entity == null)
+        //    {
+        //        throw Error.ArgumentNull("entity");
+        //    }
 
-            if (querySettings == null)
-            {
-                throw Error.ArgumentNull("querySettings");
-            }
+        //    if (querySettings == null)
+        //    {
+        //        throw Error.ArgumentNull("querySettings");
+        //    }
 
-            if (Filter != null || OrderBy != null || Top != null || Skip != null || Count != null)
-            {
-                throw Error.InvalidOperation(SRResources.NonSelectExpandOnSingleEntity);
-            }
+        //    if (Filter != null || OrderBy != null || Top != null || Skip != null || Count != null)
+        //    {
+        //        throw Error.InvalidOperation(SRResources.NonSelectExpandOnSingleEntity);
+        //    }
 
-            // Update the query setting
-            querySettings = Context.UpdateQuerySettings(querySettings, query: null);
+        //    // Update the query setting
+        //    querySettings = Context.UpdateQuerySettings(querySettings, query: null);
 
-            AddAutoSelectExpandProperties();
+        //    AddAutoSelectExpandProperties();
 
-            if (SelectExpand != null)
-            {
-                var result = ApplySelectExpand(entity, querySettings);
-                if (result != default(object))
-                {
-                    return result;
-                }
-            }
+        //    if (SelectExpand != null)
+        //    {
+        //        var result = ApplySelectExpand(entity, querySettings);
+        //        if (result != default(object))
+        //        {
+        //            return result;
+        //        }
+        //    }
 
-            return entity;
-        }
+        //    return entity;
+        //}
 
         /// <summary>
         /// Validate all OData queries, including $skip, $top, $orderby and $filter, based on the given <paramref name="validationSettings"/>.
@@ -822,8 +823,8 @@ namespace QueryBuilder.Query
                     Context.Model,
                     Context.ElementType,
                     Context.NavigationSource,
-                    queryParameters,
-                    Context.RequestContainer); // the Context.RequestContainer could be null for non-edm model
+                    queryParameters/*,
+                    Context.RequestContainer*/); // the Context.RequestContainer could be null for non-edm model
                 var originalSelectExpand = SelectExpand;
                 SelectExpand = new SelectExpandQueryOption(
                     autoSelectRawValue,
@@ -1035,8 +1036,8 @@ namespace QueryBuilder.Query
                         Context.Model,
                         Context.ElementType,
                         Context.NavigationSource,
-                        new Dictionary<string, string> { { "$count", "true" } },
-                        Context.RequestContainer));
+                        new Dictionary<string, string> { { "$count", "true" } }/*,
+                        Context.RequestContainer)*/);
             }
         }
 
@@ -1046,51 +1047,51 @@ namespace QueryBuilder.Query
                 ((querySettings.IgnoredQueryOptions & queryOptionFlag) == AllowedQueryOptions.None);
         }
 
-        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings)
-        {
-            var result = default(T);
-            bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
-            bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, querySettings, AllowedQueryOptions.Select);
-            bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, querySettings, AllowedQueryOptions.Expand);
-            if (selectAvailable || expandAvailable)
-            {
-                if ((!selectAvailable && SelectExpand.RawSelect != null) ||
-                    (!expandAvailable && SelectExpand.RawExpand != null))
-                {
-                    SelectExpand = new SelectExpandQueryOption(
-                        selectAvailable ? RawValues.Select : null,
-                        expandAvailable ? RawValues.Expand : null,
-                        SelectExpand.Context);
-                }
+        //private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings)
+        //{
+        //    var result = default(T);
+        //    bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
+        //    bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, querySettings, AllowedQueryOptions.Select);
+        //    bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, querySettings, AllowedQueryOptions.Expand);
+        //    if (selectAvailable || expandAvailable)
+        //    {
+        //        if ((!selectAvailable && SelectExpand.RawSelect != null) ||
+        //            (!expandAvailable && SelectExpand.RawExpand != null))
+        //        {
+        //            SelectExpand = new SelectExpandQueryOption(
+        //                selectAvailable ? RawValues.Select : null,
+        //                expandAvailable ? RawValues.Expand : null,
+        //                SelectExpand.Context);
+        //        }
 
-                SelectExpandClause processedClause = SelectExpand.ProcessedSelectExpandClause;
-                SelectExpandQueryOption newSelectExpand = new SelectExpandQueryOption(
-                    SelectExpand.RawSelect,
-                    SelectExpand.RawExpand,
-                    SelectExpand.Context,
-                    processedClause);
+        //        SelectExpandClause processedClause = SelectExpand.ProcessedSelectExpandClause;
+        //        SelectExpandQueryOption newSelectExpand = new SelectExpandQueryOption(
+        //            SelectExpand.RawSelect,
+        //            SelectExpand.RawExpand,
+        //            SelectExpand.Context,
+        //            processedClause);
 
-                Request.ODataFeature().SelectExpandClause = processedClause;
-                (Request.ODataFeature() as ODataFeature).QueryOptions = this;
+        //        Request.ODataFeature().SelectExpandClause = processedClause;
+        //        (Request.ODataFeature() as ODataFeature).QueryOptions = this;
 
-                if (computeAvailable)
-                {
-                    newSelectExpand.Compute = Compute;
-                }
+        //        if (computeAvailable)
+        //        {
+        //            newSelectExpand.Compute = Compute;
+        //        }
 
-                var type = typeof(T);
-                if (type == typeof(IQueryable))
-                {
-                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings);
-                }
-                else if (type == typeof(object))
-                {
-                    result = (T)newSelectExpand.ApplyTo(entity, querySettings);
-                }
-            }
+        //        var type = typeof(T);
+        //        if (type == typeof(IQueryable))
+        //        {
+        //            result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings);
+        //        }
+        //        else if (type == typeof(object))
+        //        {
+        //            result = (T)newSelectExpand.ApplyTo(entity, querySettings);
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
@@ -1102,10 +1103,10 @@ namespace QueryBuilder.Query
             Contract.Assert(context != null);
 
             ODataUriResolver uriResolver = null;
-            if (context.RequestContainer != null)
-            {
-                uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
-            }
+            //if (context.RequestContainer != null)
+            //{
+            //    uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
+            //}
 
             if (uriResolver != null)
             {

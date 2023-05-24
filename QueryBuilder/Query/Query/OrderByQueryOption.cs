@@ -73,8 +73,8 @@ namespace QueryBuilder.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } },
-                context.RequestContainer);
+                new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } }/*,
+                context.RequestContainer*/);
             _queryOptionParser.ParseApply();
         }
 
@@ -98,8 +98,8 @@ namespace QueryBuilder.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$orderby", rawValue } },
-                context.RequestContainer);
+                new Dictionary<string, string> { { "$orderby", rawValue } }/*,
+                context.RequestContainer*/);
         }
 
         internal OrderByQueryOption(OrderByQueryOption orderBy)
@@ -164,49 +164,49 @@ namespace QueryBuilder.Query
             }
         }
 
-        /// <summary>
-        /// Apply the $orderby query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
-        {
-            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
-        }
+        ///// <summary>
+        ///// Apply the $orderby query to the given IQueryable.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        //public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
+        //{
+        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+        //    return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
+        //}
 
-        /// <summary>
-        /// Apply the $orderby query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings)
-        {
-            return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
-        }
+        ///// <summary>
+        ///// Apply the $orderby query to the given IQueryable.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        //public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings)
+        //{
+        //    return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
+        //}
 
-        /// <summary>
-        /// Apply the $orderby query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        public IOrderedQueryable ApplyTo(IQueryable query)
-        {
-            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            return ApplyToCore(query, querySettings);
-        }
+        ///// <summary>
+        ///// Apply the $orderby query to the given IQueryable.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        //public IOrderedQueryable ApplyTo(IQueryable query)
+        //{
+        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+        //    return ApplyToCore(query, querySettings);
+        //}
 
-        /// <summary>
-        /// Apply the $orderby query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        public IOrderedQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
-        {
-            return ApplyToCore(query, querySettings);
-        }
+        ///// <summary>
+        ///// Apply the $orderby query to the given IQueryable.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        //public IOrderedQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
+        //{
+        //    return ApplyToCore(query, querySettings);
+        //}
 
         /// <summary>
         /// Validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
@@ -225,96 +225,96 @@ namespace QueryBuilder.Query
             }
         }
 
-        private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings)
-        {
-            if (Context.ElementClrType == null)
-            {
-                throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
-            }
+        //private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings)
+        //{
+        //    if (Context.ElementClrType == null)
+        //    {
+        //        throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
+        //    }
 
-            ICollection<OrderByNode> nodes = OrderByNodes;
+        //    ICollection<OrderByNode> nodes = OrderByNodes;
 
-            bool alreadyOrdered = false;
-            IQueryable querySoFar = query;
+        //    bool alreadyOrdered = false;
+        //    IQueryable querySoFar = query;
 
-            HashSet<object> propertiesSoFar = new HashSet<object>();
-            HashSet<string> openPropertiesSoFar = new HashSet<string>();
-            bool orderByItSeen = false;
+        //    HashSet<object> propertiesSoFar = new HashSet<object>();
+        //    HashSet<string> openPropertiesSoFar = new HashSet<string>();
+        //    bool orderByItSeen = false;
 
-            IOrderByBinder binder = Context.GetOrderByBinder();
-            QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
-            if (Compute != null)
-            {
-                binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
-            }
+        //    IOrderByBinder binder = Context.GetOrderByBinder();
+        //    QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
+        //    if (Compute != null)
+        //    {
+        //        binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
+        //    }
 
-            foreach (OrderByNode node in nodes)
-            {
-                OrderByPropertyNode propertyNode = node as OrderByPropertyNode;
-                OrderByOpenPropertyNode openPropertyNode = node as OrderByOpenPropertyNode;
-                OrderByCountNode countNode = node as OrderByCountNode;
+        //    foreach (OrderByNode node in nodes)
+        //    {
+        //        OrderByPropertyNode propertyNode = node as OrderByPropertyNode;
+        //        OrderByOpenPropertyNode openPropertyNode = node as OrderByOpenPropertyNode;
+        //        OrderByCountNode countNode = node as OrderByCountNode;
 
-                if (propertyNode != null)
-                {
-                    // Use autonomy class to achieve value equality for HasSet.
-                    var edmPropertyWithPath = new { propertyNode.Property, propertyNode.PropertyPath };
-                    OrderByDirection direction = propertyNode.Direction;
+        //        if (propertyNode != null)
+        //        {
+        //            // Use autonomy class to achieve value equality for HasSet.
+        //            var edmPropertyWithPath = new { propertyNode.Property, propertyNode.PropertyPath };
+        //            OrderByDirection direction = propertyNode.Direction;
 
-                    // This check prevents queries with duplicate properties (e.g. $orderby=Id,Id,Id,Id...) from causing stack overflows
-                    if (propertiesSoFar.Contains(edmPropertyWithPath))
-                    {
-                        throw new ODataException(Error.Format(SRResources.OrderByDuplicateProperty, edmPropertyWithPath.PropertyPath));
-                    }
+        //            // This check prevents queries with duplicate properties (e.g. $orderby=Id,Id,Id,Id...) from causing stack overflows
+        //            if (propertiesSoFar.Contains(edmPropertyWithPath))
+        //            {
+        //                throw new ODataException(Error.Format(SRResources.OrderByDuplicateProperty, edmPropertyWithPath.PropertyPath));
+        //            }
 
-                    propertiesSoFar.Add(edmPropertyWithPath);
+        //            propertiesSoFar.Add(edmPropertyWithPath);
 
-                    if (propertyNode.OrderByClause != null)
-                    {
-                        querySoFar = AddOrderByQueryForProperty(binder, propertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
-                    }
-                    else
-                    {
-                        // could have ensure stable orderby property added
-                        querySoFar = ExpressionHelpers.OrderByProperty(querySoFar, Context.Model, edmPropertyWithPath.Property, direction, Context.ElementClrType, alreadyOrdered);
-                    }
+        //            if (propertyNode.OrderByClause != null)
+        //            {
+        //                querySoFar = AddOrderByQueryForProperty(binder, propertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
+        //            }
+        //            else
+        //            {
+        //                // could have ensure stable orderby property added
+        //                querySoFar = ExpressionHelpers.OrderByProperty(querySoFar, Context.Model, edmPropertyWithPath.Property, direction, Context.ElementClrType, alreadyOrdered);
+        //            }
 
-                    alreadyOrdered = true;
-                }
-                else if (openPropertyNode != null)
-                {
-                    // This check prevents queries with duplicate properties (e.g. $orderby=Id,Id,Id,Id...) from causing stack overflows
-                    if (openPropertiesSoFar.Contains(openPropertyNode.PropertyName))
-                    {
-                        throw new ODataException(Error.Format(SRResources.OrderByDuplicateProperty, openPropertyNode.PropertyPath));
-                    }
+        //            alreadyOrdered = true;
+        //        }
+        //        else if (openPropertyNode != null)
+        //        {
+        //            // This check prevents queries with duplicate properties (e.g. $orderby=Id,Id,Id,Id...) from causing stack overflows
+        //            if (openPropertiesSoFar.Contains(openPropertyNode.PropertyName))
+        //            {
+        //                throw new ODataException(Error.Format(SRResources.OrderByDuplicateProperty, openPropertyNode.PropertyPath));
+        //            }
 
-                    openPropertiesSoFar.Add(openPropertyNode.PropertyName);
-                    Contract.Assert(openPropertyNode.OrderByClause != null);
-                    querySoFar = AddOrderByQueryForProperty(binder, openPropertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
-                    alreadyOrdered = true;
-                }
-                else if (countNode != null)
-                {
-                    Contract.Assert(countNode.OrderByClause != null);
-                    querySoFar = AddOrderByQueryForProperty(binder, countNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
-                    alreadyOrdered = true;
-                }
-                else
-                {
-                    // This check prevents queries with duplicate nodes (e.g. $orderby=$it,$it,$it,$it...) from causing stack overflows
-                    if (orderByItSeen)
-                    {
-                        throw new ODataException(Error.Format(SRResources.OrderByDuplicateIt));
-                    }
+        //            openPropertiesSoFar.Add(openPropertyNode.PropertyName);
+        //            Contract.Assert(openPropertyNode.OrderByClause != null);
+        //            querySoFar = AddOrderByQueryForProperty(binder, openPropertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
+        //            alreadyOrdered = true;
+        //        }
+        //        else if (countNode != null)
+        //        {
+        //            Contract.Assert(countNode.OrderByClause != null);
+        //            querySoFar = AddOrderByQueryForProperty(binder, countNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
+        //            alreadyOrdered = true;
+        //        }
+        //        else
+        //        {
+        //            // This check prevents queries with duplicate nodes (e.g. $orderby=$it,$it,$it,$it...) from causing stack overflows
+        //            if (orderByItSeen)
+        //            {
+        //                throw new ODataException(Error.Format(SRResources.OrderByDuplicateIt));
+        //            }
 
-                    querySoFar = ExpressionHelpers.OrderByIt(querySoFar, node.Direction, Context.ElementClrType, alreadyOrdered);
-                    alreadyOrdered = true;
-                    orderByItSeen = true;
-                }
-            }
+        //            querySoFar = ExpressionHelpers.OrderByIt(querySoFar, node.Direction, Context.ElementClrType, alreadyOrdered);
+        //            alreadyOrdered = true;
+        //            orderByItSeen = true;
+        //        }
+        //    }
 
-            return querySoFar as IOrderedQueryable;
-        }
+        //    return querySoFar as IOrderedQueryable;
+        //}
 
         private static IQueryable AddOrderByQueryForProperty(IOrderByBinder orderByBinder,
             OrderByClause orderbyClause, IQueryable querySoFar, QueryBinderContext binderContext, bool alreadyOrdered)

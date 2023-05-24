@@ -9,43 +9,43 @@ namespace QueryBuilder.Query
 {
     internal static class ODataQueryContextExtensions
     {
-        public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
-        {
-            ODataQuerySettings returnSettings = new ODataQuerySettings();
-            ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
-            if (settings != null)
-            {
-                returnSettings.CopyFrom(settings);
-            }
+        //public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
+        //{
+        //    ODataQuerySettings returnSettings = new ODataQuerySettings();
+        //    ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+        //    if (settings != null)
+        //    {
+        //        returnSettings.CopyFrom(settings);
+        //    }
 
-            return returnSettings;
-        }
+        //    return returnSettings;
+        //}
 
-        public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
-        {
-            ODataQuerySettings updatedSettings = new ODataQuerySettings();
-            ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
-            if (settings != null)
-            {
-                updatedSettings.CopyFrom(settings);
-            }
+        //public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
+        //{
+        //    ODataQuerySettings updatedSettings = new ODataQuerySettings();
+        //    ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+        //    if (settings != null)
+        //    {
+        //        updatedSettings.CopyFrom(settings);
+        //    }
 
-            updatedSettings.CopyFrom(querySettings);
+        //    updatedSettings.CopyFrom(querySettings);
 
-            if (updatedSettings.HandleNullPropagation == HandleNullPropagationOption.Default)
-            {
-                updatedSettings.HandleNullPropagation = query != null
-                    ? HandleNullPropagationOptionHelper.GetDefaultHandleNullPropagationOption(query)
-                    : HandleNullPropagationOption.True;
-            }
+        //    if (updatedSettings.HandleNullPropagation == HandleNullPropagationOption.Default)
+        //    {
+        //        updatedSettings.HandleNullPropagation = query != null
+        //            ? HandleNullPropagationOptionHelper.GetDefaultHandleNullPropagationOption(query)
+        //            : HandleNullPropagationOption.True;
+        //    }
 
-            return updatedSettings;
-        }
+        //    return updatedSettings;
+        //}
 
-        public static SkipTokenHandler GetSkipTokenHandler(this ODataQueryContext context)
-        {
-            return context?.RequestContainer?.GetRequiredService<SkipTokenHandler>() ?? DefaultSkipTokenHandler.Instance;
-        }
+        //public static SkipTokenHandler GetSkipTokenHandler(this ODataQueryContext context)
+        //{
+        //    return context?.RequestContainer?.GetRequiredService<SkipTokenHandler>() ?? DefaultSkipTokenHandler.Instance;
+        //}
 
         /// <summary>
         /// Gets the <see cref="IFilterBinder"/>.

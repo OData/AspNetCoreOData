@@ -48,34 +48,34 @@ namespace QueryBuilder.Query
         /// </summary>
         public ISkipTokenQueryValidator Validator { get; }
 
-        /// <summary>
-        /// Gets the skip token handler.
-        /// </summary>
-        public SkipTokenHandler Handler { get; }
+        ///// <summary>
+        ///// Gets the skip token handler.
+        ///// </summary>
+        //public SkipTokenHandler Handler { get; }
 
-        /// <summary>
-        /// Apply the $skiptoken query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">The query settings to use while applying this query option.</param>
-        /// <param name="queryOptions">Information about the other query options.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
-        public virtual IQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
-        {
-            return Handler.ApplyTo(query, this, querySettings, queryOptions) as IOrderedQueryable<T>;
-        }
+        ///// <summary>
+        ///// Apply the $skiptoken query to the given IQueryable.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="querySettings">The query settings to use while applying this query option.</param>
+        ///// <param name="queryOptions">Information about the other query options.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
+        //public virtual IQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+        //{
+        //    return Handler.ApplyTo(query, this, querySettings, queryOptions) as IOrderedQueryable<T>;
+        //}
 
-        /// <summary>
-        /// Apply the $skiptoken query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">The query settings to use while applying this query option.</param>
-        /// <param name="queryOptions">Information about the other query options.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
-        {
-            return Handler.ApplyTo(query, this, querySettings, queryOptions);
-        }
+        ///// <summary>
+        ///// Apply the $skiptoken query to the given IQueryable.
+        ///// </summary>
+        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
+        ///// <param name="querySettings">The query settings to use while applying this query option.</param>
+        ///// <param name="queryOptions">Information about the other query options.</param>
+        ///// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
+        //public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+        //{
+        //    return Handler.ApplyTo(query, this, querySettings, queryOptions);
+        //}
 
         /// <summary>
         /// Validate the skiptoken query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
