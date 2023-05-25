@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         public abstract DeltaItemKind Kind { get; }
 
         /// <inheritdoc/>
-        public IODataInstanceAnnotationContainer TransientInstanceAnnotationContainer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IODataInstanceAnnotationContainer TransientInstanceAnnotationContainer { get; set; }
 
         /// <summary>
         /// Clears the Delta and resets the underlying Entity.

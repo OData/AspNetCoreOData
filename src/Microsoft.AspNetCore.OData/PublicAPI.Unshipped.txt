@@ -173,6 +173,8 @@ Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler
 Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.UnbufferedODataBatchHandler() -> void
 Microsoft.AspNetCore.OData.Deltas.Delta
 Microsoft.AspNetCore.OData.Deltas.Delta.Delta() -> void
+Microsoft.AspNetCore.OData.Deltas.Delta.TransientInstanceAnnotationContainer.get -> Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer
+Microsoft.AspNetCore.OData.Deltas.Delta.TransientInstanceAnnotationContainer.set -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.CopyChangedValues(T original) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.CopyUnchangedValues(T original) -> void
