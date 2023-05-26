@@ -131,6 +131,32 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(200, totalPrice);
         }
 
+        [Fact]
+        public async Task AggregationWithFilterWorks()
+        {
+            // Arrange
+            string queryUrl = AggregationTestBaseUrl + "?$apply=filter((contains(Name,'Customer1')))/aggregate(Orders(Price with sum as TotalPrice))";
+            string expectedResult = "{\"value\":[{\"Orders\":[{\"TotalPrice\":200}]}]}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = Client.SendAsync(request).Result;
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var stringObject = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal(expectedResult, stringObject.ToString());
+
+            var result = await response.Content.ReadAsObject<JObject>();
+            var value = result["value"];
+            var orders = value.First["Orders"];
+            var totalPrice = orders.First["TotalPrice"].ToObject<int>();
+
+            Assert.Equal(200, totalPrice);
+        }
+
 #endif
 
         [Fact(Skip = "See the comments above")]
