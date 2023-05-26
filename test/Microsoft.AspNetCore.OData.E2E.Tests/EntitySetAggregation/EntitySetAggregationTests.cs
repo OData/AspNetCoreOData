@@ -148,13 +148,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             var stringObject = await response.Content.ReadAsStringAsync();
 
             Assert.Equal(expectedResult, stringObject.ToString());
-
-            var result = await response.Content.ReadAsObject<JObject>();
-            var value = result["value"];
-            var orders = value.First["Orders"];
-            var totalPrice = orders.First["TotalPrice"].ToObject<int>();
-
-            Assert.Equal(200, totalPrice);
         }
 
 #endif
