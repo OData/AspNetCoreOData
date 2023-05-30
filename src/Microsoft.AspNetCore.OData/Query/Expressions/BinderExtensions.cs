@@ -82,6 +82,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
+            context.EnsureFlattenedProperties(context.CurrentParameter, query);
+
             Expression filterExp = binder.BindFilter(filterClause, context);
             return ExpressionHelpers.Where(query, filterExp, context.ElementClrType);
         }

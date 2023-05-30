@@ -137,6 +137,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             // Arrange
             string queryUrl = AggregationTestBaseUrl + "?$apply=filter((contains(Name,'Customer1')))/aggregate(Orders(Price with sum as TotalPrice))";
             string expectedResult = "{\"value\":[{\"Orders\":[{\"TotalPrice\":200}]}]}";
+            
+                  HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = Client.SendAsync(request).Result;
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var stringObject = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal(expectedResult, stringObject.ToString());
+        }
+          
+        public async Task GroupByWithAggregationAndFilterByWorks()
+        {
+            // Arrange
+            string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((Name),aggregate(Orders(Price with sum as TotalPrice)))&$filter=Name eq 'Customer1'";
+            string expectedResult = "{\"value\":[{\"Name\":\"Customer1\",\"Orders\":[{\"TotalPrice\":200}]}]}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
