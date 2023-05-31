@@ -136,7 +136,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 string clrPropertyName = model.GetClrPropertyName(edmProperty);
                 if (obj != null)
                 {
-                    obj.TryGetPropertyValue(clrPropertyName, out value);
+                    if (!obj.TryGetPropertyValue(
+                            clrPropertyName,
+                            out value))
+                    {
+                        obj.TryGetPropertyValue(edmProperty.Name, out value);
+                    }
                 }
                 else
                 {
