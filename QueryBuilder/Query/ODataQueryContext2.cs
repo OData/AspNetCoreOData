@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-//using Microsoft.AspNetCore.Http;
+﻿using System.Diagnostics.Contracts;
 using QueryBuilder.Edm;
 using QueryBuilder.Query.Validator;
 using QueryBuilder.Routing;
-//using Microsoft.Extensions.DependencyInjection;
-//using Microsoft.Extensions.Options;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -185,21 +178,5 @@ namespace QueryBuilder.Query
                 TargetStructuredType = ElementType as IEdmStructuredType;
             }
         }
-
-        //private DefaultQueryConfigurations GetDefaultQuerySettings()
-        //{
-        //    if (Request is null)
-        //    {
-        //        return new DefaultQueryConfigurations();
-        //    }
-
-        //    IOptions<ODataOptions> odataOptions = Request.HttpContext?.RequestServices?.GetService<IOptions<ODataOptions>>();
-        //    if (odataOptions is null || odataOptions.Value is null)
-        //    {
-        //        return new DefaultQueryConfigurations();
-        //    }
-
-        //    return odataOptions.Value.QueryConfigurations;
-        //}
     }
 }
