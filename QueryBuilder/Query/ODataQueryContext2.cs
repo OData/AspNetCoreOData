@@ -35,21 +35,45 @@ namespace QueryBuilder.Query
         public ODataQueryContext2(IEdmModel model, Type elementClrType, ODataPath path, 
                                   QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null)
         {
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
             if (elementClrType == null)
             {
                 throw Error.ArgumentNull(nameof(elementClrType));
             }
 
-            ElementType = model.GetEdmTypeReference(elementClrType)?.Definition;
+            IEdmType elementType = model.GetEdmTypeReference(elementClrType)?.Definition;
 
-            if (ElementType == null)
+            if (elementType == null)
             {
                 throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
+            }
+
+            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations);
+        }
+
+        /// <summary>
+        /// Constructs an instance of <see cref="ODataQueryContext2"/> with <see cref="IEdmModel" />, element EDM type,
+        /// and <see cref="ODataPath" />.
+        /// </summary>
+        /// <param name="model">The EDM model the given EDM type belongs to.</param>
+        /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
+        /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
+        public ODataQueryContext2(IEdmModel model, IEdmType elementType, ODataPath path,
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null)
+        {
+            if (elementType == null)
+            {
+                throw Error.ArgumentNull(nameof(elementType));
+            }
+
+            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations);
+        }
+
+        private void Initialize(IEdmModel model, IEdmType elementType, Type elementClrType, ODataPath path, 
+                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
             }
 
             if (validators == null)
@@ -62,39 +86,14 @@ namespace QueryBuilder.Query
                 DefaultQueryConfigurations = new DefaultQueryConfigurations(); // instead of GetDefaultQuerySettings();
             }
 
-            ElementClrType = elementClrType;
-            Model = model;
-            Path = path;
-            NavigationSource = GetNavigationSource(Model, ElementType, path);
-            GetPathContext();
-        }
-
-        /// <summary>
-        /// Constructs an instance of <see cref="ODataQueryContext2"/> with <see cref="IEdmModel" />, element EDM type,
-        /// and <see cref="ODataPath" />.
-        /// </summary>
-        /// <param name="model">The EDM model the given EDM type belongs to.</param>
-        /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
-        /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
-        public ODataQueryContext2(IEdmModel model, IEdmType elementType, ODataPath path)
-        {
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
-            if (elementType == null)
-            {
-                throw Error.ArgumentNull(nameof(elementType));
-            }
-
             Model = model;
             ElementType = elementType;
+            ElementClrType = elementClrType;
             Path = path;
             NavigationSource = GetNavigationSource(Model, ElementType, path);
-            Validators = new QueryValidators(); // TODO: by default
             GetPathContext();
         }
+
 
         internal ODataQueryContext2(IEdmModel model, Type elementClrType)
             : this(model, elementClrType, path: null)
