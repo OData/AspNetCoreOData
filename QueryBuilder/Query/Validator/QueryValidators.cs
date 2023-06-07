@@ -47,7 +47,7 @@ namespace QueryBuilder.Query.Validator
             return FilterQueryValidator ??= new FilterQueryValidator();
         }
 
-        public IODataQueryValidator GetExpandQueryValidator()
+        public IODataQueryValidator GetODataQueryValidator()
         {
             return ODataQueryValidator ??= new ODataQueryValidator();
         }

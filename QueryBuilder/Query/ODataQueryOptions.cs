@@ -21,10 +21,14 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
-using QueryBuilder.Edm;
-using QueryBuilder.Routing;
 using QueryBuilder.Abstracts;
+using QueryBuilder.Edm;
+using QueryBuilder.Query;
 using QueryBuilder.Extensions;
+using QueryBuilder.Query.Container;
+using QueryBuilder.Routing;
+using QueryBuilder.Query.Validator;
+using QueryBuilder.Query.Expressions;
 using Microsoft.Extensions.Primitives;
 using System.Net.Http;
 using System.ComponentModel.Design;
@@ -83,7 +87,8 @@ namespace QueryBuilder.Query
             RequestUri = new Uri(requestUri);
             context.RequestUri = RequestUri;
 
-            Initialize(context);
+            //Initialize(context);
+            Initialize2();
         }
 
         /// <summary>
@@ -670,7 +675,7 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
         {
             if (entity == null)
             {
@@ -694,7 +699,7 @@ namespace QueryBuilder.Query
 
             if (SelectExpand != null)
             {
-                var result = ApplySelectExpand(entity, querySettings);
+                var result = ApplySelectExpand(entity, querySettings, requestFeature);
                 if (result != default(object))
                 {
                     return result;
@@ -931,7 +936,8 @@ namespace QueryBuilder.Query
             }
         }
 
-        private IDictionary<string, string> GetODataQueryParameters()
+        /// <param name="requestQueryCollection">The query value collection parsed from the request's QueryString.</param>
+        private IDictionary<string, string> GetODataQueryParameters(IQueryCollection requestQueryCollection)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
@@ -1137,7 +1143,7 @@ namespace QueryBuilder.Query
         }
 
         // QUESTION: Pass in HttpRequest or Request.ODataFeature() directly?
-        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
+        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature, ISelectExpandBinder binder)
         {
             var result = default(T);
             bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
@@ -1174,11 +1180,11 @@ namespace QueryBuilder.Query
                 var type = typeof(T);
                 if (type == typeof(IQueryable))
                 {
-                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings);
+                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, binder);
                 }
                 else if (type == typeof(object))
                 {
-                    result = (T)newSelectExpand.ApplyTo(entity, querySettings);
+                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, binder);
                 }
             }
 
@@ -1190,6 +1196,8 @@ namespace QueryBuilder.Query
         /// the <see cref="ODataQueryContext2"/>.
         /// </summary>
         /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        /// 
+        // TODO: Add optional context field: uriResolver
         private void Initialize(ODataQueryContext2 context)
         {
             Contract.Assert(context != null);
@@ -1234,7 +1242,35 @@ namespace QueryBuilder.Query
 
             BuildQueryOptions(normalizedQueryParameters);
 
-            Validator = context.GetODataQueryValidator();
+            Validator = context.Validators.GetODataQueryValidator();
+        }
+
+        private void Initialize2(ODataQueryContext2 context)
+        {
+            Contract.Assert(context != null);
+
+            /*
+             * Every class use of _enableNoDollarSignQueryOptions => this.context.IsNoDollarSignQueryOptions()
+             * prev if/else logic moves to context2
+             */
+
+            // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
+            // OData query parameters are normalized with the $-sign prefixes when the
+            // <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
+            RawValues = new ODataRawQueryOptions();
+            IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
+
+            _queryOptionParser = new ODataQueryOptionParser(
+                context.Model,
+                context.ElementType,
+                context.NavigationSource,
+                normalizedQueryParameters);
+
+            _queryOptionParser.Resolver = context.UriResolver ?? new ODataUriResolver { EnableCaseInsensitive = true };
+
+            BuildQueryOptions(normalizedQueryParameters);
+
+            Validator = context.Validators.GetODataQueryValidator();
         }
     }
 }

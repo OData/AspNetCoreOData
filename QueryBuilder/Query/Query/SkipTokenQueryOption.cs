@@ -11,11 +11,11 @@ namespace QueryBuilder.Query
     {
         /// <summary>
         /// Initialize a new instance of <see cref="SkipQueryOption"/> based on the raw $skiptoken value and
-        /// an EdmModel from <see cref="ODataQueryContext"/>.
+        /// an EdmModel from <see cref="ODataQueryContext2"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $skiptoken query.</param>
-        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
-        public SkipTokenQueryOption(string rawValue, ODataQueryContext context)
+        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        public SkipTokenQueryOption(string rawValue, ODataQueryContext2 context)
         {
             if (string.IsNullOrEmpty(rawValue))
             {
@@ -39,9 +39,9 @@ namespace QueryBuilder.Query
         public string RawValue { get; }
 
         /// <summary>
-        /// Gets the given <see cref="ODataQueryContext"/>.
+        /// Gets the given <see cref="ODataQueryContext2"/>.
         /// </summary>
-        public ODataQueryContext Context { get; }
+        public ODataQueryContext2 Context { get; }
 
         /// <summary>
         /// Gets the SkipToken Query Validator.

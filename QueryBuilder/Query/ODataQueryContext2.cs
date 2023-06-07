@@ -25,8 +25,9 @@ namespace QueryBuilder.Query
         /// This is a public constructor used for stand-alone scenario; in this case, the services
         /// container may not be present.
         /// </remarks>
+        // QUESTION: Pass in whole "ODataUriResolver uriResolver" or just "bool IsNoDollarQueryEnable"?
         public ODataQueryContext2(IEdmModel model, Type elementClrType, ODataPath path, 
-                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null)
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool isNoDollarQueryEnable = false)
         {
             if (elementClrType == null)
             {
@@ -40,7 +41,7 @@ namespace QueryBuilder.Query
                 throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
             }
 
-            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations);
+            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable);
         }
 
         /// <summary>
@@ -51,18 +52,18 @@ namespace QueryBuilder.Query
         /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
         /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
         public ODataQueryContext2(IEdmModel model, IEdmType elementType, ODataPath path,
-                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null)
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool isNoDollarQueryEnable = false)
         {
             if (elementType == null)
             {
                 throw Error.ArgumentNull(nameof(elementType));
             }
 
-            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations);
+            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable);
         }
 
         private void Initialize(IEdmModel model, IEdmType elementType, Type elementClrType, ODataPath path, 
-                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations)
+                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations, bool isNoDollarQueryEnable)
         {
             if (model == null)
             {
@@ -84,6 +85,7 @@ namespace QueryBuilder.Query
             ElementType = elementType;
             ElementClrType = elementClrType;
             Path = path;
+            GlobalIsNoDollarQueryEnable = isNoDollarQueryEnable;
             NavigationSource = GetNavigationSource(Model, ElementType, path);
             GetPathContext();
         }
@@ -106,6 +108,20 @@ namespace QueryBuilder.Query
         /// Gets the given <see cref="DefaultQueryConfigurations"/>.
         /// </summary>
         public DefaultQueryConfigurations DefaultQueryConfigurations { get; internal set; }
+
+        public bool GlobalEnableNoDollarSignQueryOptions { get; internal set; }
+
+        public bool IsNoDollarQueryEnable()
+        {
+            if (UriResolver != null)
+            {
+                return UriResolver.EnableNoDollarQueryOptions;
+            }
+            else
+            {
+                return GlobalEnableNoDollarSignQueryOptions;
+            }
+        }
 
         // TODO: Add param to constructor in some kind of context object
         public QueryValidators Validators { get; internal set; }
