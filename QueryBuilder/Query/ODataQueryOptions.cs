@@ -4,6 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+//using System.Net.Http.Headers;
+using Microsoft.Net.Http.Headers;
 using System.Reflection;
 //using Microsoft.AspNetCore.Http;
 //using Microsoft.AspNetCore.Http.Extensions;
@@ -19,6 +21,13 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
+using QueryBuilder.Edm;
+using QueryBuilder.Routing;
+using QueryBuilder.Abstracts;
+using QueryBuilder.Extensions;
+using Microsoft.Extensions.Primitives;
+using System.Net.Http;
+using System.ComponentModel.Design;
 
 namespace QueryBuilder.Query
 {
@@ -36,13 +45,13 @@ namespace QueryBuilder.Query
 
         private ODataQueryOptionParser _queryOptionParser;
 
-        private ETag _etagIfMatch;
+        //private ETag _etagIfMatch;
 
-        private bool _etagIfMatchChecked;
+        //private bool _etagIfMatchChecked;
 
-        private ETag _etagIfNoneMatch;
+        //private ETag _etagIfNoneMatch;
 
-        private bool _etagIfNoneMatchChecked;
+        //private bool _etagIfNoneMatchChecked;
 
         private bool _enableNoDollarSignQueryOptions = false;
 
@@ -50,11 +59,11 @@ namespace QueryBuilder.Query
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
-        /// the <see cref="ODataQueryContext"/>.
+        /// the <see cref="ODataQueryContext2"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// <param name="request">The incoming request message.</param>
-        public ODataQueryOptions(ODataQueryContext context, string requestUri)
+        public ODataQueryOptions(ODataQueryContext2 context, string requestUri)
         {
             if (context == null)
             {
@@ -83,9 +92,9 @@ namespace QueryBuilder.Query
         public Uri RequestUri { get; private set; }
 
         /// <summary>
-        ///  Gets the given <see cref="ODataQueryContext"/>
+        ///  Gets the given <see cref="ODataQueryContext2"/>
         /// </summary>
-        public ODataQueryContext Context { get; private set; }
+        public ODataQueryContext2 Context { get; private set; }
 
         /// <summary>
         /// Gets the raw string of all the OData query options
@@ -191,66 +200,121 @@ namespace QueryBuilder.Query
                  fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
         }
 
-        /// <summary>
-        /// Gets the <see cref="ETag"/> from IfMatch header.
-        /// </summary>
-        public virtual ETag IfMatch
-        {
-            get
-            {
-                if (!_etagIfMatchChecked && _etagIfMatch == null)
-                {
-                    StringValues ifMatchValues;
-                    if (Request.Headers.TryGetValue("If-Match", out ifMatchValues))
-                    {
-                        EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifMatchValues.SingleOrDefault());
-                        _etagIfMatch = GetETag(etagHeaderValue);
-                        _etagIfMatchChecked = true;
-                    }
-                }
+        ///// <summary>
+        ///// Gets the <see cref="ETag"/> from IfMatch header.
+        ///// </summary>
+        //public virtual ETag IfMatch(StringValues ifMatchValues)
+        //{
+        //    get
+        //    {
+        //        if (!_etagIfMatchChecked && _etagIfMatch == null)
+        //        {
+        //            StringValues ifMatchValues;
+        //            if (Request.Headers.TryGetValue("If-Match", out ifMatchValues))
+        //            {
+        //                EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifMatchValues.SingleOrDefault());
+        //                _etagIfMatch = GetETag(etagHeaderValue);
+        //                _etagIfMatchChecked = true;
+        //            }
+        //        }
 
-                return _etagIfMatch;
-            }
-        }
+        //        return _etagIfMatch;
+        //    }
+        //}
 
-        /// <summary>
-        /// Gets the <see cref="ETag"/> from IfNoneMatch header.
-        /// </summary>
-        public virtual ETag IfNoneMatch
-        {
-            get
-            {
-                if (!_etagIfNoneMatchChecked && _etagIfNoneMatch == null)
-                {
-                    StringValues ifNoneMatchValues;
-                    if (Request.Headers.TryGetValue("If-None-Match", out ifNoneMatchValues))
-                    {
-                        EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifNoneMatchValues.SingleOrDefault());
-                        _etagIfNoneMatch = GetETag(etagHeaderValue);
-                        if (_etagIfNoneMatch != null)
-                        {
-                            _etagIfNoneMatch.IsIfNoneMatch = true;
-                        }
-                        _etagIfNoneMatchChecked = true;
-                    }
+        ///// <summary>
+        ///// Gets the <see cref="ETag"/> from IfNoneMatch header.
+        ///// </summary>
+        //public virtual ETag IfNoneMatch
+        //{
+        //    get
+        //    {
+        //        if (!_etagIfNoneMatchChecked && _etagIfNoneMatch == null)
+        //        {
+        //            StringValues ifNoneMatchValues;
+        //            if (Request.Headers.TryGetValue("If-None-Match", out ifNoneMatchValues))
+        //            {
+        //                EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifNoneMatchValues.SingleOrDefault());
+        //                _etagIfNoneMatch = GetETag(etagHeaderValue);
+        //                if (_etagIfNoneMatch != null)
+        //                {
+        //                    _etagIfNoneMatch.IsIfNoneMatch = true;
+        //                }
+        //                _etagIfNoneMatchChecked = true;
+        //            }
 
-                    _etagIfNoneMatchChecked = true;
-                }
+        //            _etagIfNoneMatchChecked = true;
+        //        }
 
-                return _etagIfNoneMatch;
-            }
-        }
+        //        return _etagIfNoneMatch;
+        //    }
+        //}
 
         /// <summary>
         /// Gets the EntityTagHeaderValue ETag.
         /// </summary>
-        internal virtual ETag GetETag(EntityTagHeaderValue etagHeaderValue)
+        internal virtual ETag GetETag(EntityTagHeaderValue etagHeaderValue, IETagHandler etagHandler)
         {
-            return Request.GetETag(etagHeaderValue);
+
+            if (etagHeaderValue != null)
+            {
+                if (etagHeaderValue.Equals(EntityTagHeaderValue.Any))
+                {
+                    return new ETag { IsAny = true };
+                }
+
+                // get the etag handler, and parse the etag
+                IDictionary<string, object> properties = etagHandler.ParseETag(etagHeaderValue) ?? new Dictionary<string, object>();
+                IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
+
+                // get property names from request
+                ODataPath odataPath = Context.Path;
+                IEdmModel model = Context.Model;
+                IEdmNavigationSource source = odataPath.GetNavigationSource();
+                if (model != null && source != null)
+                {
+                    IList<IEdmStructuralProperty> concurrencyProperties = model.GetConcurrencyProperties(source).ToList();
+                    IList<string> concurrencyPropertyNames = concurrencyProperties.OrderBy(c => c.Name).Select(c => c.Name).ToList();
+                    ETag etag = new ETag();
+
+                    if (parsedETagValues.Count != concurrencyPropertyNames.Count)
+                    {
+                        etag.IsWellFormed = false;
+                    }
+
+                    IEnumerable<KeyValuePair<string, object>> nameValues = concurrencyPropertyNames.Zip(
+                        parsedETagValues,
+                        (name, value) => new KeyValuePair<string, object>(name, value));
+                    foreach (var nameValue in nameValues)
+                    {
+                        IEdmStructuralProperty property = concurrencyProperties.SingleOrDefault(e => e.Name == nameValue.Key);
+                        Contract.Assert(property != null);
+
+                        Type clrType = model.GetClrType(property.Type);
+                        Contract.Assert(clrType != null);
+
+                        if (nameValue.Value != null)
+                        {
+                            Type valueType = nameValue.Value.GetType();
+                            etag[nameValue.Key] = valueType != clrType
+                                ? Convert.ChangeType(nameValue.Value, clrType, CultureInfo.InvariantCulture)
+                                : nameValue.Value;
+                        }
+                        else
+                        {
+                            etag[nameValue.Key] = nameValue.Value;
+                        }
+                    }
+
+                    return etag;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
-        /// Check if the given query option is the supported query option.
+        /// Check if the given query option is the supported query option (case-insensitive by default).
         /// </summary>
         /// <param name="queryOptionName">The name of the query option.</param>
         /// <returns>Returns <c>true</c> if the query option is the supported query option.</returns>
@@ -263,19 +327,27 @@ namespace QueryBuilder.Query
                 throw Error.ArgumentNullOrEmpty(nameof(queryOptionName));
             }
 
-            ODataUriResolver resolver = null;
-            if (_queryOptionParser != null)
-            {
-                resolver = _queryOptionParser.Resolver;
-            }
+            string lowcaseQueryOptionName = queryOptionName.ToLowerInvariant();
+            return IsSystemQueryOption(lowcaseQueryOptionName, this._enableNoDollarSignQueryOptions);
+        }
 
-            if (resolver == null && Context.RequestContainer != null)
+        /// <summary>
+        /// Check if the given query option is the supported query option.
+        /// </summary>
+        /// <param name="queryOptionName">The name of the query option.</param>
+        /// <param name="enableCaseInsensitive">The setting to resolve with case-insensitivity.</param>
+        /// <returns>Returns <c>true</c> if the query option is the supported query option.</returns>
+        [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase",
+            Justification = "Need lower case string here.")]
+        public bool IsSupportedQueryOption(string queryOptionName, bool enableCaseInsensitive)
+        {
+            if (string.IsNullOrEmpty(queryOptionName))
             {
-                resolver = Context.RequestContainer.GetService<ODataUriResolver>();
+                throw Error.ArgumentNullOrEmpty(nameof(queryOptionName));
             }
 
             // If we don't have the resolver setting, by default we support case-insensitive
-            if (resolver != null && !resolver.EnableCaseInsensitive)
+            if (!enableCaseInsensitive)
             {
                 return IsSystemQueryOption(queryOptionName, this._enableNoDollarSignQueryOptions);
             }
@@ -455,7 +527,22 @@ namespace QueryBuilder.Query
         //    return result;
         //}
 
-        internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings)
+
+        // QUESTION: Do I pass whole HttpRequest or individual pieces of Headers and IODataFeature?
+        // - PRO WHOLE OBJECT: nice encapsulation if method is designed to work specifically with HttpRequest object and only that object
+        //                     reduce repetitive work of getting these attributes
+        // - INDIVIDUAL PROPERTIES: flexibility if method is more general-purpose since only a couple properties are being used
+        //                          not much repetitive work (request.Headers and request.HttpContext.ODataFeature()
+        //                          can be done outside more simply (RequestPreferenceHelpers and used objects defined in AspNetCore.Http):
+        //                             EX: if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(request.Headers, out preferredPageSize))
+        //                          properties may not be in expected format (e.g., encodedUrl) -> requires validation
+        //                          
+        //                          TODO: what does a null encodedUrl indicate regarding page size?
+
+        // returns generalizable
+        // paging/query context param model
+
+        internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings, bool requestPrefersMaxPageSize, ODataFeature odataFeature, string encodedUrl)
         {
             int pageSize = -1;
             if (querySettings.PageSize.HasValue)
@@ -468,20 +555,22 @@ namespace QueryBuilder.Query
             }
 
             int preferredPageSize = -1;
-            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
+            //if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(request.Headers, out preferredPageSize))
+            if (requestPrefersMaxPageSize)
             {
                 pageSize = Math.Min(pageSize, preferredPageSize);
             }
 
-            ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
+            //ODataFeature odataFeature = request.HttpContext.ODataFeature() as ODataFeature;
             if (pageSize > 0)
             {
                 bool resultsLimited;
                 result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-                if (resultsLimited && Request.GetEncodedUrl() != null &&
+                //if (resultsLimited && Request.GetEncodedUrl() != null &&
+                if (resultsLimited && encodedUrl != null &&
                     odataFeature.NextLink == null)
                 {
-                    odataFeature.PageSize = pageSize;
+                    odataFeature.PageSize = pageSize; // is ODataFeature as a whole pertinent > specific properties
                 }
             }
 
@@ -573,47 +662,47 @@ namespace QueryBuilder.Query
         //    return ApplyTo(entity, settings);
         //}
 
-        ///// <summary>
-        ///// Applies the query to the given entity using the given <see cref="ODataQuerySettings"/>.
-        ///// </summary>
-        ///// <param name="entity">The original entity.</param>
-        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        ///// <returns>The new entity after the $select and $expand query has been applied to.</returns>
-        ///// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
-        ///// query options.</remarks>
-        //public virtual object ApplyTo(object entity, ODataQuerySettings querySettings)
-        //{
-        //    if (entity == null)
-        //    {
-        //        throw Error.ArgumentNull("entity");
-        //    }
+        /// <summary>
+        /// Applies the query to the given entity using the given <see cref="ODataQuerySettings"/>.
+        /// </summary>
+        /// <param name="entity">The original entity.</param>
+        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
+        /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+        /// query options.</remarks>
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings)
+        {
+            if (entity == null)
+            {
+                throw Error.ArgumentNull("entity");
+            }
 
-        //    if (querySettings == null)
-        //    {
-        //        throw Error.ArgumentNull("querySettings");
-        //    }
+            if (querySettings == null)
+            {
+                throw Error.ArgumentNull("querySettings");
+            }
 
-        //    if (Filter != null || OrderBy != null || Top != null || Skip != null || Count != null)
-        //    {
-        //        throw Error.InvalidOperation(SRResources.NonSelectExpandOnSingleEntity);
-        //    }
+            if (Filter != null || OrderBy != null || Top != null || Skip != null || Count != null)
+            {
+                throw Error.InvalidOperation(SRResources.NonSelectExpandOnSingleEntity);
+            }
 
-        //    // Update the query setting
-        //    querySettings = Context.UpdateQuerySettings(querySettings, query: null);
+            // Update the query setting
+            querySettings = Context.UpdateQuerySettings(querySettings, query: null);
 
-        //    AddAutoSelectExpandProperties();
+            AddAutoSelectExpandProperties();
 
-        //    if (SelectExpand != null)
-        //    {
-        //        var result = ApplySelectExpand(entity, querySettings);
-        //        if (result != default(object))
-        //        {
-        //            return result;
-        //        }
-        //    }
+            if (SelectExpand != null)
+            {
+                var result = ApplySelectExpand(entity, querySettings);
+                if (result != default(object))
+                {
+                    return result;
+                }
+            }
 
-        //    return entity;
-        //}
+            return entity;
+        }
 
         /// <summary>
         /// Validate all OData queries, including $skip, $top, $orderby and $filter, based on the given <paramref name="validationSettings"/>.
@@ -646,7 +735,7 @@ namespace QueryBuilder.Query
         // Returns a sorted list of all properties that may legally appear
         // in an OrderBy.  If the entity type has keys, all are returned.
         // Otherwise, when no keys are present, all primitive properties are returned.
-        private static IEnumerable<IEdmStructuralProperty> GetAvailableOrderByProperties(ODataQueryContext context)
+        private static IEnumerable<IEdmStructuralProperty> GetAvailableOrderByProperties(ODataQueryContext2 context)
         {
             Contract.Assert(context != null);
 
@@ -669,7 +758,7 @@ namespace QueryBuilder.Query
         // Generates the OrderByQueryOption to use by default for $skip or $top
         // when no other $orderby is available.  It will produce a stable sort.
         // This may return a null if there are no available properties.
-        private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryContext context, List<string> applySortOptions)
+        private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryContext2 context, List<string> applySortOptions)
         {
             string orderByRaw = String.Empty;
             if (applySortOptions != null)
@@ -697,10 +786,10 @@ namespace QueryBuilder.Query
         /// and returned.
         /// </summary>
         /// <param name="orderBy">The <see cref="OrderByQueryOption"/> to evaluate.</param>
-        /// <param name="context">The <see cref="ODataQueryContext"/>.</param>
+        /// <param name="context">The <see cref="ODataQueryContext2"/>.</param>
         /// <param name="applySortOptions"></param>
         /// <returns>An <see cref="OrderByQueryOption"/> that will produce a stable sort.</returns>
-        private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryContext context, List<string> applySortOptions)
+        private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryContext2 context, List<string> applySortOptions)
         {
             Contract.Assert(orderBy != null);
             Contract.Assert(context != null);
@@ -1037,7 +1126,7 @@ namespace QueryBuilder.Query
                         Context.ElementType,
                         Context.NavigationSource,
                         new Dictionary<string, string> { { "$count", "true" } }/*,
-                        Context.RequestContainer)*/);
+                        Context.RequestContainer*/));
             }
         }
 
@@ -1047,58 +1136,61 @@ namespace QueryBuilder.Query
                 ((querySettings.IgnoredQueryOptions & queryOptionFlag) == AllowedQueryOptions.None);
         }
 
-        //private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings)
-        //{
-        //    var result = default(T);
-        //    bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
-        //    bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, querySettings, AllowedQueryOptions.Select);
-        //    bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, querySettings, AllowedQueryOptions.Expand);
-        //    if (selectAvailable || expandAvailable)
-        //    {
-        //        if ((!selectAvailable && SelectExpand.RawSelect != null) ||
-        //            (!expandAvailable && SelectExpand.RawExpand != null))
-        //        {
-        //            SelectExpand = new SelectExpandQueryOption(
-        //                selectAvailable ? RawValues.Select : null,
-        //                expandAvailable ? RawValues.Expand : null,
-        //                SelectExpand.Context);
-        //        }
+        // QUESTION: Pass in HttpRequest or Request.ODataFeature() directly?
+        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
+        {
+            var result = default(T);
+            bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
+            bool selectAvailable = IsAvailableODataQueryOption(SelectExpand.RawSelect, querySettings, AllowedQueryOptions.Select);
+            bool expandAvailable = IsAvailableODataQueryOption(SelectExpand.RawExpand, querySettings, AllowedQueryOptions.Expand);
+            if (selectAvailable || expandAvailable)
+            {
+                if ((!selectAvailable && SelectExpand.RawSelect != null) ||
+                    (!expandAvailable && SelectExpand.RawExpand != null))
+                {
+                    SelectExpand = new SelectExpandQueryOption(
+                        selectAvailable ? RawValues.Select : null,
+                        expandAvailable ? RawValues.Expand : null,
+                        SelectExpand.Context);
+                }
 
-        //        SelectExpandClause processedClause = SelectExpand.ProcessedSelectExpandClause;
-        //        SelectExpandQueryOption newSelectExpand = new SelectExpandQueryOption(
-        //            SelectExpand.RawSelect,
-        //            SelectExpand.RawExpand,
-        //            SelectExpand.Context,
-        //            processedClause);
+                SelectExpandClause processedClause = SelectExpand.ProcessedSelectExpandClause;
+                SelectExpandQueryOption newSelectExpand = new SelectExpandQueryOption(
+                    SelectExpand.RawSelect,
+                    SelectExpand.RawExpand,
+                    SelectExpand.Context,
+                    processedClause);
 
-        //        Request.ODataFeature().SelectExpandClause = processedClause;
-        //        (Request.ODataFeature() as ODataFeature).QueryOptions = this;
+                //Request.ODataFeature().SelectExpandClause = processedClause;
+                //(Request.ODataFeature() as ODataFeature).QueryOptions = this;
+                requestFeature.SelectExpandClause = processedClause;
+                requestFeature.QueryOptions = this;
 
-        //        if (computeAvailable)
-        //        {
-        //            newSelectExpand.Compute = Compute;
-        //        }
+                if (computeAvailable)
+                {
+                    newSelectExpand.Compute = Compute;
+                }
 
-        //        var type = typeof(T);
-        //        if (type == typeof(IQueryable))
-        //        {
-        //            result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings);
-        //        }
-        //        else if (type == typeof(object))
-        //        {
-        //            result = (T)newSelectExpand.ApplyTo(entity, querySettings);
-        //        }
-        //    }
+                var type = typeof(T);
+                if (type == typeof(IQueryable))
+                {
+                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings);
+                }
+                else if (type == typeof(object))
+                {
+                    result = (T)newSelectExpand.ApplyTo(entity, querySettings);
+                }
+            }
 
-        //    return result;
-        //}
+            return result;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
-        /// the <see cref="ODataQueryContext"/>.
+        /// the <see cref="ODataQueryContext2"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
-        private void Initialize(ODataQueryContext context)
+        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        private void Initialize(ODataQueryContext2 context)
         {
             Contract.Assert(context != null);
 

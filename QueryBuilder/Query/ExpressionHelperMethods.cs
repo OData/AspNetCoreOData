@@ -11,7 +11,7 @@ namespace QueryBuilder.Query
 {
     internal class ExpressionHelperMethods
     {
-        //private static MethodInfo _enumerableWhereMethod = GenericMethodOf(_ => Enumerable.Where<int>(default(IEnumerable<int>), default(Func<int, bool>)));
+        private static MethodInfo _enumerableWhereMethod = GenericMethodOf(_ => Enumerable.Where<int>(default(IEnumerable<int>), default(Func<int, bool>)));
         //private static MethodInfo _queryableToListMethod = GenericMethodOf(_ => Enumerable.ToList<int>(default(IEnumerable<int>)));
         //private static MethodInfo _orderByMethod = GenericMethodOf(_ => Queryable.OrderBy<int, int>(default(IQueryable<int>), default(Expression<Func<int, int>>)));
         //private static MethodInfo _enumerableOrderByMethod = GenericMethodOf(_ => Enumerable.OrderBy<int, int>(default(IEnumerable<int>), default(Func<int, int>)));
@@ -50,7 +50,7 @@ namespace QueryBuilder.Query
         //    private static MethodInfo _queryableSelectManyMethod = GenericMethodOf(_ => Queryable.SelectMany<int, int>(default(IQueryable<int>), default(Expression<Func<int, IEnumerable<int>>>)));
 
         //    private static MethodInfo _enumerableSelectMethod = GenericMethodOf(_ => Enumerable.Select<int, int>(default(IEnumerable<int>), i => i));
-        //    private static MethodInfo _queryableSelectMethod = GenericMethodOf(_ => Queryable.Select<int, int>(default(IQueryable<int>), i => i));
+        private static MethodInfo _queryableSelectMethod = GenericMethodOf(_ => Queryable.Select<int, int>(default(IQueryable<int>), i => i));
 
         //    private static MethodInfo _queryableTakeMethod = GenericMethodOf(_ => Queryable.Take<int>(default(IQueryable<int>), default(int)));
         //    private static MethodInfo _enumerableTakeMethod = GenericMethodOf(_ => Enumerable.Take<int>(default(IEnumerable<int>), default(int)));
@@ -108,7 +108,7 @@ namespace QueryBuilder.Query
 
         //    private static MethodInfo _safeConvertToDecimalMethod = typeof(ExpressionHelperMethods).GetMethod("SafeConvertToDecimal");
 
-        //    public static MethodInfo EnumerableWhereGeneric => _enumerableWhereMethod;
+        public static MethodInfo EnumerableWhereGeneric => _enumerableWhereMethod;
 
         //    public static MethodInfo QueryableToList => _queryableToListMethod;
 
@@ -174,7 +174,7 @@ namespace QueryBuilder.Query
 
         //    public static MethodInfo EnumerableContainsGeneric => _enumerableContainsMethod;
 
-        //    public static MethodInfo QueryableSelectGeneric => _queryableSelectMethod;
+        public static MethodInfo QueryableSelectGeneric => _queryableSelectMethod;
 
         //    public static MethodInfo EnumerableSelectGeneric => _enumerableSelectMethod;
 
