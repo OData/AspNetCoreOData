@@ -76,6 +76,7 @@ namespace QueryBuilder.Query
 
             if (defaultQueryConfigurations == null)
             {
+                // QUESTION: Should this be initialized at construction vs. at get?
                 DefaultQueryConfigurations = new DefaultQueryConfigurations(); // instead of GetDefaultQuerySettings();
             }
 
