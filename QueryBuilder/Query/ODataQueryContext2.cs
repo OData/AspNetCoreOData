@@ -27,7 +27,7 @@ namespace QueryBuilder.Query
         /// </remarks>
         // QUESTION: Pass in whole "ODataUriResolver uriResolver" or just "bool IsNoDollarQueryEnable"?
         public ODataQueryContext2(IEdmModel model, Type elementClrType, ODataPath path, 
-                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool isNoDollarQueryEnable = false)
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
         {
             if (elementClrType == null)
             {
@@ -41,8 +41,26 @@ namespace QueryBuilder.Query
                 throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
             }
 
-            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable);
+            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory);
         }
+
+        public static Func<ODataUriResolver> DefaultUriResolverFactory { get; } = () => new ODataUriResolver { EnableCaseInsensitive = true }; // one func to encapsulate all of the defaults forever; don't have to worry about too many objects
+
+        // Avoid memory leak by specifically having true/false
+        // Goal: Uri Resolver is source of truth for NoDollarSign (reduce complexity for customers + not for us).
+        //       We can still have dependency injection without taking a dependency on the DI Container.
+        private static readonly Func<ODataUriResolver> DefaultUriResolverFactoryTrue = () => {
+            ODataUriResolver resolver = DefaultUriResolverFactory();
+            resolver.EnableNoDollarQueryOptions = true;
+            return resolver;
+        };
+        private static readonly Func<ODataUriResolver> DefaultUriResolverFactoryFalse = () => {
+            ODataUriResolver resolver = DefaultUriResolverFactory();
+            resolver.EnableNoDollarQueryOptions = false;
+            return resolver;
+        };
+
+        public Func<ODataUriResolver> UriResolverFactory { get; private set; }
 
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryContext2"/> with <see cref="IEdmModel" />, element EDM type,
@@ -52,18 +70,18 @@ namespace QueryBuilder.Query
         /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
         /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
         public ODataQueryContext2(IEdmModel model, IEdmType elementType, ODataPath path,
-                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool isNoDollarQueryEnable = false)
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
         {
             if (elementType == null)
             {
                 throw Error.ArgumentNull(nameof(elementType));
             }
 
-            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable);
+            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory);
         }
 
         private void Initialize(IEdmModel model, IEdmType elementType, Type elementClrType, ODataPath path, 
-                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations, bool isNoDollarQueryEnable)
+                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations, bool? isNoDollarQueryEnable, Func<ODataUriResolver> uriResolverFactory)
         {
             if (model == null)
             {
@@ -85,11 +103,32 @@ namespace QueryBuilder.Query
             ElementType = elementType;
             ElementClrType = elementClrType;
             Path = path;
-            GlobalIsNoDollarQueryEnable = isNoDollarQueryEnable;
+            UriResolverFactory = uriResolverFactory ?? DefaultUriResolverFactory;
             NavigationSource = GetNavigationSource(Model, ElementType, path);
             GetPathContext();
-        }
 
+            if (uriResolverFactory != null)
+            {
+                UriResolverFactory = uriResolverFactory;
+            }
+            else
+            {
+                if (isNoDollarQueryEnable != null)
+                {
+                    if (isNoDollarQueryEnable.Value)
+                    {
+                        UriResolverFactory = DefaultUriResolverFactoryTrue;
+                    } else
+                    {
+                        UriResolverFactory = DefaultUriResolverFactoryFalse;
+                    }
+                }
+                else
+                {
+                    UriResolverFactory = DefaultUriResolverFactory;
+                }
+            }
+        }
 
         internal ODataQueryContext2(IEdmModel model, Type elementClrType)
             : this(model, elementClrType, path: null)
@@ -108,20 +147,6 @@ namespace QueryBuilder.Query
         /// Gets the given <see cref="DefaultQueryConfigurations"/>.
         /// </summary>
         public DefaultQueryConfigurations DefaultQueryConfigurations { get; internal set; }
-
-        public bool GlobalEnableNoDollarSignQueryOptions { get; internal set; }
-
-        public bool IsNoDollarQueryEnable()
-        {
-            if (UriResolver != null)
-            {
-                return UriResolver.EnableNoDollarQueryOptions;
-            }
-            else
-            {
-                return GlobalEnableNoDollarSignQueryOptions;
-            }
-        }
 
         // TODO: Add param to constructor in some kind of context object
         public QueryValidators Validators { get; internal set; }

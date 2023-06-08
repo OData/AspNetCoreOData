@@ -1202,21 +1202,14 @@ namespace QueryBuilder.Query
         {
             Contract.Assert(context != null);
 
-            ODataUriResolver uriResolver = null;
+            ODataUriResolver uriResolver = context.UriResolverFactory();
             //if (context.RequestContainer != null)
             //{
             //    uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
             //}
 
-            if (uriResolver != null)
-            {
-                _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
-            }
-            else
-            {
-                // Use the global setting
-                _enableNoDollarSignQueryOptions = context.Request.IsNoDollarQueryEnable();
-            }
+            // move to query context 2
+            
 
             // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
             // OData query parameters are normalized with the $-sign prefixes when the
@@ -1237,12 +1230,29 @@ namespace QueryBuilder.Query
             else
             {
                 // By default, let's enable the property name case-insensitive
-                _queryOptionParser.Resolver = new ODataUriResolver { EnableCaseInsensitive = true };
+                _queryOptionParser.Resolver = ODataQueryContext2.DefaultUriResolverFactory();
             }
+
+            _enableNoDollarSignQueryOptions = _queryOptionParser.Resolver.EnableNoDollarQueryOptions; // resolver is source of truth :)))
 
             BuildQueryOptions(normalizedQueryParameters);
 
             Validator = context.Validators.GetODataQueryValidator();
+        }
+
+        public static void DoWork()
+        {
+            ODataQueryContext2 testContext = new ODataQueryContext2(null, (Type) null, null, uriResolverFactory: () => context.RequestContainer.GetService<ODataUriResolver>()); // override global setting
+            ODataQueryOptions testQueryOptions = new ODataQueryOptions(testContext, "fakeUri");
+
+            ODataQueryContext2 testContext2 = new ODataQueryContext2(null, (Type) null, null, isNoDollarQueryEnable: true);
+            ODataQueryOptions testQueryOptions2 = new ODataQueryOptions(testContext, "fakeUri");
+
+            ODataQueryContext2 testContext3 = new ODataQueryContext2(null, (Type)null, null, isNoDollarQueryEnable: false);
+            ODataQueryOptions testQueryOptions3 = new ODataQueryOptions(testContext, "fakeUri");
+
+            ODataQueryContext2 testContext4 = new ODataQueryContext2(null, (Type)null, null);
+            ODataQueryOptions testQueryOptions4 = new ODataQueryOptions(testContext, "fakeUri");
         }
 
         private void Initialize2(ODataQueryContext2 context)
