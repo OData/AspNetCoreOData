@@ -171,49 +171,49 @@ namespace Microsoft.AspNetCore.OData.Query
             }
         }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
-        //{
-        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-        //    return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
+        {
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
+        }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings)
-        //{
-        //    return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings)
+        {
+            return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
+        }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable ApplyTo(IQueryable query)
-        //{
-        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-        //    return ApplyToCore(query, querySettings);
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable ApplyTo(IQueryable query)
+        {
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings);
+        }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
-        //{
-        //    return ApplyToCore(query, querySettings);
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
+        {
+            return ApplyToCore(query, querySettings);
+        }
 
         /// <summary>
         /// Validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
