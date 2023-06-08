@@ -167,49 +167,49 @@ namespace QueryBuilder.Query
             }
         }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query)
-        //{
-        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-        //    return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, IOrderByBinder binder)
+        {
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings, binder) as IOrderedQueryable<T>;
+        }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings)
-        //{
-        //    return ApplyToCore(query, querySettings) as IOrderedQueryable<T>;
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, IOrderByBinder binder)
+        {
+            return ApplyToCore(query, querySettings, binder) as IOrderedQueryable<T>;
+        }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable ApplyTo(IQueryable query)
-        //{
-        //    ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-        //    return ApplyToCore(query, querySettings);
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable ApplyTo(IQueryable query, IOrderByBinder binder)
+        {
+            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+            return ApplyToCore(query, querySettings, binder);
+        }
 
-        ///// <summary>
-        ///// Apply the $orderby query to the given IQueryable.
-        ///// </summary>
-        ///// <param name="query">The original <see cref="IQueryable"/>.</param>
-        ///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
-        ///// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        //public IOrderedQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
-        //{
-        //    return ApplyToCore(query, querySettings);
-        //}
+        /// <summary>
+        /// Apply the $orderby query to the given IQueryable.
+        /// </summary>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
+        public IOrderedQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, IOrderByBinder binder)
+        {
+            return ApplyToCore(query, querySettings, binder);
+        }
 
         /// <summary>
         /// Validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
@@ -228,7 +228,7 @@ namespace QueryBuilder.Query
             }
         }
 
-        private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings)
+        private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IOrderByBinder binder)
         {
             if (Context.ElementClrType == null)
             {
@@ -244,7 +244,7 @@ namespace QueryBuilder.Query
             HashSet<string> openPropertiesSoFar = new HashSet<string>();
             bool orderByItSeen = false;
 
-            IOrderByBinder binder = Context.GetOrderByBinder();
+            //IOrderByBinder binder = Context.GetOrderByBinder();
             QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
             if (Compute != null)
             {

@@ -367,10 +367,10 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, IODataFeature odataFeature)
+        public virtual IQueryable ApplyTo(IQueryable query, IODataFeature odataFeature, IOrderByBinder binder)
         {
             ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            return ApplyTo(query, querySettings, odataFeature);
+            return ApplyTo(query, querySettings, odataFeature, binder);
         }
 
         /// <summary>
@@ -379,12 +379,12 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions, IODataFeature odataFeature)
+        public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions, IODataFeature odataFeature, IOrderByBinder binder = null)
         {
             ODataQuerySettings querySettings = Context.GetODataQuerySettings();
             querySettings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, querySettings, odataFeature);
+            return ApplyTo(query, querySettings, odataFeature, binder);
         }
 
         /// <summary>
@@ -394,13 +394,13 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions, IODataFeature odataFeature)
+        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions, IODataFeature odataFeature, IOrderByBinder binder = null)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, settings, odataFeature);
+            return ApplyTo(query, settings, odataFeature, binder);
         }
 
         /// <summary>
@@ -409,7 +409,7 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, IODataFeature odataFeature)
+        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, IODataFeature odataFeature, IOrderByBinder binder = null)
         {
             if (query == null)
             {
@@ -505,7 +505,7 @@ namespace QueryBuilder.Query
                     orderBy.Compute = Compute;
                 }
 
-                result = orderBy.ApplyTo(result, querySettings);
+                result = orderBy.ApplyTo(result, querySettings, binder);
             }
 
             if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
