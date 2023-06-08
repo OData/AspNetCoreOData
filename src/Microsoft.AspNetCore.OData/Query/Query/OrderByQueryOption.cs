@@ -232,7 +232,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
         }
 
-        private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IOrderByBinder binder)
+        private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings)
         {
             if (Context.ElementClrType == null)
             {
@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.OData.Query
             HashSet<string> openPropertiesSoFar = new HashSet<string>();
             bool orderByItSeen = false;
 
-            //IOrderByBinder binder = Context.GetOrderByBinder();
+            IOrderByBinder binder = Context.GetOrderByBinder();
             QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
             if (Compute != null)
             {
