@@ -42,7 +42,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.GetComputeQueryValidator();
+            //Validator = context.GetComputeQueryValidator(); // TODO: NEXT STEP
             _queryOptionParser = queryOptionParser;
             ResultClrType = Context.ElementClrType;
         }

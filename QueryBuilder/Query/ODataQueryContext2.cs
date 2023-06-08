@@ -148,7 +148,6 @@ namespace QueryBuilder.Query
         /// </summary>
         public DefaultQueryConfigurations DefaultQueryConfigurations { get; internal set; }
 
-        // TODO: Add param to constructor in some kind of context object
         public QueryValidators Validators { get; internal set; }
 
         /// <summary>

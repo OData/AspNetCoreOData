@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace QueryBuilder.Query.Validator
 {
+
+    /* Instead of calling context.GetComputeQueryValidator(), call context.Validators.GetComputeQueryValidator(), e.g.
+     * Internally, the former call would do the following:
+     *      context?.RequestContainer?.GetService<IComputeQueryValidator>() ?? new ComputeQueryValidator();
+    */
+
     public class QueryValidators
     {
 
@@ -18,9 +24,6 @@ namespace QueryBuilder.Query.Validator
         IFilterQueryValidator FilterQueryValidator { get; set; }
 
         IODataQueryValidator ODataQueryValidator { get; set; }
-
-        // QUESTION: Should these types be of interfaces or specific implementations, since this has to be an implementation
-        OrderByModelLimitationsValidator OrderByModelLimitationsValidator { get; set; }
 
         IOrderByQueryValidator OrderByQueryValidator { get; set; }
 
@@ -52,13 +55,6 @@ namespace QueryBuilder.Query.Validator
             return ODataQueryValidator ??= new ODataQueryValidator();
         }
 
-
-        // QUESTION: This constructor requires a boolean parameter, so does it still make sense to have a default instantiation?
-        //public OrderByModelLimitationsValidator GetOrderByModelLimitationsValidator()
-        //{
-        //    return OrderByModelLimitationsValidator ??= new OrderByModelLimitationsValidator();
-        //}
-
         public IOrderByQueryValidator GetOrderByQueryValidator()
         {
             return OrderByQueryValidator ??= new OrderByQueryValidator();
@@ -88,5 +84,5 @@ namespace QueryBuilder.Query.Validator
         {
             ComputeQueryValidator = computeQueryValidator;
         }*/
-    }
+}
 }

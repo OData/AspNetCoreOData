@@ -16,7 +16,7 @@ namespace QueryBuilder.Formatter.Serialization
     public class ODataSerializerContext
     {
         private IDictionary<object, object> _items;
-        private ODataQueryContext _queryContext;
+        private ODataQueryContext2 _queryContext;
         private SelectExpandClause _selectExpandClause;
         private bool _isSelectExpandClauseSet;
 
@@ -49,9 +49,9 @@ namespace QueryBuilder.Formatter.Serialization
         /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
         /// If the resource property is the dynamic complex, the resource property is null.
         /// </param>
-        /// <param name="queryContext">The <see cref="ODataQueryContext"/> for the property being nested.</param>
+        /// <param name="queryContext">The <see cref="ODataQueryContext2"/> for the property being nested.</param>
         /// <param name="currentSelectItem">The <see cref="SelectItem"/> for the property being nested.></param>
-        internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryContext queryContext, SelectItem currentSelectItem)
+        internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryContext2 queryContext, SelectItem currentSelectItem)
         {
             if (resource == null)
             {
@@ -61,7 +61,7 @@ namespace QueryBuilder.Formatter.Serialization
             // Clone the resource's context. Use a helper function so it can
             // handle platform-specific differences in ODataSerializerContext.
             ODataSerializerContext context = resource.SerializerContext;
-            this.Request = context.Request;
+            //this.Request = context.Request;
 
             Model = context.Model;
             Path = context.Path;
@@ -143,10 +143,10 @@ namespace QueryBuilder.Formatter.Serialization
         /// </summary>
         public ODataMetadataLevel MetadataLevel { get; set; }
 
-        /// <summary>
-        /// Gets or sets the HTTP Request whose response is being serialized.
-        /// </summary>
-        public HttpRequest Request { get; set; }
+        ///// <summary>
+        ///// Gets or sets the HTTP Request whose response is being serialized.
+        ///// </summary>
+        //public HttpRequest Request { get; set; }
 
         /// <summary>
         /// Gets or sets the root element name which is used when writing primitive and enum types
@@ -185,9 +185,9 @@ namespace QueryBuilder.Formatter.Serialization
         public ISet<string> ComputedProperties { get; } = new HashSet<string>();
 
         /// <summary>
-        /// ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
+        /// ODataQueryContext2 object, retrieved from query options for top-level context and passed down to nested serializer context as is.
         /// </summary>
-        internal ODataQueryContext QueryContext
+        internal ODataQueryContext2 QueryContext
         {
             get
             {

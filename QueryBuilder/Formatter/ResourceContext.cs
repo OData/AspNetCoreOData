@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using Microsoft.AspNetCore.Http;
+//using Microsoft.AspNetCore.Http;
 using QueryBuilder.Common;
 using QueryBuilder.Edm;
 using QueryBuilder.Formatter.Deserialization;
@@ -95,21 +95,21 @@ namespace QueryBuilder.Formatter
                 {
                     _resourceInstance = BuildResourceInstance();
                 }
-
+d
                 return _resourceInstance;
             }
             set => _resourceInstance = value;
         }
 
-        /// <summary>
-        /// Gets or sets the HTTP request that caused this instance to be generated.
-        /// </summary>
-        /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
-        public HttpRequest Request
-        {
-            get => SerializerContext.Request;
-            set => SerializerContext.Request = value;
-        }
+        ///// <summary>
+        ///// Gets or sets the HTTP request that caused this instance to be generated.
+        ///// </summary>
+        ///// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        //public HttpRequest Request
+        //{
+        //    get => SerializerContext.Request;
+        //    set => SerializerContext.Request = value;
+        //}
 
         /// <summary>
         /// Gets or sets the <see cref="TimeZoneInfo"/>.

@@ -9,7 +9,7 @@ namespace QueryBuilder.Query
 {
     internal static class ODataQueryContext2Extensions
     {
-        //public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
+        //public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext2 context)
         //{
         //    ODataQuerySettings returnSettings = new ODataQuerySettings();
         //    ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
