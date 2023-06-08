@@ -57,6 +57,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [Theory]
         [InlineData("http://localhost/Customers(1)/Orders", "http://localhost/Customers(1)/Orders?$skiptoken=Id-42")]
         [InlineData("http://localhost/Customers?$expand=Orders", "http://localhost/Customers?$expand=Orders&$skiptoken=Id-42")]
+        [InlineData("http://localhost/Customers?$select=Name", "http://localhost/Customers?$select=Name&$skiptoken=Id-42")]
         public void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink(string baseUri, string expectedUri)
         {
             // Arrange
@@ -78,7 +79,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
         [Theory]
         [InlineData("http://localhost/Customers(1)/Orders", "http://localhost/Customers(1)/Orders?$skiptoken=id-42")]
-        [InlineData("http://localhost/Customers?$expand=Orders", "http://localhost/Customers?$expand=Orders&$skiptoken=id-42")]
+        [InlineData("http://localhost/Customers?$expand=orders", "http://localhost/Customers?$expand=orders&$skiptoken=id-42")]
+        [InlineData("http://localhost/Customers?$select=name", "http://localhost/Customers?$select=name&$skiptoken=id-42")]
         public void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_WithLowerCamelCase(string baseUri, string expectedUri)
         {
             // Arrange
