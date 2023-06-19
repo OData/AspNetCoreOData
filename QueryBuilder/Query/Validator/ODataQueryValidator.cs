@@ -67,8 +67,9 @@ namespace QueryBuilder.Query.Validator
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions);
             }
 
-            //TODO: bool isCountRequest = Path != null && Context.Path.LastSegment is CountSegment;
-            if (options.Count != null || options.Request.IsCountRequest())
+            ODataPath path = options.Context.Path;
+            bool isCountRequest = path != null && path.LastSegment is CountSegment;
+            if (options.Count != null || isCountRequest)
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions);
 
