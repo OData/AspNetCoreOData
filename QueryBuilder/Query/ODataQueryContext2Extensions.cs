@@ -2,7 +2,7 @@
 using QueryBuilder.Abstracts;
 using QueryBuilder.Query.Expressions;
 using QueryBuilder.Query.Validator;
-using Microsoft.Extensions.DependencyInjection;
+//using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.ModelBuilder;
 
 namespace QueryBuilder.Query

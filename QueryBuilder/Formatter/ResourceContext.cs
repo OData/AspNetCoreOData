@@ -95,7 +95,7 @@ namespace QueryBuilder.Formatter
                 {
                     _resourceInstance = BuildResourceInstance();
                 }
-d
+
                 return _resourceInstance;
             }
             set => _resourceInstance = value;

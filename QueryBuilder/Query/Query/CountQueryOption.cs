@@ -40,7 +40,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.GetCountQueryValidator();
+            Validator = context.Validators.GetCountQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 

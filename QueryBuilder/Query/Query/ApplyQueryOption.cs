@@ -2,9 +2,9 @@
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.Extensions.DependencyInjection;
+using QueryBuilder.Abstracts;
+using QueryBuilder.Query.Expressions;
+//using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -100,7 +100,7 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
         /// <returns>The new <see cref="IQueryable"/> after the filter query has been applied to.</returns>
-        public IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings)
+        public IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, IAssemblyResolver assembliesResolver, IFilterBinder filterBinder)
         {
             if (query == null)
             {
@@ -129,7 +129,7 @@ namespace QueryBuilder.Query
             // The IWebApiAssembliesResolver service is internal and can only be injected by WebApi.
             // This code path may be used in cases when the service container is not available
             // and the service container is available but may not contain an instance of IWebApiAssembliesResolver.
-            IAssemblyResolver assembliesResolver = AssemblyResolverHelper.Default;
+            /*IAssemblyResolver assembliesResolver = AssemblyResolverHelper.Default;
             if (Context.RequestContainer != null)
             {
                 IAssemblyResolver injectedResolver = Context.RequestContainer.GetService<IAssemblyResolver>();
@@ -137,7 +137,7 @@ namespace QueryBuilder.Query
                 {
                     assembliesResolver = injectedResolver;
                 }
-            }
+            }*/
 
             foreach (var transformation in applyClause.Transformations)
             {
@@ -157,10 +157,10 @@ namespace QueryBuilder.Query
                 {
                     var filterTransformation = transformation as FilterTransformationNode;
 
-                    IFilterBinder binder = Context.GetFilterBinder();
+                    //IFilterBinder binder = Context.GetFilterBinder();
                     QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);
 
-                    query = binder.ApplyBind(query, filterTransformation.FilterClause, binderContext);
+                    query = filterBinder.ApplyBind(query, filterTransformation.FilterClause, binderContext);
                 }
             }
 

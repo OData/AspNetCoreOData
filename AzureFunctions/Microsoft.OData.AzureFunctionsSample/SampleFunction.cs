@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.OData.AzureFunctions;
-using Microsoft.AspNetCore.OData.Query;
+using QueryBuilder.Query;
 using System.Collections.Generic;
 using System.Linq;
 

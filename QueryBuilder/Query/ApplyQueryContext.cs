@@ -19,5 +19,12 @@ namespace QueryBuilder.Query
         public IODataFeature ODataFeature { get; internal set; }
 
         public ODataQuerySettings QuerySettings { get; internal set; }
+
+        public int PreferredPageSize { get; internal set; }
+
+
+        //
+
+        public SkipTokenHandler SkipTokenHandler { get; set; }
     }
 }

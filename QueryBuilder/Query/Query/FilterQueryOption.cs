@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Validator;
+using QueryBuilder.Query.Expressions;
+using QueryBuilder.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -43,7 +43,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.GetFilterQueryValidator();
+            Validator = context.Validators.GetFilterQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -51,7 +51,7 @@ namespace QueryBuilder.Query
         {
             _filterClause = filterClause;
             Context = context;
-            Validator = context.GetFilterQueryValidator();
+            Validator = context.Validators.GetFilterQueryValidator();
         }
 
         // This constructor is intended for unit testing only.
@@ -69,13 +69,13 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.GetFilterQueryValidator();
+            Validator = context.Validators.GetFilterQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$filter", rawValue } },
-                context.RequestContainer);
+                new Dictionary<string, string> { { "$filter", rawValue } }/*,
+                context.RequestContainer*/);
         }
 
         /// <summary>

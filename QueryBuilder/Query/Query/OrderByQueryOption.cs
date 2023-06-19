@@ -171,33 +171,11 @@ namespace QueryBuilder.Query
         /// Apply the $orderby query to the given IQueryable.
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, IOrderByBinder binder)
-        {
-            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            return ApplyToCore(query, querySettings, binder) as IOrderedQueryable<T>;
-        }
-
-        /// <summary>
-        /// Apply the $orderby query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
         /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
         public IOrderedQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, IOrderByBinder binder)
         {
             return ApplyToCore(query, querySettings, binder) as IOrderedQueryable<T>;
-        }
-
-        /// <summary>
-        /// Apply the $orderby query to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the orderby query has been applied to.</returns>
-        public IOrderedQueryable ApplyTo(IQueryable query, IOrderByBinder binder)
-        {
-            ODataQuerySettings querySettings = Context.GetODataQuerySettings();
-            return ApplyToCore(query, querySettings, binder);
         }
 
         /// <summary>
@@ -244,7 +222,6 @@ namespace QueryBuilder.Query
             HashSet<string> openPropertiesSoFar = new HashSet<string>();
             bool orderByItSeen = false;
 
-            //IOrderByBinder binder = Context.GetOrderByBinder();
             QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
             if (Compute != null)
             {

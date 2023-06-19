@@ -58,7 +58,7 @@ namespace QueryBuilder.Query
             Context = context;
             RawSelect = select;
             RawExpand = expand;
-            Validator = context.GetSelectExpandQueryValidator();
+            Validator = context.Validators.GetSelectExpandQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
