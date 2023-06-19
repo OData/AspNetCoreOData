@@ -98,6 +98,20 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
                         }
                     },
 
+                    // not in model enum
+                    new InModelPerson
+                    {
+                        Id = 22, // special Id number
+                        Name = "Yin",
+                        Data = NotInModelEnum.Apple,
+                        Infos = new object[] { InModelColor.Blue, InModelColor.Green, NotInModelEnum.Apple },
+                        Containers = new Dictionary<string, object>
+                        {
+                            { "EnumDynamic1", InModelColor.Blue },
+                            { "EnumDynamic2", NotInModelEnum.Apple },
+                        }
+                    },
+
                     // In model complex
                     new InModelPerson
                     {

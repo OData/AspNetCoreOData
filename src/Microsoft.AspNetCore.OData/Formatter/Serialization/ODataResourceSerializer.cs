@@ -638,6 +638,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             IEdmStructuredType structuredType = resourceContext.StructuredType;
             IEdmStructuredObject structuredObject = resourceContext.EdmObject;
+            ODataSerializerContext serializierContext = resourceContext.SerializerContext;
             object value;
             IDelta delta = structuredObject as IDelta;
             if (structuredObject is EdmUntypedObject untypedObject) // NO CLR, NO EDM
@@ -700,10 +701,25 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     continue;
                 }
 
-                IEdmTypeReference edmTypeReference = resourceContext.SerializerContext.GetEdmType(dynamicPropertyValue,
-                    dynamicPropertyValue.GetType(), true);
+                Type propertyType = dynamicPropertyValue.GetType();
+                IEdmTypeReference edmTypeReference = serializierContext.GetEdmType(dynamicPropertyValue, propertyType, true);
                 if (edmTypeReference == null || edmTypeReference.IsStructuredOrUntyped())
                 {
+                    if (TypeHelper.IsEnum(propertyType))
+                    {
+                        // we don't have the Edm enum type in the model, let's write it as string.
+                        dynamicProperties.Add(new ODataProperty
+                        {
+                            Name = dynamicProperty.Key,
+
+                            // TBD: Shall we write the un-declared enum value as full-name string?
+                            // So, "Data":"Apple"  => should be ""Data":"Namespace.EnumTypeName.Apple" ?
+                            Value = dynamicPropertyValue.ToString()
+                        });
+
+                        continue;
+                    }
+
                     resourceContext.AppendDynamicOrUntypedProperty(dynamicProperty.Key, dynamicPropertyValue);
                 }
                 else
@@ -716,7 +732,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
 
                     dynamicProperties.Add(propertySerializer.CreateProperty(
-                        dynamicPropertyValue, edmTypeReference, dynamicProperty.Key, resourceContext.SerializerContext));
+                        dynamicPropertyValue, edmTypeReference, dynamicProperty.Key, serializierContext));
                 }
             }
 
@@ -1388,8 +1404,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // 1) If we can get EdmType from model, Let's use it.
             // 2) If no (aka, we don't have an Edm type associated). So, let's treat it a Untyped.
             actualType = writeContext.GetEdmType(propertyValue, propertyType, true);
+
             if (actualType.IsStructuredOrUntyped())
             {
+                if (TypeHelper.IsEnum(propertyType))
+                {
+                    // we don't have the Edm enum type in the model, let's write it as string.
+                    return new ODataProperty
+                    {
+                        Name = structuralProperty.Name,
+
+                        // TBD: Shall we write the un-declared enum value as full-name string?
+                        // So, "Data":"Apple"  => should be ""Data":"Namespace.EnumTypeName.Apple" ?
+                        Value = propertyValue.ToString()
+                    };
+                }
+
                 return propertyValue;
             }
 
