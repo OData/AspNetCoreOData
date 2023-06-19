@@ -10,7 +10,8 @@ namespace QueryBuilder.Deltas
     /// <see cref="DeltaSet{T}" /> allows and tracks changes to a delta resource set.
     /// </summary>
     [SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "<Pending>")]
-    [NonValidatingParameterBinding]
+    // TODO: Fix attribute compilation below:
+    //[NonValidatingParameterBinding]
     public class DeltaSet<T> : Collection<IDeltaSetItem>, IDeltaSet, ITypedDelta where T : class
     {
         /// <summary>

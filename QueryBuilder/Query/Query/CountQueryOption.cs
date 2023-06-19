@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Query.Validator;
+using QueryBuilder.Query.Validator;
 using Microsoft.OData.UriParser;
 
 namespace QueryBuilder.Query
@@ -59,13 +59,13 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.GetCountQueryValidator();
+            Validator = context.Validators.GetCountQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$count", rawValue } },
-                context.RequestContainer);
+                new Dictionary<string, string> { { "$count", rawValue } }/*,
+                context.RequestContainer*/);
         }
 
         /// <summary>

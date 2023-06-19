@@ -10,7 +10,8 @@ namespace QueryBuilder.Query
     /// This defines a composite OData query options that can be used to perform query composition.
     /// Currently this only supports $filter, $orderby, $top, $skip.
     /// </summary>
-    [ODataQueryParameterBinding]
+    // TODO: Fix attribute compilation below:
+    //[ODataQueryParameterBinding]
     public class ODataQueryOptions<TEntity> : ODataQueryOptions
     {
         /// <summary>

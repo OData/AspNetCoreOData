@@ -42,9 +42,9 @@ property selection combination possible. */
             throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(SelectExpandWrapper<>).Name));
         }
 
-        //public override void Write(Utf8JsonWriter writer, SelectExpandWrapper<TEntity> value, JsonSerializerOptions options)
-        //{
-        //    JsonSerializer.Serialize(writer, value.ToDictionary(SelectExpandWrapperConverter.MapperProvider), options);
-        //}
+        public override void Write(Utf8JsonWriter writer, SelectExpandWrapper<TEntity> value, JsonSerializerOptions options)
+        {
+            JsonSerializer.Serialize(writer, value.ToDictionary(SelectExpandWrapperConverter.MapperProvider), options);
+        }
     }
 }

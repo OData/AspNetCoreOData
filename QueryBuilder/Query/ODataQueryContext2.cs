@@ -26,8 +26,8 @@ namespace QueryBuilder.Query
         /// container may not be present.
         /// </remarks>
         // QUESTION: Pass in whole "ODataUriResolver uriResolver" or just "bool IsNoDollarQueryEnable"?
-        public ODataQueryContext2(IEdmModel model, Type elementClrType, ODataPath path, 
-                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
+        public ODataQueryContext2(IEdmModel model, Type elementClrType, ODataPath path,
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)
         {
             if (elementClrType == null)
             {
@@ -41,7 +41,7 @@ namespace QueryBuilder.Query
                 throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
             }
 
-            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory);
+            Initialize(model, ElementType, elementClrType, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory, skipTokenHandler);
         }
 
         public static Func<ODataUriResolver> DefaultUriResolverFactory { get; } = () => new ODataUriResolver { EnableCaseInsensitive = true }; // one func to encapsulate all of the defaults forever; don't have to worry about too many objects
@@ -70,18 +70,18 @@ namespace QueryBuilder.Query
         /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
         /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
         public ODataQueryContext2(IEdmModel model, IEdmType elementType, ODataPath path,
-                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
+                                  QueryValidators validators = null, DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)
         {
             if (elementType == null)
             {
                 throw Error.ArgumentNull(nameof(elementType));
             }
 
-            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory);
+            Initialize(model, elementType, null, path, validators, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory, skipTokenHandler);
         }
 
         private void Initialize(IEdmModel model, IEdmType elementType, Type elementClrType, ODataPath path, 
-                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations, bool? isNoDollarQueryEnable, Func<ODataUriResolver> uriResolverFactory)
+                           QueryValidators validators, DefaultQueryConfigurations defaultQueryConfigurations, bool? isNoDollarQueryEnable, Func<ODataUriResolver> uriResolverFactory, SkipTokenHandler skipTokenHandler)
         {
             if (model == null)
             {
@@ -104,6 +104,7 @@ namespace QueryBuilder.Query
             ElementClrType = elementClrType;
             Path = path;
             UriResolverFactory = uriResolverFactory ?? DefaultUriResolverFactory;
+            PagingSkipTokenHandler = skipTokenHandler;
             NavigationSource = GetNavigationSource(Model, ElementType, path);
             GetPathContext();
 
@@ -174,6 +175,8 @@ namespace QueryBuilder.Query
         /// Gets the <see cref="ODataPath"/>.
         /// </summary>
         public ODataPath Path { get; private set; }
+
+        public SkipTokenHandler PagingSkipTokenHandler { get; private set; }
 
         internal Uri RequestUri { get; set; }
 

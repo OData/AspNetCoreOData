@@ -29,7 +29,7 @@ namespace QueryBuilder.Query
 
             RawValue = rawValue;
             Validator = context.Validators.GetSkipTokenQueryValidator();
-            Handler = context.GetSkipTokenHandler();
+            Handler = context.PagingSkipTokenHandler;
             Context = context;
         }
 
