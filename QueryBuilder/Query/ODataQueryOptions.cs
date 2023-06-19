@@ -535,7 +535,7 @@ namespace QueryBuilder.Query
         // returns generalizable
         // paging/query context param model
 
-        internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings,ODataFeature odataFeature, int preferredPageSize, string encodedUrl)
+        internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings, ODataFeature odataFeature, int preferredPageSize, string encodedUrl)
         {
             int pageSize = -1;
             if (querySettings.PageSize.HasValue)
@@ -1241,34 +1241,6 @@ namespace QueryBuilder.Query
 
         //    ODataQueryContext2 testContext4 = new ODataQueryContext2(null, (Type)null, null);
         //    ODataQueryOptions testQueryOptions4 = new ODataQueryOptions(testContext, "fakeUri");
-        //}
-
-        //private void Initialize2(ODataQueryContext2 context)
-        //{
-        //    Contract.Assert(context != null);
-
-        //    /*
-        //     * Every class use of _enableNoDollarSignQueryOptions => this.context.IsNoDollarSignQueryOptions()
-        //     * prev if/else logic moves to context2
-        //     */
-
-        //    // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
-        //    // OData query parameters are normalized with the $-sign prefixes when the
-        //    // <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
-        //    RawValues = new ODataRawQueryOptions();
-        //    IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
-
-        //    _queryOptionParser = new ODataQueryOptionParser(
-        //        context.Model,
-        //        context.ElementType,
-        //        context.NavigationSource,
-        //        normalizedQueryParameters);
-
-        //    _queryOptionParser.Resolver = context.UriResolver ?? new ODataUriResolver { EnableCaseInsensitive = true };
-
-        //    BuildQueryOptions(normalizedQueryParameters);
-
-        //    Validator = context.Validators.GetODataQueryValidator();
         //}
     }
 }
