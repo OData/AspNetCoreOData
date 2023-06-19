@@ -362,14 +362,13 @@ namespace QueryBuilder.Query
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1,
-                                          IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null, IFilterBinder filterBinder = null)
+                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, settings, odataFeature, assembliesResolver, requestQueryCollection, encodedUrl, preferredPageSize, orderByBinder, selectExpandBinder, filterBinder);
+            return ApplyTo(query, settings, odataFeature, assembliesResolver, requestQueryCollection, encodedUrl, preferredPageSize);
         }
 
         /// <summary>
@@ -379,8 +378,7 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1,
-                                          IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null, IFilterBinder filterBinder = null)
+                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1)
         {
             if (query == null)
             {
@@ -407,7 +405,7 @@ namespace QueryBuilder.Query
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
             if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
             {
-                result = Apply.ApplyTo(result, querySettings, assembliesResolver, filterBinder);
+                result = Apply.ApplyTo(result, querySettings, assembliesResolver, Context.Binders.GetFilterBinder());
                 odataFeature.ApplyClause = Apply.ApplyClause;
                 this.Context.ElementClrType = Apply.ResultClrType;
             }
@@ -476,7 +474,7 @@ namespace QueryBuilder.Query
                     orderBy.Compute = Compute;
                 }
 
-                result = orderBy.ApplyTo(result, querySettings, orderByBinder);
+                result = orderBy.ApplyTo(result, querySettings, Context.Binders.GetOrderByBinder());
             }
 
             if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
@@ -488,7 +486,7 @@ namespace QueryBuilder.Query
 
             if (SelectExpand != null)
             {
-                var tempResult = ApplySelectExpand(result, querySettings, odataFeature, selectExpandBinder);
+                var tempResult = ApplySelectExpand(result, querySettings, odataFeature);
                 if (tempResult != default(IQueryable))
                 {
                     result = tempResult;
@@ -634,13 +632,13 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, IQueryCollection requestQueryCollection, AllowedQueryOptions ignoreQueryOptions, ISelectExpandBinder binder = null)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, IQueryCollection requestQueryCollection, AllowedQueryOptions ignoreQueryOptions)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(entity, settings, requestFeature, requestQueryCollection, binder);
+            return ApplyTo(entity, settings, requestFeature, requestQueryCollection);
         }
 
         /// <summary>
@@ -651,7 +649,7 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, IQueryCollection requestQueryCollection, ISelectExpandBinder binder = null)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, IQueryCollection requestQueryCollection)
         {
             if (entity == null)
             {
@@ -675,7 +673,7 @@ namespace QueryBuilder.Query
 
             if (SelectExpand != null)
             {
-                var result = ApplySelectExpand(entity, querySettings, requestFeature, binder);
+                var result = ApplySelectExpand(entity, querySettings, requestFeature);
                 if (result != default(object))
                 {
                     return result;
@@ -1120,7 +1118,7 @@ namespace QueryBuilder.Query
         }
 
         // QUESTION: Pass in HttpRequest or Request.ODataFeature() directly?
-        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature, ISelectExpandBinder binder)
+        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
         {
             var result = default(T);
             bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
@@ -1157,11 +1155,11 @@ namespace QueryBuilder.Query
                 var type = typeof(T);
                 if (type == typeof(IQueryable))
                 {
-                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, binder);
+                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, Context.Binders.GetSelectExpandBinder());
                 }
                 else if (type == typeof(object))
                 {
-                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, binder);
+                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, Context.Binders.GetSelectExpandBinder());
                 }
             }
 
