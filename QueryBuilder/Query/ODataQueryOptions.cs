@@ -69,7 +69,7 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// <param name="request">The incoming request message.</param>
-        public ODataQueryOptions(ODataQueryContext2 context, string requestUri)
+        public ODataQueryOptions(ODataQueryContext2 context, string requestUri, IQueryCollection requestQueryCollection)
         {
             if (context == null)
             {
@@ -89,7 +89,7 @@ namespace QueryBuilder.Query
             RequestUri = new Uri(requestUri);
             context.RequestUri = RequestUri;
 
-            Initialize(context);
+            Initialize(context, requestQueryCollection);
             //Initialize2();
         }
 
@@ -371,14 +371,14 @@ namespace QueryBuilder.Query
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          string encodedUrl, int preferredPageSize = -1,
+                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1,
                                           IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null, IFilterBinder filterBinder = null)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, settings, odataFeature, assembliesResolver, encodedUrl, preferredPageSize, orderByBinder, selectExpandBinder, filterBinder);
+            return ApplyTo(query, settings, odataFeature, assembliesResolver, requestQueryCollection, encodedUrl, preferredPageSize, orderByBinder, selectExpandBinder, filterBinder);
         }
 
         /// <summary>
@@ -388,7 +388,7 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          string encodedUrl, int preferredPageSize = -1,
+                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1,
                                           IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null, IFilterBinder filterBinder = null)
         {
             if (query == null)
@@ -493,7 +493,7 @@ namespace QueryBuilder.Query
                 result = SkipToken.ApplyTo(result, querySettings, this);
             }
 
-            AddAutoSelectExpandProperties();
+            AddAutoSelectExpandProperties(requestQueryCollection);
 
             if (SelectExpand != null)
             {
@@ -643,13 +643,13 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, AllowedQueryOptions ignoreQueryOptions, ISelectExpandBinder binder = null)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, IQueryCollection requestQueryCollection, AllowedQueryOptions ignoreQueryOptions, ISelectExpandBinder binder = null)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(entity, settings, requestFeature, binder);
+            return ApplyTo(entity, settings, requestFeature, requestQueryCollection, binder);
         }
 
         /// <summary>
@@ -660,7 +660,7 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, ISelectExpandBinder binder = null)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, IQueryCollection requestQueryCollection, ISelectExpandBinder binder = null)
         {
             if (entity == null)
             {
@@ -680,7 +680,7 @@ namespace QueryBuilder.Query
             // Update the query setting
             querySettings = Context.UpdateQuerySettings(querySettings, query: null);
 
-            AddAutoSelectExpandProperties();
+            AddAutoSelectExpandProperties(requestQueryCollection);
 
             if (SelectExpand != null)
             {
@@ -868,13 +868,13 @@ namespace QueryBuilder.Query
             return truncatedCollection.AsQueryable();
         }
 
-        internal void AddAutoSelectExpandProperties()
+        internal void AddAutoSelectExpandProperties(IQueryCollection requestQueryCollection)
         {
             bool containsAutoSelectExpandProperties = false;
             var autoExpandRawValue = GetAutoExpandRawValue();
             var autoSelectRawValue = GetAutoSelectRawValue();
 
-            IDictionary<string, string> queryParameters = GetODataQueryParameters();
+            IDictionary<string, string> queryParameters = GetODataQueryParameters(requestQueryCollection);
 
             if (!String.IsNullOrEmpty(autoExpandRawValue) && !autoExpandRawValue.Equals(RawValues.Expand, StringComparison.Ordinal))
             {
@@ -922,11 +922,11 @@ namespace QueryBuilder.Query
         }
 
         /// <param name="requestQueryCollection">The query value collection parsed from the request's QueryString.</param>
-        private IDictionary<string, string> GetODataQueryParameters(/*POTENCH: IQueryCollection requestQueryCollection*/) // to replace equest.Query, from Microsoft.AspNetCore.Http
+        private IDictionary<string, string> GetODataQueryParameters(IQueryCollection requestQueryCollection)
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
-            foreach (var query in Request.Query)
+            foreach (var query in /*Request.Query*/ requestQueryCollection)
             {
                 string key = query.Key.Trim();
                 string value = query.Value.ToString();
@@ -1184,7 +1184,7 @@ namespace QueryBuilder.Query
         /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// 
         // TODO: Add optional context field: uriResolver
-        private void Initialize(ODataQueryContext2 context)
+        private void Initialize(ODataQueryContext2 context, IQueryCollection requestQueryCollection)
         {
             Contract.Assert(context != null);
 
@@ -1201,7 +1201,7 @@ namespace QueryBuilder.Query
             // OData query parameters are normalized with the $-sign prefixes when the
             // <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
             RawValues = new ODataRawQueryOptions();
-            IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
+            IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters(requestQueryCollection);
 
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
