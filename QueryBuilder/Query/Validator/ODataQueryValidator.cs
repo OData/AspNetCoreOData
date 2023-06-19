@@ -1,5 +1,6 @@
-﻿using QueryBuilder.Extensions;
+﻿//using QueryBuilder.Extensions;
 using Microsoft.OData;
+using Microsoft.OData.UriParser;
 
 namespace QueryBuilder.Query.Validator
 {
@@ -66,6 +67,7 @@ namespace QueryBuilder.Query.Validator
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions);
             }
 
+            //TODO: bool isCountRequest = Path != null && Context.Path.LastSegment is CountSegment;
             if (options.Count != null || options.Request.IsCountRequest())
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions);

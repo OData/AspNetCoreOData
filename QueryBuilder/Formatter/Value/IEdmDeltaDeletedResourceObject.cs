@@ -1,0 +1,23 @@
+﻿using System;
+using Microsoft.OData;
+using QueryBuilder.Formatter.Value;
+
+namespace QueryBuilder.Formatter.Value
+{
+    /// <summary>
+    /// Represents an instance of an <see cref="IEdmChangedObject"/>.
+    /// Holds the properties necessary to create the ODataDeletedResource.
+    /// </summary>
+    public interface IEdmDeltaDeletedResourceObject : IEdmChangedObject
+    {
+        /// <summary>
+        /// The id of the deleted entity (same as the odata.id returned or computed when calling GET on resource), which may be absolute or relative.
+        /// </summary>
+        Uri Id { get; set; }
+
+        /// <summary>
+        /// Optional. Either deleted, if the entity was deleted (destroyed), or changed if the entity was removed from membership in the result (i.e., due to a data change).
+        /// </summary>
+        DeltaDeletedEntryReason? Reason { get; set; }
+    }
+}

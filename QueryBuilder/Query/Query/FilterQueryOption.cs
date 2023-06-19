@@ -155,7 +155,7 @@ namespace QueryBuilder.Query
                 binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
             }
 
-            IFilterBinder binder = Context.GetFilterBinder();
+            IFilterBinder binder = Context.Binders.GetFilterBinder();
             return binder.ApplyBind(query, filterClause, binderContext);
         }
 

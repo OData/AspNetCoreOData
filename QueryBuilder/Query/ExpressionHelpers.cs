@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-//using Microsoft.AspNetCore.OData.Common;
-//using Microsoft.AspNetCore.OData.Edm;
-//using Microsoft.AspNetCore.OData.Query.Container;
+using QueryBuilder.Common;
+using QueryBuilder.Edm;
+using QueryBuilder.Query.Container;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 

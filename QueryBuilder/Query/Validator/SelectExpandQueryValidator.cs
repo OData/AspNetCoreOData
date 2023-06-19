@@ -365,12 +365,12 @@ namespace QueryBuilder.Query.Validator
 
             // It seems the query validator interface should take the AST as input, but now we have the XXXQueryOption.
             // Here's the workaround, we should change it later.
-            IFilterQueryValidator filterValidator = validatorContext.Context.GetFilterQueryValidator();
+            IFilterQueryValidator filterValidator = validatorContext.Context.Validators.GetFilterQueryValidator();
 
-            ODataQueryContext queryContext = new ODataQueryContext
+            ODataQueryContext2 queryContext = new ODataQueryContext2
             {
-                Request = validatorContext.Context.Request,
-                RequestContainer = validatorContext.Context.RequestContainer,
+                RequestUri = validatorContext.Context.RequestUri,
+                /*RequestContainer = validatorContext.Context.RequestContainer,*/
                 Model = validatorContext.Context.Model,
                 TargetProperty = validatorContext.Property,
                 TargetStructuredType = validatorContext.StructuredType
