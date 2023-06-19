@@ -35,16 +35,16 @@ property selection combination possible. */
         }
     }
 
-    internal class SelectExpandWrapperConverter<TEntity> : JsonConverter<SelectExpandWrapper<TEntity>>
-    {
-        public override SelectExpandWrapper<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(SelectExpandWrapper<>).Name));
-        }
+    //internal class SelectExpandWrapperConverter<TEntity> : JsonConverter<SelectExpandWrapper<TEntity>>
+    //{
+    //    public override SelectExpandWrapper<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    //    {
+    //        throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(SelectExpandWrapper<>).Name));
+    //    }
 
-        public override void Write(Utf8JsonWriter writer, SelectExpandWrapper<TEntity> value, JsonSerializerOptions options)
-        {
-            JsonSerializer.Serialize(writer, value.ToDictionary(SelectExpandWrapperConverter.MapperProvider), options);
-        }
-    }
+    //    public override void Write(Utf8JsonWriter writer, SelectExpandWrapper<TEntity> value, JsonSerializerOptions options)
+    //    {
+    //        JsonSerializer.Serialize(writer, value.ToDictionary(SelectExpandWrapperConverter.MapperProvider), options);
+    //    }
+    //}
 }
