@@ -15,8 +15,7 @@ using System.Reflection;
 //using Microsoft.AspNetCore.OData.Query.Container;
 //using Microsoft.AspNetCore.OData.Query.Validator;
 //using Microsoft.Extensions.DependencyInjection;
-//using Microsoft.Extensions.Primitives;
-//using Microsoft.Net.Http.Headers;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -29,7 +28,6 @@ using QueryBuilder.Query.Container;
 using QueryBuilder.Routing;
 using QueryBuilder.Query.Validator;
 using QueryBuilder.Query.Expressions;
-using Microsoft.Extensions.Primitives;
 using System.Net.Http;
 using System.ComponentModel.Design;
 using System.IO;
@@ -52,13 +50,13 @@ namespace QueryBuilder.Query
 
         private ODataQueryOptionParser _queryOptionParser;
 
-        //private ETag _etagIfMatch;
+        private ETag _etagIfMatch;
 
-        //private bool _etagIfMatchChecked;
+        private bool _etagIfMatchChecked;
 
-        //private ETag _etagIfNoneMatch;
+        private ETag _etagIfNoneMatch;
 
-        //private bool _etagIfNoneMatchChecked;
+        private bool _etagIfNoneMatchChecked;
 
         private bool _enableNoDollarSignQueryOptions = false;
 
@@ -85,13 +83,11 @@ namespace QueryBuilder.Query
             //Contract.Assert(context.RequestContainer == null);
             //context.RequestContainer = request.GetRouteServices();
 
-
             Context = context;
             RequestUri = new Uri(requestUri);
             context.RequestUri = RequestUri;
 
             Initialize(context, requestQueryCollection);
-            //Initialize2();
         }
 
         /// <summary>
@@ -208,118 +204,112 @@ namespace QueryBuilder.Query
                  fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
         }
 
-        ///// <summary>
-        ///// Gets the <see cref="ETag"/> from IfMatch header.
-        ///// </summary>
-        //public virtual ETag IfMatch(StringValues ifMatchValues)
-        //{
-        //    get
-        //    {
-        //        if (!_etagIfMatchChecked && _etagIfMatch == null)
-        //        {
-        //            StringValues ifMatchValues;
-        //            if (Request.Headers.TryGetValue("If-Match", out ifMatchValues))
-        //            {
-        //                EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifMatchValues.SingleOrDefault());
-        //                _etagIfMatch = GetETag(etagHeaderValue);
-        //                _etagIfMatchChecked = true;
-        //            }
-        //        }
+        /// <summary>
+        /// Gets the <see cref="ETag"/> from IfMatch header.
+        /// </summary>
+        public virtual ETag IfMatch(StringValues ifMatchValues, IETagHandler etagHandler)
+        {
+            if (!_etagIfMatchChecked && _etagIfMatch == null)
+            {
+                //StringValues ifMatchValues;
+                //if (Request.Headers.TryGetValue("If-Match", out ifMatchValues))
+                //{
+                EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifMatchValues.SingleOrDefault());
+                _etagIfMatch = GetETag(etagHeaderValue, etagHandler);
+                _etagIfMatchChecked = true;
+                //}
+            }
 
-        //        return _etagIfMatch;
-        //    }
-        //}
+            return _etagIfMatch;
+        }
 
-        ///// <summary>
-        ///// Gets the <see cref="ETag"/> from IfNoneMatch header.
-        ///// </summary>
-        //public virtual ETag IfNoneMatch
-        //{
-        //    get
-        //    {
-        //        if (!_etagIfNoneMatchChecked && _etagIfNoneMatch == null)
-        //        {
-        //            StringValues ifNoneMatchValues;
-        //            if (Request.Headers.TryGetValue("If-None-Match", out ifNoneMatchValues))
-        //            {
-        //                EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifNoneMatchValues.SingleOrDefault());
-        //                _etagIfNoneMatch = GetETag(etagHeaderValue);
-        //                if (_etagIfNoneMatch != null)
-        //                {
-        //                    _etagIfNoneMatch.IsIfNoneMatch = true;
-        //                }
-        //                _etagIfNoneMatchChecked = true;
-        //            }
+        /// <summary>
+        /// Gets the <see cref="ETag"/> from IfNoneMatch header.
+        /// </summary>
+        public virtual ETag IfNoneMatch(StringValues ifNoneMatchValues, IETagHandler etagHandler)
+        {
+            if (!_etagIfNoneMatchChecked && _etagIfNoneMatch == null)
+            {
+                //StringValues ifNoneMatchValues;
+                //if (Request.Headers.TryGetValue("If-None-Match", out ifNoneMatchValues))
+                //{
+                EntityTagHeaderValue etagHeaderValue = EntityTagHeaderValue.Parse(ifNoneMatchValues.SingleOrDefault());
+                _etagIfNoneMatch = GetETag(etagHeaderValue, etagHandler);
+                if (_etagIfNoneMatch != null)
+                {
+                    _etagIfNoneMatch.IsIfNoneMatch = true;
+                }
+                _etagIfNoneMatchChecked = true;
+                //}
 
-        //            _etagIfNoneMatchChecked = true;
-        //        }
+                //_etagIfNoneMatchChecked = true;
+            }
 
-        //        return _etagIfNoneMatch;
-        //    }
-        //}
+            return _etagIfNoneMatch;
+        }
 
         /// <summary>
         /// Gets the EntityTagHeaderValue ETag.
         /// </summary>
-        //internal virtual ETag GetETag(EntityTagHeaderValue etagHeaderValue, IETagHandler etagHandler)
-        //{
+        internal virtual ETag GetETag(EntityTagHeaderValue etagHeaderValue, IETagHandler etagHandler)
+        {
 
-        //    if (etagHeaderValue != null)
-        //    {
-        //        if (etagHeaderValue.Equals(EntityTagHeaderValue.Any))
-        //        {
-        //            return new ETag { IsAny = true };
-        //        }
+            if (etagHeaderValue != null)
+            {
+                if (etagHeaderValue.Equals(EntityTagHeaderValue.Any))
+                {
+                    return new ETag { IsAny = true };
+                }
 
-        //         get the etag handler, and parse the etag
-        //        IDictionary<string, object> properties = etagHandler.ParseETag(etagHeaderValue) ?? new Dictionary<string, object>();
-        //        IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
+                // get the etag handler, and parse the etag
+                IDictionary<string, object> properties = etagHandler.ParseETag(etagHeaderValue) ?? new Dictionary<string, object>();
+                IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
 
-        //         get property names from request
-        //        ODataPath odataPath = Context.Path;
-        //        IEdmModel model = Context.Model;
-        //        IEdmNavigationSource source = odataPath.GetNavigationSource();
-        //        if (model != null && source != null)
-        //        {
-        //            IList<IEdmStructuralProperty> concurrencyProperties = model.GetConcurrencyProperties(source).ToList();
-        //            IList<string> concurrencyPropertyNames = concurrencyProperties.OrderBy(c => c.Name).Select(c => c.Name).ToList();
-        //            ETag etag = new ETag();
+                // get property names from request
+                ODataPath odataPath = Context.Path;
+                IEdmModel model = Context.Model;
+                IEdmNavigationSource source = odataPath.GetNavigationSource();
+                if (model != null && source != null)
+                {
+                    IList<IEdmStructuralProperty> concurrencyProperties = model.GetConcurrencyProperties(source).ToList();
+                    IList<string> concurrencyPropertyNames = concurrencyProperties.OrderBy(c => c.Name).Select(c => c.Name).ToList();
+                    ETag etag = new ETag();
 
-        //            if (parsedETagValues.Count != concurrencyPropertyNames.Count)
-        //            {
-        //                etag.IsWellFormed = false;
-        //            }
+                    if (parsedETagValues.Count != concurrencyPropertyNames.Count)
+                    {
+                        etag.IsWellFormed = false;
+                    }
 
-        //            IEnumerable<KeyValuePair<string, object>> nameValues = concurrencyPropertyNames.Zip(
-        //                parsedETagValues,
-        //                (name, value) => new KeyValuePair<string, object>(name, value));
-        //            foreach (var nameValue in nameValues)
-        //            {
-        //                IEdmStructuralProperty property = concurrencyProperties.SingleOrDefault(e => e.Name == nameValue.Key);
-        //                Contract.Assert(property != null);
+                    IEnumerable<KeyValuePair<string, object>> nameValues = concurrencyPropertyNames.Zip(
+                        parsedETagValues,
+                        (name, value) => new KeyValuePair<string, object>(name, value));
+                    foreach (var nameValue in nameValues)
+                    {
+                        IEdmStructuralProperty property = concurrencyProperties.SingleOrDefault(e => e.Name == nameValue.Key);
+                        Contract.Assert(property != null);
 
-        //                Type clrType = model.GetClrType(property.Type);
-        //                Contract.Assert(clrType != null);
+                        Type clrType = model.GetClrType(property.Type);
+                        Contract.Assert(clrType != null);
 
-        //                if (nameValue.Value != null)
-        //                {
-        //                    Type valueType = nameValue.Value.GetType();
-        //                    etag[nameValue.Key] = valueType != clrType
-        //                        ? Convert.ChangeType(nameValue.Value, clrType, CultureInfo.InvariantCulture)
-        //                        : nameValue.Value;
-        //                }
-        //                else
-        //                {
-        //                    etag[nameValue.Key] = nameValue.Value;
-        //                }
-        //            }
+                        if (nameValue.Value != null)
+                        {
+                            Type valueType = nameValue.Value.GetType();
+                            etag[nameValue.Key] = valueType != clrType
+                                ? Convert.ChangeType(nameValue.Value, clrType, CultureInfo.InvariantCulture)
+                                : nameValue.Value;
+                        }
+                        else
+                        {
+                            etag[nameValue.Key] = nameValue.Value;
+                        }
+                    }
 
-        //            return etag;
-        //        }
-        //    }
+                    return etag;
+                }
+            }
 
-        //    return null;
-        //}
+            return null;
+        }
 
         /// <summary>
         /// Check if the given query option is the supported query option (case-insensitive by default).
