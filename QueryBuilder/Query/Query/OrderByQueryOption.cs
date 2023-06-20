@@ -21,12 +21,12 @@ namespace QueryBuilder.Query
 
         /// <summary>
         /// Initialize a new instance of <see cref="OrderByQueryOption"/> based on the raw $orderby value and
-        /// an EdmModel from <see cref="ODataQueryContext2"/>.
+        /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $orderby query. It can be null or empty.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public OrderByQueryOption(string rawValue, ODataQueryContext2 context, ODataQueryOptionParser queryOptionParser)
+        public OrderByQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (context == null)
             {
@@ -50,7 +50,7 @@ namespace QueryBuilder.Query
             _queryOptionParser = queryOptionParser;
         }
 
-        internal OrderByQueryOption(string rawValue, ODataQueryContext2 context, string applyRaw)
+        internal OrderByQueryOption(string rawValue, ODataQueryFundamentalsContext context, string applyRaw)
         {
             if (context == null)
             {
@@ -81,7 +81,7 @@ namespace QueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal OrderByQueryOption(string rawValue, ODataQueryContext2 context)
+        internal OrderByQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (context == null)
             {
@@ -116,9 +116,9 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        ///  Gets the given <see cref="ODataQueryContext2"/>.
+        ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// Gets the mutable list of <see cref="OrderByPropertyNode"/> instances for this query option.

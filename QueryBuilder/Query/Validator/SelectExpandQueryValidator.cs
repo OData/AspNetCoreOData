@@ -367,7 +367,7 @@ namespace QueryBuilder.Query.Validator
             // Here's the workaround, we should change it later.
             IFilterQueryValidator filterValidator = validatorContext.Context.Validators.GetFilterQueryValidator();
 
-            ODataQueryContext2 queryContext = new ODataQueryContext2
+            ODataQueryFundamentalsContext queryContext = new ODataQueryFundamentalsContext
             {
                 RequestUri = validatorContext.Context.RequestUri,
                 /*RequestContainer = validatorContext.Context.RequestContainer,*/

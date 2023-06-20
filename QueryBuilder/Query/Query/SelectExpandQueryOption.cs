@@ -30,9 +30,9 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="select">The $select query parameter value.</param>
         /// <param name="expand">The $expand query parameter value.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public SelectExpandQueryOption(string select, string expand, ODataQueryContext2 context,
+        public SelectExpandQueryOption(string select, string expand, ODataQueryFundamentalsContext context,
             ODataQueryOptionParser queryOptionParser)
         {
             if (context == null)
@@ -65,7 +65,7 @@ namespace QueryBuilder.Query
         internal SelectExpandQueryOption(
             string select,
             string expand,
-            ODataQueryContext2 context,
+            ODataQueryFundamentalsContext context,
             SelectExpandClause selectExpandClause)
             : this(select, expand, context)
         {
@@ -73,7 +73,7 @@ namespace QueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal SelectExpandQueryOption(string select, string expand, ODataQueryContext2 context)
+        internal SelectExpandQueryOption(string select, string expand, ODataQueryFundamentalsContext context)
             : this(select, expand, context, queryOptionParser: context != null
                     ? new ODataQueryOptionParser(
                         context.Model,
@@ -90,9 +90,9 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        ///  Gets the given <see cref="ODataQueryContext2"/>.
+        ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// Gets the raw $select value.

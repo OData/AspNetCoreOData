@@ -12,7 +12,7 @@ namespace QueryBuilder.Query.Validator
         private IEdmProperty _property;
         private IEdmStructuredType _structuredType;
 
-        public OrderByModelLimitationsValidator(ODataQueryContext2 context, bool enableOrderBy)
+        public OrderByModelLimitationsValidator(ODataQueryFundamentalsContext context, bool enableOrderBy)
         {
             _model = context.Model;
             _enableOrderBy = enableOrderBy;

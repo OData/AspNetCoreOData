@@ -19,12 +19,12 @@ namespace QueryBuilder.Query
 
         /// <summary>
         /// Initialize a new instance of <see cref="SkipQueryOption"/> based on the raw $skip value and
-        /// an EdmModel from <see cref="ODataQueryContext2"/>.
+        /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $skip query. It can be null or empty.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public SkipQueryOption(string rawValue, ODataQueryContext2 context, ODataQueryOptionParser queryOptionParser)
+        public SkipQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (context == null)
             {
@@ -48,7 +48,7 @@ namespace QueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal SkipQueryOption(string rawValue, ODataQueryContext2 context)
+        internal SkipQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (context == null)
             {
@@ -71,9 +71,9 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        /// Gets the given <see cref="ODataQueryContext2"/>.
+        /// Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// Gets the raw $skip value.

@@ -19,9 +19,9 @@ namespace QueryBuilder.Query
         /// Initializes a new instance of the <see cref="CountQueryOption" /> class.
         /// </summary>
         /// <param name="rawValue">The raw value for the $count query option.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the query context.</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the query context.</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public CountQueryOption(string rawValue, ODataQueryContext2 context, ODataQueryOptionParser queryOptionParser)
+        public CountQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (String.IsNullOrEmpty(rawValue))
             {
@@ -45,7 +45,7 @@ namespace QueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal CountQueryOption(string rawValue, ODataQueryContext2 context)
+        internal CountQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (String.IsNullOrEmpty(rawValue))
             {
@@ -69,9 +69,9 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        /// Gets the given <see cref="ODataQueryContext2"/>.
+        /// Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// Gets the raw $count value.

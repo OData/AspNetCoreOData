@@ -16,21 +16,21 @@ namespace QueryBuilder.Query
     /// </summary>
     // TODO: Fix attribute compilation below:
     //[ODataQueryParameterBinding]
-    public class ODataQueryOptions<TEntity> : ODataQueryOptions
+    public class ODataQueryOptions<TEntity> : ODataQueryOptionsFundamentals
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
-        /// the <see cref="ODataQueryContext2"/>.
+        /// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
+        /// the <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="request">The incoming request message</param>
         /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
-        public ODataQueryOptions(ODataQueryContext2 context, string requestUri, IQueryCollection requestQueryCollection)
+        public ODataQueryOptions(ODataQueryFundamentalsContext context, string requestUri, IQueryCollection requestQueryCollection)
             : base(context, requestUri, requestQueryCollection)
         {
             if (Context.ElementClrType == null)
             {
-                throw Error.Argument("context", SRResources.ElementClrTypeNull, typeof(ODataQueryContext2).Name);
+                throw Error.Argument("context", SRResources.ElementClrTypeNull, typeof(ODataQueryFundamentalsContext).Name);
             }
 
             if (context.ElementClrType != typeof(TEntity))
@@ -109,7 +109,7 @@ namespace QueryBuilder.Query
 
             if (!TypeHelper.IsTypeAssignableFrom(typeof(TEntity), query.ElementType))
             {
-                throw Error.Argument("query", SRResources.CannotApplyODataQueryOptionsOfT, typeof(ODataQueryOptions).Name, typeof(TEntity).FullName, typeof(IQueryable).Name, query.ElementType.FullName);
+                throw Error.Argument("query", SRResources.CannotApplyODataQueryOptionsOfT, typeof(ODataQueryOptionsFundamentals).Name, typeof(TEntity).FullName, typeof(IQueryable).Name, query.ElementType.FullName);
             }
         }
     }

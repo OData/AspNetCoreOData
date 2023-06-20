@@ -127,9 +127,9 @@ namespace QueryBuilder.Abstracts
         public Uri DeltaLink { get; set; }
 
         /// <summary>
-        /// Gets or sets the parsed <see cref="ODataQueryOptions"/> of the request.
+        /// Gets or sets the parsed <see cref="ODataQueryOptionsFundamentals"/> of the request.
         /// </summary>
-        internal ODataQueryOptions QueryOptions { get; set; }
+        internal ODataQueryOptionsFundamentals QueryOptions { get; set; }
 
         /// <summary>
         /// Page size to be used by skiptoken implementation for the top-level resource for the request. 

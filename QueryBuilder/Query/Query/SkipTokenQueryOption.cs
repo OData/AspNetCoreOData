@@ -11,11 +11,11 @@ namespace QueryBuilder.Query
     {
         /// <summary>
         /// Initialize a new instance of <see cref="SkipQueryOption"/> based on the raw $skiptoken value and
-        /// an EdmModel from <see cref="ODataQueryContext2"/>.
+        /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $skiptoken query.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
-        public SkipTokenQueryOption(string rawValue, ODataQueryContext2 context)
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        public SkipTokenQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (string.IsNullOrEmpty(rawValue))
             {
@@ -39,9 +39,9 @@ namespace QueryBuilder.Query
         public string RawValue { get; }
 
         /// <summary>
-        /// Gets the given <see cref="ODataQueryContext2"/>.
+        /// Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; }
+        public ODataQueryFundamentalsContext Context { get; }
 
         /// <summary>
         /// Gets the SkipToken Query Validator.
@@ -60,7 +60,7 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The query settings to use while applying this query option.</param>
         /// <param name="queryOptions">Information about the other query options.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
-        public virtual IQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+        public virtual IQueryable<T> ApplyTo<T>(IQueryable<T> query, ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptions)
         {
             return Handler.ApplyTo(query, this, querySettings, queryOptions) as IOrderedQueryable<T>;
         }
@@ -72,7 +72,7 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The query settings to use while applying this query option.</param>
         /// <param name="queryOptions">Information about the other query options.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptions)
         {
             return Handler.ApplyTo(query, this, querySettings, queryOptions);
         }

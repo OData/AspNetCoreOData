@@ -18,12 +18,12 @@ namespace QueryBuilder.Query
 
         /// <summary>
         /// Initialize a new instance of <see cref="ComputeQueryOption"/> based on the raw $compute value and
-        /// an EdmModel from <see cref="ODataQueryContext2"/>.
+        /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $compute query. It can be null or empty.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public ComputeQueryOption(string rawValue, ODataQueryContext2 context, ODataQueryOptionParser queryOptionParser)
+        public ComputeQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (string.IsNullOrEmpty(rawValue))
             {
@@ -48,7 +48,7 @@ namespace QueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal ComputeQueryOption(string rawValue, ODataQueryContext2 context)
+        internal ComputeQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (string.IsNullOrEmpty(rawValue))
             {
@@ -73,9 +73,9 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        /// Gets the given <see cref="ODataQueryContext2"/>.
+        /// Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; }
+        public ODataQueryFundamentalsContext Context { get; }
 
         /// <summary>
         /// ClrType for result of transformations

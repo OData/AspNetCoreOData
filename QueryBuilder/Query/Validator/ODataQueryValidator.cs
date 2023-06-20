@@ -14,7 +14,7 @@ namespace QueryBuilder.Query.Validator
         /// </summary>
         /// <param name="options">The OData query to validate.</param>
         /// <param name="validationSettings">The validation settings.</param>
-        public virtual void Validate(ODataQueryOptions options, ODataValidationSettings validationSettings)
+        public virtual void Validate(ODataQueryOptionsFundamentals options, ODataValidationSettings validationSettings)
         {
             if (options == null)
             {

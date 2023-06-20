@@ -43,9 +43,9 @@ namespace QueryBuilder.Query
     //[NonValidatingParameterBinding]
     //[ODataQueryParameterBinding]
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
-    public class ODataQueryOptions
+    public class ODataQueryOptionsFundamentals
     {
-        private static readonly MethodInfo _limitResultsGenericMethod = typeof(ODataQueryOptions).GetMethods(BindingFlags.Public | BindingFlags.Static)
+        private static readonly MethodInfo _limitResultsGenericMethod = typeof(ODataQueryOptionsFundamentals).GetMethods(BindingFlags.Public | BindingFlags.Static)
             .Single(mi => mi.Name == "LimitResults" && mi.ContainsGenericParameters && mi.GetParameters().Length == 4);
 
         private ODataQueryOptionParser _queryOptionParser;
@@ -63,12 +63,12 @@ namespace QueryBuilder.Query
         private OrderByQueryOption _stableOrderBy;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
-        /// the <see cref="ODataQueryContext2"/>.
+        /// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
+        /// the <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// <param name="request">The incoming request message.</param>
-        public ODataQueryOptions(ODataQueryContext2 context, string requestUri, IQueryCollection requestQueryCollection)
+        public ODataQueryOptionsFundamentals(ODataQueryFundamentalsContext context, string requestUri, IQueryCollection requestQueryCollection)
         {
             if (context == null)
             {
@@ -96,9 +96,9 @@ namespace QueryBuilder.Query
         public Uri RequestUri { get; private set; }
 
         /// <summary>
-        ///  Gets the given <see cref="ODataQueryContext2"/>
+        ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// Gets the raw string of all the OData query options
@@ -714,7 +714,7 @@ namespace QueryBuilder.Query
         // Returns a sorted list of all properties that may legally appear
         // in an OrderBy.  If the entity type has keys, all are returned.
         // Otherwise, when no keys are present, all primitive properties are returned.
-        private static IEnumerable<IEdmStructuralProperty> GetAvailableOrderByProperties(ODataQueryContext2 context)
+        private static IEnumerable<IEdmStructuralProperty> GetAvailableOrderByProperties(ODataQueryFundamentalsContext context)
         {
             Contract.Assert(context != null);
 
@@ -737,7 +737,7 @@ namespace QueryBuilder.Query
         // Generates the OrderByQueryOption to use by default for $skip or $top
         // when no other $orderby is available.  It will produce a stable sort.
         // This may return a null if there are no available properties.
-        private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryContext2 context, List<string> applySortOptions)
+        private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryFundamentalsContext context, List<string> applySortOptions)
         {
             string orderByRaw = String.Empty;
             if (applySortOptions != null)
@@ -765,10 +765,10 @@ namespace QueryBuilder.Query
         /// and returned.
         /// </summary>
         /// <param name="orderBy">The <see cref="OrderByQueryOption"/> to evaluate.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/>.</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/>.</param>
         /// <param name="applySortOptions"></param>
         /// <returns>An <see cref="OrderByQueryOption"/> that will produce a stable sort.</returns>
-        private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryContext2 context, List<string> applySortOptions)
+        private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryFundamentalsContext context, List<string> applySortOptions)
         {
             Contract.Assert(orderBy != null);
             Contract.Assert(context != null);
@@ -1167,13 +1167,13 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
-        /// the <see cref="ODataQueryContext2"/>.
+        /// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
+        /// the <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// 
         // TODO: Add optional context field: uriResolver
-        private void Initialize(ODataQueryContext2 context, IQueryCollection requestQueryCollection)
+        private void Initialize(ODataQueryFundamentalsContext context, IQueryCollection requestQueryCollection)
         {
             Contract.Assert(context != null);
 
@@ -1205,7 +1205,7 @@ namespace QueryBuilder.Query
             else
             {
                 // By default, let's enable the property name case-insensitive
-                _queryOptionParser.Resolver = ODataQueryContext2.DefaultUriResolverFactory();
+                _queryOptionParser.Resolver = ODataQueryFundamentalsContext.DefaultUriResolverFactory();
             }
 
             _enableNoDollarSignQueryOptions = _queryOptionParser.Resolver.EnableNoDollarQueryOptions; // resolver is source of truth :)))

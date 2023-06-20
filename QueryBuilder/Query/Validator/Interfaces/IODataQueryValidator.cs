@@ -1,7 +1,7 @@
 ﻿namespace QueryBuilder.Query.Validator
 {
     /// <summary>
-    /// Provide the interface used to validate a <see cref="ODataQueryOptions"/>
+    /// Provide the interface used to validate a <see cref="ODataQueryOptionsFundamentals"/>
     /// based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
     public interface IODataQueryValidator
@@ -11,6 +11,6 @@
         /// </summary>
         /// <param name="options">The OData query options to validate.</param>
         /// <param name="validationSettings">The validation settings.</param>
-        void Validate(ODataQueryOptions options, ODataValidationSettings validationSettings);
+        void Validate(ODataQueryOptionsFundamentals options, ODataValidationSettings validationSettings);
     }
 }

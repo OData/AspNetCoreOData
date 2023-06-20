@@ -23,7 +23,7 @@ namespace QueryBuilder.Query
 
 
         // QUESTION: To remove unused parameter, should this no longer be a Context extension method? If so, where should it go?
-        public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext2 context, ODataQuerySettings querySettings, IQueryable query)
+        public static ODataQuerySettings UpdateQuerySettings(this ODataQueryFundamentalsContext context, ODataQuerySettings querySettings, IQueryable query)
         {
             ODataQuerySettings updatedSettings = new ODataQuerySettings();
 

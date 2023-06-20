@@ -18,7 +18,7 @@ namespace QueryBuilder.Query
         /// <param name="queryOptions">Information about the other query options.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
         public abstract IQueryable<T> ApplyTo<T>(IQueryable<T> query, SkipTokenQueryOption skipTokenQueryOption,
-            ODataQuerySettings querySettings, ODataQueryOptions queryOptions);
+            ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptions);
 
         /// <summary>
         /// Apply the $skiptoken query to the given IQueryable.
@@ -29,7 +29,7 @@ namespace QueryBuilder.Query
         /// <param name="queryOptions">Information about the other query options.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
         public abstract IQueryable ApplyTo(IQueryable query, SkipTokenQueryOption skipTokenQueryOption,
-            ODataQuerySettings querySettings, ODataQueryOptions queryOptions);
+            ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptions);
 
         /// <summary>
         /// Returns the URI for NextPageLink

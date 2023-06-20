@@ -10,7 +10,7 @@ namespace QueryBuilder.Query.Validator
         /// <summary>
         /// The Query context.
         /// </summary>
-        public ODataQueryContext2 Context { get; set; }
+        public ODataQueryFundamentalsContext Context { get; set; }
 
         /// <summary>
         /// The Query validation settings.

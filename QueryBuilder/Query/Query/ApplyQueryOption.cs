@@ -22,12 +22,12 @@ namespace QueryBuilder.Query
 
         /// <summary>
         /// Initialize a new instance of <see cref="ApplyQueryOption"/> based on the raw $apply value and
-        /// an EdmModel from <see cref="ODataQueryContext2"/>.
+        /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $filter query. It can be null or empty.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public ApplyQueryOption(string rawValue, ODataQueryContext2 context, ODataQueryOptionParser queryOptionParser)
+        public ApplyQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (string.IsNullOrEmpty(rawValue))
             {
@@ -53,16 +53,16 @@ namespace QueryBuilder.Query
         }
 
         // for unit test only
-        internal ApplyQueryOption(string rawValue, ODataQueryContext2 context)
+        internal ApplyQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             RawValue = rawValue;
             Context = context;
         }
 
         /// <summary>
-        ///  Gets the given <see cref="ODataQueryContext2"/>.
+        ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// ClrType for result of transformations

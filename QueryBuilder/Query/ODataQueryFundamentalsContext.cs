@@ -11,11 +11,11 @@ namespace QueryBuilder.Query
     /// <summary>
     /// This defines some context information used to perform query composition.
     /// </summary>
-    public class ODataQueryContext2
+    public class ODataQueryFundamentalsContext
     {
 
         /// <summary>
-        /// Constructs an instance of <see cref="ODataQueryContext2"/> with <see cref="IEdmModel" />, element CLR type,
+        /// Constructs an instance of <see cref="ODataQueryFundamentalsContext"/> with <see cref="IEdmModel" />, element CLR type,
         /// and <see cref="ODataPath" />.
         /// </summary>
         /// <param name="model">The EdmModel that includes the <see cref="IEdmType"/> corresponding to
@@ -27,7 +27,7 @@ namespace QueryBuilder.Query
         /// container may not be present.
         /// </remarks>
         // QUESTION: Pass in whole "ODataUriResolver uriResolver" or just "bool IsNoDollarQueryEnable"?
-        public ODataQueryContext2(IEdmModel model, Type elementClrType, ODataPath path,
+        public ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, ODataPath path,
                                   QueryValidators validators = null, QueryBinders binders = null, DefaultQueryConfigurations defaultQueryConfigurations = null, 
                                   bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)
         {
@@ -65,13 +65,13 @@ namespace QueryBuilder.Query
         public Func<ODataUriResolver> UriResolverFactory { get; private set; }
 
         /// <summary>
-        /// Constructs an instance of <see cref="ODataQueryContext2"/> with <see cref="IEdmModel" />, element EDM type,
+        /// Constructs an instance of <see cref="ODataQueryFundamentalsContext"/> with <see cref="IEdmModel" />, element EDM type,
         /// and <see cref="ODataPath" />.
         /// </summary>
         /// <param name="model">The EDM model the given EDM type belongs to.</param>
         /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
         /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
-        public ODataQueryContext2(IEdmModel model, IEdmType elementType, ODataPath path,
+        public ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType, ODataPath path,
                                   QueryValidators validators = null, QueryBinders binders = null, DefaultQueryConfigurations defaultQueryConfigurations = null, 
                                   bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)
         {
@@ -139,17 +139,17 @@ namespace QueryBuilder.Query
             }
         }
 
-        internal ODataQueryContext2(IEdmModel model, Type elementClrType)
+        internal ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType)
             : this(model, elementClrType, path: null)
         {
         }
 
-        internal ODataQueryContext2(IEdmModel model, IEdmType elementType)
+        internal ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType)
             : this(model, elementType, path: null)
         {
         }
 
-        internal ODataQueryContext2()
+        internal ODataQueryFundamentalsContext()
         { }
 
         /// <summary>

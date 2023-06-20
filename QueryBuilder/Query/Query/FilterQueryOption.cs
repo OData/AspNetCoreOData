@@ -19,12 +19,12 @@ namespace QueryBuilder.Query
 
         /// <summary>
         /// Initialize a new instance of <see cref="FilterQueryOption"/> based on the raw $filter value and
-        /// an EdmModel from <see cref="ODataQueryContext2"/>.
+        /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $filter query. It can be null or empty.</param>
-        /// <param name="context">The <see cref="ODataQueryContext2"/> which contains the <see cref="IEdmModel"/> and some type information</param>
+        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public FilterQueryOption(string rawValue, ODataQueryContext2 context, ODataQueryOptionParser queryOptionParser)
+        public FilterQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (context == null)
             {
@@ -47,7 +47,7 @@ namespace QueryBuilder.Query
             _queryOptionParser = queryOptionParser;
         }
 
-        internal FilterQueryOption(ODataQueryContext2 context, FilterClause filterClause)
+        internal FilterQueryOption(ODataQueryFundamentalsContext context, FilterClause filterClause)
         {
             _filterClause = filterClause;
             Context = context;
@@ -55,7 +55,7 @@ namespace QueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal FilterQueryOption(string rawValue, ODataQueryContext2 context)
+        internal FilterQueryOption(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (context == null)
             {
@@ -79,9 +79,9 @@ namespace QueryBuilder.Query
         }
 
         /// <summary>
-        ///  Gets the given <see cref="ODataQueryContext2"/>.
+        ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        public ODataQueryContext2 Context { get; private set; }
+        public ODataQueryFundamentalsContext Context { get; private set; }
 
         /// <summary>
         /// Gets or sets the Filter Query Validator

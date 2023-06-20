@@ -16,7 +16,7 @@ namespace QueryBuilder.Formatter.Serialization
     public class ODataSerializerContext
     {
         private IDictionary<object, object> _items;
-        private ODataQueryContext2 _queryContext;
+        private ODataQueryFundamentalsContext _queryContext;
         private SelectExpandClause _selectExpandClause;
         private bool _isSelectExpandClauseSet;
 
@@ -49,9 +49,9 @@ namespace QueryBuilder.Formatter.Serialization
         /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
         /// If the resource property is the dynamic complex, the resource property is null.
         /// </param>
-        /// <param name="queryContext">The <see cref="ODataQueryContext2"/> for the property being nested.</param>
+        /// <param name="queryContext">The <see cref="ODataQueryFundamentalsContext"/> for the property being nested.</param>
         /// <param name="currentSelectItem">The <see cref="SelectItem"/> for the property being nested.></param>
-        internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryContext2 queryContext, SelectItem currentSelectItem)
+        internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryFundamentalsContext queryContext, SelectItem currentSelectItem)
         {
             if (resource == null)
             {
@@ -174,9 +174,9 @@ namespace QueryBuilder.Formatter.Serialization
         public TimeZoneInfo TimeZone { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ODataQueryOptions"/>.
+        /// Gets or sets the <see cref="ODataQueryOptionsFundamentals"/>.
         /// </summary>
-        public ODataQueryOptions QueryOptions { get; internal set; }
+        public ODataQueryOptionsFundamentals QueryOptions { get; internal set; }
 
         /// <summary>
         /// Gets the computed properties in serializer context.
@@ -187,7 +187,7 @@ namespace QueryBuilder.Formatter.Serialization
         /// <summary>
         /// ODataQueryContext2 object, retrieved from query options for top-level context and passed down to nested serializer context as is.
         /// </summary>
-        internal ODataQueryContext2 QueryContext
+        internal ODataQueryFundamentalsContext QueryContext
         {
             get
             {
