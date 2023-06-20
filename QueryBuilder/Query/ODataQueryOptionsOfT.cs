@@ -25,8 +25,8 @@ namespace QueryBuilder.Query
         /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="request">The incoming request message</param>
         /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
-        public ODataQueryOptions(ODataQueryFundamentalsContext context, string requestUri, IQueryCollection requestQueryCollection)
-            : base(context, requestUri, requestQueryCollection)
+        public ODataQueryOptions(ODataQueryFundamentalsContext context, Request request)
+            : base(context, request)
         {
             if (Context.ElementClrType == null)
             {

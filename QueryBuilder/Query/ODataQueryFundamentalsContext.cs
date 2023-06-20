@@ -188,7 +188,7 @@ namespace QueryBuilder.Query
 
         public SkipTokenHandler PagingSkipTokenHandler { get; private set; }
 
-        internal Uri RequestUri { get; set; }
+        internal Request Request { get; set; }
 
         internal IEdmProperty TargetProperty { get; set; }
 
