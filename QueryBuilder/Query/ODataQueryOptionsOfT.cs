@@ -79,12 +79,11 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public override IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1,
-                                          IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null, IFilterBinder filterBinder = null)
+                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1)
         {
             ValidateQuery(query);
             return base.ApplyTo(query, querySettings, ignoreQueryOptions, odataFeature, assembliesResolver, requestQueryCollection,
-                                encodedUrl, preferredPageSize, orderByBinder, selectExpandBinder, filterBinder);
+                                encodedUrl, preferredPageSize);
         }
 
         /// <summary>
@@ -94,12 +93,11 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
         public override IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1,
-                                          IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null, IFilterBinder filterBinder = null)
+                                          IQueryCollection requestQueryCollection, string encodedUrl, int preferredPageSize = -1)
         {
             ValidateQuery(query);
             return base.ApplyTo(query, querySettings, odataFeature, assembliesResolver, requestQueryCollection,
-                                encodedUrl, preferredPageSize, orderByBinder, selectExpandBinder, filterBinder);
+                                encodedUrl, preferredPageSize);
         }
 
         private static void ValidateQuery(IQueryable query)
