@@ -26,7 +26,6 @@ namespace QueryBuilder.Query
         /// This is a public constructor used for stand-alone scenario; in this case, the services
         /// container may not be present.
         /// </remarks>
-        // QUESTION: Pass in whole "ODataUriResolver uriResolver" or just "bool IsNoDollarQueryEnable"?
         public ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, ODataPath path,
                                   QueryValidators validators = null, QueryBinders binders = null, DefaultQueryConfigurations defaultQueryConfigurations = null, 
                                   bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)

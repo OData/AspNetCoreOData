@@ -11,6 +11,9 @@ using Microsoft.OData.AzureFunctions;
 using QueryBuilder.Query;
 using System.Collections.Generic;
 using System.Linq;
+using QueryBuilder.Abstracts;
+using Microsoft.OData.ModelBuilder;
+using System.Net.Http;
 
 namespace Microsoft.OData.AzureFunctionsSample
 {
@@ -20,9 +23,19 @@ namespace Microsoft.OData.AzureFunctionsSample
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
             ILogger log,
-            [OData(typeof(EdmModelProvider))] ODataQueryOptions<Customer> options)
+            [OData(typeof(EdmModelProvider))] ODataQueryOptionsFundamentals<Customer> options)
         {
-            var result = options.ApplyTo(customers.AsQueryable());
+            IODataFeature odataFeature = req.HttpContext.Features.Get<IODataFeature>();
+            if (odataFeature == null)
+            {
+                odataFeature = new ODataFeature();
+                req.HttpContext.Features.Set(odataFeature);
+            }
+
+            var result = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings(),
+                                         (ODataFeature) odataFeature, new DefaultAssemblyResolver(),
+                                         "fakeEncodedUrl") ;
+
             return new OkObjectResult(result);
         }
 

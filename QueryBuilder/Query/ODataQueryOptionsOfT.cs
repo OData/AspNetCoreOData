@@ -16,7 +16,7 @@ namespace QueryBuilder.Query
     /// </summary>
     // TODO: Fix attribute compilation below:
     //[ODataQueryParameterBinding]
-    public class ODataQueryOptions<TEntity> : ODataQueryOptionsFundamentals
+    public class ODataQueryOptionsFundamentals<TEntity> : ODataQueryOptionsFundamentals
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
@@ -25,7 +25,7 @@ namespace QueryBuilder.Query
         /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="request">The incoming request message</param>
         /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
-        public ODataQueryOptions(ODataQueryFundamentalsContext context, Request request)
+        public ODataQueryOptionsFundamentals(ODataQueryFundamentalsContext context, Request request)
             : base(context, request)
         {
             if (Context.ElementClrType == null)
