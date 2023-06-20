@@ -359,7 +359,7 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
+        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, AllowedQueryOptions ignoreQueryOptions, IAssemblyResolver assembliesResolver,
                                           string encodedUrl, int preferredPageSize = -1)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
