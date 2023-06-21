@@ -62,18 +62,19 @@ namespace Microsoft.AspNetCore.OData.Query
 
             actionExecutingContext.HttpContext.Items.TryAdd(nameof(RequestQueryData), requestQueryData);
 
-            ODataQueryOptions queryOptions = CreateQueryOptionsOnExecuting(actionExecutingContext);
-            if (queryOptions == null)
-            {
-                return; // skip validation
-            }
-
-            // Create and validate the query options.
-            requestQueryData.QueryValidationRunBeforeActionExecution = true;
-            requestQueryData.ProcessedQueryOptions = queryOptions;
-
             try
             {
+                ODataQueryOptions queryOptions = CreateQueryOptionsOnExecuting(actionExecutingContext);
+
+                if (queryOptions == null)
+                {
+                    return; // skip validation
+                }
+
+                // Create and validate the query options.
+                requestQueryData.QueryValidationRunBeforeActionExecution = true;
+                requestQueryData.ProcessedQueryOptions = queryOptions;
+                
                 HttpRequest request = actionExecutingContext.HttpContext.Request;
                 ValidateQuery(request, requestQueryData.ProcessedQueryOptions);
             }
