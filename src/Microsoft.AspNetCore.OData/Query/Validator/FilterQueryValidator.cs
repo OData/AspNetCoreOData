@@ -351,6 +351,16 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                         model,
                         defaultQueryConfigs.EnableFilter);
                 }
+                else if (propertyAccessNode.Source.Kind == QueryNodeKind.ResourceRangeVariableReference)
+                {
+                    ResourceRangeVariableReferenceNode resourceRangeVariableReferenceNode = propertyAccessNode.Source as ResourceRangeVariableReferenceNode;
+                    notFilterable = EdmHelpers.IsNotFilterable(
+                        property,
+                        validatorContext.Property,
+                        resourceRangeVariableReferenceNode.RangeVariable.StructuredTypeReference.StructuredDefinition(),
+                        model,
+                        defaultQueryConfigs.EnableFilter);
+                }
                 else
                 {
                     notFilterable = EdmHelpers.IsNotFilterable(property,
