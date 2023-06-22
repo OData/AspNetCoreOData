@@ -33,8 +33,7 @@ namespace Microsoft.OData.AzureFunctionsSample
             }
 
             var result = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings(),
-                                         (ODataFeature) odataFeature, new DefaultAssemblyResolver(),
-                                         "fakeEncodedUrl") ;
+                                         (ODataFeature) odataFeature, new DefaultAssemblyResolver());
 
             return new OkObjectResult(result);
         }

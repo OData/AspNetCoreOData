@@ -358,15 +358,15 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, AllowedQueryOptions ignoreQueryOptions, IAssemblyResolver assembliesResolver,
-                                          string encodedUrl, int preferredPageSize = -1)
+        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
+        public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver, AllowedQueryOptions ignoreQueryOptions,
+                                          int pageSize = -1)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, settings, odataFeature, assembliesResolver, encodedUrl, preferredPageSize);
+            return ApplyTo(query, settings, odataFeature, assembliesResolver, pageSize);
         }
 
         /// <summary>
@@ -374,9 +374,9 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                           string encodedUrl, int preferredPageSize = -1)
+        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
+        public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
+                                           int pageSize = -1)
         {
             if (query == null)
             {
@@ -394,6 +394,7 @@ namespace QueryBuilder.Query
             }
 
             IQueryable result = query;
+            bool resultsLimited = false;
             //IODataFeature odataFeature = Request.ODataFeature();
 
             // Update the query setting
@@ -441,7 +442,7 @@ namespace QueryBuilder.Query
                 ODataPath path = odataFeature.Path;
                 if (path != null && path.LastSegment is CountSegment)
                 {
-                    return result;
+                    return (result, resultsLimited);
                 }
             }
 
@@ -501,59 +502,27 @@ namespace QueryBuilder.Query
                 result = Top.ApplyTo(result, querySettings);
             }
 
-            result = ApplyPaging(result, querySettings, odataFeature, preferredPageSize, encodedUrl);
+            (result, resultsLimited) = ApplyPaging(result, querySettings, pageSize);
 
-            return result;
+            return (result, resultsLimited);
         }
 
-
-        // TODO: Do I pass whole HttpRequest or individual pieces of Headers and IODataFeature?
-        // - PRO WHOLE OBJECT: nice encapsulation if method is designed to work specifically with HttpRequest object and only that object
-        //                     reduce repetitive work of getting these attributes
-        // - INDIVIDUAL PROPERTIES: flexibility if method is more general-purpose since only a couple properties are being used
-        //                          not much repetitive work (request.Headers and request.HttpContext.ODataFeature()
-        //                          can be done outside more simply (RequestPreferenceHelpers and used objects defined in AspNetCore.Http):
-        //                             EX: if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(request.Headers, out preferredPageSize))
-        //                          properties may not be in expected format (e.g., encodedUrl) -> requires validation
-        //                          
-        //                          TODO: what does a null encodedUrl indicate regarding page size?
-
-        // returns generalizable
-        // paging/query context param model
-
-        internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings, ODataFeature odataFeature, int preferredPageSize, string encodedUrl)
+        // TODO: In Wrapper:
+        //  - pass in pageSize based on querySettings.PageSize/querySettings.ModelBoundPageSize, and the minimum between that and RequestPreferenceHelpers.RequestPrefersMaxPageSize.
+        //  - determine whether to change odataFeature.PageSize based on resultsLimited, encodedUrl, and odataFeature.NextLink
+        // Returns:
+        // - IQueryable
+        // - bool: whether the results were limited
+        internal static (IQueryable, bool) ApplyPaging(IQueryable result, ODataQuerySettings querySettings, int pageSize)
         {
-            int pageSize = -1;
-            if (querySettings.PageSize.HasValue)
-            {
-                pageSize = querySettings.PageSize.Value;
-            }
-            else if (querySettings.ModelBoundPageSize.HasValue)
-            {
-                pageSize = querySettings.ModelBoundPageSize.Value;
-            }
+            bool resultsLimited = false;
 
-            if (preferredPageSize >= 0)
-            {
-                pageSize = Math.Min(pageSize, preferredPageSize);
-            }
-
-            //ODataFeature odataFeature = request.HttpContext.ODataFeature() as ODataFeature;
             if (pageSize > 0)
             {
-                bool resultsLimited;
                 result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-                //if (resultsLimited && Request.GetEncodedUrl() != null &&
-                if (resultsLimited && encodedUrl != null &&
-                    odataFeature.NextLink == null)
-                {
-                    odataFeature.PageSize = pageSize; // is ODataFeature as a whole pertinent > specific properties
-                }
             }
+            return (result, resultsLimited);
 
-            odataFeature.QueryOptions = this;
-
-            return result;
         }
 
         /// <summary>
@@ -1115,7 +1084,6 @@ namespace QueryBuilder.Query
                 ((querySettings.IgnoredQueryOptions & queryOptionFlag) == AllowedQueryOptions.None);
         }
 
-        // QUESTION: Pass in HttpRequest or Request.ODataFeature() directly?
         private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
         {
             var result = default(T);

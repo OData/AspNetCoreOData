@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,6 @@ namespace QueryBuilder.Query
         /// </summary>
         public Uri Uri { get; private set; }
 
-        public IQueryCollection Query { get; set; }
+        public IEnumerable<KeyValuePair<string, StringValues>> Query { get; set; } // general IEnumerable key-value pairs
     }
 }

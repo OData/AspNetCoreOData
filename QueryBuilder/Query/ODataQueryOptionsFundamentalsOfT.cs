@@ -77,13 +77,12 @@ namespace QueryBuilder.Query
         /// Apply the individual query to the given IQueryable in the right order.
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public override IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, AllowedQueryOptions ignoreQueryOptions, IAssemblyResolver assembliesResolver,
-                                          string encodedUrl, int preferredPageSize = -1)
+        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
+        public override (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
+                                           AllowedQueryOptions ignoreQueryOptions, int pageSize = -1)
         {
             ValidateQuery(query);
-            return base.ApplyTo(query, querySettings, odataFeature, ignoreQueryOptions, assembliesResolver,
-                                encodedUrl, preferredPageSize);
+            return base.ApplyTo(query, querySettings, odataFeature, ignoreQueryOptions, assembliesResolver, pageSize);
         }
 
         /// <summary>
@@ -91,13 +90,12 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
-        public override IQueryable ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                          string encodedUrl, int preferredPageSize = -1)
+        /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
+        public override (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
+                                                   int pageSize = -1)
         {
             ValidateQuery(query);
-            return base.ApplyTo(query, querySettings, odataFeature, assembliesResolver,
-                                encodedUrl, preferredPageSize);
+            return base.ApplyTo(query, querySettings, odataFeature, assembliesResolver, pageSize);
         }
 
         private static void ValidateQuery(IQueryable query)
