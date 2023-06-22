@@ -17,6 +17,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -831,7 +833,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 TypeName = edmPropertyType.FullName(),
             };
 
-            resource.Properties = CreateKeyProperties(refLink.EntityReferenceLink.Url, readContext) ?? Array.Empty<ODataProperty>();
+            resource.Properties = CreateKeyProperties(refLink.EntityReferenceLink.Url, readContext, isEntityReferenceLink: true) ?? Array.Empty<ODataProperty>();
             ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(resource);
 
             foreach (ODataInstanceAnnotation instanceAnnotation in refLink.EntityReferenceLink.InstanceAnnotations)
@@ -859,7 +861,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 return resourceWrapper;
             }
 
-            IEnumerable<ODataProperty> keys = CreateKeyProperties(resourceWrapper.Resource.Id, readContext);
+            IEnumerable<ODataProperty> keys = CreateKeyProperties(resourceWrapper.Resource.Id, readContext, isEntityReferenceLink: false);
             if (keys == null)
             {
                 return resourceWrapper;
@@ -893,9 +895,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         /// </summary>
         /// <param name="id">The key Id.</param>
         /// <param name="readContext">The reader context.</param>
+        /// <param name="isEntityReferenceLink">Creation is running for entity reference link.</param>
         /// <returns>The key properties.</returns>
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
-        private static IList<ODataProperty> CreateKeyProperties(Uri id, ODataDeserializerContext readContext)
+        private static IList<ODataProperty> CreateKeyProperties(Uri id, ODataDeserializerContext readContext, bool isEntityReferenceLink)
         {
             Contract.Assert(id != null);
             Contract.Assert(readContext != null);
@@ -910,6 +913,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 IEdmModel model = readContext.Model;
                 HttpRequest request = readContext.Request;
                 IServiceProvider requestContainer = request.GetRouteServices();
+                IODataFeature oDataFeature = request.ODataFeature();
+                ODataOptions odataOptions = request.HttpContext.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
                 Uri resolvedId = id;
 
                 string idOriginalString = id.OriginalString;
@@ -922,15 +927,37 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     resolvedId = new Uri(resolvedUri, UriKind.RelativeOrAbsolute);
                 }
 
-                Uri serviceRootUri = new Uri(request.CreateODataLink());
                 IODataPathParser pathParser = requestContainer?.GetService<IODataPathParser>();
                 if (pathParser == null) // Seems like IODataPathParser is NOT injected into DI container by default
                 {
                     pathParser = new DefaultODataPathParser();
                 }
 
+                ODataPath path = null;
+                if (odataOptions.EnableServiceRootValidationOnEntityReferenceLinkDeserialization || !isEntityReferenceLink)
+                {
+                    Uri serviceRootUri = new Uri(request.CreateODataLink());
+                    path = pathParser.Parse(model, serviceRootUri, resolvedId, requestContainer);
+                }
+                else
+                {
+                    // Get the relative URI from the service root. This is needed since for servers, the request root URI
+                    // and the @odata.bind URI might be different. This can happen in cases where there are intermediate
+                    // routers (proxies) between the client and the server.
+                    string relativeResourceUri = resolvedId.PathAndQuery;
+
+                    // If path contains a Route prefix, remove it from the relative URI.
+                    if (!string.IsNullOrEmpty(request.ODataFeature().RoutePrefix))
+                    {
+                        // The path will always start with a '/'. So we are removing the route prefix as well
+                        // /routePrefix/odata/Customers(1) -> /odata/Customers(1)
+                        relativeResourceUri = relativeResourceUri.Substring(relativeResourceUri.IndexOf('/', 1));
+                    }
+
+                    path = pathParser.Parse(model, serviceRoot: null, new Uri(relativeResourceUri, UriKind.Relative), requestContainer);
+                }
+
                 IList<ODataProperty> properties = null;
-                ODataPath path = pathParser.Parse(model, serviceRootUri, resolvedId, requestContainer);
                 KeySegment keySegment = path.OfType<KeySegment>().LastOrDefault();
                 if (keySegment != null)
                 {

@@ -63,6 +63,11 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
 
+        /// <summary>
+        /// Gets or sets a value indicating whether service root URI should be validated against the resource URI during deserialization of entity reference link.
+        /// </summary>
+        public bool EnableServiceRootValidationOnEntityReferenceLinkDeserialization { get; set; } = true;
+
         #endregion
 
         #region RouteComponents
