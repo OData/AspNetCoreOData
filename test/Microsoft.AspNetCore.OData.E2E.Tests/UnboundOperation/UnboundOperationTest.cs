@@ -441,6 +441,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.UnboundOperation
             Assert.DoesNotContain("Street 11", responseString);
         }
 
-#endregion
+        [Fact]
+        public async Task AnEmptyFilterQueryOptionShouldReturnA400()
+        {
+            // Arrange
+            var uri = "odata/UpdateAddress?$filter=";
+            var content = new { Address = new { Street = "Street 11", City = "City 11", ZipCode = "201101" }, ID = 401 };
+            HttpClient client = CreateClient();
+
+            // Act
+            var response = await client.PostAsJsonAsync(uri, content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        #endregion
     }
 }
