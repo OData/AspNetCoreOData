@@ -443,6 +443,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
 
             SelectExpandNode selectExpandNode = CreateSelectExpandNode(resourceContext);
+            /*if (expectedType.Definition.FullTypeName() == "ODataRoutingSample.Models.Customer")
+            {
+                var selectedProperty = selectExpandNode.SelectedComplexProperties.First(kvp => kvp.Key.Name == "FavoriteAddresses");
+                selectExpandNode.SelectedComplexProperties[selectedProperty.Key] = new PathSelectItem(
+                    ((writeContext.QueryOptions.SelectExpand.SelectExpandClause.SelectedItems.First() as WildcardSelectItem).SubsumedSelectItems.First() as PathSelectItem).SelectedPath, 
+                    null, 
+                    null, 
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                    null,
+                    null);
+            }*/
+
             if (selectExpandNode != null)
             {
                 ODataResource resource = CreateResource(selectExpandNode, resourceContext);

@@ -406,8 +406,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 bool isSelectingOpenTypeSegments = isContainDynamicPropertySelection || IsSelectAllOnOpenType(selectExpandClause, structuredType);
 
+                //// propertiestoinclude is not null for the non-* case
                 if (propertiesToExpand != null || propertiesToInclude != null || computedProperties != null || autoSelectedProperties != null || isSelectingOpenTypeSegments)
                 {
+                    //// TODO this returns null in our case
                     Expression propertyContainerCreation =
                         BuildPropertyContainer(context, source, structuredType, propertiesToExpand, propertiesToInclude, computedProperties, autoSelectedProperties, isSelectingOpenTypeSegments);
 
@@ -506,15 +508,30 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
 
                 // $select=...
+                //// TODO for * call, select item is a wildcard select item, which has nested pathselectitmes
                 PathSelectItem pathItem = selectItem as PathSelectItem;
                 if (pathItem != null)
                 {
+                    //// TODO so we never enter the if body, and this next call is what adds the count to currentlevelpropertiestoincldue for the non-* case
                     DynamicPathSegment dynamicSegment = ProcessSelectedItem(pathItem, navigationSource, currentLevelPropertiesInclude);
                     if (dynamicSegment != null)
                     {
                         dynamicsSegments.Add(dynamicSegment);
                     }
                     continue;
+                }
+
+                var wildcardSelectItem = selectItem as WildcardSelectItem;
+                if (wildcardSelectItem != null)
+                {
+                    foreach (var subsumedSelectItem in wildcardSelectItem.SubsumedSelectItems.Cast<PathSelectItem>())
+                    {
+                        DynamicPathSegment dynamicSegment = ProcessSelectedItem(subsumedSelectItem, navigationSource, currentLevelPropertiesInclude);
+                        if (dynamicSegment != null)
+                        {
+                            dynamicsSegments.Add(dynamicSegment);
+                        }
+                    }
                 }
 
                 // Skip processing the "WildcardSelectItem and NamespaceQualifiedWildcardSelectItem"
@@ -951,6 +968,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression nullCheck = GetNullCheckExpression(structuralProperty, propertyValue, subSelectExpandClause);
 
+            //// TODO if countoption is null, this returns a bogus expression
             Expression countExpression = CreateTotalCountExpression(context, propertyValue, pathSelectItem.CountOption);
 
             // be noted: the property structured type could be null, because the property maybe not a complex property.
