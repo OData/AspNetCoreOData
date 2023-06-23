@@ -14,7 +14,7 @@ using System.Runtime.Serialization;
 /// </summary>
 [DataContract(Name = "policy")]
 [JsonConverter(typeof(PolicyJsonConverter))]
-public abstract class Policy : ValidatableBase
+public class Policy : ValidatableBase
 {
     #region Properties
 
@@ -97,6 +97,10 @@ public abstract class Policy : ValidatableBase
         }
 
         logger.LogDebug("Policy base entity creation validated successfully.");
+    }
+
+    protected override void ValidateEntityStructure(ILogger logger)
+    {
     }
 
     #endregion

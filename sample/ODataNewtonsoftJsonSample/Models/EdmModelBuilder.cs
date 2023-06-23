@@ -20,6 +20,8 @@ namespace ODataRoutingSample.Models
             builder.EntitySet<Department>("Departments");
             builder.EntitySet<ForwardingPolicy>("ForwardingPolicies");
 
+            builder.EntitySet<Policy>("Policies");
+
             var function = builder.Function("RateByOrder");
             function.Parameter<int>("order");
             function.Returns<int>();
