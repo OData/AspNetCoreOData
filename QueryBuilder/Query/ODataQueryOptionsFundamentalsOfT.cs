@@ -28,7 +28,7 @@ namespace QueryBuilder.Query
         public ODataQueryOptionsFundamentals(ODataQueryFundamentalsContext context, Request request)
             : base(context, request)
         {
-            if (Context.ElementClrType == null)
+            if (QueryContext.ElementClrType == null)
             {
                 throw Error.Argument("context", SRResources.ElementClrTypeNull, typeof(ODataQueryFundamentalsContext).Name);
             }
@@ -78,11 +78,10 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
-        public override (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                           AllowedQueryOptions ignoreQueryOptions, int pageSize = -1)
+        public override (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
         {
             ValidateQuery(query);
-            return base.ApplyTo(query, querySettings, odataFeature, assembliesResolver, ignoreQueryOptions, pageSize);
+            return base.ApplyTo(query, querySettings, ignoreQueryOptions);
         }
 
         /// <summary>
@@ -91,11 +90,10 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
-        public override (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                                   int pageSize = -1)
+        public override (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings)
         {
             ValidateQuery(query);
-            return base.ApplyTo(query, querySettings, odataFeature, assembliesResolver, pageSize);
+            return base.ApplyTo(query, querySettings);
         }
 
         private static void ValidateQuery(IQueryable query)

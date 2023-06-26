@@ -193,7 +193,7 @@ namespace QueryBuilder.Formatter.Serialization
             {
                 if (QueryOptions != null)
                 {
-                    return QueryOptions.Context;
+                    return QueryOptions.QueryContext;
                 }
 
                 return _queryContext;

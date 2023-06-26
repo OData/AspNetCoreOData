@@ -82,7 +82,7 @@ namespace QueryBuilder.Query
 
             context.Request = Request;
 
-            Context = context;
+            QueryContext = context;
             Request = request;
 
             Initialize(context);
@@ -96,7 +96,7 @@ namespace QueryBuilder.Query
         /// <summary>
         ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>
         /// </summary>
-        public ODataQueryFundamentalsContext Context { get; private set; }
+        public ODataQueryFundamentalsContext QueryContext { get; private set; }
 
         /// <summary>
         /// Gets the raw string of all the OData query options
@@ -264,8 +264,8 @@ namespace QueryBuilder.Query
                 IList<object> parsedETagValues = properties.Select(property => property.Value).ToList();
 
                 // get property names from request
-                ODataPath odataPath = Context.Path;
-                IEdmModel model = Context.Model;
+                ODataPath odataPath = QueryContext.Path;
+                IEdmModel model = QueryContext.Model;
                 IEdmNavigationSource source = odataPath.GetNavigationSource();
                 if (model != null && source != null)
                 {
@@ -359,14 +359,13 @@ namespace QueryBuilder.Query
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
-        public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver, AllowedQueryOptions ignoreQueryOptions,
-                                          int pageSize = -1)
+        public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(query, settings, odataFeature, assembliesResolver, pageSize);
+            return ApplyTo(query, settings);
         }
 
         /// <summary>
@@ -375,8 +374,7 @@ namespace QueryBuilder.Query
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="querySettings">The settings to use in query composition.</param>
         /// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
-        public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, ODataFeature odataFeature, IAssemblyResolver assembliesResolver,
-                                           int pageSize = -1)
+        public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings)
         {
             if (query == null)
             {
@@ -388,25 +386,20 @@ namespace QueryBuilder.Query
                 throw Error.ArgumentNull(nameof(querySettings));
             }
 
-            if (odataFeature == null)
-            {
-                throw Error.ArgumentNull(nameof(odataFeature));
-            }
-
             IQueryable result = query;
             bool resultsLimited = false;
-            //IODataFeature odataFeature = Request.ODataFeature();
 
             // Update the query setting
-            querySettings = Context.UpdateQuerySettings(querySettings, query);
+            querySettings = QueryContext.UpdateQuerySettings(querySettings, query);
 
             // First apply $apply
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
             if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
             {
-                result = Apply.ApplyTo(result, querySettings, assembliesResolver, Context.Binders.GetFilterBinder());
-                odataFeature.ApplyClause = Apply.ApplyClause;
-                this.Context.ElementClrType = Apply.ResultClrType;
+                result = Apply.ApplyTo(result, querySettings, QueryContext.RequestContext.AssembliesResolver, QueryContext.Binders.GetFilterBinder());
+                // WRAPPER:
+                //odataFeature.ApplyClause = Apply.ApplyClause;
+                this.QueryContext.ElementClrType = Apply.ResultClrType;
             }
 
             // TODO: need pass the result from $compute to the remaining query options
@@ -430,16 +423,17 @@ namespace QueryBuilder.Query
 
             if (IsAvailableODataQueryOption(Count, querySettings, AllowedQueryOptions.Count))
             {
-                if (odataFeature.TotalCountFunc == null)
-                {
-                    Func<long> countFunc = Count.GetEntityCountFunc(result);
-                    if (countFunc != null)
-                    {
-                        odataFeature.TotalCountFunc = countFunc;
-                    }
-                }
+                // WRAPPER:
+                //if (odataFeature.TotalCountFunc == null)
+                //{
+                //    Func<long> countFunc = Count.GetEntityCountFunc(result);
+                //    if (countFunc != null)
+                //    {
+                //        odataFeature.TotalCountFunc = countFunc;
+                //    }
+                //}
 
-                ODataPath path = odataFeature.Path;
+                ODataPath path = QueryContext.Path;
                 if (path != null && path.LastSegment is CountSegment)
                 {
                     return (result, resultsLimited);
@@ -473,7 +467,7 @@ namespace QueryBuilder.Query
                     orderBy.Compute = Compute;
                 }
 
-                result = orderBy.ApplyTo(result, querySettings, Context.Binders.GetOrderByBinder());
+                result = orderBy.ApplyTo(result, querySettings, QueryContext.Binders.GetOrderByBinder());
             }
 
             if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
@@ -485,7 +479,7 @@ namespace QueryBuilder.Query
 
             if (SelectExpand != null)
             {
-                var tempResult = ApplySelectExpand(result, querySettings, odataFeature);
+                var tempResult = ApplySelectExpand(result, querySettings);
                 if (tempResult != default(IQueryable))
                 {
                     result = tempResult;
@@ -502,7 +496,7 @@ namespace QueryBuilder.Query
                 result = Top.ApplyTo(result, querySettings);
             }
 
-            (result, resultsLimited) = ApplyPaging(result, querySettings, pageSize);
+            (result, resultsLimited) = ApplyPaging(result, querySettings, QueryContext.RequestContext.PageSize);
 
             return (result, resultsLimited);
         }
@@ -540,8 +534,8 @@ namespace QueryBuilder.Query
             List<string> applySortOptions = GetApplySortOptions(apply);
 
             _stableOrderBy = OrderBy == null
-                ? GenerateDefaultOrderBy(Context, applySortOptions)
-                : EnsureStableSortOrderBy(OrderBy, Context, applySortOptions);
+                ? GenerateDefaultOrderBy(QueryContext, applySortOptions)
+                : EnsureStableSortOrderBy(OrderBy, QueryContext, applySortOptions);
 
             return _stableOrderBy;
         }
@@ -599,13 +593,13 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature, AllowedQueryOptions ignoreQueryOptions)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions)
         {
             ODataQuerySettings settings = new ODataQuerySettings();
             settings.CopyFrom(querySettings);
             settings.IgnoredQueryOptions = ignoreQueryOptions;
 
-            return ApplyTo(entity, settings, requestFeature);
+            return ApplyTo(entity, settings);
         }
 
         /// <summary>
@@ -616,7 +610,7 @@ namespace QueryBuilder.Query
         /// <returns>The new entity after the $select and $expand query has been applied to.</returns>
         /// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
         /// query options.</remarks>
-        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
+        public virtual object ApplyTo(object entity, ODataQuerySettings querySettings)
         {
             if (entity == null)
             {
@@ -634,13 +628,13 @@ namespace QueryBuilder.Query
             }
 
             // Update the query setting
-            querySettings = Context.UpdateQuerySettings(querySettings, query: null);
+            querySettings = QueryContext.UpdateQuerySettings(querySettings, query: null);
 
             AddAutoSelectExpandProperties();
 
             if (SelectExpand != null)
             {
-                var result = ApplySelectExpand(entity, querySettings, requestFeature);
+                var result = ApplySelectExpand(entity, querySettings);
                 if (result != default(object))
                 {
                     return result;
@@ -662,7 +656,7 @@ namespace QueryBuilder.Query
                 throw Error.ArgumentNull(nameof(validationSettings));
             }
 
-            this.Context.ValidationSettings = validationSettings;
+            this.QueryContext.ValidationSettings = validationSettings;
 
             if (Validator != null)
             {
@@ -855,24 +849,24 @@ namespace QueryBuilder.Query
             if (containsAutoSelectExpandProperties)
             {
                 _queryOptionParser = new ODataQueryOptionParser(
-                    Context.Model,
-                    Context.ElementType,
-                    Context.NavigationSource,
+                    QueryContext.Model,
+                    QueryContext.ElementType,
+                    QueryContext.NavigationSource,
                     queryParameters/*,
                     Context.RequestContainer*/); // the Context.RequestContainer could be null for non-edm model
                 var originalSelectExpand = SelectExpand;
                 SelectExpand = new SelectExpandQueryOption(
                     autoSelectRawValue,
                     autoExpandRawValue,
-                    Context,
+                    QueryContext,
                     _queryOptionParser);
                 if (originalSelectExpand != null && originalSelectExpand.LevelsMaxLiteralExpansionDepth > 0)
                 {
                     SelectExpand.LevelsMaxLiteralExpansionDepth = originalSelectExpand.LevelsMaxLiteralExpansionDepth;
                 }
-                else if (Context.ValidationSettings != null && Context.ValidationSettings.MaxExpansionDepth > 0)
+                else if (QueryContext.ValidationSettings != null && QueryContext.ValidationSettings.MaxExpansionDepth > 0)
                 {
-                    SelectExpand.LevelsMaxLiteralExpansionDepth = Context.ValidationSettings.MaxExpansionDepth;
+                    SelectExpand.LevelsMaxLiteralExpansionDepth = QueryContext.ValidationSettings.MaxExpansionDepth;
                 }
             }
         }
@@ -923,13 +917,13 @@ namespace QueryBuilder.Query
             {
                 IList<SelectModelPath> autoSelectProperties = null;
 
-                if (Context.TargetStructuredType != null && Context.TargetProperty != null)
+                if (QueryContext.TargetStructuredType != null && QueryContext.TargetProperty != null)
                 {
-                    autoSelectProperties = Context.Model.GetAutoSelectPaths(Context.TargetStructuredType, Context.TargetProperty);
+                    autoSelectProperties = QueryContext.Model.GetAutoSelectPaths(QueryContext.TargetStructuredType, QueryContext.TargetProperty);
                 }
-                else if (Context.ElementType is IEdmStructuredType structuredType)
+                else if (QueryContext.ElementType is IEdmStructuredType structuredType)
                 {
-                    autoSelectProperties = Context.Model.GetAutoSelectPaths(structuredType, null);
+                    autoSelectProperties = QueryContext.Model.GetAutoSelectPaths(structuredType, null);
                 }
 
                 string autoSelectRawValue = autoSelectProperties == null ? null : string.Join(",", autoSelectProperties.Select(a => a.SelectPath));
@@ -958,13 +952,13 @@ namespace QueryBuilder.Query
             var expandRawValue = RawValues.Expand;
 
             IList<ExpandModelPath> autoExpandNavigationProperties = null;
-            if (Context.TargetStructuredType != null && Context.TargetProperty != null)
+            if (QueryContext.TargetStructuredType != null && QueryContext.TargetProperty != null)
             {
-                autoExpandNavigationProperties = Context.Model.GetAutoExpandPaths(Context.TargetStructuredType, Context.TargetProperty, !string.IsNullOrEmpty(RawValues.Select));
+                autoExpandNavigationProperties = QueryContext.Model.GetAutoExpandPaths(QueryContext.TargetStructuredType, QueryContext.TargetProperty, !string.IsNullOrEmpty(RawValues.Select));
             }
-            else if (Context.ElementType is IEdmStructuredType elementType)
+            else if (QueryContext.ElementType is IEdmStructuredType elementType)
             {
-                autoExpandNavigationProperties = Context.Model.GetAutoExpandPaths(elementType, null, !string.IsNullOrEmpty(RawValues.Select));
+                autoExpandNavigationProperties = QueryContext.Model.GetAutoExpandPaths(elementType, null, !string.IsNullOrEmpty(RawValues.Select));
             }
 
             string autoExpandRawValue = autoExpandNavigationProperties == null ? null : string.Join(",", autoExpandNavigationProperties.Select(c => c.ExpandPath));
@@ -998,22 +992,22 @@ namespace QueryBuilder.Query
                     case "$filter":
                         ThrowIfEmpty(kvp.Value, "$filter");
                         RawValues.Filter = kvp.Value;
-                        Filter = new FilterQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Filter = new FilterQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$orderby":
                         ThrowIfEmpty(kvp.Value, "$orderby");
                         RawValues.OrderBy = kvp.Value;
-                        OrderBy = new OrderByQueryOption(kvp.Value, Context, _queryOptionParser);
+                        OrderBy = new OrderByQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$top":
                         ThrowIfEmpty(kvp.Value, "$top");
                         RawValues.Top = kvp.Value;
-                        Top = new TopQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Top = new TopQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$skip":
                         ThrowIfEmpty(kvp.Value, "$skip");
                         RawValues.Skip = kvp.Value;
-                        Skip = new SkipQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Skip = new SkipQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$select":
                         RawValues.Select = kvp.Value;
@@ -1021,7 +1015,7 @@ namespace QueryBuilder.Query
                     case "$count":
                         ThrowIfEmpty(kvp.Value, "$count");
                         RawValues.Count = kvp.Value;
-                        Count = new CountQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Count = new CountQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$expand":
                         RawValues.Expand = kvp.Value;
@@ -1031,7 +1025,7 @@ namespace QueryBuilder.Query
                         break;
                     case "$skiptoken":
                         RawValues.SkipToken = kvp.Value;
-                        SkipToken = new SkipTokenQueryOption(kvp.Value, Context);
+                        SkipToken = new SkipTokenQueryOption(kvp.Value, QueryContext);
                         break;
                     case "$deltatoken":
                         RawValues.DeltaToken = kvp.Value;
@@ -1039,17 +1033,17 @@ namespace QueryBuilder.Query
                     case "$apply":
                         ThrowIfEmpty(kvp.Value, "$apply");
                         RawValues.Apply = kvp.Value;
-                        Apply = new ApplyQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Apply = new ApplyQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$compute":
                         ThrowIfEmpty(kvp.Value, "$compute");
                         RawValues.Compute = kvp.Value;
-                        Compute = new ComputeQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Compute = new ComputeQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$search":
                         ThrowIfEmpty(kvp.Value, "$search");
                         RawValues.Search = kvp.Value;
-                        Search = new SearchQueryOption(kvp.Value, Context, _queryOptionParser);
+                        Search = new SearchQueryOption(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     default:
                         // we don't throw if we can't recognize the query
@@ -1060,19 +1054,19 @@ namespace QueryBuilder.Query
             if (!string.IsNullOrWhiteSpace(RawValues.Select) || !string.IsNullOrWhiteSpace(RawValues.Expand))
             {
                 SelectExpand = new SelectExpandQueryOption(RawValues.Select, RawValues.Expand,
-                    Context, _queryOptionParser);
+                    QueryContext, _queryOptionParser);
             }
 
-            bool isCountRequest = Context.Path != null && Context.Path.LastSegment is CountSegment;
+            bool isCountRequest = QueryContext.Path != null && QueryContext.Path.LastSegment is CountSegment;
             if (isCountRequest)
             {
                 Count = new CountQueryOption(
                     "true",
-                    Context,
+                    QueryContext,
                     new ODataQueryOptionParser(
-                        Context.Model,
-                        Context.ElementType,
-                        Context.NavigationSource,
+                        QueryContext.Model,
+                        QueryContext.ElementType,
+                        QueryContext.NavigationSource,
                         new Dictionary<string, string> { { "$count", "true" } }/*,
                         Context.RequestContainer*/));
             }
@@ -1084,7 +1078,7 @@ namespace QueryBuilder.Query
                 ((querySettings.IgnoredQueryOptions & queryOptionFlag) == AllowedQueryOptions.None);
         }
 
-        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings, ODataFeature requestFeature)
+        private T ApplySelectExpand<T>(T entity, ODataQuerySettings querySettings)
         {
             var result = default(T);
             bool computeAvailable = IsAvailableODataQueryOption(Compute?.RawValue, querySettings, AllowedQueryOptions.Compute);
@@ -1110,8 +1104,8 @@ namespace QueryBuilder.Query
 
                 //Request.ODataFeature().SelectExpandClause = processedClause;
                 //(Request.ODataFeature() as ODataFeature).QueryOptions = this;
-                requestFeature.SelectExpandClause = processedClause;
-                requestFeature.QueryOptions = this;
+                //requestFeature.SelectExpandClause = processedClause;
+                //requestFeature.QueryOptions = this;
 
                 if (computeAvailable)
                 {
@@ -1121,11 +1115,11 @@ namespace QueryBuilder.Query
                 var type = typeof(T);
                 if (type == typeof(IQueryable))
                 {
-                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, Context.Binders.GetSelectExpandBinder());
+                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, QueryContext.Binders.GetSelectExpandBinder());
                 }
                 else if (type == typeof(object))
                 {
-                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, Context.Binders.GetSelectExpandBinder());
+                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, QueryContext.Binders.GetSelectExpandBinder());
                 }
             }
 

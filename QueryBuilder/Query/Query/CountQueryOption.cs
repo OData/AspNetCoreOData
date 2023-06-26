@@ -146,7 +146,7 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="query">The query to compute the count for.</param>
         /// <returns>The Func of entities number that satisfy the specified query if the response should include a count query option, or <c>null</c> otherwise.</returns>
-        internal Func<long> GetEntityCountFunc(IQueryable query)
+        public Func<long> GetEntityCountFunc(IQueryable query)
         {
             if (Context.ElementClrType == null)
             {

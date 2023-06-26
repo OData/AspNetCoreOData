@@ -5,6 +5,8 @@ using QueryBuilder.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using QueryBuilder.Query.Expressions;
+using Microsoft.OData.ModelBuilder;
+using QueryBuilder.Abstracts;
 
 namespace QueryBuilder.Query
 {
@@ -26,9 +28,7 @@ namespace QueryBuilder.Query
         /// This is a public constructor used for stand-alone scenario; in this case, the services
         /// container may not be present.
         /// </remarks>
-        public ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, ODataPath path,
-                                  QueryValidators validators = null, QueryBinders binders = null, DefaultQueryConfigurations defaultQueryConfigurations = null, 
-                                  bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)
+        public ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, ODataPath path, RequestContext requestContext)
         {
             if (elementClrType == null)
             {
@@ -42,7 +42,7 @@ namespace QueryBuilder.Query
                 throw Error.Argument(nameof(elementClrType), SRResources.ClrTypeNotInModel, elementClrType.FullName);
             }
 
-            Initialize(model, ElementType, elementClrType, path, validators, binders, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory, skipTokenHandler);
+            Initialize(model, ElementType, elementClrType, path, requestContext);
         }
 
         public static Func<ODataUriResolver> DefaultUriResolverFactory { get; } = () => new ODataUriResolver { EnableCaseInsensitive = true }; // one func to encapsulate all of the defaults forever; don't have to worry about too many objects
@@ -70,60 +70,42 @@ namespace QueryBuilder.Query
         /// <param name="model">The EDM model the given EDM type belongs to.</param>
         /// <param name="elementType">The EDM type of the element of the collection being queried.</param>
         /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
-        public ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType, ODataPath path,
-                                  QueryValidators validators = null, QueryBinders binders = null, DefaultQueryConfigurations defaultQueryConfigurations = null, 
-                                  bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null, SkipTokenHandler skipTokenHandler = null)
+        public ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType, ODataPath path, RequestContext requestContext)
         {
             if (elementType == null)
             {
                 throw Error.ArgumentNull(nameof(elementType));
             }
 
-            Initialize(model, elementType, null, path, validators, binders, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory, skipTokenHandler);
+            Initialize(model, elementType, null, path, requestContext);
         }
 
-        private void Initialize(IEdmModel model, IEdmType elementType, Type elementClrType, ODataPath path, 
-                           QueryValidators validators, QueryBinders binders, DefaultQueryConfigurations defaultQueryConfigurations, bool? isNoDollarQueryEnable, Func<ODataUriResolver> uriResolverFactory, SkipTokenHandler skipTokenHandler)
+        private void Initialize(IEdmModel model, IEdmType elementType, Type elementClrType, ODataPath path, RequestContext requestContext)
         {
             if (model == null)
             {
                 throw Error.ArgumentNull(nameof(model));
             }
 
-            if (validators == null)
-            {
-                Validators = new QueryValidators();
-            }
-
-            if (binders == null)
-            {
-                Binders = new QueryBinders();
-            }
-
-            if (defaultQueryConfigurations == null)
-            {
-                // QUESTION: Should this be initialized at construction vs. at get?
-                DefaultQueryConfigurations = new DefaultQueryConfigurations(); // instead of GetDefaultQuerySettings();
-            }
-
             Model = model;
             ElementType = elementType;
             ElementClrType = elementClrType;
             Path = path;
-            UriResolverFactory = uriResolverFactory ?? DefaultUriResolverFactory;
-            PagingSkipTokenHandler = skipTokenHandler;
+            RequestContext = requestContext;
+            UriResolverFactory = requestContext.UriResolverFactory ?? DefaultUriResolverFactory;
+            PagingSkipTokenHandler = requestContext.SkipTokenHandler;
             NavigationSource = GetNavigationSource(Model, ElementType, path);
             GetPathContext();
 
-            if (uriResolverFactory != null)
+            if (requestContext.UriResolverFactory != null)
             {
-                UriResolverFactory = uriResolverFactory;
+                UriResolverFactory = requestContext.UriResolverFactory;
             }
             else
             {
-                if (isNoDollarQueryEnable != null)
+                if (requestContext.IsNoDollarQueryEnable != null)
                 {
-                    if (isNoDollarQueryEnable.Value)
+                    if (requestContext.IsNoDollarQueryEnable.Value)
                     {
                         UriResolverFactory = DefaultUriResolverFactoryTrue;
                     } else
@@ -138,18 +120,20 @@ namespace QueryBuilder.Query
             }
         }
 
-        internal ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType)
-            : this(model, elementClrType, path: null)
+        internal ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, RequestContext requestContext)
+            : this(model, elementClrType, path: null, requestContext)
         {
         }
 
-        internal ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType)
-            : this(model, elementType, path: null)
+        internal ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType, RequestContext requestContext)
+            : this(model, elementType, path: null, requestContext)
         {
         }
 
         internal ODataQueryFundamentalsContext()
         { }
+
+        public RequestContext RequestContext { get; internal set; }
 
         /// <summary>
         /// Gets the given <see cref="DefaultQueryConfigurations"/>.
