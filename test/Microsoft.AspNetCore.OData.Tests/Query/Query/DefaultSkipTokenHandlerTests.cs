@@ -354,17 +354,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = true};
             var entitySetConfiguration = builder.EntitySet<SkipCustomer>("Customers");
-            //var entityType = entitySetConfiguration.EntityType;
-            //entityType.Property(sc => sc.Id)
-            //    .Name = "SkipCustomerId";
-            //entityType.HasKey(sc => sc.Id);
-            //entityType.Property(sc => sc.Name)
-            //    .Name = "FirstAndLastName";
-            //entityType.Property(sc => sc.Birthday)
-            //    .Name = "DateOfBirth";
-            //entityType.Property(sc => sc.Gender)
-            //    .Name = "MaleOrFemale";
-            //entityType.Property(sc => sc.Gender).
             return builder.GetEdmModel();
         }
         
