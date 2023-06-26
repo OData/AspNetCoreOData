@@ -82,7 +82,7 @@ namespace QueryBuilder.Query
                                            AllowedQueryOptions ignoreQueryOptions, int pageSize = -1)
         {
             ValidateQuery(query);
-            return base.ApplyTo(query, querySettings, odataFeature, ignoreQueryOptions, assembliesResolver, pageSize);
+            return base.ApplyTo(query, querySettings, odataFeature, assembliesResolver, ignoreQueryOptions, pageSize);
         }
 
         /// <summary>
