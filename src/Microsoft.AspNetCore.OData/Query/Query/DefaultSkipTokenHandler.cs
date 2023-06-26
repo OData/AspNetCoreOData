@@ -135,12 +135,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 bool islast = count == lastIndex;
                 if (obj != null)
                 {
-                    //if (!obj.TryGetPropertyValue(
-                    //        clrPropertyName,
-                    //        out value))
-                    //{
-                        obj.TryGetPropertyValue(edmProperty.Name, out value);
-                    //}
+                    obj.TryGetPropertyValue(edmProperty.Name, out value);
                 }
                 else
                 {
