@@ -32,7 +32,7 @@ namespace Microsoft.OData.AzureFunctionsSample
                 req.HttpContext.Features.Set(odataFeature);
             }
 
-            var result = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings(),
+            (IQueryable result, bool pageSizeLimited) = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings(),
                                          (ODataFeature) odataFeature, new DefaultAssemblyResolver());
 
             return new OkObjectResult(result);
