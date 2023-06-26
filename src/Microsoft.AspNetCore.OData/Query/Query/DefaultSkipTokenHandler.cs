@@ -133,18 +133,18 @@ namespace Microsoft.AspNetCore.OData.Query
             foreach (IEdmProperty edmProperty in propertiesForSkipToken)
             {
                 bool islast = count == lastIndex;
-                string clrPropertyName = model.GetClrPropertyName(edmProperty);
                 if (obj != null)
                 {
-                    if (!obj.TryGetPropertyValue(
-                            clrPropertyName,
-                            out value))
-                    {
+                    //if (!obj.TryGetPropertyValue(
+                    //        clrPropertyName,
+                    //        out value))
+                    //{
                         obj.TryGetPropertyValue(edmProperty.Name, out value);
-                    }
+                    //}
                 }
                 else
                 {
+                    string clrPropertyName = model.GetClrPropertyName(edmProperty);
                     value = lastMember.GetType().GetProperty(clrPropertyName).GetValue(lastMember);
                 }
 
@@ -426,21 +426,23 @@ namespace Microsoft.AspNetCore.OData.Query
             foreach (string pair in keyValuesPairs)
             {
                 string[] pieces = pair.Split(new char[] { propertyDelimiter }, 2);
-                if (pieces.Length > 1 && !String.IsNullOrWhiteSpace(pieces[0]))
+                string propertyName = pieces[0];
+                if (pieces.Length > 1 && !String.IsNullOrWhiteSpace(propertyName))
                 {
                     object propValue = null;
 
                     IEdmTypeReference propertyType = null;
-                    IEdmProperty property = type.FindProperty(pieces[0]);
+                    IEdmProperty property = type.FindProperty(propertyName);
                     Type propertyClrType = null;
                     if (property != null)
                     {
+                        propertyName = context.Model.GetClrPropertyName(property);
                         propertyType = property.Type;
                         propertyClrType = context.Model.GetClrType(propertyType);
                     }
 
                     propValue = ODataUriUtils.ConvertFromUriLiteral(pieces[1], ODataVersion.V401, context.Model, propertyType);
-                    propertyValuePairs.Add(pieces[0], (propValue, propertyClrType));
+                    propertyValuePairs.Add(propertyName, (propValue, propertyClrType));
                 }
                 else
                 {
