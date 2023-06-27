@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
@@ -8,14 +6,10 @@ using System.Linq;
 using QueryBuilder.Abstracts;
 using QueryBuilder.Edm;
 //using QueryBuilder.Extensions;
-using QueryBuilder.Routing;
+//using QueryBuilder.Routing;
 //using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
-using QueryBuilder.Edm;
-using QueryBuilder.Query;
-using QueryBuilder;
 
 namespace QueryBuilder.Query
 {
