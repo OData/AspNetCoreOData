@@ -10,8 +10,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{B1F86961-6958-4617-ACA4-C231F95AE099}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataRoutingSample", "sample\ODataRoutingSample\ODataRoutingSample.csproj", "{A949AA11-2C07-490C-8F07-8A87A2B2E0B8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119} = {535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData", "src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj", "{02F8B058-E703-4BF4-A7BB-96FF68355F14}"
+	ProjectSection(ProjectDependencies) = postProject
+		{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119} = {535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.OData.Tests", "test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj", "{FF17DFD5-7ED0-433F-8DD9-4576E0CFFFBA}"
 EndProject
@@ -31,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.OData.AzureFuncti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.OData.AzureFunctionsSample", "AzureFunctions\Microsoft.OData.AzureFunctionsSample\Microsoft.OData.AzureFunctionsSample.csproj", "{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryBuilder", "QueryBuilder\QueryBuilder.csproj", "{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryBuilder", "QueryBuilder\QueryBuilder.csproj", "{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
