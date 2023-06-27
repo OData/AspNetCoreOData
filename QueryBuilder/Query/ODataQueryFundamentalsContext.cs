@@ -45,24 +45,6 @@ namespace QueryBuilder.Query
             Initialize(model, ElementType, elementClrType, path, requestContext);
         }
 
-        public static Func<ODataUriResolver> DefaultUriResolverFactory { get; } = () => new ODataUriResolver { EnableCaseInsensitive = true }; // one func to encapsulate all of the defaults forever; don't have to worry about too many objects
-
-        // Avoid memory leak by specifically having true/false
-        // Goal: Uri Resolver is source of truth for NoDollarSign (reduce complexity for customers + not for us).
-        //       We can still have dependency injection without taking a dependency on the DI Container.
-        private static readonly Func<ODataUriResolver> DefaultUriResolverFactoryTrue = () => {
-            ODataUriResolver resolver = DefaultUriResolverFactory();
-            resolver.EnableNoDollarQueryOptions = true;
-            return resolver;
-        };
-        private static readonly Func<ODataUriResolver> DefaultUriResolverFactoryFalse = () => {
-            ODataUriResolver resolver = DefaultUriResolverFactory();
-            resolver.EnableNoDollarQueryOptions = false;
-            return resolver;
-        };
-
-        public Func<ODataUriResolver> UriResolverFactory { get; private set; }
-
         /// <summary>
         /// Constructs an instance of <see cref="ODataQueryFundamentalsContext"/> with <see cref="IEdmModel" />, element EDM type,
         /// and <see cref="ODataPath" />.
@@ -92,32 +74,8 @@ namespace QueryBuilder.Query
             ElementClrType = elementClrType;
             Path = path;
             RequestContext = requestContext;
-            UriResolverFactory = requestContext.UriResolverFactory ?? DefaultUriResolverFactory;
-            PagingSkipTokenHandler = requestContext.SkipTokenHandler;
             NavigationSource = GetNavigationSource(Model, ElementType, path);
             GetPathContext();
-
-            if (requestContext.UriResolverFactory != null)
-            {
-                UriResolverFactory = requestContext.UriResolverFactory;
-            }
-            else
-            {
-                if (requestContext.IsNoDollarQueryEnable != null)
-                {
-                    if (requestContext.IsNoDollarQueryEnable.Value)
-                    {
-                        UriResolverFactory = DefaultUriResolverFactoryTrue;
-                    } else
-                    {
-                        UriResolverFactory = DefaultUriResolverFactoryFalse;
-                    }
-                }
-                else
-                {
-                    UriResolverFactory = DefaultUriResolverFactory;
-                }
-            }
         }
 
         internal ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, RequestContext requestContext)
@@ -133,16 +91,10 @@ namespace QueryBuilder.Query
         internal ODataQueryFundamentalsContext()
         { }
 
-        public RequestContext RequestContext { get; internal set; }
-
         /// <summary>
         /// Gets the given <see cref="DefaultQueryConfigurations"/>.
         /// </summary>
         public DefaultQueryConfigurations DefaultQueryConfigurations { get; internal set; }
-
-        public QueryValidators Validators { get; internal set; }
-
-        public QueryBinders Binders { get; internal set; }
 
         /// <summary>
         /// Gets the given <see cref="IEdmModel"/> that contains the EntitySet.
@@ -169,9 +121,9 @@ namespace QueryBuilder.Query
         /// </summary>
         public ODataPath Path { get; private set; }
 
-        public SkipTokenHandler PagingSkipTokenHandler { get; private set; }
-
         internal Request Request { get; set; }
+
+        public RequestContext RequestContext { get; internal set; }
 
         internal IEdmProperty TargetProperty { get; set; }
 

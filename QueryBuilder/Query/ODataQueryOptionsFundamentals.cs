@@ -396,7 +396,7 @@ namespace QueryBuilder.Query
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
             if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
             {
-                result = Apply.ApplyTo(result, querySettings, QueryContext.RequestContext.AssembliesResolver, QueryContext.Binders.GetFilterBinder());
+                result = Apply.ApplyTo(result, querySettings, QueryContext.RequestContext.AssembliesResolver, QueryContext.RequestContext.Binders.GetFilterBinder());
                 // WRAPPER:
                 //odataFeature.ApplyClause = Apply.ApplyClause;
                 this.QueryContext.ElementClrType = Apply.ResultClrType;
@@ -467,7 +467,7 @@ namespace QueryBuilder.Query
                     orderBy.Compute = Compute;
                 }
 
-                result = orderBy.ApplyTo(result, querySettings, QueryContext.Binders.GetOrderByBinder());
+                result = orderBy.ApplyTo(result, querySettings, QueryContext.RequestContext.Binders.GetOrderByBinder());
             }
 
             if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
@@ -1115,11 +1115,11 @@ namespace QueryBuilder.Query
                 var type = typeof(T);
                 if (type == typeof(IQueryable))
                 {
-                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, QueryContext.Binders.GetSelectExpandBinder());
+                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, QueryContext.RequestContext.Binders.GetSelectExpandBinder());
                 }
                 else if (type == typeof(object))
                 {
-                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, QueryContext.Binders.GetSelectExpandBinder());
+                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, QueryContext.RequestContext.Binders.GetSelectExpandBinder());
                 }
             }
 
@@ -1130,32 +1130,21 @@ namespace QueryBuilder.Query
         /// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
         /// the <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
-        /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+        /// <param name="queryContext">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// 
         // TODO: Add optional context field: uriResolver
-        private void Initialize(ODataQueryFundamentalsContext context)
+        private void Initialize(ODataQueryFundamentalsContext queryContext)
         {
-            Contract.Assert(context != null);
+            Contract.Assert(queryContext != null);
 
-            ODataUriResolver uriResolver = context.UriResolverFactory();
-            //if (context.RequestContainer != null)
-            //{
-            //    uriResolver = context.RequestContainer.GetService<ODataUriResolver>();
-            //}
-
-            // move to query context 2
-            
-
-            // Parse the query from request Uri, including only keys which are OData query parameters or parameter alias
-            // OData query parameters are normalized with the $-sign prefixes when the
-            // <code>EnableNoDollarSignPrefixSystemQueryOption</code> option is used.
+            ODataUriResolver uriResolver = queryContext.RequestContext.UriResolverFactory();
             RawValues = new ODataRawQueryOptions();
             IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
 
             _queryOptionParser = new ODataQueryOptionParser(
-                context.Model,
-                context.ElementType,
-                context.NavigationSource,
+                queryContext.Model,
+                queryContext.ElementType,
+                queryContext.NavigationSource,
                 normalizedQueryParameters);
 
             if (uriResolver != null)
@@ -1165,14 +1154,14 @@ namespace QueryBuilder.Query
             else
             {
                 // By default, let's enable the property name case-insensitive
-                _queryOptionParser.Resolver = ODataQueryFundamentalsContext.DefaultUriResolverFactory();
+                _queryOptionParser.Resolver = RequestContext.DefaultUriResolverFactory();
             }
 
             _enableNoDollarSignQueryOptions = _queryOptionParser.Resolver.EnableNoDollarQueryOptions; // resolver is source of truth :)))
 
             BuildQueryOptions(normalizedQueryParameters);
 
-            Validator = context.Validators.GetODataQueryValidator();
+            Validator = queryContext.RequestContext.Validators.GetODataQueryValidator();
         }
 
         //TESTING

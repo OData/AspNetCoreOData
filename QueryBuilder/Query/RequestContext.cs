@@ -14,7 +14,7 @@ namespace QueryBuilder.Query
     public class RequestContext
     {
         public RequestContext(IAssemblyResolver assembliesResolver = null, ODataQuerySettings defaultQuerySettings = null, int pageSize = -1,
-                              QueryValidators queryValidators = null, QueryBinders queryBinders = null, SkipTokenHandler skipTokenHandler = null,
+                              QueryValidators validators = null, QueryBinders binders = null, SkipTokenHandler skipTokenHandler = null,
                               DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
         {
             if (assembliesResolver == null)
@@ -26,20 +26,17 @@ namespace QueryBuilder.Query
                  defaultQuerySettings = new ODataQuerySettings();
             }
 
-            if (queryValidators == null)
+            if (validators == null)
             {
-                queryValidators = new QueryValidators();
+                validators = new QueryValidators();
             }
 
-            if (queryBinders == null)
+            if (binders == null)
             {
-                queryBinders = new QueryBinders();
+                binders = new QueryBinders();
             }
 
-            //if (skipTokenHandler == null)
-            //{
-            //    skipTokenHandler = DefaultSkipTokenHandler.Instance;
-            //}
+            // TODO: Handle null SkipTokenHandler
 
             if (defaultQueryConfigurations == null)
             {
@@ -49,12 +46,12 @@ namespace QueryBuilder.Query
             AssembliesResolver = assembliesResolver;
             DefaultQuerySettings = defaultQuerySettings;
             PageSize = pageSize;
-            QueryValidators = queryValidators;
-            QueryBinders = queryBinders;
-            SkipTokenHandler = skipTokenHandler;
+            Validators = validators;
+            Binders = binders;
+            PagingSkipTokenHandler = skipTokenHandler;
             DefaultQueryConfigurations = defaultQueryConfigurations;
             IsNoDollarQueryEnable = isNoDollarQueryEnable;
-            UriResolverFactory = uriResolverFactory;
+            InitializeUriResolverFactory(uriResolverFactory);
         }
 
         public IAssemblyResolver AssembliesResolver { get; set; }
@@ -63,16 +60,59 @@ namespace QueryBuilder.Query
 
         public int PageSize { get; set; }
 
-        public QueryValidators QueryValidators { get; set; }
+        public QueryValidators Validators { get; set; }
 
-        public QueryBinders QueryBinders { get; set; }
+        public QueryBinders Binders { get; set; }
 
-        public SkipTokenHandler SkipTokenHandler { get; set; }
+        public SkipTokenHandler PagingSkipTokenHandler { get; set; }
 
         public DefaultQueryConfigurations DefaultQueryConfigurations { get; set; }
 
         public bool? IsNoDollarQueryEnable { get; set; }
 
         public Func<ODataUriResolver> UriResolverFactory { get; set; }
+
+        public static Func<ODataUriResolver> DefaultUriResolverFactory { get; } = () => new ODataUriResolver { EnableCaseInsensitive = true }; // one func to encapsulate all of the defaults forever; don't have to worry about too many objects
+
+        // Avoid memory leak by specifically having true/false
+        // Goal: Uri Resolver is source of truth for NoDollarSign (reduce complexity for customers + not for us).
+        //       We can still have dependency injection without taking a dependency on the DI Container.
+        private static readonly Func<ODataUriResolver> DefaultUriResolverFactoryTrue = () => {
+            ODataUriResolver resolver = DefaultUriResolverFactory();
+            resolver.EnableNoDollarQueryOptions = true;
+            return resolver;
+        };
+
+        private static readonly Func<ODataUriResolver> DefaultUriResolverFactoryFalse = () => {
+            ODataUriResolver resolver = DefaultUriResolverFactory();
+            resolver.EnableNoDollarQueryOptions = false;
+            return resolver;
+        };
+
+        private void InitializeUriResolverFactory(Func<ODataUriResolver> uriResolverFactory)
+        {
+            if (UriResolverFactory != null)
+            {
+                UriResolverFactory = uriResolverFactory;
+            }
+            else
+            {
+                if (IsNoDollarQueryEnable != null)
+                {
+                    if (IsNoDollarQueryEnable.Value)
+                    {
+                        UriResolverFactory = DefaultUriResolverFactoryTrue;
+                    }
+                    else
+                    {
+                        UriResolverFactory = DefaultUriResolverFactoryFalse;
+                    }
+                }
+                else
+                {
+                    UriResolverFactory = DefaultUriResolverFactory;
+                }
+            }
+        }
     }
 }
