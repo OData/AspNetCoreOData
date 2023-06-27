@@ -5,8 +5,6 @@ using QueryBuilder.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using QueryBuilder.Query.Expressions;
-using Microsoft.OData.ModelBuilder;
-using QueryBuilder.Abstracts;
 
 namespace QueryBuilder.Query
 {
@@ -167,5 +165,78 @@ namespace QueryBuilder.Query
                 TargetStructuredType = ElementType as IEdmStructuredType;
             }
         }
+
+        #region Validator Methods
+
+        public IComputeQueryValidator GetComputeQueryValidator()
+        {
+            return RequestContext.Validators.GetComputeQueryValidator();
+        }
+
+        public ICountQueryValidator GetCountQueryValidator()
+        {
+            return RequestContext.Validators.GetCountQueryValidator();
+        }
+
+        public IFilterQueryValidator GetFilterQueryValidator()
+        {
+             return RequestContext.Validators.GetFilterQueryValidator();
+        }
+
+        public IODataQueryValidator GetODataQueryValidator()
+        {
+            return RequestContext.Validators.GetODataQueryValidator();
+        }
+
+        public IOrderByQueryValidator GetOrderByQueryValidator()
+        {
+            return RequestContext.Validators.GetOrderByQueryValidator();
+        }
+
+        public ISelectExpandQueryValidator GetSelectExpandQueryValidator()
+        {
+            return RequestContext.Validators.GetSelectExpandQueryValidator();
+        }
+
+        public ISkipQueryValidator GetSkipQueryValidator()
+        {
+            return RequestContext.Validators.GetSkipQueryValidator();
+        }
+
+        public ISkipTokenQueryValidator GetSkipTokenQueryValidator()
+        {
+            return RequestContext.Validators.GetSkipTokenQueryValidator();
+        }
+
+        public ITopQueryValidator GetTopQueryValidator()
+        {
+            return RequestContext.Validators.GetTopQueryValidator();
+        }
+
+        #endregion
+
+        #region Binder Methods
+
+        public IOrderByBinder GetOrderByBinder()
+        {
+            return RequestContext.Binders.GetOrderByBinder();
+        }
+
+        public ISelectExpandBinder GetSelectExpandBinder()
+        {
+            return RequestContext.Binders.GetSelectExpandBinder();
+        }
+
+        public ISearchBinder GetSearchBinder()
+        {
+            return RequestContext.Binders.GetSearchBinder();
+        }
+
+        public IFilterBinder GetFilterBinder()
+        {
+            return RequestContext.Binders.GetFilterBinder();
+        }
+
+        #endregion
     }
 }

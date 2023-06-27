@@ -1,20 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace QueryBuilder.Query.Validator
+﻿namespace QueryBuilder.Query.Validator
 {
-
-    /* Instead of calling context.GetComputeQueryValidator(), call context.Validators.GetComputeQueryValidator(), e.g.
-     * Internally, the former call would do the following:
-     *      context?.RequestContainer?.GetService<IComputeQueryValidator>() ?? new ComputeQueryValidator();
-    */
-
     public class QueryValidators
     {
-
         public QueryValidators() { }
 
         IComputeQueryValidator ComputeQueryValidator { get; set; }
@@ -79,10 +66,5 @@ namespace QueryBuilder.Query.Validator
         {
             return TopQueryValidator ??= new TopQueryValidator();
         }
-
-        /*public void SetComputeQueryValidator(IComputeQueryValidator computeQueryValidator)
-        {
-            ComputeQueryValidator = computeQueryValidator;
-        }*/
-}
+    }
 }

@@ -396,7 +396,7 @@ namespace QueryBuilder.Query
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
             if (IsAvailableODataQueryOption(Apply, querySettings, AllowedQueryOptions.Apply))
             {
-                result = Apply.ApplyTo(result, querySettings, QueryContext.RequestContext.AssembliesResolver, QueryContext.RequestContext.Binders.GetFilterBinder());
+                result = Apply.ApplyTo(result, querySettings, QueryContext.RequestContext.AssembliesResolver, QueryContext.GetFilterBinder());
                 // WRAPPER:
                 //odataFeature.ApplyClause = Apply.ApplyClause;
                 this.QueryContext.ElementClrType = Apply.ResultClrType;
@@ -467,7 +467,7 @@ namespace QueryBuilder.Query
                     orderBy.Compute = Compute;
                 }
 
-                result = orderBy.ApplyTo(result, querySettings, QueryContext.RequestContext.Binders.GetOrderByBinder());
+                result = orderBy.ApplyTo(result, querySettings, QueryContext.GetOrderByBinder());
             }
 
             if (IsAvailableODataQueryOption(SkipToken, querySettings, AllowedQueryOptions.SkipToken))
@@ -1115,11 +1115,11 @@ namespace QueryBuilder.Query
                 var type = typeof(T);
                 if (type == typeof(IQueryable))
                 {
-                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, QueryContext.RequestContext.Binders.GetSelectExpandBinder());
+                    result = (T)newSelectExpand.ApplyTo((IQueryable)entity, querySettings, QueryContext.GetSelectExpandBinder());
                 }
                 else if (type == typeof(object))
                 {
-                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, QueryContext.RequestContext.Binders.GetSelectExpandBinder());
+                    result = (T)newSelectExpand.ApplyTo(entity, querySettings, QueryContext.GetSelectExpandBinder());
                 }
             }
 
@@ -1161,7 +1161,7 @@ namespace QueryBuilder.Query
 
             BuildQueryOptions(normalizedQueryParameters);
 
-            Validator = queryContext.RequestContext.Validators.GetODataQueryValidator();
+            Validator = queryContext.GetODataQueryValidator();
         }
 
         //TESTING
