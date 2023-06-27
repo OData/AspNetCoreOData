@@ -1,14 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+	<TargetFrameworks Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &gt;= '17.0'">$(TargetFrameworks);net6.0</TargetFrameworks>
+	  <ImplicitUsings>enable</ImplicitUsings>
 	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	  <OutputType>Library</OutputType>
 	  <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 	  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <IsPackable>true</IsPackable>
+	  <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
