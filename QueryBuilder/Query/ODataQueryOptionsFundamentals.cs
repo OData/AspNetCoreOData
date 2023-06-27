@@ -372,7 +372,7 @@ namespace ODataQueryBuilder.Query
             bool resultsLimited = false;
 
             // Update the query setting
-            querySettings = QueryContext.UpdateQuerySettings(querySettings, query);
+            querySettings = UpdateQuerySettings(querySettings, query);
 
             // First apply $apply
             // Section 3.15 of the spec http://docs.oasis-open.org/odata/odata-data-aggregation-ext/v4.0/cs01/odata-data-aggregation-ext-v4.0-cs01.html#_Toc378326311
@@ -610,7 +610,7 @@ namespace ODataQueryBuilder.Query
             }
 
             // Update the query setting
-            querySettings = QueryContext.UpdateQuerySettings(querySettings, query: null);
+            querySettings = UpdateQuerySettings(querySettings, query: null);
 
             AddAutoSelectExpandProperties();
 
@@ -1146,7 +1146,32 @@ namespace ODataQueryBuilder.Query
             Validator = queryContext.GetODataQueryValidator();
         }
 
-        //TESTING
+        public static ODataQuerySettings UpdateQuerySettings(ODataQuerySettings querySettings, IQueryable query)
+        {
+            ODataQuerySettings updatedSettings = new ODataQuerySettings();
+
+            // INTENTIONAL CHANGE: Removed because this always gets overriden:
+            // - Commit: https://github.com/OData/AspNetCoreOData/commit/c48a776b5818b36d983abe61b4aaf30761a3216b#diff-163dd061aeec926a287d9ea683e9be25f263c02989731faa52b7f1b6bd540dbd
+            // - Seems like there's no corresponding PR
+            //ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+            //if (settings != null)
+            //{
+            //    updatedSettings.CopyFrom(settings);
+            //}
+
+            updatedSettings.CopyFrom(querySettings);
+
+            if (updatedSettings.HandleNullPropagation == HandleNullPropagationOption.Default)
+            {
+                updatedSettings.HandleNullPropagation = query != null
+                    ? HandleNullPropagationOptionHelper.GetDefaultHandleNullPropagationOption(query)
+                    : HandleNullPropagationOption.True;
+            }
+
+            return updatedSettings;
+        }
+
+        #region Testing
         //public static void DoWork()
         //{
         //    ODataQueryContext2 testContext = new ODataQueryContext2(null, (Type)null, null, uriResolverFactory: () => context.RequestContainer.GetService<ODataUriResolver>()); // override global setting
@@ -1161,5 +1186,6 @@ namespace ODataQueryBuilder.Query
         //    ODataQueryContext2 testContext4 = new ODataQueryContext2(null, (Type)null, null);
         //    ODataQueryOptions testQueryOptions4 = new ODataQueryOptions(testContext, "fakeUri");
         //}
+        #endregion
     }
 }
