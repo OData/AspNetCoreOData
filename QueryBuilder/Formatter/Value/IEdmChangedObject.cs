@@ -1,7 +1,7 @@
-﻿using QueryBuilder.Deltas;
-using QueryBuilder.Formatter.Value;
+﻿using ODataQueryBuilder.Deltas;
+using ODataQueryBuilder.Formatter.Value;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an instance of an <see cref="IEdmChangedObject"/>.

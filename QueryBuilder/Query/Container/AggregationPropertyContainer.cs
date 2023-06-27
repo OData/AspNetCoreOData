@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Query.Wrapper;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     /// <summary>
     /// Represent properties used in groupby and aggregate clauses to make them accessible in further clauses/transformations

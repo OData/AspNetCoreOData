@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// Allows client to tell OData which are the custom aggregation methods defined.

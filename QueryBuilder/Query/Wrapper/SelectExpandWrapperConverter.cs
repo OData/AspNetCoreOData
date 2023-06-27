@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Container;
 using Microsoft.OData.Edm;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Query.Wrapper;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     /// <summary>
     /// Supports converting <see cref="SelectExpandWrapper{T}"/> types by using a factory pattern.

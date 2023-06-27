@@ -5,9 +5,9 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using QueryBuilder.Common;
+using ODataQueryBuilder.Common;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     /// <summary>
     /// A container of property names and property values.

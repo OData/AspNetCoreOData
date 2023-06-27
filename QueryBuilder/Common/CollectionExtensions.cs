@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace QueryBuilder.Common
+namespace ODataQueryBuilder.Common
 {
     /// <summary>
     /// Helper extension methods for fast use of collections.

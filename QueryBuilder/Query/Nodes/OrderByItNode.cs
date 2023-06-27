@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents the order by expression '$it' in the $orderby clause.

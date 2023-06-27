@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.OData.UriParser;
-using QueryBuilder;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Routing
+namespace ODataQueryBuilder.Routing
 {
     /// <summary>
     /// Translator the parameter alias, convert node, returned entity set into OData path segment.

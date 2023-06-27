@@ -2,7 +2,7 @@
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Config;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This class describes the model bound settings to use during query composition.

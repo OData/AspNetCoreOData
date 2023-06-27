@@ -2,11 +2,11 @@
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
-using QueryBuilder.Abstracts;
+using ODataQueryBuilder.Abstracts;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// The extensions used to map between C# types and Edm types.

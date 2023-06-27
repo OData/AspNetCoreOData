@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Query
+﻿namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This enum defines how to handle null propagation in queryable support.

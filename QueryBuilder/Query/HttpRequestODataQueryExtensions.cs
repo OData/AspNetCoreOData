@@ -3,15 +3,15 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 //using Microsoft.AspNetCore.Http;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Edm;
 //using QueryBuilder.Extensions;
 //using QueryBuilder.Routing;
 //using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// 

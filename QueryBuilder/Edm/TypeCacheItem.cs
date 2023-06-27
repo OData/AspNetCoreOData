@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     internal class TypeCacheItem
     {

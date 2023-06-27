@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an instance of an <see cref="IEdmType"/>.

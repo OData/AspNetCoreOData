@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     /// <summary>
     /// Represents a class that truncates a collection to a given page size.

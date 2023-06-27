@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     /// <summary>
     /// Represents a container class that contains properties that are grouped by using $apply.

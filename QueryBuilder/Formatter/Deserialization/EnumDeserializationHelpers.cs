@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using QueryBuilder.Common;
+using ODataQueryBuilder.Common;
 using Microsoft.OData;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     internal static class EnumDeserializationHelpers
     {

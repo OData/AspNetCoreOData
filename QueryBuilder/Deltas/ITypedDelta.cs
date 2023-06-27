@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// The typed delta.

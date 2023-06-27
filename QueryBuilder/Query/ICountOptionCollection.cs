@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents a collection that has total count.

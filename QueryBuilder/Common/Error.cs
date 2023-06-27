@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace QueryBuilder
+namespace ODataQueryBuilder
 {
     /// <summary>
     /// Utility class for creating and unwrapping <see cref="Exception"/> instances.

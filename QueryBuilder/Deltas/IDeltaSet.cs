@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// The interface for a delta resource set.

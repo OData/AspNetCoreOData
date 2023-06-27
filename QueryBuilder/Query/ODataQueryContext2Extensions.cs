@@ -1,11 +1,11 @@
 ﻿using System.Linq;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Validator;
 //using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.ModelBuilder;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     internal static class ODataQueryContext2Extensions
     {

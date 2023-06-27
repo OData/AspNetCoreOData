@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// The Edm model name annotation.

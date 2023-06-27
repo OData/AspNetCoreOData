@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     //
     // Summary:

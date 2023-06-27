@@ -2,9 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
-using QueryBuilder.Abstracts;
+using ODataQueryBuilder.Abstracts;
 
-namespace QueryBuilder.Formatter
+namespace ODataQueryBuilder.Formatter
 {
     /// <summary>
     /// ActionPayload holds the Parameter names and values provided by a client in a POST request

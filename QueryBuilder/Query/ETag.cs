@@ -4,9 +4,9 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 //using QueryBuilder.Properties0;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Container;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// The ETag parsed from request.

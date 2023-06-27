@@ -8,19 +8,19 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Deserialization;
-using QueryBuilder.Query.Container;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Deserialization;
+using ODataQueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Wrapper;
 //using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// The base class for all expression binders.

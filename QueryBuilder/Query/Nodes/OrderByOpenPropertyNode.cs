@@ -1,7 +1,7 @@
 ﻿using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents ordering on a dynamic property

@@ -6,14 +6,14 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Container;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions {
+namespace ODataQueryBuilder.Query.Expressions {
     /// <summary>
     /// The helper class for all expression binders.
     /// </summary>

@@ -6,16 +6,16 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Container;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Wrapper;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
     internal class AggregationBinder : TransformationBinderBase

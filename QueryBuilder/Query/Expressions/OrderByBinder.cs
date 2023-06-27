@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// The default implementation to bind an OData $orderby represented by <see cref="OrderByClause"/>

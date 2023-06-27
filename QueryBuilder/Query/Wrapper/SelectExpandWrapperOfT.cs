@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     /* Entityframework requires that the two different type initializers for a given type in the same query have the
 same set of properties in the same order.

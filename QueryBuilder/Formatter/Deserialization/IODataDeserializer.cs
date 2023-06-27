@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     /// <summary>
     /// An <see cref="IODataDeserializer"/> is used to read an ODataMessage into a CLR object.

@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Query.Container
+﻿namespace ODataQueryBuilder.Query.Container
 {
     internal class SingleExpandedProperty<T> : NamedProperty<T>
     {

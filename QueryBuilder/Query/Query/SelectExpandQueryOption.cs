@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents the OData $select and $expand query options.

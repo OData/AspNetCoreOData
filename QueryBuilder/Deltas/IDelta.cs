@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// <see cref="IDelta" /> allows and tracks changes to an object.

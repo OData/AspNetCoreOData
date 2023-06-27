@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
-using QueryBuilder;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     internal static class SelectExpandPathExtensions
     {

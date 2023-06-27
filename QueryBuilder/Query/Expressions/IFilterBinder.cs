@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// Exposes the ability to translate an OData $filter represented by <see cref="FilterClause"/> to the <see cref="Expression"/>.

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// Extension methods for Query binders

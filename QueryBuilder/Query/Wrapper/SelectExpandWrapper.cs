@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Value;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Query.Container;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     internal abstract class SelectExpandWrapper : IEdmEntityObject, ISelectExpandWrapper
     {

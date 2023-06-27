@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
-using QueryBuilder.Query;
+using ODataQueryBuilder.Query;
 using Microsoft.OData.UriParser.Aggregation;
 //using Microsoft.AspNetCore.Routing;
 //using Microsoft.Extensions.DependencyInjection;
 
-namespace QueryBuilder.Abstracts
+namespace ODataQueryBuilder.Abstracts
 {
     /// <summary>
     /// Contains the details of a given OData request. These properties should all be mutable.

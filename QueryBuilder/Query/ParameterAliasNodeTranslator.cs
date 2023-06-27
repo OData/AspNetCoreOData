@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using QueryBuilder.Routing;
+using ODataQueryBuilder.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using QueryBuilder;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a translator to translate parameter alias nodes.

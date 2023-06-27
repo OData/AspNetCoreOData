@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.ModelBuilder;
 
-namespace QueryBuilder.Abstracts
+namespace ODataQueryBuilder.Abstracts
 {
     internal static class AssemblyResolverHelper
     {

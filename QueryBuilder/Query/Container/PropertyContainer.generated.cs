@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
 
 

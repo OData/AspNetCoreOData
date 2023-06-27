@@ -1,7 +1,7 @@
 ﻿using Microsoft.OData.Edm;
-using QueryBuilder;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Implementing IEdmCollectionType to identify collection of DeltaResourceSet.

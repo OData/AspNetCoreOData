@@ -7,7 +7,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace QueryBuilder.Abstracts
+namespace ODataQueryBuilder.Abstracts
 {
     /// <summary>
     /// Provide the interface for the details of a given OData request.

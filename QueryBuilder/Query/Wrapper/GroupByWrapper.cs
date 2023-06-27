@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using QueryBuilder.Common;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Query.Container;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     internal class GroupByWrapper : DynamicTypeWrapper
     {

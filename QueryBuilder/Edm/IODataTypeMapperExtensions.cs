@@ -1,9 +1,9 @@
 ﻿using System;
-using QueryBuilder.Abstracts;
+using ODataQueryBuilder.Abstracts;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// Extension methods for <see cref="IODataTypeMapper"/>.

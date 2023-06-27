@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     internal class NamedProperty<T> : PropertyContainer
     {

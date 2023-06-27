@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     internal class CollectionExpandedProperty<T> : NamedProperty<T>
     {

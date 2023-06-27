@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// Base class for the Delta resource

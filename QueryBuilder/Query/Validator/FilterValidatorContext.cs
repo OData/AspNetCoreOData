@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using Microsoft.OData;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// The metadata context for $filter validator.

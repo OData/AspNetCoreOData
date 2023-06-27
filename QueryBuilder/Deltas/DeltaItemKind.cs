@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Deltas
+﻿namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// The Kind of the object within the DeltaPayload used to distinguish between

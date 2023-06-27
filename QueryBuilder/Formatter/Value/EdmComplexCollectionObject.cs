@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using QueryBuilder.Abstracts;
+using ODataQueryBuilder.Abstracts;
 using Microsoft.OData.Edm;
-using QueryBuilder.Formatter.Value;
-using QueryBuilder;
+using ODataQueryBuilder.Formatter.Value;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an <see cref="IEdmObject"/> that is a collection of <see cref="IEdmComplexObject"/>s.

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 //using Microsoft.AspNetCore.Http;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Deserialization;
-using QueryBuilder.Formatter.Serialization;
-using QueryBuilder.Formatter.Value;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Deserialization;
+using ODataQueryBuilder.Formatter.Serialization;
+using ODataQueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Query.Wrapper;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter
+namespace ODataQueryBuilder.Formatter
 {
     /// <summary>
     ///  Contains context information about the resource currently being serialized.

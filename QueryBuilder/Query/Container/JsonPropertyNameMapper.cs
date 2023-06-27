@@ -5,9 +5,9 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Container;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     internal class JsonPropertyNameMapper : IPropertyMapper
     {

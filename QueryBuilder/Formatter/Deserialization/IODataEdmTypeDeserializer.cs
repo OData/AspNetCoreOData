@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     /// <summary>
     /// Interface for all <see cref="ODataDeserializer" />s that deserialize into an object backed by <see cref="IEdmType"/>.

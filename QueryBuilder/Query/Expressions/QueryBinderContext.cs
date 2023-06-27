@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Wrapper;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// Encapsulates all binder information about an individual OData query option binding.

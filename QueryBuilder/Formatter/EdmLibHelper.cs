@@ -1,13 +1,13 @@
 ﻿using System;
-using QueryBuilder.Common;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.ModelBuilder;
-using QueryBuilder.Edm;
-using QueryBuilder.Deltas;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Deltas;
 
-namespace QueryBuilder.Formatter
+namespace ODataQueryBuilder.Formatter
 {
     internal static class EdmLibHelper
     {

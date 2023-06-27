@@ -1,14 +1,14 @@
 ﻿using System.Linq;
 //using Microsoft.AspNetCore.Http;
-using QueryBuilder.Common;
+using ODataQueryBuilder.Common;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
 using Microsoft.Extensions.Primitives;
-using QueryBuilder.Abstracts;
+using ODataQueryBuilder.Abstracts;
 using Microsoft.OData.ModelBuilder;
-using QueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Expressions;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a composite OData query options that can be used to perform query composition.

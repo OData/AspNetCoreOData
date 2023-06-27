@@ -4,12 +4,12 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Value;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     internal class ComputeWrapper<T> : GroupByWrapper, IEdmEntityObject
     {

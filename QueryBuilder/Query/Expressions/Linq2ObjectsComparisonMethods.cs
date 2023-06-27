@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     internal static class Linq2ObjectsComparisonMethods
     {

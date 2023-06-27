@@ -7,20 +7,20 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Deserialization;
-using QueryBuilder.Query.Container;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Deserialization;
+using ODataQueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Wrapper;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query;
-using QueryBuilder;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// The base class for all expression query binders.

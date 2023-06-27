@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using QueryBuilder.Query;
+using ODataQueryBuilder.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.ModelBuilder.Config;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     internal static class AutoSelectExpandHelper
     {

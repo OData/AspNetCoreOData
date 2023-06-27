@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// Represents a single order by expression in the $orderby clause.

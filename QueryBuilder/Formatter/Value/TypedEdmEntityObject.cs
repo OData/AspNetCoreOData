@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an <see cref="IEdmEntityObject"/> backed by a CLR object with a one-to-one mapping.

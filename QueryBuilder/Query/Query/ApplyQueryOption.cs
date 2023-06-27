@@ -2,15 +2,15 @@
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Query.Expressions;
 //using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a $apply OData query option for querying.

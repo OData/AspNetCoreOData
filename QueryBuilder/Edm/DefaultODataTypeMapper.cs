@@ -5,13 +5,13 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Common;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Common;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.Spatial;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// The default implementation for <see cref="IODataTypeMapper"/>.

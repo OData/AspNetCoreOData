@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     // wraps a constant value so that EntityFramework parametrizes the constant.
     internal abstract class LinqParameterContainer

@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using QueryBuilder.Common;
-using QueryBuilder.Query;
-using QueryBuilder;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// OData ETag of an entity type <typeparamref name="TEntity"/>.

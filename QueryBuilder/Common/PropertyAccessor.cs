@@ -1,9 +1,9 @@
-﻿using QueryBuilder.Common;
-using QueryBuilder;
+﻿using ODataQueryBuilder.Common;
+using ODataQueryBuilder;
 using System;
 using System.Reflection;
 
-namespace QueryBuilder.Common
+namespace ODataQueryBuilder.Common
 {
     /// <summary>
     /// Represents a strategy for Getting and Setting a PropertyInfo on <typeparamref name="TStructuralType"/>

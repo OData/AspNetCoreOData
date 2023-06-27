@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Deltas
+﻿namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// The delta set item base.

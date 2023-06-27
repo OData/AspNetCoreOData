@@ -1,9 +1,9 @@
 ﻿using System;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Edm;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// Represents a validator used to validate a <see cref="CountQueryOption"/> 

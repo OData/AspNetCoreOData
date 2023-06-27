@@ -5,13 +5,13 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Value;
 using Microsoft.OData.Edm;
-using QueryBuilder.Formatter.Deserialization;
-using QueryBuilder;
+using ODataQueryBuilder.Formatter.Deserialization;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     internal static class CollectionDeserializationHelpers
     {

@@ -7,7 +7,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Validation;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     internal static class EdmModelExtensions
     {

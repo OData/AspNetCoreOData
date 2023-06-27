@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.OData;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// This class helps to bind uri functions to CLR.

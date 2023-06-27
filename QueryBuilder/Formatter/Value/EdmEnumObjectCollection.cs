@@ -2,11 +2,11 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using Microsoft.OData.Edm;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Formatter.Value;
-using QueryBuilder;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Formatter.Value;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an <see cref="IEdmObject"/> that is a collection of <see cref="IEdmEnumObject"/>s.

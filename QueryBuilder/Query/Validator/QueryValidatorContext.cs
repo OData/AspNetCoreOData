@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// The base for validator context.

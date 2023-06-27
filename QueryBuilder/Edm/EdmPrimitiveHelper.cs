@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Xml.Linq;
-using QueryBuilder.Common;
+using ODataQueryBuilder.Common;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     internal static class EdmPrimitiveHelper
     {

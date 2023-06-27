@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.OData.AzureFuncti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.OData.AzureFunctionsSample", "AzureFunctions\Microsoft.OData.AzureFunctionsSample\Microsoft.OData.AzureFunctionsSample.csproj", "{5AF431D3-6D45-440A-8A50-E60C3EEC9EE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryBuilder", "QueryBuilder\QueryBuilder.csproj", "{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataQueryBuilder", "QueryBuilder\ODataQueryBuilder.csproj", "{535FAB35-4C0F-4EBD-A19F-CC23DAD5E119}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

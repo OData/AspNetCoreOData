@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Linq;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     internal static class HandleNullPropagationOptionHelper
     {

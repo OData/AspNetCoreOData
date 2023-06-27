@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.OData;
-using QueryBuilder.Deltas;
+using ODataQueryBuilder.Deltas;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// <see cref="DeltaDeletedResource{T}" /> allows and tracks changes to a delta deleted resource.

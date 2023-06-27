@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using QueryBuilder;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// The navigation property path is a model path with the following restriction:

@@ -1,8 +1,8 @@
-﻿using QueryBuilder.Edm;
+﻿using ODataQueryBuilder.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// Represents a validator used to validate a <see cref="TopQueryOption"/> based on the <see cref="ODataValidationSettings"/>.

@@ -19,7 +19,7 @@
     <PackageReference Include="Microsoft.OData.Edm" Version="7.15.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\QueryBuilder\QueryBuilder.csproj" />
+    <ProjectReference Include="..\..\QueryBuilder\ODataQueryBuilder.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 //using Microsoft.AspNetCore.Http;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     /// <summary>
     /// Represents a factory that creates an <see cref="IODataDeserializer"/>.

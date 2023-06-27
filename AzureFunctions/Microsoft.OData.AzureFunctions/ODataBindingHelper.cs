@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using QueryBuilder;
-using QueryBuilder.Extensions;
-using QueryBuilder.Query;
+using ODataQueryBuilder;
+using ODataQueryBuilder.Extensions;
+using ODataQueryBuilder.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 

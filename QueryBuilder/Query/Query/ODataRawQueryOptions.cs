@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Query
+﻿namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents the raw query values in the string format from the incoming request.

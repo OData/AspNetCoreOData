@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using QueryBuilder.Formatter.Deserialization;
-using QueryBuilder.Common;
-using QueryBuilder;
+using ODataQueryBuilder.Formatter.Deserialization;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Common
+namespace ODataQueryBuilder.Common
 {
     /// <summary>
     /// FastPropertyAccessor is a <see cref="PropertyAccessor{TStructuralType}"/> that speeds up (compares to reflection)

@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Query.Validator
+﻿namespace ODataQueryBuilder.Query.Validator
 {
     public class QueryValidators
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Net.Http.Headers;
 
-namespace QueryBuilder.Abstracts
+namespace ODataQueryBuilder.Abstracts
 {
     /// <summary>
     /// Exposes the ability to convert a collection of concurrency property names and values into an <see cref="EntityTagHeaderValue"/>

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using QueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Expressions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a $search OData query option for querying.

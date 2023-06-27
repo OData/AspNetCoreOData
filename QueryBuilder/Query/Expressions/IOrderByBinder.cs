@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// Exposes the ability to translate an OData $orderby represented by <see cref="OrderByClause"/> to the <see cref="Expression"/>

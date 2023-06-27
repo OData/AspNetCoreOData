@@ -1,12 +1,12 @@
 ﻿using System;
 //using Microsoft.AspNetCore.Http;
-using QueryBuilder.Common;
-using QueryBuilder.Deltas;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Deltas;
+using ODataQueryBuilder.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     /// <summary>
     /// This class encapsulates the state and settings that get passed to <see cref="IODataDeserializer"/>.

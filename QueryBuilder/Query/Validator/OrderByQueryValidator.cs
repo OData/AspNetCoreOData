@@ -1,7 +1,7 @@
 ﻿using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// Represents a validator used to validate an <see cref="OrderByQueryOption"/> based on the <see cref="ODataValidationSettings"/>.

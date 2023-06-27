@@ -7,7 +7,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Routing
+namespace ODataQueryBuilder.Routing
 {
     /// <summary>
     /// A handler used to calculate some values based on the odata path.

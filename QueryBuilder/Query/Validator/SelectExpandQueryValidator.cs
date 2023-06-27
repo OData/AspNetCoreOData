@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -10,7 +10,7 @@ using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// Represents a validator used to validate a <see cref="SelectExpandQueryOption" /> based on the <see cref="ODataValidationSettings"/>.

@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Routing
+﻿namespace ODataQueryBuilder.Routing
 {
     /// <summary>
     /// Provides the values of segment kinds for implementations of odata path template.

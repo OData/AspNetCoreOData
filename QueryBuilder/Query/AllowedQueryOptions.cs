@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// OData query options to allow for querying.

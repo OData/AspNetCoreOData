@@ -3,12 +3,12 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Expressions {
+namespace ODataQueryBuilder.Query.Expressions {
     internal class TransformationBinderBase : ExpressionBinderBase
     {
         internal TransformationBinderBase(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType,

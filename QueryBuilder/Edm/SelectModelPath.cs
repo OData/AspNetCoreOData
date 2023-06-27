@@ -2,7 +2,7 @@
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// The select property path is a model path with the following restriction:

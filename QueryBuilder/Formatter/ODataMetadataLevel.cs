@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Formatter
+﻿namespace ODataQueryBuilder.Formatter
 {
     /// <summary>
     /// The amount of metadata information to serialize in an OData response.

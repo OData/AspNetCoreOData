@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a $compute OData query option for querying.

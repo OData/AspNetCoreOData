@@ -1,10 +1,10 @@
-﻿using QueryBuilder.Query.Wrapper;
-using QueryBuilder;
+﻿using ODataQueryBuilder.Query.Wrapper;
+using ODataQueryBuilder;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     internal class SelectSomeAndInheritance<TEntity> : SelectExpandWrapper<TEntity>
     {

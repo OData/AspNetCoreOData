@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Formatter.Value
+﻿namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an instance of an enum value.

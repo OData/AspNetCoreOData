@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a $filter OData query option for querying.

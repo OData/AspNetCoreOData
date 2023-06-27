@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents the value of the $count query option and exposes a way to retrieve the number of entities that satisfy a query.

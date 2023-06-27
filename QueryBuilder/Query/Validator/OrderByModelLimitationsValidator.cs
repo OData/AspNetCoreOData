@@ -1,9 +1,9 @@
-﻿using QueryBuilder.Edm;
+﻿using ODataQueryBuilder.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query.Validator
+namespace ODataQueryBuilder.Query.Validator
 {
     internal class OrderByModelLimitationsValidator : QueryNodeVisitor<SingleValueNode>
     {

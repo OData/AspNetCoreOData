@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using QueryBuilder.Formatter.Serialization;
+using ODataQueryBuilder.Formatter.Serialization;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents how NextLink for paging is generated.

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using QueryBuilder;
-using QueryBuilder.Query;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Edm;
 
-namespace QueryBuilder.Formatter.Serialization
+namespace ODataQueryBuilder.Formatter.Serialization
 {
     /// <summary>
     /// Represents an <see cref="ODataSerializer"/> for serializing the raw value of an <see cref="IEdmPrimitiveType"/>.

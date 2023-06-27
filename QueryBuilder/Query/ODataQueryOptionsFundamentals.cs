@@ -8,14 +8,14 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Container;
-using QueryBuilder.Routing;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Container;
+using ODataQueryBuilder.Routing;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.OData.ModelBuilder;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a composite OData query options that can be used to perform query composition.

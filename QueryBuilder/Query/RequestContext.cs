@@ -1,12 +1,12 @@
 ﻿using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Validator;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines some context information for the query request.

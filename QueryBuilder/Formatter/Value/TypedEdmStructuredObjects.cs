@@ -2,11 +2,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.Contracts;
 using System.Reflection;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an <see cref="IEdmStructuredObject"/> backed by a CLR object with a one-to-one mapping.

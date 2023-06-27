@@ -8,12 +8,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
-using QueryBuilder.Abstracts;
-using QueryBuilder.Common;
-using QueryBuilder.Deltas;
-using QueryBuilder;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Deltas;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// A class the tracks changes (i.e. the Delta) for a particular <typeparamref name="T"/>.

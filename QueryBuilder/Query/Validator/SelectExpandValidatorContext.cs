@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Query.Validator
+﻿namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// The metadata context for $select and $expand validator.

@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics.Contracts;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Validator;
-using QueryBuilder.Routing;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Validator;
+using ODataQueryBuilder.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Expressions;
 using Microsoft.Extensions.Primitives;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines some context information used to perform query composition.

@@ -9,7 +9,7 @@ using Microsoft.OData.Edm.Vocabularies.Community.V1;
 using Microsoft.OData.Edm.Vocabularies.V1;
 using Microsoft.OData.ModelBuilder;
 
-namespace QueryBuilder.Edm
+namespace ODataQueryBuilder.Edm
 {
     /// <summary>
     /// The extensions for the <see cref="IEdmModel"/> for the annotations.

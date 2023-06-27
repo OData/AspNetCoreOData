@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.OData;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Formatter.Value;
 
-namespace QueryBuilder.Formatter.Value
+namespace ODataQueryBuilder.Formatter.Value
 {
     /// <summary>
     /// Represents an instance of an <see cref="IEdmChangedObject"/>.

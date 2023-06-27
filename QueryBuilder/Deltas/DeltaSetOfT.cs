@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 //using Microsoft.AspNetCore.OData.Abstracts;
-using QueryBuilder.Abstracts;
+using ODataQueryBuilder.Abstracts;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// <see cref="DeltaSet{T}" /> allows and tracks changes to a delta resource set.

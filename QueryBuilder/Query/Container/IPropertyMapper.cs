@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 //using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Query.Wrapper;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     /// <summary>
     /// The result of a $select and $expand projection is represented as an <see cref="ISelectExpandWrapper"/>

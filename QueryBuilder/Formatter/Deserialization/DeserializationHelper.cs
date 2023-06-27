@@ -5,14 +5,14 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
-using QueryBuilder.Common;
-using QueryBuilder.Deltas;
-using QueryBuilder.Edm;
-using QueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Deltas;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Formatter.Deserialization
+namespace ODataQueryBuilder.Formatter.Deserialization
 {
     internal static class DeserializationHelpers
     {

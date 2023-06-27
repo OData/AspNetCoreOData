@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
-using QueryBuilder.Query.Container;
-using QueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     internal class ComputeBinder : TransformationBinderBase
     {

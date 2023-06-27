@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     internal class ClrCanonicalFunctions
     {

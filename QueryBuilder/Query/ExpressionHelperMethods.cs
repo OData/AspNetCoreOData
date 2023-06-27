@@ -7,7 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     internal class ExpressionHelperMethods
     {

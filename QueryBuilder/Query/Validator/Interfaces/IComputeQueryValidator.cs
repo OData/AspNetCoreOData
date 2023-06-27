@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder.Query.Validator
+﻿namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
     /// Provide the interface used to validate a <see cref="ComputeQueryOption"/>

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Edm;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Routing
+namespace ODataQueryBuilder.Routing
 {
     /// <summary>
     ///  Extension methods for <see cref="ODataPath"/>.

@@ -1,6 +1,6 @@
 ﻿using Microsoft.OData.ModelBuilder.Config;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This class describes the default configurations to use during query composition.

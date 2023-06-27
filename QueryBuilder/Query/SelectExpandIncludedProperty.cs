@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     internal class SelectExpandIncludedProperty
     {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.OData;
-using QueryBuilder.Deltas;
+using ODataQueryBuilder.Deltas;
 using System;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// <see cref="IDeltaDeletedResource" /> allows and tracks changes to a deleted resource.

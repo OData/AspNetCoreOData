@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using QueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Container;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query.Wrapper
+namespace ODataQueryBuilder.Query.Wrapper
 {
     /// <summary>
     /// Represents the result of a $select and $expand query operation.

@@ -5,17 +5,17 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query;
-using QueryBuilder;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// The base class for all expression binders.

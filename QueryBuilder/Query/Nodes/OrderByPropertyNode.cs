@@ -2,7 +2,7 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Represents an order by <see cref="IEdmProperty"/> expression.

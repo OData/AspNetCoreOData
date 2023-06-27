@@ -1,4 +1,4 @@
-﻿namespace QueryBuilder
+﻿namespace ODataQueryBuilder
 {
     using System;
 

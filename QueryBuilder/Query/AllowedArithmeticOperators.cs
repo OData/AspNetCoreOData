@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// Arithmetic operators to allow for querying using $filter.

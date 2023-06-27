@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.Contracts;
 using System.Linq.Expressions;
 
-namespace QueryBuilder.Query.Container
+namespace ODataQueryBuilder.Query.Container
 {
     /// <summary>
     /// Represents a container that captures a named property that is a part of the select expand query.

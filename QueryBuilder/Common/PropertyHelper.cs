@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
 
-namespace QueryBuilder.Common
+namespace ODataQueryBuilder.Common
 {
     internal class PropertyHelper
     {

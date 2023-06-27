@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 //using Microsoft.AspNetCore.OData.Deltas;
 //using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.ModelBuilder;
-using QueryBuilder.Query.Wrapper;
-using QueryBuilder.Deltas;
+using ODataQueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Deltas;
 
-namespace QueryBuilder.Common
+namespace ODataQueryBuilder.Common
 {
     /// <summary>
     /// The type related helper methods.

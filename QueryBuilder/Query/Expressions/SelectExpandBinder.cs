@@ -9,15 +9,15 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
-using QueryBuilder.Common;
-using QueryBuilder.Edm;
-using QueryBuilder.Query.Container;
-using QueryBuilder.Query.Expressions;
-using QueryBuilder.Query.Wrapper;
-using QueryBuilder.Query;
-using QueryBuilder;
+using ODataQueryBuilder.Common;
+using ODataQueryBuilder.Edm;
+using ODataQueryBuilder.Query.Container;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Wrapper;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder;
 
-namespace QueryBuilder.Query.Expressions
+namespace ODataQueryBuilder.Query.Expressions
 {
     /// <summary>
     /// Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="SelectExpandClause"/> to

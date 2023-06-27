@@ -1,8 +1,8 @@
-﻿using QueryBuilder.Formatter.Value;
-using QueryBuilder.Deltas;
+﻿using ODataQueryBuilder.Formatter.Value;
+using ODataQueryBuilder.Deltas;
 using System;
 
-namespace QueryBuilder.Deltas
+namespace ODataQueryBuilder.Deltas
 {
     /// <summary>
     /// The delta helpers.

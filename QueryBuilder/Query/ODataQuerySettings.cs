@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This class describes the settings to use during query composition.

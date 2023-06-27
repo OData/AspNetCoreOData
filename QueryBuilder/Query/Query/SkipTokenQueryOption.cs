@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using QueryBuilder.Query.Validator;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.OData.Edm;
 
-namespace QueryBuilder.Query
+namespace ODataQueryBuilder.Query
 {
     /// <summary>
     /// This defines a $skiptoken OData query option for querying.
