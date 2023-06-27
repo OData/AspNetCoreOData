@@ -369,7 +369,7 @@ namespace QueryBuilder.Query.Validator
 
             ODataQueryFundamentalsContext queryContext = new ODataQueryFundamentalsContext
             {
-                Request = validatorContext.Context.Request,
+                RequestQueryCollection = validatorContext.Context.RequestQueryCollection,
                 /*RequestContainer = validatorContext.Context.RequestContainer,*/
                 Model = validatorContext.Context.Model,
                 TargetProperty = validatorContext.Property,

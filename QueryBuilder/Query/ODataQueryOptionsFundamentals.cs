@@ -50,22 +50,22 @@ namespace QueryBuilder.Query
         /// </summary>
         /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
         /// <param name="request">The incoming request message.</param>
-        public ODataQueryOptionsFundamentals(ODataQueryFundamentalsContext context, Request request)
+        public ODataQueryOptionsFundamentals(ODataQueryFundamentalsContext context, IEnumerable<KeyValuePair<string, StringValues>> requestQueryCollection)
         {
             if (context == null)
             {
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            if (request == null)
+            if (requestQueryCollection == null)
             {
-                throw Error.ArgumentNullOrEmpty(nameof(request));
+                throw Error.ArgumentNullOrEmpty(nameof(requestQueryCollection));
             }
 
-            context.Request = Request;
+            context.RequestQueryCollection = requestQueryCollection;
 
             QueryContext = context;
-            Request = request;
+            RequestQueryCollection = requestQueryCollection;
 
             Initialize(context);
         }
@@ -73,7 +73,7 @@ namespace QueryBuilder.Query
         /// <summary>
         /// Gets the request message associated with this instance.
         /// </summary>
-        public Request Request { get; private set; }
+        public IEnumerable<KeyValuePair<string, StringValues>> RequestQueryCollection { get; private set; }
 
         /// <summary>
         ///  Gets the given <see cref="ODataQueryFundamentalsContext"/>
@@ -858,7 +858,7 @@ namespace QueryBuilder.Query
         {
             Dictionary<string, string> result = new Dictionary<string, string>();
 
-            foreach (var query in Request.Query)
+            foreach (var query in RequestQueryCollection)
             {
                 string key = query.Key.Trim();
                 string value = query.Value.ToString();

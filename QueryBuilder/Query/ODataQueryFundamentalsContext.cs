@@ -5,6 +5,7 @@ using QueryBuilder.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using QueryBuilder.Query.Expressions;
+using Microsoft.Extensions.Primitives;
 
 namespace QueryBuilder.Query
 {
@@ -119,7 +120,7 @@ namespace QueryBuilder.Query
         /// </summary>
         public ODataPath Path { get; private set; }
 
-        internal Request Request { get; set; }
+        internal IEnumerable<KeyValuePair<string, StringValues>> RequestQueryCollection { get; set; }
 
         public RequestContext RequestContext { get; internal set; }
 
