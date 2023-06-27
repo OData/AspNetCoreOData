@@ -43,7 +43,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.Validators.GetFilterQueryValidator();
+            Validator = context.GetFilterQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -51,7 +51,7 @@ namespace QueryBuilder.Query
         {
             _filterClause = filterClause;
             Context = context;
-            Validator = context.Validators.GetFilterQueryValidator();
+            Validator = context.GetFilterQueryValidator();
         }
 
         // This constructor is intended for unit testing only.
@@ -69,7 +69,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.Validators.GetFilterQueryValidator();
+            Validator = context.GetFilterQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -155,7 +155,7 @@ namespace QueryBuilder.Query
                 binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
             }
 
-            IFilterBinder binder = Context.Binders.GetFilterBinder();
+            IFilterBinder binder = Context.GetFilterBinder();
             return binder.ApplyBind(query, filterClause, binderContext);
         }
 

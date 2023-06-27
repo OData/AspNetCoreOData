@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
-using System.Linq;
-//using System.Net.Http.Headers;
 using Microsoft.Net.Http.Headers;
 using System.Reflection;
-//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Http.Extensions;
-//using Microsoft.AspNetCore.OData.Abstracts;
-//using Microsoft.AspNetCore.OData.Edm;
-//using Microsoft.AspNetCore.OData.Extensions;
-//using Microsoft.AspNetCore.OData.Query.Container;
-//using Microsoft.AspNetCore.OData.Query.Validator;
-//using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -22,15 +10,9 @@ using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 using QueryBuilder.Abstracts;
 using QueryBuilder.Edm;
-using QueryBuilder.Query;
-//using QueryBuilder.Extensions;
 using QueryBuilder.Query.Container;
 using QueryBuilder.Routing;
 using QueryBuilder.Query.Validator;
-using QueryBuilder.Query.Expressions;
-using System.Net.Http;
-using System.ComponentModel.Design;
-using System.IO;
 using Microsoft.OData.ModelBuilder;
 
 namespace QueryBuilder.Query

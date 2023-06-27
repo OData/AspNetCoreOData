@@ -33,12 +33,6 @@ namespace Microsoft.OData.AzureFunctionsSample
             ILogger log,
             [OData(typeof(EdmModelProvider))] ODataQueryOptionsFundamentals<Customer> options)
         {
-
-            RequestContext requestContext = new RequestContext();
-            //RequestContext(IAssemblyResolver assembliesResolver = null, ODataQuerySettings defaultQuerySettings = null, int pageSize = -1,
-            //                  QueryValidators validators = null, QueryBinders binders = null, SkipTokenHandler skipTokenHandler = null,
-            //                  DefaultQueryConfigurations defaultQueryConfigurations = null, bool ? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
-
             (IQueryable result, bool pageSizeLimited) = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings());
 
             return new OkObjectResult(result);

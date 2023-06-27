@@ -43,7 +43,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.Validators.GetTopQueryValidator();
+            Validator = context.GetTopQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -62,7 +62,7 @@ namespace QueryBuilder.Query
 
             Context = context;
             RawValue = rawValue;
-            Validator = context.Validators.GetTopQueryValidator();
+            Validator = context.GetTopQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,

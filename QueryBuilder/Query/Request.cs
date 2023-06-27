@@ -9,7 +9,7 @@ namespace QueryBuilder.Query
 {
     public class Request
     {
-        public Request(string uri, IQueryCollection requestQueryCollection)
+        public Request(string uri, IEnumerable<KeyValuePair<string, StringValues>> requestQueryCollection)
         {
             // TODO: Validate that the uri and queryCollection are consistent
             Uri = new Uri(uri);
@@ -17,7 +17,7 @@ namespace QueryBuilder.Query
 
         }
 
-        public Request(Uri uri, IQueryCollection requestQueryCollection)
+        public Request(Uri uri, IEnumerable<KeyValuePair<string, StringValues>> requestQueryCollection)
         {
             // TODO: Validate that the uri and queryCollection are consistent
             Uri = uri;

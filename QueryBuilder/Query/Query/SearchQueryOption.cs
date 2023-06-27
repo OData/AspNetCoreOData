@@ -123,7 +123,7 @@ namespace QueryBuilder.Query
                 throw Error.ArgumentNull(nameof(querySettings));
             }
 
-            ISearchBinder binder = Context.Binders.GetSearchBinder();
+            ISearchBinder binder = Context.GetSearchBinder();
             if (binder == null)
             {
                 // If the developer doesn't provide the search binder, let's ignore the $search clause.

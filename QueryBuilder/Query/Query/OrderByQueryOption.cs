@@ -46,7 +46,7 @@ namespace QueryBuilder.Query
             Context = context;
             RawValue = rawValue;
             //Validator = context.GetOrderByQueryValidator();
-            Validator = context.Validators.GetOrderByQueryValidator();
+            Validator = context.GetOrderByQueryValidator();
             _queryOptionParser = queryOptionParser;
         }
 
@@ -70,7 +70,7 @@ namespace QueryBuilder.Query
             Context = context;
             RawValue = rawValue;
             //Validator = context.GetOrderByQueryValidator();
-            Validator = context.Validators.GetOrderByQueryValidator();
+            Validator = context.GetOrderByQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
@@ -96,7 +96,7 @@ namespace QueryBuilder.Query
             Context = context;
             RawValue = rawValue;
             //Validator = context.GetOrderByQueryValidator();
-            Validator = context.Validators.GetOrderByQueryValidator();
+            Validator = context.GetOrderByQueryValidator();
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
