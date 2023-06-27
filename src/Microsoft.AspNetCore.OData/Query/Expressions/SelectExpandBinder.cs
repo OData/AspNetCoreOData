@@ -524,7 +524,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 var wildcardSelectItem = selectItem as WildcardSelectItem;
                 if (wildcardSelectItem != null)
                 {
-                    foreach (var subsumedSelectItem in wildcardSelectItem.SubsumedSelectItems.Cast<PathSelectItem>())
+                    //// TODO this doesn't handle cases like $select=*,path/to/definedpropery
+                    //// TODO the defined property gets added twice, but it shouldn't be; webapi could differentiate these cases by looking for '$', but really ODL should have "subsumed" items, and "non-subsumed" items to differentaite bewten the cases
+                    foreach (var subsumedSelectItem in wildcardSelectItem.SubsumedSelectItems.Cast<PathSelectItem>().Where(item => item.HasOptions))
                     {
                         DynamicPathSegment dynamicSegment = ProcessSelectedItem(subsumedSelectItem, navigationSource, currentLevelPropertiesInclude);
                         if (dynamicSegment != null)
