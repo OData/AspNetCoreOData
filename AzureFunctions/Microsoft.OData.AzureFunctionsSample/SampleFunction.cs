@@ -14,6 +14,14 @@ using System.Linq;
 using QueryBuilder.Abstracts;
 using Microsoft.OData.ModelBuilder;
 using System.Net.Http;
+using Microsoft.OData.ModelBuilder.Config;
+using Microsoft.OData.UriParser;
+using QueryBuilder.Query.Expressions;
+using QueryBuilder.Query.Validator;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.ComponentModel.Design;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.OData.AzureFunctionsSample
 {
@@ -25,6 +33,20 @@ namespace Microsoft.OData.AzureFunctionsSample
             ILogger log,
             [OData(typeof(EdmModelProvider))] ODataQueryOptionsFundamentals<Customer> options)
         {
+
+            RequestContext requestContext = new RequestContext();
+            //RequestContext(IAssemblyResolver assembliesResolver = null, ODataQuerySettings defaultQuerySettings = null, int pageSize = -1,
+            //                  QueryValidators validators = null, QueryBinders binders = null, SkipTokenHandler skipTokenHandler = null,
+            //                  DefaultQueryConfigurations defaultQueryConfigurations = null, bool ? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null)
+
+            (IQueryable result, bool pageSizeLimited) = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings());
+
+            return new OkObjectResult(result);
+        }
+
+        #region Testing
+        private static IODataFeature GetODataFeature(HttpRequest req)
+        {
             IODataFeature odataFeature = req.HttpContext.Features.Get<IODataFeature>();
             if (odataFeature == null)
             {
@@ -32,11 +54,9 @@ namespace Microsoft.OData.AzureFunctionsSample
                 req.HttpContext.Features.Set(odataFeature);
             }
 
-            (IQueryable result, bool pageSizeLimited) = options.ApplyTo(customers.AsQueryable(), new ODataQuerySettings(),
-                                         (ODataFeature) odataFeature, new DefaultAssemblyResolver());
-
-            return new OkObjectResult(result);
+            return odataFeature;
         }
+        #endregion
 
         private static IList<Customer> customers = new List<Customer>
         {
