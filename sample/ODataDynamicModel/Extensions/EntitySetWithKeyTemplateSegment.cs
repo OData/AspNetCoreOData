@@ -65,7 +65,6 @@ namespace ODataDynamicModel.Extensions
 
                 KeySegment keySegment = new KeySegment(keysValues, entityType, entitySet.EntitySet);
 
-                context.Segments.Add(entitySet);
                 context.Segments.Add(keySegment);
 
                 return true;

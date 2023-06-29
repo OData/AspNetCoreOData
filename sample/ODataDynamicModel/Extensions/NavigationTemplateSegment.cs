@@ -38,7 +38,7 @@ namespace ODataDynamicModel.Extensions
                 var navigationSource = keySegment.NavigationSource;
                 IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty);
 
-                NavigationPropertySegment seg = new NavigationPropertySegment(navigationProperty, navigationSource);
+                NavigationPropertySegment seg = new NavigationPropertySegment(navigationProperty, targetNavigationSource);
                 context.Segments.Add(seg);
                 return true;
             }
