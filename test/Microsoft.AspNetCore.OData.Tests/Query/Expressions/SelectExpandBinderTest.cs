@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -40,16 +41,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         private readonly IEdmModel _model;
         private readonly IEdmEntityType _customer;
         private readonly IEdmEntityType _order;
+        private readonly IEdmEntityType _product;
         private readonly IEdmEntitySet _customers;
         private readonly IEdmEntitySet _orders;
+        private readonly IEdmEntitySet _products;
 
         public SelectExpandBinderTest()
         {
             _model = GetEdmModel();
             _customer = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "QueryCustomer");
             _order = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "QueryOrder");
+            _product = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "QueryProduct");
             _customers = _model.EntityContainer.FindEntitySet("Customers");
             _orders = _model.EntityContainer.FindEntitySet("Orders");
+            _products = _model.EntityContainer.FindEntitySet("Products");
 
             _settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
             _context = new ODataQueryContext(_model, typeof(QueryCustomer)) { RequestContainer = new MockServiceProvider() };
@@ -107,6 +112,49 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotNull(edmType);
             Assert.Equal(EdmTypeKind.Collection, edmType.TypeKind);
             Assert.Same(_customer, edmType.AsElementType());
+        }
+
+        [Theory]
+        [InlineData("ProductTags")]
+        [InlineData("ProductTags($orderby=$this/Name)")]
+        [InlineData("ProductTags($orderby=$this/Name desc)")]
+        public void Bind_SelectAndOrderBy_PropertyFromDataMember(string expand)
+        {
+            // Arrange
+            IQueryable<QueryProduct> products;
+
+            QueryProduct customer1 = new QueryProduct
+            {
+                Id = 1,
+                Name = "Product 1",
+                Quantity = 1,
+                Tags = new List<QueryProductTag>()
+                {
+                    new QueryProductTag(){Id = 1001, Name = "Tag 3" },
+                    new QueryProductTag(){Id = 1002, Name = "Tag 2" },
+                    new QueryProductTag(){Id = 1003, Name = "Tag 1" },
+                    new QueryProductTag(){Id = 1004, Name = "Tag 4" },
+                }
+            };
+
+            products = new[] { customer1 }.AsQueryable();
+            ODataQueryContext context = new ODataQueryContext(_model, typeof(QueryProduct)) { RequestContainer = new MockServiceProvider() };
+
+            SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: null, expand: expand, context: context);
+
+            _settings.PageSize = 2;
+
+            QueryBinderContext queryBinderContext = new QueryBinderContext(_model, _settings, selectExpand.Context.ElementClrType)
+            {
+                NavigationSource = context.NavigationSource
+            };
+
+            // Act
+            SelectExpandBinder binder = new SelectExpandBinder();
+            IQueryable queryable = binder.ApplyBind(products, selectExpand.SelectExpandClause, queryBinderContext);
+
+            // Assert
+            Assert.NotNull(queryable);
         }
 
         [Fact]
@@ -535,7 +583,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Arrange
             QueryCustomer aCustomer = new QueryCustomer
             {
-                Emails = new [] { "E1", "E3", "E2" }
+                Emails = new[] { "E1", "E3", "E2" }
             };
             Expression source = Expression.Constant(aCustomer);
             SelectExpandClause selectExpandClause = ParseSelectExpand(select, null, _model, _customer, _customers);
@@ -672,7 +720,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             {
                 HomeAddress = new QueryAddress
                 {
-                    Codes = new [] { "C1", "C4" , "C2" }
+                    Codes = new[] { "C1", "C4", "C2" }
                 }
             };
             Expression source = Expression.Constant(aCustomer);
@@ -936,7 +984,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public void ProjectAsWrapper_ReturnsKeysAndConcurrencyProperties_EvenIfNotPresentInSelectClause(string select, bool containAddress, int count)
         {
             // Arrange
-            IEdmStructuralProperty etagProperty =  _customer.DeclaredStructuralProperties().FirstOrDefault(c => c.Name == "CustomerETag");
+            IEdmStructuralProperty etagProperty = _customer.DeclaredStructuralProperties().FirstOrDefault(c => c.Name == "CustomerETag");
             Assert.NotNull(etagProperty); // Guard
             ((EdmModel)_model).SetOptimisticConcurrencyAnnotation(_customers, new[] { etagProperty });
 
@@ -1101,7 +1149,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             Assert.Equal(3, propertyToInclude.Value.SelectAndExpand.SelectedItems.Count()); // Street, Region, Codes
 
-            Assert.Equal(new [] { "Street", "Region", "Codes"},
+            Assert.Equal(new[] { "Street", "Region", "Codes" },
                 propertyToInclude.Value.SelectAndExpand.SelectedItems.Select(s =>
             {
                 PathSelectItem subSelectItem = (PathSelectItem)s;
@@ -1123,7 +1171,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Act
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
-            IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem > propertiesToExpand;
+            IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
             ISet<IEdmStructuralProperty> autoSelectedProperties;
             IList<DynamicPathSegment> dynamicPathSegments = SelectExpandBinder.GetSelectExpandProperties(_model, _customer, _customers, selectExpandClause,
                 out propertiesToInclude, out propertiesToExpand, out autoSelectedProperties);
@@ -1874,8 +1922,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             var customer = builder.EntitySet<QueryCustomer>("Customers").EntityType;
             builder.EntitySet<QueryOrder>("Orders");
             builder.EntitySet<QueryCity>("Cities");
+            builder.EntitySet<QueryProduct>("Products");
 
-            customer.Collection.Function("IsUpgraded").Returns<bool>().Namespace="NS";
+            customer.Collection.Function("IsUpgraded").Returns<bool>().Namespace = "NS";
             customer.Collection.Action("UpgradeAll").Namespace = "NS";
             return builder.GetEdmModel();
         }
@@ -1964,6 +2013,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public IDictionary<string, object> OrderProperties { get; set; }
     }
 
+    [DataContract]
+    public class QueryProduct
+    {
+        [DataMember(Name = "ProductId")]
+        [Key]
+        public int Id { get; set; }
+
+        [DataMember(Name = "ProductName")]
+        public string Name { get; set; }
+
+        [DataMember(Name = "ProductQuantity")]
+        public int Quantity { get; set; }
+
+        [DataMember(Name = "ProductTags")]
+        public IList<QueryProductTag> Tags { get; set; }
+    }
+
+    public class QueryProductTag
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+    }
     public class QueryCustomer
     {
         public int Id { get; set; }
