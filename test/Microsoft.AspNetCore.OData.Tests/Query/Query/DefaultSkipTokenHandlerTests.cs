@@ -21,9 +21,15 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query
 {
+    using System.Runtime.Serialization;
+
     public class DefaultSkipTokenHandlerTests
     {
         private static IEdmModel _model = GetEdmModel();
+
+        private static IEdmModel _modelLowerCamelCased = GetEdmModelLowerCamelCased();
+
+        private static IEdmModel _modelAliased = GetEdmModelAliased();
 
         [Fact]
         public void GenerateNextPageLink_ReturnsNull_NullContext()
@@ -55,23 +61,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [Theory]
         [InlineData("http://localhost/Customers(1)/Orders", "http://localhost/Customers(1)/Orders?$skiptoken=Id-42")]
         [InlineData("http://localhost/Customers?$expand=Orders", "http://localhost/Customers?$expand=Orders&$skiptoken=Id-42")]
+        [InlineData("http://localhost/Customers?$select=Name", "http://localhost/Customers?$select=Name&$skiptoken=Id-42")]
         public void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink(string baseUri, string expectedUri)
         {
-            // Arrange
-            ODataSerializerContext serializerContext = GetSerializerContext(_model, true);
-            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
-            SkipCustomer instance = new SkipCustomer
-            {
-                Id = 42,
-                Name = "ZX"
-            };
+            this.GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_Implementation(baseUri,
+                expectedUri, _model);
+        }
 
-            // Act
-            Uri uri = handler.GenerateNextPageLink(new Uri(baseUri), 10, instance, serializerContext);
-            var actualUri = uri.ToString();
+        [Theory]
+        [InlineData("http://localhost/Customers(1)/Orders", "http://localhost/Customers(1)/Orders?$skiptoken=id-42")]
+        [InlineData("http://localhost/Customers?$expand=orders", "http://localhost/Customers?$expand=orders&$skiptoken=id-42")]
+        [InlineData("http://localhost/Customers?$select=name", "http://localhost/Customers?$select=name&$skiptoken=id-42")]
+        public void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_WithLowerCamelCase(string baseUri, string expectedUri)
+        {
+            this.GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_Implementation(baseUri,
+                expectedUri, _modelLowerCamelCased);
+        }
 
-            // Assert
-            Assert.Equal(expectedUri, actualUri);
+        [Theory]
+        [InlineData("http://localhost/Customers(1)/Orders", "http://localhost/Customers(1)/Orders?$skiptoken=SkipCustomerId-42")]
+        [InlineData("http://localhost/Customers?$expand=Orders", "http://localhost/Customers?$expand=Orders&$skiptoken=SkipCustomerId-42")]
+        [InlineData("http://localhost/Customers?$select=FirstAndLastName", "http://localhost/Customers?$select=FirstAndLastName&$skiptoken=SkipCustomerId-42")]
+        public void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_WithAlias(string baseUri, string expectedUri)
+        {
+            this.GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_Implementation(baseUri,
+                expectedUri, _modelAliased);
         }
 
         [Fact]
@@ -84,116 +98,130 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [Fact]
         public void GenerateSkipTokenValue_Returns_SkipTokenValue()
         {
-            // Arrange
-            SkipCustomer lastMember = new SkipCustomer
-            {
-                Id = 42,
-                Name = "ZX"
-            };
+            GenerateSkipTokenValue_Returns_SkipTokenValue_Implementation(_model,
+                "Id-42");
+        }
 
-            // Act
-            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _model, null);
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithLowerCamelCase()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_Implementation(_modelLowerCamelCased,
+                "id-42");
+        }
 
-            // Assert
-            Assert.Equal("Id-42", skipTokenValue);
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithAlias()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_Implementation(_modelAliased,
+                "SkipCustomerId-42");
         }
 
         [Fact]
         public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby()
         {
-            // Arrange
-            SkipCustomer lastMember = new SkipCustomer
-            {
-                Id = 42,
-                Name = "ZX"
-            };
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_Implementation(
+                _model,
+                "Name",
+                "Name-%27ZX%27,Id-42");
+        }
 
-            IEdmEntityType entityType = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty("Name");
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-            {
-                new OrderByPropertyNode(property, OrderByDirection.Ascending)
-            };
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithLowerCamelCase_WithOrderby()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_Implementation(
+                _modelLowerCamelCased,
+                "name",
+                "name-%27ZX%27,id-42");
+        }
 
-            // Act
-            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _model, orderByNodes);
-
-            // Assert
-            Assert.Equal("Name-%27ZX%27,Id-42", skipTokenValue);
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithAlias_WithOrderby()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_Implementation(
+                _modelAliased,
+                "FirstAndLastName",
+                "FirstAndLastName-%27ZX%27,SkipCustomerId-42");
         }
 
         [Fact]
         public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_IfNullValue()
         {
-            // Arrange
-            SkipCustomer lastMember = new SkipCustomer
-            {
-                Id = 42,
-                Name = null
-            };
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_IfNullValue_Implementation(
+                _model,
+                "Name",
+                "Name-null,Id-42");
+        }
 
-            IEdmEntityType entityType = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty("Name");
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-            {
-                new OrderByPropertyNode(property, OrderByDirection.Ascending)
-            };
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithLowerCamelCase_WithOrderby_IfNullValue()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_IfNullValue_Implementation(
+                _modelLowerCamelCased,
+                "name",
+                "name-null,id-42");
+        }
 
-            // Act
-            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _model, orderByNodes);
-
-            // Assert
-            Assert.Equal("Name-null,Id-42", skipTokenValue);
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithAlias_WithOrderby_IfNullValue()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_IfNullValue_Implementation(
+                _modelAliased,
+                "FirstAndLastName",
+                "FirstAndLastName-null,SkipCustomerId-42");
         }
 
         [Fact]
         public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithDateTimeOffset()
         {
-            // Arrange
-            SkipCustomer lastMember = new SkipCustomer
-            {
-                Id = 42,
-                Birthday = new DateTime(2021, 01, 20, 3, 4, 5, DateTimeKind.Utc)
-            };
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithDateTimeOffset_Implementation(
+                _model,
+                "Birthday",
+                "Birthday-2021-01-19T19%3A04%3A05-08%3A00,Id-42");
+        }
 
-            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8
-            IEdmEntityType entityType = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty("Birthday");
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-            {
-                new OrderByPropertyNode(property, OrderByDirection.Ascending)
-            };
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithLowerCamelCase_WithDateTimeOffset()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithDateTimeOffset_Implementation(
+                _modelLowerCamelCased,
+                "birthday",
+                "birthday-2021-01-19T19%3A04%3A05-08%3A00,id-42");
+        }
 
-            // Act
-            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _model, orderByNodes, timeZone);
-
-            // Assert
-            Assert.Equal("Birthday-2021-01-19T19%3A04%3A05-08%3A00,Id-42", skipTokenValue);
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithAlias_WithDateTimeOffset()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithDateTimeOffset_Implementation(
+                _modelAliased,
+                "DateOfBirth",
+                "DateOfBirth-2021-01-19T19%3A04%3A05-08%3A00,SkipCustomerId-42");
         }
 
         [Fact]
         public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue()
         {
-            // Arrange
-            SkipCustomer lastMember = new SkipCustomer
-            {
-                Id = 42,
-                Name = "ZX",
-                Gender = Gender.Male
-            };
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
+                _model,
+                "Gender",
+                "Gender-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,Id-42");
+        }
 
-            IEdmEntityType entityType = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty("Gender");
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-            {
-                new OrderByPropertyNode(property, OrderByDirection.Ascending)
-            };
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithLowerCamelCase_WithOrderby_WithEnumValue()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
+                _modelLowerCamelCased,
+                "gender",
+                "gender-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,id-42");
+        }
 
-            // Act
-            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _model, orderByNodes);
-
-            // Assert
-            Assert.Equal("Gender-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,Id-42", skipTokenValue);
+        [Fact]
+        public void GenerateSkipTokenValue_Returns_SkipTokenValue_WithAlias_WithOrderby_WithEnumValue()
+        {
+            GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
+                _modelAliased,
+                "MaleOrFemale",
+                "MaleOrFemale-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,SkipCustomerId-42");
         }
 
         [Fact]
@@ -248,49 +276,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [Fact]
         public void ApplyToSkipTokenHandler_ThrowsODataException_InvalidSkipTokenValue()
         {
-            // Arrange
-            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
-            ODataQuerySettings settings = new ODataQuerySettings
-            {
-                HandleNullPropagation = HandleNullPropagationOption.False
-            };
-            ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
-
-            SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("abc", context);
-            IQueryable<SkipCustomer> customers = new List<SkipCustomer>().AsQueryable();
-
-            // Act & Assert
-            ExceptionAssert.Throws<ODataException>(
-                () => handler.ApplyTo(customers, skipTokenQuery, new ODataQuerySettings(), null),
-                "Unable to parse the skiptoken value 'abc'. Skiptoken value should always be server generated.");
+            ApplyToSkipTokenHandler_ThrowsODataException_InvalidSkipTokenValue_Implementation(_model);
         }
 
         [Fact]
-        public void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQuaryable()
+        public void ApplyToSkipTokenHandler_ThrowsODataException_WithLowerCamelCase_InvalidSkipTokenValue()
         {
-            // Arrange
-            ODataQuerySettings settings = new ODataQuerySettings
-            {
-                HandleNullPropagation = HandleNullPropagationOption.False
-            };
-            ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+            ApplyToSkipTokenHandler_ThrowsODataException_InvalidSkipTokenValue_Implementation(_modelLowerCamelCased);
+        }
+        
+        [Fact]
+        public void ApplyToSkipTokenHandler_ThrowsODataException_WithAlias_InvalidSkipTokenValue()
+        {
+            ApplyToSkipTokenHandler_ThrowsODataException_InvalidSkipTokenValue_Implementation(_modelAliased);
+        }
 
-            SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Id-2", context);
-            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
-            IQueryable<SkipCustomer> customers = new List<SkipCustomer>
-            {
-                new SkipCustomer { Id = 2, Name = "Aaron" },
-                new SkipCustomer { Id = 1, Name = "Andy" },
-                new SkipCustomer { Id = 3, Name = "Alex" }
-            }.AsQueryable();
+        [Fact]
+        public void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable()
+        {
+            ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
+                _model,
+                "Id-2");
+        }
 
-            // Act
-            SkipCustomer[] results = handler.ApplyTo(customers, skipTokenQuery, settings, null).ToArray();
+        [Fact]
+        public void ApplyToOfTDefaultSkipTokenHandler_Applies_WithLowerCamelCase_ToQueryable()
+        {
+            ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
+                _modelLowerCamelCased,
+                "id-2");
+        }
 
-            // Assert
-            SkipCustomer skipTokenCustomer = Assert.Single(results);
-            Assert.Equal(3, skipTokenCustomer.Id);
-            Assert.Equal("Alex", skipTokenCustomer.Name);
+        [Fact]
+        public void ApplyToOfTDefaultSkipTokenHandler_Applies_WithAlias_ToQueryable()
+        {
+            ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
+                _modelAliased,
+                "SkipCustomerId-2");
         }
 
         private ODataSerializerContext GetSerializerContext(IEdmModel model, bool enableSkipToken = false)
@@ -315,19 +337,279 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
         private static IEdmModel GetEdmModel()
         {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = false};
             builder.EntitySet<SkipCustomer>("Customers");
             return builder.GetEdmModel();
         }
 
+        private static IEdmModel GetEdmModelLowerCamelCased()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = false};
+            builder.EntitySet<SkipCustomer>("Customers");
+            builder.EnableLowerCamelCase();
+            return builder.GetEdmModel();
+        }
+
+        private static IEdmModel GetEdmModelAliased()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = true};
+            var entitySetConfiguration = builder.EntitySet<SkipCustomer>("Customers");
+            return builder.GetEdmModel();
+        }
+        
+        private void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_Implementation(
+            string baseUri,
+            string expectedUri,
+            IEdmModel edmModel)
+        {
+            // Arrange
+            ODataSerializerContext serializerContext = this.GetSerializerContext(
+                edmModel,
+                true);
+            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+            SkipCustomer instance = new SkipCustomer {Id = 42, Name = "ZX"};
+
+            // Act
+            Uri uri = handler.GenerateNextPageLink(
+                new Uri(baseUri),
+                10,
+                instance,
+                serializerContext);
+            var actualUri = uri.ToString();
+
+            // Assert
+            Assert.Equal(
+                expectedUri,
+                actualUri);
+        }
+        
+        private static void GenerateSkipTokenValue_Returns_SkipTokenValue_Implementation(IEdmModel edmModel, string expectedSkipToken)
+        {
+            // Arrange
+            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX"};
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
+                lastMember,
+                edmModel,
+                null);
+
+            // Assert
+            Assert.Equal(
+                expectedSkipToken,
+                skipTokenValue);
+        }
+
+        private static void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_Implementation(
+            IEdmModel edmModel,
+            string propertyName,
+            string expectedSkipToken)
+        {
+            // Arrange
+            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX"};
+
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "SkipCustomer");
+            IEdmProperty property = entityType.FindProperty(propertyName);
+            IList<OrderByNode> orderByNodes = new List<OrderByNode>
+                {
+                    new OrderByPropertyNode(
+                        property,
+                        OrderByDirection.Ascending)
+                };
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
+                lastMember,
+                edmModel,
+                orderByNodes);
+
+            // Assert
+            Assert.Equal(
+                expectedSkipToken,
+                skipTokenValue);
+        }
+
+        private static void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_IfNullValue_Implementation(
+            IEdmModel edmModel,
+            string propertyName,
+            string expectedSkipToken)
+        {
+            // Arrange
+            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = null};
+
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "SkipCustomer");
+            IEdmProperty property = entityType.FindProperty(propertyName);
+            IList<OrderByNode> orderByNodes = new List<OrderByNode>
+                {
+                    new OrderByPropertyNode(
+                        property,
+                        OrderByDirection.Ascending)
+                };
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
+                lastMember,
+                edmModel,
+                orderByNodes);
+
+            // Assert
+            Assert.Equal(
+                expectedSkipToken,
+                skipTokenValue);
+        }
+
+        private static void GenerateSkipTokenValue_Returns_SkipTokenValue_WithDateTimeOffset_Implementation(
+            IEdmModel edmModel,
+            string propertyName,
+            string expectedSkipToken)
+        {
+            // Arrange
+            SkipCustomer lastMember = new SkipCustomer
+                {
+                    Id = 42,
+                    Birthday = new DateTime(
+                        2021,
+                        01,
+                        20,
+                        3,
+                        4,
+                        5,
+                        DateTimeKind.Utc)
+                };
+
+            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "SkipCustomer");
+            IEdmProperty property = entityType.FindProperty(propertyName);
+            IList<OrderByNode> orderByNodes = new List<OrderByNode>
+                {
+                    new OrderByPropertyNode(
+                        property,
+                        OrderByDirection.Ascending)
+                };
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
+                lastMember,
+                edmModel,
+                orderByNodes,
+                timeZone);
+
+            // Assert
+            Assert.Equal(
+                expectedSkipToken,
+                skipTokenValue);
+        }
+        
+        private static void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
+            IEdmModel edmModel,
+            string propertyName,
+            string expectedSkipToken)
+        {
+            // Arrange
+            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX", Gender = Gender.Male};
+
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "SkipCustomer");
+            IEdmProperty property = entityType.FindProperty(propertyName);
+            IList<OrderByNode> orderByNodes = new List<OrderByNode>
+                {
+                    new OrderByPropertyNode(
+                        property,
+                        OrderByDirection.Ascending)
+                };
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
+                lastMember,
+                edmModel,
+                orderByNodes);
+
+            // Assert
+            Assert.Equal(
+                expectedSkipToken,
+                skipTokenValue);
+        }
+
+        private static void ApplyToSkipTokenHandler_ThrowsODataException_InvalidSkipTokenValue_Implementation(
+            IEdmModel edmModel)
+        {
+            // Arrange
+            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+            ODataQuerySettings settings = new ODataQuerySettings {HandleNullPropagation = HandleNullPropagationOption.False};
+            ODataQueryContext context = new ODataQueryContext(
+                edmModel,
+                typeof(SkipCustomer));
+
+            SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
+                "abc",
+                context);
+            IQueryable<SkipCustomer> customers = new List<SkipCustomer>().AsQueryable();
+
+            // Act & Assert
+            ExceptionAssert.Throws<ODataException>(
+                () => handler.ApplyTo(
+                    customers,
+                    skipTokenQuery,
+                    new ODataQuerySettings(),
+                    null),
+                "Unable to parse the skiptoken value 'abc'. Skiptoken value should always be server generated.");
+        }
+        
+        private static void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
+            IEdmModel edmModel,
+            string skipTokenQueryOptionRawValue)
+        {
+            // Arrange
+            ODataQuerySettings settings = new ODataQuerySettings {HandleNullPropagation = HandleNullPropagationOption.False};
+            ODataQueryContext context = new ODataQueryContext(
+                edmModel,
+                typeof(SkipCustomer));
+
+            SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
+                skipTokenQueryOptionRawValue,
+                context);
+            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+            IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+                {
+                    new SkipCustomer {Id = 2, Name = "Aaron"},
+                    new SkipCustomer {Id = 1, Name = "Andy"},
+                    new SkipCustomer {Id = 3, Name = "Alex"}
+                }.AsQueryable();
+
+            // Act
+            SkipCustomer[] results = handler.ApplyTo(
+                    customers,
+                    skipTokenQuery,
+                    settings,
+                    null)
+                .ToArray();
+
+            // Assert
+            SkipCustomer skipTokenCustomer = Assert.Single(results);
+            Assert.Equal(
+                3,
+                skipTokenCustomer.Id);
+            Assert.Equal(
+                "Alex",
+                skipTokenCustomer.Name);
+        }
+
+        [DataContract]
         public class SkipCustomer
         {
+            [DataMember(Name = "SkipCustomerId")]
             public int Id { get; set; }
 
+            [DataMember(Name = "FirstAndLastName")]
             public string Name { get; set; }
 
+            [DataMember(Name = "DateOfBirth")]
             public DateTime Birthday { get; set; }
 
+            [DataMember(Name = "MaleOrFemale")]
             public Gender Gender { get; set; }
         }
 
