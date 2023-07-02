@@ -39,7 +39,9 @@ namespace Microsoft.AspNetCore.OData.Results
 
             if (generaticType == typeof(PageResult<>))
             {
-                return (JsonConverter)Activator.CreateInstance(typeof(PageResultConverter<>).MakeGenericType(new Type[] { entityType }));
+                return (JsonConverter)Activator.CreateInstance(
+                    typeof(PageResultConverter<>).MakeGenericType(new Type[] { entityType }),
+                    new object[] { options.PropertyNamingPolicy });
             }
 
             return null;
@@ -48,27 +50,45 @@ namespace Microsoft.AspNetCore.OData.Results
 
     internal class PageResultConverter<TEntity> : JsonConverter<PageResult<TEntity>>
     {
+        private JsonNamingPolicy? _namingPolicy;
+        public PageResultConverter(JsonNamingPolicy? namingPolicy)
+        {
+            _namingPolicy = namingPolicy;
+        }
+
         public override PageResult<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             Contract.Assert(false, "PageResult{TEntity} should never be deserialized into");
             throw new NotImplementedException();
         }
 
+        private string GetConvertedName(string name)
+        {
+            if (_namingPolicy == null)
+            {
+                return name;
+            }
+            else
+            {
+                return _namingPolicy.ConvertName(name);
+            }
+        }
+
         public override void Write(Utf8JsonWriter writer, PageResult<TEntity> value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
-            writer.WritePropertyName("items");
+            writer.WritePropertyName(GetConvertedName("items"));
             JsonSerializer.Serialize(writer, value.Items, options);
 
             if (value.NextPageLink != null)
             {
-                writer.WritePropertyName("nextpagelink");
+                writer.WritePropertyName(GetConvertedName("nextpagelink"));
                 writer.WriteStringValue(value.NextPageLink.OriginalString);
             }
 
             if (value.Count != null)
             {
-                writer.WritePropertyName("count");
+                writer.WritePropertyName(GetConvertedName("count"));
                 writer.WriteNumberValue(value.Count.Value);
             }
 
