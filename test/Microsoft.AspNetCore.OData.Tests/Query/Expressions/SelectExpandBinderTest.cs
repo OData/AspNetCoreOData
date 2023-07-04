@@ -12,6 +12,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -40,16 +42,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         private readonly IEdmModel _model;
         private readonly IEdmEntityType _customer;
         private readonly IEdmEntityType _order;
+        private readonly IEdmEntityType _product;
         private readonly IEdmEntitySet _customers;
         private readonly IEdmEntitySet _orders;
+        private readonly IEdmEntitySet _products;
 
         public SelectExpandBinderTest()
         {
             _model = GetEdmModel();
             _customer = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "QueryCustomer");
             _order = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "QueryOrder");
+            _product = _model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "QueryProduct");
             _customers = _model.EntityContainer.FindEntitySet("Customers");
             _orders = _model.EntityContainer.FindEntitySet("Orders");
+            _products = _model.EntityContainer.FindEntitySet("Products");
 
             _settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
             _context = new ODataQueryContext(_model, typeof(QueryCustomer)) { RequestContainer = new MockServiceProvider() };
@@ -107,6 +113,73 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotNull(edmType);
             Assert.Equal(EdmTypeKind.Collection, edmType.TypeKind);
             Assert.Same(_customer, edmType.AsElementType());
+        }
+
+        [Theory]
+        [InlineData("ProductTags")]
+        [InlineData("ProductTags($orderby=$this/Name)")]
+        [InlineData("ProductTags($orderby=$this/Name desc)")]
+        public void Bind_SelectAndOrderBy_PropertyFromDataMember(string expand)
+        {
+            // Arrange
+            IQueryable<QueryProduct> products;
+
+            QueryProduct product1 = new QueryProduct
+            {
+                Id = 1,
+                Name = "Product 1",
+                Quantity = 1,
+                Tags = new List<QueryProductTag>()
+                {
+                    new QueryProductTag(){Id = 1001, Name = "Tag 1" },
+                    new QueryProductTag(){Id = 1002, Name = "Tag 2" },
+                    new QueryProductTag(){Id = 1003, Name = "Tag 3" },
+                    new QueryProductTag(){Id = 1004, Name = "Tag 4" },
+                }
+            };
+
+            products = new[] { product1 }.AsQueryable();
+            ODataQueryContext context = new ODataQueryContext(_model, typeof(QueryProduct)) { RequestContainer = new MockServiceProvider() };
+
+            SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: null, expand: expand, context: context);
+
+            _settings.PageSize = 2;
+
+            QueryBinderContext queryBinderContext = new QueryBinderContext(_model, _settings, selectExpand.Context.ElementClrType)
+            {
+                NavigationSource = context.NavigationSource
+            };
+
+            // Act
+            SelectExpandBinder binder = new SelectExpandBinder();
+            IQueryable queryable = binder.ApplyBind(products, selectExpand.SelectExpandClause, queryBinderContext);
+
+            // Assert
+            Assert.NotNull(queryable);
+
+            IEnumerator enumerator = queryable.GetEnumerator();
+            Assert.True(enumerator.MoveNext());
+            var product = Assert.IsAssignableFrom<SelectExpandWrapper<QueryProduct>>(enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.NotNull(product.Instance);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryProduct", product.Instance.GetType().ToString());
+            IEnumerable<SelectExpandWrapper<QueryProductTag>> innerProductTags = product.Container
+                .ToDictionary(PropertyMapper)["ProductTags"] as IEnumerable<SelectExpandWrapper<QueryProductTag>>;
+            Assert.NotNull(innerProductTags);
+
+            SelectExpandWrapper<QueryProductTag> firstTag = innerProductTags.FirstOrDefault();
+            SelectExpandWrapper<QueryProductTag> lastTag = innerProductTags.LastOrDefault();
+
+            if (expand.EndsWith("desc)"))
+            {
+                Assert.Equal("Tag 4", firstTag.Instance.Name);
+                Assert.Equal("Tag 3", lastTag.Instance.Name);
+            }
+            else
+            {
+                Assert.Equal("Tag 1", firstTag.Instance.Name);
+                Assert.Equal("Tag 2", lastTag.Instance.Name);
+            }
         }
 
         [Fact]
@@ -1874,6 +1947,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             var customer = builder.EntitySet<QueryCustomer>("Customers").EntityType;
             builder.EntitySet<QueryOrder>("Orders");
             builder.EntitySet<QueryCity>("Cities");
+            builder.EntitySet<QueryProduct>("Products");
 
             customer.Collection.Function("IsUpgraded").Returns<bool>().Namespace="NS";
             customer.Collection.Action("UpgradeAll").Namespace = "NS";
@@ -1962,6 +2036,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public QueryCustomer Customer { get; set; }
 
         public IDictionary<string, object> OrderProperties { get; set; }
+    }
+
+    [DataContract]
+    public class QueryProduct
+    {
+        [DataMember(Name = "ProductId")]
+        [Key]
+        public int Id { get; set; }
+
+        [DataMember(Name = "ProductName")]
+        public string Name { get; set; }
+
+        [DataMember(Name = "ProductQuantity")]
+        public int Quantity { get; set; }
+
+        [DataMember(Name = "ProductTags")]
+        public IList<QueryProductTag> Tags { get; set; }
+    }
+
+    public class QueryProductTag
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public string Name { get; set; }
     }
 
     public class QueryCustomer
