@@ -123,26 +123,24 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Arrange
             IQueryable<QueryProduct> products;
 
-            QueryProduct customer1 = new QueryProduct
+            QueryProduct product1 = new QueryProduct
             {
                 Id = 1,
                 Name = "Product 1",
                 Quantity = 1,
                 Tags = new List<QueryProductTag>()
                 {
-                    new QueryProductTag(){Id = 1001, Name = "Tag 3" },
+                    new QueryProductTag(){Id = 1001, Name = "Tag 1" },
                     new QueryProductTag(){Id = 1002, Name = "Tag 2" },
-                    new QueryProductTag(){Id = 1003, Name = "Tag 1" },
+                    new QueryProductTag(){Id = 1003, Name = "Tag 3" },
                     new QueryProductTag(){Id = 1004, Name = "Tag 4" },
                 }
             };
 
-            products = new[] { customer1 }.AsQueryable();
+            products = new[] { product1 }.AsQueryable();
             ODataQueryContext context = new ODataQueryContext(_model, typeof(QueryProduct)) { RequestContainer = new MockServiceProvider() };
 
             SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: null, expand: expand, context: context);
-
-            _settings.PageSize = 2;
 
             QueryBinderContext queryBinderContext = new QueryBinderContext(_model, _settings, selectExpand.Context.ElementClrType)
             {
@@ -155,6 +153,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Assert
             Assert.NotNull(queryable);
+
+            IEnumerator enumerator = queryable.GetEnumerator();
+            Assert.True(enumerator.MoveNext());
+            var product = Assert.IsAssignableFrom<SelectExpandWrapper<QueryProduct>>(enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.NotNull(product.Instance);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryProduct", product.Instance.GetType().ToString());
+            IEnumerable<SelectExpandWrapper<QueryProductTag>> innerProductTags = product.Container
+                .ToDictionary(PropertyMapper)["ProductTags"] as IEnumerable<SelectExpandWrapper<QueryProductTag>>;
+            Assert.NotNull(innerProductTags);
+
+            SelectExpandWrapper<QueryProductTag> firstTag = innerProductTags.FirstOrDefault();
+            SelectExpandWrapper<QueryProductTag> lastTag = innerProductTags.LastOrDefault();
+
+            if (expand.EndsWith("desc)"))
+            {
+                Assert.Equal("Tag 4", firstTag.Instance.Name);
+                Assert.Equal("Tag 1", lastTag.Instance.Name);
+            }
+            else
+            {
+                Assert.Equal("Tag 1", firstTag.Instance.Name);
+                Assert.Equal("Tag 4", lastTag.Instance.Name);
+            }
         }
 
         [Fact]
@@ -2037,6 +2059,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         public string Name { get; set; }
     }
+
     public class QueryCustomer
     {
         public int Id { get; set; }
