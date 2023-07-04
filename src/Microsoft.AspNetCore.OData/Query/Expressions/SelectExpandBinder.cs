@@ -1208,6 +1208,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                             string propertyName = context.Model.GetClrPropertyName(prop);
                             source = ExpressionHelpers.OrderByPropertyExpression(source, propertyName, elementType,
                                 alreadyOrdered);
+
                             if (!alreadyOrdered)
                             {
                                 alreadyOrdered = true;

@@ -142,6 +142,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: null, expand: expand, context: context);
 
+            _settings.PageSize = 2;
+
             QueryBinderContext queryBinderContext = new QueryBinderContext(_model, _settings, selectExpand.Context.ElementClrType)
             {
                 NavigationSource = context.NavigationSource
@@ -170,12 +172,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             if (expand.EndsWith("desc)"))
             {
                 Assert.Equal("Tag 4", firstTag.Instance.Name);
-                Assert.Equal("Tag 1", lastTag.Instance.Name);
+                Assert.Equal("Tag 3", lastTag.Instance.Name);
             }
             else
             {
                 Assert.Equal("Tag 1", firstTag.Instance.Name);
-                Assert.Equal("Tag 4", lastTag.Instance.Name);
+                Assert.Equal("Tag 2", lastTag.Instance.Name);
             }
         }
 
