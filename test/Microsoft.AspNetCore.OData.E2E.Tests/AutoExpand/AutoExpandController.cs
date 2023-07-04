@@ -51,6 +51,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         {
             return Created(customer);
         }
+
+        [EnableQuery]
+        public IActionResult Put(int key, [FromBody] Customer customer)
+        {
+            var existingCustomer = AutoExpandDataSource.Customers.FirstOrDefault(d => d.Id == key);
+
+            if (existingCustomer == null)
+            {
+                return BadRequest();
+            }
+
+            return Updated(existingCustomer);
+        }
     }
 
     public class PeopleController : ODataController

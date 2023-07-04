@@ -453,5 +453,40 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
                 Assert.Contains(expectedOrder, json);
             }
         }
+
+        [Fact]
+        public async Task PutCustomer_AutoExpandNavigationProperties()
+        {
+            //Arrange
+            var requestUri = "autoexpand/Customers(2)";
+            var content = "{\"Id\":2}";
+            var client = CreateClient();
+            var stringContent = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json");
+
+            var expectedOrder = "\"Order\":{\"Id\":2,\"Choice\":{\"Id\":2,\"Amount\":2000.0}}";
+            var expectedFriend = "\"Friend\":{" +
+                "\"Id\":1," +
+                "\"HomeAddress\":{" +
+                "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress\"," +
+                "\"Street\":\"UsStreet 1\"," +
+                "\"City\":\"UsCity 1\"," +
+                "\"CountryOrRegion\":{\"Id\":101,\"Name\":\"C and R 101\"}," +
+                "\"ZipCode\":{\"Id\":2001,\"Code\":\"Code 1\"}}," +
+                "\"Order\":{\"Id\":1}," +
+                "\"Friend\":null}}";
+
+            //Act & Assert
+            using (var request = new HttpRequestMessage(HttpMethod.Put, requestUri) { Content = stringContent })
+            {
+                request.Headers.Add("Prefer", "return=representation");
+                using (var response = await client.SendAsync(request))
+                {
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                    var json = response.Content.ReadAsStringAsync().Result;
+                    Assert.Contains(expectedFriend, json);
+                    Assert.Contains(expectedOrder, json);
+                }
+            }
+        }
     }
 }
