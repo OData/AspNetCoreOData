@@ -1726,7 +1726,7 @@ public class Microsoft.AspNetCore.OData.Results.UnprocessableEntityODataResult :
 	public virtual System.Threading.Tasks.Task ExecuteResultAsync (Microsoft.AspNetCore.Mvc.ActionContext context)
 }
 
-public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ActionResult, IActionResult {
+public class Microsoft.AspNetCore.OData.Results.UpdatedODataResult`1 : Microsoft.AspNetCore.Mvc.ObjectResult, IActionResult, IStatusCodeActionResult {
 	public UpdatedODataResult`1 (T entity)
 
 	T Entity  { public virtual get; }

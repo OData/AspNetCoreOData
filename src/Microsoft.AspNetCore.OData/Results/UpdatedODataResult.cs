@@ -20,13 +20,14 @@ namespace Microsoft.AspNetCore.OData.Results
     /// </summary>
     /// <typeparam name="T">The entity type.</typeparam>
     /// <remarks>This action result handles content negotiation and the HTTP prefer header.</remarks>
-    public class UpdatedODataResult<T> : ActionResult
+    public class UpdatedODataResult<T> : ObjectResult
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdatedODataResult{T}"/> class.
         /// </summary>
         /// <param name="entity">The updated entity.</param>
         public UpdatedODataResult(T entity)
+            : base(entity)
         {
             Entity = entity ?? throw new ArgumentNullException(nameof(entity));
         }
