@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using ODataQueryBuilder.Query;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -185,7 +186,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="queryOptions">Information about the other query options.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to, could be null.</returns>
         public override IQueryable<T> ApplyTo<T>(IQueryable<T> query, SkipTokenQueryOption skipTokenQueryOption,
-            ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+            ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptions)
         {
             return ApplyToImplementation(query, skipTokenQueryOption, querySettings, queryOptions) as IQueryable<T>;
         }
@@ -199,13 +200,13 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="queryOptions">Information about the other query options, could be null.</param>
         /// <returns>The new <see cref="IQueryable"/> after the skiptoken query has been applied to.</returns>
         public override IQueryable ApplyTo(IQueryable query, SkipTokenQueryOption skipTokenQueryOption,
-            ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+            ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptionsFundamentals)
         {
-            return ApplyToImplementation(query, skipTokenQueryOption, querySettings, queryOptions);
+            return ApplyToImplementation(query, skipTokenQueryOption, querySettings, queryOptionsFundamentals);
         }
 
         private static IQueryable ApplyToImplementation(IQueryable query, SkipTokenQueryOption skipTokenQueryOption,
-            ODataQuerySettings querySettings, ODataQueryOptions queryOptions)
+            ODataQuerySettings querySettings, ODataQueryOptionsFundamentals queryOptionsFundamentals)
         {
             if (query == null)
             {
@@ -222,7 +223,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNull(nameof(querySettings));
             }
 
-            ODataQueryContext context = skipTokenQueryOption.Context;
+            ODataQueryFundamentalsContext context = skipTokenQueryOption.Context;
             if (context.ElementClrType == null)
             {
                 throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
@@ -230,12 +231,12 @@ namespace Microsoft.AspNetCore.OData.Query
 
             IList<OrderByNode> orderByNodes = null;
 
-            if (queryOptions != null)
+            if (queryOptionsFundamentals != null)
             {
-                OrderByQueryOption orderBy = queryOptions.GenerateStableOrder();
+                OrderByQueryOptionFundamentals orderBy = queryOptionsFundamentals.GenerateStableOrder();
                 if (orderBy != null)
                 {
-                    orderByNodes = orderBy.OrderByNodes;
+                    orderByNodes = (IList<OrderByNode>)orderBy.OrderByNodes;
                 }
             }
 
@@ -252,7 +253,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
         /// <returns></returns>
         [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
-        private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IList<OrderByNode> orderByNodes, ODataQueryContext context, string skipTokenRawValue)
+        private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IList<OrderByNode> orderByNodes, ODataQueryFundamentalsContext context, string skipTokenRawValue)
         {
             Contract.Assert(query != null);
             Contract.Assert(context.ElementClrType != null);
@@ -408,7 +409,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="value">The skiptoken string value.</param>
         /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        internal static IDictionary<string, (object PropertyValue, Type PropertyType)> PopulatePropertyValuePairs(string value, ODataQueryContext context)
+        internal static IDictionary<string, (object PropertyValue, Type PropertyType)> PopulatePropertyValuePairs(string value, ODataQueryFundamentalsContext context)
         {
             Contract.Assert(context != null);
 

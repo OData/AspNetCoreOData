@@ -42,7 +42,7 @@ namespace ODataQueryBuilder.Query
 
         private bool _enableNoDollarSignQueryOptions = false;
 
-        private OrderByQueryOption _stableOrderBy;
+        private OrderByQueryOptionFundamentals _stableOrderBy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
@@ -111,9 +111,9 @@ namespace ODataQueryBuilder.Query
         public SearchQueryOption Search { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="OrderByQueryOption"/>.
+        /// Gets the <see cref="OrderByQueryOptionFundamentals"/>.
         /// </summary>
-        public OrderByQueryOption OrderBy { get; private set; }
+        public OrderByQueryOptionFundamentals OrderBy { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="SkipQueryOption"/>.
@@ -422,7 +422,7 @@ namespace ODataQueryBuilder.Query
                 }
             }
 
-            OrderByQueryOption orderBy = OrderBy;
+            OrderByQueryOptionFundamentals orderBy = OrderBy;
 
             // $skip or $top require a stable sort for predictable results.
             // Result limits require a stable sort to be able to generate a next page link.
@@ -505,7 +505,7 @@ namespace ODataQueryBuilder.Query
         /// Generates the Stable OrderBy query option based on the existing OrderBy and other query options. 
         /// </summary>
         /// <returns>An order by query option that ensures stable ordering of the results.</returns>
-        public virtual OrderByQueryOption GenerateStableOrder()
+        public virtual OrderByQueryOptionFundamentals GenerateStableOrder()
         {
             if (_stableOrderBy != null)
             {
@@ -680,13 +680,13 @@ namespace ODataQueryBuilder.Query
         // Generates the OrderByQueryOption to use by default for $skip or $top
         // when no other $orderby is available.  It will produce a stable sort.
         // This may return a null if there are no available properties.
-        private OrderByQueryOption GenerateDefaultOrderBy(ODataQueryFundamentalsContext context, List<string> applySortOptions)
+        private OrderByQueryOptionFundamentals GenerateDefaultOrderBy(ODataQueryFundamentalsContext context, List<string> applySortOptions)
         {
             string orderByRaw = String.Empty;
             if (applySortOptions != null)
             {
                 orderByRaw = String.Join(",", applySortOptions);
-                return new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
+                return new OrderByQueryOptionFundamentals(orderByRaw, context, Apply.RawValue);
             }
             else
             {
@@ -697,21 +697,21 @@ namespace ODataQueryBuilder.Query
 
             return String.IsNullOrEmpty(orderByRaw)
                     ? null
-                    : new OrderByQueryOption(orderByRaw, context);
+                    : new OrderByQueryOptionFundamentals(orderByRaw, context);
         }
 
         /// <summary>
-        /// Ensures the given <see cref="OrderByQueryOption"/> will produce a stable sort.
+        /// Ensures the given <see cref="OrderByQueryOptionFundamentals"/> will produce a stable sort.
         /// If it will, the input <paramref name="orderBy"/> will be returned
-        /// unmodified.  If the given <see cref="OrderByQueryOption"/> will not produce a
-        /// stable sort, a new <see cref="OrderByQueryOption"/> instance will be created
+        /// unmodified.  If the given <see cref="OrderByQueryOptionFundamentals"/> will not produce a
+        /// stable sort, a new <see cref="OrderByQueryOptionFundamentals"/> instance will be created
         /// and returned.
         /// </summary>
-        /// <param name="orderBy">The <see cref="OrderByQueryOption"/> to evaluate.</param>
+        /// <param name="orderBy">The <see cref="OrderByQueryOptionFundamentals"/> to evaluate.</param>
         /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/>.</param>
         /// <param name="applySortOptions"></param>
-        /// <returns>An <see cref="OrderByQueryOption"/> that will produce a stable sort.</returns>
-        private OrderByQueryOption EnsureStableSortOrderBy(OrderByQueryOption orderBy, ODataQueryFundamentalsContext context, List<string> applySortOptions)
+        /// <returns>An <see cref="OrderByQueryOptionFundamentals"/> that will produce a stable sort.</returns>
+        private OrderByQueryOptionFundamentals EnsureStableSortOrderBy(OrderByQueryOptionFundamentals orderBy, ODataQueryFundamentalsContext context, List<string> applySortOptions)
         {
             Contract.Assert(orderBy != null);
             Contract.Assert(context != null);
@@ -738,7 +738,7 @@ namespace ODataQueryBuilder.Query
                 if (propertyPathsToAdd.Any())
                 {
                     var orderByRaw = orderBy.RawValue + "," + String.Join(",", propertyPathsToAdd);
-                    orderBy = new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
+                    orderBy = new OrderByQueryOptionFundamentals(orderByRaw, context, Apply.RawValue);
                 }
             }
             else
@@ -750,7 +750,7 @@ namespace ODataQueryBuilder.Query
                     // Clone the given one and add the remaining properties to end, thereby making
                     // the sort stable but preserving the user's original intent for the major
                     // sort order.
-                    orderBy = new OrderByQueryOption(orderBy);
+                    orderBy = new OrderByQueryOptionFundamentals(orderBy);
 
                     foreach (IEdmStructuralProperty property in propertiesToAdd)
                     {
@@ -979,7 +979,7 @@ namespace ODataQueryBuilder.Query
                     case "$orderby":
                         ThrowIfEmpty(kvp.Value, "$orderby");
                         RawValues.OrderBy = kvp.Value;
-                        OrderBy = new OrderByQueryOption(kvp.Value, QueryContext, _queryOptionParser);
+                        OrderBy = new OrderByQueryOptionFundamentals(kvp.Value, QueryContext, _queryOptionParser);
                         break;
                     case "$top":
                         ThrowIfEmpty(kvp.Value, "$top");
@@ -1189,3 +1189,241 @@ namespace ODataQueryBuilder.Query
         #endregion
     }
 }
+
+
+
+
+
+
+
+//using System.Diagnostics.CodeAnalysis;
+//using System.Diagnostics.Contracts;
+//using System.Globalization;
+//using Microsoft.Net.Http.Headers;
+//using System.Reflection;
+//using Microsoft.Extensions.Primitives;
+//using Microsoft.OData;
+//using Microsoft.OData.Edm;
+//using Microsoft.OData.UriParser;
+//using Microsoft.OData.UriParser.Aggregation;
+//using ODataQueryBuilder.Abstracts;
+//using ODataQueryBuilder.Edm;
+//using ODataQueryBuilder.Query.Container;
+//using ODataQueryBuilder.Routing;
+//using ODataQueryBuilder.Query.Validator;
+//using Microsoft.OData.ModelBuilder;
+
+//namespace ODataQueryBuilder.Query
+//{
+//    /// <summary>
+//    /// This defines a composite OData query options that can be used to perform query composition.
+//    /// Currently this only supports $filter, $orderby, $top, $skip, and $count.
+//    /// </summary>
+//    // TODO: Fix attribute compilation below:
+//    //[NonValidatingParameterBinding]
+//    //[ODataQueryParameterBinding]
+//    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
+//    public class ODataQueryOptionsFundamentals
+//    {
+///// <summary>
+///// Initializes a new instance of the <see cref="ODataQueryOptionsFundamentals"/> class based on the incoming request and some metadata information from
+///// the <see cref="ODataQueryFundamentalsContext"/>.
+///// </summary>
+///// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information.</param>
+///// <param name="requestQueryCollection">The incoming request message's queries.</param>
+//public ODataQueryOptionsFundamentals(ODataQueryFundamentalsContext context, IEnumerable<KeyValuePair<string, StringValues>> requestQueryCollection);
+
+///// <summary>
+///// Gets the request query collection associated with this instance.
+///// </summary>
+//public IEnumerable<KeyValuePair<string, StringValues>> RequestQueryCollection { get; private set; }
+
+///// <summary>
+/////  Gets the given <see cref="ODataQueryFundamentalsContext"/>
+///// </summary>
+//public ODataQueryFundamentalsContext QueryContext { get; private set; }
+
+///// <summary>
+///// Gets the raw string of all the OData query options
+///// </summary>
+//public ODataRawQueryOptions RawValues { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="SelectExpandQueryOption"/>.
+///// </summary>
+//public SelectExpandQueryOption SelectExpand { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="ApplyQueryOption"/>.
+///// </summary>
+//public ApplyQueryOption Apply { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="ComputeQueryOption"/>.
+///// </summary>
+//public ComputeQueryOption Compute { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="FilterQueryOption"/>.
+///// </summary>
+//public FilterQueryOption Filter { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="SearchQueryOption"/>.
+///// </summary>
+//public SearchQueryOption Search { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="OrderByQueryOptionFundamentals"/>.
+///// </summary>
+//public OrderByQueryOptionFundamentals OrderBy { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="SkipQueryOption"/>.
+///// </summary>
+//public SkipQueryOption Skip { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="SkipTokenQueryOption"/>.
+///// </summary>
+//public SkipTokenQueryOption SkipToken { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="TopQueryOption"/>.
+///// </summary>
+//public TopQueryOption Top { get; private set; }
+
+///// <summary>
+///// Gets the <see cref="CountQueryOption"/>.
+///// </summary>
+//public CountQueryOption Count { get; private set; }
+
+///// <summary>
+///// Gets or sets the query validator.
+///// </summary>
+//public IODataQueryValidator Validator { get; set; }
+
+///// <summary>
+///// Check if the given query option is an OData system query option using $-prefix-required theme.
+///// </summary>
+///// <param name="queryOptionName">The name of the query option.</param>
+///// <returns>Returns <c>true</c> if the query option is an OData system query option.</returns>
+//public static bool IsSystemQueryOption(string queryOptionName);
+
+///// <summary>
+///// Check if the given query option is an OData system query option.
+///// </summary>
+///// <param name="queryOptionName">The name of the query option.</param>
+///// <param name="isDollarSignOptional">Whether the optional-$-prefix scheme is used for OData system query.</param>
+///// <returns>Returns <c>true</c> if the query option is an OData system query option.</returns>
+//public static bool IsSystemQueryOption(string queryOptionName, bool isDollarSignOptional);
+
+///// <summary>
+///// Gets the <see cref="ETag"/> from IfMatch header.
+///// </summary>
+//public virtual ETag IfMatch(StringValues ifMatchValues, IETagHandler etagHandler);
+
+///// <summary>
+///// Gets the <see cref="ETag"/> from IfNoneMatch header.
+///// </summary>
+//public virtual ETag IfNoneMatch(StringValues ifNoneMatchValues, IETagHandler etagHandler);
+
+///// <summary>
+///// Check if the given query option is the supported query option (case-insensitive by default).
+///// </summary>
+///// <param name="queryOptionName">The name of the query option.</param>
+///// <returns>Returns <c>true</c> if the query option is the supported query option.</returns>
+//public bool IsSupportedQueryOption(string queryOptionName);
+
+///// <summary>
+///// Check if the given query option is the supported query option.
+///// </summary>
+///// <param name="queryOptionName">The name of the query option.</param>
+///// <param name="enableCaseInsensitive">The setting to resolve with case-insensitivity.</param>
+///// <returns>Returns <c>true</c> if the query option is the supported query option.</returns>
+//[SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase",
+//    Justification = "Need lower case string here.")]
+//public bool IsSupportedQueryOption(string queryOptionName, bool enableCaseInsensitive);
+
+///// <summary>
+///// Apply the individual query to the given IQueryable in the right order.
+///// </summary>
+///// <param name="query">The original <see cref="IQueryable"/>.</param>
+///// <param name="querySettings">The settings to use in query composition.</param>
+///// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+///// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
+//public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions);
+
+///// <summary>
+///// Apply the individual query to the given IQueryable in the right order.
+///// </summary>
+///// <param name="query">The original <see cref="IQueryable"/>.</param>
+///// <param name="querySettings">The settings to use in query composition.</param>
+///// <returns>The new <see cref="IQueryable"/> after the query has been applied to, as well as a <see cref="bool"/> representing whether the results have been limited to a page size.</returns>
+//public virtual (IQueryable, bool) ApplyTo(IQueryable query, ODataQuerySettings querySettings);
+
+///// <summary>
+///// Generates the Stable OrderBy query option based on the existing OrderBy and other query options. 
+///// </summary>
+///// <returns>An order by query option that ensures stable ordering of the results.</returns>
+//public virtual OrderByQueryOptionFundamentals GenerateStableOrder();
+
+///// <summary>
+///// Apply the individual query to the given IQueryable in the right order.
+///// </summary>
+///// <param name="entity">The original entity.</param>
+///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+///// <param name="ignoreQueryOptions">The query parameters that are already applied in queries.</param>
+///// <returns>The new entity after the $select and $expand query has been applied to.</returns>
+///// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+///// query options.</remarks>
+//public virtual object ApplyTo(object entity, ODataQuerySettings querySettings, AllowedQueryOptions ignoreQueryOptions);
+
+///// <summary>
+///// Applies the query to the given entity using the given <see cref="ODataQuerySettings"/>.
+///// </summary>
+///// <param name="entity">The original entity.</param>
+///// <param name="querySettings">The <see cref="ODataQuerySettings"/> that contains all the query application related settings.</param>
+///// <returns>The new entity after the $select and $expand query has been applied to.</returns>
+///// <remarks>Only $select and $expand query options can be applied on single entities. This method throws if the query contains any other
+///// query options.</remarks>
+//public virtual object ApplyTo(object entity, ODataQuerySettings querySettings);
+
+///// <summary>
+///// Validate all OData queries, including $skip, $top, $orderby and $filter, based on the given <paramref name="validationSettings"/>.
+///// It throws an ODataException if validation failed.
+///// </summary>
+///// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+//public virtual void Validate(ODataValidationSettings validationSettings);
+
+///// <summary>
+///// Limits the query results to a maximum number of results.
+///// </summary>
+///// <typeparam name="T">The entity CLR type</typeparam>
+///// <param name="queryable">The queryable to limit.</param>
+///// <param name="limit">The query result limit.</param>
+///// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
+///// <returns>The limited query results.</returns>
+//public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, out bool resultsLimited);
+
+///// <summary>
+///// Limits the query results to a maximum number of results.
+///// </summary>
+///// <typeparam name="T">The entity CLR type</typeparam>
+///// <param name="queryable">The queryable to limit.</param>
+///// <param name="limit">The query result limit.</param>
+///// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+///// <param name="resultsLimited"><c>true</c> if the query results were limited; <c>false</c> otherwise</param>
+///// <returns>The limited query results.</returns>
+//public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited);
+
+///// <summary>
+///// Updates the query settings to the new provided settings for the given query.
+///// </summary>
+///// <param name="querySettings">The new settings to copy from.</param>
+///// <param name="query">The query to determine how to handle null propogation by default.</param>
+///// <returns>The updated query settings.</returns>
+///// <remarks>Originally part of ODataQueryContextExtensions.</remarks>
+//public static ODataQuerySettings UpdateQuerySettings(ODataQuerySettings querySettings, IQueryable query);
+//    }
+//}

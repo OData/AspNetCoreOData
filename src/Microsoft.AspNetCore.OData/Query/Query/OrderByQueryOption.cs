@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using ODataQueryBuilder.Query;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -56,6 +57,8 @@ namespace Microsoft.AspNetCore.OData.Query
             _queryOptionParser = queryOptionParser;
         }
 
+        private OrderByQueryOptionFundamentals queryOptionFundamentals { get;  set; }
+
         internal OrderByQueryOption(string rawValue, ODataQueryContext context, string applyRaw)
         {
             if (context == null)
@@ -80,8 +83,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } }/*,
-                context.RequestContainer*/);
+                new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } },
+                context.RequestContainer);
             _queryOptionParser.ParseApply();
         }
 
@@ -105,8 +108,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$orderby", rawValue } }/*,
-                context.RequestContainer*/);
+                new Dictionary<string, string> { { "$orderby", rawValue } },
+                context.RequestContainer);
         }
 
         internal OrderByQueryOption(OrderByQueryOption orderBy)

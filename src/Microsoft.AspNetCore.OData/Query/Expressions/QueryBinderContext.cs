@@ -160,7 +160,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets or sets the source.
         /// Basically for $compute in $select and $expand
         /// </summary>
-        public Expression Source { get;set; }
+        public Expression Source { get; set; }
 
         /// <summary>
         /// Gets the parameter using parameter name.

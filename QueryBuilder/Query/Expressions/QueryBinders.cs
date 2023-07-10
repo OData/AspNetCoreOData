@@ -9,8 +9,14 @@ namespace ODataQueryBuilder.Query.Expressions
 
     public class QueryBinders
     {
-
-        public QueryBinders() { }
+        public QueryBinders(IOrderByBinder orderByBinder = null, ISelectExpandBinder selectExpandBinder = null,
+            ISearchBinder searchBinder = null, IFilterBinder filterBinder = null)
+        {
+            OrderByBinder = orderByBinder;
+            SelectExpandBinder = selectExpandBinder;
+            SearchBinder = searchBinder;
+            FilterBinder = filterBinder;
+        }
 
         IOrderByBinder OrderByBinder { get; set; }
 

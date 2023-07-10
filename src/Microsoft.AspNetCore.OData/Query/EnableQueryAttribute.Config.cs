@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using ODataQueryBuilder.Query;
 
 namespace Microsoft.AspNetCore.OData.Query
 {

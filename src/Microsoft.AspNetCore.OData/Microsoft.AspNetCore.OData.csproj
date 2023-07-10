@@ -68,6 +68,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\QueryBuilder\ODataQueryBuilder.csproj" />
+		<ProjectReference Include="..\..\QueryBuilder\ODataQueryBuilder.sln"/>
 	</ItemGroup>
 
   <ItemGroup>

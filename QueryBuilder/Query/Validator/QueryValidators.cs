@@ -2,7 +2,26 @@
 {
     public class QueryValidators
     {
-        public QueryValidators() { }
+        public QueryValidators(IComputeQueryValidator computeQueryValidator = null,
+            ICountQueryValidator countQueryValidator = null,
+            IFilterQueryValidator filterQueryValidator = null,
+            IODataQueryValidator odataQueryValidator = null,
+            IOrderByQueryValidator orderByQueryValidator = null,
+            ISelectExpandQueryValidator selectExpandQueryValidator = null,
+            ISkipQueryValidator skipQueryValidator = null,
+            ISkipTokenQueryValidator skipTokenQueryValidator = null,
+            ITopQueryValidator topQueryValidator = null)
+        {
+            ComputeQueryValidator = computeQueryValidator;
+            CountQueryValidator = countQueryValidator;
+            FilterQueryValidator = filterQueryValidator;
+            ODataQueryValidator = odataQueryValidator;
+            OrderByQueryValidator = orderByQueryValidator;
+            SelectExpandQueryValidator = selectExpandQueryValidator;
+            SkipQueryValidator = skipQueryValidator;
+            SkipTokenQueryValidator = skipTokenQueryValidator;
+            TopQueryValidator = topQueryValidator;
+        }
 
         IComputeQueryValidator ComputeQueryValidator { get; set; }
 

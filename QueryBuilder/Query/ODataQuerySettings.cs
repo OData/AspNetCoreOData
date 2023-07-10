@@ -1,4 +1,13 @@
-﻿using System;
+﻿//-----------------------------------------------------------------------------
+// <copyright file="ODataQuerySettings.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder;
+using System;
 
 namespace ODataQueryBuilder.Query
 {
@@ -137,7 +146,7 @@ namespace ODataQueryBuilder.Query
         /// </summary>
         public bool HandleReferenceNavigationPropertyExpandFilter { get; set; }
 
-        internal void CopyFrom(ODataQuerySettings settings)
+        public void CopyFrom(ODataQuerySettings settings)
         {
             TimeZone = settings.TimeZone;
             EnsureStableOrdering = settings.EnsureStableOrdering;

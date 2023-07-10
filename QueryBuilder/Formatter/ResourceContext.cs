@@ -25,21 +25,21 @@ namespace ODataQueryBuilder.Formatter
         /// </summary>
         public ResourceContext()
         {
-            SerializerContext = new ODataSerializerContext();
+            SerializerContext = new ODataSerializerContextFundamnentals();
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceContext"/> class.
         /// </summary>
-        /// <param name="serializerContext">The backing <see cref="ODataSerializerContext"/>.</param>
+        /// <param name="serializerContext">The backing <see cref="ODataSerializerContextFundamnentals"/>.</param>
         /// <param name="structuredType">The EDM structured type of this instance context.</param>
         /// <param name="resourceInstance">The object representing the instance of this context.</param>
-        public ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, object resourceInstance)
+        public ResourceContext(ODataSerializerContextFundamnentals serializerContext, IEdmStructuredTypeReference structuredType, object resourceInstance)
             : this(serializerContext, structuredType, AsEdmResourceObject(serializerContext, resourceInstance, structuredType))
         {
         }
 
-        private ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, IEdmStructuredObject edmObject)
+        private ResourceContext(ODataSerializerContextFundamnentals serializerContext, IEdmStructuredTypeReference structuredType, IEdmStructuredObject edmObject)
         {
             if (serializerContext == null)
             {
@@ -52,9 +52,9 @@ namespace ODataQueryBuilder.Formatter
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="ODataSerializerContext"/>.
+        /// Gets or sets the <see cref="ODataSerializerContextFundamnentals"/>.
         /// </summary>
-        public ODataSerializerContext SerializerContext { get; set; }
+        public ODataSerializerContextFundamnentals SerializerContext { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="IEdmModel"/> to which this instance belongs.
@@ -224,7 +224,7 @@ namespace ODataQueryBuilder.Formatter
             return resource;
         }
 
-        private static IEdmStructuredObject AsEdmResourceObject(ODataSerializerContext serializerContext, object resourceInstance, IEdmStructuredTypeReference structuredType)
+        private static IEdmStructuredObject AsEdmResourceObject(ODataSerializerContextFundamnentals serializerContext, object resourceInstance, IEdmStructuredTypeReference structuredType)
         {
             if (serializerContext == null)
             {

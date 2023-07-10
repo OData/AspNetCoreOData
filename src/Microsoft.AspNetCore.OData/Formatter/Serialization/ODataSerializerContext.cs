@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.AspNetCore.OData.Edm;
+using ODataQueryBuilder.Formatter.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -69,6 +70,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             // handle platform-specific differences in ODataSerializerContext.
             ODataSerializerContext context = resource.SerializerContext;
             this.Request = context.Request;
+
+            fundamentals = new ODataSerializerContextFundamnentals(resource, edmProperty, queryContext.QueryContextFundamnentals, currentSelectItem);
 
             Model = context.Model;
             Path = context.Path;

@@ -13,20 +13,20 @@ namespace ODataQueryBuilder.Query
     /// <summary>
     /// This defines a $orderby OData query option for querying.
     /// </summary>
-    public class OrderByQueryOption
+    public class OrderByQueryOptionFundamentals
     {
         private OrderByClause _orderByClause;
         private IList<OrderByNode> _orderByNodes;
         private ODataQueryOptionParser _queryOptionParser;
 
         /// <summary>
-        /// Initialize a new instance of <see cref="OrderByQueryOption"/> based on the raw $orderby value and
+        /// Initialize a new instance of <see cref="OrderByQueryOptionFundamentals"/> based on the raw $orderby value and
         /// an EdmModel from <see cref="ODataQueryFundamentalsContext"/>.
         /// </summary>
         /// <param name="rawValue">The raw value for $orderby query. It can be null or empty.</param>
         /// <param name="context">The <see cref="ODataQueryFundamentalsContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
         /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
-        public OrderByQueryOption(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
+        public OrderByQueryOptionFundamentals(string rawValue, ODataQueryFundamentalsContext context, ODataQueryOptionParser queryOptionParser)
         {
             if (context == null)
             {
@@ -50,7 +50,7 @@ namespace ODataQueryBuilder.Query
             _queryOptionParser = queryOptionParser;
         }
 
-        internal OrderByQueryOption(string rawValue, ODataQueryFundamentalsContext context, string applyRaw)
+        internal OrderByQueryOptionFundamentals(string rawValue, ODataQueryFundamentalsContext context, string applyRaw)
         {
             if (context == null)
             {
@@ -81,7 +81,7 @@ namespace ODataQueryBuilder.Query
         }
 
         // This constructor is intended for unit testing only.
-        internal OrderByQueryOption(string rawValue, ODataQueryFundamentalsContext context)
+        internal OrderByQueryOptionFundamentals(string rawValue, ODataQueryFundamentalsContext context)
         {
             if (context == null)
             {
@@ -105,7 +105,7 @@ namespace ODataQueryBuilder.Query
                 context.RequestContainer*/);
         }
 
-        internal OrderByQueryOption(OrderByQueryOption orderBy)
+        internal OrderByQueryOptionFundamentals(OrderByQueryOptionFundamentals orderBy)
         {
             Context = orderBy.Context;
             RawValue = orderBy.RawValue;

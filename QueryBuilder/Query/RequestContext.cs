@@ -1,4 +1,5 @@
 ﻿using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 using ODataQueryBuilder.Abstracts;
 using ODataQueryBuilder.Query.Expressions;
@@ -116,3 +117,27 @@ namespace ODataQueryBuilder.Query
         }
     }
 }
+
+
+//public RequestContext(IAssemblyResolver assembliesResolver = null, ODataQuerySettings defaultQuerySettings = null, int pageSize = -1,
+//                      QueryValidators validators = null, QueryBinders binders = null, SkipTokenHandler skipTokenHandler = null,
+//                      DefaultQueryConfigurations defaultQueryConfigurations = null, bool? isNoDollarQueryEnable = null, Func<ODataUriResolver> uriResolverFactory = null);
+//public IAssemblyResolver AssembliesResolver { get; set; }
+
+//public ODataQuerySettings DefaultQuerySettings { get; set; }
+
+//public int PageSize { get; set; }
+
+//public QueryValidators Validators { get; set; }
+
+//public QueryBinders Binders { get; set; }
+
+//public SkipTokenHandler PagingSkipTokenHandler { get; set; }
+
+//public DefaultQueryConfigurations DefaultQueryConfigurations { get; set; }
+
+//public bool? IsNoDollarQueryEnable { get; set; }
+
+//public Func<ODataUriResolver> UriResolverFactory { get; set; }
+
+//public static Func<ODataUriResolver> DefaultUriResolverFactory { get; } = () => new ODataUriResolver { EnableCaseInsensitive = true }; // one func to encapsulate all of the defaults forever; don't have to worry about too many objects

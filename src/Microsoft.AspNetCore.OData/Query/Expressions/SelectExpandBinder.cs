@@ -20,6 +20,8 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder.Query.Expressions;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {

@@ -202,7 +202,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
         }
 
-        private DefaultQueryConfigurations GetDefaultQuerySettings()
+        internal DefaultQueryConfigurations GetDefaultQuerySettings()
         {
             if (Request is null)
             {

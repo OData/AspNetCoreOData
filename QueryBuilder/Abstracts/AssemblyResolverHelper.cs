@@ -2,7 +2,7 @@
 
 namespace ODataQueryBuilder.Abstracts
 {
-    internal static class AssemblyResolverHelper
+    public static class AssemblyResolverHelper
     {
         public static IAssemblyResolver Default = new DefaultAssemblyResolver();
     }

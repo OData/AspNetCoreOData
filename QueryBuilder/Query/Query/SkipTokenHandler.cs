@@ -39,6 +39,6 @@ namespace ODataQueryBuilder.Query
         /// <param name="instance">Instance based on which SkipToken value will be generated.</param>
         /// <param name="context">Serializer context</param>
         /// <returns>URI for the NextPageLink.</returns>
-        public abstract Uri GenerateNextPageLink(Uri baseUri, int pageSize, object instance, ODataSerializerContext context);
+        public abstract Uri GenerateNextPageLink(Uri baseUri, int pageSize, object instance, ODataSerializerContextFundamnentals context);
     }
 }

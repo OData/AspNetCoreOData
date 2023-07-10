@@ -13,7 +13,7 @@ namespace ODataQueryBuilder.Formatter.Serialization
     /// <summary>
     /// Represents an <see cref="ODataSerializer"/> for serializing the raw value of an <see cref="IEdmPrimitiveType"/>.
     /// </summary>
-    public class ODataSerializerContext
+    public class ODataSerializerContextFundamnentals
     {
         private IDictionary<object, object> _items;
         private ODataQueryFundamentalsContext _queryContext;
@@ -21,14 +21,14 @@ namespace ODataQueryBuilder.Formatter.Serialization
         private bool _isSelectExpandClauseSet;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
+        /// Initializes a new instance of the <see cref="ODataSerializerContextFundamnentals"/> class.
         /// </summary>
-        public ODataSerializerContext()
+        public ODataSerializerContextFundamnentals()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
+        /// Initializes a new instance of the <see cref="ODataSerializerContextFundamnentals"/> class.
         /// </summary>
         /// <param name="resource">The resource whose property is being nested.</param>
         /// <param name="selectExpandClause">The <see cref="SelectExpandClause"/> for the property being nested.</param>
@@ -36,14 +36,14 @@ namespace ODataQueryBuilder.Formatter.Serialization
         /// If the resource property is the dynamic complex, the resource property is null.
         /// </param>
         /// <remarks>This constructor is used to construct the serializer context for writing nested and expanded properties.</remarks>
-        public ODataSerializerContext(ResourceContext resource, SelectExpandClause selectExpandClause, IEdmProperty edmProperty)
+        public ODataSerializerContextFundamnentals(ResourceContext resource, SelectExpandClause selectExpandClause, IEdmProperty edmProperty)
             : this(resource, edmProperty, null, null)
         {
             SelectExpandClause = selectExpandClause;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class for nested resources.
+        /// Initializes a new instance of the <see cref="ODataSerializerContextFundamnentals"/> class for nested resources.
         /// </summary>
         /// <param name="resource">The resource whose property is being nested.</param>
         /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
@@ -51,7 +51,7 @@ namespace ODataQueryBuilder.Formatter.Serialization
         /// </param>
         /// <param name="queryContext">The <see cref="ODataQueryFundamentalsContext"/> for the property being nested.</param>
         /// <param name="currentSelectItem">The <see cref="SelectItem"/> for the property being nested.></param>
-        internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryFundamentalsContext queryContext, SelectItem currentSelectItem)
+        internal ODataSerializerContextFundamnentals(ResourceContext resource, IEdmProperty edmProperty, ODataQueryFundamentalsContext queryContext, SelectItem currentSelectItem)
         {
             if (resource == null)
             {
@@ -60,7 +60,7 @@ namespace ODataQueryBuilder.Formatter.Serialization
 
             // Clone the resource's context. Use a helper function so it can
             // handle platform-specific differences in ODataSerializerContext.
-            ODataSerializerContext context = resource.SerializerContext;
+            ODataSerializerContextFundamnentals context = resource.SerializerContext;
             //this.Request = context.Request;
 
             Model = context.Model;

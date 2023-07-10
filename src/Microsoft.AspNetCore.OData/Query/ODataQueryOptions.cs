@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -24,9 +25,14 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
-//using ODataQueryBuilder.Query;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder.Query.Validator;
+using ODataQueryBuilder.Query.Expressions;
+using System.Runtime.ConstrainedExecution;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -464,22 +470,6 @@ namespace Microsoft.AspNetCore.OData.Query
 
         internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings)
         {
-            int pageSize = -1;
-            if (querySettings.PageSize.HasValue)
-            {
-                pageSize = querySettings.PageSize.Value;
-            }
-            else if (querySettings.ModelBoundPageSize.HasValue)
-            {
-                pageSize = querySettings.ModelBoundPageSize.Value;
-            }
-
-            int preferredPageSize = -1;
-            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
-            {
-                pageSize = Math.Min(pageSize, preferredPageSize);
-            }
-
             ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
             if (pageSize > 0)
             {
@@ -1096,8 +1086,72 @@ namespace Microsoft.AspNetCore.OData.Query
                     result = (T)newSelectExpand.ApplyTo(entity, querySettings);
                 }
             }
-
             return result;
+        }
+
+        private RequestContext BuildRequestContext(ODataQueryContext context)
+        {
+            IAssemblyResolver assembliesResolver = context.GetAssemblyResolver();
+            ODataQuerySettings defaultQuerySettings = context.GetODataQuerySettings();
+            int pageSize = -1; // TODO: Calculate
+            QueryValidators validators = new QueryValidators(context.GetComputeQueryValidator(),
+                context.GetCountQueryValidator(), context.GetFilterQueryValidator(),
+                context.GetODataQueryValidator(), context.GetOrderByQueryValidator(),
+                context.GetSelectExpandQueryValidator(), context.GetSkipQueryValidator(),
+                context.GetSkipTokenQueryValidator(), context.GetTopQueryValidator());
+            QueryBinders binders = new QueryBinders(context.GetOrderByBinder(),
+                context.GetSelectExpandBinder(), context.GetSearchBinder(),
+                context.GetFilterBinder());
+            SkipTokenHandler skipTokenHandler = context.GetSkipTokenHandler();
+            DefaultQueryConfigurations defaultQueryConfigurations = Context.GetDefaultQuerySettings();
+            bool? isNoDollarQueryEnable = context.Request.IsNoDollarQueryEnable();
+            Func<ODataUriResolver> uriResolverFactory = () => Context.RequestContainer.GetService<ODataUriResolver>();
+
+
+            return new RequestContext(assembliesResolver, defaultQuerySettings, pageSize, validators, binders,
+                skipTokenHandler, defaultQueryConfigurations, isNoDollarQueryEnable, uriResolverFactory);
+        }
+
+        private int CalculateDefaultPageSize(ODataQuerySettings querySettings)
+        {
+            int pageSize = -1;
+            if (querySettings.PageSize.HasValue)
+            {
+                pageSize = querySettings.PageSize.Value;
+            }
+            else if (querySettings.ModelBoundPageSize.HasValue)
+            {
+                pageSize = querySettings.ModelBoundPageSize.Value;
+            }
+
+            int preferredPageSize = -1;
+            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
+            {
+                pageSize = Math.Min(pageSize, queryOptionsFundamentals.);
+            }
+
+            return pageSize;
+        }
+
+        private int CalculateDefaultPageSize()
+        {
+            int pageSize = -1;
+            if (querySettings.PageSize.HasValue)
+            {
+                pageSize = querySettings.PageSize.Value;
+            }
+            else if (querySettings.ModelBoundPageSize.HasValue)
+            {
+                pageSize = querySettings.ModelBoundPageSize.Value;
+            }
+
+            int preferredPageSize = -1;
+            if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
+            {
+                pageSize = Math.Min(pageSize, preferredPageSize);
+            }
+
+            return pageSize;
         }
 
         /// <summary>

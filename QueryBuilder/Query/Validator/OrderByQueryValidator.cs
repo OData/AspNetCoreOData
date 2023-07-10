@@ -4,16 +4,16 @@ using Microsoft.OData.UriParser;
 namespace ODataQueryBuilder.Query.Validator
 {
     /// <summary>
-    /// Represents a validator used to validate an <see cref="OrderByQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
+    /// Represents a validator used to validate an <see cref="OrderByQueryOptionFundamentals"/> based on the <see cref="ODataValidationSettings"/>.
     /// </summary>
     public class OrderByQueryValidator : IOrderByQueryValidator
     {
         /// <summary>
-        /// Validates an <see cref="OrderByQueryOption" />.
+        /// Validates an <see cref="OrderByQueryOptionFundamentals" />.
         /// </summary>
         /// <param name="orderByOption">The $orderby query.</param>
         /// <param name="validationSettings">The validation settings.</param>
-        public virtual void Validate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings)
+        public virtual void Validate(OrderByQueryOptionFundamentals orderByOption, ODataValidationSettings validationSettings)
         {
             if (orderByOption == null)
             {

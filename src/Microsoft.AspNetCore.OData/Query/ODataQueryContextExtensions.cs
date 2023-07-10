@@ -6,9 +6,10 @@
 //------------------------------------------------------------------------------
 
 using System.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Validator;
+using ODataQueryBuilder.Abstracts;
+using ODataQueryBuilder.Query;
+using ODataQueryBuilder.Query.Expressions;
+using ODataQueryBuilder.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.ModelBuilder;
 
