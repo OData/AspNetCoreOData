@@ -366,18 +366,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, wrapperPropertyValueExpression));
 
             bool isSelectedAll = IsSelectAll(selectExpandClause);
-            if (isSelectedAll)
-            {
-                // Initialize property 'Instance' on the wrapper class
-                wrapperProperty = wrapperType.GetProperty("Instance");
-                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, source));
-
-                wrapperProperty = wrapperType.GetProperty("UseInstanceForProperties");
-                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Constant(true)));
-                isInstancePropertySet = true;
-            }
-            else
-            {
+            
+            if (!isSelectedAll)
+            { 
                 // Initialize property 'TypeName' on the wrapper class as we don't have the instance.
                 Expression typeName = CreateTypeNameExpression(source, structuredType, model);
                 if (typeName != null)
@@ -405,6 +396,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 bool isContainDynamicPropertySelection = ParseComputedDynamicProperties(context, dynamicPathSegments, isSelectedAll, out computedProperties);
 
                 bool isSelectingOpenTypeSegments = isContainDynamicPropertySelection || IsSelectAllOnOpenType(selectExpandClause, structuredType);
+
+                if (isSelectedAll)
+                {
+                    propertiesToInclude ??= new Dictionary<IEdmStructuralProperty, PathSelectItem>();
+                    IEnumerable<IEdmStructuralProperty> structuralProperties = structuredType.StructuralProperties();
+
+                    foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
+                    {
+                        propertiesToInclude.Add(structuralProperty, null);
+                    }
+                }
 
                 if (propertiesToExpand != null || propertiesToInclude != null || computedProperties != null || autoSelectedProperties != null || isSelectingOpenTypeSegments)
                 {
