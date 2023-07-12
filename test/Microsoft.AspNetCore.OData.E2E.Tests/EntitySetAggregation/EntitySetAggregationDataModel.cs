@@ -22,6 +22,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
         public DbSet<Customer> Customers { get; set; }
 
+        public DbSet<Order> Orders { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>().OwnsOne(c => c.Address).WithOwner();

@@ -102,4 +102,49 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             return employees.AsQueryable();
         }
     }
+
+    public class OrdersController : ODataController
+    {
+        private readonly EntitySetAggregationContext _context;
+
+        public OrdersController(EntitySetAggregationContext context)
+        {
+            context.Database.EnsureCreated();
+            _context = context;
+
+            if (!_context.Orders.Any())
+            {
+                Generate();
+            }
+        }
+
+        [EnableQuery]
+        public IQueryable<Order> Get()
+        {
+            return _context.Orders;
+        }
+
+        [EnableQuery]
+        public SingleResult<Order> Get(int key)
+        {
+            return SingleResult.Create(_context.Orders.Where(c => c.Id == key));
+        }
+
+        public void Generate()
+        {
+            for (int i = 1; i <= 3; i++)
+            {
+                var order = new Order
+                {
+                    Name = "Order" + 2 * i,
+                    Price = i * 25,
+                    SaleInfo = new SaleInfo { Quantity = i, UnitPrice = 25 }
+                };
+
+                _context.Orders.Add(order);
+            }
+
+            _context.SaveChanges();
+        }
+    }
 }

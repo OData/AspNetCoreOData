@@ -29,10 +29,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             public override void ConfigureServices(IServiceCollection services)
             {
                 // Use the sql server got the access error.
-                services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EntitySetAggregationContext;Trusted_Connection=True;"));
-                //services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase("EntitySetAggregationTest"));
+               // services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EntitySetAggregationContext;Trusted_Connection=True;"));
+                services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase("EntitySetAggregationTest"));
 
-                services.ConfigureControllers(typeof(CustomersController));
+                services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController));
 
                 IEdmModel edmModel = EntitySetAggregationEdmModel.GetEdmModel();
                 services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
@@ -132,6 +132,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
         }
 
         [Fact]
+        public async Task GroupByWithAggregationAndOrderByDynamicPropsWorks()
+        {
+            // Arrange
+            string queryUrl = "aggregation/Orders?$apply=groupby((Name),aggregate(Price with sum as TotalPrice))&$orderby=TotalPrice desc";
+            string expectedResult = "{\"value\":[{\"Name\":\"Order6\",\"TotalPrice\":75},{\"Name\":\"Order4\",\"TotalPrice\":50},{\"Name\":\"Order2\",\"TotalPrice\":25}]}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = Client.SendAsync(request).Result;
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var stringObject = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal(expectedResult, stringObject.ToString());
+        }
+
+        [Fact]
         public async Task AggregationWithFilterWorks()
         {
             // Arrange
@@ -150,7 +169,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
             Assert.Equal(expectedResult, stringObject.ToString());
         }
-          
+
+        [Fact]
         public async Task GroupByWithAggregationAndFilterByWorks()
         {
             // Arrange
