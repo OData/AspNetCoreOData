@@ -367,7 +367,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             bool isSelectedAll = IsSelectAll(selectExpandClause);
             
-            if (!isSelectedAll)
+            if (isSelectedAll)
+            {
+                // Initialize property 'Instance' on the wrapper class	            { 
+                wrapperProperty = wrapperType.GetProperty("Instance");	
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, source));	
+
+                wrapperProperty = wrapperType.GetProperty("UseInstanceForProperties");	
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Constant(true)));	
+                isInstancePropertySet = true;
+            }
+            else
             { 
                 // Initialize property 'TypeName' on the wrapper class as we don't have the instance.
                 Expression typeName = CreateTypeNameExpression(source, structuredType, model);
