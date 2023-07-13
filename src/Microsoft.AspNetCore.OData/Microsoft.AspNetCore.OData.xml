@@ -4309,6 +4309,15 @@
             <returns>A new <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/>.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext.Create(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext,System.Collections.Generic.IAsyncEnumerable{System.Object})">
+            <summary>
+            Create a <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/> from an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/> and <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/>.
+            </summary>
+            <param name="writeContext">The serializer context.</param>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <returns>A new <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/>.</returns>
+            <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> that serializes instances of objects backed by an <see cref="T:Microsoft.OData.Edm.IEdmType"/>.
@@ -4914,9 +4923,27 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataResourceSet"/> object.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.CreateResourceSet(System.Collections.Generic.IAsyncEnumerable{System.Object},Microsoft.OData.Edm.IEdmCollectionTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Create the <see cref="T:Microsoft.OData.ODataResourceSet"/> to be written for the given resourceSet instance.
+            </summary>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <param name="resourceSetType">The EDM type of the resourceSet being written.</param>
+            <param name="writeContext">The serializer context.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataResourceSet"/> object.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.GetNextLinkGenerator(Microsoft.OData.ODataResourceSetBase,System.Collections.IEnumerable,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Creates a function that takes in an object and generates nextlink uri.
+            </summary>
+            <param name="resourceSet">The resource set describing a collection of structured objects.</param>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <param name="writeContext">The serializer context.</param>
+            <returns>The function that generates the NextLink from an object.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.GetNextLinkGenerator(Microsoft.OData.ODataResourceSetBase,System.Collections.Generic.IAsyncEnumerable{System.Object},Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates a function that takes in an object and generates a nextlink uri.
             </summary>
             <param name="resourceSet">The resource set describing a collection of structured objects.</param>
             <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>

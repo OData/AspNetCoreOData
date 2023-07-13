@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -55,11 +56,27 @@ namespace Microsoft.AspNetCore.OData.Formatter
             {
                 Request = writeContext.Request,
                 EntitySetBase = writeContext.NavigationSource as IEdmEntitySetBase,
-              //  Url = writeContext.Url,
                 ResourceSetInstance = resourceSetInstance
             };
 
             return resourceSetContext;
+        }
+
+        /// <summary>
+        /// Create a <see cref="ResourceSetContext"/> from an <see cref="ODataSerializerContext"/> and <see cref="IAsyncEnumerable{T}"/>.
+        /// </summary>
+        /// <param name="writeContext">The serializer context.</param>
+        /// <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+        /// <returns>A new <see cref="ResourceSetContext"/>.</returns>
+        /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        internal static ResourceSetContext Create(ODataSerializerContext writeContext, IAsyncEnumerable<object> resourceSetInstance)
+        {
+            return new ResourceSetContext
+            {
+                Request = writeContext.Request,
+                EntitySetBase = writeContext.NavigationSource as IEdmEntitySetBase,
+                ResourceSetInstance = resourceSetInstance
+            };
         }
     }
 }

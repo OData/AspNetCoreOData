@@ -240,7 +240,8 @@ namespace Microsoft.AspNetCore.OData.Common
                     .Union(new[] { clrType })
                     .FirstOrDefault(
                         t => t.IsGenericType
-                             && t.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+                             && (t.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                             || t.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
 
             if (collectionInterface != null)
             {
