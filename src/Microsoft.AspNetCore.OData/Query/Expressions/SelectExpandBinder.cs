@@ -381,7 +381,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // Initialize the property 'Container' on the wrapper class
             // source => new Wrapper { Container =  new PropertyContainer { .... } }
-            if (selectExpandClause != null)
+            if (selectExpandClause != null && !isSelectedAll)
             {
                 IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude;
                 IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand;
