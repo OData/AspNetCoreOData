@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 options.Compute.Validate(validationSettings);
             }
 
-            if (options.Apply != null)
+            if (options.Apply?.ApplyClause != null)
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
             }
