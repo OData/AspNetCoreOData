@@ -397,17 +397,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 bool isSelectingOpenTypeSegments = isContainDynamicPropertySelection || IsSelectAllOnOpenType(selectExpandClause, structuredType);
 
-                if (isSelectedAll)
-                {
-                    propertiesToInclude ??= new Dictionary<IEdmStructuralProperty, PathSelectItem>();
-                    IEnumerable<IEdmStructuralProperty> structuralProperties = structuredType.StructuralProperties();
-
-                    foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
-                    {
-                        propertiesToInclude.Add(structuralProperty, null);
-                    }
-                }
-
                 if (propertiesToExpand != null || propertiesToInclude != null || computedProperties != null || autoSelectedProperties != null || isSelectingOpenTypeSegments)
                 {
                     Expression propertyContainerCreation =
