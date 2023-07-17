@@ -112,6 +112,8 @@ To connect to webapinightly feed, use this feed URL:
 
 ## 4. Documentation
 
+* [Official documentation](https://learn.microsoft.com/odata/webapi-8/overview)
+
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/main/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
 
 * [ASP.NET OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/): A blog introducing the project.
