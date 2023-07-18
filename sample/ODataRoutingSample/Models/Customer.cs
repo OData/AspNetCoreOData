@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ODataRoutingSample.Models
 {
@@ -22,6 +23,14 @@ namespace ODataRoutingSample.Models
         public virtual Address HomeAddress { get; set; }
 
         public virtual IList<Address> FavoriteAddresses { get; set; }
+
+        public virtual Foo Foo { get; set; }
+    }
+
+    public class Foo
+    {
+        [NotMapped]
+        public IDictionary<string, object> DynamicProperties { get; set; }
     }
 
     public class VipCustomer : Customer

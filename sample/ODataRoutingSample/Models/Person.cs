@@ -22,9 +22,9 @@ namespace ODataRoutingSample.Models
 
         public object Other { get; set; }
 
-        public IList<object> Infos { get; set; } // Collection(Edm.Untyped)
+        public IList<object> Infos { get; set; } = new List<object>(); // Collection(Edm.Untyped)
 
-        public IList<object> Sources { get; set; } // Collection(Edm.Untyped)
+        public IList<object> Sources { get; set; } = new List<object>(); // Collection(Edm.Untyped)
 
         public PersonExtraInfo CustomProperties { get; set; }
     }
