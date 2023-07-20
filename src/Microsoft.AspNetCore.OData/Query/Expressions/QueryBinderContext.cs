@@ -169,6 +169,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         public Expression Source { get;set; }
 
         /// <summary>
+        /// Gets or sets the query provider.
+        /// </summary>
+        internal string QueryProvider { get; set; }
+
+        /// <summary>
         /// Gets the parameter using parameter name.
         /// </summary>
         /// <param name="name">The parameter name.</param>
