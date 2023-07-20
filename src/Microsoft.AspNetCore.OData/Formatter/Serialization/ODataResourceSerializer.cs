@@ -1179,22 +1179,25 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmNavigationSource navigationSource = writeContext.NavigationSource;
             ODataNestedResourceInfo navigationLink = null;
 
-            if (navigationSource != null && navigationProperty.Type != null)
+            if (navigationProperty.Type != null)
             {
                 IEdmTypeReference propertyType = navigationProperty.Type;
-                IEdmModel model = writeContext.Model;
-                NavigationSourceLinkBuilderAnnotation linkBuilder = EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(model, navigationSource);
-                Uri navigationUrl = linkBuilder.BuildNavigationLink(resourceContext, navigationProperty, writeContext.MetadataLevel);
-
                 navigationLink = new ODataNestedResourceInfo
                 {
                     IsCollection = propertyType.IsCollection(),
                     Name = navigationProperty.Name,
                 };
 
-                if (navigationUrl != null)
+                if (navigationSource != null)
                 {
-                    navigationLink.Url = navigationUrl;
+                    IEdmModel model = writeContext.Model;
+                    NavigationSourceLinkBuilderAnnotation linkBuilder = EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(model, navigationSource);
+                    Uri navigationUrl = linkBuilder.BuildNavigationLink(resourceContext, navigationProperty, writeContext.MetadataLevel);
+
+                    if (navigationUrl != null)
+                    {
+                        navigationLink.Url = navigationUrl;
+                    }
                 }
             }
 
