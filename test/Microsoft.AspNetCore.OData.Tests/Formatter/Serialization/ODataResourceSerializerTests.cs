@@ -2290,32 +2290,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 },
              false);
 
-            var writeContext = new ODataSerializerContext() 
-            { 
+            var writeContext = new ODataSerializerContext()
+            {
                 Model = model,
                 SelectExpandClause = selectExpand
             };
-            var stream = new MemoryStream();
-            IODataResponseMessage responseMessage = new ODataMessageWrapper(stream);
-            ODataUri uri = new ODataUri { ServiceRoot = new Uri("http://myService", UriKind.Absolute) };
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings
+
+            using (var stream = new MemoryStream())
             {
-                ODataUri = uri                
-            };
-            ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, settings);
-            ODataWriter writer = await messageWriter.CreateODataResourceWriterAsync(null, resultType as IEdmComplexType);
+                IODataResponseMessage responseMessage = new ODataMessageWrapper(stream);
+                ODataUri uri = new ODataUri { ServiceRoot = new Uri("http://myService", UriKind.Absolute) };
+                ODataMessageWriterSettings settings = new ODataMessageWriterSettings
+                {
+                    ODataUri = uri
+                };
 
-            ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
+                using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, settings))
+                {
+                    ODataWriter writer = await messageWriter.CreateODataResourceWriterAsync(null, resultType as IEdmComplexType);
+                    ODataResourceSerializer serializer = new ODataResourceSerializer(_serializerProvider);
 
-            // Act
-            await serializer.WriteObjectInlineAsync(result, resultTypeReference, writer, writeContext);
+                    // Act
+                    await serializer.WriteObjectInlineAsync(result, resultTypeReference, writer, writeContext);
 
-            // Assert
-            stream.Position = 0;
-            StreamReader reader = new StreamReader(stream);
-            string response = reader.ReadToEnd();
-            Assert.Contains(@"""ProductID"":1", response);
-            Assert.Contains(@"""ProductID"":2", response);
+                    // Assert
+                    stream.Position = 0;
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        string response = reader.ReadToEnd();
+                        Assert.Contains(@"""ProductID"":1", response);
+                        Assert.Contains(@"""ProductID"":2", response);
+                    }
+                }
+            }
         }
 
         [Fact]
