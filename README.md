@@ -124,7 +124,16 @@ To connect to webapinightly feed, use this feed URL:
 
 Any contributions, feature requests, bugs and issues are welcome.
 
-### 5.2 Support
+### 5.2 Reporting Security Issues
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue). You can also find these instructions in this repo's [SECURITY.md](./SECURITY.md).
+
+### 5.3 Support
+
+- Issues: Report issues on [Github issues](https://github.com/OData/AspNetCoreOData/issues).
+- Questions: Ask questions on [Stack Overflow](http://stackoverflow.com/questions/ask?tags=odata).
+- Feedback: Please send mails to [odatafeedback@microsoft.com](mailto:odatafeedback@microsoft.com).
+- Team blog: Please visit [https://devblogs.microsoft.com/odata/](https://devblogs.microsoft.com/odata/) and [http://www.odata.org/blog/](http://www.odata.org/blog/).
 
 ### Code of Conduct
 
