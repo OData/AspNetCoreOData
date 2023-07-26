@@ -32,6 +32,11 @@ namespace ODataQueryBuilder.Query
         /// </remarks>
         public ODataQueryFundamentalsContext(IEdmModel model, Type elementClrType, ODataPath path, RequestContext requestContext)
         {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
             if (elementClrType == null)
             {
                 throw Error.ArgumentNull(nameof(elementClrType));
@@ -57,6 +62,11 @@ namespace ODataQueryBuilder.Query
         /// <param name="requestContext">Context information about the request.</param>
         public ODataQueryFundamentalsContext(IEdmModel model, IEdmType elementType, ODataPath path, RequestContext requestContext)
         {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
             if (elementType == null)
             {
                 throw Error.ArgumentNull(nameof(elementType));
@@ -97,7 +107,7 @@ namespace ODataQueryBuilder.Query
         /// <summary>
         /// Gets the given <see cref="DefaultQueryConfigurations"/>.
         /// </summary>
-        public DefaultQueryConfigurations DefaultQueryConfigurations { get; internal set; }
+        public virtual DefaultQueryConfigurations DefaultQueryConfigurations { get; internal set; }
 
         /// <summary>
         /// Gets the given <see cref="IEdmModel"/> that contains the EntitySet.
@@ -173,7 +183,7 @@ namespace ODataQueryBuilder.Query
 
         #region Validator Methods
 
-        public IComputeQueryValidator GetComputeQueryValidator()
+        public virtual IComputeQueryValidator GetComputeQueryValidator()
         {
             return RequestContext.Validators.GetComputeQueryValidator();
         }

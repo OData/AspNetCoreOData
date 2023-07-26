@@ -33,6 +33,7 @@ using ODataQueryBuilder.Query;
 using ODataQueryBuilder.Query.Validator;
 using ODataQueryBuilder.Query.Expressions;
 using System.Runtime.ConstrainedExecution;
+using Microsoft.AspNetCore.Authentication;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
