@@ -19,6 +19,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using ODataQueryBuilder.Query;
+using ODataQueryBuilder.Query.Validator;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
