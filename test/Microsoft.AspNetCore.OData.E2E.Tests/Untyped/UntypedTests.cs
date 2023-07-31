@@ -411,6 +411,181 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
         }
 
         [Fact]
+        public async Task CreatePerson_WithPrimitiveUntypedValueODataTyped_Works_RoundTrip()
+        {
+            // Arrange
+            const string payload = @"{
+  ""data@odata.type"": ""#Edm.Guid"",
+  ""data"":""40EE4E85-C443-41B2-9611-C55F97D80E84"",
+  ""id"": 90
+}";
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/people");
+            request.Content = new StringContent(payload);
+            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":90," +
+                "\"Name\":null," +
+                "\"Data@odata.type\":\"#Guid\"," +
+                "\"Data\":\"40ee4e85-c443-41b2-9611-c55f97d80e84\"," +
+                "\"Infos\":[]" +
+              "}", payloadBody);
+        }
+
+        [Fact]
+        public async Task CreatePerson_WithEnumUntypedValueODataTyped_Works_RoundTrip()
+        {
+            // Arrange
+            const string payload = @"{
+  ""data@odata.type"": ""#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelColor"",
+  ""data"":""Blue"",
+  ""id"": 91
+}";
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/people");
+            request.Content = new StringContent(payload);
+            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":91," +
+                "\"Name\":null," +
+                "\"Data\":\"Blue\"," +
+                "\"Infos\":[]" +
+              "}", payloadBody);
+        }
+
+        [Fact]
+        public async Task CreatePerson_WithResourceUntypedValueODataTyped_Works_RoundTrip()
+        {
+            // Arrange
+            const string payload = @"{
+  ""data"":{
+    ""@odata.type"":""#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress"",
+    ""City"":""Redmond"",
+    ""Street"":""156TH AVE""
+  },
+  ""id"": 92
+}";
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/people");
+            request.Content = new StringContent(payload);
+            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":92," +
+                "\"Name\":null," +
+                "\"Data\":{\"City\":\"Redmond\",\"Street\":\"156TH AVE\"}," +
+                "\"Infos\":[]" +
+              "}", payloadBody);
+        }
+
+        [Fact]
+        public async Task CreatePerson_WithPrimitiveCollectionUntypedValueODataTyped_Works_RoundTrip()
+        {
+            // Arrange
+            const string payload = @"{
+  ""data"":[
+    4,
+    {
+      ""@odata.type"":""#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress"",
+      ""City"":""Earth"",
+      ""Street"":""Min AVE""
+    }
+  ],
+  ""id"": 94
+}";
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/people");
+            request.Content = new StringContent(payload);
+            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":94," +
+                "\"Name\":null," +
+                "\"Data\":[" +
+                  "4," +
+                  "{" +
+                    "\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress\"," +
+                    "\"City\":\"Earth\"," +
+                    "\"Street\":\"Min AVE\"" +
+                  "}" +
+                "]," +
+                "\"Infos\":[]" +
+              "}", payloadBody);
+        }
+
+        [Fact]
+        public async Task CreatePerson_WithCollectionItemUntypedValueODataTyped_Works_RoundTrip()
+        {
+            // Arrange
+            const string payload = @"{
+  ""data@odata.type"":""#Collection(Edm.Int32)"",
+  ""data"":[
+    4,
+    5
+  ],
+  ""id"": 93
+}";
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/people");
+            request.Content = new StringContent(payload);
+            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+            request.Content.Headers.ContentLength = payload.Length;
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":93," +
+                "\"Name\":null," +
+                "\"Data\":[4,5]," +
+                "\"Infos\":[]" +
+              "}", payloadBody);
+        }
+
+        [Fact]
         public async Task CreatePerson_Works_RoundTrip()
         {
             // Arrange

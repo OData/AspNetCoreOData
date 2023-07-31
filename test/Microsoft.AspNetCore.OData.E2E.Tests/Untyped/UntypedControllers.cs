@@ -1,11 +1,13 @@
 //-----------------------------------------------------------------------------
-// <copyright file="PropertyNameCaseSensitiveControllers.cs" company=".NET Foundation">
+// <copyright file="UntypedController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System.IdentityModel.Tokens.Jwt;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
@@ -62,6 +64,48 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
         public IActionResult Post([FromBody] InModelPerson person)
         {
             Assert.NotNull(person);
+
+            if (person.Id == 90) // primitive
+            {
+                Assert.IsType<Guid>(person.Data);
+                Assert.Equal(new Guid("40EE4E85-C443-41B2-9611-C55F97D80E84"), person.Data);
+                return Created(person);
+            }
+
+            if (person.Id == 91) // enum
+            {
+                Assert.Equal(InModelColor.Blue, person.Data);
+                return Created(person);
+            }
+
+            if (person.Id == 92) // resource
+            {
+                InModelAddress address = Assert.IsType<InModelAddress>(person.Data);
+                Assert.Equal("Redmond", address.City);
+                Assert.Equal("156TH AVE", address.Street);
+                return Created(person);
+            }
+
+            if (person.Id == 93) // collection of primitive
+            {
+                IEnumerable<int> enumerable = person.Data as IEnumerable<int>;
+                Assert.Collection(enumerable,
+                    e => Assert.Equal(4, e),
+                    e => Assert.Equal(5, e));
+                return Created(person);
+            }
+
+            if (person.Id == 94) // collection of mix
+            {
+                EdmUntypedCollection untypedcoll = Assert.IsType<EdmUntypedCollection>(person.Data);
+                Assert.Equal(2, untypedcoll.Count);
+                Assert.Equal(4, untypedcoll.ElementAt(0));
+                InModelAddress address = Assert.IsType<InModelAddress>(untypedcoll.ElementAt(1));
+                Assert.Equal("Earth", address.City);
+                Assert.Equal("Min AVE", address.Street);
+                return Created(person);
+            }
+
             if (person.Id == 98)
             {
                 // 98 is special created

@@ -2282,7 +2282,15 @@
             </summary>
             <param name="model">The Edm model.</param>
             <param name="resourceSet">The given resource set.</param>
-            <returns></returns>
+            <returns>The resolved type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveResourceType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataResourceBase)">
+            <summary>
+            Resolve the type reference from the type name of <see cref="T:Microsoft.OData.ODataResourceBase"/>
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="resource">The given resource.</param>
+            <returns>The resolved type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetAllProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
             <summary>
