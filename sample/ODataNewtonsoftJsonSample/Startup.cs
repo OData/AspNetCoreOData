@@ -12,8 +12,12 @@ using Microsoft.AspNetCore.OData.NewtonsoftJson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace ODataNewtonsoftJsonSample
 {
@@ -29,8 +33,20 @@ namespace ODataNewtonsoftJsonSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var converters = new List<JsonConverter>
+            {
+                new MACConverter(),
+            };
+
             services.AddControllers()
-                .AddOData(opt => opt.Select().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", GetEdmModel()))
+                .AddOData(opt => opt.Select().Expand().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", GetEdmModel()))
+                .AddNewtonsoftJson(
+                    options => {
+                        options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                        //options.SerializerSettings.ContractResolver = WebApiJsonResolver.Instance;
+                        options.SerializerSettings.Converters = converters;
+                })
                 .AddODataNewtonsoftJson()
                 //.AddNewtonsoftJson(
                 //options =>

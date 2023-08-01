@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net.NetworkInformation;
 
 namespace ODataNewtonsoftJsonSample.Controllers
 {
@@ -43,7 +44,7 @@ namespace ODataNewtonsoftJsonSample.Controllers
         // 3) ~/WeatherForecast
         // Try it and you will get different payload.
         [HttpGet]
-        [EnableQuery]
+        [MyEnableQuery]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
@@ -51,7 +52,8 @@ namespace ODataNewtonsoftJsonSample.Controllers
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
+                Summary = Summaries[rng.Next(Summaries.Length)],
+                Mac = PhysicalAddress.Parse("00:0E:59:00:00:00"),
             })
             .ToArray();
         }

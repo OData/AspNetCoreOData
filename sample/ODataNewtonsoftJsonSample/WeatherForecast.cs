@@ -7,6 +7,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.NetworkInformation;
 
 namespace ODataNewtonsoftJsonSample
 {
@@ -22,5 +23,14 @@ namespace ODataNewtonsoftJsonSample
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
         public string Summary { get; set; }
+
+        // This property is hold the Mac value for OData side
+        public string ODataMac
+        {
+            get => Mac.ToString();
+            set => PhysicalAddress.Parse(value);
+        }
+
+        public PhysicalAddress Mac { get; set; }
     }
 }
