@@ -115,6 +115,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
             // Assert
             SelectorModel actualSelectorModel = Assert.Single(action.Selectors);
             Assert.Equal("/Customers({key})/Orders({relatedKey})/NS.MyOrder/Title", actualSelectorModel.AttributeRouteModel.Template);
+            Assert.Null(actualSelectorModel.AttributeRouteModel.Order);
             Assert.Contains(actualSelectorModel.EndpointMetadata, a => a is ODataRoutingMetadata);
         }
 
@@ -144,21 +145,74 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
                 e =>
                 {
                     Assert.Equal("/Customers/{key}", e.AttributeRouteModel.Template);
+                    Assert.Equal(9, e.AttributeRouteModel.Order);
                     Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
                 },
                 e =>
                 {
                     Assert.Equal("/Orders/{key}", e.AttributeRouteModel.Template);
+                    Assert.Equal(9, e.AttributeRouteModel.Order);
                     Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
                 },
                 e =>
                 {
                     Assert.Equal("/Customers", e.AttributeRouteModel.Template);
+                    Assert.Equal(3, e.AttributeRouteModel.Order);
                     Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
                 },
                 e =>
                 {
                     Assert.Equal("/Orders", e.AttributeRouteModel.Template);
+                    Assert.Equal(3, e.AttributeRouteModel.Order);
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                });
+        }
+
+        [Fact]
+        public void AppliesToActionWithOrderOnControllerRoutePrefixWorksAsExpected()
+        {
+            // Arrange
+            ControllerModel controller = ControllerModelHelpers.BuildControllerModel<WithPrefixController2>("List");
+            ActionModel action = controller.Actions.First();
+            Assert.Equal(2, action.Selectors.Count);
+
+            ODataControllerActionContext context = new ODataControllerActionContext(string.Empty, _edmModel, controller)
+            {
+                Action = action,
+                Options = _options,
+            };
+
+            AttributeRoutingConvention attributeConvention = CreateConvention();
+
+            // Act
+            bool ok = _attributeConvention.AppliesToAction(context);
+            Assert.False(ok);
+
+            // Assert
+            Assert.Equal(4, action.Selectors.Count);
+            Assert.Collection(action.Selectors,
+                e =>
+                {
+                    Assert.Equal("/Customers/{key}", e.AttributeRouteModel.Template);
+                    Assert.Equal(9, e.AttributeRouteModel.Order); // Order from controller
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                },
+                e =>
+                {
+                    Assert.Equal("/Orders/{key}", e.AttributeRouteModel.Template);
+                    Assert.Equal(8, e.AttributeRouteModel.Order); // Order from controller
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                },
+                e =>
+                {
+                    Assert.Equal("/Customers", e.AttributeRouteModel.Template);
+                    Assert.Equal(3, e.AttributeRouteModel.Order); // Order from action
+                    Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
+                },
+                e =>
+                {
+                    Assert.Equal("/Orders", e.AttributeRouteModel.Template);
+                    Assert.Equal(3, e.AttributeRouteModel.Order); // Order from action
                     Assert.Contains(e.EndpointMetadata, a => a is ODataRoutingMetadata);
                 });
         }
@@ -284,9 +338,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Conventions
         [Route("Orders")]
         private class WithPrefixController
         {
-            [HttpGet("{key}")]
-            [HttpPost("")]
+            [HttpGet("{key}", Order = 9)]
+            [HttpPost("", Order = 3)]
             public void List(int key)
+            {
+            }
+        }
+
+        [ODataAttributeRouting] // using this attribute if not derived from ODataController
+        [Route("Customers", Order = 9)]
+        [Route("Orders", Order = 8)]
+        private class WithPrefixController2
+        {
+            [HttpGet("{key}")]
+            [HttpPost("", Order = 3)] // 3 should override 8 on controller
+            public void List()
             {
             }
         }
