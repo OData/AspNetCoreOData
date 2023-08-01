@@ -142,7 +142,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IServiceProvider sp = context.Options.RouteComponents[prefix].ServiceProvider;
 
             SelectorModel newSelectorModel = CreateActionSelectorModel(prefix, model, sp, newRouteTemplate, actionSelector,
-                        attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName);
+                        attributeRouteModel.Template, actionModel.ActionName, controllerModel.ControllerName, attributeRouteModel.Order);
             if (newSelectorModel != null)
             {
                 IList<SelectorModel> selectors;
@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
         private SelectorModel CreateActionSelectorModel(string prefix, IEdmModel model, IServiceProvider sp,
             string routeTemplate, SelectorModel actionSelectorModel,
-            string originalTemplate, string actionName, string controllerName)
+            string originalTemplate, string actionName, string controllerName, int? order)
         {
             try
             {
@@ -182,7 +182,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     // replace the attribute routing template using absolute routing template to avoid appending any controller route template
                     newSelectorModel.AttributeRouteModel = new AttributeRouteModel()
                     {
-                        Template = $"/{originalTemplate}" // add a "/" to make sure it's absolute template, don't combine with controller
+                        Template = $"/{originalTemplate}", // add a "/" to make sure it's absolute template, don't combine with controller
+                        Order = order
                     };
 
                     return newSelectorModel;
