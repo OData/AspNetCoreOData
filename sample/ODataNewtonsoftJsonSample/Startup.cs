@@ -39,7 +39,7 @@ namespace ODataNewtonsoftJsonSample
             };
 
             services.AddControllers()
-                .AddOData(opt => opt.Select().Expand().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", GetEdmModel()))
+                .AddOData(opt => opt.Select().Expand().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", EdmModelBuilder.GetModel()))
                 .AddNewtonsoftJson(
                     options => {
                         options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
@@ -76,14 +76,6 @@ namespace ODataNewtonsoftJsonSample
             {
                 endpoints.MapControllers();
             });
-        }
-
-        IEdmModel GetEdmModel()
-        {
-            var odataBuilder = new ODataConventionModelBuilder();
-
-            odataBuilder.EntitySet<WeatherForecast>(nameof(WeatherForecast));
-            return odataBuilder.GetEdmModel();
         }
     }
 }
