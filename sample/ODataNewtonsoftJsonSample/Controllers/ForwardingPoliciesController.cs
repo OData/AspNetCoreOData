@@ -79,12 +79,16 @@ namespace ODataRoutingSample.Controllers.v1
         public IActionResult Patch(int key, Delta<ForwardingPolicy> delta)
         {
             /*
-PATCH http://localhost:12197/v1/ForwardingPolicies/320343815
+             * update rather tahn insert (only action prop)
+             * make sure it goes through graph
+            */
+            /*
 {
    "PolicyRules@delta": [
     {
-        "@odata.type": "Microsoft.Naas.Contracts.ControlPlane.MsGraphModels.Rules.m365ForwardingRule",
-      "Name":"Microsoft"
+        "@odata.type": "#Microsoft.Naas.Contracts.ControlPlane.MsGraphModels.Rules.m365ForwardingRule", // must have odata.type, i'm unclear if this is an odata rule, or a webapi rule
+        "@id": "1234",
+        "action":"forward"
    }
   ]
 }
