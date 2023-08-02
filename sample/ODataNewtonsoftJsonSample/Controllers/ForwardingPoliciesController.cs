@@ -79,8 +79,8 @@ namespace ODataRoutingSample.Controllers.v1
         public IActionResult Patch(int key, Delta<ForwardingPolicy> delta)
         {
             /*
-             * update rather tahn insert (only action prop)
              * make sure it goes through graph
+             * maybe some implementation?
             */
             /*
 {
@@ -93,6 +93,8 @@ namespace ODataRoutingSample.Controllers.v1
   ]
 }
             */
+
+
 
             // Or using the following payload (v4.0 format)
 
