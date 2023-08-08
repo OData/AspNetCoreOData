@@ -222,9 +222,20 @@ namespace Microsoft.AspNetCore.OData.Edm
                     }
 
                     Type enumerableOfT = ExtractGenericInterface(clrType, typeof(IEnumerable<>));
-                    if (enumerableOfT != null)
+                    Type asyncEnumerableOfT = ExtractGenericInterface(clrType, typeof(IAsyncEnumerable<>));
+
+                    if (enumerableOfT != null || asyncEnumerableOfT != null)
                     {
-                        Type elementClrType = enumerableOfT.GetGenericArguments()[0];
+                        Type elementClrType = null;
+                        
+                        if (enumerableOfT != null)
+                        {
+                            elementClrType = enumerableOfT.GetGenericArguments()[0];
+                        }
+                        else
+                        {
+                            elementClrType = asyncEnumerableOfT.GetGenericArguments()[0];
+                        }
 
                         // IEnumerable<SelectExpandWrapper<T>> is a collection of T.
                         if (elementClrType.IsSelectExpandWrapper(out entityType))
