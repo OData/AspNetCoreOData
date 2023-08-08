@@ -19,13 +19,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
         public CustomersController(EntitySetAggregationContext context)
         {
-            context.Database.EnsureCreated();
+            EntitySetAggregationContext.EnsureDatabaseCreated(context);
             _context = context;
-
-            if (!_context.Customers.Any())
-            {
-                Generate();
-            }
         }
 
         [EnableQuery]
@@ -38,40 +33,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
         public SingleResult<Customer> Get(int key)
         {
             return SingleResult.Create(_context.Customers.Where(c => c.Id == key));
-        }
-
-        public void Generate()
-        {
-            for (int i = 1; i <= 3; i++)
-            {
-                var customer = new Customer
-                {
-                   // Id = i,
-                    Name = "Customer" + (i+1) % 2,
-                    Orders = 
-                        new List<Order> {
-                            new Order {
-                                Name = "Order" + 2*i,
-                                Price = i * 25,
-                                SaleInfo = new SaleInfo { Quantity = i, UnitPrice = 25 }
-                            },
-                            new Order {
-                                Name = "Order" + 2*i+1,
-                                Price = i * 75,
-                                SaleInfo = new SaleInfo { Quantity = i, UnitPrice = 75 }
-                            }
-                        },
-                    Address = new Address
-                    {
-                        Name = "City" + i % 2,
-                        Street = "Street" + i % 2,
-                    }
-                };
-
-                _context.Customers.Add(customer);
-            }
-
-            _context.SaveChanges();
         }
     }
 
@@ -109,42 +70,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
         public OrdersController(EntitySetAggregationContext context)
         {
-            context.Database.EnsureCreated();
+            EntitySetAggregationContext.EnsureDatabaseCreated(context);
             _context = context;
-
-            if (!_context.Orders.Any())
-            {
-                Generate();
-            }
         }
 
         [EnableQuery]
         public IQueryable<Order> Get()
         {
             return _context.Orders;
-        }
-
-        [EnableQuery]
-        public SingleResult<Order> Get(int key)
-        {
-            return SingleResult.Create(_context.Orders.Where(c => c.Id == key));
-        }
-
-        public void Generate()
-        {
-            for (int i = 1; i <= 3; i++)
-            {
-                var order = new Order
-                {
-                    Name = "Order" + 2 * i,
-                    Price = i * 25,
-                    SaleInfo = new SaleInfo { Quantity = i, UnitPrice = 25 }
-                };
-
-                _context.Orders.Add(order);
-            }
-
-            _context.SaveChanges();
         }
     }
 }
