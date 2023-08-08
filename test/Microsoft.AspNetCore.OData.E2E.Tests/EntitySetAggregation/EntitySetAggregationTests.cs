@@ -106,63 +106,64 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 #if NET6_0_OR_GREATER
 
         [Fact]
-        public void GroupByWithAggregationAndOrderByWorks()
+        public async Task GroupByWithAggregationAndOrderByWorks()
         {
             // Arrange
             string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((Name),aggregate(Orders(Price with sum as TotalPrice)))&$orderby=Name desc";
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = await Client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GroupByWithAggregationAndOrderByDynamicPropsWorks()
+        {
+            // Arrange
+            string queryUrl = "aggregation/Orders?$apply=groupby((Name),aggregate(Price with sum as TotalPrice))&$orderby=TotalPrice desc";
             
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);         
+        }
+
+        [Fact]
+        public async Task AggregationWithFilterWorks()
+        {
+            // Arrange
+            string queryUrl = AggregationTestBaseUrl + "?$apply=filter((contains(Name,'Customer1')))/aggregate(Orders(Price with sum as TotalPrice))";
+
+                  HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]
-        public void GroupByWithAggregationAndOrderByDynamicPropsWorks()
+        public async Task GroupByWithAggregationAndFilterByWorks()
         {
             // Arrange
-            string queryUrl = "aggregation/Orders?$apply=groupby((Name),aggregate(Price with sum as TotalPrice))&$orderby=TotalPrice desc";
+            string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((Name),aggregate(Orders(Price with sum as TotalPrice)))&$filter=Name eq 'Customer1'";
            
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public void AggregationWithFilterWorks()
-        {
-            // Arrange
-            string queryUrl = AggregationTestBaseUrl + "?$apply=filter((contains(Name,'Customer1')))/aggregate(Orders(Price with sum as TotalPrice))";
-                  HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
-            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-
-            // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [Fact]
-        public void GroupByWithAggregationAndFilterByWorks()
-        {
-            // Arrange
-            string queryUrl = AggregationTestBaseUrl + "?$apply=groupby((Name),aggregate(Orders(Price with sum as TotalPrice)))&$filter=Name eq 'Customer1'";
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
-            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
-
-            // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
