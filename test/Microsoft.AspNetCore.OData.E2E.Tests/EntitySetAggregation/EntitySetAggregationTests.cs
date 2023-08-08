@@ -115,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -136,12 +136,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
         {
             // Arrange
             string queryUrl = "aggregation/Orders?$apply=groupby((Name),aggregate(Price with sum as TotalPrice))&$orderby=TotalPrice desc";
-            string expectedResult = "{\"value\":[{\"Name\":\"Order6\",\"TotalPrice\":75},{\"Name\":\"Order4\",\"TotalPrice\":50},{\"Name\":\"Order2\",\"TotalPrice\":25}]}";
+            string expectedResult = "{\"value\":[{\"Name\":\"Order61\",\"TotalPrice\":225},{\"Name\":\"Order41\",\"TotalPrice\":150},{\"Name\":\"Order21\",\"TotalPrice\":75},{\"Name\":\"Order6\",\"TotalPrice\":75},{\"Name\":\"Order4\",\"TotalPrice\":50},{\"Name\":\"Order2\",\"TotalPrice\":25}]}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -161,7 +161,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -180,7 +180,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
 
             // Act
-            HttpResponseMessage response = Client.SendAsync(request).Result;
+            HttpResponseMessage response = await Client.SendAsync(request);
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
