@@ -166,8 +166,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            context.EnsureFlattenedProperties(context.CurrentParameter, query);
-
             OrderByBinderResult orderByResult = binder.BindOrderBy(orderByClause, context);
             IQueryable querySoFar = query;
 
