@@ -151,6 +151,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
         }
 
         [Fact]
+        public async Task GroupByMoreThanOnePropertyWithDollarTopWorks()
+        {
+            // Arrange
+            string queryUrl = "aggregation/Orders?$apply=groupby((Id, Name),aggregate(Price with sum as TotalPrice))&$top=1";
+            string expectedResult = "{\"value\":[{\"Name\":\"Order2\",\"Id\":1,\"TotalPrice\":25}]}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            // Act
+            HttpResponseMessage response = await Client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var stringObject = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal(expectedResult, stringObject.ToString());
+        }
+
+        [Fact]
         public async Task AggregationWithFilterWorks()
         {
             // Arrange

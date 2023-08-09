@@ -255,6 +255,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);
             }
 
+            binderContext.EnsureFlattenedProperties(binderContext.CurrentParameter, query);
+
             foreach (OrderByNode node in nodes)
             {
                 OrderByPropertyNode propertyNode = node as OrderByPropertyNode;
