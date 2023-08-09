@@ -205,14 +205,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             ODataDeserializerContext nestedReadContext = readContext.CloneWithoutType();
             if (elementType == null || elementType.IsUntyped())
             {
-                if (resourceWrapper.Resource.TypeName == null || resourceWrapper.Resource.TypeName == "Edm.Untyped")
+                // We should use the given type name to read
+                elementType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
+                if (elementType.IsUntyped())
                 {
                     nestedReadContext.ResourceType = typeof(EdmUntypedObject);
-                }
-                else
-                {
-                    // We should use the given type name to read
-                    elementType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
                 }
             }
 

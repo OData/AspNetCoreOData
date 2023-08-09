@@ -611,15 +611,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (edmType.IsUntyped())
             {
-                if (resourceWrapper.Resource.TypeName == null || resourceWrapper.Resource.TypeName == "Edm.Untyped")
+                // We should use the given type name to replace the EdmType.
+                // If it's real untyped, use untyped object to read.
+                edmType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
+                if (edmType.IsUntyped())
                 {
                     nestedReadContext.ResourceType = typeof(EdmUntypedObject);
                     return deserializer.ReadInline(resourceWrapper, edmType, nestedReadContext);
-                }
-                else
-                {
-                    // We should use the given type name to read
-                    edmType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
                 }
             }
 
