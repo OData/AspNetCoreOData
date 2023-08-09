@@ -207,8 +207,8 @@ Send one of the following requests
 
 ```C#
 GET http://localhost:5219/odata/Customers(2)
-GET http://localhost:5219/odata/Customers(SSN='SSN-2-102')
-GET http://localhost:5219/odata/Customers(CoreSN='SSN-2-102')
+GET http://localhost:5219/odata/Customers(SSN='SSN-%25-2-102')
+GET http://localhost:5219/odata/Customers(CoreSN='SSN-%25-2-102')
 ```
 
 you can get the following result:
@@ -217,7 +217,7 @@ you can get the following result:
     "@odata.context": "http://localhost:5219/odata/$metadata#Customers/$entity",
     "Id": 2,
     "Name": "Jerry",
-    "SSN": "SSN-2-102",
+    "SSN": "SSN-%25-2-102",
     "Titles": [
         "abc",
         null,

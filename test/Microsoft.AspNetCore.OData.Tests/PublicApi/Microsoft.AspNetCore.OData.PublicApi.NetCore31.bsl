@@ -1868,6 +1868,7 @@ public class Microsoft.AspNetCore.OData.Routing.ODataRouteOptions {
 	bool EnablePropertyNameCaseInsensitive  { public get; public set; }
 	bool EnableQualifiedOperationCall  { public get; public set; }
 	bool EnableUnqualifiedOperationCall  { public get; public set; }
+	System.Nullable`1[[System.Int32]] Order  { public get; public set; }
 }
 
 public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IODataRoutingMetadata {

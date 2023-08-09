@@ -13953,6 +13953,12 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions" /> class.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.Order">
+            <summary>
+            Gets or sets the route order in conventional routing.
+            By default, move the conventional routing later as much as possible.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarCountRouting">
             <summary>
             Gets/sets a value indicating whether to enable $count in conventional routing.

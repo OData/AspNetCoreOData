@@ -1353,6 +1353,8 @@ Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableQualifiedOperationCal
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableUnqualifiedOperationCall.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.ODataRouteOptions() -> void
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.Order.get -> int?
+Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.Order.set -> void
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.IsConventional.get -> bool
 Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata.IsConventional.set -> void

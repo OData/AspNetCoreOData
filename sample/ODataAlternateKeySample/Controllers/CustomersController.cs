@@ -54,6 +54,7 @@ namespace ODataAlternateKeySample.Controllers
         [HttpGet("odata/Customers(CoreSN={ssn})")] // use core alternate key
         public IActionResult GetCustomerBySSN(string ssn)
         {
+            ssn = ssn.Replace("%", "%25");
             var c = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssn);
             if (c == null)
             {

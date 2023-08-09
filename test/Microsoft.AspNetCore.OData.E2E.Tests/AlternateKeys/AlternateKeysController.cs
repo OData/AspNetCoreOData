@@ -38,7 +38,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AlternateKeys
         }
 
         // alternate key: SSN
-        [HttpGet("Customers(SSN={ssn})", Order = 2)]
+        // why set Order = -2 (any number less than 0)? it is because 'Get' method has 'catch-all' template, we should move this template ahead
+        // Small order goes first.
+        // We can also leave order value unset, same as 'Get' method and 'PatchCustomerBySSN' method without setting the order value.
+        // Without setting the order value makes all routes with same order value and catch-all goes latter
+        [HttpGet("Customers(SSN={ssn})", Order = -2)]
         public IActionResult GetCustomerBySSN(string ssn)
         {
             // for special test

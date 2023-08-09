@@ -215,6 +215,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                     // OData convention route template doesn't get combined with the route template applied to the controller.
                     // Route templates applied to an action that begin with / or ~/ don't get combined with route templates applied to the controller.
                     Template = $"/{templateStr}",
+                    Order = options?.Order,
                     Name = templateStr // do we need this?
                 };
 

@@ -34,6 +34,11 @@ namespace Microsoft.AspNetCore.OData.Routing
         }
 
         /// <summary>
+        /// Gets or sets the route order in conventional routing.
+        /// </summary>
+        public int? Order { get; set; }
+
+        /// <summary>
         /// Gets/sets a value indicating whether to enable $count in conventional routing.
         /// </summary>
         public bool EnableDollarCountRouting { get; set; } = true;
