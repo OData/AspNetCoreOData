@@ -325,6 +325,34 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
         }
 
         [Fact]
+        public async Task QuerySinglePeople_WithDeclaredOrUndeclaredEnum_OnUntypedAndDynamicProperty()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync("odata/people/22");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People/$entity\"," +
+                "\"Id\":22," +
+                "\"Name\":\"Yin\"," +
+                "\"EnumDynamic1@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelColor\"," +
+                "\"EnumDynamic1\":\"Blue\"," +
+                "\"EnumDynamic2\":\"Apple\"," +
+                "\"Data@odata.type\":\"#String\"," +
+                "\"Data\":\"Apple\"," +
+                "\"Infos\":[\"Blue\",\"Green\",\"Apple\"]" +
+              "}", payloadBody);
+        }
+
+        [Fact]
         public async Task QuerySinglePeople_WithCollectionInCollection_OnDeclaredUntypedProperty()
         {
             // Arrange
