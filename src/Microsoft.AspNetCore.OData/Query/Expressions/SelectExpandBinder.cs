@@ -83,7 +83,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
             Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
 
-
             // expression looks like -> source => new Wrapper { Instance = source .... }
             LambdaExpression projectionLambdaExpression = Expression.Lambda(projectionExpression, source);
 
