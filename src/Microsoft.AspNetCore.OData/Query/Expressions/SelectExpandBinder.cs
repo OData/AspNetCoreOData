@@ -9,11 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -31,8 +29,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
     {
-        private string queryProvider;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SelectExpandBinder" /> class.
         /// Select and Expand binder depends on <see cref="IFilterBinder"/> and <see cref="IOrderByBinder"/> to process inner $filter and $orderby.
@@ -84,8 +80,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IEdmNavigationSource navigationSource = context.NavigationSource;
             ParameterExpression source = context.CurrentParameter;
 
-            queryProvider = context.QueryProvider;
-
             // expression looks like -> new Wrapper { Instance = source , Properties = "...", Container = new PropertyContainer { ... } }
             Expression projectionExpression = ProjectElement(context, source, selectExpandClause, structuredType, navigationSource);
 
@@ -106,6 +100,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Type elementType;
             bool isCollection = TypeHelper.IsCollection(source.Type, out elementType);
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
+            subContext.QueryProvider = context.QueryProvider;
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
             {
                 subContext.AddComputedProperties(computeClause.ComputedItems);
@@ -380,7 +375,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 // as observed here: https://github.com/OData/AspNetCoreOData/issues/497
 
                 Expression updatedExpression = null;
-                if (IsEfQueryProvider())
+                if (IsEfQueryProvider(context))
                 {
                     updatedExpression = SelectExpandBinder.RemoveNonStructucalProperties(source, structuredType);
                 }
@@ -479,13 +474,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return updatedSource;     
         }
 
-        private bool IsEfQueryProvider()
+        private bool IsEfQueryProvider(QueryBinderContext context)
         {
-            if (queryProvider != null &&
-                queryProvider == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace ||
-                queryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5 ||
-                queryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6 ||
-                queryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)
+            if (context.QueryProvider != null &&
+                context.QueryProvider == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5 ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6 ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)
             {
                 return true;
             }

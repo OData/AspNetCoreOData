@@ -100,6 +100,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
+            this.QueryProvider = context.QueryProvider;
+
             if (ElementType == null)
             {
                 throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
