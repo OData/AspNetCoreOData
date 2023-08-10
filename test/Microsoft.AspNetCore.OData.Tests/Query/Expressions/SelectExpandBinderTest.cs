@@ -13,7 +13,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -207,6 +206,44 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             object customer = partialOrder.Container.ToDictionary(PropertyMapper)["Customer"];
             SelectExpandWrapper<QueryCustomer> innerInnerCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(customer);
             Assert.Same(_queryable.First(), innerInnerCustomer.Instance);
+        }
+
+        [Theory]
+        [InlineData(HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6)]
+        public void Bind_UsingEFQueryProvider_GeneratedExpression__DoesNot_ContainExpandedObject(string queryProvider)
+        {
+            // Arrange
+            SelectExpandQueryOption selectExpand = new SelectExpandQueryOption("Orders", "Orders,Orders($expand=Customer)", _context);
+
+            // Act
+            SelectExpandBinder binder = new SelectExpandBinder();
+            _queryBinderContext.QueryProvider = queryProvider;
+            IQueryable queryable = binder.ApplyBind(_queryable, selectExpand.SelectExpandClause, _queryBinderContext);
+
+            // Assert
+            IEnumerator enumerator = queryable.GetEnumerator();
+            Assert.True(enumerator.MoveNext());
+            var partialCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.Null(partialCustomer.Instance);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCustomer", partialCustomer.InstanceType);
+            IEnumerable<SelectExpandWrapper<QueryOrder>> innerOrders = partialCustomer.Container
+                .ToDictionary(PropertyMapper)["Orders"] as IEnumerable<SelectExpandWrapper<QueryOrder>>;
+            Assert.NotNull(innerOrders);
+            SelectExpandWrapper<QueryOrder> partialOrder = innerOrders.Single();
+            
+            // We only write structural properties to the instance.
+            // This means that navigation properties on the instance property will be null
+            // when using any instance of EF query provider. 
+            Assert.Null(partialOrder.Instance.Customer);
+
+            object customer = partialOrder.Container.ToDictionary(PropertyMapper)["Customer"];
+            SelectExpandWrapper<QueryCustomer> innerInnerCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(customer);
+
+            Assert.Null(innerInnerCustomer.Instance.Orders);
         }
 
         [Fact]

@@ -368,9 +368,23 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             bool isSelectedAll = IsSelectAll(selectExpandClause);
             if (isSelectedAll)
             {
+                // If we have an EF query provider, then we remove the non-structural properties. The reason for this is to avoid 
+                // Creating an expression that will generate duplicate LEFT joins when a LEFT join already exists in the IQueryable 
+                // as observed here: https://github.com/OData/AspNetCoreOData/issues/497
+
+                Expression updatedExpression = null;
+                if (IsEfQueryProvider(context))
+                {
+                    updatedExpression = SelectExpandBinder.RemoveNonStructucalProperties(source, structuredType);
+                }
+                else 
+                {
+                    updatedExpression = source;
+                }
+
                 // Initialize property 'Instance' on the wrapper class
                 wrapperProperty = wrapperType.GetProperty("Instance");
-                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, source));
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, updatedExpression));
 
                 wrapperProperty = wrapperType.GetProperty("UseInstanceForProperties");
                 wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Constant(true)));
@@ -425,6 +439,51 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Type wrapperGenericType = GetWrapperGenericType(isInstancePropertySet, isTypeNamePropertySet, isContainerPropertySet);
             wrapperType = wrapperGenericType.MakeGenericType(elementType);
             return Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments);
+        }
+
+        // Generates the expression
+        //      { Instance = new Customer() {Id = $it.Id, Name= $it.Name}}
+        private static Expression RemoveNonStructucalProperties(Expression source, IEdmStructuredType structuredType)
+        {
+            Expression updatedSource = null;
+
+            Type elementType = source.Type;
+            IEnumerable<IEdmStructuralProperty> structuralProperties = structuredType.StructuralProperties();
+
+            PropertyInfo[] props = elementType.GetProperties();
+            List<MemberBinding> bindings = new List<MemberBinding>();
+
+            foreach (PropertyInfo prop in props)
+            {
+                foreach (var sp in structuralProperties)
+                {
+                    if (sp.Name == prop.Name)
+                    {
+                        MemberExpression propertyExpression = Expression.Property(source, prop);
+                        bindings.Add(Expression.Bind(prop, propertyExpression));
+                        break;
+                    }
+                }
+            }
+
+            NewExpression newExpression = Expression.New(source.Type);
+            updatedSource = Expression.MemberInit(newExpression, bindings);
+
+            return updatedSource;     
+        }
+
+        private bool IsEfQueryProvider(QueryBinderContext context)
+        {
+            if (context.QueryProvider != null &&
+                context.QueryProvider == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5 ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6 ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static bool ParseComputedDynamicProperties(QueryBinderContext context, IList<DynamicPathSegment> dynamicPathSegments, bool isSelectedAll,
