@@ -3,7 +3,7 @@
   <PropertyGroup>
     <VersionMajor Condition="'$(VersionMajor)' == ''">8</VersionMajor>
     <VersionMinor Condition="'$(VersionMinor)' == ''">2</VersionMinor>
-    <VersionBuild Condition="'$(VersionBuild)' == ''">0</VersionBuild>
+    <VersionBuild Condition="'$(VersionBuild)' == ''">1</VersionBuild>
     <VersionRelease Condition="'$(VersionRelease)' == ''"></VersionRelease>
   </PropertyGroup>
   
@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <!--
-    Revision number is a date code. Note that this only work for 6 years before the year part (year minus 2020)
-    overflows the UInt16. The system convert below will throw errors when this happens.
+    The revision number is a date code. Note that this only work for 6 years before the year part (year minus 2020)
+    overflows the UInt16. The system conversion below will throw errors when this happens.
   -->
   <PropertyGroup>
     <VersionStartYear Condition="'$(VersionStartYear)' == ''">2020</VersionStartYear>
