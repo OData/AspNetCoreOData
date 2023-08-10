@@ -1414,8 +1414,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     {
                         Name = structuralProperty.Name,
 
-                        // TBD: Shall we write the un-declared enum value as full-name string?
+                        // Shall we write the un-declared enum value as full-name string?
                         // So, "Data":"Apple"  => should be ""Data":"Namespace.EnumTypeName.Apple" ?
+                        // We keep it simple to write it as string (enum member name), not the full-name string.
                         Value = propertyValue.ToString()
                     };
                 }
