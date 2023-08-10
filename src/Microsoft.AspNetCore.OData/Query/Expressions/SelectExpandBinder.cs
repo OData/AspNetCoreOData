@@ -99,7 +99,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Type elementType;
             bool isCollection = TypeHelper.IsCollection(source.Type, out elementType);
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
-            subContext.QueryProvider = context.QueryProvider;
+            
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
             {
                 subContext.AddComputedProperties(computeClause.ComputedItems);
