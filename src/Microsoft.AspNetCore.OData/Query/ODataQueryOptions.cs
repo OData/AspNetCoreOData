@@ -420,7 +420,8 @@ namespace Microsoft.AspNetCore.OData.Query
             if (querySettings.EnsureStableOrdering &&
                 (IsAvailableODataQueryOption(Skip, querySettings, AllowedQueryOptions.Skip) ||
                  IsAvailableODataQueryOption(Top, querySettings, AllowedQueryOptions.Top) ||
-                 querySettings.PageSize.HasValue))
+                 querySettings.PageSize.HasValue ||
+                 querySettings.ModelBoundPageSize.HasValue))
             {
                 // If there is no OrderBy present, we manufacture a default.
                 // If an OrderBy is already present, we add any missing
