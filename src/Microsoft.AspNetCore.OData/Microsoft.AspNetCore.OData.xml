@@ -13961,7 +13961,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.Order">
             <summary>
             Gets or sets the route order in conventional routing.
-            By default, move the conventional routing later as much as possible.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.ODataRouteOptions.EnableDollarCountRouting">
