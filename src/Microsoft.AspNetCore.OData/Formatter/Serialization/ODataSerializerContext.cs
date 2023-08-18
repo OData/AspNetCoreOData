@@ -362,13 +362,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     if (edmType == null)
                     {
-                        if (instance is ITypedDelta delta)
+                        if (instance != null)
                         {
-                            edmType = Model.GetEdmTypeReference(delta.ExpectedClrType);
-                        }
-                        else
-                        {
-                            edmType = Model.GetEdmTypeReference(instance.GetType());
+                            if (instance is ITypedDelta delta)
+                            {
+                                edmType = Model.GetEdmTypeReference(delta.ExpectedClrType);
+                            }
+                            else
+                            {
+                                edmType = Model.GetEdmTypeReference(instance.GetType());
+                            }
                         }
 
                         if (edmType == null && !isUntyped)
