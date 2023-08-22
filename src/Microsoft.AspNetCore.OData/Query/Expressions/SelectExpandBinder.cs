@@ -375,7 +375,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 Expression updatedExpression = null;
                 if (IsEfQueryProvider(context))
                 {
-                    updatedExpression = SelectExpandBinder.RemoveNonStructucalProperties(source, structuredType);
+                    updatedExpression = SelectExpandBinder.RemoveNonStructucalProperties(context, source, structuredType);
                 }
                 else 
                 {
@@ -443,8 +443,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // Generates the expression
         //      { Instance = new Customer() {Id = $it.Id, Name= $it.Name}}
-        private static Expression RemoveNonStructucalProperties(Expression source, IEdmStructuredType structuredType)
+        private static Expression RemoveNonStructucalProperties(QueryBinderContext context, Expression source, IEdmStructuredType structuredType)
         {
+            IEdmModel model = context.Model;
             Expression updatedSource = null;
 
             Type elementType = source.Type;
@@ -457,7 +458,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 foreach (var sp in structuralProperties)
                 {
-                    if (sp.Name == prop.Name)
+                    if (model.GetClrPropertyName(sp) == prop.Name)
                     {
                         MemberExpression propertyExpression = Expression.Property(source, prop);
                         bindings.Add(Expression.Bind(prop, propertyExpression));
