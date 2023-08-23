@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
@@ -295,6 +296,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             SelectExpandWrapper<QueryCustomer> innerInnerCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(customer);
 
             Assert.Null(innerInnerCustomer.Instance.Orders);
+            Assert.Equal(2, innerInnerCustomer.Instance.TestReadonlyProperty.Count);
+            Assert.Equal("Test1", innerInnerCustomer.Instance.TestReadonlyProperty[0]);
+            Assert.Equal("Test2", innerInnerCustomer.Instance.TestReadonlyProperty[1]);
+            Assert.Equal(2, innerInnerCustomer.Instance.TestReadOnlyWithAttribute);
         }
 
         [Theory]
@@ -2227,6 +2232,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         public QueryOrder PrivateOrder { get; set; }
 
         public IList<QueryOrder> Orders { get; set; }
+
+        public List<string> TestReadonlyProperty
+        {
+            get { return new List<string>() { "Test1", "Test2" }; }
+        }
+
+        [ReadOnly(true)]
+        public int TestReadOnlyWithAttribute
+        {
+            get
+            {
+                return 2;
+            }
+        }
+
+        [ReadOnly(true)]
+        public int TestReadOnlyWithAttributeAndSetter
+        {
+            get; set;
+        }
 
         public IDictionary<string, object> CustomerProperties { get; set; }
     }

@@ -458,7 +458,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 foreach (var sp in structuralProperties)
                 {
-                    if (model.GetClrPropertyName(sp) == prop.Name)
+                    if (prop.CanWrite && model.GetClrPropertyName(sp) == prop.Name)
                     {
                         MemberExpression propertyExpression = Expression.Property(source, prop);
                         bindings.Add(Expression.Bind(prop, propertyExpression));
