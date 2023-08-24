@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
 using ODataRoutingSample.Models;
 using ODataRoutingSample.OpenApi;
+using static ODataRoutingSample.Controllers.v1.CustomersController;
 
 namespace ODataRoutingSample
 {
@@ -75,7 +77,7 @@ namespace ODataRoutingSample
                 */
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                     .AddRouteComponents(model0)
-                    .AddRouteComponents("v1", model1)
+                    .AddRouteComponents("v1", model1, services => services.AddSingleton<ODataResourceSetSerializer, CustomResourceSetSerializer>())
                     .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
                     .AddRouteComponents("v3", model3)
                     .Conventions.Add(new MyConvention())

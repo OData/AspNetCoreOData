@@ -6,14 +6,21 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData;
+using Microsoft.OData.Edm;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v1
@@ -44,7 +51,27 @@ namespace ODataRoutingSample.Controllers.v1
         [EnableQuery]
         public IActionResult Get()
         {
+            Request.Headers.Add("Prefer", "odata.include-annotations=*");
             return Ok(GetCustomers());
+        }
+
+        public sealed class CustomResourceSetSerializer : ODataResourceSetSerializer
+        {
+            public CustomResourceSetSerializer(IODataSerializerProvider serializerProvider)
+                : base(serializerProvider)
+            {
+            }
+
+            public override ODataResourceSet CreateResourceSet(IEnumerable resourceSetInstance, IEdmCollectionTypeReference resourceSetType, ODataSerializerContext writeContext)
+            {
+                var resourceSet = base.CreateResourceSet(resourceSetInstance, resourceSetType, writeContext);
+                if (resourceSetType.Definition.FullTypeName() == "Collection(ODataRoutingSample.Models.Customer)")
+                {
+                    resourceSet.InstanceAnnotations.Add(new ODataInstanceAnnotation("microsoft.graph.tips", new ODataPrimitiveValue("gdebruin")));
+                }
+
+                return resourceSet;
+            }
         }
 
         [HttpGet]
