@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -55,6 +56,136 @@ namespace ODataRoutingSample.Controllers.v1
             return Ok(GetCustomers());
         }
 
+        public sealed class CustoResourceSerialer : ODataResourceSerializer
+        {
+            public CustoResourceSerialer(IODataSerializerProvider serializerProvider) : base(serializerProvider)
+            {
+            }
+
+            public override ODataResource CreateResource(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
+            {
+                var resourceSet = base.CreateResource(selectExpandNode, resourceContext);
+                if (resourceContext.StructuredType.FullTypeName() == "ODataRoutingSample.Models.Customer")
+                {
+                    resourceSet.InstanceAnnotations.Add(new ODataInstanceAnnotation("microsoft.graph.tips", new ODataPrimitiveValue("gdebruin2")));
+                }
+                else if (resourceContext.StructuredType.FullTypeName() == "ODataRoutingSample.Models.Address")
+                {
+                    /*resourceSet.InstanceAnnotations.Add();
+                    resourceSet.InstanceAnnotations.Add();*/
+                    resourceSet.InstanceAnnotations = new FakeCollection();
+                }
+
+                return resourceSet;
+            }
+
+            private sealed class FakeCollection : ICollection<ODataInstanceAnnotation>
+            {
+                private bool isBefore = true;
+
+                private readonly ICollection<ODataInstanceAnnotation> before = new ODataInstanceAnnotation[]
+                {
+                    new ODataInstanceAnnotation("microsoft.graph.foo", new ODataPrimitiveValue("gdebruin3")),
+                };
+
+                private readonly ICollection<ODataInstanceAnnotation> after = new ODataInstanceAnnotation[]
+                {
+                    new ODataInstanceAnnotation("microsoft.graph.tips", new ODataPrimitiveValue("gdebruin4")),
+                    new ODataInstanceAnnotation("microsoft.graph.foo", new ODataPrimitiveValue("gdebruin5")),
+                };
+
+                public int Count => this.isBefore ? this.before.Count : this.after.Count;
+
+                public bool IsReadOnly => this.isBefore ? this.before.IsReadOnly : this.after.IsReadOnly;
+
+                public void Add(ODataInstanceAnnotation item)
+                {
+                    if (this.isBefore)
+                    {
+                        this.before.Add(item);
+                    }
+                    else
+                    {
+                        this.after.Add(item);
+                    }
+                }
+
+                public void Clear()
+                {
+                    if (this.isBefore)
+                    {
+                        this.before.Clear();
+                    }
+                    else
+                    {
+                        this.after.Clear();
+                    }
+                }
+
+                public bool Contains(ODataInstanceAnnotation item)
+                {
+                    if (this.isBefore)
+                    {
+                        return this.before.Contains(item);
+                    }
+                    else
+                    {
+                        return this.after.Contains(item);
+                    }
+                }
+
+                public void CopyTo(ODataInstanceAnnotation[] array, int arrayIndex)
+                {
+                    if (this.isBefore)
+                    {
+                        this.before.CopyTo(array, arrayIndex);
+                    }
+                    else
+                    {
+                        this.after.CopyTo(array, arrayIndex);
+                    }
+                }
+
+                public IEnumerator<ODataInstanceAnnotation> GetEnumerator()
+                {
+                    if (this.isBefore)
+                    {
+                        this.isBefore = false;
+                        return this.before.GetEnumerator();
+                    }
+                    else
+                    {
+                        return this.after.GetEnumerator();
+                    }
+                }
+
+                public bool Remove(ODataInstanceAnnotation item)
+                {
+                    if (this.isBefore)
+                    {
+                        return this.before.Remove(item);
+                    }
+                    else
+                    {
+                        return this.after.Remove(item);
+                    }
+                }
+
+                IEnumerator IEnumerable.GetEnumerator()
+                {
+                    if (this.isBefore)
+                    {
+                        this.isBefore = false;
+                        return this.before.GetEnumerator();
+                    }
+                    else
+                    {
+                        return this.after.GetEnumerator();
+                    }
+                }
+            }
+        }
+
         public sealed class CustomResourceSetSerializer : ODataResourceSetSerializer
         {
             public CustomResourceSetSerializer(IODataSerializerProvider serializerProvider)
@@ -68,6 +199,10 @@ namespace ODataRoutingSample.Controllers.v1
                 if (resourceSetType.Definition.FullTypeName() == "Collection(ODataRoutingSample.Models.Customer)")
                 {
                     resourceSet.InstanceAnnotations.Add(new ODataInstanceAnnotation("microsoft.graph.tips", new ODataPrimitiveValue("gdebruin")));
+                }
+                else if (resourceSetType.Definition.FullTypeName() == "ODataRoutingSample.Models.Customer")
+                {
+                    resourceSet.InstanceAnnotations.Add(new ODataInstanceAnnotation("microsoft.graph.foo", new ODataPrimitiveValue("gdebruin2")));
                 }
 
                 return resourceSet;

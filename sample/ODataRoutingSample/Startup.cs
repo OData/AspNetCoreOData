@@ -77,7 +77,9 @@ namespace ODataRoutingSample
                 */
                 .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                     .AddRouteComponents(model0)
-                    .AddRouteComponents("v1", model1, services => services.AddSingleton<ODataResourceSetSerializer, CustomResourceSetSerializer>())
+                    .AddRouteComponents("v1", model1, services => services
+                        .AddSingleton<ODataResourceSetSerializer, CustomResourceSetSerializer>()
+                        .AddSingleton<ODataResourceSerializer, CustoResourceSerialer>())
                     .AddRouteComponents("v2{data}", model2, services => services.AddSingleton<ODataBatchHandler, DefaultODataBatchHandler>())
                     .AddRouteComponents("v3", model3)
                     .Conventions.Add(new MyConvention())
