@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                         DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
                         TimeZoneInfo timeZone = timeZoneInfo ?? TimeZoneInfo.Local;
                         dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
-                        return dateTimeOffsetValue.DateTime;
+                        return dateTimeOffsetValue.UtcDateTime;
                     }
 
                     if (value is Date)
