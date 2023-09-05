@@ -400,6 +400,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.User", usr.Instance.GetType().ToString());
             IEnumerable<SelectExpandWrapper<DataFile>> fileRefsNavigations = usr.Container
                 .ToDictionary(PropertyMapper)["FileRefNavigation"] as IEnumerable<SelectExpandWrapper<DataFile>>;
+            
             Assert.Null(fileRefsNavigations);
         }
 
