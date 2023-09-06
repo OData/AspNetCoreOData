@@ -9624,11 +9624,6 @@
             Basically for $compute in $select and $expand
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QueryProvider">
-            <summary>
-            Gets or sets the query provider.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetParameter(System.String)">
             <summary>
             Gets the parameter using parameter name.
