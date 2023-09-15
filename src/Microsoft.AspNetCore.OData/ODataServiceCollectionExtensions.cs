@@ -5,10 +5,13 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -105,5 +108,108 @@ namespace Microsoft.AspNetCore.OData
 
             return services;
         }
+
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Adds the core minimal OData services required for OData requests.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddMinimalOData(this IServiceCollection services)
+        {
+            return services.AddMinimalOData(options => { });
+        }
+
+        /// <summary>
+        /// Adds the core minimal OData services required for OData requests.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="setupAction">The OData options to configure the services with,
+        /// including access to a service provider which you can resolve services from.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddMinimalOData(this IServiceCollection services, Action<ODataOptions> setupAction)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            if (setupAction == null)
+            {
+                throw Error.ArgumentNull(nameof(setupAction));
+            }
+
+            services.AddMinimalODataCore();
+            services.Configure(setupAction);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the core minimal OData services required for OData requests.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <param name="setupAction">The OData options to configure the services with,
+        /// including access to a service provider which you can resolve services from.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        public static IServiceCollection AddMinimalOData(this IServiceCollection services, Action<ODataOptions, IServiceProvider> setupAction)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            if (setupAction == null)
+            {
+                throw Error.ArgumentNull(nameof(setupAction));
+            }
+
+            services.AddMinimalODataCore();
+            services.AddOptions<ODataOptions>().Configure(setupAction);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds the minimal core OData services required for OData requests.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+        private static IServiceCollection AddMinimalODataCore(this IServiceCollection services)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            //
+            // Options
+            //
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IConfigureOptions<ODataOptions>, ODataOptionsSetup>());
+
+            services.TryAddEnumerable(
+                ServiceDescriptor.Transient<IConfigureOptions<JsonOptions>, ODataJsonOptionsSetup>());
+
+            //
+            // Parser & Resolver & Provider
+            //
+            services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>());
+
+            services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+
+            //
+            // Routing
+            //
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataMinimalMatcherPolicy>());
+
+            services.TryAddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
+
+            services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
+
+            return services;
+        }
+#endif
     }
 }

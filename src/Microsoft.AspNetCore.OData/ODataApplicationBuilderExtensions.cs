@@ -5,10 +5,18 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.AspNetCore.OData.Routing.Parser;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.OData
 {
@@ -81,6 +89,71 @@ namespace Microsoft.AspNetCore.OData
             }
 
             return app.UseMiddleware<ODataRouteDebugMiddleware>(routePattern);
+        }
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="app">TODO</param>
+        /// <returns>TODO</returns>
+        public static IApplicationBuilder UseMinimalOData(this IApplicationBuilder app)
+        {
+            if (app == null)
+            {
+                throw Error.ArgumentNull(nameof(app));
+            }
+
+            return app.UseMiddleware<ODataMinimalApiMiddleware>();
+        }
+    }
+
+    internal class ODataMinimalApiMiddleware
+    {
+        private readonly RequestDelegate _next;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ODataMinimalApiMiddleware"/> class.
+        /// </summary>
+        /// <param name="next">The next middleware.</param>
+        public ODataMinimalApiMiddleware(RequestDelegate next)
+        {
+            _next = next ?? throw new ArgumentNullException(nameof(next)); ;
+        }
+
+        /// <summary>
+        /// Invoke the OData minimal middleware.
+        /// </summary>
+        /// <param name="context">The http context.</param>
+        /// <returns>A task that can be awaited.</returns>
+        public async Task Invoke(HttpContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            var dataSource = context.RequestServices.GetRequiredService<EndpointDataSource>();
+            var odataOptions = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
+            var odataPathTemplateParser = context.RequestServices.GetRequiredService<IODataPathTemplateParser>();
+
+            var routePrefixes = odataOptions.RouteComponents.Keys;
+
+            foreach (RouteEndpoint endpoint in dataSource.Endpoints)
+            {
+                // TODO: Does endpoint.RoutePattern contain the route prefix when MapGroup (.NET 7) is used?
+                var routeTemplate = endpoint.RoutePattern.RawText;
+                var routePrefix = ODataRoutingHelpers.FindRoutePrefix(routeTemplate, routePrefixes, out string sanitizedRouteTemplate);
+
+                var model = odataOptions.RouteComponents[routePrefix].EdmModel;
+                var serviceProvider = odataOptions.RouteComponents[routePrefix].ServiceProvider;
+
+                var odataPathTemplate = odataPathTemplateParser.Parse(model, sanitizedRouteTemplate, serviceProvider);
+
+                // endpoint.Metadata.Add(new ODataRoutingMetadata(routePrefix, model, odataPathTemplate));
+                endpoint.Metadata.Append(new ODataRoutingMetadata(routePrefix, model, odataPathTemplate));
+            }
+
+            await _next(context).ConfigureAwait(false);
         }
     }
 }
