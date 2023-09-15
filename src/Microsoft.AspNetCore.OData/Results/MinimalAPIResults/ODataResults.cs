@@ -1,7 +1,6 @@
 ﻿#if NET7_0_OR_GREATER
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Formatter.Serialization;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.OData.Extensions;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -30,20 +29,17 @@ namespace Microsoft.AspNetCore.OData.Results.MinimalAPIResults
 
         public async Task ExecuteAsync(HttpContext httpContext)
         {
-            var serializer = httpContext.RequestServices.GetRequiredService<ODataMinimalSerializer>();
+            object res = Result;
 
-            object? result = null;
-
-            if (Result is ODataResult res)
+            if (Result is ODataResult odataResult)
             {
-                result = res.Result;
+                res = odataResult.Result;
             }
             else
-            {
-                result = Result;
+            { 
             }
 
-            await serializer.WriteAsync(httpContext, result);
+            await httpContext.WriteODataPayloadAsync(res, res.GetType());
         }
     }
 }

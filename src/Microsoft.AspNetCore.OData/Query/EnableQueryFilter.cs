@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             var result = await next(context);
 
-            var res = OnEndPointExecuted(context, result);
+            var res = OnEndpointExecuted(context, result);
 
             return new ODataResult(res);
         }
@@ -218,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         /// <param name="context">The context related to this action, including the response message,
         /// request message and HttpConfiguration etc.</param>
-        private object? OnEndPointExecuted(EndpointFilterInvocationContext context, object? result)
+        private object? OnEndpointExecuted(EndpointFilterInvocationContext context, object? result)
         {
             if (context == null)
             {
