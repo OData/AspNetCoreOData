@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData.ModelBuilder;
 using MinimalApisTestProj.EndPoints;
 using MinimalApisTestProj.Models;
@@ -20,12 +18,9 @@ builder.Services.AddMinimalOData(options =>
 
 var app = builder.Build();
 
-app.MapGet("api/v1.0/customers", CustomerEndPoints.GetAllCustomers)
+app.MapGroup("api/v1.0")
     .WithODataRoutingMetadata(app.Services)
-    .AddEndpointFilter<EnableQueryFilter>();
-
-app.MapPost("api/v1.0/customers", CustomerEndPoints.PostCustomer)
-    .WithODataRoutingMetadata(app.Services);
+    .MapCustomerEndpoints();
 
 
 

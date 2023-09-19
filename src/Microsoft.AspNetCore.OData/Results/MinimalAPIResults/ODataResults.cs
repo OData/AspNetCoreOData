@@ -9,9 +9,34 @@ namespace Microsoft.AspNetCore.OData.Results.MinimalAPIResults
 {
     public static class ODataResults
     {
-        public static ODataResult ODResult<T>(this IResultExtensions resultExtensions, IQueryable<T> result)
+        public static ODataResult ODataQuery<T>(this IResultExtensions resultExtensions, IQueryable<T> result)
         {
             return new ODataResult(result);
+        }
+
+        public static ODataResult ODataQuery<T>(this IResultExtensions resultExtensions, T result)
+        {
+            return new ODataResult(result);
+        }
+
+        public static ODataResult ODataEntity<T>(this IResultExtensions resultExtensions, T result)
+        {
+            return new ODataResult(result);
+        }
+
+        public static ODataResult ODataEntity(this IResultExtensions resultExtensions, object result)
+        {
+            return new ODataResult(result);
+        }
+
+        public static ODataResult OData(this IResultExtensions resultExtensions, object result, HttpStatusCode statusCode)
+        {
+            return new ODataResult(result, statusCode);
+        }
+
+        public static ODataResult OData<T>(this IResultExtensions resultExtensions, T result, HttpStatusCode statusCode)
+        {
+            return new ODataResult(result, statusCode);
         }
     }
 
