@@ -261,7 +261,7 @@ namespace Microsoft.AspNetCore.OData.Query
             if (orderByNodes != null)
             {
                 directionMap =
-                    orderByNodes.OfType<OrderByPropertyNode>().ToDictionary(node => node.Property.Name, node => node.Direction);
+                    orderByNodes.OfType<OrderByPropertyNode>().ToDictionary(node => context.Model.GetClrPropertyName(node.Property), node => node.Direction);
             }
             else
             {

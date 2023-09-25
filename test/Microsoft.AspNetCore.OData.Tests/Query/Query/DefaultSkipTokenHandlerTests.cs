@@ -21,6 +21,8 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query
 {
+    using Microsoft.AspNetCore.Http;
+    using System.Reflection;
     using System.Runtime.Serialization;
 
     public class DefaultSkipTokenHandlerTests
@@ -315,6 +317,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 "SkipCustomerId-2");
         }
 
+        [Fact]
+        public void ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_ToQueryable()
+        {
+            ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_ToQueryable_Implementation(
+                _model,
+                "Name",
+                "Name-'Alex',Id-3");
+        }
+
+        [Fact]
+        public void ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_WithLowerCamelCase_ToQueryable()
+        {
+            ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_ToQueryable_Implementation(
+                _modelLowerCamelCased,
+                "name",
+                "name-'Alex',Id-3");
+        }
+
+        [Fact]
+        public void ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_WithAlias_ToQueryable()
+        {
+            ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_ToQueryable_Implementation(
+                _modelAliased,
+                "FirstAndLastName",
+                "FirstAndLastName-'Alex',SkipCustomerId-3");
+        }
+
         private ODataSerializerContext GetSerializerContext(IEdmModel model, bool enableSkipToken = false)
         {
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Customers");
@@ -594,6 +623,53 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 skipTokenCustomer.Id);
             Assert.Equal(
                 "Alex",
+                skipTokenCustomer.Name);
+        }
+
+        private static void ApplyToOfTDefaultSkipTokenHandler_Applies_WithOrderByDesc_ToQueryable_Implementation(
+            IEdmModel edmModel,
+            string orderByPropertyName,
+            string skipTokenQueryOptionRawValue)
+        {
+            // Arrange
+            ODataQuerySettings settings = new ODataQuerySettings {HandleNullPropagation = HandleNullPropagationOption.False};
+            ODataQueryContext context = new ODataQueryContext(
+                edmModel,
+                typeof(SkipCustomer));
+
+            HttpRequest request = RequestFactory.Create(
+                HttpMethods.Get,
+                $"http://server/service/Customers/?$orderby={orderByPropertyName} desc&$skiptoken={skipTokenQueryOptionRawValue}");
+
+            // Act
+            ODataQueryOptions oDataQueryOptions = new ODataQueryOptions(context, request);
+
+            SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
+                skipTokenQueryOptionRawValue,
+                context);
+            DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+            IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+                {
+                    new SkipCustomer {Id = 2, Name = "Aaron"},
+                    new SkipCustomer {Id = 1, Name = "Andy"},
+                    new SkipCustomer {Id = 3, Name = "Alex"}
+                }.AsQueryable();
+
+            // Act
+            SkipCustomer[] results = handler.ApplyTo(
+                    customers,
+                    skipTokenQuery,
+                    settings,
+                    oDataQueryOptions)
+                .ToArray();
+
+            // Assert
+            SkipCustomer skipTokenCustomer = Assert.Single(results);
+            Assert.Equal(
+                2,
+                skipTokenCustomer.Id);
+            Assert.Equal(
+                "Aaron",
                 skipTokenCustomer.Name);
         }
 
