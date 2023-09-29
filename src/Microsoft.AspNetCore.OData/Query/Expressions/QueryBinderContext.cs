@@ -100,8 +100,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
-            QueryProvider = context.QueryProvider;
-
             if (ElementType == null)
             {
                 throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
@@ -169,11 +167,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Basically for $compute in $select and $expand
         /// </summary>
         public Expression Source { get;set; }
-
-        /// <summary>
-        /// Gets or sets the query provider.
-        /// </summary>
-        internal string QueryProvider { get; set; }
 
         /// <summary>
         /// Gets the parameter using parameter name.
