@@ -676,6 +676,38 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.Equal(expectedExpression, queryExpression);
         }
 
+        [Theory]
+        [InlineData(null, 1)]
+        [InlineData(1, null)]
+        public void ApplyToODataQueryOptions_Builds_Default_OrderBy_With_Paging(int? pageSize, int? modelBoundPageSize)
+        {
+            // Arrange
+            IEdmModel model = GetEdmModel(c => c.CustomerId);
+            HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers");
+
+            var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Customer)), request);
+            ODataQuerySettings querySettings = new ODataQuerySettings
+            {
+                PageSize = pageSize,
+                ModelBoundPageSize = modelBoundPageSize
+            };
+
+            Customer[] customers = new[] {
+                new Customer() { CustomerId = 4 },
+                new Customer() { CustomerId = 3 },
+                new Customer() { CustomerId = 1 },
+                new Customer() { CustomerId = 2 }
+            };
+
+            // Act
+            IQueryable query = options.ApplyTo(customers.AsQueryable(), querySettings);
+            Customer[] results = (query as IQueryable<Customer>).ToArray();
+
+            // Assert
+            Assert.Equal(querySettings.PageSize ?? querySettings.ModelBoundPageSize, results.Length);
+            Assert.Equal(customers.OrderBy(c => c.CustomerId).First().CustomerId, results[0].CustomerId);
+        }
+
         [Fact]
         public void Validate_ThrowsValidationErrors_ForOrderBy()
         {
