@@ -97,6 +97,14 @@ namespace ODataRoutingSample.Controllers.v1
                         new Address { City = "Redmond", Street = "256 AVE NE" },
                         new Address { City = "Redd", Street = "56 AVE NE" },
                     },
+                    PassKeyProfiles = new List<PassKeyProfile>
+                    {
+                        new PassKeyProfile
+                        {
+                            Id = 7,
+                            Value = "btaess",
+                        },
+                    },
                 },
                 new Customer
                 {

@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Linq;
+
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
@@ -59,8 +61,20 @@ namespace ODataRoutingSample.Models
             builder.EntitySet<Organization>("Organizations");
             builder.EntitySet<Department>("Departments");
             builder.EntitySet<Company>("Companies");
-            builder.EntitySet<Customer>("Customers");
+            var customers = builder.EntitySet<Customer>("Customers");
+            
+            /*builder.NavigationSources
+
+            customers.HasManyBinding(customer => customer.PassKeyProfiles, */
+
+                
+
             builder.Singleton<Customer>("Me");
+            var testpolicy = builder.Singleton<TestPolicy>("policy");
+            ////testpolicy.EntityType.NavigationProperties.First(property => string.Equals(property.Name, "AuthMethodConfigurations", System.StringComparison.OrdinalIgnoreCase)
+
+            System.Diagnostics.Debugger.Launch();
+            var navigationSources = builder.NavigationSources.ToList();
 
             var function = builder.Function("RateByOrder");
             function.Parameter<int>("order");

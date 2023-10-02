@@ -5,10 +5,25 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.OData.ModelBuilder;
 using System.Collections.Generic;
 
 namespace ODataRoutingSample.Models
 {
+    public class TestPolicy
+    {
+        [Contained]
+        public virtual IList<TestAuthMethodConfiguration> AuthMethodConfigurations { get; set; } = new List<TestAuthMethodConfiguration>();
+    }
+
+    public class TestAuthMethodConfiguration
+    {
+        public string Id { get; set; }
+
+        [Contained]
+        public virtual IList<PassKeyProfile> PassKeyProfiles { get; set; } //// /policies/authmethodconfigurations/{id1}/passkeyprofiles/{id2}
+    }
+
     public class Customer
     {
         public int Id { get; set; }
@@ -22,6 +37,15 @@ namespace ODataRoutingSample.Models
         public virtual Address HomeAddress { get; set; }
 
         public virtual IList<Address> FavoriteAddresses { get; set; }
+
+        public virtual IList<PassKeyProfile> PassKeyProfiles { get; set; } = new List<PassKeyProfile>();
+    }
+
+    public class PassKeyProfile
+    {
+        public int Id { get; set; }
+
+        public string Value { get; set; }
     }
 
     public class VipCustomer : Customer
