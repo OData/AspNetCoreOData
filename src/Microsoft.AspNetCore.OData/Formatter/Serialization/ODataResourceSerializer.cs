@@ -143,7 +143,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 {
                     await writer.WriteStartAsync(resource).ConfigureAwait(false);
                     await WriteDeltaComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    await WriteDeltaNavigationPropertiesAsync(selectExpandNode, resourceContext, writer);
+                    await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
+                    await WriteDeltaNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                     await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
