@@ -321,9 +321,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             serializer.Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(0), It.IsAny<ResourceContext>())).Verifiable();
             serializer.Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(1), It.IsAny<ResourceContext>())).Verifiable();
+            ODataSerializerContext writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
+            writeContext.MetadataLevel = ODataMetadataLevel.Full;
 
             // Act
-            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, writeContext);
 
             // Assert
             serializer.Verify();
@@ -359,9 +361,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Mock<ODataWriter> writer = new Mock<ODataWriter>();
             writer.Setup(w => w.WriteStartAsync(navigationLinks[0])).Verifiable();
             writer.Setup(w => w.WriteStartAsync(navigationLinks[1])).Verifiable();
+            ODataSerializerContext writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
+            writeContext.MetadataLevel = ODataMetadataLevel.Full;
+
 
             // Act
-            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
+            await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, writeContext);
 
             // Assert
             writer.Verify();
