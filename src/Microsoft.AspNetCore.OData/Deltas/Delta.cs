@@ -106,5 +106,10 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// Gets the nested resources changed at this level.
         /// </summary>
         public abstract IDictionary<string, object> GetDeltaNestedNavigationProperties();
+
+        public bool TryGetPropertyValue(string name, Microsoft.OData.Edm.IEdmTypeReference typeRef, out object value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

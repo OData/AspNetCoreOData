@@ -22,5 +22,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// otherwise, null. The parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if the instance contains the property with the given name; otherwise, <c>false</c>.</returns>
         bool TryGetPropertyValue(string propertyName, out object value);
+
+        /// <summary>
+        /// Gets the value of the property with the given name and edm type.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="edmType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value);
     }
 }

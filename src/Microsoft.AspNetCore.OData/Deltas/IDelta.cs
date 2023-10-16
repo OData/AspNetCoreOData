@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.OData.Edm;
 using System;
 using System.Collections.Generic;
 
@@ -47,6 +48,14 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <param name="value">The value of the Property</param>
         /// <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
         bool TryGetPropertyValue(string name, out object value);
+
+        /// <summary>
+        /// Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+        /// </summary>
+        /// <param name="name">The name of the Property</param>
+        /// <param name="value">The value of the Property</param>
+        /// <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        bool TryGetPropertyValue(string name, IEdmTypeReference typeRef, out object value);
 
         /// <summary>
         /// Attempts to get the <see cref="Type"/> of the Property called <paramref name="name"/> from the underlying Entity.

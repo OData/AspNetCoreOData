@@ -119,5 +119,28 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 
             return helper.GetValue;
         }
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+        {
+            if (Instance == null)
+            {
+                value = null;
+                return false;
+            }
+
+            Contract.Assert(_type != null);
+
+            Func<object, object> getter = GetOrCreatePropertyGetter(_type, propertyName, _edmType, Model);
+            if (getter == null)
+            {
+                value = null;
+                return false;
+            }
+            else
+            {
+                value = getter(Instance);
+                return true;
+            }
+        }
     }
 }

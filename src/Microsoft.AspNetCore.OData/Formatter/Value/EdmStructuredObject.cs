@@ -293,5 +293,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
 
             throw Error.InvalidOperation(SRResources.UnsupportedEdmType, edmType.ToTraceString(), edmType.TypeKind());
         }
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
