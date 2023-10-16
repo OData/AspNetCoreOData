@@ -20,8 +20,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// </summary>
     internal abstract class TypedEdmStructuredObject : IEdmStructuredObject
     {
-        private static readonly ConcurrentDictionary<(string, Type), Func<object, object>> _propertyGetterCache =
-            new ConcurrentDictionary<(string, Type), Func<object, object>>();
+        private static readonly ConcurrentDictionary<Tuple<string, Type>, Func<object, object>> _propertyGetterCache =
+            new ConcurrentDictionary<Tuple<string, Type>, Func<object, object>>();
 
         private IEdmStructuredTypeReference _edmType;
         private Type _type;
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             IEdmStructuredTypeReference edmType,
             IEdmModel model)
         {
-            (string, Type) key = (propertyName, type);
+            Tuple<string, Type> key = Tuple.Create(propertyName, type);
             Func<object, object> getter;
 
             if (!_propertyGetterCache.TryGetValue(key, out getter))
