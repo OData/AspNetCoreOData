@@ -42,12 +42,12 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// <param name="serializerContext">The backing <see cref="ODataSerializerContext"/>.</param>
         /// <param name="structuredType">The EDM structured type of this instance context.</param>
         /// <param name="resourceInstance">The object representing the instance of this context.</param>
-        public ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, object resourceInstance)
-            : this(serializerContext, structuredType, AsEdmResourceObject(serializerContext, resourceInstance, structuredType))
+        public ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, object resourceInstance, IEdmTypeReference edmType = null)
+            : this(serializerContext, structuredType, AsEdmResourceObject(serializerContext, resourceInstance, structuredType), edmType)
         {
         }
 
-        private ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, IEdmStructuredObject edmObject)
+        private ResourceContext(ODataSerializerContext serializerContext, IEdmStructuredTypeReference structuredType, IEdmStructuredObject edmObject, IEdmTypeReference edmType)
         {
             if (serializerContext == null)
             {
@@ -57,6 +57,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             SerializerContext = serializerContext;
             StructuredType = structuredType.StructuredDefinition();
             EdmObject = edmObject;
+            EdmReferenceType = edmType;
         }
 
         /// <summary>
@@ -91,6 +92,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// Gets or sets the <see cref="IEdmStructuredObject"/> backing this instance.
         /// </summary>
         public IEdmStructuredObject EdmObject { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IEdmTypeReference"/> backing this instance.
+        /// </summary>
+        public IEdmTypeReference EdmReferenceType { get; set; }
 
         /// <summary>
         /// Gets or sets the value of this resource instance.
@@ -160,26 +166,26 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 throw Error.InvalidOperation(SRResources.EdmObjectNull, typeof(ResourceContext).Name);
             }
 
-            if (SerializerContext.IsDeltaOfT && ResourceInstance is IDelta delta && delta.TryGetPropertyValue(propertyName, out object value))
+            if (SerializerContext.IsDeltaOfT && ResourceInstance is IDelta delta && delta.TryGetPropertyValue(propertyName, EdmReferenceType, out object value))
             {
                 return value;
             }
 
-            if (EdmObject.TryGetPropertyValue(propertyName, out value))
+            if (EdmObject.TryGetPropertyValue(propertyName, EdmReferenceType, out value))
             {
                 return value;
             }
             else
             {
-                IEdmTypeReference edmType = EdmObject.GetEdmType();
-                if (edmType == null)
+                //IEdmTypeReference edmType = EdmObject.GetEdmType();
+                if (EdmReferenceType == null)
                 {
                     // Provide general guidance in the message. typeof(IEdmTypeReference).Name would be too specific.
                     throw Error.InvalidOperation(SRResources.EdmTypeCannotBeNull, EdmObject.GetType().FullName,
                         typeof(IEdmObject).Name);
                 }
 
-                throw Error.InvalidOperation(SRResources.PropertyNotFound, edmType.ToTraceString(), propertyName);
+                throw Error.InvalidOperation(SRResources.PropertyNotFound, EdmReferenceType.ToTraceString(), propertyName);
             }
         }
 
@@ -212,7 +218,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             foreach (IEdmStructuralProperty property in StructuredType.StructuralProperties())
             {
                 object value;
-                if (EdmObject.TryGetPropertyValue(property.Name, out value) && value != null)
+                if (EdmObject.TryGetPropertyValue(property.Name, property.Type, out value) && value != null)
                 {
                     if (value is SelectExpandWrapper)
                     {

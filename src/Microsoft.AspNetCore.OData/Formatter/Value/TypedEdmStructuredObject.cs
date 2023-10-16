@@ -20,8 +20,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// </summary>
     internal abstract class TypedEdmStructuredObject : IEdmStructuredObject
     {
-        private static readonly ConcurrentDictionary<Tuple<string, Type>, Func<object, object>> _propertyGetterCache =
-            new ConcurrentDictionary<Tuple<string, Type>, Func<object, object>>();
+        private static readonly ConcurrentDictionary<(string, Type), Func<object, object>> _propertyGetterCache =
+            new ConcurrentDictionary<(string, Type), Func<object, object>>();
 
         private IEdmStructuredTypeReference _edmType;
         private Type _type;
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             IEdmStructuredTypeReference edmType,
             IEdmModel model)
         {
-            Tuple<string, Type> key = Tuple.Create(propertyName, type);
+            (string, Type) key = (propertyName, type);
             Func<object, object> getter;
 
             if (!_propertyGetterCache.TryGetValue(key, out getter))
@@ -118,6 +118,29 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             var helper = new PropertyHelper(property);
 
             return helper.GetValue;
+        }
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+        {
+            if (Instance == null)
+            {
+                value = null;
+                return false;
+            }
+
+            Contract.Assert(_type != null);
+
+            Func<object, object> getter = GetOrCreatePropertyGetter(_type, propertyName, _edmType, Model);
+            if (getter == null)
+            {
+                value = null;
+                return false;
+            }
+            else
+            {
+                value = getter(Instance);
+                return true;
+            }
         }
     }
 }

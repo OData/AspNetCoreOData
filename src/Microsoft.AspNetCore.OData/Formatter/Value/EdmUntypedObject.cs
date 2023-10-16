@@ -24,5 +24,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         /// <inheritdoc/>
         public bool TryGetPropertyValue(string propertyName, out object value)
             => TryGetValue(propertyName, out value);
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

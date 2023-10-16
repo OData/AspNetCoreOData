@@ -161,5 +161,41 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         }
 
         protected abstract Type GetElementType();
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmTypeReference, out object value)
+        {
+            // look into the container first to see if it has that property. container would have it 
+            // if the property was expanded.
+            if (Container != null)
+            {
+                _containerDict = _containerDict ?? Container.ToDictionary(DefaultPropertyMapper, includeAutoSelected: true);
+                if (_containerDict.TryGetValue(propertyName, out value))
+                {
+                    return true;
+                }
+            }
+
+            // fall back to the instance.
+            if (UseInstanceForProperties && UntypedInstance != null)
+            {
+                IEdmModel model = Model;
+
+                if (edmTypeReference is IEdmComplexTypeReference)
+                {
+                    _typedEdmStructuredObject = _typedEdmStructuredObject ??
+                        new TypedEdmComplexObject(UntypedInstance, edmTypeReference as IEdmComplexTypeReference, model);
+                }
+                else
+                {
+                    _typedEdmStructuredObject = _typedEdmStructuredObject ??
+                        new TypedEdmEntityObject(UntypedInstance, edmTypeReference as IEdmEntityTypeReference, model);
+                }
+
+                return _typedEdmStructuredObject.TryGetPropertyValue(propertyName, edmTypeReference, out value);
+            }
+
+            value = null;
+            return false;
+        }
     }
 }

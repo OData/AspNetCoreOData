@@ -126,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             Contract.Assert(writeContext != null);
 
-            IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
+            IEdmStructuredTypeReference structuredType = GetResourceType(graph);
             ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
             EdmDeltaResourceObject deltaResource = graph as EdmDeltaResourceObject;
             if (deltaResource != null && deltaResource.NavigationSource != null)
@@ -439,8 +439,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return;
             }
 
-            IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
-            ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
+            IEdmStructuredTypeReference structuredType = GetResourceType(graph, expectedType);
+            ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph, expectedType);
 
             SelectExpandNode selectExpandNode = CreateSelectExpandNode(resourceContext);
             if (selectExpandNode != null)
@@ -1822,12 +1822,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private IEdmStructuredTypeReference GetResourceType(object graph, ODataSerializerContext writeContext)
+        private IEdmStructuredTypeReference GetResourceType(object graph, IEdmTypeReference edmType = null)
         {
             Contract.Assert(graph != null);
 
-            IEdmTypeReference edmType = writeContext.GetEdmType(graph, graph.GetType(), true);
-            Contract.Assert(edmType != null);
+            //Contract.Assert(edmType != null);
 
             if (edmType.IsUntyped())
             {

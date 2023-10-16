@@ -87,6 +87,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         {
             return Model.GetEdmTypeReference(typeof(T));
         }
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     internal class ComputeWrapperConverter<T> : JsonConverter<ComputeWrapper<T>>

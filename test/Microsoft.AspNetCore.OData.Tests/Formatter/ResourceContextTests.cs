@@ -362,6 +362,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                 value = null;
                 return false;
             }
+
+            public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

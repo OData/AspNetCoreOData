@@ -36,5 +36,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
         {
             return _edmType;
         }
+
+        public bool TryGetPropertyValue(string propertyName, IEdmTypeReference edmType, out object value)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

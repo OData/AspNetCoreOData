@@ -1794,6 +1794,14 @@
             <param name="value">The value of the Property</param>
             <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyValue(System.String,Microsoft.OData.Edm.IEdmTypeReference,System.Object@)">
+            <summary>
+            Attempts to get the value of the Property called <paramref name="name"/> from the underlying Entity.
+            </summary>
+            <param name="name">The name of the Property</param>
+            <param name="value">The value of the Property</param>
+            <returns>Returns <c>true</c> if the Property was found and <c>false</c> if not.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.IDelta.TryGetPropertyType(System.String,System.Type@)">
             <summary>
             Attempts to get the <see cref="T:System.Type"/> of the Property called <paramref name="name"/> from the underlying Entity.
@@ -4187,7 +4195,7 @@
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext"/> class.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext,Microsoft.OData.Edm.IEdmStructuredTypeReference,System.Object)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ResourceContext.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext,Microsoft.OData.Edm.IEdmStructuredTypeReference,System.Object,Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext"/> class.
             </summary>
@@ -4218,6 +4226,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.EdmObject">
             <summary>
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject"/> backing this instance.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.EdmReferenceType">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> backing this instance.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.ResourceInstance">
@@ -5938,6 +5951,15 @@
             <param name="value">When this method returns, contains the value of the property with the given name, if the property is found;
             otherwise, null. The parameter is passed uninitialized.</param>
             <returns><c>true</c> if the instance contains the property with the given name; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject.TryGetPropertyValue(System.String,Microsoft.OData.Edm.IEdmTypeReference,System.Object@)">
+            <summary>
+            Gets the value of the property with the given name and edm type.
+            </summary>
+            <param name="propertyName"></param>
+            <param name="edmType"></param>
+            <param name="value"></param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmUntypedObject">
             <summary>
