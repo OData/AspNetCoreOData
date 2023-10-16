@@ -10,8 +10,8 @@ namespace ODataPerformanceProfile
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Product>("Products");
-          //  builder.EntitySet<Supplier>("Suppliers");
-          //  builder.EntitySet<Order>("Orders");
+            builder.EntitySet<Supplier>("Suppliers");
+            builder.EntitySet<Order>("Orders");
 
             return builder.GetEdmModel();
         }
