@@ -463,7 +463,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                         await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
-                        await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                        if (writeContext.MetadataLevel == ODataMetadataLevel.Full)
+                        {
+                            await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                        }
+                        
                         await WriteExpandedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await WriteReferencedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
                         await writer.WriteEndAsync().ConfigureAwait(false);
