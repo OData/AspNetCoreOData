@@ -25,7 +25,6 @@ using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.Nav
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
-using System.Xml.Linq;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -799,8 +798,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEnumerable<ODataNestedResourceInfo> navigationLinks = CreateNavigationLinks(selectExpandNode.SelectedNavigationProperties, resourceContext);
             foreach (ODataNestedResourceInfo navigationLink in navigationLinks)
             {
-                await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
-                await writer.WriteEndAsync().ConfigureAwait(false);
+                if (resourceContext.WriteNavigationLinks)
+                {
+                    await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
+                    await writer.WriteEndAsync().ConfigureAwait(false);
+
+                }
             }
         }
 
@@ -1214,6 +1217,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     if (navigationUrl != null)
                     {
                         navigationLink.Url = navigationUrl;
+                        resourceContext.WriteNavigationLinks = true;
+                    }
+                    else if (writeContext.MetadataLevel == ODataMetadataLevel.Full)
+                    {
+                        resourceContext.WriteNavigationLinks = true;
+                    }
+                    else
+                    {
+                        resourceContext.WriteNavigationLinks = false;
                     }
                 }
             }
