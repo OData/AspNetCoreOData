@@ -4220,6 +4220,11 @@
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject"/> backing this instance.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.WriteNavigationLinks">
+            <summary>
+             Get or sets whether navigation links should be written.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.ResourceInstance">
             <summary>
             Gets or sets the value of this resource instance.

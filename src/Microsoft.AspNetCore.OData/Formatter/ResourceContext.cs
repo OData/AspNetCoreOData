@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Formatter
@@ -52,6 +53,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
             if (serializerContext == null)
             {
                 throw Error.ArgumentNull(nameof(serializerContext));
+            }
+
+            if (serializerContext.MetadataLevel == ODataMetadataLevel.Full)
+            {
+                this.WriteNavigationLinks = true;
             }
 
             SerializerContext = serializerContext;
@@ -91,6 +97,11 @@ namespace Microsoft.AspNetCore.OData.Formatter
         /// Gets or sets the <see cref="IEdmStructuredObject"/> backing this instance.
         /// </summary>
         public IEdmStructuredObject EdmObject { get; set; }
+
+        /// <summary>
+        ///  Get or sets whether navigation links should be written.
+        /// </summary>
+        internal bool WriteNavigationLinks { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the value of this resource instance.
