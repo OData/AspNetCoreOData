@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData.Common;
@@ -255,6 +256,20 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (statusCodeResult?.StatusCode == null || IsSuccessStatusCode(statusCodeResult.StatusCode.Value))
                 {
                     ObjectResult responseContent = actionExecutedContext.Result as ObjectResult;
+
+                    ControllerActionDescriptor controllerActionDescriptor = actionDescriptor as ControllerActionDescriptor;
+                    Type returnType = controllerActionDescriptor.MethodInfo.ReturnType;
+
+                    if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
+                    {
+                        returnType = returnType.GetGenericArguments().First();
+
+                        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+                        {
+                            responseContent.DeclaredType = returnType;
+                        }
+                    }
+
                     if (responseContent != null)
                     {
                         // Get collection from SingleResult.
