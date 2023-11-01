@@ -107,11 +107,6 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
         /// <param name="segment">the segment to Translate</param>
         public override void Handle(OperationImportSegment segment)
         {
-            if (segment == null)
-            {
-                throw Error.ArgumentNull(nameof(segment));
-            }
-
             if (segment.OperationImports.First().IsActionImport())
             {
                 _segmentTemplates.Add(new ActionImportSegmentTemplate(segment));

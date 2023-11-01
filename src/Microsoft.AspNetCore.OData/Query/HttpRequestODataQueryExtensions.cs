@@ -24,7 +24,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
-    /// 
+    /// Extensions for ETag.
     /// </summary>
     public static class HttpRequestODataQueryExtensions
     {
@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Query
         {
             if (request == null)
             {
-                throw Error.ArgumentNull("request");
+                throw Error.ArgumentNull(nameof(request));
             }
 
             if (entityTagHeaderValue != null)

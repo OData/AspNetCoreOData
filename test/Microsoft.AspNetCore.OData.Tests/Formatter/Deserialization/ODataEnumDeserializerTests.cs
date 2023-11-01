@@ -10,9 +10,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
@@ -22,7 +25,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         private static IEdmModel _edmModel = GetEdmModel();
 
         [Fact]
-        public async Task ReadFromStreamAsync()
+        public async Task ReadAsync_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            var deserializer = new ODataEnumDeserializer();
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader: null, type: null, readContext: null), "messageReader");
+
+            // Arrange & Act & Assert
+            ODataMessageReader messageReader = ODataFormatterHelpers.GetMockODataMessageReader();
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader, type: null, readContext: null), "type");
+
+            // Arrange & Act & Assert
+            await ExceptionAssert.ThrowsArgumentNullAsync(
+                () => deserializer.ReadAsync(messageReader, typeof(Color), readContext: null), "readContext");
+        }
+
+        [Fact]
+        public async Task ReadAsync_Works_ForEnumValue()
         {
             // Arrange
             string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
@@ -46,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public async Task ReadFromStreamAsync_RawValue()
+        public async Task ReadAsync_Works_ForRawValue()
         {
             // Arrange
             string content = "{\"value\":\"Blue\"}";
@@ -69,7 +90,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public async Task ReadFromStreamAsync_ForUnType()
+        public async Task ReadAsync_Works_ForUnType()
         {
             // Arrange
             string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
@@ -94,7 +115,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public async Task ReadFromStreamAsync_ModelAlias()
+        public async Task ReadAsync_Works_ForModelAlias()
         {
             // Arrange
             string content = "{\"@odata.type\":\"#NS.level\",\"value\":\"veryhigh\"}";
@@ -119,6 +140,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Assert
             Level level = Assert.IsType<Level>(value);
             Assert.Equal(Level.High, level);
+        }
+
+        [Fact]
+        public void ReadInline_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange
+            ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+            Mock<IEdmTypeReference> edmType = new Mock<IEdmTypeReference>();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(new object(), edmType.Object, readContext: null), "readContext");
         }
 
         private static IEdmModel GetEdmModel()

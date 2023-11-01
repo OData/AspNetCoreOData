@@ -677,7 +677,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             Contract.Assert(resource != null);
             Contract.Assert(readContext != null);
 
-            IEdmCollectionTypeReference collectionType = readContext.Model.ResolveResouceSetType(resourceSetWrapper.ResourceSet);
+            IEdmCollectionTypeReference collectionType = readContext.Model.ResolveResourceSetType(resourceSetWrapper.ResourceSet);
 
             IEnumerable value = ReadNestedResourceSetInline(resourceSetWrapper, collectionType, readContext) as IEnumerable;
             object result = value;

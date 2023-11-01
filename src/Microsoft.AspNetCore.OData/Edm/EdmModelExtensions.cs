@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <param name="model">The Edm model.</param>
         /// <param name="resourceSet">The given resource set.</param>
         /// <returns></returns>
-        public static IEdmCollectionTypeReference ResolveResouceSetType(this IEdmModel model, ODataResourceSetBase resourceSet)
+        public static IEdmCollectionTypeReference ResolveResourceSetType(this IEdmModel model, ODataResourceSetBase resourceSet)
         {
             if (model == null)
             {

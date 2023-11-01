@@ -130,11 +130,11 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             if (model == null)
             {
-                throw Error.ArgumentNull("model");
+                throw Error.ArgumentNull(nameof(model));
             }
             if (operation == null)
             {
-                throw Error.ArgumentNull("operation");
+                throw Error.ArgumentNull(nameof(operation));
             }
 
             OperationLinkBuilder linkBuilder = model.GetAnnotationValue<OperationLinkBuilder>(operation);
@@ -189,15 +189,15 @@ namespace Microsoft.AspNetCore.OData.Edm
                     {
                         linkBuilder =
                             new OperationLinkBuilder(
-                                (ResourceSetContext reseourceSetContext) =>
-                                    reseourceSetContext.GenerateActionLink(operation), followsConventions: true);
+                                (ResourceSetContext resourceSetContext) =>
+                                    resourceSetContext.GenerateActionLink(operation), followsConventions: true);
                     }
                     else
                     {
                         linkBuilder =
                             new OperationLinkBuilder(
-                                (ResourceSetContext reseourceSetContext) =>
-                                    reseourceSetContext.GenerateFunctionLink(operation), followsConventions: true);
+                                (ResourceSetContext resourceSetContext) =>
+                                    resourceSetContext.GenerateFunctionLink(operation), followsConventions: true);
                     }
                 }
             }

@@ -6,16 +6,19 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
@@ -49,6 +52,198 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             HandleNullPropagation = HandleNullPropagationOption.True
         };
+
+        [Fact]
+        public void ApplyBind_OnIFilterBinder_WithEnumerable_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            IFilterBinder binder = null;
+            IEnumerable query = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<IFilterBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "query");
+
+            // Arrange & Act & Assert
+            query = new Mock<IEnumerable>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "filterClause");
+
+            // Arrange & Act & Assert
+            FilterClause filterClause = new FilterClause(new Mock<SingleValueNode>().Object, new Mock<RangeVariable>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, filterClause, null), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnIFilterBinder_WithQueryable_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            IFilterBinder binder = null;
+            IQueryable query = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<IFilterBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "query");
+
+            // Arrange & Act & Assert
+            query = new Mock<IQueryable>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "filterClause");
+
+            // Arrange & Act & Assert
+            FilterClause filterClause = new FilterClause(new Mock<SingleValueNode>().Object, new Mock<RangeVariable>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, filterClause, null), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnIFilterBinder_WithExpression_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            IFilterBinder binder = null;
+            Expression source = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<IFilterBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "source");
+
+            // Arrange & Act & Assert
+            source = new Mock<Expression>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "filterClause");
+
+            // Arrange & Act & Assert
+            FilterClause filterClause = new FilterClause(new Mock<SingleValueNode>().Object, new Mock<RangeVariable>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, filterClause, null), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnIOrderByBinder_WithQueryable_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            IOrderByBinder binder = null;
+            IQueryable query = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null, true), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<IOrderByBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null, true), "query");
+
+            // Arrange & Act & Assert
+            query = new Mock<IQueryable>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null, true), "orderByClause");
+
+            // Arrange & Act & Assert
+            OrderByClause orderByClause = new OrderByClause(null, new Mock<SingleValueNode>().Object, OrderByDirection.Descending, new Mock<RangeVariable>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, orderByClause, null, true), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnIOrderByBinder_WithExpression_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            IOrderByBinder binder = null;
+            Expression source = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null, true), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<IOrderByBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null, true), "source");
+
+            // Arrange & Act & Assert
+            source = new Mock<Expression>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null, true), "orderByClause");
+
+            // Arrange & Act & Assert
+            OrderByClause orderByClause = new OrderByClause(null, new Mock<SingleValueNode>().Object, OrderByDirection.Descending, new Mock<RangeVariable>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, orderByClause, null, true), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnISelectExpandBinder_WithQueryable_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            ISelectExpandBinder binder = null;
+            IQueryable source = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<ISelectExpandBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "source");
+
+            // Arrange & Act & Assert
+            source = new Mock<IQueryable>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "selectExpandClause");
+
+            // Arrange & Act & Assert
+            SelectExpandClause selectExpandClause = new SelectExpandClause(null, true);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, selectExpandClause, null), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnISelectExpandBinder_WithObject_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            ISelectExpandBinder binder = null;
+            object source = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<ISelectExpandBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "source");
+
+            // Arrange & Act & Assert
+            source = new object();
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "selectExpandClause");
+
+            // Arrange & Act & Assert
+            SelectExpandClause selectExpandClause = new SelectExpandClause(null, true);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, selectExpandClause, null), "context");
+        }
+
+        [Fact]
+        public void ApplyBind_OnISearchBinder_WithQueryable_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            ISearchBinder binder = null;
+            IQueryable query = null;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "binder");
+
+            // Arrange & Act & Assert
+            binder = new Mock<ISearchBinder>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "source");
+
+            // Arrange & Act & Assert
+            query = new Mock<IQueryable>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, null, null), "searchClause");
+
+            // Arrange & Act & Assert
+            SearchClause searchClause = new SearchClause(new Mock<SingleValueNode>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(query, searchClause, null), "context");
+        }
+
+        [Fact]
+        public void FilterBinder_ApplyBind_WorksForQueryable()
+        {
+            // Arrange
+            IQueryable<Product> products = new List<Product>().AsQueryable();
+            QueryBinderContext context = new QueryBinderContext(_model, _defaultSettings, typeof(Product));
+
+            // Act & Assert
+            Mock<IFilterBinder> binder = new Mock<IFilterBinder>();
+            FilterClause filterClause = new FilterClause(new Mock<SingleValueNode>().Object, new Mock<RangeVariable>().Object);
+            Expression body = Expression.Constant(true);;
+            ParameterExpression filterParameter = context.CurrentParameter;
+            LambdaExpression filterExpr = Expression.Lambda(body, filterParameter);
+
+            binder.Setup(b => b.BindFilter(filterClause, context)).Returns(filterExpr);
+
+            // Act
+            Expression result = binder.Object.ApplyBind(Expression.Constant(products), filterClause, context);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("System.Collections.Generic.List`1[Microsoft.AspNetCore.OData.Tests.Models.Product].Where($it => True)", result.ToString());
+        }
 
         [Fact]
         public void FilterBinder_ApplyBind_WorksForEnumerable()
@@ -147,8 +342,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Expression filterExpr = BindFilter<Product>(filter, _model, querySettings, assembliesResolver);
 
             // Assert
-            string acutalExpr = ExpressionStringBuilder.ToString(filterExpr);
-            Assert.Equal(expectedExpr, acutalExpr);
+            string actualExpr = ExpressionStringBuilder.ToString(filterExpr);
+            Assert.Equal(expectedExpr, actualExpr);
 
             // Act
             IEnumerable<Product> results = InvokeFilter(products, filterExpr);

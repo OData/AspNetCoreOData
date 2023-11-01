@@ -62,6 +62,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void AddToCollection_ThrowsSerializationException_IsEnumerableWithoutAddMethod()
+        {
+            // Arrange & Act & Assert
+            IList<int> source = new List<int>();
+            IEnumerable newCollection = Enumerable.Empty<int>();
+            Action test = () => source.AddToCollection(newCollection, typeof(int), typeof(CollectionDeserializationHelpersTest), "PropertyName", newCollection.GetType());
+            SerializationException exception = Assert.Throws<SerializationException>(() => test());
+            Assert.Contains("of the property 'PropertyName' on type 'Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.CollectionDeserializationHelpersTest' does not have an Add method. Consider using a collection type that does have an Add method - for example IList<T> or ICollection<T>.",
+                exception.Message);
+        }
+
+        [Fact]
         public void AddToCollection_ThrowsSerializationException_IsAnArray()
         {
             // Arrange

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Moq;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
@@ -28,6 +29,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
             // Arrange & Act & Assert
             IEdmEntityType entityType = new Mock<IEdmEntityType>().Object;
             ExceptionAssert.ThrowsArgumentNull(() => new EdmChangedObjectCollection(entityType, changedObjectList: null), "list");
+        }
+
+        [Fact]
+        public void Ctor_ConfigureProperties()
+        {
+            // Arrange & Act & Assert
+            IEdmEntityType entityType = new Mock<IEdmEntityType>().Object;
+            IList<IEdmChangedObject> objects = new List<IEdmChangedObject>();
+            EdmChangedObjectCollection collection = new EdmChangedObjectCollection(entityType, objects);
+            Assert.Empty(collection);
         }
 
         [Fact]

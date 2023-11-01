@@ -114,8 +114,8 @@ namespace Microsoft.AspNetCore.OData.Edm
                             IEdmTypeReference typeRef = property.Type.GetElementTypeOrSelf();
                             if (typeRef.IsComplex() && edmModel.CanExpand(typeRef.AsComplex().ComplexDefinition(), structuralProperty))
                             {
-                                IEdmStructuredType subStrucutredType = typeRef.AsStructured().StructuredDefinition();
-                                if (edmModel.HasAutoExpandProperty(subStrucutredType, structuralProperty, visited))
+                                IEdmStructuredType subStructuredType = typeRef.AsStructured().StructuredDefinition();
+                                if (edmModel.HasAutoExpandProperty(subStructuredType, structuralProperty, visited))
                                 {
                                     return true;
                                 }
@@ -265,7 +265,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
         private static bool CanExpand(this IEdmModel edmModel, IEdmStructuredType structuredType, IEdmProperty property)
         {
-            // first for back-compability, check the queryable restriction
+            // first for back-compatible, check the queryable restriction
             QueryableRestrictionsAnnotation annotation = EdmHelpers.GetPropertyRestrictions(property, edmModel);
             if (annotation != null && annotation.Restrictions.NotExpandable)
             {

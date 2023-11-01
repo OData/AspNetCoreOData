@@ -210,6 +210,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             ExceptionAssert.ThrowsArgumentNull(() => _mapper.GetClrType(model, null, true, resolver), "edmType");
         }
 
+        [Fact]
+        public void FindClrType_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            Mock<IEdmType> edmType = new Mock<IEdmType>();
+            edmType.Setup(x => x.TypeKind).Returns(EdmTypeKind.Entity);
+            ExceptionAssert.ThrowsArgumentNull(() => DefaultODataTypeMapper.FindClrType(null, edmType.Object, null), "edmModel");
+
+            IEdmModel model = new Mock<IEdmModel>().Object;
+            IAssemblyResolver resolver = new Mock<IAssemblyResolver>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => DefaultODataTypeMapper.FindClrType(model, null, resolver), "edmType");
+
+            ExceptionAssert.ThrowsArgumentNull(() => DefaultODataTypeMapper.FindClrType(model, edmType.Object, null), "assembliesResolver");
+        }
+
         [Theory]
         [InlineData(EdmPrimitiveTypeKind.String, typeof(string))]
         [InlineData(EdmPrimitiveTypeKind.Boolean, typeof(bool))]

@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Data;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -17,6 +18,58 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 {
     public class EdmHelpersTests
     {
+        [Fact]
+        public void ToStructuredTypeReference_ReturnsCorrectly()
+        {
+            // 1) null
+            IEdmTypeReference typeReference = null;
+            Assert.Null(typeReference.ToStructuredTypeReference());
+
+            // 2) Edm.ComplexType
+            typeReference = EdmCoreModel.Instance.GetComplexType(false);
+            Assert.Same(typeReference, typeReference.ToStructuredTypeReference());
+
+            // 3) Edm.Untyped
+            typeReference = EdmCoreModel.Instance.GetUntyped();
+            Assert.Same(EdmUntypedStructuredTypeReference.NullableTypeReference, typeReference.ToStructuredTypeReference());
+        }
+
+        [Fact]
+        public void IsStructuredOrUntypedStructuredCollection_ReturnsCorrectly()
+        {
+            // 1) null
+            IEdmTypeReference typeReference = null;
+            Assert.False(typeReference.IsStructuredOrUntypedStructuredCollection());
+
+            // 2) non-collection
+            typeReference = EdmCoreModel.Instance.GetInt32(false);
+            Assert.False(typeReference.IsStructuredOrUntypedStructuredCollection());
+
+            // 3) Collection(Edm.ComplexType)
+            typeReference = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetComplexType(false)));
+            Assert.True(typeReference.IsStructuredOrUntypedStructuredCollection());
+        }
+
+        [Fact]
+        public void IsStructuredOrUntypedStructured_ReturnsCorrectly()
+        {
+            // 1) null
+            IEdmTypeReference typeReference = null;
+            Assert.False(typeReference.IsStructuredOrUntypedStructured());
+
+            // 2) non-structured
+            typeReference = EdmCoreModel.Instance.GetInt32(false);
+            Assert.False(typeReference.IsStructuredOrUntypedStructured());
+
+            // 3) Edm.ComplexType
+            typeReference = EdmCoreModel.Instance.GetComplexType(false);
+            Assert.True(typeReference.IsStructuredOrUntypedStructured());
+
+            // 4) Edm.Untyped (structured)
+            typeReference = EdmUntypedStructuredTypeReference.NullableTypeReference;
+            Assert.True(typeReference.IsStructuredOrUntypedStructured());
+        }
+
         [Fact]
         public void IsUntypedOrCollectionUntyped_ReturnsCorrectly()
         {
@@ -87,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                 IEdmTypeDefinition typeDefinition = new EdmTypeDefinition("NS", "TypeDef", primitive);
                 IEdmCollectionType collection = new EdmCollectionType(new EdmEntityTypeReference(entity, isNullable: false));
                 IEdmCollectionType collectionNullable = new EdmCollectionType(new EdmEntityTypeReference(entity, isNullable: true));
-                IEdmEntityReferenceType entityReferenenceType = new EdmEntityReferenceType(entity);
+                IEdmEntityReferenceType entityReferenceType = new EdmEntityReferenceType(entity);
 
                 return new TheoryDataSet<IEdmType, bool, Type>
                 {
@@ -105,8 +158,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                     { path, false, typeof(IEdmPathTypeReference) },
                     { typeDefinition, true, typeof(IEdmTypeDefinitionReference) },
                     { typeDefinition, false, typeof(IEdmTypeDefinitionReference) },
-                    { entityReferenenceType, true, typeof(IEdmEntityReferenceTypeReference) },
-                    { entityReferenenceType, true, typeof(IEdmEntityReferenceTypeReference) },
+                    { entityReferenceType, true, typeof(IEdmEntityReferenceTypeReference) },
+                    { entityReferenceType, true, typeof(IEdmEntityReferenceTypeReference) },
                 };
             }
         }
@@ -144,11 +197,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
+        public void ToEdmTypeReference_ThrowsArgumentNull_ForNullInput()
+        {
+            // Arrange & Act
+            IEdmType edmType = null;
+            ExceptionAssert.ThrowsArgumentNull(() => edmType.ToEdmTypeReference(false), "edmType");
+        }
+
+        [Fact]
         public void ToCollection_ThrowsArgumentNull_EdmType()
         {
             // Arrange & Act
             IEdmType edmType = null;
             ExceptionAssert.ThrowsArgumentNull(() => edmType.ToCollection(false), "edmType");
+        }
+
+        [Fact]
+        public void GetModelBoundQuerySettingsOrNull_ThrowsArgumentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetModelBoundQuerySettingsOrNull(null, null), "edmModel");
+        }
+
+        [Fact]
+        public void GetModelBoundQuerySettings_ThrowsArgumentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetModelBoundQuerySettings(null, null), "edmModel");
         }
     }
 }

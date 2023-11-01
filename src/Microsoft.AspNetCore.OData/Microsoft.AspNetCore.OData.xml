@@ -2134,7 +2134,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsStructuredOrUntyped(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
-            Tests wheather a <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
+            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
             </summary>
             <param name="edmTypeReference">The test type reference.</param>
             <returns>True/false.</returns>
@@ -2162,7 +2162,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementType(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
-            Get the elementType if it's collection or return itself's type
+            Get the elementType if it's collection or return itself
             </summary>
             <param name="edmTypeReference">The test type reference.</param>
             <returns>Element type or itself.</returns>
@@ -2265,7 +2265,7 @@
             <param name="entityType">The Edm entity type.</param>
             <returns>Alternate Keys of this type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveResouceSetType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataResourceSetBase)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveResourceSetType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataResourceSetBase)">
             <summary>
             Resolve the type reference from the type name of <see cref="T:Microsoft.OData.ODataResourceSetBase"/>
             </summary>
@@ -8862,12 +8862,6 @@
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.#ctor(System.IServiceProvider)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase"/> class.
-            </summary>
-            <param name="requestContainer">The request container.</param>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Bind(Microsoft.OData.UriParser.QueryNode)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics
@@ -9557,6 +9551,12 @@
             All parameters present in current context.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
+            For unit-test only
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.#ctor(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Type)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext" /> class.
@@ -9868,7 +9868,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions">
             <summary>
-            
+            Extensions for ETag.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.Net.Http.Headers.EntityTagHeaderValue)">

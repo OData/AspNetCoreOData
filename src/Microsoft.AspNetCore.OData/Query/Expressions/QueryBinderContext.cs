@@ -41,6 +41,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryBinderContext" /> class.
+        /// For unit-test only
+        /// </summary>
+        internal QueryBinderContext()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="QueryBinderContext" /> class.
         /// </summary>
         /// <param name="model">The Edm model.</param>
         /// <param name="querySettings">The query setting.</param>
