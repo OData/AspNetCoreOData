@@ -714,7 +714,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void CreateResource_Calls_CreateComputedProperty_ForEachSelecteComputedProperty()
+        public void CreateComputedProperty_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNullOrEmpty(() => serializer.CreateComputedProperty(null, null), "propertyName");
+            ExceptionAssert.ThrowsArgumentNull(() => serializer.CreateComputedProperty("any", null), "resourceContext");
+        }
+
+        [Fact]
+        public void CreateResource_Calls_CreateComputedProperty_ForEachSelectComputedProperty()
         {
             // Arrange
             SelectExpandNode selectExpandNode = new SelectExpandNode();
@@ -798,7 +810,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
-        public void CreateResource_SetsETagToNull_IfModelDontHaveConcurrencyProperty()
+        public void CreateResource_SetsETagToNull_IfModelNotHaveConcurrencyProperty()
         {
             // Arrange
             IEdmEntitySet orderSet = _model.EntityContainer.FindEntitySet("Orders");

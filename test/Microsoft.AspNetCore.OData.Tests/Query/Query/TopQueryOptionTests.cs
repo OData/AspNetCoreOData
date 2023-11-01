@@ -25,6 +25,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void ConstructorNullContextThrows()
         {
             ExceptionAssert.Throws<ArgumentNullException>(() => new TopQueryOption("1", null));
+            ExceptionAssert.Throws<ArgumentNullException>(() => new TopQueryOption("1", null, queryOptionParser: null));
         }
 
         [Fact]
@@ -32,10 +33,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+            ODataQueryContext context = new ODataQueryContext(model, typeof(Customer));
 
             // Act & Assert
-            ExceptionAssert.Throws<ArgumentException>(() =>
-                new TopQueryOption(null, new ODataQueryContext(model, typeof(Customer))));
+            ExceptionAssert.Throws<ArgumentException>(() => new TopQueryOption(null, context));
+            ExceptionAssert.Throws<ArgumentException>(() => new TopQueryOption(null, context, queryOptionParser: null));
         }
 
         [Fact]
@@ -118,7 +120,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             var context = new ODataQueryContext(model, typeof(Customer));
             var top = new TopQueryOption(skipValue, context);
 
-            ExceptionAssert.Throws<ODataException>(() => top.Value);
+            ExceptionAssert.Throws<ODataException>(() => top.Value,
+                $"Invalid value '{skipValue}' for $top query option found. The $top query option requires a non-negative integer value.");
+        }
+
+        [Fact]
+        public void Value_ThrowsODataException_ForLargeValue()
+        {
+            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+            var context = new ODataQueryContext(model, typeof(Customer));
+            var top = new TopQueryOption("2147483648", context); // int.MaxValue + 1
+
+            ExceptionAssert.Throws<ODataException>(() => top.Value,
+                "The limit of '2147483647' for Top query has been exceeded. The value from the incoming request is '2147483648'.");
         }
 
         [Fact]
@@ -181,6 +195,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //    option.Validator = null;
         //    ExceptionAssert.DoesNotThrow(() => option.Validate(settings));
         //}
+
+        [Fact]
+        public void Validate_ThrowsArgumentNull_Settings()
+        {
+            // Arrange
+            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
+            ODataQueryContext context = new ODataQueryContext(model.Model, model.Customer);
+            TopQueryOption top = new TopQueryOption("42", context);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => top.Validate(null), "validationSettings");
+        }
+
+        [Fact]
+        public void ApplyTo_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange
+            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
+            ODataQueryContext context = new ODataQueryContext(model.Model, model.Customer);
+            TopQueryOption top = new TopQueryOption("42", context);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => top.ApplyTo(null, null), "query");
+
+            ExceptionAssert.ThrowsArgumentNull(() => top.ApplyTo(new Mock<IQueryable>().Object, null), "querySettings");
+        }
 
         [Fact]
         public void Property_Value_WorksWithUnTypedContext()

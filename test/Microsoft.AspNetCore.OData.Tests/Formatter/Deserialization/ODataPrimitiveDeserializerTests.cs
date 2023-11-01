@@ -150,9 +150,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
                 "primitiveProperty");
         }
 
+        [Fact]
+        public void ReadPrimitive_ThrowsArgumentNull_ReadContext()
+        {
+            var deserializer = new ODataPrimitiveDeserializer();
+            ODataProperty property = new ODataProperty();
+
+            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadPrimitive(property, null), "readContext");
+        }
+
+        [Fact]
+        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
+        {
+            var deserializer = new ODataPrimitiveDeserializer();
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(null, typeof(object), null), "messageReader");
+
+            ODataMessageReader messageReader = ODataFormatterHelpers.GetMockODataMessageReader();
+            await ExceptionAssert.ThrowsArgumentNullAsync(() => deserializer.ReadAsync(messageReader, typeof(object), null), "readContext");
+        }
+
         [Theory]
         [MemberData(nameof(EdmPrimitiveData))]
-        public async Task ReadAsync_PrimitiveWithTypeinContext(object obj, string edmType, string value)
+        public async Task ReadAsync_PrimitiveWithTypeInContext(object obj, string edmType, string value)
         {
             // Arrange
             IEdmModel model = CreateModel();

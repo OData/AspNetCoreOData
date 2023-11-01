@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 {
                     if (index < count - 1 || foundNavProp)
                     {
-                        throw new ODataException(Error.Format(SRResources.InvalidLastSegmentInSelectExpandPath, element.GetType().Name));
+                        throw new ODataException(Error.Format(SRResources.InvalidSegmentInSelectExpandPath, element.GetType().Name));
                     }
 
                     foundNavProp = true;

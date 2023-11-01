@@ -8,7 +8,9 @@
 using System;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Edm
@@ -180,6 +182,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             Assert.Same(linkBuilder2, actualLinkBuilder);
             Assert.Equal(new Uri("http://localhost2"), actualLinkBuilder.BuildLink((ResourceContext)null));
+        }
+
+        [Fact]
+        public void GetNavigationSourceLinkBuilder_ThrowsArgumentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetNavigationSourceLinkBuilder(null), "model");
+        }
+
+        [Fact]
+        public void SetNavigationSourceLinkBuilder_ThrowsArgumentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetNavigationSourceLinkBuilder(null, null), "model");
+        }
+
+        [Fact]
+        public void GetOperationLinkBuilder_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetOperationLinkBuilder(null), "model");
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetOperationLinkBuilder(null), "operation");
+        }
+
+        [Fact]
+        public void SetOperationLinkBuilder_ThrowsArgumentNull_Model()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.SetOperationLinkBuilder(null, null), "model");
         }
     }
 }

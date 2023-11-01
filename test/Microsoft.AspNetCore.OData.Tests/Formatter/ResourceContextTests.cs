@@ -38,6 +38,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
         }
 
         [Fact]
+        public void Ctor_ThrowsArgumentNull_SerializerContext()
+        {
+            // Arrange & Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => new ResourceContext(null, null, null), "serializerContext");
+        }
+
+        [Fact]
         public void Property_ResourceInstance_RoundTrips()
         {
             ReflectionAssert.Property(_context, (c) => c.ResourceInstance, null, allowNull: true, roundTripTestValue: _entityInstance);

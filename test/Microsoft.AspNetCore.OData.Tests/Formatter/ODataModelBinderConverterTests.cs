@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -25,6 +26,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 {
     public class ODataModelBinderConverterTests
     {
+        [Fact]
+        public void Convert_ForNullValues()
+        {
+            var result = ODataModelBinderConverter.Convert(null, null, null, "IsActive", null, null);
+            Assert.Null(result);
+
+            result = ODataModelBinderConverter.Convert(new ODataNullValue(), null, null, "IsActive", null, null);
+            Assert.Null(result);
+        }
+
         /// <summary>
         /// The set of potential values to test against
         /// <see cref="ODataModelBinderConverter.Convert(object, IEdmTypeReference, Type, string, OData.Formatter.Deserialization.ODataDeserializerContext, IServiceProvider)"/>.

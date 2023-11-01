@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics.Contracts;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 using Microsoft.OData;
@@ -55,20 +54,8 @@ namespace Microsoft.AspNetCore.OData.Routing.Parser
 
             ODataPath path = uriParser.ParsePath();
 
-            return Templatify(path, model);
-        }
-
-        private static ODataPathTemplate Templatify(ODataPath path, IEdmModel model)
-        {
-            if (path == null)
-            {
-                throw Error.ArgumentNull(nameof(path));
-            }
-
-            Contract.Assert(model != null);
-
+            // Templatify
             ODataPathSegmentToTemplateHandler handler = new ODataPathSegmentToTemplateHandler(model);
-
             path.WalkWith(handler);
 
             return new ODataPathTemplate(handler.Templates);

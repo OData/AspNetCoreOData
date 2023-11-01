@@ -219,7 +219,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull(nameof(resourceSetWrapper));
             }
 
-            IEdmCollectionTypeReference edmType = readContext.Model.ResolveResouceSetType(resourceSetWrapper.ResourceSet);
+            IEdmCollectionTypeReference edmType = readContext.Model.ResolveResourceSetType(resourceSetWrapper.ResourceSet);
 
             IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(edmType);
             if (deserializer == null)

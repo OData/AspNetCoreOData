@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Moq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query
@@ -52,6 +53,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             // Assert
             Assert.Equal("Get", request.Method, ignoreCase: true);
             Assert.Equal("?$filter=Id le 5", request.QueryString.Value);
+        }
+
+        [Fact]
+        public void TransformQueryRequestAsync_ThrowsArgumentNull_Request()
+        {
+            // Arrange
+            Mock<IODataQueryRequestParser> parser = new Mock<IODataQueryRequestParser>();
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => ODataQueryRequestMiddleware.TransformQueryRequestAsync(parser.Object, null).Wait(), "request");
         }
     }
 }

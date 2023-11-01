@@ -2758,8 +2758,6 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinde
 }
 
 public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
-	protected ExpressionBinderBase (System.IServiceProvider requestContainer)
-
 	System.Linq.Expressions.ParameterExpression Parameter  { protected abstract get; }
 
 	public abstract System.Linq.Expressions.Expression Bind (Microsoft.OData.UriParser.QueryNode node)

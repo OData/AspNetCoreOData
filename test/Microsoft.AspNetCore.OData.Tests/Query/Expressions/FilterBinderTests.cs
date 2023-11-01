@@ -32,6 +32,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         private static Dictionary<Type, IEdmModel> _modelCache = new Dictionary<Type, IEdmModel>();
 
+        [Fact]
+        public void BindFilter_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange & Act & Assert
+            FilterBinder binder = new FilterBinder();
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindFilter(null, null), "filterClause");
+
+            // Arrange & Act & Assert
+            FilterClause filterClause = new FilterClause(new Mock<SingleValueNode>().Object, new Mock<RangeVariable>().Object);
+            ExceptionAssert.ThrowsArgumentNull(() => binder.BindFilter(filterClause, null), "context");
+        }
+
         #region Logical Operators
         [Theory]
         [InlineData(null, true, true)]

@@ -75,6 +75,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => linkBuilder.BuildNavigationLink(null, null, ODataMetadataLevel.Full), "instanceContext");
+            ExceptionAssert.ThrowsArgumentNull(() => linkBuilder.BuildNavigationLink(null, null), "instanceContext");
         }
 
         [Fact]
@@ -85,6 +86,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
 
             // Act & Assert
             ExceptionAssert.ThrowsArgumentNull(() => linkBuilder.BuildNavigationLink(new ResourceContext(), null, ODataMetadataLevel.Full), "navigationProperty");
+            ExceptionAssert.ThrowsArgumentNull(() => linkBuilder.BuildNavigationLink(new ResourceContext(), null), "navigationProperty");
         }
 
         [Fact]

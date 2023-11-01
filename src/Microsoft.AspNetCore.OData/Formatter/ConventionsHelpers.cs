@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IEdmEntityType entityType = resourceContext.StructuredType as IEdmEntityType;
             if (entityType == null)
             {
-                return String.Empty;
+                return string.Empty;
             }
 
             IEnumerable<IEdmProperty> keys = entityType.Key();

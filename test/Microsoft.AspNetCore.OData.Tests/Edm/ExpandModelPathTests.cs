@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void Ctor_ExpandModelPath_Throws_EmtpyElement()
+        public void Ctor_ExpandModelPath_Throws_EmptyElement()
         {
             // Arrange
             IList<IEdmElement> elements = new List<IEdmElement>();
@@ -146,6 +146,41 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Assert
             ExceptionAssert.Throws<ODataException>(test,
                 "The last segment 'EdmComplexType' of the select or expand query option is not supported.");
+        }
+
+        [Fact]
+        public void Ctor_ExpandModelPath_Throws_OnlyMultipleNavigationElement()
+        {
+            // Arrange
+            IList<IEdmElement> elements = new List<IEdmElement>
+            {
+                _relatedNavProperty,
+                _relatedNavProperty
+            };
+
+            // Act
+            Action test = () => new ExpandModelPath(elements);
+
+            // Assert
+            ExceptionAssert.Throws<ODataException>(test,
+                "A segment 'EdmNavigationProperty' within the select or expand query option is not supported.");
+        }
+
+        [Fact]
+        public void Ctor_ExpandModelPath_Throws_ForNonSupportedElement()
+        {
+            // Arrange
+            IList<IEdmElement> elements = new List<IEdmElement>
+            {
+                new EdmEntityContainer("NS", "Default")
+            };
+
+            // Act
+            Action test = () => new ExpandModelPath(elements);
+
+            // Assert
+            ExceptionAssert.Throws<ODataException>(test,
+                "A segment 'EdmEntityContainer' within the select or expand query option is not supported.");
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         private static IEdmModel _model = GetEdmModel();
 
         [Fact]
-        public void ResolveAlternateKeyProperties_ThrowsArugmentNull()
+        public void ResolveAlternateKeyProperties_ThrowsArgumentNull()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -34,11 +34,36 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void ResolveProperty_ThrowsArugmentNull()
+        public void ResolveProperty_ThrowsArgumentNull()
         {
             // Arrange & Act & Assert
             IEdmStructuredType structuredType = null;
             ExceptionAssert.ThrowsArgumentNull(() => structuredType.ResolveProperty(null), "structuredType");
+        }
+
+        [Fact]
+        public void ResolveResourceSetType_ThrowsArgumentNull()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.ResolveResourceSetType(null), "model");
+
+            // Arrange & Act & Assert
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.ResolveResourceSetType(null), "resourceSet");
+        }
+
+
+        [Fact]
+        public void GetAllProperties_ThrowsArgumentNull()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetAllProperties(null), "model");
+
+            // Arrange & Act & Assert
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetAllProperties(null), "structuredType");
         }
 
         [Fact]

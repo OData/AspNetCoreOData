@@ -6,8 +6,10 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
 using Xunit;
@@ -134,6 +136,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         }
 
         [Fact]
+        public void IsODataQueryRequest_ReturnsCorrectly()
+        {
+            // 'GET'
+            HttpRequest request = RequestFactory.Create();
+            request.Method = "GET";
+            Assert.False(request.IsODataQueryRequest());
+
+            // 'POST' but not /$query
+            request.Method = "POST";
+            request.Path = new PathString("/any");
+            Assert.False(request.IsODataQueryRequest());
+
+            // 'POST' but /$query
+            request.Method = "POST";
+            request.Path = new PathString("/any/$query");
+            Assert.True(request.IsODataQueryRequest());
+        }
+
+        [Fact]
         public void GetRouteServices_ThrowsArgumentNull_Request()
         {
             // Arrange & Act & Assert
@@ -169,6 +190,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Arrange & Act & Assert
             HttpRequest request = null;
             ExceptionAssert.ThrowsArgumentNull(() => request.ClearRouteServices(), "request");
+        }
+
+        [Fact]
+        public void ClearRouteServices_ClearsServiceFromRequest()
+        {
+            // Arrange
+            HttpRequest request = RequestFactory.Create();
+            IODataFeature oDataFeature = request.ODataFeature();
+            oDataFeature.RequestScope = new Mock<IServiceScope>().Object;
+            oDataFeature.Services = new Mock<IServiceProvider>().Object;
+
+            // Act
+            request.ClearRouteServices(false);
+
+            // Assert
+            Assert.Null(oDataFeature.RequestScope);
+            Assert.Null(oDataFeature.Services);
+        }
+
+        [Fact]
+        public void ODataOptions_ThrowsArgumentNull_Request()
+        {
+            // Arrange & Act & Assert
+            HttpRequest request = null;
+            ExceptionAssert.ThrowsArgumentNull(() => request.ODataOptions(), "request");
         }
 
         [Fact]

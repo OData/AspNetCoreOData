@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Xunit;
 
@@ -38,6 +39,38 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                     { new TimeOfDay(15, 38, 25, 109), "15:38:25.1090000"},
                 };
             }
+        }
+
+        [Fact]
+        public void GetEntityKey_ForNonEntityType()
+        {
+            // Arrange
+            EdmComplexType complexType = new EdmComplexType("NS", "Name");
+            var entityInstance = new { Property = "key" };
+
+            ResourceContext entityContext = new ResourceContext(_writeContext, complexType.AsReference(), entityInstance);
+
+            // Act
+            var keyValue = ConventionsHelpers.GetEntityKey(entityContext);
+
+            // Assert
+            Assert.Empty(keyValue);
+        }
+
+        [Fact]
+        public void GetEntityKeyValue_ForNonEntityType()
+        {
+            // Arrange
+            EdmComplexType complexType = new EdmComplexType("NS", "Name");
+            var entityInstance = new { Property = "key" };
+
+            ResourceContext entityContext = new ResourceContext(_writeContext, complexType.AsReference(), entityInstance);
+
+            // Act
+            var keyValue = ConventionsHelpers.GetEntityKeyValue(entityContext);
+
+            // Assert
+            Assert.Equal(string.Empty, keyValue);
         }
 
         [Fact]
@@ -203,6 +236,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Assert
             Assert.Equal("Key1=2015-02-26,Key2=01:02:03.0040000", keyValue);
+        }
+
+        [Fact]
+        public void ConvertValue_ForEnumValue()
+        {
+            // Arrange & Act
+            var value = ConventionsHelpers.ConvertValue(SimpleEnum.First, null, null);
+
+            // Assert
+            ODataEnumValue enumValue = Assert.IsType<ODataEnumValue>(value);
+            Assert.Equal("First", enumValue.Value);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum", enumValue.TypeName);
         }
 
         public static TheoryDataSet<object, string> GetUriRepresentationForValue_DataSet

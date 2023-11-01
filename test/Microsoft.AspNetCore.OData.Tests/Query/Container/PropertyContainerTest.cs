@@ -140,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
         }
 
         [Fact]
-        public void CreatePropertyContainer_WithNullPropertyName_DoesntIncludeTheProperty()
+        public void CreatePropertyContainer_WithNullPropertyName_NotIncludeTheProperty()
         {
             // Arrange
             Expression propertyName = Expression.Constant(null, typeof(string));

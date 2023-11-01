@@ -24,7 +24,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         [Fact]
         public void ConstructorNullContextThrows()
         {
-            ExceptionAssert.Throws<ArgumentNullException>(() => new SkipQueryOption("1", null));
+            ExceptionAssert.ThrowsArgumentNull(() => new SkipQueryOption("1", null), "context");
+            ExceptionAssert.ThrowsArgumentNull(() => new SkipQueryOption("1", null, queryOptionParser: null), "context");
         }
 
         [Fact]
@@ -32,10 +33,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+            ODataQueryContext context = new ODataQueryContext(model, typeof(Customer));
 
             // Act & Assert
-            ExceptionAssert.Throws<ArgumentException>(() =>
-                new SkipQueryOption(null, new ODataQueryContext(model, typeof(Customer))));
+            ExceptionAssert.Throws<ArgumentException>(() => new SkipQueryOption(null, context));
+            ExceptionAssert.Throws<ArgumentException>(() => new SkipQueryOption(null, context, queryOptionParser: null));
         }
 
         [Fact]
@@ -174,6 +176,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //    option.Validator = null;
         //    ExceptionAssert.DoesNotThrow(() => option.Validate(settings));
         //}
+
+        [Fact]
+        public void Validate_ThrowsArgumentNull_Settings()
+        {
+            // Arrange
+            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
+            ODataQueryContext context = new ODataQueryContext(model.Model, model.Customer);
+            SkipQueryOption skip = new SkipQueryOption("42", context);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => skip.Validate(null), "validationSettings");
+        }
+
+        [Fact]
+        public void ApplyTo_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange
+            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
+            ODataQueryContext context = new ODataQueryContext(model.Model, model.Customer);
+            SkipQueryOption skip = new SkipQueryOption("42", context);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(() => skip.ApplyTo(null, null), "query");
+
+            ExceptionAssert.ThrowsArgumentNull(() => skip.ApplyTo(new Mock<IQueryable>().Object, null), "querySettings");
+        }
 
         [Fact]
         public void Property_Value_WorksWithUnTypedContext()

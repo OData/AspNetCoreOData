@@ -15,13 +15,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -71,23 +69,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionBinderBase"/> class.
-        /// </summary>
-        /// <param name="requestContainer">The request container.</param>
-        protected ExpressionBinderBase(IServiceProvider requestContainer)
-        {
-            Contract.Assert(requestContainer != null);
-
-            QuerySettings = requestContainer.GetRequiredService<ODataQuerySettings>();
-            Model = requestContainer.GetRequiredService<IEdmModel>();
-
-            // The IWebApiAssembliesResolver service is internal and can only be injected by WebApi.
-            // This code path may be used in the cases when the service container available
-            // but may not contain an instance of IWebApiAssembliesResolver.
-            IAssemblyResolver injectedResolver = requestContainer.GetService<IAssemblyResolver>();
-            InternalAssembliesResolver = (injectedResolver != null) ? injectedResolver : AssemblyResolverHelper.Default;
-        }
 
         internal ExpressionBinderBase(IEdmModel model, IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
             : this(model, querySettings)

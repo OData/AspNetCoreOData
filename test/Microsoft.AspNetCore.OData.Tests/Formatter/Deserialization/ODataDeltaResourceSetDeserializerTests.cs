@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
@@ -157,9 +158,66 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void ReadInline_Calls_ReadInlineForEachDeltaItem()
+        public void ReadDeltaResourceSet_ThrowsArgumentNull_Inputs()
         {
-            IODataDeserializerProvider provider = ODataFormatterHelpers.GetDeserializerProvider();
+            // Arrange & Act & Assert
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+
+            ExceptionAssert.ThrowsArgumentNull(() =>
+            {
+                foreach (var item in deserializer.ReadDeltaResourceSet(null, null, null))
+                    ;
+            }, "deltaResourceSet");
+
+            // Arrange & Act & Assert
+            ODataDeltaResourceSetWrapper wrapper = new ODataDeltaResourceSetWrapper(null);
+            Mock<IEdmStructuredTypeReference> elementType = new Mock<IEdmStructuredTypeReference>();
+            ExceptionAssert.ThrowsArgumentNull(() =>
+            {
+                foreach (var item in deserializer.ReadDeltaResourceSet(wrapper, elementType.Object, null))
+                    ;
+            }, "readContext");
+        }
+
+        [Fact]
+        public void ReadDeltaResourceSet_Calls_ReadDeltaLinkItems()
+        {
+            // Arrange
+            IEdmModel model = GetEdmModel();
+            IEdmEntityType customer = model.SchemaElements.OfType<IEdmEntityType>().First(c => c.Name == "Customer");
+            IEdmStructuredTypeReference elementType = new EdmEntityTypeReference(customer, true);
+
+            ODataDeltaDeletedLinkWrapper deletedLinkWrapper = new ODataDeltaDeletedLinkWrapper(new ODataDeltaDeletedLink(new Uri("http://localhost"), new Uri("http://delete"), "delete"));
+            ODataDeltaLinkWrapper linkWrapper = new ODataDeltaLinkWrapper(new ODataDeltaLink(new Uri("http://localhost"), new Uri("http://link"), "delete"));
+
+            ODataDeltaResourceSetWrapper deltaResourceSetWrapper = new ODataDeltaResourceSetWrapper(new ODataDeltaResourceSet());
+            deltaResourceSetWrapper.DeltaItems.Add(deletedLinkWrapper);
+            deltaResourceSetWrapper.DeltaItems.Add(linkWrapper);
+
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
+            ODataDeltaResourceSetDeserializer deserializer = new ODataDeltaResourceSetDeserializer(deserializerProvider.Object);
+            ODataDeserializerContext readContext = new ODataDeserializerContext()
+            {
+                Model = model,
+                ResourceType = typeof(DeltaSet<>)
+            };
+
+            // Act
+            var result = deserializer.ReadDeltaResourceSet(deltaResourceSetWrapper, elementType, readContext) as IEnumerable<object>;
+
+            // Assert
+            Assert.Collection(result,
+                e =>
+                {
+                    DeltaDeletedLink<Customer> ddl = Assert.IsType<DeltaDeletedLink<Customer>>(e);
+                    Assert.Equal(new Uri("http://delete"), ddl.Target);
+                },
+                e =>
+                {
+                    DeltaLink<Customer> dl = Assert.IsType<DeltaLink<Customer>>(e);
+                    Assert.Equal(new Uri("http://link"), dl.Target);
+                });
         }
 
         [Fact]
@@ -195,7 +253,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             var result = deserializer.ReadDeltaResourceSet(deltaResourceSetWrapper, elementType, readContext);
 
             // Assert
-            Assert.Equal(new[] { "entry1", "entry2" }, result.OfType<String>());
+            Assert.Equal(new[] { "entry1", "entry2" }, result.OfType<string>());
             resourceDeserializer.Verify();
         }
 
