@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         {
             Contract.Assert(model != null);
             Contract.Assert(navigationSource != null);
-
+            
             if (!_cachedConcurrencyProperties.TryGetValue(navigationSource, out IEnumerable<IEdmStructuralProperty> cachedProperties))
             {
                 // Ensure that concurrency properties cache is attached to model as an annotation to avoid expensive calculations each time
@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                     concurrencyProperties = new ConcurrencyPropertiesAnnotation();
                     model.SetAnnotationValue(model, concurrencyProperties);
                 }
-
+                
                 if (concurrencyProperties.TryGetValue(navigationSource, out cachedProperties))
                 {
                     _cachedConcurrencyProperties[navigationSource] = cachedProperties;
