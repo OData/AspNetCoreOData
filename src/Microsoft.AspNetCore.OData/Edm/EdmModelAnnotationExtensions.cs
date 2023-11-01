@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -23,6 +24,8 @@ namespace Microsoft.AspNetCore.OData.Edm
     /// </summary>
     public static class EdmModelAnnotationExtensions
     {
+        private static ConcurrentDictionary<IEdmNavigationSource, IEnumerable<IEdmStructuralProperty>> _cachedConcurrencyProperties = new ConcurrentDictionary<IEdmNavigationSource, IEnumerable<IEdmStructuralProperty>>();
+        
         /// <summary>
         /// Gets the Org.OData.Core.V1.AcceptableMediaTypes
         /// </summary>
@@ -80,54 +83,62 @@ namespace Microsoft.AspNetCore.OData.Edm
             Contract.Assert(model != null);
             Contract.Assert(navigationSource != null);
 
-            // Ensure that concurrency properties cache is attached to model as an annotation to avoid expensive calculations each time
-            ConcurrencyPropertiesAnnotation concurrencyProperties = model.GetAnnotationValue<ConcurrencyPropertiesAnnotation>(model);
-            if (concurrencyProperties == null)
+            if (!_cachedConcurrencyProperties.TryGetValue(navigationSource, out IEnumerable<IEdmStructuralProperty> cachedProperties))
             {
-                concurrencyProperties = new ConcurrencyPropertiesAnnotation();
-                model.SetAnnotationValue(model, concurrencyProperties);
-            }
-
-            IEnumerable<IEdmStructuralProperty> cachedProperties;
-            if (concurrencyProperties.TryGetValue(navigationSource, out cachedProperties))
-            {
-                return cachedProperties;
-            }
-
-            IList<IEdmStructuralProperty> results = new List<IEdmStructuralProperty>();
-            IEdmEntityType entityType = navigationSource.EntityType();
-            IEdmVocabularyAnnotatable annotatable = navigationSource as IEdmVocabularyAnnotatable;
-            if (annotatable != null)
-            {
-                var annotations = model.FindVocabularyAnnotations<IEdmVocabularyAnnotation>(annotatable, CoreVocabularyModel.ConcurrencyTerm);
-                IEdmVocabularyAnnotation annotation = annotations.FirstOrDefault();
-                if (annotation != null)
+                // Ensure that concurrency properties cache is attached to model as an annotation to avoid expensive calculations each time
+                ConcurrencyPropertiesAnnotation concurrencyProperties = model.GetAnnotationValue<ConcurrencyPropertiesAnnotation>(model);
+                if (concurrencyProperties == null)
                 {
-                    IEdmCollectionExpression properties = annotation.Value as IEdmCollectionExpression;
-                    if (properties != null)
+                    concurrencyProperties = new ConcurrencyPropertiesAnnotation();
+                    model.SetAnnotationValue(model, concurrencyProperties);
+                }
+
+                if (concurrencyProperties.TryGetValue(navigationSource, out cachedProperties))
+                {
+                    _cachedConcurrencyProperties[navigationSource] = cachedProperties;
+                    return cachedProperties;
+                }
+
+                IList<IEdmStructuralProperty> results = new List<IEdmStructuralProperty>();
+                IEdmEntityType entityType = navigationSource.EntityType();
+                IEdmVocabularyAnnotatable annotatable = navigationSource as IEdmVocabularyAnnotatable;
+                if (annotatable != null)
+                {
+                    var annotations = model.FindVocabularyAnnotations<IEdmVocabularyAnnotation>(annotatable, CoreVocabularyModel.ConcurrencyTerm);
+                    IEdmVocabularyAnnotation annotation = annotations.FirstOrDefault();
+                    if (annotation != null)
                     {
-                        foreach (var property in properties.Elements)
+                        IEdmCollectionExpression properties = annotation.Value as IEdmCollectionExpression;
+                        if (properties != null)
                         {
-                            IEdmPathExpression pathExpression = property as IEdmPathExpression;
-                            if (pathExpression != null)
+                            foreach (var property in properties.Elements)
                             {
-                                // So far, we only consider the single path, because only the direct properties from declaring type are used.
-                                // However we have an issue tracking on: https://github.com/OData/WebApi/issues/472
-                                string propertyName = pathExpression.PathSegments.First();
-                                IEdmProperty edmProperty = entityType.FindProperty(propertyName);
-                                IEdmStructuralProperty structuralProperty = edmProperty as IEdmStructuralProperty;
-                                if (structuralProperty != null)
+                                IEdmPathExpression pathExpression = property as IEdmPathExpression;
+                                if (pathExpression != null)
                                 {
-                                    results.Add(structuralProperty);
+                                    // So far, we only consider the single path, because only the direct properties from declaring type are used.
+                                    // However we have an issue tracking on: https://github.com/OData/WebApi/issues/472
+                                    string propertyName = pathExpression.PathSegments.First();
+                                    IEdmProperty edmProperty = entityType.FindProperty(propertyName);
+                                    IEdmStructuralProperty structuralProperty = edmProperty as IEdmStructuralProperty;
+                                    if (structuralProperty != null)
+                                    {
+                                        results.Add(structuralProperty);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            concurrencyProperties[navigationSource] = results;
-            return results;
+                concurrencyProperties[navigationSource] = results;
+                _cachedConcurrencyProperties[navigationSource] = results;
+                return results;
+            }
+            else 
+            {
+                return cachedProperties;
+            }
         }
 
         /// <summary>

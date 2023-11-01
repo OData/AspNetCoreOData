@@ -775,7 +775,10 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     properties.Add(etagProperty.Name, resourceContext.GetPropertyValue(etagProperty.Name));
                 }
 
-                return resourceContext.Request.CreateETag(properties, resourceContext.TimeZone);
+                if (properties.Count != 0)
+                {
+                    return resourceContext.Request.CreateETag(properties, resourceContext.TimeZone);
+                }
             }
 
             return null;
