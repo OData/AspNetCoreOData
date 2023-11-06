@@ -368,9 +368,23 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             bool isSelectedAll = IsSelectAll(selectExpandClause);
             if (isSelectedAll)
             {
+                // If we have an EF query provider, then we remove the non-structural properties. The reason for this is to avoid 
+                // Creating an expression that will generate duplicate LEFT joins when a LEFT join already exists in the IQueryable 
+                // as observed here: https://github.com/OData/AspNetCoreOData/issues/497
+
+                Expression updatedExpression = null;
+                if (IsEfQueryProvider(context))
+                {
+                    updatedExpression = RemoveNonStructuralProperties(context, source, structuredType);
+                }
+                else
+                {
+                    updatedExpression = source;
+                }
+
                 // Initialize property 'Instance' on the wrapper class
                 wrapperProperty = wrapperType.GetProperty("Instance");
-                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, source));
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, updatedExpression));
 
                 wrapperProperty = wrapperType.GetProperty("UseInstanceForProperties");
                 wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Constant(true)));
@@ -429,7 +443,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // Generates the expression
         //      { Instance = new Customer() {Id = $it.Id, Name= $it.Name}}
-        private static Expression RemoveNonStructucalProperties(QueryBinderContext context, Expression source, IEdmStructuredType structuredType)
+        private static Expression RemoveNonStructuralProperties(QueryBinderContext context, Expression source, IEdmStructuredType structuredType)
         {
             IEdmModel model = context.Model;
             Expression updatedSource = null;
