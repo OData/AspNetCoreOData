@@ -259,7 +259,15 @@ namespace Microsoft.AspNetCore.OData.Query
                     ControllerActionDescriptor controllerActionDescriptor = actionDescriptor as ControllerActionDescriptor;
                     Type returnType = controllerActionDescriptor.MethodInfo.ReturnType;
 
-                    responseContent.DeclaredType = returnType;
+                    if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
+                    {
+                        returnType = returnType.GetGenericArguments().First();
+
+                        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+                        {
+                            responseContent.DeclaredType = returnType;
+                        }
+                    }
 
                     if (responseContent != null)
                     {
