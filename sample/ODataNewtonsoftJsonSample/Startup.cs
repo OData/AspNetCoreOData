@@ -14,6 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using ODataRoutingSample.Models;
+using System.Reflection;
 
 namespace ODataNewtonsoftJsonSample
 {
@@ -29,8 +31,12 @@ namespace ODataNewtonsoftJsonSample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IEdmModel model1 = EdmModelBuilder.GetEdmModelV1();
+
             services.AddControllers()
-                .AddOData(opt => opt.Select().Filter().Count().SetMaxTop(10).AddRouteComponents("odata", GetEdmModel()))
+                .AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
+                    .AddRouteComponents("v1", model1)
+                )
                 .AddODataNewtonsoftJson()
                 //.AddNewtonsoftJson(
                 //options =>
