@@ -45,6 +45,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.IAsyncEnumerableTests
             return _context.Customers.AsAsyncEnumerable();
         }
 
+        [EnableQuery]
+        [HttpGet("v2/Customers")]
+        public ActionResult<IAsyncEnumerable<Customer>> CustomersDataNew()
+        {
+            return Ok(_context.Customers.AsAsyncEnumerable());
+        }
+
         public async IAsyncEnumerable<Customer> CreateCollectionAsync<T>()
         {
             await Task.Delay(5);

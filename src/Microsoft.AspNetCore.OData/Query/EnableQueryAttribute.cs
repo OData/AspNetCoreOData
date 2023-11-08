@@ -255,6 +255,20 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (statusCodeResult?.StatusCode == null || IsSuccessStatusCode(statusCodeResult.StatusCode.Value))
                 {
                     ObjectResult responseContent = actionExecutedContext.Result as ObjectResult;
+
+                    ControllerActionDescriptor controllerActionDescriptor = actionDescriptor as ControllerActionDescriptor;
+                    Type returnType = controllerActionDescriptor.MethodInfo.ReturnType;
+
+                    if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
+                    {
+                        returnType = returnType.GetGenericArguments().First();
+
+                        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+                        {
+                            responseContent.DeclaredType = returnType;
+                        }
+                    }
+
                     if (responseContent != null)
                     {
                         // Get collection from SingleResult.
