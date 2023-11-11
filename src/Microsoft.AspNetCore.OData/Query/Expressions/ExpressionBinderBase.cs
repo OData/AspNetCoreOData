@@ -688,7 +688,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
 
-            return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.EndsWith, QuerySettings, arguments);
+            return ExpressionBinderHelper.MakeCustomFunctionCall(ClrCanonicalFunctions.EndsWith, arguments);
         }
 
         private Expression BindCustomMethodExpressionOrNull(SingleValueFunctionCallNode node)
