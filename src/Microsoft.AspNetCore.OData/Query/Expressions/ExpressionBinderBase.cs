@@ -688,7 +688,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
 
-            return ExpressionBinderHelper.MakeCustomFunctionCall(ClrCanonicalFunctions.EndsWith, arguments);
+            return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.EndsWith, QuerySettings, arguments);
         }
 
         private Expression BindCustomMethodExpressionOrNull(SingleValueFunctionCallNode node)
@@ -700,7 +700,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             MethodInfo methodInfo;
             if (UriFunctionsBinder.TryGetMethodInfo(node.Name, methodArgumentsType, out methodInfo))
             {
-                return ExpressionBinderHelper.MakeFunctionCall(methodInfo, QuerySettings, arguments);
+                return ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
             }
 
             return null;
