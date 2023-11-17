@@ -581,7 +581,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (resourceContext.StructuredType.TypeKind == EdmTypeKind.Entity && resourceContext.NavigationSource != null)
             {
-                if (!(resourceContext.NavigationSource is IEdmContainedEntitySet))
+                // Condition 1. If resourceContext.NavigationSource is a contained entity set
+                //    and a contained resource is being written, the id/read/edit links can be derived
+                //    from the entity set or parent resource, i.e., no need to use link builder to build the links.
+                // Condition 2. If resourceContext.NavigationSource is a contained entity set
+                //    but an expanded non-contained resource is being written,
+                //    deriving the id/read/edit links from the entity set or parent resource will
+                //    most likely result into invalid links.
+                //    A navigation property binding should exist and we should try
+                //    to use the navigation link builder to build the links.
+                // NOTE: resourceContext.SerializerContext.NavigationProperty will not be null when writing an expanded resource
+                if (!(resourceContext.NavigationSource is IEdmContainedEntitySet)
+                    || resourceContext.SerializerContext.NavigationProperty?.ContainsTarget == false)
                 {
                     IEdmModel model = resourceContext.SerializerContext.Model;
                     NavigationSourceLinkBuilderAnnotation linkBuilder = EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(model, resourceContext.NavigationSource);
