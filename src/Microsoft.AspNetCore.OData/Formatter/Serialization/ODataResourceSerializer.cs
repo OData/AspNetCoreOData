@@ -532,7 +532,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ODataResource resource = new ODataResource
             {
                 TypeName = typeName ?? "Edm.Untyped",
-                Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
+                Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext)
             };
 
             if (resourceContext.EdmObject is EdmDeltaResourceObject && resourceContext.NavigationSource != null)
@@ -622,6 +622,83 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             return resource;
+        }
+
+        private IEnumerable<ODataProperty> ReuseODataProperties(
+            SelectExpandNode selectExpandNode,
+            ResourceContext resourceContext)
+        {
+            List<ODataProperty> properties = new List<ODataProperty>();
+
+            if (selectExpandNode.SelectedStructuralProperties != null)
+            {
+                IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
+                
+                if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
+                {
+                    if (resourceContext.EdmObject is TypedEdmEntityObject obj && obj.Instance is IDelta deltaObject)
+                    {
+                        IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
+                        structuralProperties = structuralProperties.Where(p => changedProperties.Contains(p.Name));
+                    }
+                }
+                
+                foreach (var structuralProperty in structuralProperties)
+                {
+                    var propertyType = structuralProperty.Type;
+
+                    if (propertyType == null)
+                    {
+                        continue;
+                    }
+
+                    if (propertyType != null && propertyType.IsStream())
+                    {
+                        // skip the stream property, the stream property is written in its own logic
+                        continue;
+                    }
+
+                    if (propertyType != null &&
+                        (propertyType.IsUntyped() || propertyType.IsCollectionUntyped()))
+                    {
+                        // skip it here, we use a different method to write all 'declared' untyped properties
+                        continue;
+                    }
+
+                    if (resourceContext.SerializerContext.PropertiesSerializersCache.TryGetValue(
+                        propertyType, out (IODataEdmTypeSerializer, ODataProperty) value))
+                    {
+                        object propertyValue = resourceContext.GetPropertyValue(structuralProperty.Name);
+
+                        var (serializer, prop) = value;
+                        prop.Value = serializer.CreateODataValue(propertyValue, propertyType, resourceContext.SerializerContext);
+                        prop.Name = structuralProperty.Name;
+                        properties.Add(prop);
+                    }
+                    else
+                    {
+                        ODataProperty newProp = CreateStructuralProperty(structuralProperty, resourceContext);
+                        if (newProp != null)
+                        {
+                            properties.Add(newProp);
+                        }   
+                    }
+                }
+            }
+           
+            if (selectExpandNode.SelectedComputedProperties != null)
+            {
+                foreach (string propertyName in selectExpandNode.SelectedComputedProperties)
+                {
+                    ODataProperty property = CreateComputedProperty(propertyName, resourceContext);
+                    if (property != null)
+                    {
+                        properties.Add(property);
+                    }
+                }
+            }
+
+            return properties;
         }
 
         /// <summary>
@@ -1253,6 +1330,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(resourceContext != null);
 
             List<ODataProperty> properties = new List<ODataProperty>();
+
             if (selectExpandNode.SelectedStructuralProperties != null)
             {
                 IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
@@ -1266,30 +1344,48 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
                 }
 
-                foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
+                foreach (var structuralProperty in structuralProperties)
                 {
-                    if (structuralProperty.Type != null && structuralProperty.Type.IsStream())
-                    {
-                        // skip the stream property, the stream property is written in its own logic
-                        continue;
-                    }
+                    var propertyType = structuralProperty.Type;
 
-                    if (structuralProperty.Type != null &&
-                        (structuralProperty.Type.IsUntyped() || structuralProperty.Type.IsCollectionUntyped()))
+                    if (propertyType != null && resourceContext.SerializerContext.PropertiesSerializersCache.TryGetValue(
+                        propertyType, out (IODataEdmTypeSerializer, ODataProperty) value))
                     {
-                        // skip it here, we use a different method to write all 'declared' untyped properties
-                        continue;
-                    }
+                        object propertyValue = resourceContext.GetPropertyValue(structuralProperty.Name);
 
-                    ODataProperty property = CreateStructuralProperty(structuralProperty, resourceContext);
-                    if (property != null)
+                        var (serializer, prop) = value;
+                        
+                        //prop.Value = propertyValue;
+                        //object supportedValue = ConvertPrimitiveValue(value, propertyType, resourceContext.SerializerContext?.TimeZone);
+                        prop.Value = serializer.CreateODataValue(propertyValue, propertyType, resourceContext.SerializerContext);
+                        prop.Name = structuralProperty.Name;
+                        properties.Add(prop);
+                    }
+                    else
                     {
-                        properties.Add(property);
+                        if (propertyType != null && propertyType.IsStream())
+                        {
+                            // skip the stream property, the stream property is written in its own logic
+                            continue;
+                        }
+
+                        if (propertyType != null &&
+                            (propertyType.IsUntyped() || propertyType.IsCollectionUntyped()))
+                        {
+                            // skip it here, we use a different method to write all 'declared' untyped properties
+                            continue;
+                        }
+
+                        ODataProperty newProp = CreateStructuralProperty(structuralProperty, resourceContext);
+
+                        if (newProp != null)
+                        {
+                            properties.Add(newProp);
+                        }   
                     }
                 }
             }
 
-            // Try to add computed properties
             if (selectExpandNode.SelectedComputedProperties != null)
             {
                 foreach (string propertyName in selectExpandNode.SelectedComputedProperties)
@@ -1481,8 +1577,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
+            IODataEdmTypeSerializer serializer = null;
 
-            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+            if (!writeContext.PropertiesSerializersCache.TryGetValue(structuralProperty.Type, out (IODataEdmTypeSerializer, ODataProperty) value))
+            {
+                serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+            }
+            else 
+            {
+                serializer = value.Item1;
+            }
+                      
             if (serializer == null)
             {
                 throw new SerializationException(
