@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -27,6 +28,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     public class ODataSerializerContext
     {
         private IDictionary<object, object> _items;
+        private IDictionary<IEdmTypeReference, (IODataEdmTypeSerializer, ODataProperty)> _propertiesSerializerCache;
         private ODataQueryContext _queryContext;
         private SelectExpandClause _selectExpandClause;
         private bool _isSelectExpandClauseSet;
@@ -91,6 +93,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             ExpandedResource = resource; // parent resource
 
             CurrentSelectItem = currentSelectItem;
+
+            PropertiesSerializersCache = context.PropertiesSerializersCache;
 
             var expandedNavigationSelectItem = currentSelectItem as ExpandedNavigationSelectItem;
             if (expandedNavigationSelectItem != null)
@@ -248,6 +252,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             private set
             {
                 _items = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets a property bag associated with this context to store edm type serializers associated with an edm type.
+        /// </summary>
+        internal IDictionary<IEdmTypeReference, (IODataEdmTypeSerializer, ODataProperty)> PropertiesSerializersCache
+        {
+            get
+            {
+                _propertiesSerializerCache = _propertiesSerializerCache ?? new Dictionary<IEdmTypeReference, (IODataEdmTypeSerializer, ODataProperty)>();
+                return _propertiesSerializerCache;
+            }
+            private set
+            {
+                _propertiesSerializerCache = value;
             }
         }
 

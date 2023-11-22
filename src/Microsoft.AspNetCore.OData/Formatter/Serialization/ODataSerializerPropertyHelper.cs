@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System.Diagnostics.Contracts;
-using System.Threading.Tasks;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
@@ -33,11 +32,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             Contract.Assert(elementName != null);
-            return new ODataProperty
+
+            ODataProperty property = new ODataProperty
             {
                 Name = elementName,
                 Value = serializer.CreateODataValue(graph, expectedType, writeContext)
             };
+
+            if (writeContext != null)
+            {
+                if (!writeContext.PropertiesSerializersCache.TryGetValue(expectedType, out (IODataEdmTypeSerializer, ODataProperty) value1))
+                {
+                    writeContext.PropertiesSerializersCache[expectedType] = (serializer, property);
+                }
+            }
+
+            return property;
         }
 
         private static ODataProperty CreateCollectionProperty(ODataCollectionSerializer serializer, object graph, IEdmTypeReference expectedType, string elementName,
