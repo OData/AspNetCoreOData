@@ -1102,20 +1102,6 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -4220,11 +4206,6 @@
             Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmStructuredObject"/> backing this instance.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.WriteNavigationLinks">
-            <summary>
-             Get or sets whether navigation links should be written.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.ResourceContext.ResourceInstance">
             <summary>
             Gets or sets the value of this resource instance.
@@ -4777,6 +4758,14 @@
             <param name="resourceContext">The context for the untyped instance being written.</param>
             <returns>The nested resource info to be written. Returns 'null' will omit this untyped serialization.</returns>
             <remarks>It enables customer to get more control by overriding this method. </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.ShouldWriteNavigation(Microsoft.OData.ODataNestedResourceInfo,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Checks whether a navigation link should be written or not. 
+            </summary>
+            <param name="navigationLink">The navigation link to be written</param>
+            <param name="resourceContext">The resource context for the resource whose navigation link is being written.</param>
+            <returns>true if navigation link should be written; otherwise false.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDynamicComplexNestedResourceInfo(System.String,System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -15235,6 +15224,22 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
+            <param name="segment">The value segment.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
+            <summary>
+            Gets the value segment.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>
+ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
