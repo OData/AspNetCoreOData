@@ -41,9 +41,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (writeContext != null)
             {
-                if (!writeContext.PropertiesSerializersCache.TryGetValue(expectedType, out (IODataEdmTypeSerializer, ODataProperty) value1))
+                var cache = writeContext.PropertiesSerializersCache;
+
+                if (!cache.TryGetValue(expectedType, out _))
                 {
-                    writeContext.PropertiesSerializersCache[expectedType] = (serializer, property);
+                    cache[expectedType] = (serializer, property);
                 }
             }
 

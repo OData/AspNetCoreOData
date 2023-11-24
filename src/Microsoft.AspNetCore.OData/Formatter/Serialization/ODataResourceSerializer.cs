@@ -1267,43 +1267,39 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     }
                 }
 
-                foreach (var structuralProperty in structuralProperties)
+                foreach (IEdmStructuralProperty structuralProperty in structuralProperties)
                 {
-                    var propertyType = structuralProperty.Type;
-
-                    if (propertyType != null && resourceContext.SerializerContext.PropertiesSerializersCache.TryGetValue(
-                        propertyType, out (IODataEdmTypeSerializer, ODataProperty) value))
+                    if (structuralProperty.Type != null && resourceContext.SerializerContext.PropertiesSerializersCache.TryGetValue(
+                        structuralProperty.Type, out (IODataEdmTypeSerializer, ODataProperty) value))
                     {
                         object propertyValue = resourceContext.GetPropertyValue(structuralProperty.Name);
 
                         var (serializer, prop) = value;
                         
-                        //prop.Value = propertyValue;
-                        //object supportedValue = ConvertPrimitiveValue(value, propertyType, resourceContext.SerializerContext?.TimeZone);
-                        prop.Value = serializer.CreateODataValue(propertyValue, propertyType, resourceContext.SerializerContext);
+                        prop.Value = serializer.CreateODataValue(propertyValue, structuralProperty.Type, resourceContext.SerializerContext);
                         prop.Name = structuralProperty.Name;
                         properties.Add(prop);
                     }
                     else
                     {
-                        if (propertyType != null && propertyType.IsStream())
+                        if (structuralProperty.Type != null && structuralProperty.Type.IsStream())
                         {
                             // skip the stream property, the stream property is written in its own logic
                             continue;
                         }
 
-                        if (propertyType != null &&
-                            (propertyType.IsUntyped() || propertyType.IsCollectionUntyped()))
+                        if (structuralProperty.Type != null &&
+                            (structuralProperty.Type.IsUntyped() || structuralProperty.Type.IsCollectionUntyped()))
                         {
                             // skip it here, we use a different method to write all 'declared' untyped properties
                             continue;
                         }
 
-                        ODataProperty newProp = CreateStructuralProperty(structuralProperty, resourceContext);
+                        ODataProperty property = CreateStructuralProperty(structuralProperty, resourceContext);
 
-                        if (newProp != null)
+                        if (property != null)
                         {
-                            properties.Add(newProp);
+                            properties.Add(property);
                         }   
                     }
                 }
