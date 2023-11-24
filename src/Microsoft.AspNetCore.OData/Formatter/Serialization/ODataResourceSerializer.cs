@@ -1274,11 +1274,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     {
                         object propertyValue = resourceContext.GetPropertyValue(structuralProperty.Name);
 
-                        var (serializer, prop) = value;
-                        
-                        prop.Value = serializer.CreateODataValue(propertyValue, structuralProperty.Type, resourceContext.SerializerContext);
-                        prop.Name = structuralProperty.Name;
-                        properties.Add(prop);
+                        var (serializer, property) = value;
+
+                        property.Value = serializer.CreateODataValue(propertyValue, structuralProperty.Type, resourceContext.SerializerContext);
+                        property.Name = structuralProperty.Name;
+                        properties.Add(property);
                     }
                     else
                     {
