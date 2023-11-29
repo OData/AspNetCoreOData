@@ -160,7 +160,15 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
             Assert.NotNull(response.Content);
 
             string payload = await response.Content.ReadAsStringAsync();
-            Assert.Equal("{\"Id\":2,\"Name\":\"Sam\",\"Age\":40,\"Price\":2.99,\"Qty\":15,\"Age20Ago\":20,\"UpperChar\":\"SAM\",\"Location\":{\"Street\":\"Street 2\",\"ZipCode\":32509}}", payload);
+            Assert.Equal("{\"Id\":2," +
+                "\"Name\":\"Sam\"," +
+                "\"Age\":40," +
+                "\"Price\":2.99," +
+                "\"Qty\":15," +
+                "\"Candys\":[\"BasicBerry\"]," +
+                "\"Age20Ago\":20," +
+                "\"UpperChar\":\"SAM\"," +
+                "\"Location\":{\"Street\":\"Street 2\",\"ZipCode\":32509}}", payload);
         }
 
         [Fact]
@@ -233,6 +241,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
                 "\"Age\":34," +
                 "\"Price\":6.99," +
                 "\"Qty\":4," +
+                "\"Candys\":[\"Snickers\",\"Hershey\"]," +
                 "\"Location\":{\"Street\":\"Street 3\",\"ZipCode\":98052}," +
                 "\"Sales\":[" +
                   "{\"Amount\":3,\"TaxRate\":0.31,\"Tax\":0.9299999999999999}," +
@@ -268,6 +277,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
                 "\"Age\":29," +
                 "\"Price\":3.99," +
                 "\"Qty\":15," +
+                "\"Candys\":[\"Snickers\",\"M&M\"]," +
                 "\"Location\":{\"Street\":\"Street 4\",\"ZipCode\":88309}," +
                 "\"Sales\":[" +
                   "{\"Amount\":7,\"TaxRate\":0.71,\"Tax\":4.97}," +
@@ -276,6 +286,64 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
                   "{\"Amount\":10,\"TaxRate\":1.01,\"Tax\":10.1}" +
                 "]" +
               "}", payload);
+        }
+
+        [Fact]
+        public async Task QueryForAnResource_IncludesDollarComputeWithAnyClause_WithDollarSelect()
+        {
+            // Arrange
+            string queryUrl = "odata/Customers?$select=Id,HasSnickers&$compute=Candys/any(r:r eq 'Snickers') as HasSnickers";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+
+            // Assert
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            Assert.Equal("{\"value\":[" +
+                    "{\"Id\":1,\"HasSnickers\":false}," +
+                    "{\"Id\":2,\"HasSnickers\":false}," +
+                    "{\"Id\":3,\"HasSnickers\":true}," +
+                    "{\"Id\":4,\"HasSnickers\":true}," +
+                    "{\"Id\":5,\"HasSnickers\":false}" +
+                "]}", payload);
+        }
+
+        [Fact]
+        public async Task QueryForAnResource_IncludesDollarComputeWithAllClause_WithDollarSelect()
+        {
+            // Arrange
+            string queryUrl = "odata/Customers?$select=Id,HasNoSnickers&$compute=Candys/all(r:r ne 'Snickers') as HasNoSnickers";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+
+            // Assert
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            Assert.Equal("{\"value\":[" +
+                    "{\"Id\":1,\"HasNoSnickers\":true}," +
+                    "{\"Id\":2,\"HasNoSnickers\":true}," +
+                    "{\"Id\":3,\"HasNoSnickers\":false}," +
+                    "{\"Id\":4,\"HasNoSnickers\":false}," +
+                    "{\"Id\":5,\"HasNoSnickers\":true}" +
+                "]}", payload);
         }
 
         [Fact]

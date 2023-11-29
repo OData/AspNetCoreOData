@@ -25,11 +25,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
         {
             _customers = new List<ComputeCustomer>
             {
-                new ComputeCustomer { Id = 1, Name = "Peter", Age = 19, Price = 1.99, Qty = 10 },
-                new ComputeCustomer { Id = 2, Name = "Sam",   Age = 40, Price = 2.99, Qty = 15 },
-                new ComputeCustomer { Id = 3, Name = "John",  Age = 34, Price = 6.99, Qty = 4 },
-                new ComputeCustomer { Id = 4, Name = "Kerry", Age = 29, Price = 3.99, Qty = 15 },
-                new ComputeCustomer { Id = 5, Name = "Alex",  Age = 08, Price = 9.01, Qty = 20 },
+                new ComputeCustomer { Id = 1, Name = "Peter", Age = 19, Price = 1.99, Qty = 10, Candys = new List<string>(){ "kit kat"} },
+                new ComputeCustomer { Id = 2, Name = "Sam",   Age = 40, Price = 2.99, Qty = 15, Candys = new List<string>(){ "BasicBerry"} },
+                new ComputeCustomer { Id = 3, Name = "John",  Age = 34, Price = 6.99, Qty = 4, Candys = new List<string>(){ "Snickers", "Hershey"} },
+                new ComputeCustomer { Id = 4, Name = "Kerry", Age = 29, Price = 3.99, Qty = 15, Candys = new List<string>(){ "Snickers", "M&M"} },
+                new ComputeCustomer { Id = 5, Name = "Alex",  Age = 08, Price = 9.01, Qty = 20, Candys = new List<string>(){ "M&M", "Twix"} },
             };
             int[] zipcode = { 98029, 32509, 98052, 88309, 12304 };
 
