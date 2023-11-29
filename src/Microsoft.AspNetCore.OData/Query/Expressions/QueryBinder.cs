@@ -373,7 +373,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             // Be noted: it's used in $compute for $select and $expand.
-            if (context.Source != null)
+            if (context.Source != null && rangeVariable.Name == "$it")
             {
                 return context.Source;
             }

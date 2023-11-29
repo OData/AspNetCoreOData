@@ -792,6 +792,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 foreach (var computedProperty in computedProperties)
                 {
+                    // $select=computed&$compute=.... as computed
                     BindComputedProperty(source, context, computedProperty, includedProperties);
                 }
             }

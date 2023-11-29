@@ -21,6 +21,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
 
         public int Qty { get; set; }
 
+        public IList<string> Candys { get; set; }
+
         public ComputeAddress Location { get; set; }
 
         public IList<ComputeSale> Sales { get; set; }

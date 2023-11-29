@@ -190,10 +190,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 return null;
             }
 
-            TypedEdmStructuredObject edmStructruredObject = EdmObject as TypedEdmStructuredObject;
-            if (edmStructruredObject != null)
+            TypedEdmStructuredObject edmStructuredObject = EdmObject as TypedEdmStructuredObject;
+            if (edmStructuredObject != null)
             {
-                return edmStructruredObject.Instance;
+                return edmStructuredObject.Instance;
             }
 
             SelectExpandWrapper selectExpandWrapper = EdmObject as SelectExpandWrapper;
