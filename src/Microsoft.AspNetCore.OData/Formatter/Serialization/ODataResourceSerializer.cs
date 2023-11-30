@@ -1252,7 +1252,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(selectExpandNode != null);
             Contract.Assert(resourceContext != null);
 
-            List<ODataProperty> properties = new List<ODataProperty>();
+            int listSize = selectExpandNode.SelectedStructuralProperties.Count + selectExpandNode.SelectedComputedProperties.Count;
+            List<ODataProperty> properties = new List<ODataProperty>(listSize);
+
             if (selectExpandNode.SelectedStructuralProperties != null)
             {
                 IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
