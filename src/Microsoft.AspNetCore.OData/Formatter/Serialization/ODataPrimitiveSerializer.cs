@@ -181,38 +181,39 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             if (value != null)
             {
-                Type type = value.GetType();
-
-                // Note that type cannot be a nullable type as value is not null and it is boxed.
-                switch (Type.GetTypeCode(type))
+                if (value is char charValue)
                 {
-                    case TypeCode.Char:
-                        return new string((char)value, 1);
+                    return new string(charValue, 1);
+                }
 
-                    case TypeCode.UInt16:
-                        return (int)(ushort)value;
+                if (value is ushort ushortValue)
+                {
+                    return (int)ushortValue;
+                }
 
-                    case TypeCode.UInt32:
-                        return (long)(uint)value;
+                if (value is uint uintValue)
+                {
+                    return (long)uintValue;
+                }
 
-                    case TypeCode.UInt64:
-                        return checked((long)(ulong)value);
+                if (value is ulong ulongValue)
+                {
+                    return checked((long)ulongValue);
+                }
 
-                    case TypeCode.DateTime:
-                        DateTime dateTime = (DateTime)value;
-                        return TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime, timeZoneInfo);
+                if (value is DateTime dateTimeValue)
+                {
+                    return TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTimeValue, timeZoneInfo);
+                }
 
-                    default:
-                        if (type == typeof(char[]))
-                        {
-                            return new string(value as char[]);
-                        }
-                        else if (type == typeof(XElement))
-                        {
-                            return ((XElement)value).ToString();
-                        }
+                if (value is char[] charArrayValue)
+                {
+                    return new string(charArrayValue);
+                }
 
-                        break;
+                if (value is XElement xElementValue)
+                {
+                    return xElementValue.ToString();
                 }
             }
 
