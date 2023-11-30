@@ -2327,6 +2327,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerC
 
 	System.Collections.Generic.ISet`1[[System.String]] ComputedProperties  { public get; }
 	Microsoft.OData.Edm.IEdmProperty EdmProperty  { public get; public set; }
+	System.Collections.Generic.IDictionary`2[[Microsoft.OData.Edm.IEdmTypeReference],[Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer]] EdmTypeSerializers  { public get; }
 	Microsoft.AspNetCore.OData.Formatter.ResourceContext ExpandedResource  { public get; public set; }
 	bool ExpandReference  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[System.Object],[System.Object]] Items  { public get; }

@@ -134,13 +134,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             Type type = value.GetType();
-            if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateTime(type))
+            if (primitiveType != null &&
+                primitiveType.Definition is IEdmPrimitiveType res &&
+                res?.PrimitiveKind == EdmPrimitiveTypeKind.Date &&
+                TypeHelper.IsDateTime(type))
             {
                 Date dt = (DateTime)value;
                 return dt;
             }
 
-            if (primitiveType != null && primitiveType.IsTimeOfDay() && TypeHelper.IsTimeSpan(type))
+            if (primitiveType != null &&
+                primitiveType.Definition is IEdmPrimitiveType r &&
+                r?.PrimitiveKind == EdmPrimitiveTypeKind.TimeOfDay &&
+                TypeHelper.IsTimeSpan(type))
             {
                 TimeOfDay tod = (TimeSpan)value;
                 return tod;
@@ -148,14 +154,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
 #if NET6_0
             // Since ODL doesn't support "DateOnly", we have to use Date defined in ODL.
-            if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateOnly(type))
+            if (primitiveType != null && 
+                primitiveType.Definition is IEdmPrimitiveType r1 &&
+                r1?.PrimitiveKind == EdmPrimitiveTypeKind.Date &&
+                TypeHelper.IsDateOnly(type))
             {
                 DateOnly dateOnly = (DateOnly)value;
                 return new Date(dateOnly.Year, dateOnly.Month, dateOnly.Day);
             }
 
             // Since ODL doesn't support "TimeOnly", we have to use TimeOfDay defined in ODL.
-            if (primitiveType != null && primitiveType.IsTimeOfDay() && TypeHelper.IsTimeOnly(type))
+            if (primitiveType != null &&
+                primitiveType.Definition is IEdmPrimitiveType r2 &&
+                r2?.PrimitiveKind == EdmPrimitiveTypeKind.TimeOfDay &&
+                TypeHelper.IsTimeOnly(type))
             {
                 TimeOnly timeOnly = (TimeOnly)value;
                 return new TimeOfDay(timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond);
