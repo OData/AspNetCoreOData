@@ -1252,9 +1252,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             Contract.Assert(selectExpandNode != null);
             Contract.Assert(resourceContext != null);
 
-            int listSize = selectExpandNode.SelectedStructuralProperties.Count + selectExpandNode.SelectedComputedProperties.Count;
+            int listSize = (selectExpandNode.SelectedStructuralProperties?.Count ?? 0) + (selectExpandNode.SelectedComputedProperties?.Count ?? 0);
             List<ODataProperty> properties = new List<ODataProperty>(listSize);
-
             if (selectExpandNode.SelectedStructuralProperties != null)
             {
                 IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
@@ -1496,7 +1495,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmTypeReference propertyType = structuralProperty.Type;
             if (propertyValue != null)
             {
-                if (!propertyType.IsPrimitive() && !propertyType.IsEnum())
+                if (propertyType.Definition?.TypeKind != EdmTypeKind.Primitive && propertyType.Definition.TypeKind != EdmTypeKind.Enum)
                 {
                     IEdmTypeReference actualType = writeContext.GetEdmType(propertyValue, propertyValue.GetType());
                     if (propertyType != null && propertyType != actualType)
