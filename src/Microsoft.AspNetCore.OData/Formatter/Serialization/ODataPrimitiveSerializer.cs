@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// <inheritdoc/>
         public sealed override ODataValue CreateODataValue(object graph, IEdmTypeReference expectedType, ODataSerializerContext writeContext)
         {
-            if (!expectedType.IsPrimitive())
+            if (expectedType.Definition?.TypeKind != EdmTypeKind.Primitive)
             {
                 throw Error.InvalidOperation(SRResources.CannotWriteType, typeof(ODataPrimitiveSerializer), expectedType.FullName());
             }

@@ -5094,6 +5094,11 @@
             Gets a property bag associated with this context to store any generic data.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.EdmTypeSerializers">
+            <summary>
+            A cache of the various edm type serializers.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ExpandedResource">
             <summary>
             Gets or sets the resource that is being expanded.

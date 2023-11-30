@@ -27,6 +27,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
     public class ODataSerializerContext
     {
         private IDictionary<object, object> _items;
+        private IDictionary<IEdmTypeReference, IODataEdmTypeSerializer> _edmTypeSerializers;
         private ODataQueryContext _queryContext;
         private SelectExpandClause _selectExpandClause;
         private bool _isSelectExpandClauseSet;
@@ -248,6 +249,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             private set
             {
                 _items = value;
+            }
+        }
+
+        /// <summary>
+        /// A cache of the various edm type serializers.
+        /// </summary>
+        public IDictionary<IEdmTypeReference, IODataEdmTypeSerializer> EdmTypeSerializers
+        {
+            get
+            {
+                _edmTypeSerializers = _edmTypeSerializers ?? new Dictionary<IEdmTypeReference, IODataEdmTypeSerializer>();
+                return _edmTypeSerializers;
+            }
+            private set
+            {
+                _edmTypeSerializers = value;
             }
         }
 

@@ -1483,7 +1483,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             ODataSerializerContext writeContext = resourceContext.SerializerContext;
 
-            IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+            if (!writeContext.EdmTypeSerializers.TryGetValue(structuralProperty.Type, out IODataEdmTypeSerializer serializer))
+            {
+                serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+                writeContext.EdmTypeSerializers[structuralProperty.Type] = serializer;
+            }
+
             if (serializer == null)
             {
                 throw new SerializationException(
