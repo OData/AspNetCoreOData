@@ -812,12 +812,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEnumerable<ODataNestedResourceInfo> navigationLinks = CreateNavigationLinks(selectExpandNode.SelectedNavigationProperties, resourceContext);
             foreach (ODataNestedResourceInfo navigationLink in navigationLinks)
             {
-                if (resourceContext.WriteNavigationLinks)
-                {
-                    await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
-                    await writer.WriteEndAsync().ConfigureAwait(false);
-
-                }
+                await writer.WriteStartAsync(navigationLink).ConfigureAwait(false);
+                await writer.WriteEndAsync().ConfigureAwait(false);
             }
         }
 
@@ -1131,11 +1127,27 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             foreach (IEdmNavigationProperty navProperty in navigationProperties)
             {
                 ODataNestedResourceInfo navigationLink = CreateNavigationLink(navProperty, resourceContext);
-                if (navigationLink != null)
+                if (ShouldWriteNavigation(navigationLink, resourceContext))
                 {
                     yield return navigationLink;
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks whether a navigation link should be written or not. 
+        /// </summary>
+        /// <param name="navigationLink">The navigation link to be written.</param>
+        /// <param name="resourceContext">The resource context for the resource whose navigation link is being written.</param>
+        /// <returns>true if navigation link should be written; otherwise false.</returns>
+        protected virtual bool ShouldWriteNavigation(ODataNestedResourceInfo navigationLink, ResourceContext resourceContext) 
+        {
+            if (navigationLink?.Url != null || (navigationLink != null && resourceContext.SerializerContext.MetadataLevel == ODataMetadataLevel.Full))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -1231,15 +1243,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     if (navigationUrl != null)
                     {
                         navigationLink.Url = navigationUrl;
-                        resourceContext.WriteNavigationLinks = true;
-                    }
-                    else if (writeContext.MetadataLevel == ODataMetadataLevel.Full)
-                    {
-                        resourceContext.WriteNavigationLinks = true;
-                    }
-                    else
-                    {
-                        resourceContext.WriteNavigationLinks = false;
                     }
                 }
             }
