@@ -1925,7 +1925,18 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.BindableOperationFinder.#ctor(Microsoft.OData.Edm.IEdmModel)">
             <summary>
-            Constructs a ndOperationsBoundToCollection(Microsoft.OData.Edm.IEdmEntityType)">
+            Constructs a concurrent cache for looking up bindable operations for any EntityType in the provided model.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.BindableOperationFinder.FindOperations(Microsoft.OData.Edm.IEdmEntityType)">
+            <summary>
+            Finds operations that can be invoked on the given entity type. This would include all the operations that are bound
+            to the given type and its base types.
+            </summary>
+            <param name="entityType">The EDM entity type.</param>
+            <returns>A collection of operations bound to the entity type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.BindableOperationFinder.FindOperationsBoundToCollection(Microsoft.OData.Edm.IEdmEntityType)">
             <summary>
             Finds operations that can be invoked on the feed. This would include all the operations that are bound to the given
             type and its base types.
@@ -15229,22 +15240,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
