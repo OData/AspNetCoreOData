@@ -452,7 +452,6 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ComputedProperties.get -> System.Collections.Generic.ISet<string>
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.EdmProperty.get -> Microsoft.OData.Edm.IEdmProperty
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.EdmProperty.set -> void
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.EdmTypeSerializers.get -> System.Collections.Generic.IDictionary<Microsoft.OData.Edm.IEdmTypeReference, Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer>
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ExpandedResource.get -> Microsoft.AspNetCore.OData.Formatter.ResourceContext
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ExpandedResource.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ExpandReference.get -> bool
