@@ -135,8 +135,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             Type type = value.GetType();
             if (primitiveType != null &&
-                primitiveType.Definition is IEdmPrimitiveType res &&
-                res?.PrimitiveKind == EdmPrimitiveTypeKind.Date &&
+                primitiveType.Definition is IEdmPrimitiveType date &&
+                date.PrimitiveKind == EdmPrimitiveTypeKind.Date &&
                 TypeHelper.IsDateTime(type))
             {
                 Date dt = (DateTime)value;
@@ -144,8 +144,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             if (primitiveType != null &&
-                primitiveType.Definition is IEdmPrimitiveType r &&
-                r?.PrimitiveKind == EdmPrimitiveTypeKind.TimeOfDay &&
+                primitiveType.Definition is IEdmPrimitiveType timeOfDay &&
+                timeOfDay.PrimitiveKind == EdmPrimitiveTypeKind.TimeOfDay &&
                 TypeHelper.IsTimeSpan(type))
             {
                 TimeOfDay tod = (TimeSpan)value;

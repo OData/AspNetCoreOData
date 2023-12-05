@@ -262,10 +262,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 _edmTypeSerializers = _edmTypeSerializers ?? new Dictionary<IEdmTypeReference, IODataEdmTypeSerializer>();
                 return _edmTypeSerializers;
             }
-            private set
-            {
-                _edmTypeSerializers = value;
-            }
         }
 
         /// <summary>
