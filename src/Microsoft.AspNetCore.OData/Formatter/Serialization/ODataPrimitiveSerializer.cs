@@ -134,6 +134,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
 
             Type type = value.GetType();
+
+            // Return values for supported primitive values. 
+            if (type == typeof(string)
+                || type == typeof(int)
+                || type == typeof(bool)
+                || type == typeof(double)
+                || type == typeof(Guid))
+            {
+                return value;
+            }
+
             if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateTime(type))
             {
                 Date dt = (DateTime)value;
