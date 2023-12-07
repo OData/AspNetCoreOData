@@ -277,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
-        // Patch ~/Widnows(1)
+        // Patch ~/Windows(1)
         public async Task PatchContainingEntity(string modelMode)
         {
             string requestUri = $"{modelMode}/Windows(1)";
@@ -325,7 +325,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
-        // Patch ~/Widnows(3)
+        // Patch ~/Windows(3)
         public async Task PatchContainingEntity_Matched_DerivedType(string modelMode)
         {
             string requestUri = $"{modelMode}/Windows(3)";
@@ -357,7 +357,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
-        // Patch ~/Widnows(3)
+        // Patch ~/Windows(3)
         public async Task PatchContainingEntity_DeltaIsBaseType(string modelMode)
         {
             string requestUri = $"{modelMode}/Windows(3)";
@@ -401,7 +401,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
-        // Patch ~/Widnows(3)
+        // Patch ~/Windows(3)
         public async Task Patch_Matched_DerivedComplexType(string modelMode)
         {
             string requestUri = $"{modelMode}/Windows(3)/CurrentShape";
@@ -674,7 +674,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
-        // PUT ~/Widnows(1)/CurrentShape
+        // PUT ~/Windows(1)/CurrentShape
         public async Task PutCurrentShape(string modelMode)
         {
             // Arrange
