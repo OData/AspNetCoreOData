@@ -326,14 +326,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         [InlineData("convention")]
         [InlineData("explicit")]
         // Patch ~/Widnows(3)
-        public async Task PatchContainingEntity_MismatchedRuntimeTypeError(string modelMode)
+        public async Task PatchContainingEntity_Matched_DerivedType(string modelMode)
         {
             string requestUri = $"{modelMode}/Windows(3)";
 
             HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
 
-            // Attempt to PATCH nested resource with delta object of the different CLR type
-            // will result an error.
+            // PATCH nested resource with delta object of the different CLR type
+            // will return a success result.
             var content = @"
 {
     'CurrentShape':
@@ -351,7 +351,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
             HttpClient client = CreateClient();
             HttpResponseMessage response = await client.SendAsync(request);
             string contentOfString = await response.Content.ReadAsStringAsync();
-            Assert.True(HttpStatusCode.BadRequest == response.StatusCode);
+            Assert.True(HttpStatusCode.OK == response.StatusCode);
         }
 
         [Theory]
@@ -396,6 +396,36 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
             // Only 'Vertexes' is updated;  'HasBoarder' still has the correct value.
             Assert.Contains("\"Vertexes\":[{\"X\":1,\"Y\":2},{\"X\":2,\"Y\":3},{\"X\":4,\"Y\":8}]", contentOfString);
             Assert.Contains("\"HasBorder\":false", contentOfString);
+        }
+
+        [Theory]
+        [InlineData("convention")]
+        [InlineData("explicit")]
+        // Patch ~/Widnows(3)
+        public async Task Patch_Matched_DerivedComplexType(string modelMode)
+        {
+            string requestUri = $"{modelMode}/Windows(3)/CurrentShape";
+
+            HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
+
+            // Attempt to PATCH nested resource with delta object of the different CLR type
+            // will result an error.
+
+            var content = @"
+    {
+        '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance.Circle',
+        'Radius':2,
+        'Center':{'X':1,'Y':2},
+        'HasBorder':true
+    }";
+
+            StringContent stringContent = new StringContent(content: content, encoding: Encoding.UTF8, mediaType: "application/json");
+            request.Content = stringContent;
+            HttpClient client = CreateClient();
+            HttpResponseMessage response = await client.SendAsync(request);
+            JObject contentOfJObject = await response.Content.ReadAsObject<JObject>();
+            Assert.Equal(2, (int)contentOfJObject["Radius"]);
+            Assert.True(HttpStatusCode.OK == response.StatusCode);
         }
 
         private async Task<string> ExecuteAsync(HttpRequestMessage request, string content)
