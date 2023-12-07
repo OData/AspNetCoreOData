@@ -181,6 +181,7 @@ Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType) -> 
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Delta(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.GetInstance() -> T
+Microsoft.AspNetCore.OData.Deltas.Delta<T>.IsComplexType.get -> bool
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Patch(T original) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.Put(T original) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.UpdatableProperties.get -> System.Collections.Generic.IList<string>
