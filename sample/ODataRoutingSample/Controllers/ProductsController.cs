@@ -178,6 +178,17 @@ namespace ODataRoutingSample.Controllers
         public string GetWholeSalary(string order, string name)
         {
             return $"Products/GetWholeSalary: {order}, {name}";
+
+            // Be noted:
+            // The function parameter from route value is unescaped, so we don't need to do it again.
+            // for example: we can send request like: 
+            // http://localhost:5000/Products/Default.GetWholeSalary(order='2',name='key%253A')
+            // The response should look like:
+            //
+            // {
+            //    "@odata.context": "http://localhost:5000/$metadata#Edm.String",
+            //   "value": "Products/GetWholeSalary: 2, key%3A"
+            // }
         }
 
         [HttpGet]
