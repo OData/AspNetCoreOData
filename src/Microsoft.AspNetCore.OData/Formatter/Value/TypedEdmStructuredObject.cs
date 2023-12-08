@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Common;
@@ -20,8 +21,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
     /// </summary>
     internal abstract class TypedEdmStructuredObject : IEdmStructuredObject
     {
-        private static readonly ConcurrentDictionary<Tuple<string, Type>, Func<object, object>> _propertyGetterCache =
-            new ConcurrentDictionary<Tuple<string, Type>, Func<object, object>>();
+        private static readonly ConcurrentDictionary<(string, Type), Func<object, object>> _propertyGetterCache =
+            new ConcurrentDictionary<(string, Type), Func<object, object>>(new PropertyGetterCacheEqualityComparer());
 
         private IEdmStructuredTypeReference _edmType;
         private Type _type;
@@ -88,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             IEdmStructuredTypeReference edmType,
             IEdmModel model)
         {
-            Tuple<string, Type> key = Tuple.Create(propertyName, type);
+            (string, Type) key = (propertyName, type);
             Func<object, object> getter;
 
             if (!_propertyGetterCache.TryGetValue(key, out getter))
@@ -118,6 +119,39 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value
             var helper = new PropertyHelper(property);
 
             return helper.GetValue;
+        }
+    }
+
+    /// <summary>
+    /// A custom equality comparer for the property getter cache. 
+    /// </summary>
+    internal class PropertyGetterCacheEqualityComparer : IEqualityComparer<(string, Type)>
+    {
+        public bool Equals((string, Type) x, (string, Type) y)
+        {
+            return x.Item1 == y.Item1 && x.Item2 == y.Item2;
+        }
+
+        /// <summary>
+        /// This method overrides the default GetHashCode() implementation
+        /// for a tuple of (string, Type) to provide a more effective hash code.
+        /// </summary>
+        /// <param name="obj">The tuple object to calculate a hash code for</param>
+        /// <returns>The calculated hash code. </returns>
+        public int GetHashCode((string, Type) obj)
+        {
+            unchecked
+            {
+                // The choice of 19 as the initial prime number is arbitrary but common in most hash code implementations.
+                // Multyplying by a prime number helps to reduce the chance of collisions.
+                // The hashcode of each tuple element is combined with the calculated hash to create
+                // a more unique hash code for the tuple.
+                int hash = 19;
+                hash = hash * 23 + obj.Item1.GetHashCode();
+                hash = hash * 23 + obj.Item2.GetHashCode();
+
+                return hash;
+            }
         }
     }
 }
