@@ -190,6 +190,7 @@ Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource()
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource(System.Type structuralType) -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties) -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo) -> void
+Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.DeltaDeletedResource(System.Type structuralType, System.Collections.Generic.IEnumerable<string> updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo, bool isComplexType) -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Id.get -> System.Uri
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Id.set -> void
 Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource<T>.Reason.get -> Microsoft.OData.DeltaDeletedEntryReason?

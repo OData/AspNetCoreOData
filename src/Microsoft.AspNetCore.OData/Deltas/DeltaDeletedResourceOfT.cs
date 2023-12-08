@@ -62,6 +62,21 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="DeltaDeletedResource{T}"/>.
+        /// </summary>
+        /// <param name="structuralType">The derived entity type which the changes would be tracked.
+        /// <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+        /// <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+        /// names, including those of dynamic properties, are ignored.</param>
+        /// <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+        /// <param name="isComplexType">If structuralType is a complex type.</param>
+        /// properties. <c>null</c> means this entity type is not open.</param>
+        public DeltaDeletedResource(Type structuralType, IEnumerable<string> updatableProperties, PropertyInfo dynamicDictionaryPropertyInfo, bool isComplexType)
+            : base(structuralType, updatableProperties, dynamicDictionaryPropertyInfo, isComplexType)
+        {
+        }
+
         /// <inheritdoc />
         public Uri Id { get; set; }
 

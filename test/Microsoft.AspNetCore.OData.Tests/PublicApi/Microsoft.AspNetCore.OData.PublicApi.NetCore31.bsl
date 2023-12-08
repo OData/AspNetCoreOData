@@ -509,8 +509,10 @@ public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OD
 	public Delta`1 (System.Type structuralType)
 	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties)
 	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo)
+	public Delta`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo, bool isComplexType)
 
 	System.Type ExpectedClrType  { public virtual get; }
+	bool IsComplexType  { public get; }
 	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
 	System.Collections.Generic.IList`1[[System.String]] UpdatableProperties  { public get; }
@@ -534,6 +536,7 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1 : Delta`1,
 	public DeltaDeletedResource`1 (System.Type structuralType)
 	public DeltaDeletedResource`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties)
 	public DeltaDeletedResource`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo)
+	public DeltaDeletedResource`1 (System.Type structuralType, System.Collections.Generic.IEnumerable`1[[System.String]] updatableProperties, System.Reflection.PropertyInfo dynamicDictionaryPropertyInfo, bool isComplexType)
 
 	System.Uri Id  { public virtual get; public virtual set; }
 	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
