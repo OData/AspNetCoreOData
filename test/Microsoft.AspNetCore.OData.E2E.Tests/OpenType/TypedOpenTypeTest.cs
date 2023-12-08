@@ -452,7 +452,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
             request.Content = new StringContent(
                 @"{
-                        '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.OpenType.Address',
+                        '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.OpenType.GlobalAddress',
                         'City':'NewCity',
                         'OtherProperty@odata.type':'#Date',
                         'OtherProperty':'2016-02-01'
@@ -467,7 +467,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             content = await response.Content.ReadAsObject<JObject>();
-            Assert.Equal(7, content.Count); // @odata.context + 3 declared properties + 2 dynamic properties + 1 new dynamic properties
+            Assert.Equal(7, content.Count); // @odata.context + 3 declared properties + 2 dynamic properties + 1 @odata.type
             Assert.Equal("NewCity", content["City"]); // updated
             Assert.Equal("1 Microsoft Way", content["Street"]);
             Assert.Equal("US", content["CountryCode"]);
@@ -499,7 +499,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
             request.Content = new StringContent(
                 @"{
-                        '@odata.type':'#Microsoft.Test.E2E.AspNet.OData.OpenType.Address',
+                        '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.OpenType.Address',
                         'City':'NewCity',
                         'OtherProperty@odata.type':'#Date',
                         'OtherProperty':'2016-02-01'
@@ -514,7 +514,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             content = await response.Content.ReadAsObject<JObject>();
-            Assert.Equal(5, content.Count); // @odata.context + 3 declared properties + 1 dynamic properties + 1 new dynamic properties
+            Assert.Equal(6, content.Count); // @odata.context + 3 declared properties + 1 dynamic properties + 1 @odata.type
             Assert.Equal("NewCity", content["City"]); // updated
             Assert.Equal("1 Microsoft Way", content["Street"]);
 

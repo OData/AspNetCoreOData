@@ -463,7 +463,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
         /// </summary>
         /// <param name="original">The entity to be updated.</param>
-        public void Patch(T original)
+        /// <returns>The updated entity.</returns>
+        public T Patch(T original)
         {
             if (IsComplexType)
             {
@@ -471,6 +472,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
             }
 
             CopyChangedValues(original);
+
+            return original;
         }
 
         /// <summary>

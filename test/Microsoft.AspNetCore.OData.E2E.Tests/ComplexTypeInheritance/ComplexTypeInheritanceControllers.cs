@@ -128,17 +128,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
         {
             Window window = _windows.First(e => e.Id == key);
             var currShape = window.CurrentShape;
+            Shape newcurrShape = null;
 
             try
             {
-                delta.Patch(currShape);
+                newcurrShape = delta.Patch(currShape);
             }
             catch (ArgumentException ae)
             {
                 return BadRequest(ae.Message);
             }
 
-            return Ok(currShape);
+            return Ok(newcurrShape);
         }
 
         public IActionResult Put(int key, [FromBody]Window window)

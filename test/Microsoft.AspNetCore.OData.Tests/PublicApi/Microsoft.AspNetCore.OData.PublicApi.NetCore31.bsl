@@ -524,7 +524,7 @@ public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OD
 	public virtual System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetDeltaNestedNavigationProperties ()
 	public T GetInstance ()
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetUnchangedPropertyNames ()
-	public void Patch (T original)
+	public T Patch (T original)
 	public void Put (T original)
 	public virtual bool TryGetPropertyType (string name, out System.Type& type)
 	public virtual bool TryGetPropertyValue (string name, out System.Object& value)
