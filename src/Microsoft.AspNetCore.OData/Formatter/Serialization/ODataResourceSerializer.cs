@@ -783,7 +783,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 IDictionary<string, object> properties = null;
                 foreach (IEdmStructuralProperty etagProperty in concurrencyProperties)
                 {
-                    properties ??= new Dictionary<string, object>();
+                    properties ??= new SortedDictionary<string, object>();
                     
                     properties.Add(etagProperty.Name, resourceContext.GetPropertyValue(etagProperty.Name));
                 }
