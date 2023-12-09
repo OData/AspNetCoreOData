@@ -29,6 +29,8 @@ namespace Microsoft.AspNetCore.OData
     public class ODataOptions
     {
         #region Settings
+        private IServiceProvider _serviceProvider;
+
         /// <summary>
         /// Gets or sets the <see cref="ODataUrlKeyDelimiter"/> to use while parsing, specifically
         /// whether to recognize keys as segments or not.
@@ -61,7 +63,7 @@ namespace Microsoft.AspNetCore.OData
         /// <summary>
         /// Gets the <see cref="RouteOptions"/> instance responsible for configuring the route template.
         /// </summary>
-        public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();
+        public ODataRouteOptions RouteOptions { get; } = new ODataRouteOptions();        
 
         #endregion
 
@@ -72,6 +74,28 @@ namespace Microsoft.AspNetCore.OData
         /// </summary>
         /// <remarks>DO NOT modify this dictionary yourself. Instead, use the 'AddRouteComponents()` methods for registering model instances.</remarks>
         public IDictionary<string, (IEdmModel EdmModel, IServiceProvider ServiceProvider)> RouteComponents { get; } = new Dictionary<string, (IEdmModel, IServiceProvider)>();
+
+        /// <summary>
+        /// Configures service collection for non-EDM scenario
+        /// </summary>
+        /// <param name="configureServices">The sub service configuration action.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions AddRouteComponents(Action<IServiceCollection> configureServices)
+        {
+            return AddRouteComponents(ODataVersion.V4, configureServices);
+        }
+
+        /// <summary>
+        /// Configures service collection for non-EDM scenario
+        /// </summary>
+        /// <param name="version">The OData version to be used.</param>
+        /// <param name="configureServices">The sub service configuration action.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions AddRouteComponents(ODataVersion version, Action<IServiceCollection> configureServices)
+        {
+            _serviceProvider = BuildRouteContainer(null, version, configureServices);
+            return this;
+        }
 
         /// <summary>
         /// Adds an <see cref="IEdmModel"/> to the default route.
@@ -171,7 +195,7 @@ namespace Microsoft.AspNetCore.OData
         {
             if (routePrefix == null)
             {
-                return null;
+                return _serviceProvider;
             }
 
             string sanitizedRoutePrefix = SanitizeRoutePrefix(routePrefix);
@@ -304,13 +328,11 @@ namespace Microsoft.AspNetCore.OData
         /// Build the container.
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        /// <param name="setupAction">The setup config.</param>
         /// <param name="version">The OData version config.</param>
+        /// <param name="setupAction">The setup config.</param>
         /// <returns>The built service provider.</returns>
         private IServiceProvider BuildRouteContainer(IEdmModel model, ODataVersion version, Action<IServiceCollection> setupAction)
         {
-            Contract.Assert(model != null);
-
             ServiceCollection services = new ServiceCollection();
             DefaultContainerBuilder builder = new DefaultContainerBuilder();
 
@@ -331,10 +353,13 @@ namespace Microsoft.AspNetCore.OData
                     EnableNoDollarQueryOptions = EnableNoDollarQueryOptions // retrieve it from global setting
                 });
 
-            // Inject the Edm model.
-            // From Current ODL implement, such injection only be used in reader and writer if the input
-            // model is null.
-            builder.Services.AddSingleton(sp => model);
+            if (model != null)
+            {
+                // Inject the Edm model.
+                // From Current ODL implement, such injection only be used in reader and writer if the input
+                // model is null.
+                builder.Services.AddSingleton(sp => model);
+            }
 
             // Inject the customized services.
             setupAction?.Invoke(builder.Services);

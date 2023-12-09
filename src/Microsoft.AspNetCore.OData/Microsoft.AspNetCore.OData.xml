@@ -6422,6 +6422,21 @@
             </summary>
             <remarks>DO NOT modify this dictionary yourself. Instead, use the 'AddRouteComponents()` methods for registering model instances.</remarks>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Configures service collection for non-EDM scenario
+            </summary>
+            <param name="configureServices">The sub service configuration action.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.ODataVersion,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Configures service collection for non-EDM scenario
+            </summary>
+            <param name="version">The OData version to be used.</param>
+            <param name="configureServices">The sub service configuration action.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Adds an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to the default route.
@@ -6552,8 +6567,8 @@
             Build the container.
             </summary>
             <param name="model">The Edm model.</param>
-            <param name="setupAction">The setup config.</param>
             <param name="version">The OData version config.</param>
+            <param name="setupAction">The setup config.</param>
             <returns>The built service provider.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataOptions.SanitizeRoutePrefix(System.String)">

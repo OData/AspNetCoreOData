@@ -271,12 +271,6 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 return requestContainer;
             }
 
-            // if the prefixName == null, it's a non-model scenario
-            if (request.ODataFeature().RoutePrefix == null)
-            {
-                return null;
-            }
-
             // HTTP routes will not have chance to call CreateRequestContainer. We have to call it.
             return request.CreateRouteServices(request.ODataFeature().RoutePrefix);
         }
@@ -300,6 +294,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             IServiceScope requestScope = request.CreateRequestScope(routePrefix);
+            if (requestScope == null)
+            {
+                // non-model scenario with dependency injection non enabled
+                return null;
+            }
+
             IServiceProvider requestContainer = requestScope.ServiceProvider;
 
             request.ODataFeature().RequestScope = requestScope;
@@ -341,14 +341,16 @@ namespace Microsoft.AspNetCore.OData.Extensions
         {
             ODataOptions options = request.ODataOptions();
 
-            IServiceProvider rootContainer = options.GetRouteServices(routePrefix);
+            IServiceProvider rootContainer = options?.GetRouteServices(routePrefix);
+            if (rootContainer == null)
+            {
+                return null;
+            }
+
             IServiceScope scope = rootContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
-            // Bind scoping request into the OData container.
-            if (!string.IsNullOrEmpty(routePrefix))
-            {
-                scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
-            }
+            // Bind scoping request into the OData container.            
+            scope.ServiceProvider.GetRequiredService<HttpRequestScope>().HttpRequest = request;
 
             return scope;
         }

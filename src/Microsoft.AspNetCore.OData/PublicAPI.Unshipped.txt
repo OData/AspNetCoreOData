@@ -666,6 +666,8 @@ Microsoft.AspNetCore.OData.ODataMvcOptionsSetup
 Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.MvcOptions options) -> void
 Microsoft.AspNetCore.OData.ODataMvcOptionsSetup.ODataMvcOptionsSetup() -> void
 Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.ODataVersion version, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configureServices) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler batchHandler) -> Microsoft.AspNetCore.OData.ODataOptions
 Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(string routePrefix, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.OData.ODataOptions
