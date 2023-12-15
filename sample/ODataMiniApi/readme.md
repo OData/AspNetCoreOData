@@ -6,7 +6,6 @@ This is an ASP.NET Core OData 8.x minimal API project.
 Minimal APIs are a simplified approach for building fast HTTP APIs with ASP.NET Core. You can build fully functioning REST endpoints with minimal code and configuration. Skip traditional scaffolding and avoid unnecessary controllers by fluently declaring API routes and actions. 
 
 
-
 ## Basic endpoints
 
 1) GET `http://localhost:5177/schools`
@@ -128,3 +127,48 @@ Content-Type: application/json
     "birthDay": "1977-11-04"
 }
 ```
+
+Check using `http://localhost:5177/schools/3`, you can see a new student added:
+
+```json
+[
+  "schoolId": 3,
+    "schoolName": "Earth University",
+    "mailAddress": {
+        "apartNum": 101,
+        "city": "Belly",
+        "street": "24TH ST",
+        "zipCode": "98029"
+    },
+    "students": [
+        ...
+        {
+            "studentId": 98,
+            "firstName": "Sokuda",
+            "lastName": "Yu",
+            "favoriteSport": "Soccer",
+            "grade": 7,
+            "schoolId": 3,
+            "birthDay": "1977-11-04"
+        }
+    ]
+}
+```
+
+3) Patch `http://localhost:5177/odata/students/10`
+Content-Type: application/json
+
+```json
+{
+
+    "firstName": "Sokuda",
+    "lastName": "Yu",
+    "schoolId": 4
+}
+```
+
+This will change the student, and also move the student from `Schools(1)` to `Schools(4)`
+
+4) Delete `http://localhost:5177/odata/students/10`
+
+This will delete the `Students(10)`
