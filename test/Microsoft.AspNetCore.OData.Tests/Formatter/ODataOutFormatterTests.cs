@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Act & Assert
             IReadOnlyList<string> contentTypes = formatter.GetSupportedContentTypes("application/json", typeof(string));
-            Assert.Equal(12, contentTypes.Count);
+            Assert.Equal(36, contentTypes.Count);
 
             // Act & Assert
             formatter.SupportedMediaTypes.Clear();

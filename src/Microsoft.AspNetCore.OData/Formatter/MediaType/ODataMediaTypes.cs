@@ -29,6 +29,30 @@ namespace Microsoft.AspNetCore.OData.Formatter.MediaType
         public const string ApplicationJsonODataNoMetadataStreamingTrue = "application/json;odata.metadata=none;odata.streaming=true";
         public const string ApplicationJsonStreamingFalse = "application/json;odata.streaming=false";
         public const string ApplicationJsonStreamingTrue = "application/json;odata.streaming=true";
+        public const string ApplicationJsonIeee754CompatibleTrue = "application/json;IEEE754Compatible=true";
+        public const string ApplicationJsonIeee754CompatibleFalse = "application/json;IEEE754Compatible=false";
+        public const string ApplicationJsonODataFullMetadataIeee754CompatibleTrue = "application/json;odata.metadata=full;IEEE754Compatible=true";
+        public const string ApplicationJsonODataFullMetadataIeee754CompatibleFalse = "application/json;odata.metadata=full;IEEE754Compatible=false";
+        public const string ApplicationJsonODataFullMetadataStreamingFalseIeee754CompatibleTrue = "application/json;odata.metadata=full;odata.streaming=false;IEEE754Compatible=true";
+        public const string ApplicationJsonODataFullMetadataStreamingFalseIeee754CompatibleFalse = "application/json;odata.metadata=full;odata.streaming=false;IEEE754Compatible=false";
+        public const string ApplicationJsonODataFullMetadataStreamingTrueIeee754CompatibleTrue = "application/json;odata.metadata=full;odata.streaming=true;IEEE754Compatible=true";
+        public const string ApplicationJsonODataFullMetadataStreamingTrueIeee754CompatibleFalse = "application/json;odata.metadata=full;odata.streaming=true;IEEE754Compatible=false";
+        public const string ApplicationJsonODataMinimalMetadataIeee754CompatibleTrue = "application/json;odata.metadata=minimal;IEEE754Compatible=true";
+        public const string ApplicationJsonODataMinimalMetadataIeee754CompatibleFalse = "application/json;odata.metadata=minimal;IEEE754Compatible=false";
+        public const string ApplicationJsonODataMinimalMetadataStreamingFalseIeee754CompatibleTrue = "application/json;odata.metadata=minimal;odata.streaming=false;IEEE754Compatible=true";
+        public const string ApplicationJsonODataMinimalMetadataStreamingFalseIeee754CompatibleFalse = "application/json;odata.metadata=minimal;odata.streaming=false;IEEE754Compatible=false";
+        public const string ApplicationJsonODataMinimalMetadataStreamingTrueIeee754CompatibleTrue = "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=true";
+        public const string ApplicationJsonODataMinimalMetadataStreamingTrueIeee754CompatibleFalse = "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=false";
+        public const string ApplicationJsonODataNoMetadataIeee754CompatibleTrue = "application/json;odata.metadata=none;IEEE754Compatible=true";
+        public const string ApplicationJsonODataNoMetadataIeee754CompatibleFalse = "application/json;odata.metadata=none;IEEE754Compatible=false";
+        public const string ApplicationJsonODataNoMetadataStreamingFalseIeee754CompatibleTrue = "application/json;odata.metadata=none;odata.streaming=false;IEEE754Compatible=true";
+        public const string ApplicationJsonODataNoMetadataStreamingFalseIeee754CompatibleFalse = "application/json;odata.metadata=none;odata.streaming=false;IEEE754Compatible=false";
+        public const string ApplicationJsonODataNoMetadataStreamingTrueIeee754CompatibleTrue = "application/json;odata.metadata=none;odata.streaming=true;IEEE754Compatible=true";
+        public const string ApplicationJsonODataNoMetadataStreamingTrueIeee754CompatibleFalse = "application/json;odata.metadata=none;odata.streaming=true;IEEE754Compatible=false";
+        public const string ApplicationJsonStreamingFalseIeee754CompatibleTrue = "application/json;odata.streaming=false;IEEE754Compatible=true";
+        public const string ApplicationJsonStreamingFalseIeee754CompatibleFalse = "application/json;odata.streaming=false;IEEE754Compatible=false";
+        public const string ApplicationJsonStreamingTrueIeee754CompatibleTrue = "application/json;odata.streaming=true;IEEE754Compatible=true";
+        public const string ApplicationJsonStreamingTrueIeee754CompatibleFalse = "application/json;odata.streaming=true;IEEE754Compatible=false";
         public const string ApplicationXml = "application/xml";
 
         public static ODataMetadataLevel GetMetadataLevel(string mediaType, IEnumerable<KeyValuePair<string, string>> parameters)
