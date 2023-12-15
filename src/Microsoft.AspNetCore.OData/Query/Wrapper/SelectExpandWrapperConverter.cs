@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
     /// <summary>
     /// Supports converting <see cref="SelectExpandWrapper{T}"/> types by using a factory pattern.
     /// </summary>
-    internal class SelectExpandWrapperConverter : JsonConverterFactory
+    public class SelectExpandWrapperConverter : JsonConverterFactory
     {
         public static readonly Func<IEdmModel, IEdmStructuredType, IPropertyMapper> MapperProvider =
             (IEdmModel model, IEdmStructuredType type) => new JsonPropertyNameMapper(model, type);
@@ -65,30 +65,30 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             }
 
             // Since 'type' is tested in 'CanConvert()', it must be a generic type
-            Type generaticType = type.GetGenericTypeDefinition();
+            Type genericType = type.GetGenericTypeDefinition();
             Type entityType = type.GetGenericArguments()[0];
 
-            if (generaticType == typeof(SelectSome<>))
+            if (genericType == typeof(SelectSome<>))
             {
                 return (JsonConverter)Activator.CreateInstance(typeof(SelectSomeConverter<>).MakeGenericType(new Type[] { entityType }));
             }
 
-            if (generaticType == typeof(SelectSomeAndInheritance<>))
+            if (genericType == typeof(SelectSomeAndInheritance<>))
             {
                 return (JsonConverter)Activator.CreateInstance(typeof(SelectSomeAndInheritanceConverter<>).MakeGenericType(new Type[] { entityType }));
             }
 
-            if (generaticType == typeof(SelectAll<>))
+            if (genericType == typeof(SelectAll<>))
             {
                 return (JsonConverter)Activator.CreateInstance(typeof(SelectAllConverter<>).MakeGenericType(new Type[] { entityType }));
             }
 
-            if (generaticType == typeof(SelectAllAndExpand<>))
+            if (genericType == typeof(SelectAllAndExpand<>))
             {
                 return (JsonConverter)Activator.CreateInstance(typeof(SelectAllAndExpandConverter<>).MakeGenericType(new Type[] { entityType }));
             }
 
-            if (generaticType == typeof(SelectExpandWrapper<>))
+            if (genericType == typeof(SelectExpandWrapper<>))
             {
                 return (JsonConverter)Activator.CreateInstance(typeof(SelectExpandWrapperConverter<>).MakeGenericType(new Type[] { entityType }));
             }

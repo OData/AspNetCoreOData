@@ -25,6 +25,7 @@ property selection combination possible. */
     /// Represents a container class that contains properties that are either selected or expanded using $select and $expand.
     /// </summary>
     /// <typeparam name="TElement">The element being selected and expanded.</typeparam>
+    [JsonConverter(typeof(SelectExpandWrapperConverter))]
     internal class SelectExpandWrapper<TElement> : SelectExpandWrapper
     {
         /// <summary>

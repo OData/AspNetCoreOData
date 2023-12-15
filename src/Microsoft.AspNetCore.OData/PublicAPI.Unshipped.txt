@@ -238,6 +238,10 @@ Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.IdLink.get -> System.Uri
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.IdLink.set -> void
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.ReadLink.get -> System.Uri
 Microsoft.AspNetCore.OData.Edm.EntitySelfLinks.ReadLink.set -> void
+Microsoft.AspNetCore.OData.Edm.IODataEndpointModelMapper
+Microsoft.AspNetCore.OData.Edm.IODataEndpointModelMapper.Maps.get -> System.Collections.Concurrent.ConcurrentDictionary<Microsoft.AspNetCore.Http.Endpoint, Microsoft.OData.Edm.IEdmModel>
+Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration
+Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration.Apply(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.OData.ModelBuilder.ODataModelBuilder builder) -> void
 Microsoft.AspNetCore.OData.Edm.IODataTypeMapper
 Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetClrPrimitiveType(Microsoft.OData.Edm.IEdmPrimitiveType primitiveType, bool nullable) -> System.Type
 Microsoft.AspNetCore.OData.Edm.IODataTypeMapper.GetClrType(Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmType edmType, bool nullable, Microsoft.OData.ModelBuilder.IAssemblyResolver assembliesResolver) -> System.Type
@@ -275,6 +279,10 @@ Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions
 Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions
 Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions
 Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers
+Microsoft.AspNetCore.OData.Extensions.ODataEndpointConventionBuilderExtensions
+Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata
+Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata.ODataPrefixMetadata(string prefix) -> void
+Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata.Prefix.get -> string
 Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions
 Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys
 Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer
@@ -1212,6 +1220,8 @@ Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.TryGetPropertyValue(
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary(System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> propertyMapperProvider) -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter
+Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.SelectExpandWrapperConverter() -> void
 Microsoft.AspNetCore.OData.Results.BadRequestODataResult
 Microsoft.AspNetCore.OData.Results.BadRequestODataResult.BadRequestODataResult(Microsoft.OData.ODataError odataError) -> void
 Microsoft.AspNetCore.OData.Results.BadRequestODataResult.BadRequestODataResult(string message) -> void
@@ -1553,6 +1563,8 @@ override Microsoft.AspNetCore.OData.Query.ETag.TrySetMember(System.Dynamic.SetMe
 override Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
 override Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
+override Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CanConvert(System.Type typeToConvert) -> bool
+override Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CreateConverter(System.Type type, System.Text.Json.JsonSerializerOptions options) -> System.Text.Json.Serialization.JsonConverter
 override Microsoft.AspNetCore.OData.Results.BadRequestODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Results.ConflictODataResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
 override Microsoft.AspNetCore.OData.Results.CreatedODataResult<T>.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext context) -> System.Threading.Tasks.Task
@@ -1710,6 +1722,8 @@ static Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.ODataOptions(
 static Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions.IsSuccessStatusCode(this Microsoft.AspNetCore.Http.HttpResponse response) -> bool
 static Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(this Microsoft.AspNetCore.Http.HttpRequest request, params Microsoft.OData.UriParser.ODataPathSegment[] segments) -> string
 static Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(this Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IList<Microsoft.OData.UriParser.ODataPathSegment> segments) -> string
+static Microsoft.AspNetCore.OData.Extensions.ODataEndpointConventionBuilderExtensions.UseOData<TBuilder>(this TBuilder builder, Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration config) -> TBuilder
+static Microsoft.AspNetCore.OData.Extensions.ODataEndpointConventionBuilderExtensions.UseOData<TBuilder>(this TBuilder builder, string prefix) -> TBuilder
 static Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions.CreateODataError(this Microsoft.AspNetCore.Mvc.SerializableError serializableError) -> Microsoft.OData.ODataError
 static Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateActionLink(this Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext, Microsoft.OData.Edm.IEdmOperation action) -> System.Uri
 static Microsoft.AspNetCore.OData.Formatter.LinkGenerationHelpers.GenerateActionLink(this Microsoft.AspNetCore.OData.Formatter.ResourceSetContext resourceSetContext, Microsoft.OData.Edm.IEdmOperation action) -> System.Uri
@@ -1737,6 +1751,9 @@ static Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions.AddOData(this Micros
 static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
 static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
 static Microsoft.AspNetCore.OData.ODataMvcCoreBuilderExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IMvcCoreBuilder
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataOptions, System.IServiceProvider> setupAction) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 static Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> void
@@ -1758,6 +1775,7 @@ static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(st
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(string queryOptionName, bool isDollarSignOptional) -> bool
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults<T>(System.Linq.IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited) -> System.Linq.IQueryable<T>
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults<T>(System.Linq.IQueryable<T> queryable, int limit, out bool resultsLimited) -> System.Linq.IQueryable<T>
+static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>>
 static Microsoft.AspNetCore.OData.Query.OrderByNode.CreateCollection(Microsoft.OData.UriParser.OrderByClause orderByClause) -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Query.OrderByNode>
 static Microsoft.AspNetCore.OData.Results.SingleResult.Create<T>(System.Linq.IQueryable<T> queryable) -> Microsoft.AspNetCore.OData.Results.SingleResult<T>
 static Microsoft.AspNetCore.OData.Routing.Conventions.OperationRoutingConvention.AddSelector(Microsoft.AspNetCore.OData.Routing.Conventions.ODataControllerActionContext context, Microsoft.OData.Edm.IEdmOperation edmOperation, bool hasKeyParameter, Microsoft.OData.Edm.IEdmEntityType entityType, Microsoft.OData.Edm.IEdmNavigationSource navigationSource, Microsoft.OData.Edm.IEdmEntityType castType) -> void
@@ -1778,6 +1796,7 @@ static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.Mess
 static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.MessageLanguageKey -> string
 static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.ModelStateKey -> string
 static readonly Microsoft.AspNetCore.OData.Extensions.SerializableErrorKeys.StackTraceKey -> string
+static readonly Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.MapperProvider -> System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper>
 virtual Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ExecuteRequestMessagesAsync(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem> requests, Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>>
 virtual Microsoft.AspNetCore.OData.Batch.DefaultODataBatchHandler.ParseBatchRequestsAsync(Microsoft.AspNetCore.Http.HttpContext context) -> System.Threading.Tasks.Task<System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem>>
 virtual Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.CreateResponseMessageAsync(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem> responses, Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task

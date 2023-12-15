@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
+    [JsonConverter(typeof(DynamicTypeWrapperConverter))]
     internal class FlatteningWrapper<T> : GroupByWrapper
     {
         // TODO: how to use 'Source'?
