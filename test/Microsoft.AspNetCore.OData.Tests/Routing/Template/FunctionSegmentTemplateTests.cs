@@ -405,7 +405,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
             Assert.Same(function, functionSegment.Operations.First());
             var parameter = Assert.Single(functionSegment.Parameters);
             Assert.Equal("name", parameter.Name);
-            Assert.Equal("Ji/Change# T", parameter.Value.ToString());
+            Assert.Equal("Ji/Change%23%20T", parameter.Value.ToString());
         }
 
         [Fact]
