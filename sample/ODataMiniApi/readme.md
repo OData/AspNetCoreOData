@@ -172,3 +172,137 @@ This will change the student, and also move the student from `Schools(1)` to `Sc
 4) Delete `http://localhost:5177/odata/students/10`
 
 This will delete the `Students(10)`
+
+
+## OData CSDL metadata
+
+I built one metadata endpoint to return the CSDL representation of 'customized' OData.
+
+I use '$odata' to return the metadata.
+
+Try: GET http://localhost:5177/customized/$odata, You can get CSDL XML representation:
+
+```xml
+<?xml version="1.0" encoding="utf-16"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:DataServices>
+        <Schema Namespace="ODataMiniApi" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityType Name="School">
+                <Key>
+                    <PropertyRef Name="SchoolId" />
+                </Key>
+                <Property Name="SchoolId" Type="Edm.Int32" Nullable="false" />
+                <Property Name="SchoolName" Type="Edm.String" />
+                <Property Name="MailAddress" Type="ODataMiniApi.Address" />
+                <Property Name="Students" Type="Collection(ODataMiniApi.Student)" />
+            </EntityType>
+            <ComplexType Name="Address">
+                <Property Name="ApartNum" Type="Edm.Int32" Nullable="false" />
+                <Property Name="City" Type="Edm.String" />
+                <Property Name="Street" Type="Edm.String" />
+                <Property Name="ZipCode" Type="Edm.String" />
+            </ComplexType>
+            <ComplexType Name="Student">
+                <Property Name="StudentId" Type="Edm.Int32" Nullable="false" />
+                <Property Name="FirstName" Type="Edm.String" />
+                <Property Name="LastName" Type="Edm.String" />
+                <Property Name="FavoriteSport" Type="Edm.String" />
+                <Property Name="Grade" Type="Edm.Int32" Nullable="false" />
+                <Property Name="SchoolId" Type="Edm.Int32" Nullable="false" />
+                <Property Name="BirthDay" Type="Edm.Date" Nullable="false" />
+            </ComplexType>
+        </Schema>
+        <Schema Namespace="Default" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="Container">
+                <EntitySet Name="Schools" EntityType="ODataMiniApi.School" />
+            </EntityContainer>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
+```
+
+You can use 'Accept' request header or '$format' or 'format' query option to specify JSON or XML format, by default it's XML format.
+
+Try: GET http://localhost:5177/customized/$odata, You can get CSDL XML representation:
+Request Header:
+Accept: application/json
+
+You can get:
+
+```json
+{
+    "$Version": "4.0",
+    "$EntityContainer": "Default.Container",
+    "ODataMiniApi": {
+        "School": {
+            "$Kind": "EntityType",
+            "$Key": [
+                "SchoolId"
+            ],
+            "SchoolId": {
+                "$Type": "Edm.Int32"
+            },
+            "SchoolName": {
+                "$Nullable": true
+            },
+            "MailAddress": {
+                "$Type": "ODataMiniApi.Address",
+                "$Nullable": true
+            },
+            "Students": {
+                "$Collection": true,
+                "$Type": "ODataMiniApi.Student",
+                "$Nullable": true
+            }
+        },
+        "Address": {
+            "$Kind": "ComplexType",
+            "ApartNum": {
+                "$Type": "Edm.Int32"
+            },
+            "City": {
+                "$Nullable": true
+            },
+            "Street": {
+                "$Nullable": true
+            },
+            "ZipCode": {
+                "$Nullable": true
+            }
+        },
+        "Student": {
+            "$Kind": "ComplexType",
+            "StudentId": {
+                "$Type": "Edm.Int32"
+            },
+            "FirstName": {
+                "$Nullable": true
+            },
+            "LastName": {
+                "$Nullable": true
+            },
+            "FavoriteSport": {
+                "$Nullable": true
+            },
+            "Grade": {
+                "$Type": "Edm.Int32"
+            },
+            "SchoolId": {
+                "$Type": "Edm.Int32"
+            },
+            "BirthDay": {
+                "$Type": "Edm.Date"
+            }
+        }
+    },
+    "Default": {
+        "Container": {
+            "$Kind": "EntityContainer",
+            "Schools": {
+                "$Collection": true,
+                "$Type": "ODataMiniApi.School"
+            }
+        }
+    }
+}
+```

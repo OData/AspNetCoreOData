@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Extensions;
 using ODataMiniApi;
 using ODataMiniApi.Students;
+using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDb>(options => options.UseInMemoryDatabase("SchoolStudentList"));
@@ -44,7 +45,9 @@ app.MapGet("/schools/{id}", async (int id, AppDb db, ODataQueryOptions<School> o
 app.MapGet("/customized/schools", (AppDb db, ODataQueryOptions<School> options) => {
     db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     return options.ApplyTo(db.Schools);
-}).UseOData("customized"); // In customized OData, MailAddress and Student are complex type, you can also use 'IODataModelConfiguration'
+}).UseOData("customized"); // In customized OData, MailAddress and Student are complex types, you can also use 'IODataModelConfiguration'
+
+app.MapGet("/customized/$odata", MetadataHandler.HandleMetadata).UseOData("customized");
 
 #endregion
 
