@@ -1,0 +1,75 @@
+@baseUrl = http://localhost:5177
+
+  
+###
+# @name GetSchools
+GET {{baseUrl}}/schools HTTP/1.1
+Cache-Control: no-cache
+
+
+###
+# @name Example2
+GET {{baseUrl}}/schools?$expand=mailaddress&$select=schoolName&$top=2 HTTP/1.1
+Cache-Control: no-cache
+
+
+###
+# @name Example3
+GET {{baseUrl}}/schools/5?$expand=students($top=1)&$select=schoolName HTTP/1.1
+Cache-Control: no-cache
+
+
+###
+# @name Example4
+GET {{baseUrl}}/customized/schools?$select=schoolName,mailAddress&$orderby=schoolName&$top=1 HTTP/1.1
+Cache-Control: no-cache
+
+
+###
+# @name Example5
+GET {{baseUrl}}/odata/students?$select=lastName&$top=3 HTTP/1.1
+Cache-Control: no-cache
+
+
+###
+# @name Create Student
+POST {{baseUrl}}/odata/students HTTP/1.1
+Cache-Control: no-cache
+Content-Type: application/json; charset=utf-8
+
+{
+    "firstName": "Sokuda",
+    "lastName": "Yu",
+    "favoriteSport": "Soccer",
+    "grade": 7,
+    "schoolId": 3,
+    "birthDay": "1977-11-04"
+}
+
+
+###
+@recordId = {{CreateStudent.response.body.studentId}}
+
+
+###
+# @name Read Student
+GET {{baseUrl}}/odata/students/{{recordId}} HTTP/1.1
+Cache-Control: no-cache
+
+###
+# @name Update Student
+PATCH {{baseUrl}}/odata/students/{{recordId}} HTTP/1.1
+Cache-Control: no-cache
+Content-Type: application/json; charset=utf-8
+
+{
+
+    "firstName": "Sokuda",
+    "lastName": "Yu",
+    "schoolId": 4
+}
+
+###
+# @name Delete Student
+DELETE {{baseUrl}}/odata/students/{{recordId}} HTTP/1.1
+Cache-Control: no-cache
