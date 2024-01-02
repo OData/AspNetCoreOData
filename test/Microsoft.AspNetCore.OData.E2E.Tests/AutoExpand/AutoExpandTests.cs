@@ -22,6 +22,81 @@ using Xunit.Abstractions;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
 {
+    public class AutoExpandMoreTests : WebApiTestBase<AutoExpandMoreTests>
+    {
+        private readonly ITestOutputHelper output;
+        public AutoExpandMoreTests(WebApiTestFixture<AutoExpandMoreTests> fixture, ITestOutputHelper output)
+                : base(fixture)
+        {
+            this.output = output;
+        }
+
+        protected static void UpdateConfigureServices(IServiceCollection services)
+        {
+            IEdmModel edmModel = AutoExpandEdmModel.GetEdmModel1();
+
+            services.ConfigureControllers(typeof(RootsController));
+
+            services.AddControllers().AddOData(opt =>
+                opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select().AddRouteComponents("odata", edmModel));
+        }
+
+        [Fact]
+        public async Task QueryForAnResource_Includes_AutoExpandNavigationProperty()
+        {
+            // Arrange
+            string queryUrl = $"odata/root";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+            string payload = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            this.output.WriteLine(payload);
+        }
+
+        [Fact]
+        public async Task QueryForAnResource_Includes_AutoExpandNavigationProperty2()
+        {
+            // Arrange
+            string queryUrl = $"odata/root?$expand=e1s";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+            string payload = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            this.output.WriteLine(payload);
+        }
+
+        [Fact]
+        public async Task QueryForAnResource_Includes_AutoExpandNavigationProperty3()
+        {
+            // Arrange
+            string queryUrl = $"odata/root?$select=id";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+            string payload = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            this.output.WriteLine(request.ToString());
+            this.output.WriteLine(payload);
+        }
+    }
+
     public class AutoExpandTests : WebApiTestBase<AutoExpandTests>
     {
         private readonly ITestOutputHelper output;

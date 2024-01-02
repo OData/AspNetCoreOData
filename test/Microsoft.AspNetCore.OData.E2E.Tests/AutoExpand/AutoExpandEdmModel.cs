@@ -7,6 +7,8 @@
 
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
 {
@@ -33,5 +35,54 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             IEdmModel model = builder.GetEdmModel();
             return model;
         }
+
+        public static IEdmModel GetEdmModel1()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.Singleton<Root>("Root");
+            return builder.GetEdmModel();
+        }
     }
+
+    public class Root
+    {
+        [Key]
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        [AutoExpand]
+        [Contained]
+        public IEnumerable<Expandable1> E1s { get; set; }
+
+        [AutoExpand]
+        [Contained]
+        public IEnumerable<Expandable2> E2s { get; set; }
+    }
+
+    public class Expandable1
+    {
+        [Key]
+        public string Id { get; set; }
+    }
+
+    public class Expandable2
+    {
+        [Key]
+        public string Id { get; set; }
+
+        [AutoExpand]
+        [Contained]
+        public IEnumerable<Expandable1> E1s { get; set; }
+
+        [Contained]
+        public IEnumerable<Expendables3> E3s { get; set; }
+    }
+
+    public class Expendables3
+    {
+        [AutoExpand]
+        [Contained]
+        public IEnumerable<Expandable1> E1s { get; set; }
+    }
+
 }

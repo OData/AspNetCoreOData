@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -14,6 +15,76 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
 {
+    public class RootsController : ODataController
+    {
+        private static Root _root = new Root
+        {
+            Id = 99,
+            Name = "Sam",
+            E1s = new[]
+            {
+                new Expandable1
+                {
+                    Id = "E1S_1"
+                },
+                new Expandable1
+                {
+                    Id = "E1S_2"
+                }
+            },
+            E2s = new[]
+            {
+                new Expandable2
+                {
+                    Id = "E2S_1",
+                    E1s = new[]
+                    {
+                        new Expandable1 { Id = "E2S_1_E1S_1"},
+                        new Expandable1 { Id = "E2S_1_E1S_2"}
+                    },
+                    E3s = new[]
+                    {
+                        new Expendables3
+                        {
+                            E1s = new[]
+                            {
+                                new Expandable1 {Id = "E2S_1_E3S_1"},
+                                new Expandable1 {Id = "E2S_1_E3S_2"}
+                            }
+                        }
+                    }
+                },
+                new Expandable2
+                {
+                    Id = "E2S_2",
+                    E1s = new[]
+                    {
+                        new Expandable1 { Id = "E2S_2_E1S_1"},
+                        new Expandable1 { Id = "E2S_2_E1S_2"}
+                    },
+                    E3s = new[]
+                    {
+                        new Expendables3
+                        {
+                            E1s = new[]
+                            {
+                                new Expandable1 {Id = "E2S_2_E3S_1"},
+                                new Expandable1 {Id = "E2S_2_E3S_2"}
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        [HttpGet("/odata/root")]
+        [EnableQuery]
+        public IActionResult Get()
+        {
+            return Ok(_root);
+        }
+    }
+
     public class CustomersController : ODataController
     {
         [EnableQuery]
