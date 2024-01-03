@@ -1102,6 +1102,20 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -4763,7 +4777,7 @@
             <summary>
             Checks whether a navigation link should be written or not. 
             </summary>
-            <param name="navigationLink">The navigation link to be written</param>
+            <param name="navigationLink">The navigation link to be written.</param>
             <param name="resourceContext">The resource context for the resource whose navigation link is being written.</param>
             <returns>true if navigation link should be written; otherwise false.</returns>
         </member>
@@ -7359,6 +7373,11 @@
               Looks up a localized string similar to Action import and function import &apos;{0}&apos; MUST be unique within an entity container..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.OrderByClauseInvalid">
+            <summary>
+              Looks up a localized string similar to OrderBy clause kind &apos;{0}&apos; is not valid. Only kind &apos;{1}&apos; is accepted..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.OrderByClauseNotSupported">
             <summary>
               Looks up a localized string similar to Only ordering by properties is supported for non-primitive collections. Expressions are not supported..
@@ -9938,6 +9957,24 @@
             Copy the $filter configuration of properties.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.OrderByClauseNode">
+            <summary>
+            Represents the order by expression in the $orderby clause.
+            Use this to represent other $orderby except 'Property,OpenProperty,$count, $it' orderBy expression.
+            Again, in the next major release, we don't need this class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByClauseNode.#ctor(Microsoft.OData.UriParser.OrderByClause)">
+            <summary>
+            Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByClauseNode"/> class.
+            </summary>
+            <param name="orderByClause">The order by clause.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByClauseNode.OrderByClause">
+            <summary>
+            Gets the <see cref="P:Microsoft.AspNetCore.OData.Query.OrderByClauseNode.OrderByClause"/> of this node.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.OrderByCountNode">
             <summary>
             Represents an order by <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> expression.
@@ -9965,9 +10002,21 @@
             </summary>
             <param name="direction">The <see cref="T:Microsoft.OData.UriParser.OrderByDirection"/> for this node.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByItNode.#ctor(Microsoft.OData.UriParser.OrderByClause)">
+            <summary>
+            Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByItNode"/> class.
+            </summary>
+            <param name="clause">The orderby clause.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.OrderByItNode.Name">
+            <summary>
+            Gets the range variable name
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.OrderByNode">
             <summary>
             Represents a single order by expression in the $orderby clause.
+            saxu: Why do we need this class and its derived type? only fetch the PropertyPath? In the next major release, we can consider to remove all of these.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.OrderByNode.#ctor(Microsoft.OData.UriParser.OrderByDirection)">
@@ -12256,6 +12305,185 @@
             <param name="orderByOption">The $orderby query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateOrderBy(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Validates a <see cref="T:Microsoft.OData.UriParser.OrderByClause" />.
+            </summary>
+            <param name="orderByClause">The <see cref="T:Microsoft.OData.UriParser.OrderByClause" />.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleValueNode(Microsoft.OData.UriParser.SingleValueNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext,System.Boolean)">
+            <summary>
+            The recursive method that validate most of the SingleValueNode type.
+            </summary>
+            <param name="node">The single value node.</param>
+            <param name="validatorContext">The validator context.</param>
+            <param name="skipRangeVariable">The boolean value indicating skip the range variable validation. Typically, if it's 'Source' of a query node, we should skip it.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleValueOpenPropertyNode(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the dynamic property inside the $orderby query.
+            </summary>
+            <param name="openPropertyNode">The in operator node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateInNode(Microsoft.OData.UriParser.InNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the 'in' operator in the $orderby query.
+            </summary>
+            <param name="inNode">The in operator node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateConstantNode(Microsoft.OData.UriParser.ConstantNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the 'constant' inside the $orderby query.
+            </summary>
+            <param name="constantNode">The constant node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the 'cast' inside the $orderby query.
+            </summary>
+            <param name="convertNode">The convert node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCountNode(Microsoft.OData.UriParser.CountNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the '$count' inside the $orderBy query.
+            </summary>
+            <param name="countNode">The count node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            override this method to restrict the binary operators inside the $orderby query.
+            That includes all the logical operators except 'not' and all math operators.
+            </summary>
+            <param name="binaryOperatorNode">The binary operator node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateRangeVariable(Microsoft.OData.UriParser.RangeVariable,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate the parameter used in the $orderby query.
+            </summary>
+            <param name="rangeVariable">The range variable node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleValuePropertyAccessNode(Microsoft.OData.UriParser.SingleValuePropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate property accessors.
+            </summary>
+            <param name="propertyAccessNode">The single value property access node.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate Function calls, such as 'length', 'year', etc.
+            </summary>
+            <param name="node">The single value function call node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleComplexNode(Microsoft.OData.UriParser.SingleComplexNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate single complex property accessors.
+            </summary>
+            <param name="singleComplexNode">The single complex node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleResourceFunctionCallNode(Microsoft.OData.UriParser.SingleResourceFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate single resource function calls.
+            </summary>
+            <param name="node">The node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleResourceCastNode(Microsoft.OData.UriParser.SingleResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method if you want to validate casts on single resource.
+            </summary>
+            <param name="singleResourceCastNode">The single resource cast node.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.CollectionNavigationNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method for the collection value navigation property node.
+            </summary>
+            <param name="collectionNavigation">The source node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.SingleNavigationNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method for the single value navigation property node.
+            </summary>
+            <param name="singleNavigation">The source node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateAllNode(Microsoft.OData.UriParser.AllNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the 'all' query inside the $orderby query.
+            </summary>
+            <param name="allNode">The all node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateAnyNode(Microsoft.OData.UriParser.AnyNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to restrict the 'any' query inside the $orderby query.
+            </summary>
+            <param name="anyNode">The any node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCollectionNode(Microsoft.OData.UriParser.CollectionNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            The recursive method that validate most of the query node type is of CollectionNode type.
+            </summary>
+            <param name="node">The single value node.</param>
+            <param name="validatorContext">The validator context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method if you want to validate on resource collections cast node.
+            </summary>
+            <param name="collectionResourceCastNode">The collection resource cast node.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCollectionPropertyAccessNode(Microsoft.OData.UriParser.CollectionPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate collection property accessors.
+            </summary>
+            <param name="propertyAccessNode">The collection property access node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCollectionComplexNode(Microsoft.OData.UriParser.CollectionComplexNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate collection complex property accessors.
+            </summary>
+            <param name="collectionComplexNode">The collection complex node to validate.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext">
+            <summary>
+            The metadata context for $orderby validator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext.OrderBy">
+            <summary>
+            The top level $orderby query option.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext.OrderByNodeCount">
+            <summary>
+            Gets current orderby node count.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext.IncrementNodeCount">
+            <summary>
+            Increment orderby node count.
+            </summary>
+            <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
             <summary>
             The base for validator context.
@@ -12278,7 +12506,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.StructuredType">
             <summary>
-            The applied strutured type.
+            The applied structured type.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext.CurrentDepth">
@@ -12290,6 +12518,18 @@
             <summary>
             Gets the Edm model.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorHelpers">
+            <summary>
+            Helper methods for validation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorHelpers.ValidateFunction(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a single value function call.
+            </summary>
+            <param name="functionCallNode">The function name.</param>
+            <param name="settings">The validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator">
             <summary>
@@ -15224,22 +15464,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">

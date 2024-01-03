@@ -1321,6 +1321,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to OrderBy clause kind &apos;{0}&apos; is not valid. Only kind &apos;{1}&apos; is accepted..
+        /// </summary>
+        internal static string OrderByClauseInvalid {
+            get {
+                return ResourceManager.GetString("OrderByClauseInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only ordering by properties is supported for non-primitive collections. Expressions are not supported..
         /// </summary>
         internal static string OrderByClauseNotSupported {

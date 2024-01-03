@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Query
             SingleValuePropertyAccessNode propertyExpression = orderByClause.Expression as SingleValuePropertyAccessNode;
             if (propertyExpression == null)
             {
-                throw new ODataException(SRResources.OrderByClauseNotSupported);
+                throw new ODataException(string.Format(SRResources.OrderByClauseInvalid, orderByClause.Expression.Kind, QueryNodeKind.SingleValuePropertyAccess));
             }
             else
             {

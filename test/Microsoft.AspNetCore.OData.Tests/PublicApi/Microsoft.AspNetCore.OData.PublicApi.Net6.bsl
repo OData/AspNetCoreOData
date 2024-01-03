@@ -1471,6 +1471,12 @@ public class Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions {
 	string Top  { public get; }
 }
 
+public class Microsoft.AspNetCore.OData.Query.OrderByClauseNode : Microsoft.AspNetCore.OData.Query.OrderByNode {
+	public OrderByClauseNode (Microsoft.OData.UriParser.OrderByClause orderByClause)
+
+	Microsoft.OData.UriParser.OrderByClause OrderByClause  { public get; }
+}
+
 public class Microsoft.AspNetCore.OData.Query.OrderByCountNode : Microsoft.AspNetCore.OData.Query.OrderByNode {
 	public OrderByCountNode (Microsoft.OData.UriParser.OrderByClause orderByClause)
 
@@ -1478,7 +1484,10 @@ public class Microsoft.AspNetCore.OData.Query.OrderByCountNode : Microsoft.AspNe
 }
 
 public class Microsoft.AspNetCore.OData.Query.OrderByItNode : Microsoft.AspNetCore.OData.Query.OrderByNode {
+	public OrderByItNode (Microsoft.OData.UriParser.OrderByClause clause)
 	public OrderByItNode (Microsoft.OData.UriParser.OrderByDirection direction)
+
+	string Name  { public get; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.OrderByOpenPropertyNode : Microsoft.AspNetCore.OData.Query.OrderByNode {
@@ -3052,6 +3061,39 @@ public class Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator : 
 	public OrderByQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+	protected virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateBinaryOperatorNode (Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateCollectionComplexNode (Microsoft.OData.UriParser.CollectionComplexNode collectionComplexNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateCollectionNode (Microsoft.OData.UriParser.CollectionNode node, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateCollectionPropertyAccessNode (Microsoft.OData.UriParser.CollectionPropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateCollectionResourceCastNode (Microsoft.OData.UriParser.CollectionResourceCastNode collectionResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateConstantNode (Microsoft.OData.UriParser.ConstantNode constantNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateConvertNode (Microsoft.OData.UriParser.ConvertNode convertNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateCountNode (Microsoft.OData.UriParser.CountNode countNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateInNode (Microsoft.OData.UriParser.InNode inNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.CollectionNavigationNode collectionNavigation, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateNavigationPropertyNode (Microsoft.OData.UriParser.SingleNavigationNode singleNavigation, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateOrderBy (Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateQueryNode (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateRangeVariable (Microsoft.OData.UriParser.RangeVariable rangeVariable, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateSingleComplexNode (Microsoft.OData.UriParser.SingleComplexNode singleComplexNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateSingleResourceCastNode (Microsoft.OData.UriParser.SingleResourceCastNode singleResourceCastNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateSingleResourceFunctionCallNode (Microsoft.OData.UriParser.SingleResourceFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateSingleValueFunctionCallNode (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateSingleValueNode (Microsoft.OData.UriParser.SingleValueNode node, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext, bool skipRangeVariable)
+	protected virtual void ValidateSingleValueOpenPropertyNode (Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openPropertyNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateSingleValuePropertyAccessNode (Microsoft.OData.UriParser.SingleValuePropertyAccessNode propertyAccessNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+	protected virtual void ValidateUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
+}
+
+public class Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext : Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext {
+	public OrderByValidatorContext ()
+
+	Microsoft.AspNetCore.OData.Query.OrderByQueryOption OrderBy  { public get; public set; }
+	int OrderByNodeCount  { public get; }
+
+	public void IncrementNodeCount ()
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator : ISelectExpandQueryValidator {

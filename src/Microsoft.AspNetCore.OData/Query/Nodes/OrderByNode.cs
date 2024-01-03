@@ -14,6 +14,7 @@ namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// Represents a single order by expression in the $orderby clause.
+    /// saxu: Why do we need this class and its derived type? only fetch the PropertyPath? In the next major release, we can consider to remove all of these.
     /// </summary>
     public abstract class OrderByNode
     {
@@ -42,10 +43,6 @@ namespace Microsoft.AspNetCore.OData.Query
             PropertyPath = RestorePropertyPath(orderByClause.Expression);
         }
 
-        internal OrderByNode()
-        {
-        }
-
         /// <summary>
         /// Gets the <see cref="OrderByDirection"/> for the current node.
         /// </summary>
@@ -66,23 +63,24 @@ namespace Microsoft.AspNetCore.OData.Query
                 if (clause.Expression is CountNode)
                 {
                     result.Add(new OrderByCountNode(clause));
-                    continue;
                 }
-
-                if (clause.Expression is NonResourceRangeVariableReferenceNode ||
+                else if (clause.Expression is NonResourceRangeVariableReferenceNode ||
                     clause.Expression is ResourceRangeVariableReferenceNode)
                 {
-                    result.Add(new OrderByItNode(clause.Direction));
-                    continue;
+                    result.Add(new OrderByItNode(clause));
                 }
-
-                if (clause.Expression is SingleValueOpenPropertyAccessNode)
+                else if (clause.Expression is SingleValueOpenPropertyAccessNode)
                 {
                     result.Add(new OrderByOpenPropertyNode(clause));
                 }
-                else
+                else if(clause.Expression is SingleValuePropertyAccessNode)
                 {
                     result.Add(new OrderByPropertyNode(clause));
+                }
+                else
+                {
+                    // For other, let's create a wrapper. In next major release, we don't need this wrapper.
+                    result.Add(new OrderByClauseNode(clause));
                 }
             }
 

@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -100,6 +101,48 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
         public IActionResult GetItemsWithoutColumn()
         {
             return Ok(_itemWithoutColumns);
+        }
+    }
+
+    public class StudentsController : ODataController
+    {
+        private static IList<OrderByStudent> _students = new List<OrderByStudent>
+        {
+            new OrderByStudent { Id = 1, Name = "A1", Birthday = new DateTimeOffset(2011, 1, 1, 1, 1, 1, TimeSpan.Zero),
+                Grades = new List<int>{ 1, 2 ,3 }, Location = new OrderByAddress{ City = "Cesar", ZipCode = "98" } },
+
+            new OrderByStudent { Id = 2, Name = "a1", Birthday = new DateTimeOffset(1908, 11, 21, 5, 1, 1, TimeSpan.Zero),
+                Grades = new List<int>{ 8 }, Location = new OrderByAddress{ City = "Debra", ZipCode = "1807" } },
+
+            new OrderByStudent { Id = 3, Name = "bb", Birthday = new DateTimeOffset(1987, 9, 11, 1, 1, 1, TimeSpan.Zero),
+                Grades = new List<int>{ 5, 6, 8, 9 }, Location = new OrderByAddress{ City = "Avat", ZipCode = "98087" } },
+
+            new OrderByStudent { Id = 4, Name = "Bc", Birthday = new DateTimeOffset(2023, 3, 4, 1, 1, 1, TimeSpan.Zero),
+                Grades = new List<int>{ 4, 5, 6 }, Location = new OrderByAddress{ City = "Aveneve", ZipCode = "89" } },
+
+            new OrderByStudent { Id = 5, Name = "AB", Birthday = new DateTimeOffset(2019, 6, 7, 1, 1, 1, TimeSpan.Zero),
+                Grades = new List<int>{ 0 }, Location = new OrderByAddress{ City = "Ces", ZipCode = "11" } },
+
+            new OrderByStudent { Id = 6, Name = "Ab", Birthday = new DateTimeOffset(2019, 2, 18, 1, 1, 1, TimeSpan.Zero),
+                Grades = new List<int>{ 9, 8, 7, 1, 2 }, Location = new OrderByAddress{ City = "Claire", ZipCode = "56" } }
+        };
+
+        [EnableQuery]
+        public IActionResult Get()
+        {
+            return Ok(_students);
+        }
+
+        [EnableQuery]
+        public IActionResult Get(int key)
+        {
+            return Ok(_students.FirstOrDefault(c => c.Id == key));
+        }
+
+        [EnableQuery]
+        public IActionResult GetGrades(int key)
+        {
+            return Ok(_students.FirstOrDefault(c => c.Id == key).Grades);
         }
     }
 }

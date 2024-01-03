@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         public IEdmProperty Property { get; set; }
 
         /// <summary>
-        /// The applied strutured type.
+        /// The applied structured type.
         /// </summary>
         public IEdmStructuredType StructuredType { get; set; }
 

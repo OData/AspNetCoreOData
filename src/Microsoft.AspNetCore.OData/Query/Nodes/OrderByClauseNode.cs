@@ -1,33 +1,29 @@
 //-----------------------------------------------------------------------------
-// <copyright file="OrderByCountNode.cs" company=".NET Foundation">
+// <copyright file="OrderByClauseNode.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.OData;
-using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
-    /// Represents an order by <see cref="IEdmProperty"/> expression.
+    /// Represents the order by expression in the $orderby clause.
+    /// Use this to represent other $orderby except 'Property,OpenProperty,$count, $it' orderBy expression.
+    /// Again, in the next major release, we don't need this class.
     /// </summary>
-    public class OrderByCountNode : OrderByNode
+    public class OrderByClauseNode : OrderByNode
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="OrderByCountNode"/> class.
+        /// Instantiates a new instance of <see cref="OrderByClauseNode"/> class.
         /// </summary>
-        /// <param name="orderByClause">The orderby clause representing property access.</param>
-        public OrderByCountNode(OrderByClause orderByClause)
+        /// <param name="orderByClause">The order by clause.</param>
+        public OrderByClauseNode(OrderByClause orderByClause)
             : base(orderByClause)
         {
             OrderByClause = orderByClause;
-            if (!(orderByClause.Expression is CountNode))
-            {
-                throw new ODataException(string.Format(SRResources.OrderByClauseInvalid, orderByClause.Expression.Kind, QueryNodeKind.Count));
-            }
         }
 
         /// <summary>

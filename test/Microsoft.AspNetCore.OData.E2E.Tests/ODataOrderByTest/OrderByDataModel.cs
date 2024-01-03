@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -79,4 +82,27 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
         Three,
         Four
     }
+
+    #region Advanced $orderby
+
+    public class OrderByStudent
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public DateTimeOffset Birthday { get; set; }
+
+        public IList<int> Grades { get; set; }
+
+        public OrderByAddress Location { get; set; }
+    }
+
+    public class OrderByAddress
+    {
+        public string City { get; set; }
+
+        public string ZipCode { get; set; }
+    }
+    #endregion
 }

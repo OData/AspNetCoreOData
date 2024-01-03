@@ -259,11 +259,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             foreach (OrderByNode node in nodes)
             {
-                OrderByPropertyNode propertyNode = node as OrderByPropertyNode;
-                OrderByOpenPropertyNode openPropertyNode = node as OrderByOpenPropertyNode;
-                OrderByCountNode countNode = node as OrderByCountNode;
-
-                if (propertyNode != null)
+                if (node is OrderByPropertyNode propertyNode)
                 {
                     // Use autonomy class to achieve value equality for HasSet.
                     var edmPropertyWithPath = new { propertyNode.Property, propertyNode.PropertyPath };
@@ -289,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     alreadyOrdered = true;
                 }
-                else if (openPropertyNode != null)
+                else if (node is OrderByOpenPropertyNode openPropertyNode)
                 {
                     // This check prevents queries with duplicate properties (e.g. $orderby=Id,Id,Id,Id...) from causing stack overflows
                     if (openPropertiesSoFar.Contains(openPropertyNode.PropertyName))
@@ -302,10 +298,15 @@ namespace Microsoft.AspNetCore.OData.Query
                     querySoFar = AddOrderByQueryForProperty(binder, openPropertyNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
                     alreadyOrdered = true;
                 }
-                else if (countNode != null)
+                else if (node is OrderByCountNode countNode)
                 {
                     Contract.Assert(countNode.OrderByClause != null);
                     querySoFar = AddOrderByQueryForProperty(binder, countNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
+                    alreadyOrdered = true;
+                }
+                else if (node is OrderByClauseNode clauseNode)
+                {
+                    querySoFar = AddOrderByQueryForProperty(binder, clauseNode.OrderByClause, querySoFar, binderContext, alreadyOrdered);
                     alreadyOrdered = true;
                 }
                 else
