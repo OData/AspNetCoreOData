@@ -246,7 +246,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
             string payloadBody = await response.Content.ReadAsStringAsync();
 
             // Origin is : 9, 8, 7, 1, 2
-            Assert.Equal("{\"Grades\":[1,2,7,8,9]}", payloadBody);
+            Assert.Equal("{\"value\":[1,2,7,8,9]}", payloadBody);
         }
     }
 }
