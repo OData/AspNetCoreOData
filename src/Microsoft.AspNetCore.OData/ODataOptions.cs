@@ -311,7 +311,6 @@ namespace Microsoft.AspNetCore.OData
         {
             Contract.Assert(model != null);
 
-            ServiceCollection services = new ServiceCollection();
             DefaultContainerBuilder builder = new DefaultContainerBuilder();
 
             // Inject the core odata services.

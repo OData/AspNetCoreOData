@@ -1163,6 +1163,19 @@
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>
             Returns type of T if the type implements IEnumerable of T, otherwise, return null.
+            e otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsCollection(System.Type,System.Type@)">
+            <summary>
+            Determine if a type is a collection.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <param name="elementType">out: the element type of the collection.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
+            <summary>
+            Returns type of T if the type implements IEnumerable of T, otherwise, return null.
             </summary>
             <param name="type"></param>
             <returns></returns>
@@ -1622,22 +1635,7 @@
             <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
             names, including those of dynamic properties, are ignored.</param>
             <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
-            properties. <c>null</c> means this entity type is not open.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.Kind">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.StructuredType">
-            <inheritdoc/>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
-            <inheritdoc/>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.UpdatableProperties">
-            <summary>
-            The list of property names that can be updated.
-            </summary>
-            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
+            properties. <c>null</c> means nger
             considered to be changed.</remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
@@ -1694,6 +1692,19 @@
             <summary>
             Copies the changed property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
             to the <paramref name="original"/> entity recursively.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
+            <summary>
+            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
+            to the <paramref name="original"/> entity.
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
+            <summary>
+            Overwrites the <paramref name="origina="original"/> entity recursively.
             </summary>
             <param name="original">The entity to be updated.</param>
         </member>
@@ -4763,7 +4774,7 @@
             <summary>
             Checks whether a navigation link should be written or not. 
             </summary>
-            <param name="navigationLink">The navigation link to be written</param>
+            <param name="navigationLink">The navigation link to be written.</param>
             <param name="resourceContext">The resource context for the resource whose navigation link is being written.</param>
             <returns>true if navigation link should be written; otherwise false.</returns>
         </member>
@@ -15224,22 +15235,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
