@@ -773,20 +773,22 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 IEnumerable<IEdmStructuralProperty> concurrencyProperties;
                 if (model != null && navigationSource != null)
                 {
-                    concurrencyProperties = model.GetConcurrencyProperties(navigationSource).OrderBy(c => c.Name);
+                    concurrencyProperties = model.GetConcurrencyProperties(navigationSource);
                 }
                 else
                 {
                     concurrencyProperties = Enumerable.Empty<IEdmStructuralProperty>();
                 }
 
-                IDictionary<string, object> properties = new Dictionary<string, object>();
+                IDictionary<string, object> properties = null;
                 foreach (IEdmStructuralProperty etagProperty in concurrencyProperties)
                 {
+                    properties ??= new SortedDictionary<string, object>();
+                    
                     properties.Add(etagProperty.Name, resourceContext.GetPropertyValue(etagProperty.Name));
                 }
 
-                if (properties.Count != 0)
+                if (properties != null)
                 {
                     return resourceContext.Request.CreateETag(properties, resourceContext.TimeZone);
                 }
