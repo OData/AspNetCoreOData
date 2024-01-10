@@ -5,13 +5,14 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -204,7 +205,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                     catch (ODataException ex)
                     {
                         string message = Error.Format(SRResources.InvalidKeyInUriFound, strValue, edmType.FullName());
-                        throw new ODataException(message, ex);
+                        ILoggerFactory loggerFactory = context.HttpContext?.RequestServices?.GetService<ILoggerFactory>();
+                        if (loggerFactory != null)
+                        {
+                            loggerFactory.CreateLogger<KeySegmentTemplate>().LogError(message, ex);
+                            return false;
+                        }
+                        else
+                        {
+                            throw new ODataException(message, ex);
+                        }
                     }
 
                     // for non FromODataUri, so update it, for example, remove the single quote for string value.

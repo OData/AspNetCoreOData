@@ -13,7 +13,6 @@ abstract Microsoft.AspNetCore.OData.Formatter.MediaType.MediaTypeMapping.TryMatc
 abstract Microsoft.AspNetCore.OData.Formatter.MediaType.ODataRawValueMediaTypeMapping.IsMatch(Microsoft.OData.UriParser.PropertySegment propertySegment) -> bool
 abstract Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLinkBase.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
 abstract Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Bind(Microsoft.OData.UriParser.QueryNode node) -> System.Linq.Expressions.Expression
-abstract Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.Parameter.get -> System.Linq.Expressions.ParameterExpression
 abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo(System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable
 abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.ApplyTo<T>(System.Linq.IQueryable<T> query, Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipTokenQueryOption, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> System.Linq.IQueryable<T>
 abstract Microsoft.AspNetCore.OData.Query.SkipTokenHandler.GenerateNextPageLink(System.Uri baseUri, int pageSize, object instance, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext context) -> System.Uri
@@ -891,11 +890,6 @@ Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable<TE
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ETag() -> void
 Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase
-Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindArguments(System.Collections.Generic.IEnumerable<Microsoft.OData.UriParser.QueryNode> nodes) -> System.Linq.Expressions.Expression[]
-Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.EnsureFlattenedPropertyContainer(System.Linq.Expressions.ParameterExpression source) -> void
-Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.ExpressionBinderBase(System.IServiceProvider requestContainer) -> void
-Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode) -> System.Reflection.PropertyInfo
-Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.GetFlattenedPropertyExpression(string propertyPath) -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.FilterBinder() -> void
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder

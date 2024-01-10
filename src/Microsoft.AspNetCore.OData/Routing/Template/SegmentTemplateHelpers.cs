@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -95,7 +97,16 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                         catch (ODataException ex)
                         {
                             string message = Error.Format(SRResources.InvalidParameterValueInUriFound, originalStrValue, edmParameter.Type.FullName());
-                            throw new ODataException(message, ex);
+                            ILoggerFactory loggerFactory = context.HttpContext?.RequestServices?.GetService<ILoggerFactory>();
+                            if (loggerFactory != null)
+                            {
+                                loggerFactory.CreateLogger("ODataFunctionParameterMatcher").LogError(message, ex);
+                                return null;
+                            }
+                            else
+                            {
+                                throw new ODataException(message, ex);
+                            }
                         }
 
                         // for without FromODataUri, so update it, for example, remove the single quote for string value.
