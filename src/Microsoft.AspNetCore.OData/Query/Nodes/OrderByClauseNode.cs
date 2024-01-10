@@ -12,8 +12,11 @@ namespace Microsoft.AspNetCore.OData.Query
     /// <summary>
     /// Represents the order by expression in the $orderby clause.
     /// Use this to represent other $orderby except 'Property,OpenProperty,$count, $it' orderBy expression.
-    /// Again, in the next major release, we don't need this class.
     /// </summary>
+    /// <remarks>
+    /// Again, in the next major release, we don't need this class.
+    /// Track on it at: https://github.com/OData/AspNetCoreOData/issues/1153
+    /// </remarks>
     public class OrderByClauseNode : OrderByNode
     {
         /// <summary>

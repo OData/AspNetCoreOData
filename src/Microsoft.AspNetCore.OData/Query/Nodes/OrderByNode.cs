@@ -14,8 +14,11 @@ namespace Microsoft.AspNetCore.OData.Query
 {
     /// <summary>
     /// Represents a single order by expression in the $orderby clause.
-    /// saxu: Why do we need this class and its derived type? only fetch the PropertyPath? In the next major release, we can consider to remove all of these.
     /// </summary>
+    /// <remarks>
+    /// Why do we need this class and its derived type? only fetch the PropertyPath? In the next major release, we can consider to remove all of these.
+    /// Track on it at: https://github.com/OData/AspNetCoreOData/issues/1153
+    /// </remarks>
     public abstract class OrderByNode
     {
         /// <summary>

@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 case ClrCanonicalFunctions.IndexofFunctionName:
                     result = AllowedFunctions.IndexOf;
                     break;
-                case "isof":
+                case ClrCanonicalFunctions.IsofFunctionName:
                     result = AllowedFunctions.IsOf;
                     break;
                 case ClrCanonicalFunctions.LengthFunctionName:
