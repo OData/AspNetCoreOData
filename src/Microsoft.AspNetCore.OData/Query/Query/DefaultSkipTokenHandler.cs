@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Expressions;
@@ -82,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     skipTokenGenerator = (obj) =>
                     {
-                        return GenerateSkipTokenValue(obj, model, orderByNodes, context.TimeZone);
+                        return GenerateSkipTokenValue(obj, model, orderByNodes, context);
                     };
 
                     return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator);
@@ -95,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 skipTokenGenerator = (obj) =>
                 {
-                    return GenerateSkipTokenValue(obj, model, orderByNodes, context.TimeZone);
+                    return GenerateSkipTokenValue(obj, model, orderByNodes, context);
                 };
             }
 
@@ -108,14 +107,16 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
         /// <param name="model">The edm model.</param>
         /// <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
-        /// <param name="timeZoneInfo">The timezone info.</param>
+        /// <param name="writeContext">The write context info.</param>
         /// <returns>Value for the skiptoken to be used in the next link.</returns>
-        internal static string GenerateSkipTokenValue(Object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes, TimeZoneInfo timeZoneInfo = null)
+        internal static string GenerateSkipTokenValue(object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes, ODataSerializerContext writeContext = null)
         {
             if (lastMember == null)
             {
                 return string.Empty;
             }
+
+            TimeZoneInfo timeZoneInfo = writeContext?.TimeZone;
 
             IEnumerable<IEdmProperty> propertiesForSkipToken = GetPropertiesForSkipToken(lastMember, model, orderByNodes);
             StringBuilder skipTokenBuilder = new StringBuilder(String.Empty);
@@ -135,7 +136,18 @@ namespace Microsoft.AspNetCore.OData.Query
                 bool islast = count == lastIndex;
                 if (obj != null)
                 {
+                    // When the request contains "$select=property", 
                     obj.TryGetPropertyValue(edmProperty.Name, out value);
+                }
+                else if (edmProperty is EdmDynamicProperty dynamicProperty)
+                {
+                    (bool found, object dynamicValue) = GetDynamicPropertyValue(lastMember, dynamicProperty.Name, writeContext);
+                    if (!found)
+                    {
+                        continue; // Let's simply ignore this.
+                    }
+
+                    value = dynamicValue;
                 }
                 else
                 {
@@ -147,12 +159,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 {
                     uriLiteral = ODataUriUtils.ConvertToUriLiteral(value, ODataVersion.V401);
                 }
-                else if (edmProperty.Type.IsEnum())
+                else if (edmProperty.Type != null && edmProperty.Type.IsEnum())
                 {
                     ODataEnumValue enumValue = new ODataEnumValue(value.ToString(), value.GetType().FullName);
                     uriLiteral = ODataUriUtils.ConvertToUriLiteral(enumValue, ODataVersion.V401, model);
                 }
-                else if (edmProperty.Type.IsDateTimeOffset() && value is DateTime)
+                else if (edmProperty.Type != null && edmProperty.Type.IsDateTimeOffset() && value is DateTime)
                 {
                     var dateTime = (DateTime)value;
                     var dateTimeOffsetValue = TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime, timeZoneInfo);
@@ -174,6 +186,35 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             return skipTokenBuilder.ToString();
+        }
+
+        private static (bool, object) GetDynamicPropertyValue(object lastMember, string dynamicPropertyName, ODataSerializerContext context)
+        {
+            Type lastMemberType = lastMember.GetType();
+
+            // check whether the dynamic property is from $compute
+            if (context.QueryOptions != null && context.QueryOptions.Compute != null)
+            {
+                // case sensitive only?
+                ComputeExpression computeClause = context.QueryOptions.Compute.ComputeClause.ComputedItems.FirstOrDefault(c => c.Alias == dynamicPropertyName);
+                if (computeClause != null)
+                {
+                    // Before we implement the 'IComputeBinder', let's use ISelectExpandBinder
+                    PathSelectItem select = new PathSelectItem(new ODataSelectPath(new DynamicPathSegment(dynamicPropertyName)));
+                    SelectExpandClause clause = new SelectExpandClause(new SelectItem[] { select }, false);
+                    QueryBinderContext binderContext = new QueryBinderContext(context.Model, new ODataQuerySettings(), lastMemberType);
+                    binderContext.ComputedProperties[dynamicPropertyName] = computeClause;
+                    ISelectExpandBinder selectExpandBinder = context.QueryContext.GetSelectExpandBinder();
+                    IEdmStructuredObject bindResult = selectExpandBinder.ApplyBind(lastMember, clause, binderContext) as IEdmStructuredObject;
+                    if (bindResult != null)
+                    {
+                        bindResult.TryGetPropertyValue(dynamicPropertyName, out object dynamicPropertyValue);
+                        return (true, dynamicPropertyValue);
+                    }
+                }
+            }
+
+            return (false, null);
         }
 
         /// <summary>
@@ -467,13 +508,19 @@ namespace Microsoft.AspNetCore.OData.Query
             IEnumerable<IEdmProperty> key = entity.Key();
             if (orderByNodes != null)
             {
-                if (orderByNodes.OfType<OrderByOpenPropertyNode>().Any())
+                IList<IEdmProperty> orderByProps = new List<IEdmProperty>();
+                foreach (OrderByNode node in orderByNodes)
                 {
-                    //SkipToken will not support ordering on dynamic properties
-                    return null;
+                    if (node is OrderByPropertyNode propertyNode)
+                    {
+                        orderByProps.Add(propertyNode.Property);
+                    }
+                    else if (node is OrderByOpenPropertyNode openPropNode)
+                    {
+                        orderByProps.Add(new EdmDynamicProperty { Name = openPropNode.PropertyName });
+                    }
                 }
 
-                IList<IEdmProperty> orderByProps = orderByNodes.OfType<OrderByPropertyNode>().Select(p => p.Property).ToList();
                 foreach (IEdmProperty subKey in key)
                 {
                     if (!orderByProps.Contains(subKey))
@@ -486,6 +533,17 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             return key;
+        }
+
+        class EdmDynamicProperty : IEdmProperty
+        {
+            public EdmPropertyKind PropertyKind => EdmPropertyKind.None;
+
+            public IEdmTypeReference Type => null;
+
+            public IEdmStructuredType DeclaringType => null;
+
+            public string Name { get; set; }
         }
 
         /// <summary>

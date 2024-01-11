@@ -49,4 +49,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
 
         public IDictionary<string, object> Dynamics { get; set; } = new Dictionary<string, object>();
     }
+
+    public class ComputeStudent
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+    }
 }

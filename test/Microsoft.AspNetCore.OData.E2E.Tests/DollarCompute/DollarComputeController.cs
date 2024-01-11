@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -14,7 +15,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
 {
     public class CustomersController : ODataController
     {
-        [EnableQuery]
+        [EnableQuery(PageSize = 2)]
         public IActionResult Get()
         {
             return Ok(DollarComputeDataSource.Customers);
@@ -49,6 +50,27 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
         public IActionResult GetSales()
         {
             return Ok();
+        }
+    }
+
+    public class StudentsController : ODataController
+    {
+        private static IList<ComputeStudent> _students = new List<ComputeStudent>
+        {
+            new ComputeStudent { Id = 1, Name = "cc" },
+            new ComputeStudent { Id = 2, Name = "dd" },
+            new ComputeStudent { Id = 3, Name = "AA"},
+            new ComputeStudent { Id = 4, Name = "DD" },
+            new ComputeStudent { Id = 5, Name = "BB" },
+            new ComputeStudent { Id = 6, Name = "CC" },
+            new ComputeStudent { Id = 7, Name = "aa" },
+            new ComputeStudent { Id = 8, Name = "bb" },
+        };
+
+        [EnableQuery(PageSize = 2)]
+        public IActionResult Get()
+        {
+            return Ok(_students);
         }
     }
 }

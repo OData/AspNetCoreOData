@@ -20,5 +20,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
             IEdmModel model = builder.GetEdmModel();
             return model;
         }
+
+        public static IEdmModel GetStudentModel()
+        {
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<ComputeStudent>("Students");
+            IEdmModel model = builder.GetEdmModel();
+            return model;
+        }
     }
 }

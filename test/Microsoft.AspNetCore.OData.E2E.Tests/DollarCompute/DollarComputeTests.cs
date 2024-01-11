@@ -37,7 +37,32 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
             services.ConfigureControllers(typeof(CustomersController));
 
             services.AddControllers().AddOData(opt =>
-                opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select().AddRouteComponents("odata", edmModel));
+                opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).SkipToken().Select().AddRouteComponents("odata", edmModel));
+        }
+
+        [Fact]
+        public async Task QueryForResourceSet_IncludesDollarCompute_UsedInDollarFilter2()
+        {
+            // Arrange
+           // string queryUrl = $"odata/Customers";
+           // string queryUrl = $"odata/Customers?$orderby=lowername&$compute=tolower(name) as lowername&$select=lowername";
+            string queryUrl = $"odata/Customers?$orderby=lowername&$compute=tolower(name) as lowername";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("", payloadBody);
         }
 
         [Theory]
