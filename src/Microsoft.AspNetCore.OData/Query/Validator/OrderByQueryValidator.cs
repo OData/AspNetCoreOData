@@ -249,7 +249,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         }
 
         /// <summary>
-        /// override this method to restrict the binary operators inside the $orderby query.
+        /// Override this method to restrict the binary operators inside the $orderby query.
         /// That includes all the logical operators except 'not' and all math operators.
         /// </summary>
         /// <param name="binaryOperatorNode">The binary operator node to validate.</param>

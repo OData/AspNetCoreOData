@@ -226,7 +226,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
 
 
         [Fact]
-        public async Task DollarOrderBy_UsingDollarThis_OnCollection()
+        public async Task DollarOrderBy_UsingDollarIt_OnCollection()
         {
             // Arrange
             string queryUrl = "odata/students/6/Grades?$orderby=$it";
