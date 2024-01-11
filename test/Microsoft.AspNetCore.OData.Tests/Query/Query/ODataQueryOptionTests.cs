@@ -715,7 +715,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmModel model = GetEdmModel(c => c.CustomerId);
             HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/service/Customers?$orderby=CustomerId,Name");
 
-            var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Customer)), request);
+            ODataQueryContext queryContext = new ODataQueryContext(model, typeof(Customer));
+            queryContext.DefaultQueryConfigurations.EnableOrderBy = true;
+            var options = new ODataQueryOptions(queryContext, request);
             ODataValidationSettings validationSettings = new ODataValidationSettings { MaxOrderByNodeCount = 1 };
 
             // Act & Assert

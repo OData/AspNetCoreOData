@@ -306,14 +306,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
         [Theory]
         [InlineData("SharePrice add 1")]
-        public void OrderBy_Throws_For_Expressions(string orderByQuery)
+        [InlineData("tolower(Name)")]
+        public void OrderBy_Works_For_Expressions(string orderByQuery)
         {
             var model = new ODataModelBuilder().Add_Customer_EntityType_With_Address().Add_Customers_EntitySet().GetEdmModel();
             var orderByOption = new OrderByQueryOption(orderByQuery, new ODataQueryContext(model, typeof(Customer)));
 
-            ExceptionAssert.Throws<ODataException>(
-                () => orderByOption.OrderByNodes.Count(),
-                "Only ordering by properties is supported for non-primitive collections. Expressions are not supported.");
+            var nodes = orderByOption.OrderByNodes;
+            OrderByNode orderByNode = Assert.Single(nodes);
+            OrderByClauseNode clauseNode = Assert.IsType<OrderByClauseNode>(orderByNode);
         }
 
         //[Fact]
@@ -678,16 +679,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
-        public void OrderBy_Throws_ParameterAliasNotFound()
+        public void OrderBy_Works_ParameterAlias()
         {
             // Arrange
             var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
             var orderByOption = new OrderByQueryOption("@p", new ODataQueryContext(model, typeof(Customer)));
 
             // Act & Assert
-            ExceptionAssert.Throws<ODataException>(
-                () => orderByOption.OrderByNodes,
-                "Only ordering by properties is supported for non-primitive collections. Expressions are not supported.");
+            var nodes = orderByOption.OrderByNodes;
+            OrderByNode orderByNode = Assert.Single(nodes);
+            OrderByClauseNode clauseNode = Assert.IsType<OrderByClauseNode>(orderByNode);
         }
     }
 }

@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.ModelBuilder.Config;
 using Microsoft.OData.UriParser;
 using Xunit;
 
@@ -255,6 +254,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             ODataQueryContext context = new ODataQueryContext(model, edmType);
             OrderByQueryOption option = new OrderByQueryOption("ComplexProperty/Value", context);
             ODataValidationSettings settings = new ODataValidationSettings();
+            settings.AllowedOrderByProperties.Add("ComplexProperty");
             settings.AllowedOrderByProperties.Add("Value");
 
             // Act & Assert

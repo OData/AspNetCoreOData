@@ -135,6 +135,21 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             return null;
         }
 
+        public override SingleValueNode Visit(SingleValueFunctionCallNode nodeIn)
+        {
+            foreach (var parameter in nodeIn.Parameters)
+            {
+                parameter.Accept(this);
+            }
+
+            if (nodeIn.Source != null)
+            {
+                return nodeIn.Source.Accept(this);
+            }
+
+            return null;
+        }
+
         private static string GetPropertyName(SingleValueNode node)
         {
             if (node.Kind == QueryNodeKind.SingleNavigationNode)

@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             // Act & Assert
             ExceptionAssert.Throws<ODataException>(() => new OrderByOpenPropertyNode(orderBy),
-                "Only ordering by properties is supported for non-primitive collections. Expressions are not supported.");
+                "OrderBy clause kind 'None' is not valid. Only kind 'SingleValueOpenPropertyAccess' is accepted.");
         }
     }
 }

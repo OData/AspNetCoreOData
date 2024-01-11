@@ -27,8 +27,7 @@ namespace Microsoft.AspNetCore.OData.Query
             var openPropertyExpression = orderByClause.Expression as SingleValueOpenPropertyAccessNode;
             if (openPropertyExpression == null)
             {
-                // TODO: need refactor the error message
-                throw new ODataException(SRResources.OrderByClauseNotSupported);
+                throw new ODataException(string.Format(SRResources.OrderByClauseInvalid, orderByClause.Expression.Kind, QueryNodeKind.SingleValueOpenPropertyAccess));
             }
 
             PropertyName = openPropertyExpression.Name;

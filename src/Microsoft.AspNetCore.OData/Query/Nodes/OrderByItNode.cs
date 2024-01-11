@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query
@@ -21,6 +22,39 @@ namespace Microsoft.AspNetCore.OData.Query
         public OrderByItNode(OrderByDirection direction)
             : base(direction)
         {
+            Name = "$it";
         }
+
+        /// <summary>
+        /// Instantiates a new instance of <see cref="OrderByItNode"/> class.
+        /// </summary>
+        /// <param name="clause">The orderby clause.</param>
+        public OrderByItNode(OrderByClause clause)
+            : base(clause)
+        {
+            if (clause == null)
+            {
+                throw Error.ArgumentNull(nameof(clause));
+            }
+
+            if (clause.Expression is NonResourceRangeVariableReferenceNode nonResourceVarNode)
+            {
+                Name = nonResourceVarNode.Name;
+            }
+            else if (clause.Expression is ResourceRangeVariableReferenceNode resourceVarNode)
+            {
+                Name = resourceVarNode.Name;
+            }
+            else
+            {
+                throw new ODataException(string.Format(SRResources.OrderByClauseInvalid, clause.Expression.Kind,
+                    "NonResourceRangeVariableReferenceNode or ResourceRangeVariableReferenceNode"));
+            }
+        }
+
+        /// <summary>
+        /// Gets the range variable name
+        /// </summary>
+        public string Name { get; }
     }
 }
