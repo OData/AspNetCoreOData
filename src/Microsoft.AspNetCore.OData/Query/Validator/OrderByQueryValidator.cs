@@ -512,7 +512,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// The recursive method that validate most of the query node type is of CollectionNode type.
         /// </summary>
-        /// <param name="node">The single value node.</param>
+        /// <param name="node">The collection value node.</param>
         /// <param name="validatorContext">The validator context.</param>
         protected virtual void ValidateCollectionNode(CollectionNode node, OrderByValidatorContext validatorContext)
         {
