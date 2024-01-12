@@ -59,7 +59,9 @@ namespace Microsoft.AspNetCore.OData.Routing.Template
                 {
                     string strValue = rawValue as string;
                     string newStrValue = context.GetParameterAliasOrSelf(strValue);
-                    newStrValue = Uri.UnescapeDataString(newStrValue);
+
+                    // rawValue from Request route values, it's unescaped except the back-slash.
+                    newStrValue = newStrValue.UnescapeBackSlashUriString();
                     if (newStrValue != strValue)
                     {
                         updatedValues[parameterTemp] = newStrValue;
