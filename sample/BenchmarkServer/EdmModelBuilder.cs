@@ -20,7 +20,18 @@ namespace ODataPerformanceProfile
             builder.EntitySet<Supplier>("Suppliers");
             builder.EntitySet<Order>("Orders");
 
-            return builder.GetEdmModel();
+            builder.EntityType<Product>().Collection
+                .Function("mostRecent")
+                .Returns<string>();
+
+            builder.EntityType<Product>()
+                .Action("rate")
+                .Parameter<int>("rating");
+
+            var model = builder.GetEdmModel();
+            model.MarkAsImmutable();
+
+            return model;
         }
     }
 }
