@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private T _instance;
         private Type _structuredType;
-        private bool isComplexType;
+        private bool _isComplexType;
 
         private readonly PropertyInfo _dynamicDictionaryPropertyinfo;
         private HashSet<string> _changedDynamicProperties;
@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// properties. <c>null</c> means this entity type is not open.</param>
         public Delta(Type structuralType, IEnumerable<string> updatableProperties,
             PropertyInfo dynamicDictionaryPropertyInfo)
-            :this(structuralType,updatableProperties,dynamicDictionaryPropertyInfo,false)
+            :this(structuralType, updatableProperties, dynamicDictionaryPropertyInfo, isComplexType: false)
         {
         }
 
@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
             PropertyInfo dynamicDictionaryPropertyInfo, bool isComplexType)
         {
             _dynamicDictionaryPropertyinfo = dynamicDictionaryPropertyInfo;
-            this.isComplexType = isComplexType;
+            _isComplexType = isComplexType;
             Reset(structuralType);
             InitializeProperties(updatableProperties);
         }
@@ -134,13 +134,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <summary>
         /// If the StructuralType is a Complex type.
         /// </summary>
-        public bool IsComplexType
-        {
-            get
-            {
-                return isComplexType;
-            }
-        }
+        public bool IsComplexType => _isComplexType;
 
         /// <inheritdoc/>
         public override void Clear()
@@ -489,9 +483,9 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private dynamic ReAssignComplexDerivedType(dynamic originalValue, Type newType, Type originalType, Type declaredType)
         {
-            //As per OASIS discussion, changing a complex type from 1 derived type to another is allowed if both derived type have a common ancestor and the property
-            //is declared in terms of a common ancestor. The logic below checks for a common ancestor. Create a new object of the derived type in delta request.
-            //And copy the common properties.
+            // As per OASIS discussion, changing a complex type from 1 derived type to another is allowed if both derived type have a common ancestor and the property
+            // is declared in terms of a common ancestor. The logic below checks for a common ancestor. Create a new object of the derived type in delta request.
+            // And copy the common properties.
 
             if (newType == originalType)
             {
