@@ -277,11 +277,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                             structuredType.StructuredDefinition());
 
                         return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties,
-                            dynamicDictionaryPropertyInfo);
+                            dynamicDictionaryPropertyInfo, structuredType.IsComplex());
                     }
                     else
                     {
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties);
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties, null, structuredType.IsComplex());
                     }
                 }
                 else

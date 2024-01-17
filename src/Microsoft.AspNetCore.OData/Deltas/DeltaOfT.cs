@@ -41,6 +41,7 @@ namespace Microsoft.AspNetCore.OData.Deltas
 
         private T _instance;
         private Type _structuredType;
+        private bool _isComplexType;
 
         private readonly PropertyInfo _dynamicDictionaryPropertyinfo;
         private HashSet<string> _changedDynamicProperties;
@@ -90,8 +91,26 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// properties. <c>null</c> means this entity type is not open.</param>
         public Delta(Type structuralType, IEnumerable<string> updatableProperties,
             PropertyInfo dynamicDictionaryPropertyInfo)
+            :this(structuralType, updatableProperties, dynamicDictionaryPropertyInfo, isComplexType: false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of <see cref="Delta{T}"/>.
+        /// </summary>
+        /// <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+        /// <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+        /// </param>
+        /// <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+        /// names, including those of dynamic properties, are ignored.</param>
+        /// <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+        /// properties. <c>null</c> means this entity type is not open.</param>
+        /// <param name="isComplexType">If structuralType is a complex type.</param>
+        public Delta(Type structuralType, IEnumerable<string> updatableProperties,
+            PropertyInfo dynamicDictionaryPropertyInfo, bool isComplexType)
         {
             _dynamicDictionaryPropertyinfo = dynamicDictionaryPropertyInfo;
+            _isComplexType = isComplexType;
             Reset(structuralType);
             InitializeProperties(updatableProperties);
         }
@@ -111,6 +130,11 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <remarks>When the list is modified, any modified properties that were removed from the list are no longer
         /// considered to be changed.</remarks>
         public IList<string> UpdatableProperties => _updatableProperties;
+
+        /// <summary>
+        /// If the StructuralType is a Complex type.
+        /// </summary>
+        public bool IsComplexType => _isComplexType;
 
         /// <inheritdoc/>
         public override void Clear()
@@ -388,6 +412,15 @@ namespace Microsoft.AspNetCore.OData.Deltas
                     bool isDeltaType = DeltaHelper.IsDeltaOfT(deltaNestedResource.GetType());
                     Contract.Assert(isDeltaType, nestedResourceName + "'s corresponding value should be Delta<T> type but is not.");
 
+                    Type newType = deltaNestedResource.StructuredType;
+                    Type originalType = originalNestedResource.GetType();
+
+                    if (deltaNestedResource.IsComplexType && newType != originalType)
+                    {
+                        originalNestedResource = ReAssignComplexDerivedType(originalNestedResource, newType, originalType, deltaNestedResource.ExpectedClrType);
+                        _structuredType.GetProperty(nestedResourceName).SetValue(original, (object)originalNestedResource);
+                    }
+
                     deltaNestedResource.CopyChangedValues(originalNestedResource);
                 }
             }
@@ -424,9 +457,17 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
         /// </summary>
         /// <param name="original">The entity to be updated.</param>
-        public void Patch(T original)
+        /// <returns>The updated entity.</returns>
+        public T Patch(T original)
         {
+            if (IsComplexType)
+            {
+                original = ReAssignComplexDerivedType(original, _structuredType, original.GetType(), ExpectedClrType) as T;
+            }
+
             CopyChangedValues(original);
+
+            return original;
         }
 
         /// <summary>
@@ -438,6 +479,61 @@ namespace Microsoft.AspNetCore.OData.Deltas
         {
             CopyChangedValues(original);
             CopyUnchangedValues(original);
+        }
+
+        private dynamic ReAssignComplexDerivedType(dynamic originalValue, Type newType, Type originalType, Type declaredType)
+        {
+            // As per OASIS discussion, changing a complex type from 1 derived type to another is allowed if both derived type have a common ancestor and the property
+            // is declared in terms of a common ancestor. The logic below checks for a common ancestor. Create a new object of the derived type in delta request.
+            // And copy the common properties.
+
+            if (newType == originalType)
+            {
+                return originalValue;
+            }
+
+            Type newBaseType = newType;
+            HashSet<Type> newBaseTypes = new HashSet<Type>();
+
+            //Iterate till you find the declaring base type and add all that to hashset
+            while (newBaseType != null && newBaseType != declaredType)
+            {
+                newBaseTypes.Add(newBaseType);
+                newBaseType = newBaseType.BaseType;
+            }
+
+            newBaseTypes.Add(declaredType);
+
+            //Here original type is the type for original (T) resource.
+            //We will keep  going to base types and finally will get the Common Basetype for the derived complex types in to the originalType variable.
+
+            //The new Original type, means the new complex type (T) which will replace the current complex type.
+            dynamic newOriginalNestedResource = originalValue;
+
+            while (originalType != null)
+            {
+                if (newBaseTypes.Contains(originalType))
+                {
+                    //Now originalType = common base type of the derived complex types.
+                    //OriginalNested Resource = T(of current Complex type). We are creating newOriginalNestedResource (T - new complex type).
+                    newOriginalNestedResource = Activator.CreateInstance(newType);
+
+                    //Here we get all the properties of common base type and get value from original complex type(T) and
+                    //copy it to the new complex type newOriginalNestedResource(came as a part of Delta)
+
+                    foreach (PropertyInfo property in originalType.GetProperties())
+                    {
+                        object value = property.GetValue(originalValue);
+                        property.SetValue(newOriginalNestedResource, value);
+                    }
+
+                    break;
+                }
+
+                originalType = originalType.BaseType;
+            }
+
+            return newOriginalNestedResource;
         }
 
         private static void CopyDynamicPropertyDictionary(IDictionary<string, object> source,

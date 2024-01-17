@@ -123,6 +123,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ComplexTypeInheritance
             return Ok(window);
         }
 
+        [HttpPatch("Windows({key})/CurrentShape")]
+        public IActionResult PatchShape(int key, [FromBody] Delta<Shape> delta)
+        {
+            Window window = _windows.First(e => e.Id == key);
+            var currShape = window.CurrentShape;
+            Shape newcurrShape = null;
+
+            try
+            {
+                newcurrShape = delta.Patch(currShape);
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(ae.Message);
+            }
+
+            return Ok(newcurrShape);
+        }
+
         public IActionResult Put(int key, [FromBody]Window window)
         {
             if (key != window.Id)

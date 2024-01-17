@@ -333,7 +333,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
                 account.Address = new Address();
             }
 
-            address.Patch(account.Address);
+            account.Address = address.Patch(account.Address);
 
             return Updated(account);
         }
@@ -356,7 +356,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.OpenType
             }
 
             GlobalAddress globalAddress = account.Address as GlobalAddress;
-            address.Patch(globalAddress);
+            account.Address = address.Patch(globalAddress);
             return Updated(account);
         }
 
