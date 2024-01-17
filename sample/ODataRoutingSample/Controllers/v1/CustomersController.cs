@@ -7,13 +7,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Data;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v1
@@ -41,10 +49,93 @@ namespace ODataRoutingSample.Controllers.v1
 
         // For example: http://localhost:5000/v1/customers?$apply=groupby((Name), aggregate($count as count))&$orderby=name desc
         [HttpGet]
-        [EnableQuery]
+        //// removing this is very important: [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Filter)]
         public IActionResult Get()
         {
+            ODataQueryContext context = new ODataQueryContext(Request.GetModel(), Request.GetModel().FindType("ODataRoutingSample.Models.Customer") as IEdmEntityType, path: null);
+            var options = new ODataQueryOptions(context, Request);
+
+            var fixedQueryOptions = GenerateString(options.RawValues, AllowedQueryOptions.All & ~AllowedQueryOptions.Expand);
+            var expands = options
+                .SelectExpand?
+                .SelectExpandClause
+                .SelectedItems
+                .OfType<ExpandedNavigationSelectItem>()
+                .Select(expand => string.Join("/", expand.PathToNavigationProperty.Select(segment => segment.Identifier)));
+            if (expands != null)
+            {
+                fixedQueryOptions = (string.IsNullOrEmpty(fixedQueryOptions) ? "?" : $"{fixedQueryOptions}&") + "$expand=" + string.Join(",", expands);
+
+                options.Request.QueryString = new Microsoft.AspNetCore.Http.QueryString(fixedQueryOptions);
+                var newOptions = new ODataQueryOptions(options.Context, options.Request);
+
+                Request.ODataFeature().SelectExpandClause = newOptions.SelectExpand.SelectExpandClause;
+
+                var updatedClause = Request.ODataFeature().SelectExpandClause;
+            }
+
             return Ok(GetCustomers());
+        }
+
+        private static IReadOnlyDictionary<AllowedQueryOptions, string> GenerateDictionary(ODataRawQueryOptions odataRawQueryOptions)
+        {
+            var dictionary = new Dictionary<AllowedQueryOptions, string>();
+            if (!string.IsNullOrEmpty(odataRawQueryOptions.Apply))
+            {
+                var option = AllowedQueryOptions.Apply;
+                dictionary[option] = "$" + option.ToString().ToLowerInvariant() + "=" + odataRawQueryOptions.Apply;
+            }
+
+            //// TODO
+
+            if (!string.IsNullOrEmpty(odataRawQueryOptions.Filter))
+            {
+                var option = AllowedQueryOptions.Filter;
+                dictionary[option] = "$" + option.ToString().ToLowerInvariant() + "=" + odataRawQueryOptions.Filter;
+            }
+
+            if (!string.IsNullOrEmpty(odataRawQueryOptions.Select))
+            {
+                var option = AllowedQueryOptions.Select;
+                dictionary[option] = "$" + option.ToString().ToLowerInvariant() + "=" + odataRawQueryOptions.Select;
+            }
+
+            return dictionary;
+        }
+
+        private static string GenerateString(ODataRawQueryOptions odataRawQueryOptions, AllowedQueryOptions allowedQueryOptions)
+        {
+            var options = string.Join("&", ExtractOptions(odataRawQueryOptions, allowedQueryOptions));
+            if (!string.IsNullOrEmpty(options))
+            {
+                return options = "?" + options;
+            }
+
+            return options;
+        }
+
+        private static IEnumerable<AllowedQueryOptions> GenerateAllowedQueryOptions(AllowedQueryOptions allowedQueryOptions)
+        {
+            foreach (AllowedQueryOptions allowedQueryOption in Enum.GetValues(typeof(AllowedQueryOptions)))
+            {
+                if ((allowedQueryOptions & allowedQueryOption) == allowedQueryOption)
+                {
+                    yield return allowedQueryOption;
+                }
+            }
+        }
+
+        private static IEnumerable<string> ExtractOptions(ODataRawQueryOptions odataRawQueryOptions, AllowedQueryOptions allowedQueryOptions)
+        {
+            var dictionary = GenerateDictionary(odataRawQueryOptions);
+            var options = GenerateAllowedQueryOptions(allowedQueryOptions);
+            foreach (var option in options)
+            {
+                if (dictionary.TryGetValue(option, out var value))
+                {
+                    yield return value;
+                }
+            }
         }
 
         [HttpGet]
@@ -97,6 +188,11 @@ namespace ODataRoutingSample.Controllers.v1
                         new Address { City = "Redmond", Street = "256 AVE NE" },
                         new Address { City = "Redd", Street = "56 AVE NE" },
                     },
+                    Foo = new Foo()
+                    {
+                        Id = 5,
+                        SomeProp = "asdf",
+                    }
                 },
                 new Customer
                 {

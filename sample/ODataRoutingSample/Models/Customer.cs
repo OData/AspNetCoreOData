@@ -22,6 +22,15 @@ namespace ODataRoutingSample.Models
         public virtual Address HomeAddress { get; set; }
 
         public virtual IList<Address> FavoriteAddresses { get; set; }
+
+        public virtual Foo Foo { get; set; }
+    }
+
+    public class Foo
+    {
+        public int Id { get; set; }
+
+        public string SomeProp { get; set; }
     }
 
     public class VipCustomer : Customer

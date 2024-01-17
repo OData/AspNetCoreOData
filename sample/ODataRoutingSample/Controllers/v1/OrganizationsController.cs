@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
+using Microsoft.OData.UriParser;
 using ODataRoutingSample.Models;
 
 namespace ODataRoutingSample.Controllers.v1
@@ -20,7 +21,7 @@ namespace ODataRoutingSample.Controllers.v1
     public class OrganizationsController : Controller
     {
         [EnableQuery]
-        public IActionResult Post([FromBody] Organization org)
+        public IActionResult Post([FromBody] Organization org, ODataQueryOptions options)
         {
             /*
              * You can send a Post request with the request body as follows (v4.0):
