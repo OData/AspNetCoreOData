@@ -7,13 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Routing;
-using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Tests.Commons;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Moq;
@@ -63,6 +58,88 @@ namespace Microsoft.AspNetCore.OData.Tests
             ExceptionAssert.ThrowsArgumentNull(() => path.GetNavigationSource(), "path");
         }
 
+        [Theory]
+        [InlineData("Customers", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Name", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Orders", "Orders", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Orders(1)", "Orders", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Orders(1)/$ref", "Orders", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Orders(1)/Amount", "Orders", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("MyOrders(1)/NonContainedOrderLines", "NonContainedOrderLines", EdmNavigationSourceKind.UnknownEntitySet)]
+        [InlineData("MyOrders(1)/NonContainedOrderLines(1)", "NonContainedOrderLines", EdmNavigationSourceKind.UnknownEntitySet)]
+        [InlineData("MyOrders(1)/NonContainedOrderLines(1)/$ref", "NonContainedOrderLines", EdmNavigationSourceKind.UnknownEntitySet)]
+        [InlineData("MyOrders(1)/OrderLines", "OrderLines", EdmNavigationSourceKind.ContainedEntitySet)]
+        [InlineData("MyOrders(1)/OrderLines(1)", "OrderLines", EdmNavigationSourceKind.ContainedEntitySet)]
+        [InlineData("MyOrders(1)/OrderLines(1)/$ref", "OrderLines", EdmNavigationSourceKind.ContainedEntitySet)]
+        [InlineData("Customers(1)/Account", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Account/Bank", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers(1)/Account/DynamicProperty", null, EdmNavigationSourceKind.None)]
+        [InlineData("GetTopCustomers()", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("GetTotalSalesAmount()", null, EdmNavigationSourceKind.None)]
+        [InlineData("Customers(1)/NS.IsUpgraded()", null, EdmNavigationSourceKind.None)]
+        [InlineData("Customers/NS.UpgradeAll()", null, EdmNavigationSourceKind.None)]
+        [InlineData("Customers/NS.GetTop", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("Customers/NS.GetBestOrders()", "Orders", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("VipCustomer", "VipCustomer", EdmNavigationSourceKind.Singleton)]
+        [InlineData("VipCustomer/Name", "VipCustomer", EdmNavigationSourceKind.Singleton)]
+        [InlineData("VipCustomer/Orders", "Orders", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("VipCustomer/NS.IsUpgraded", null, EdmNavigationSourceKind.None)]
+        [InlineData("Customers(1)/NS.SpecialCustomer", "Customers", EdmNavigationSourceKind.EntitySet)]
+        [InlineData("VipCustomer/NS.SpecialCustomer", "VipCustomer", EdmNavigationSourceKind.Singleton)]
+        [InlineData("Customers/$count", null, EdmNavigationSourceKind.None)]
+        [InlineData("Customers(1)/Account/Amount/$value", null, EdmNavigationSourceKind.None)]
+        [InlineData("$batch", null, EdmNavigationSourceKind.None)]
+        [InlineData("$metadata", null, EdmNavigationSourceKind.None)]
+        public void GetNavigationSource_ReturnsCorrectNavigationSource(string path, string expectedNavigationSource, EdmNavigationSourceKind navigationSourceKind)
+        {
+            var model = new Models.CustomersModelWithInheritance();
+            var parser = new ODataUriParser(model.Model, new Uri(path, UriKind.Relative));
+            parser.EnableUriTemplateParsing = true;
+            ODataPath odataPath = parser.ParsePath();
+
+            var navigationSource = odataPath.GetNavigationSource();
+
+            if (expectedNavigationSource == null)
+            {
+                Assert.Null(navigationSource);
+            }
+            else
+            {
+                Assert.NotNull(navigationSource);
+                Assert.Equal(expectedNavigationSource, navigationSource.Name);
+                Assert.Equal(navigationSourceKind, navigationSource.NavigationSourceKind());
+            }
+        }
+
+        [Fact]
+        public void GetNavigationSource_WhenPathTemplateSegment_ReturnsNull()
+        {
+            var model = new Models.CustomersModelWithInheritance();
+            ODataPath path = new ODataPath(
+                new EntitySetSegment(model.Customers),
+                new PathTemplateSegment("template")
+            );
+
+            var navigationSource = path.GetNavigationSource();
+
+            Assert.Null(navigationSource);
+        }
+
+        [Fact]
+        public void GetNavigationSource_WhenUnknownPathSegment_ReturnsNull()
+        {
+            var model = new Models.CustomersModelWithInheritance();
+            ODataPath path = new ODataPath(
+                new EntitySetSegment(model.Customers),
+                new UnknownTestODataPathSegment()
+            );
+
+            var navigationSource = path.GetNavigationSource();
+
+            Assert.Null(navigationSource);
+        }
+
         [Fact]
         public void GetPathString_ThrowsArgumentNull_Path()
         {
@@ -88,6 +165,24 @@ namespace Microsoft.AspNetCore.OData.Tests
                 MetadataSegment.Instance
             };
             Assert.Equal("$metadata", segments.GetPathString());
+        }
+
+        /// <summary>
+        /// Test path segment used to test handling of unknown path segments.
+        /// </summary>
+        class UnknownTestODataPathSegment : ODataPathSegment
+        {
+            public override IEdmType EdmType => throw new NotImplementedException();
+
+            public override void HandleWith(PathSegmentHandler handler)
+            {
+                handler.Handle(this);
+            }
+
+            public override T TranslateWith<T>(PathSegmentTranslator<T> translator)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
