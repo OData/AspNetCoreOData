@@ -21,28 +21,10 @@ namespace Microsoft.AspNetCore.OData.Routing
     /// </summary>
     public class ODataPathNavigationSourceHandler : PathSegmentHandler
     {
-        private readonly IList<string> _path;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataPathNavigationSourceHandler"/> class.
-        /// </summary>
-        public ODataPathNavigationSourceHandler()
-        {
-            _path = new List<string>();
-        }
-
         /// <summary>
         /// Gets the path navigation source.
         /// </summary>
         public IEdmNavigationSource NavigationSource { get; private set; }
-
-        /// <summary>
-        /// Gets the path template.
-        /// </summary>
-        public string Path
-        {
-            get { return string.Join("/", _path); }
-        }
 
         /// <summary>
         /// Handle an <see cref="EntitySetSegment"/>.
@@ -53,7 +35,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = segment.EntitySet;
-            _path.Add(segment.EntitySet.Name);
         }
 
         /// <summary>
@@ -76,9 +57,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = segment.NavigationSource;
-
-            _path.Add(segment.NavigationProperty.Name);
-            _path.Add(ODataSegmentKinds.Ref);
         }
 
         /// <summary>
@@ -90,7 +68,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = segment.NavigationSource;
-            _path.Add(segment.NavigationProperty.Name);
         }
 
         /// <summary>
@@ -102,7 +79,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(segment.Identifier);
         }
 
         /// <summary>
@@ -114,33 +90,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = segment.EntitySet;
-
-            IEdmActionImport actionImport = segment.OperationImports.Single() as IEdmActionImport;
-
-            if (actionImport != null)
-            {
-                _path.Add(actionImport.Name);
-            }
-            else
-            {
-                IEdmFunctionImport function = (IEdmFunctionImport)segment.OperationImports.Single();
-
-                IList<string> parameterValues = new List<string>();
-                foreach (var parameter in segment.Parameters)
-                {
-                    var functionParameter = function.Function.Parameters.FirstOrDefault(p => p.Name == parameter.Name);
-                    if (functionParameter == null)
-                    {
-                        continue;
-                    }
-
-                    parameterValues.Add(functionParameter.Type.FullName());
-                }
-
-                string literal = string.Format(CultureInfo.InvariantCulture, "{0}({1})", function.Name, string.Join(",", parameterValues));
-
-                _path.Add(literal);
-            }
         }
 
         /// <summary>
@@ -151,33 +100,6 @@ namespace Microsoft.AspNetCore.OData.Routing
         {
             Contract.Assert(segment != null);
             NavigationSource = segment.EntitySet;
-
-            IEdmAction action = segment.Operations.Single() as IEdmAction;
-
-            if (action != null)
-            {
-                _path.Add(action.FullName());
-            }
-            else
-            {
-                IEdmFunction function = (IEdmFunction)segment.Operations.Single();
-
-                IList<string> parameterValues = new List<string>();
-                foreach (var parameter in segment.Parameters)
-                {
-                    var functionParameter = function.Parameters.FirstOrDefault(p => p.Name == parameter.Name);
-                    if (functionParameter == null)
-                    {
-                        continue;
-                    }
-
-                    parameterValues.Add(functionParameter.Type.FullName());
-                }
-
-                string literal = string.Format(CultureInfo.InvariantCulture, "{0}({1})", function.FullName(), string.Join(",", parameterValues));
-
-                _path.Add(literal);
-            }
         }
 
         /// <summary>
@@ -189,7 +111,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(segment.LiteralText);
         }
 
         /// <summary>
@@ -201,8 +122,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             // Not set navigation source to null as the relevant navigation source for the path will be the previous navigation source.
-
-            _path.Add(segment.Property.Name);
         }
 
         /// <summary>
@@ -214,7 +133,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = segment.Singleton;
-            _path.Add(segment.Singleton.Name);
         }
 
         /// <summary>
@@ -226,15 +144,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = segment.NavigationSource;
-
-            // Uri literal does not use the collection type.
-            IEdmType elementType = segment.EdmType;
-            if (segment.EdmType.TypeKind == EdmTypeKind.Collection)
-            {
-                elementType = ((IEdmCollectionType)segment.EdmType).ElementType.Definition;
-            }
-
-            _path.Add(elementType.FullTypeName());
         }
 
         /// <summary>
@@ -246,7 +155,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(ODataSegmentKinds.Value);
         }
 
         /// <summary>
@@ -258,7 +166,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(ODataSegmentKinds.Count);
         }
 
         /// <summary>
@@ -270,7 +177,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(ODataSegmentKinds.Batch);
         }
 
         /// <summary>
@@ -282,7 +188,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(ODataSegmentKinds.Metadata);
         }
 
         /// <summary>
@@ -295,7 +200,6 @@ namespace Microsoft.AspNetCore.OData.Routing
             Contract.Assert(segment != null);
 
             NavigationSource = null;
-            _path.Add(segment.ToString());
         }
     }
 }
