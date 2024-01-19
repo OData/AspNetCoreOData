@@ -77,59 +77,9 @@ namespace Microsoft.AspNetCore.OData.Routing
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            for (int i = path.Count - 1; i > -1; --i)
-            {
-                ODataPathSegment segment = path[i];
-                if (segment is EntitySetSegment entitySetSegment)
-                {
-                    return entitySetSegment.EntitySet;
-                }
-
-                if (segment is KeySegment keySegment)
-                {
-                    return keySegment.NavigationSource;
-                }
-
-                if (segment is NavigationPropertyLinkSegment navigationPropertyLinkSegment)
-                {
-                    return navigationPropertyLinkSegment.NavigationSource;
-                }
-
-                if (segment is NavigationPropertySegment navigationPropertySegment)
-                {
-                    return navigationPropertySegment.NavigationSource;
-                }
-
-                if (segment is OperationImportSegment operationImportSegment)
-                {
-                    return operationImportSegment.EntitySet;
-                }
-
-                if (segment is OperationSegment operationSegment)
-                {
-                    return operationSegment.EntitySet;
-                }
-
-                if (segment is SingletonSegment singleton)
-                {
-                    return singleton.Singleton;
-                }
-
-                if (segment is TypeSegment typeSegment)
-                {
-                    return typeSegment.NavigationSource;
-                }
-
-                if (segment is PropertySegment)
-                {
-                    continue;
-                }
-
-                return null;
-
-            }
-
-            return null;
+            ODataPathNavigationSourceHandler handler = new ODataPathNavigationSourceHandler();
+            path.WalkWith(handler);
+            return handler.NavigationSource;
         }
 
         /// <summary>
