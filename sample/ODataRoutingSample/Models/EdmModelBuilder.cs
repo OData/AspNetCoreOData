@@ -56,6 +56,18 @@ namespace ODataRoutingSample.Models
         public static IEdmModel GetEdmModelV1()
         {
             var builder = new ODataConventionModelBuilder();
+            builder.EnableLowerCamelCase();
+            
+            builder.EntitySet<Foo>("foos");
+            builder.EntitySet<FooTemplate>("fooTemplates");
+            var createAction = builder.EntityType<Foo>().Collection.Action("create");
+            createAction.Parameter<FooTemplate>("template").Required();
+            createAction.ReturnsCollectionFromEntitySet<Foo>("foos");
+            builder.EntityType<Foo>().Name = "foo";
+            builder.EntityType<FooTemplate>().Name = "fooTemplate";
+            builder.ComplexType<Fizz>().Name = "fizz";
+            builder.ComplexType<Buzz>().Name = "buzz";
+
             builder.EntitySet<Organization>("Organizations");
             builder.EntitySet<Department>("Departments");
             builder.EntitySet<Company>("Companies");
