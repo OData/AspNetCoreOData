@@ -150,7 +150,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
-        public void GetNavigationSource_WhenUnknownPathSegment_ReturnsNull()
+        public void GetNavigationSource_ReturnsNull_ForUnknownPathSegment()
         {
             var model = new Models.CustomersModelWithInheritance();
             ODataPath path = new ODataPath(
