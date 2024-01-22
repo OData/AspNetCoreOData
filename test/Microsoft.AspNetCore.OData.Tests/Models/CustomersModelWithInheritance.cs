@@ -331,7 +331,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
             model.AddElement(isSpecialAllUpgraded);
 
             // unbound function and imports
-            // function with entity set
+            // function with entity set path
             EdmFunction getTopCustomers = new EdmFunction(
                 "NS",
                 "GetTopCustomers",
