@@ -61,8 +61,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementClrType = clrType ?? throw Error.ArgumentNull(nameof(clrType));
 
-            LambdaParameter = Expression.Parameter(ElementClrType, DollarIt);
-
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
             // Check if element type is null and not of AggregationWrapper type and not of NoGroupByAggregationWrapper type.
@@ -201,8 +199,18 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         #region AggregationBinder
-        public ParameterExpression LambdaParameter { get; set; }
-        public Type TransformationElementType { get { return this.LambdaParameter.Type; } }
+        public ParameterExpression LambdaParameter
+        {
+            get
+            {
+                return this._lambdaParameters[DollarThis];
+            }
+            set
+            {
+                this._lambdaParameters[DollarThis] = value;
+            }
+        }
+        public Type TransformationElementType { get { return this.CurrentParameter.Type; } }
         public bool HasInstancePropertyContainer;
         public Dictionary<SingleValueNode, Expression> PreFlattenedMap { get; set; } = new Dictionary<SingleValueNode, Expression>();
         #endregion
