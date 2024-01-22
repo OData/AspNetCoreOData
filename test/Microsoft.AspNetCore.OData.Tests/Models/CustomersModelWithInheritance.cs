@@ -290,7 +290,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
             getOrder.AddParameter("orderId", intType);
             model.AddElement(getOrder);
 
-            // functions with entity set
+            // functions with entity set path
             EdmFunction getSimilarCustomers = new EdmFunction(
                 "NS",
                 "GetTop",
@@ -343,7 +343,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
 
             container.AddFunctionImport("GetTopCustomers", getTopCustomers, customers.Path, includeInServiceDocument: true);
 
-            // function without entity set
+            // function without entity set path
             EdmFunction getTotalSalesAmount = new EdmFunction(
                 "NS",
                 "GetTotalSalesAmount",
