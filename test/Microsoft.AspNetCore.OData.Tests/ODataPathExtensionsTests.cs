@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Tests
         // bound operation without an entity set path should return null
         [InlineData("Customers(1)/NS.IsUpgraded()", null, EdmNavigationSourceKind.None)]
         [InlineData("Customers/NS.UpgradeAll()", null, EdmNavigationSourceKind.None)]
-        // bound operaiton with an entity set path should return the entity set
+        // bound operation with an entity set path should return the entity set
         [InlineData("Customers/NS.GetTop", "Customers", EdmNavigationSourceKind.EntitySet)]
         [InlineData("Customers/NS.GetBestOrders()", "Orders", EdmNavigationSourceKind.EntitySet)]
         // singleton segment should return the singleton
