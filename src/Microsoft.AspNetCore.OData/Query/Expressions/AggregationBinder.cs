@@ -104,7 +104,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //                      }
             //                  })
 
-            Type groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
+            Type groupByClr = transformationNode.Kind == TransformationNodeKind.GroupBy ? typeof(GroupByWrapper) : typeof(NoGroupByWrapper);
+            Type groupingType = typeof(IGrouping<,>).MakeGenericType(groupByClr, context.TransformationElementType);
             ParameterExpression parameterExpression = Expression.Parameter(groupingType, "$it");
             Type resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
             IEnumerable<AggregateExpressionBase> aggregateExpressions = GetAggregateExpressions(context, transformationNode);

@@ -404,7 +404,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // IAggregationBinder.BindGroupBy(transformationNode, context)
             LambdaExpression groupLambda = binder.BindGroupBy(transformationNode, context) as LambdaExpression;
 
-            Type groupByType = groupLambda.ReturnType;
+            Type groupByType = transformationNode.Kind == TransformationNodeKind.GroupBy ? typeof(GroupByWrapper) : typeof(NoGroupByWrapper);
 
             // Invoke GroupBy method
             IQueryable grouping = ExpressionHelpers.GroupBy(source, groupLambda, source.ElementType, groupByType);
@@ -413,7 +413,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             LambdaExpression selectLambda = binder.BindSelect(transformationNode, context) as LambdaExpression;
 
             // Invoke Select method
-            var groupingType = typeof(IGrouping<,>).MakeGenericType(typeof(GroupByWrapper), context.TransformationElementType);
+            var groupingType = typeof(IGrouping<,>).MakeGenericType(groupByType, context.TransformationElementType);
 
             return ExpressionHelpers.Select(grouping, selectLambda, groupingType);
         }
