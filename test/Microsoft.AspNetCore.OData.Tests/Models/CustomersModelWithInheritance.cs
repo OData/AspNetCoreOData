@@ -290,6 +290,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
             getOrder.AddParameter("orderId", intType);
             model.AddElement(getOrder);
 
+            // functions with entity set path
+            EdmFunction getSimilarCustomers = new EdmFunction(
+                "NS",
+                "GetTop",
+                new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))),
+                isBound: true,
+                entitySetPathExpression: customers.Path,
+                isComposable: true);
+            getSimilarCustomers.AddParameter(
+                "Customers",
+                new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            model.AddElement(getSimilarCustomers);
+
+            EdmFunction getBestOrders = new EdmFunction(
+                "NS",
+                "GetBestOrders",
+                 new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(order, false))),
+                isBound: true,
+                entitySetPathExpression: new EdmPathExpression("Customers", "Orders"),
+                isComposable: true
+             );
+            getBestOrders.AddParameter("Customers",
+                new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))));
+            model.AddElement(getBestOrders);
+
             // functions bound to collection
             EdmFunction isAllUpgraded = new EdmFunction("NS", "IsAllUpgraded", returnType, isBound: true,
                 entitySetPathExpression: null, isComposable: false);
@@ -304,6 +329,31 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
                 new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(specialCustomer, false))));
             isSpecialAllUpgraded.AddParameter("param", intType);
             model.AddElement(isSpecialAllUpgraded);
+
+            // unbound function and imports
+            // function with entity set path
+            EdmFunction getTopCustomers = new EdmFunction(
+                "NS",
+                "GetTopCustomers",
+                new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))),
+                isBound: false,
+                entitySetPathExpression: customers.Path,
+                isComposable: false
+            );
+
+            container.AddFunctionImport("GetTopCustomers", getTopCustomers, customers.Path, includeInServiceDocument: true);
+
+            // function without entity set path
+            EdmFunction getTotalSalesAmount = new EdmFunction(
+                "NS",
+                "GetTotalSalesAmount",
+                intType,
+                isBound: false,
+                entitySetPathExpression: null,
+                isComposable: false
+            );
+
+            container.AddFunctionImport("GetTotalSalesAmount", getTotalSalesAmount, null, includeInServiceDocument: true);
 
             // function with optional parameters
             EdmFunction getSalaray = new EdmFunction("NS", "GetWholeSalary", intType, isBound: true, entitySetPathExpression: null, isComposable: false);
