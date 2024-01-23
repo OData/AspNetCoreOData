@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
@@ -15,6 +16,7 @@ namespace ODataRoutingSample.Models
         public static IEdmModel GetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
+
             builder.EntitySet<Product>("Products");
             builder.EntitySet<Person>("People").EntityType.HasKey(c => new { c.FirstName, c.LastName });
 

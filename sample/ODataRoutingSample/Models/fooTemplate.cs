@@ -15,5 +15,10 @@
 
         [IgnoreDataMember]
         public bool BuzzProvided { get; set; }
+
+        public Frob Frob { get; set; }
+
+        [IgnoreDataMember]
+        public bool FrobProvided { get; set; }
     }
 }

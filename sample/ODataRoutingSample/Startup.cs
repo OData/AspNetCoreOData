@@ -51,6 +51,10 @@ namespace ODataRoutingSample
                     {
                         fooTemplate.BuzzProvided = true;
                     }
+                    else if (nestedResourceInfo.NestedResourceInfo.Name == "frob")
+                    {
+                        fooTemplate.FrobProvided = true;
+                    }
                 }
             }
 
@@ -64,6 +68,7 @@ namespace ODataRoutingSample
             {
                 fooTemplate.FizzProvided = false;
                 fooTemplate.BuzzProvided = false;
+                fooTemplate.FrobProvided = false;
             }
 
             return resource;
@@ -97,7 +102,8 @@ namespace ODataRoutingSample
         public override ODataValue CreateODataValue(object graph, IEdmTypeReference expectedType, ODataSerializerContext writeContext)
         {
             if (expectedType.FullName() == "ODataRoutingSample.Models.fizz" || 
-                expectedType.FullName() == "ODataRoutingSample.Models.buzz")
+                expectedType.FullName() == "ODataRoutingSample.Models.buzz" ||
+                expectedType.FullName() == "ODataRoutingSample.Models.frob")
             {
                 return new EmptyValue();
             }
@@ -125,6 +131,11 @@ namespace ODataRoutingSample
                 if (!fooTemplate.BuzzProvided)
                 {
                     propertiesToAnnotate.Add("buzz");
+                }
+
+                if (!fooTemplate.FrobProvided)
+                {
+                    propertiesToAnnotate.Add("frob");
                 }
 
                 foreach (var propertyToAnnotate in propertiesToAnnotate)

@@ -73,6 +73,8 @@ namespace ODataRoutingSample.Controllers.v1
                 FizzProvided = fooTemplate.FizzProvided,
                 Buzz = fooTemplate.Buzz,
                 BuzzProvided = fooTemplate.BuzzProvided,
+                Frob = fooTemplate.Frob,
+                FrobProvided = fooTemplate.FrobProvided,
             };
             var foo = CreateNewFoo(fooProperties);
 
