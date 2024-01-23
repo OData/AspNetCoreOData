@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 throw Error.ArgumentNull(nameof(path));
             }
 
-            for (int i = path.Count - 1; i > -1; --i)
+            for (int i = path.Count - 1; i >= 0; --i)
             {
                 ODataPathSegment segment = path[i];
                 if (segment is EntitySetSegment entitySetSegment)
@@ -126,7 +126,6 @@ namespace Microsoft.AspNetCore.OData.Routing
                 }
 
                 return null;
-
             }
 
             return null;
