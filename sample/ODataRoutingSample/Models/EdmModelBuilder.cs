@@ -67,6 +67,7 @@ namespace ODataRoutingSample.Models
             builder.EntityType<FooTemplate>().Name = "fooTemplate";
             builder.ComplexType<Fizz>().Name = "fizz";
             builder.ComplexType<Buzz>().Name = "buzz";
+            builder.ComplexType<Frob>().Name = "frob";
 
             builder.EntitySet<Organization>("Organizations");
             builder.EntitySet<Department>("Departments");

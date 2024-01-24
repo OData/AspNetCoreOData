@@ -13,6 +13,11 @@
 
         [IgnoreDataMember]
         public bool BuzzProvided { get; set; }
+
+        public Frob Frob { get; set; }
+
+        [IgnoreDataMember]
+        public bool FrobProvided { get; set; }
     }
 
     public class Foo
@@ -22,6 +27,8 @@
         public Fizz Fizz { get; set; }
 
         public Buzz Buzz { get; set; }
+
+        public Frob Frob { get; set; }
     }
 
     public class Fizz
@@ -29,6 +36,10 @@
     }
 
     public class Buzz
+    {
+    }
+
+    public class Frob
     {
     }
 }

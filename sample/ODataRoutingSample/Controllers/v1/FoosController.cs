@@ -87,6 +87,7 @@ namespace ODataRoutingSample.Controllers.v1
                 Id = id,
                 Fizz = fooProperties.FizzProvided ? fooProperties.Fizz : DefaultFizz(),
                 Buzz = fooProperties.BuzzProvided ? fooProperties.Buzz : DefaultBuzz(),
+                Frob = fooProperties.FrobProvided ? fooProperties.Frob : DefaultFrob(),
             };
 
             this.fooDemoData.Foos[id] = foo;
@@ -102,6 +103,11 @@ namespace ODataRoutingSample.Controllers.v1
         private static Buzz DefaultBuzz()
         {
             return null;
+        }
+
+        private static Frob DefaultFrob()
+        {
+            return new Frob();
         }
     }
 }
