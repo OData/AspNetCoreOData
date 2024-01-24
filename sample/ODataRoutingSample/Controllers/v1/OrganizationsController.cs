@@ -5,9 +5,16 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
@@ -191,6 +198,87 @@ namespace ODataRoutingSample.Controllers.v1
             return Ok($"Calculated the price using {orgId} and {parId} | using {orgId2} and {parId2}");
         }
 
+        private sealed class HttpRequestCopy : HttpRequest
+        {
+            public HttpRequestCopy(HttpRequest httpRequest)
+            {
+                //// NOTE: this implementation is for demonstration purposes and should be fully fleshed out for production use
+                this.HttpContext = httpRequest.HttpContext;
+                this.Headers = new HeaderDictionary(httpRequest.Headers.ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+            }
+
+            public override HttpContext HttpContext { get; }
+
+            public override string Method { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override string Scheme { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override bool IsHttps { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override HostString Host { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override PathString PathBase { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override PathString Path { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override QueryString QueryString { get; set; }
+            public override IQueryCollection Query { get; set; }
+            public override string Protocol { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+            public override IHeaderDictionary Headers { get; }
+
+            public override IRequestCookieCollection Cookies { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override long? ContentLength { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override string ContentType { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+            public override Stream Body { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+            public override bool HasFormContentType => throw new System.NotImplementedException();
+
+            public override IFormCollection Form { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+
+            public override Task<IFormCollection> ReadFormAsync(CancellationToken cancellationToken = default)
+            {
+                throw new System.NotImplementedException();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult organizationsFilter([FromODataUri] string expression)
+        {
+/*
+http://localhost:64771/v1/Organizations/organizationsFilter(expression='Name eq ''asdf''')
+http://localhost:64771/v1/Organizations/organizationsFilter(expression='OrganizationId eq 10')
+*/
+            ODataQueryContext context = new ODataQueryContext(Request.GetModel(), typeof(Organization), path: null);
+            var requestCopy = new HttpRequestCopy(Request);
+            requestCopy.QueryString = new QueryString($"?$filter={expression}");
+            requestCopy.Query = new QueryCollection(
+                new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+                {
+                    { "$filter", new Microsoft.Extensions.Primitives.StringValues(expression) }
+                });
+            var options = new ODataQueryOptions<Organization>(context, requestCopy);
+
+            //// NOTE: this is where data would be retrieved from the data store
+            var organizations = new[] { new Organization() { OrganizationId = 10, Name = "asdf" } }.AsQueryable();
+
+            var result = options.ApplyTo(organizations);
+
+            return Ok(result);
+        }
+
+        [HttpGet("v1/Organizations/organizationsFilter(expression={expression})/garrettsFunction()")]
+        public IActionResult garrettsFunction([FromODataUri] string expression)
+        {
+/*
+http://localhost:64771/v1/Organizations/organizationsFilter(expression='Name eq ''asdf''')/garrettsFunction()
+*/
+            var organizationsResult = organizationsFilter(expression);
+            if (organizationsResult is ObjectResult objectResult && objectResult.Value is IQueryable organizationsQueryable)
+            {
+                var organizations = organizationsQueryable.AsEnumerable().Cast<Organization>();
+                return Ok(string.Join(string.Empty, organizations.Select(organization => organization.Name)));
+            }
+            else
+            {
+                return organizationsResult;
+            }
+        }
+
         [HttpPost("v1/Organizations/GetByAccount(accountId={aId})/MarkAsFavourite")]
         public IActionResult MarkAsFavouriteAfterGetByAccount(string aId)
         {
@@ -253,6 +341,14 @@ DELETE ~/v1/Organizations/{key}/{navigationProperty}/{relatedKey}/$ref
         public IActionResult DeleteRef(int key, int relatedKey, string navigationProperty)
         {
             return Ok($"DeleteRef - {key} - {relatedKey}: {navigationProperty}");
+        }
+    }
+
+    public static class Extensions
+    {
+        public static IEnumerable AsEnumerable(this IQueryable queryable)
+        {
+            return queryable;
         }
     }
 }

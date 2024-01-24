@@ -92,6 +92,14 @@ namespace ODataRoutingSample.Models
             productPrice.Parameter<string>("partId").Required();
             productPrice.IsComposable = true;
 
+            var organizationsFilter = builder.EntityType<Organization>().Collection.
+                Function("organizationsFilter").ReturnsCollectionFromEntitySet<Organization>("Organizations");
+            organizationsFilter.Parameter<string>("expression").Required();
+            organizationsFilter.IsComposable = true;
+
+            var garrettsFunction = builder.EntityType<Organization>().Collection.Function("garrettsFunction").Returns<string>();
+            garrettsFunction.IsComposable = true;
+
             // Add a composable function
             var getOrgByAccount =
                 builder.EntityType<Organization>()

@@ -1177,19 +1177,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>
             Returns type of T if the type implements IEnumerable of T, otherwise, return null.
-            e otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsCollection(System.Type,System.Type@)">
-            <summary>
-            Determine if a type is a collection.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <param name="elementType">out: the element type of the collection.</param>
-            <returns>True if the type is an enumeration; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
-            <summary>
-            Returns type of T if the type implements IEnumerable of T, otherwise, return null.
             </summary>
             <param name="type"></param>
             <returns></returns>
@@ -1488,6 +1475,18 @@
             <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
             properties. <c>null</c> means this entity type is not open.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo,System.Boolean)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            <param name="isComplexType">If structuralType is a complex type.</param>
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Id">
             <inheritdoc />
         </member>
@@ -1649,8 +1648,41 @@
             <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
             names, including those of dynamic properties, are ignored.</param>
             <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
-            properties. <c>null</c> means nger
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo,System.Boolean)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
+            <param name="isComplexType">If structuralType is a complex type.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.StructuredType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.UpdatableProperties">
+            <summary>
+            The list of property names that can be updated.
+            </summary>
+            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
             considered to be changed.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.IsComplexType">
+            <summary>
+            If the StructuralType is a Complex type.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
             <inheritdoc/>
@@ -1718,23 +1750,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
             <summary>
-            Overwrites the <paramref name="origina="original"/> entity recursively.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
-            <summary>
-            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
-            to the <paramref name="original"/> entity.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
-            <summary>
             Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
             <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
             </summary>
             <param name="original">The entity to be updated.</param>
+            <returns>The updated entity.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Put(`0)">
             <summary>
@@ -6035,6 +6055,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.PropertyGetterCacheEqualityComparer">
+            <summary>
+            A custom equality comparer for the property getter cache. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.PropertyGetterCacheEqualityComparer.GetHashCode(System.ValueTuple{System.String,System.Type})">
+            <summary>
+            This method overrides the default GetHashCode() implementation
+            for a tuple of (string, Type) to provide a more effective hash code.
+            </summary>
+            <param name="obj">The tuple object to calculate a hash code for</param>
+            <returns>The calculated hash code. </returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmUntypedObject">
             <summary>
@@ -12375,7 +12408,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
             <summary>
-            override this method to restrict the binary operators inside the $orderby query.
+            Override this method to restrict the binary operators inside the $orderby query.
             That includes all the logical operators except 'not' and all math operators.
             </summary>
             <param name="binaryOperatorNode">The binary operator node to validate.</param>
@@ -12456,7 +12489,7 @@
             <summary>
             The recursive method that validate most of the query node type is of CollectionNode type.
             </summary>
-            <param name="node">The single value node.</param>
+            <param name="node">The collection value node.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
