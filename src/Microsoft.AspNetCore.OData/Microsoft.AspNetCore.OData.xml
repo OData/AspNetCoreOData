@@ -1177,19 +1177,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>
             Returns type of T if the type implements IEnumerable of T, otherwise, return null.
-            e otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsCollection(System.Type,System.Type@)">
-            <summary>
-            Determine if a type is a collection.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <param name="elementType">out: the element type of the collection.</param>
-            <returns>True if the type is an enumeration; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
-            <summary>
-            Returns type of T if the type implements IEnumerable of T, otherwise, return null.
             </summary>
             <param name="type"></param>
             <returns></returns>
@@ -1488,6 +1475,18 @@
             <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
             properties. <c>null</c> means this entity type is not open.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo,System.Boolean)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.</param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            <param name="isComplexType">If structuralType is a complex type.</param>
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaDeletedResource`1.Id">
             <inheritdoc />
         </member>
@@ -1649,8 +1648,41 @@
             <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
             names, including those of dynamic properties, are ignored.</param>
             <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
-            properties. <c>null</c> means nger
+            properties. <c>null</c> means this entity type is not open.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.#ctor(System.Type,System.Collections.Generic.IEnumerable{System.String},System.Reflection.PropertyInfo,System.Boolean)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="structuralType">The derived entity type or complex type for which the changes would be tracked.
+            <paramref name="structuralType"/> should be assignable to instances of <typeparamref name="T"/>.
+            </param>
+            <param name="updatableProperties">The set of properties that can be updated or reset. Unknown property
+            names, including those of dynamic properties, are ignored.</param>
+            <param name="dynamicDictionaryPropertyInfo">The property info that is used as dictionary of dynamic
+            properties. <c>null</c> means this entity type is not open.</param>
+            <param name="isComplexType">If structuralType is a complex type.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.Kind">
+            <inheritdoc />
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.StructuredType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.ExpectedClrType">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.UpdatableProperties">
+            <summary>
+            The list of property names that can be updated.
+            </summary>
+            <remarks>When the list is modified, any modified properties that were removed from the list are no longer
             considered to be changed.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta`1.IsComplexType">
+            <summary>
+            If the StructuralType is a Complex type.
+            </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Clear">
             <inheritdoc/>
@@ -1718,23 +1750,11 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
             <summary>
-            Overwrites the <paramref name="origina="original"/> entity recursively.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
-            <summary>
-            Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
-            to the <paramref name="original"/> entity.
-            </summary>
-            <param name="original">The entity to be updated.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Patch(`0)">
-            <summary>
             Overwrites the <paramref name="original"/> entity with the changes tracked by this Delta.
             <remarks>The semantics of this operation are equivalent to a HTTP PATCH operation, hence the name.</remarks>
             </summary>
             <param name="original">The entity to be updated.</param>
+            <returns>The updated entity.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.Put(`0)">
             <summary>
@@ -2788,6 +2808,29 @@
             </summary>
             <param name="context">An feed context wrapping the feed instance.</param>
             <returns>The generated link.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers">
+            <summary>
+            Helper methods for <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.ToList(Microsoft.OData.UriParser.OrderByClause)">
+            <summary>
+            Convert the OrderByClause to list.
+            </summary>
+            <param name="clause">The input orderby clause, the 'ThenBy' in each node does matter.</param>
+            <returns>The output orderby clauses, the 'ThenBy' in each node does NOT matter.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.IsTopLevelSingleProperty(Microsoft.OData.UriParser.OrderByClause,Microsoft.OData.Edm.IEdmProperty@,System.String@)">
+            <summary>
+            Test the OrderByClause to see whether it's an orderby like: $orderby=name
+            For others, for example, $orderby=location/city is not top-level single property orderby.
+            When we support key alias (key on sub-property or complex property), we should consider to update this.
+            </summary>
+            <param name="clause">The OrderbyClause.</param>
+            <param name="property">The output property.</param>
+            <param name="propertyName">The output property name, it works for dynamic property.</param>
+            <returns>true/false.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.SelectModelPath">
             <summary>
@@ -6036,6 +6079,19 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmStructuredObject.TryGetPropertyValue(System.String,System.Object@)">
             <inheritdoc/>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.PropertyGetterCacheEqualityComparer">
+            <summary>
+            A custom equality comparer for the property getter cache. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.PropertyGetterCacheEqualityComparer.GetHashCode(System.ValueTuple{System.String,System.Type})">
+            <summary>
+            This method overrides the default GetHashCode() implementation
+            for a tuple of (string, Type) to provide a more effective hash code.
+            </summary>
+            <param name="obj">The tuple object to calculate a hash code for</param>
+            <returns>The calculated hash code. </returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.TypedEdmUntypedObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmUntypedObject"/> backed by a CLR object without Edm type.
@@ -7604,6 +7660,11 @@
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenNotSupportedOrderByExpression">
+            <summary>
+              Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenParseError">
             <summary>
               Looks up a localized string similar to Unable to parse the skiptoken value &apos;{0}&apos;. Skiptoken value should always be server generated..
@@ -7611,7 +7672,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenProcessingError">
             <summary>
-              Looks up a localized string similar to Unable to get property values from the skiptoken value..
+              Looks up a localized string similar to Unable to get property values from the skiptoken value, or the token value can not match the orderby clause..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTopLimitExceeded">
@@ -9622,6 +9683,17 @@
             Gets the compute expressions.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.OrderByClauses">
+            <summary>
+            Gets/sets the orderby clause.
+            Since we 'overlap' the orderby clause to list, then the 'ThenBy' does NOT matter again, please ignore it.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.EnableSkipToken">
+            <summary>
+            Gets/sets the enable skip token, it's for nested orderby.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties">
             <summary>
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
@@ -9803,6 +9875,17 @@
             <param name="source">The source contains the dynamic property.</param>
             <param name="structuredType">The structured type contains the dynamic property.</param>
             <param name="includedProperties">The container to hold the created property.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindOrderByProperties(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression},System.Boolean)">
+            <summary>
+            Build the orderby clause into the included properties.
+            For example: $orderby=tolower(substring(name,1,2))
+            </summary>
+            <param name="context">The wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
+            <param name="source">The source.</param>
+            <param name="structuredType">The structured type.</param>
+            <param name="includedProperties">The container to hold the created property.</param>
+            <param name="isSelectedAll">Is select all flag.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreateTypeNameExpression(System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel)">
             <summary>
@@ -11089,14 +11172,14 @@
             <param name="context">Serializer context</param>
             <returns>Returns the URI for NextPageLink. If a null object is passed for the instance, resorts to the default paging mechanism of using $skip and $top.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},System.TimeZoneInfo)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Generates a string to be used as the skip token value within the next link.
             </summary>
             <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
             <param name="model">The edm model.</param>
-            <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
-            <param name="timeZoneInfo">The timezone info.</param>
+            <param name="clause">The orderby clause to generate the skiptoken value.</param>
+            <param name="context">The serializer context.</param>
             <returns>Value for the skiptoken to be used in the next link.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
@@ -11119,33 +11202,14 @@
             <param name="queryOptions">Information about the other query options, could be null.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyToCore(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},Microsoft.AspNetCore.OData.Query.ODataQueryContext,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetOrderByClauses(System.Object,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.OrderByClause)">
             <summary>
-            Core logic for applying the query option to the IQueryable. 
+            Get all orderby clause and append the keys if apply
             </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="querySettings">Query setting used for validating the query option.</param>
-            <param name="orderByNodes">OrderBy information required to correctly apply the query option for default implementation.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.PopulatePropertyValuePairs(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
-            <summary>
-            Generates a dictionary with property name and property values specified in the skiptoken value.
-            </summary>
-            <param name="value">The skiptoken string value.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetPropertiesForSkipToken(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode})">
-            <summary>
-            Returns the list of properties that should be used for generating the skiptoken value. 
-            </summary>
-            <param name="lastMember">The last record that will be returned in the response.</param>
-            <param name="model">IEdmModel</param>
-            <param name="orderByNodes">OrderBy nodes in the original request.</param>
-            <returns>List of properties that should be used for generating the skiptoken value.</returns>
+            <param name="lastMember">The last object.</param>
+            <param name="model">The edm model.</param>
+            <param name="clause">The original orderby clause.</param>
+            <returns>The orderby clauses, since we don't need the 'ThenBy' for each clause, we didn't need to change it.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetTypeFromObject(System.Object,Microsoft.OData.Edm.IEdmModel)">
             <summary>
@@ -11446,6 +11510,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator">
             <summary>
             Gets or sets the $select and $expand query validator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.OrderBy">
+            <summary>
+            Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.OrderBy"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.SelectExpandClause">
@@ -12375,7 +12444,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
             <summary>
-            override this method to restrict the binary operators inside the $orderby query.
+            Override this method to restrict the binary operators inside the $orderby query.
             That includes all the logical operators except 'not' and all math operators.
             </summary>
             <param name="binaryOperatorNode">The binary operator node to validate.</param>
@@ -12456,7 +12525,7 @@
             <summary>
             The recursive method that validate most of the query node type is of CollectionNode type.
             </summary>
-            <param name="node">The single value node.</param>
+            <param name="node">The collection value node.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateCollectionResourceCastNode(Microsoft.OData.UriParser.CollectionResourceCastNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">

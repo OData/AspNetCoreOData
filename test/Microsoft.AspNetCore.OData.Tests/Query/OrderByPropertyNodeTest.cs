@@ -157,7 +157,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         }
 
         [Fact]
-        public void CreateCollection_CopmplexType_Succeeds()
+        public void CreateCollection_ComplexType_Succeeds()
         {
             // Arrange
             CustomersModelWithInheritance model = new CustomersModelWithInheritance();

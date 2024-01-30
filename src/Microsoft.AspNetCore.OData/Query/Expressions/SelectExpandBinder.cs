@@ -104,6 +104,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 subContext.AddComputedProperties(computeClause.ComputedItems);
             }
 
+            if (orderByClause != null && context.EnableSkipToken)
+            {
+                subContext.OrderByClauses = orderByClause.ToList();
+            }
+
             if (isCollection)
             {
                 // new CollectionWrapper<ElementType> { Instance = source.Select(s => new Wrapper { ... }) };
@@ -406,10 +411,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 bool isSelectingOpenTypeSegments = isContainDynamicPropertySelection || IsSelectAllOnOpenType(selectExpandClause, structuredType);
 
-                if (propertiesToExpand != null || propertiesToInclude != null || computedProperties != null || autoSelectedProperties != null || isSelectingOpenTypeSegments)
+                if (propertiesToExpand != null || propertiesToInclude != null || computedProperties != null || autoSelectedProperties != null || isSelectingOpenTypeSegments || context.OrderByClauses != null)
                 {
                     Expression propertyContainerCreation =
-                        BuildPropertyContainer(context, source, structuredType, propertiesToExpand, propertiesToInclude, computedProperties, autoSelectedProperties, isSelectingOpenTypeSegments);
+                        BuildPropertyContainer(context, source, structuredType, propertiesToExpand, propertiesToInclude, computedProperties, autoSelectedProperties, isSelectingOpenTypeSegments, isSelectedAll);
 
                     if (propertyContainerCreation != null)
                     {
@@ -766,7 +771,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude,
             IList<string> computedProperties,
             ISet<IEdmStructuralProperty> autoSelectedProperties,
-            bool isSelectingOpenTypeSegments)
+            bool isSelectingOpenTypeSegments,
+            bool isSelectedAll)
         {
             IList<NamedPropertyExpression> includedProperties = new List<NamedPropertyExpression>();
 
@@ -814,6 +820,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 BuildDynamicProperty(context, source, structuredType, includedProperties);
             }
+
+            BindOrderByProperties(context, source, structuredType, includedProperties, isSelectedAll);
 
             // create a property container that holds all these property names and values.
             return PropertyContainer.CreatePropertyContainer(includedProperties);
@@ -1065,6 +1073,95 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
                 includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue));
             }
+        }
+
+        /// <summary>
+        /// Build the orderby clause into the included properties.
+        /// For example: $orderby=tolower(substring(name,1,2))
+        /// </summary>
+        /// <param name="context">The query binder context.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="structuredType">The structured type.</param>
+        /// <param name="includedProperties">The container to hold the created property.</param>
+        /// <param name="isSelectedAll">Is select all flag.</param>
+        protected virtual void BindOrderByProperties(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
+            IList<NamedPropertyExpression> includedProperties, bool isSelectedAll)
+        {
+            if (context == null || context.OrderByClauses == null || source == null || structuredType == null || includedProperties == null)
+            {
+                return;
+            }
+
+            // Avoid duplicated binding.
+            ISet<string> usedPropertyNames = new HashSet<string>();
+            foreach (var p in includedProperties)
+            {
+                if (p.Name is ConstantExpression constExp && constExp.Type == typeof(string))
+                {
+                    usedPropertyNames.Add(constExp.Value.ToString());
+                }
+            }
+
+            Expression propertyName;
+            Expression propertyValue;
+            IList<string> names = new List<string>();
+            string name;
+            int start = 1;
+            foreach (OrderByClause clause in context.OrderByClauses)
+            {
+                // It could do things duplicated, for example if we have:
+                // $orderby=tolower(dynamic)$compute=...as dynamic&$select=dynamic
+                // dynamic is bind already since it's in $select, ideally we don't need to bind 'dynamic' in $orderby again (even we cached the compute binding once)
+                // Besides, for 'top-level' key orderby, since the key properties are auto-select, we don't need to bind them again.
+                if (clause.IsTopLevelSingleProperty(out IEdmProperty edmProperty, out name))
+                {
+                    // $orderby=Id or
+                    // $orderby=computedProp&$select=computedProp
+                    if ((edmProperty != null && isSelectedAll) || usedPropertyNames.Contains(name))
+                    {
+                        continue;
+                    }
+                }
+
+                name = GetOrderByName(usedPropertyNames, ref start);
+                names.Add(name);
+                usedPropertyNames.Add(name);
+
+                propertyName = Expression.Constant(name);
+                propertyValue = Bind(clause.Expression, context);
+                includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue)
+                {
+                    AutoSelected = true
+                });
+            }
+
+            if (names.Count > 0)
+            {
+                // We use this to keep the order and naming mapping.
+                propertyName = Expression.Constant(OrderByClauseHelpers.OrderByGlobalNameKey);
+                propertyValue = Expression.Constant(string.Join(",", names));
+                includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue)
+                {
+                    AutoSelected = true
+                });
+            }
+        }
+
+        private static string GetOrderByName(ISet<string> usedPropertyNames, ref int start)
+        {
+            do
+            {
+                // For advanced orderby, for example: $orderby=tolower(substring(location/street,1,2))
+                // we want to create a 'propertyName: propertyValue' binding.
+                // Since we cannot use the raw orderby literal to naming the property name, since it could be complicated and invalid
+                // We create a random name for each orderby clause.
+                string name = $"{OrderByClauseHelpers.OrderByPropertyNamePrefix}{start++}";
+                if (!usedPropertyNames.Contains(name))
+                {
+                    return name;
+                }
+            }
+            while (true);
         }
 
         private static SelectExpandClause GetOrCreateSelectExpandClause(IEdmNavigationProperty navigationProperty, ExpandedReferenceSelectItem expandedItem)

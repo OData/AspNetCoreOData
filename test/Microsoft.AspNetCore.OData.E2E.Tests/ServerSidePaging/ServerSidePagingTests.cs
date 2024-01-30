@@ -827,6 +827,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging
             Assert.Equal(55, (pageResult[0] as JObject)["CreditLimit"].ToObject<decimal?>());
             Assert.Null(content.GetValue("@odata.nextLink"));
         }
+
         [Fact]
         public async Task VerifySkipTokenPagingOrderedByNullableDateTimeProperty()
         {

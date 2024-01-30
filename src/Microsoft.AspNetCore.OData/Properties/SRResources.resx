@@ -736,7 +736,10 @@
     <value>'select' and 'expand' cannot be empty or whitespace. Omit the parameter from the query if it is not used.</value>
   </data>
   <data name="SkipTokenProcessingError" xml:space="preserve">
-    <value>Unable to get property values from the skiptoken value.</value>
+    <value>Unable to get property values from the skiptoken value, or the token value can not match the orderby clause.</value>
+  </data>
+  <data name="SkipTokenNotSupportedOrderByExpression" xml:space="preserve">
+    <value>SkipToken doesn't support $orderby expression kind '{0}'. Only support property or simple property path with $orderby when SkipToken enabled.</value>
   </data>
   <data name="UnableToIdentifyUniqueProperty" xml:space="preserve">
     <value>Unable to identify a unique property named '{0}'.</value>

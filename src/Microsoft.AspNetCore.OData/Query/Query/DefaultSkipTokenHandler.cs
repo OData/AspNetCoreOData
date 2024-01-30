@@ -7,12 +7,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.OData.Common;
@@ -21,7 +17,6 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
-using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
@@ -49,18 +44,13 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <returns>Returns the URI for NextPageLink. If a null object is passed for the instance, resorts to the default paging mechanism of using $skip and $top.</returns>
         public override Uri GenerateNextPageLink(Uri baseUri, int pageSize, Object instance, ODataSerializerContext context)
         {
-            if (context == null)
-            {
-                return null;
-            }
-
-            if (pageSize <= 0)
+            if (context == null || pageSize <= 0)
             {
                 return null;
             }
 
             Func<object, string> skipTokenGenerator = null;
-            IList<OrderByNode> orderByNodes = null;
+            OrderByClause orderByClause = null;
             ExpandedReferenceSelectItem expandedItem = context.CurrentSelectItem as ExpandedReferenceSelectItem;
             IEdmModel model = context.Model;
 
@@ -77,12 +67,12 @@ namespace Microsoft.AspNetCore.OData.Query
 
                     if (expandedItem.OrderByOption != null)
                     {
-                        orderByNodes = OrderByNode.CreateCollection(expandedItem.OrderByOption);
+                        orderByClause = expandedItem.OrderByOption;
                     }
 
                     skipTokenGenerator = (obj) =>
                     {
-                        return GenerateSkipTokenValue(obj, model, orderByNodes, context.TimeZone);
+                        return GenerateSkipTokenValue(obj, model, orderByClause, context);
                     };
 
                     return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator);
@@ -90,12 +80,12 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 if (context.QueryOptions != null && context.QueryOptions.OrderBy != null)
                 {
-                    orderByNodes = context.QueryOptions.OrderBy.OrderByNodes;
+                    orderByClause = context.QueryOptions.OrderBy.OrderByClause;
                 }
 
                 skipTokenGenerator = (obj) =>
                 {
-                    return GenerateSkipTokenValue(obj, model, orderByNodes, context.TimeZone);
+                    return GenerateSkipTokenValue(obj, model, orderByClause, context);
                 };
             }
 
@@ -107,52 +97,44 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         /// <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
         /// <param name="model">The edm model.</param>
-        /// <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
-        /// <param name="timeZoneInfo">The timezone info.</param>
+        /// <param name="clause">The orderby clause to generate the skiptoken value.</param>
+        /// <param name="context">The serializer context.</param>
         /// <returns>Value for the skiptoken to be used in the next link.</returns>
-        internal static string GenerateSkipTokenValue(Object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes, TimeZoneInfo timeZoneInfo = null)
+        internal static string GenerateSkipTokenValue(object lastMember, IEdmModel model, OrderByClause clause, ODataSerializerContext context = null)
         {
             if (lastMember == null)
             {
                 return string.Empty;
             }
 
-            IEnumerable<IEdmProperty> propertiesForSkipToken = GetPropertiesForSkipToken(lastMember, model, orderByNodes);
-            StringBuilder skipTokenBuilder = new StringBuilder(String.Empty);
-            if (propertiesForSkipToken == null)
+            IList<OrderByClause> clauses = GetOrderByClauses(lastMember, model, clause);
+
+            TimeZoneInfo timeZoneInfo = context?.TimeZone;
+            IList<KeyValuePair<string, object>> values = GetPropertyValues(lastMember, model, clauses, context);
+            if (values == null || values.Count == 0 || values.Count != clauses.Count)
             {
-                return skipTokenBuilder.ToString();
+                return null;
             }
 
-            int count = 0;
-            string uriLiteral;
-            object value;
-            int lastIndex = propertiesForSkipToken.Count() - 1;
-            IEdmStructuredObject obj = lastMember as IEdmStructuredObject;
-
-            foreach (IEdmProperty edmProperty in propertiesForSkipToken)
+            StringBuilder skipTokenBuilder = new StringBuilder();
+            int index = 0;
+            foreach (OrderByClause orderBy in clauses)
             {
-                bool islast = count == lastIndex;
-                if (obj != null)
-                {
-                    obj.TryGetPropertyValue(edmProperty.Name, out value);
-                }
-                else
-                {
-                    string clrPropertyName = model.GetClrPropertyName(edmProperty);
-                    value = lastMember.GetType().GetProperty(clrPropertyName).GetValue(lastMember);
-                }
+                object value = values[index].Value;
+                string name = values[index].Key;
+                IEdmTypeReference typeReference = orderBy.Expression.TypeReference;
 
+                string uriLiteral;
                 if (value == null)
                 {
                     uriLiteral = ODataUriUtils.ConvertToUriLiteral(value, ODataVersion.V401);
                 }
-                else if (edmProperty.Type.IsEnum())
+                else if (typeReference != null && typeReference.IsEnum())
                 {
                     ODataEnumValue enumValue = new ODataEnumValue(value.ToString(), value.GetType().FullName);
                     uriLiteral = ODataUriUtils.ConvertToUriLiteral(enumValue, ODataVersion.V401, model);
                 }
-                else if (edmProperty.Type.IsDateTimeOffset() && value is DateTime)
+                else if (typeReference != null && typeReference.IsDateTimeOffset() && value is DateTime)
                 {
                     var dateTime = (DateTime)value;
                     var dateTimeOffsetValue = TimeZoneInfoHelper.ConvertToDateTimeOffset(dateTime, timeZoneInfo);
@@ -165,15 +147,105 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 var encodedUriLiteral = WebUtility.UrlEncode(uriLiteral);
 
-                skipTokenBuilder
-                    .Append(edmProperty.Name)
-                    .Append(propertyDelimiter)
-                    .Append(encodedUriLiteral)
-                    .Append(islast ? String.Empty : CommaDelimiter.ToString(CultureInfo.CurrentCulture));
-                count++;
+                // By design: We should only include the value?
+                // For back-compatibility, let's keep the key-value pair for top-level property orderby
+                // For other advance orderby clause, only include the value.
+                if (!string.IsNullOrEmpty(name))
+                {
+                    skipTokenBuilder.Append(name).Append(propertyDelimiter);
+                }
+                skipTokenBuilder.Append(encodedUriLiteral);
+
+                index++;
+                if (index != clauses.Count)
+                {
+                    skipTokenBuilder.Append(',');
+                }
             }
 
             return skipTokenBuilder.ToString();
+        }
+
+        private static IList<KeyValuePair<string, object>> GetPropertyValues(object source, IEdmModel model, IList<OrderByClause> clauses,
+            ODataSerializerContext context)
+        {
+            if (source == null || clauses == null || clauses.Count == 0)
+            {
+                return null;
+            }
+
+            // When page size enabled, we will generate the next link no matter what the following scenarios:
+            // 1) Without $orderby, $select, $expand, for example: ~/customers
+            // 2) Without $select =..., for example: ~/customers?$orderby=....
+            // 3) Without $orderby=..., for example: ~/customers?$select=....
+            // 4) With $orderby, $select..., for example: ~/customers?$select=....&$orderby=.....
+
+            // If the request contains $select, the SelectExpandBinder at least contains the 'key(s)', since they are auto-selected
+            // If the request doesn't contain $select, the below codes can return all properties
+            IEdmStructuredObject structuredObj = source as IEdmStructuredObject;
+            if (structuredObj == null)
+            {
+                Type sourceType = source.GetType();
+                QueryBinderContext binderContext = new QueryBinderContext(model, new ODataQuerySettings(), sourceType);
+                binderContext.AddComputedProperties(context?.QueryOptions?.Compute?.ComputeClause?.ComputedItems);
+                binderContext.OrderByClauses = clauses;
+                ISelectExpandBinder selectExpandBinder = context != null && context.QueryContext != null ?
+                    context.QueryContext.GetSelectExpandBinder() :
+                    new SelectExpandBinder(new FilterBinder(), new OrderByBinder());
+
+                SelectExpandClause selectAll = new SelectExpandClause(null, true);
+                structuredObj = selectExpandBinder.ApplyBind(source, selectAll, binderContext) as IEdmStructuredObject;
+            }
+
+            if (structuredObj == null)
+            {
+                return null;
+            }
+
+            structuredObj.TryGetPropertyValue(OrderByClauseHelpers.OrderByGlobalNameKey, out object orderByNameObject);
+
+            IList<KeyValuePair<string, object>> values = new List<KeyValuePair<string, object>>();
+            string[] orderByNames = orderByNameObject == null ? null : (orderByNameObject as string).Split(",");
+            int index = 0;
+            object value;
+            foreach (OrderByClause clause in clauses)
+            {
+                if (clause.IsTopLevelSingleProperty(out _, out string name))
+                {
+                    // Let's first retrieve the value using property name, for example: "Id"
+                    if (structuredObj.TryGetPropertyValue(name, out value))
+                    {
+                        values.Add(new KeyValuePair<string, object>(name, value));
+                    }
+                    else
+                    {
+                        value = GetValue(structuredObj, orderByNames, index++, out string _);
+                        values.Add(new KeyValuePair<string, object>(name, value));
+                    }
+                }
+                else
+                {
+                    value = GetValue(structuredObj, orderByNames, index++, out string _);
+                    values.Add(new KeyValuePair<string, object>(string.Empty, value));
+                }
+            }
+
+            return values;
+        }
+
+        private static object GetValue(IEdmStructuredObject source, string[] orderByNames, int index, out string name)
+        {
+            name = string.Empty;
+            if (orderByNames != null && index < orderByNames.Length)
+            {
+                if (source.TryGetPropertyValue(orderByNames[index], out object value))
+                {
+                    name = orderByNames[index];
+                    return value;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -228,234 +300,154 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
             }
 
-            IList<OrderByNode> orderByNodes = null;
-
-            if (queryOptions != null)
-            {
-                OrderByQueryOption orderBy = queryOptions.GenerateStableOrder();
-                if (orderBy != null)
-                {
-                    orderByNodes = orderBy.OrderByNodes;
-                }
-            }
-
-            return ApplyToCore(query, querySettings, orderByNodes, skipTokenQueryOption.Context, skipTokenQueryOption.RawValue);
+            return ApplyToCore(query, querySettings, queryOptions, skipTokenQueryOption.RawValue);
         }
 
-        /// <summary>
-        /// Core logic for applying the query option to the IQueryable. 
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <param name="querySettings">Query setting used for validating the query option.</param>
-        /// <param name="orderByNodes">OrderBy information required to correctly apply the query option for default implementation.</param>
-        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
-        /// <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
-        /// <returns></returns>
-        [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Class coupling acceptable.")]
-        private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings, IList<OrderByNode> orderByNodes, ODataQueryContext context, string skipTokenRawValue)
+        private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings,
+             ODataQueryOptions queryOptions, string skipTokenRawValue)
         {
-            Contract.Assert(query != null);
-            Contract.Assert(context.ElementClrType != null);
-
-            IDictionary<string, OrderByDirection> directionMap;
-            if (orderByNodes != null)
+            OrderByQueryOption orderByOption = queryOptions?.OrderBy;
+            if (orderByOption == null)
             {
-                directionMap =
-                    orderByNodes.OfType<OrderByPropertyNode>().ToDictionary(node => context.Model.GetClrPropertyName(node.Property), node => node.Direction);
-            }
-            else
-            {
-                directionMap = new Dictionary<string, OrderByDirection>();
+                return query;
             }
 
-            IDictionary<string, (object PropertyValue, Type PropertyType)> propertyValuePairs = PopulatePropertyValuePairs(skipTokenRawValue, context);
+            // It's better to visit the nodes of OrderByClause reclusively to get the orderby raw value.
+            // Since we don't have such methods, let's simply split the request raw value.
+            IList<string> orderBys = orderByOption.RawValue.Split(',');
+            IList<OrderByClause> orderByClauses = orderByOption.OrderByClause.ToList();
+            IList<string> tokenValueParis = PopulatePropertyValuePairs(skipTokenRawValue);
 
-            if (propertyValuePairs.Count == 0)
+            if (orderBys.Count != orderByClauses.Count && orderByClauses.Count != tokenValueParis.Count)
             {
                 throw Error.InvalidOperation(SRResources.SkipTokenProcessingError);
             }
 
-            bool parameterizeConstant = querySettings.EnableConstantParameterization;
-            ParameterExpression param = Expression.Parameter(context.ElementClrType);
-            Expression where = null;
-            /* We will create a where lambda of the following form -
-             * Where (Prop1>Value1)
-             * OR (Prop1=Value1 AND Prop2>Value2)
-             * OR (Prop1=Value1 AND Prop2=Value2 AND Prop3>Value3)
-             * and so on...
-             * Adding the first true to simplify implementation.
-             */
-            Expression lastEquality = null;
-            bool firstProperty = true;
-
-            foreach (KeyValuePair<string, (object PropertyValue, Type PropertyType)> item in propertyValuePairs)
+            string where = string.Empty;
+            string lastEquality = null;
+            bool isFirst = true;
+            Contract.Assert(orderBys.Count == orderByClauses.Count);
+            for (int i = 0; i < orderBys.Count; ++i)
             {
-                string key = item.Key;
-                MemberExpression property = Expression.Property(param, key);
+                OrderByClause orderBy = orderByClauses[i];
+                string orderByRaw = orderBys[i];
+                string orderByValue = tokenValueParis[i];
+                bool isNullValue = string.Equals(orderByValue, "null", StringComparison.OrdinalIgnoreCase);
 
-                object value = item.Value.PropertyValue;
-
-                Type propertyType = item.Value.PropertyType ?? value.GetType();
-                bool propertyIsNullable = property.Type.IsNullable();
-
-                Expression compare = null;
-                if (value is ODataEnumValue enumValue)
+                string compare;
+                if (orderBy.Direction == OrderByDirection.Descending)
                 {
-                    value = enumValue.Value;
-                    propertyType = value.GetType();
-                }
-                else if (value is ODataNullValue)
-                {
-                    value = null;
-                    propertyType = property.Type;
-                }
+                    // In descending ordering, the 'null' value goes later.
+                    orderByRaw = orderByRaw.RemoveDesc();
 
-                Expression constant = parameterizeConstant ? LinqParameterContainer.Parameterize(propertyType, value) : Expression.Constant(value);
-
-                if (directionMap.ContainsKey(key) && directionMap[key] == OrderByDirection.Descending)
-                {
-                    // Prop < Value
-                    compare = ExpressionBinderHelper.CreateBinaryExpression(
-                        binaryOperator: BinaryOperatorKind.LessThan,
-                        left: property,
-                        right: constant,
-                        liftToNull: !propertyIsNullable,
-                        querySettings: querySettings);
-
-                    if (propertyIsNullable && value != null)
+                    if (isNullValue)
                     {
-                        // Prop == null
-
-                        // We only do this when value is NOT null since
-                        // ((Prop1 < null) OR (Prop1 == null)) OR ((Prop1 == null) AND (Prop2 > Value2))
-                        // doesn't make logical sense
-                        Expression condition = ExpressionBinderHelper.CreateBinaryExpression(
-                            binaryOperator: BinaryOperatorKind.Equal,
-                            left: property,
-                            right: parameterizeConstant ? LinqParameterContainer.Parameterize(property.Type, null) : Expression.Constant(null),
-                            liftToNull: false,
-                            querySettings: querySettings);
-
-                        // (Prop < Value) OR (Prop == null)
-                        compare = Expression.OrElse(compare, condition);
-                    }
-                }
-                else
-                {
-                    if (value == null)
-                    {
-                        // Prop != null
-
-                        // We are aiming for the following expression
-                        // when value is null in the ascending order scenario:
-                        // (Prop1 != null) OR ((Prop1 == null) AND (Prop2 > Value2)) ...
-                        compare = ExpressionBinderHelper.CreateBinaryExpression(
-                            binaryOperator: BinaryOperatorKind.NotEqual,
-                            left: property,
-                            right: constant,
-                            liftToNull: false,
-                            querySettings: querySettings);
+                        compare = "false"; // Dummy compare, always false
                     }
                     else
                     {
-                        // Prop > Value
-
-                        // We are aiming for the following expression
-                        // when value is NOT null in the ascending order scenario:
-                        // (Prop1 > Value1) OR ((Prop1 == Value1) AND (Prop2 > Value2)) ...
-                        compare = ExpressionBinderHelper.CreateBinaryExpression(
-                            binaryOperator: BinaryOperatorKind.GreaterThan,
-                            left: property,
-                            right: constant,
-                            liftToNull: !propertyIsNullable,
-                            querySettings: querySettings);
+                        // (prop < value) OR (prop == null)
+                        compare = $"(({orderByRaw} lt {orderByValue}) or ({orderByRaw} eq null))";
                     }
-                }
-
-                if (firstProperty)
-                {
-                    lastEquality = ExpressionBinderHelper.CreateBinaryExpression(
-                        binaryOperator: BinaryOperatorKind.Equal,
-                        left: property,
-                        right: constant,
-                        liftToNull: !propertyIsNullable,
-                        querySettings: querySettings);
-                    where = compare;
-                    firstProperty = false;
                 }
                 else
                 {
-                    Expression condition = Expression.AndAlso(lastEquality, compare);
-                    where = Expression.OrElse(where, condition);
-                    lastEquality = Expression.AndAlso(
-                        lastEquality,
-                        ExpressionBinderHelper.CreateBinaryExpression(
-                            binaryOperator: BinaryOperatorKind.Equal,
-                            left: property,
-                            right: constant,
-                            liftToNull: !propertyIsNullable,
-                            querySettings: querySettings));
+                    if (isNullValue)
+                    {
+                        // We are aiming for the following expression
+                        // when value is null in the ascending order scenario:
+                        // (Prop1 != null) OR ((Prop1 == null) AND (Prop2 > Value2)) ...
+                        compare = $"({orderByRaw} ne null)";
+                    }
+                    else
+                    {
+                        // We are aiming for the following expression
+                        // when value is NOT null in the ascending order scenario:
+                        // (Prop1 > Value1) OR ((Prop1 == Value1) AND (Prop2 > Value2)) ...
+                        compare = $"({orderByRaw} gt {orderByValue})";
+                    }
+                }
+
+                if (isFirst)
+                {
+                    lastEquality = $"({orderByRaw} eq {orderByValue})";
+                    where = compare;
+                    isFirst = false;
+                }
+                else
+                {
+                    string condition = $"({lastEquality} and {compare})";
+                    where = $"({where} or {condition})";
+                    lastEquality = $"({lastEquality} and ({orderByRaw} eq {orderByValue}))";
                 }
             }
 
-            Expression whereLambda = Expression.Lambda(where, param);
-            return ExpressionHelpers.Where(query, whereLambda, query.ElementType);
+            FilterQueryOption filter = new FilterQueryOption(where, queryOptions.Context);
+            filter.Compute = queryOptions.Compute;
+
+            return filter.ApplyTo(query, querySettings);
         }
 
-        /// <summary>
-        /// Generates a dictionary with property name and property values specified in the skiptoken value.
-        /// </summary>
-        /// <param name="value">The skiptoken string value.</param>
-        /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and some type information</param>
-        /// <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        internal static IDictionary<string, (object PropertyValue, Type PropertyType)> PopulatePropertyValuePairs(string value, ODataQueryContext context)
+        internal static string[] PopulatePropertyValuePairs(string value)
         {
-            Contract.Assert(context != null);
-
-            IDictionary<string, (object PropertyValue, Type PropertyType)> propertyValuePairs = new Dictionary<string, (object PropertyValue, Type PropertyType)>();
             IList<string> keyValuesPairs = ParseValue(value, CommaDelimiter);
-
-            IEdmStructuredType type = context.ElementType as IEdmStructuredType;
-            Debug.Assert(type != null);
-
+            string[] items = new string[keyValuesPairs.Count];
+            int index = 0;
             foreach (string pair in keyValuesPairs)
             {
-                string[] pieces = pair.Split(new char[] { propertyDelimiter }, 2);
-                string propertyName = pieces[0];
-                if (pieces.Length > 1 && !String.IsNullOrWhiteSpace(propertyName))
+                // Since the original design is to use '-' to split the "propertyName" and "PropertyValue".
+                // Now, the keyValuePairs should only contain the property value and the property value itself could contain '-'.
+                // So far, the possible problem is for 'DateTimeOffset', 'Date', 'Guid' or a negative value (-42).
+                // Actually, I think it's better to use '=' to split the name and value.
+                // For back-compatibility, let's keep use '-'
+                string trimmedPair = pair.Trim();
+                if (trimmedPair.StartsWith('-'))
                 {
-                    object propValue = null;
+                    items[index] = trimmedPair;
+                    ++index;
+                    continue;
+                }
 
-                    IEdmTypeReference propertyType = null;
-                    IEdmProperty property = type.FindProperty(propertyName);
-                    Type propertyClrType = null;
-                    if (property != null)
-                    {
-                        propertyName = context.Model.GetClrPropertyName(property);
-                        propertyType = property.Type;
-                        propertyClrType = context.Model.GetClrType(propertyType);
-                    }
+                if (DateTimeOffset.TryParse(trimmedPair, out _) ||
+                    Date.TryParse(trimmedPair, out _) ||
+                    Guid.TryParse(trimmedPair, out _))
+                {
+                    items[index] = trimmedPair;
+                    ++index;
+                    continue;
+                }
 
-                    propValue = ODataUriUtils.ConvertFromUriLiteral(pieces[1], ODataVersion.V401, context.Model, propertyType);
-                    propertyValuePairs.Add(propertyName, (propValue, propertyClrType));
+                // It should work for: abc--42
+                IList<string> pieces = trimmedPair.Split(new char[] { propertyDelimiter }, 2);
+                if (pieces.Count == 1)
+                {
+                    // without the property name, only contains the value
+                    items[index] = pieces[0];
+                }
+                else if (pieces.Count == 2 && !string.IsNullOrWhiteSpace(pieces[0]))
+                {
+                    // without the property name, only contains the value
+                    items[index] = pieces[1];
                 }
                 else
                 {
                     throw new ODataException(Error.Format(SRResources.SkipTokenParseError, value));
                 }
+
+                ++index;
             }
 
-            return propertyValuePairs;
+            return items;
         }
 
         /// <summary>
-        /// Returns the list of properties that should be used for generating the skiptoken value. 
+        /// Get all orderby clause and append the keys if apply
         /// </summary>
-        /// <param name="lastMember">The last record that will be returned in the response.</param>
-        /// <param name="model">IEdmModel</param>
-        /// <param name="orderByNodes">OrderBy nodes in the original request.</param>
-        /// <returns>List of properties that should be used for generating the skiptoken value.</returns>
-        internal static IEnumerable<IEdmProperty> GetPropertiesForSkipToken(object lastMember, IEdmModel model, IList<OrderByNode> orderByNodes)
+        /// <param name="lastMember">The last object.</param>
+        /// <param name="model">The edm model.</param>
+        /// <param name="clause">The original orderby clause.</param>
+        /// <returns>The orderby clauses, since we don't need the 'ThenBy' for each clause, we didn't need to change it.</returns>
+        internal static IList<OrderByClause> GetOrderByClauses(object lastMember, IEdmModel model, OrderByClause clause)
         {
             IEdmType edmType = GetTypeFromObject(lastMember, model);
             IEdmEntityType entity = edmType as IEdmEntityType;
@@ -464,28 +456,35 @@ namespace Microsoft.AspNetCore.OData.Query
                 return null;
             }
 
-            IEnumerable<IEdmProperty> key = entity.Key();
-            if (orderByNodes != null)
+            IList<OrderByClause> orderByClauses = new List<OrderByClause>();
+            ISet<IEdmProperty> properties = new HashSet<IEdmProperty>();
+            while (clause != null)
             {
-                if (orderByNodes.OfType<OrderByOpenPropertyNode>().Any())
+                // Be noted, the 'ThenBy' doesn't reset to null. It doesn't matter since we don't use it.
+                orderByClauses.Add(clause);
+
+                if (clause.IsTopLevelSingleProperty(out IEdmProperty property, out _))
                 {
-                    //SkipToken will not support ordering on dynamic properties
-                    return null;
+                    properties.Add(property);
                 }
 
-                IList<IEdmProperty> orderByProps = orderByNodes.OfType<OrderByPropertyNode>().Select(p => p.Property).ToList();
-                foreach (IEdmProperty subKey in key)
-                {
-                    if (!orderByProps.Contains(subKey))
-                    {
-                        orderByProps.Add(subKey);
-                    }
-                }
-
-                return orderByProps.AsEnumerable();
+                clause = clause.ThenBy;
             }
 
-            return key;
+            ResourceRangeVariable rangeVar = new ResourceRangeVariable("$it", new EdmEntityTypeReference(entity, true), navigationSource: null);
+            ResourceRangeVariableReferenceNode rangeNode = new ResourceRangeVariableReferenceNode("$it", rangeVar);
+            IEnumerable<IEdmProperty> key = entity.Key();
+            foreach (IEdmProperty subKey in key)
+            {
+                if (!properties.Contains(subKey))
+                {
+                    SingleValuePropertyAccessNode node = new SingleValuePropertyAccessNode(rangeNode, subKey);
+                    OrderByClause keyOrderBy = new OrderByClause(null, node, OrderByDirection.Ascending, rangeVar);
+                    orderByClauses.Add(keyOrderBy);
+                }
+            }
+
+            return orderByClauses;
         }
 
         /// <summary>
