@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
@@ -63,8 +64,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
-            // Check if element type is null and not of AggregationWrapper type and not of NoGroupByAggregationWrapper type.
-            if (ElementType == null && ElementClrType != typeof(AggregationWrapper) && ElementClrType != typeof(NoGroupByAggregationWrapper))
+            // Check if element type is null and not of GroupByWrapper or its derived types.
+            if (ElementType == null && !typeof(GroupByWrapper).IsAssignableFrom(ElementClrType))
             {
                 throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
             }
