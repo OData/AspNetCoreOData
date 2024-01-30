@@ -211,7 +211,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
         public Type TransformationElementType { get { return this.CurrentParameter.Type; } }
+
         public bool HasInstancePropertyContainer;
+
         public Dictionary<SingleValueNode, Expression> PreFlattenedMap { get; set; } = new Dictionary<SingleValueNode, Expression>();
         #endregion
 

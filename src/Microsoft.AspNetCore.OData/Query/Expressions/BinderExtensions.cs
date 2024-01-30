@@ -392,11 +392,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
-
-            IDictionary<string, Expression> flattenedPropertyContainer = QueryBinder.GetFlattenedPropertyContainer(context, source);
+            context.EnsureFlattenedProperties(context.LambdaParameter, source);
 
             AggregationBinderHelper binderHelper = new AggregationBinderHelper();
-            source = binderHelper.FlattenReferencedProperties(source, context, flattenedPropertyContainer, transformationNode);
+            source = binderHelper.FlattenReferencedProperties(source, context, context.FlattenedProperties, transformationNode);
 
             // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
             // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
