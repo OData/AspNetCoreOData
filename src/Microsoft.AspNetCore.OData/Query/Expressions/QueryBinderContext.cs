@@ -211,9 +211,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 this._lambdaParameters[DollarThis] = value;
             }
         }
-        public Type TransformationElementType { get { return this.CurrentParameter.Type; } }
+        public Type TransformationElementType { get { return this.LambdaParameter.Type; } }
 
-        public bool HasInstancePropertyContainer;
+        public bool HasInstancePropertyContainer { get; set; }
 
         public Dictionary<SingleValueNode, Expression> PreFlattenedMap { get; set; } = new Dictionary<SingleValueNode, Expression>();
         #endregion
@@ -281,7 +281,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 BaseQuery = query
             };
 
-            this.FlattenedProperties = binder.GetFlattenedProperties(source);
+            if (query != null)
+            {
+                this.HasInstancePropertyContainer = query.ElementType.IsGenericType
+                    && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+
+                this.FlattenedProperties = binder.GetFlattenedProperties(source);
+            }
         }
     }
 }

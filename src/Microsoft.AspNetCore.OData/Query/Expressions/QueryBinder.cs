@@ -1093,13 +1093,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                //   return GetFlattenedPropertyExpression(propertyPath, context)
-                //      ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (!propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
-
                 bool isAggregated = context.ElementClrType == typeof(AggregationWrapper);
 
                 return GetFlattenedPropertyExpression(propertyPath, context)
-                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyName, isAggregated), context);
+                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (context.HasInstancePropertyContainer && !propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
             }
         }
 
