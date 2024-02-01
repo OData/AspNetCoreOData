@@ -306,7 +306,7 @@ namespace Microsoft.AspNetCore.OData.Query
         private static IQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings,
              ODataQueryOptions queryOptions, string skipTokenRawValue)
         {
-            OrderByQueryOption orderByOption = queryOptions?.OrderBy;
+            OrderByQueryOption orderByOption = queryOptions?.GenerateStableOrder();
             if (orderByOption == null)
             {
                 return query;
@@ -426,7 +426,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
                 else if (pieces.Count == 2 && !string.IsNullOrWhiteSpace(pieces[0]))
                 {
-                    // without the property name, only contains the value
+                    // with the property name, only contains the value
                     items[index] = pieces[1];
                 }
                 else

@@ -22,7 +22,6 @@ using Xunit;
 namespace Microsoft.AspNetCore.OData.Tests.Query
 {
     using Microsoft.AspNetCore.Http;
-    using System.Reflection;
     using System.Runtime.Serialization;
 
     public class DefaultSkipTokenHandlerTests
@@ -565,6 +564,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+            ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
 
             SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
                 "abc",
@@ -577,8 +578,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     customers,
                     skipTokenQuery,
                     new ODataQuerySettings(),
-                    null),
-                "Unable to parse the skiptoken value 'abc'. Skiptoken value should always be server generated.");
+                    queryOptions),
+                "Could not find a property named 'abc' on type 'Microsoft.AspNetCore.OData.Tests.Query.SkipCustomer'.");
         }
         
         private static void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
@@ -590,6 +591,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+            ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
 
             SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
                 skipTokenQueryOptionRawValue,
@@ -607,7 +610,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     customers,
                     skipTokenQuery,
                     settings,
-                    null)
+                    queryOptions)
                 .ToArray();
 
             // Assert

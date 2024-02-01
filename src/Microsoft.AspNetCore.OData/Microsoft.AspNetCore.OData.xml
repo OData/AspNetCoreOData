@@ -2832,6 +2832,13 @@
             <param name="propertyName">The output property name, it works for dynamic property.</param>
             <returns>true/false.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.RemoveDesc(System.String)">
+            <summary>
+            Remove the ' desc' from the orderby clause.
+            </summary>
+            <param name="orderby">The orderby clause</param>
+            <returns>changed orderby clause.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.SelectModelPath">
             <summary>
             The select property path is a model path with the following restriction:
@@ -9881,7 +9888,7 @@
             Build the orderby clause into the included properties.
             For example: $orderby=tolower(substring(name,1,2))
             </summary>
-            <param name="context">The wrapper for properties used by the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder"/>.</param>
+            <param name="context">The query binder context.</param>
             <param name="source">The source.</param>
             <param name="structuredType">The structured type.</param>
             <param name="includedProperties">The container to hold the created property.</param>
