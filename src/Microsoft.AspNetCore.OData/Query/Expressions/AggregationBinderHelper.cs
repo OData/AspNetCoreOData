@@ -5,10 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.UriParser.Aggregation;
@@ -60,12 +62,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 && groupingProperties.Any()
                 && (flattenedPropertyContainer == null || !flattenedPropertyContainer.Any()))
             {
-                var wrapperType = typeof(FlatteningWrapper<>).MakeGenericType(context.TransformationElementType);
-                var sourceProperty = wrapperType.GetProperty("Source");
+                Type wrapperType = typeof(FlatteningWrapper<>).MakeGenericType(context.TransformationElementType);
+                PropertyInfo sourceProperty = wrapperType.GetProperty("Source");
                 List<MemberAssignment> wta = new List<MemberAssignment>();
                 wta.Add(Expression.Bind(sourceProperty, context.LambdaParameter));
 
-                var aggrregatedPropertiesToFlatten = aggregateExpressions.OfType<AggregateExpression>().Where(e => e.Method != AggregationMethod.VirtualPropertyCount).ToList();
+                List<AggregateExpression> aggregatedPropertiesToFlatten = aggregateExpressions.OfType<AggregateExpression>().Where(e => e.Method != AggregationMethod.VirtualPropertyCount).ToList();
                 // Generated Select will be stack like, meaning that first property in the list will be deepest one
                 // For example if we add $it.B.C, $it.B.D, select will look like
                 // new {
@@ -74,22 +76,23 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 //          Value = $it.B.D
                 //      }
                 // }
-                // We are generated references (in currentContainerExpression) from  the beginning of the  Select ($it.Value, then $it.Next.Value etc.)
+                // We are generating references (in currentContainerExpression) from  the beginning of the  Select ($it.Value, then $it.Next.Value etc.)
                 // We have proper match we need insert properties in reverse order
                 // After this 
                 // properties = { $it.B.D, $it.B.C}
                 // _preFlattendMAp = { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
-                var properties = new NamedPropertyExpression[aggrregatedPropertiesToFlatten.Count];
-                var aliasIdx = aggrregatedPropertiesToFlatten.Count - 1;
-                var aggParam = Expression.Parameter(wrapperType, "$it");
-                var currentContainerExpression = Expression.Property(aggParam, GroupByContainerProperty);
-                foreach (var aggExpression in aggrregatedPropertiesToFlatten)
+                NamedPropertyExpression[] properties = new NamedPropertyExpression[aggregatedPropertiesToFlatten.Count];
+                int aliasIdx = aggregatedPropertiesToFlatten.Count - 1;
+                ParameterExpression aggParam = Expression.Parameter(wrapperType, "$it");
+                MemberExpression currentContainerExpression = Expression.Property(aggParam, GroupByContainerProperty);
+
+                foreach (var aggExpression in aggregatedPropertiesToFlatten)
                 {
-                    var alias = "Property" + aliasIdx.ToString(CultureInfo.CurrentCulture); // We just need unique alias, we aren't going to use it
+                    string alias = "Property" + aliasIdx.ToString(CultureInfo.CurrentCulture); // We just need unique alias, we aren't going to use it
 
                     // Add Value = $it.B.C
-                    var propAccessExpression = BindAccessor(aggExpression.Expression, context);
-                    var type = propAccessExpression.Type;
+                    Expression propAccessExpression = BindAccessor(aggExpression.Expression, context);
+                    Type type = propAccessExpression.Type;
                     propAccessExpression = WrapConvert(propAccessExpression);
                     properties[aliasIdx] = new NamedPropertyExpression(Expression.Constant(alias), propAccessExpression);
 
@@ -102,11 +105,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     aliasIdx--;
                 }
 
-                var wrapperProperty = typeof(AggregationWrapper).GetProperty(GroupByContainerProperty);
+                PropertyInfo wrapperProperty = typeof(AggregationWrapper).GetProperty(GroupByContainerProperty);
 
                 wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
-                var flatLambda = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wta), context.LambdaParameter);
+                LambdaExpression flatLambda = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wta), context.LambdaParameter);
 
                 query = ExpressionHelpers.Select(query, flatLambda, context.TransformationElementType);
 
