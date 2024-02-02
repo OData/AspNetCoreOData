@@ -276,17 +276,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         internal void EnsureFlattenedProperties(ParameterExpression source, IQueryable query)
         {
-            TransformationBinderBase binder = new TransformationBinderBase(this.QuerySettings, this.AssembliesResolver, this.ElementClrType, this.Model)
-            {
-                BaseQuery = query
-            };
-
             if (query != null)
             {
                 this.HasInstancePropertyContainer = query.ElementType.IsGenericType
                     && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
-                this.FlattenedProperties = binder.GetFlattenedProperties(source);
+                AggregationBinderHelper binderHelper = new AggregationBinderHelper();
+                this.FlattenedProperties = binderHelper.GetFlattenedProperties(source, this, query);
             }
         }
     }

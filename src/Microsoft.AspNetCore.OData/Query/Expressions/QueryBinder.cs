@@ -1357,7 +1357,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        internal static IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context, IQueryable query)
+        internal IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context, IQueryable query)
         {
             if (!typeof(GroupByWrapper).IsAssignableFrom(query.ElementType))
             {
