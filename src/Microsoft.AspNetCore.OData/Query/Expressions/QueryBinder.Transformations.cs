@@ -73,29 +73,29 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         ? (Expression)Expression.Property(context.LambdaParameter, "Source")
                         : context.LambdaParameter;
                 case QueryNodeKind.SingleValuePropertyAccess:
-                    var propAccessNode = node as SingleValuePropertyAccessNode;
+                    SingleValuePropertyAccessNode propAccessNode = node as SingleValuePropertyAccessNode;
                     return CreatePropertyAccessExpression(BindAccessor(propAccessNode.Source, context, baseElement), context, propAccessNode.Property, GetFullPropertyPath(propAccessNode));
                 case QueryNodeKind.AggregatedCollectionPropertyNode:
-                    var aggPropAccessNode = node as AggregatedCollectionPropertyNode;
+                    AggregatedCollectionPropertyNode aggPropAccessNode = node as AggregatedCollectionPropertyNode;
                     return CreatePropertyAccessExpression(BindAccessor(aggPropAccessNode.Source, context, baseElement), context, aggPropAccessNode.Property);
                 case QueryNodeKind.SingleComplexNode:
-                    var singleComplexNode = node as SingleComplexNode;
+                    SingleComplexNode singleComplexNode = node as SingleComplexNode;
                     return CreatePropertyAccessExpression(BindAccessor(singleComplexNode.Source, context, baseElement), context, singleComplexNode.Property, GetFullPropertyPath(singleComplexNode));
                 case QueryNodeKind.SingleValueOpenPropertyAccess:
-                    var openNode = node as SingleValueOpenPropertyAccessNode;
+                    SingleValueOpenPropertyAccessNode openNode = node as SingleValueOpenPropertyAccessNode;
                     return GetFlattenedPropertyExpression(openNode.Name, context) ?? CreateOpenPropertyAccessExpression(openNode, context);
                 case QueryNodeKind.None:
                 case QueryNodeKind.SingleNavigationNode:
-                    var navNode = (SingleNavigationNode)node;
+                    SingleNavigationNode navNode = node as SingleNavigationNode;
                     return CreatePropertyAccessExpression(BindAccessor(navNode.Source, context), context, navNode.NavigationProperty, GetFullPropertyPath(navNode));
                 case QueryNodeKind.BinaryOperator:
-                    var binaryNode = (BinaryOperatorNode)node;
-                    var leftExpression = BindAccessor(binaryNode.Left, context, baseElement);
-                    var rightExpression = BindAccessor(binaryNode.Right, context, baseElement);
+                    BinaryOperatorNode binaryNode = node as BinaryOperatorNode;
+                    Expression leftExpression = BindAccessor(binaryNode.Left, context, baseElement);
+                    Expression rightExpression = BindAccessor(binaryNode.Right, context, baseElement);
                     return ExpressionBinderHelper.CreateBinaryExpression(binaryNode.OperatorKind, leftExpression, rightExpression,
                         liftToNull: true, context.QuerySettings);
                 case QueryNodeKind.Convert:
-                    var convertNode = (ConvertNode)node;
+                    ConvertNode convertNode = node as ConvertNode;
                     return CreateConvertExpression(convertNode, BindAccessor(convertNode.Source, context, baseElement), context);
                 case QueryNodeKind.CollectionNavigationNode:
                     return baseElement ?? context.LambdaParameter;
@@ -131,16 +131,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             switch (transformation.Kind)
             {
                 case TransformationNodeKind.Aggregate:
-                    var aggregateClause = transformation as AggregateTransformationNode;
+                    AggregateTransformationNode aggregateClause = transformation as AggregateTransformationNode;
                     aggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions, context);
                     break;
                 case TransformationNodeKind.GroupBy:
-                    var groupByClause = transformation as GroupByTransformationNode;
+                    GroupByTransformationNode groupByClause = transformation as GroupByTransformationNode;
                     if (groupByClause.ChildTransformations != null)
                     {
                         if (groupByClause.ChildTransformations.Kind == TransformationNodeKind.Aggregate)
                         {
-                            var aggregationNode = (AggregateTransformationNode)groupByClause.ChildTransformations;
+                            AggregateTransformationNode aggregationNode = (AggregateTransformationNode)groupByClause.ChildTransformations;
                             aggregateExpressions = FixCustomMethodReturnTypes(aggregationNode.AggregateExpressions, context);
                         }
                         else
@@ -162,7 +162,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             return aggregateExpressions.Select(x =>
             {
-                var ae = x as AggregateExpression;
+                AggregateExpression ae = x as AggregateExpression;
                 return ae != null ? FixCustomMethodReturnType(ae, context) : x;
             });
         }
@@ -174,21 +174,21 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return expression;
             }
 
-            var customMethod = GetCustomMethod(expression, context);
+            MethodInfo customMethod = GetCustomMethod(expression, context);
 
             // var typeReference = customMethod.ReturnType.GetEdmPrimitiveTypeReference();
-            var typeReference = context.Model.GetEdmPrimitiveTypeReference(customMethod.ReturnType);
+            IEdmPrimitiveTypeReference typeReference = context.Model.GetEdmPrimitiveTypeReference(customMethod.ReturnType);
 
             return new AggregateExpression(expression.Expression, expression.MethodDefinition, expression.Alias, typeReference);
         }
 
         internal MethodInfo GetCustomMethod(AggregateExpression expression, QueryBinderContext context)
         {
-            var propertyLambda = Expression.Lambda(BindAccessor(expression.Expression, context), context.LambdaParameter);
+            LambdaExpression propertyLambda = Expression.Lambda(BindAccessor(expression.Expression, context), context.LambdaParameter);
             Type inputType = propertyLambda.Body.Type;
 
             string methodToken = expression.MethodDefinition.MethodLabel;
-            var customFunctionAnnotations = context.Model.GetAnnotationValue<CustomAggregateMethodAnnotation>(context.Model);
+            CustomAggregateMethodAnnotation customFunctionAnnotations = context.Model.GetAnnotationValue<CustomAggregateMethodAnnotation>(context.Model);
 
             MethodInfo customMethod;
             if (!customFunctionAnnotations.GetMethodInfo(methodToken, inputType, out customMethod))
@@ -226,8 +226,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
             {
-                var dynamicDictIsNotNull = Expression.NotEqual(propertyAccessExpression, Expression.Constant(null));
-                var dynamicDictIsNotNullAndContainsKey = Expression.AndAlso(dynamicDictIsNotNull, containsKeyExpression);
+                BinaryExpression dynamicDictIsNotNull = Expression.NotEqual(propertyAccessExpression, Expression.Constant(null));
+                BinaryExpression dynamicDictIsNotNullAndContainsKey = Expression.AndAlso(dynamicDictIsNotNull, containsKeyExpression);
                 return Expression.Condition(
                     dynamicDictIsNotNullAndContainsKey,
                     readDictionaryIndexerExpression,

@@ -18,6 +18,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
+using static Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
@@ -200,6 +201,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         #region AggregationBinder
+
+        /// <summary>
+        /// The parameter name for current type. Used in transformation queries.
+        /// </summary>
         public ParameterExpression LambdaParameter
         {
             get
@@ -211,10 +216,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 this._lambdaParameters[DollarThis] = value;
             }
         }
+        /// <summary>
+        /// The type of the element in a transformation query.
+        /// </summary>
         public Type TransformationElementType { get { return this.LambdaParameter.Type; } }
 
+        /// <summary>
+        /// If the container has an Instance property.
+        /// </summary>
         public bool HasInstancePropertyContainer { get; set; }
 
+        /// <summary>
+        /// A mapping of flattened single value nodes and their values. For example { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
+        /// </summary>
         public Dictionary<SingleValueNode, Expression> PreFlattenedMap { get; set; } = new Dictionary<SingleValueNode, Expression>();
         #endregion
 
@@ -278,8 +292,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             if (query != null)
             {
-                this.HasInstancePropertyContainer = query.ElementType.IsGenericType
-                    && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
+                this.HasInstancePropertyContainer = query.ElementType.IsGenericType && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
 
                 AggregationBinderHelper binderHelper = new AggregationBinderHelper();
                 this.FlattenedProperties = binderHelper.GetFlattenedProperties(source, this, query);

@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 ParameterExpression aggParam = Expression.Parameter(wrapperType, "$it");
                 MemberExpression currentContainerExpression = Expression.Property(aggParam, GroupByContainerProperty);
 
-                foreach (var aggExpression in aggregatedPropertiesToFlatten)
+                foreach (AggregateExpression aggExpression in aggregatedPropertiesToFlatten)
                 {
                     string alias = "Property" + aliasIdx.ToString(CultureInfo.CurrentCulture); // We just need unique alias, we aren't going to use it
 
