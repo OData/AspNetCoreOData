@@ -232,11 +232,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataResourceSetWrapper resourceSetWrapper = new ODataResourceSetWrapper(new ODataResourceSet());
             resourceSetWrapper.Resources.Add(new ODataResourceWrapper(new ODataResource { Id = new Uri("http://a1/") }));
             resourceSetWrapper.Resources.Add(new ODataResourceWrapper(new ODataResource { Id = new Uri("http://a2/") }));
-            ODataDeserializerContext readContext = new ODataDeserializerContext();
+            ODataDeserializerContext readContext = new ODataDeserializerContext
+            {
+                Model = _model
+            };
 
             deserializerProvider.Setup(p => p.GetEdmTypeDeserializer(_customerType, false)).Returns(entityDeserializer.Object);
-            entityDeserializer.Setup(d => d.ReadInline(resourceSetWrapper.Resources[0], _customerType, readContext)).Returns("a1").Verifiable();
-            entityDeserializer.Setup(d => d.ReadInline(resourceSetWrapper.Resources[1], _customerType, readContext)).Returns("a2").Verifiable();
+            entityDeserializer.Setup(d => d.ReadInline(resourceSetWrapper.Resources[0], _customerType, It.IsAny<ODataDeserializerContext>())).Returns("a1").Verifiable();
+            entityDeserializer.Setup(d => d.ReadInline(resourceSetWrapper.Resources[1], _customerType, It.IsAny<ODataDeserializerContext>())).Returns("a2").Verifiable();
 
             // Act
             var result = deserializer.ReadResourceSet(resourceSetWrapper, _customerType, readContext);
@@ -313,14 +316,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public async Task ReadAsync_ReturnsEdmComplexObjectCollection_TypelessMode()
+        public async Task ReadAsync_ReturnsEdmUntypedCollection_WithTypeMode()
         {
             // Arrange
-            IEdmTypeReference addressType = _model.GetEdmTypeReference(typeof(Address)).AsComplex();
-            IEdmCollectionTypeReference addressCollectionType =
-                new EdmCollectionTypeReference(new EdmCollectionType(addressType));
-
-            HttpContent content = new StringContent("{ 'value': [ {'@odata.type':'Microsoft.AspNetCore.OData.Tests.Models.Address', 'City' : 'Redmond' } ] }");
+            HttpContent content = new StringContent("{ 'value': [ 4, {'@odata.type':'Microsoft.AspNetCore.OData.Tests.Models.Address', 'City' : 'Redmond' } ] }");
             HeaderDictionary headerDict = new HeaderDictionary
             {
                 { "Content-Type", "application/json" }
@@ -332,6 +331,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             ODataDeserializerContext readContext = new ODataDeserializerContext
             {
                 Model = _model,
+                ResourceType = typeof(EdmUntypedCollection),
+                ResourceEdmType = EdmUntypedHelpers.NullableUntypedCollectionReference
+            };
+
+            // Act
+            var result = await deserializer.ReadAsync(reader, typeof(EdmUntypedCollection), readContext)  as EdmUntypedCollection;
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.Equal(4, result[0]);
+            Address address = Assert.IsType<Address>(result[1]);
+
+            Assert.Null(address.Street);
+            Assert.Equal("Redmond", address.City);
+        }
+
+        [Fact]
+        public async Task ReadAsync_ReturnsEdmComplexObjectCollection_TypelessMode()
+        {
+            // Arrange
+            CustomersModelWithInheritance model = new CustomersModelWithInheritance();
+            IEdmTypeReference addressType = new EdmComplexTypeReference(model.Address, true);
+            IEdmCollectionTypeReference addressCollectionType =
+                new EdmCollectionTypeReference(new EdmCollectionType(addressType));
+
+            HttpContent content = new StringContent("{ 'value': [ {'@odata.type':'NS.Address', 'City' : 'Redmond' } ] }");
+            HeaderDictionary headerDict = new HeaderDictionary
+            {
+                { "Content-Type", "application/json" }
+            };
+
+            IODataRequestMessage request = ODataMessageWrapperHelper.Create(await content.ReadAsStreamAsync(), headerDict);
+            ODataMessageReader reader = new ODataMessageReader(request, new ODataMessageReaderSettings(), model.Model);
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            ODataDeserializerContext readContext = new ODataDeserializerContext
+            {
+                Model = model.Model,
                 ResourceType = typeof(IEdmObject),
                 ResourceEdmType = addressCollectionType
             };

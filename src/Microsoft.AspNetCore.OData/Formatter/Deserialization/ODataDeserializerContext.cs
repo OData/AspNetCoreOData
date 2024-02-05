@@ -99,8 +99,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 if (!_isNoClrType.HasValue)
                 {
-                    _isNoClrType = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
-                        typeof(ODataUntypedActionParameters) == ResourceType;
+                    _isNoClrType = (TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) &&
+                        (typeof(EdmUntypedObject) != ResourceType && typeof(EdmUntypedCollection) != ResourceType))
+                        || typeof(ODataUntypedActionParameters) == ResourceType;
                 }
 
                 return _isNoClrType.Value;

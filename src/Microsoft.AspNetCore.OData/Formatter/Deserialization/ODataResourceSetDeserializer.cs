@@ -215,28 +215,26 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (nestedReadContext.ResourceType == null)
             {
-                Type clrType = readContext.Model.GetClrType(elementType);
-                if (clrType == null)
+                if (readContext.IsNoClrType)
                 {
-                    if (readContext.IsNoClrType)
+                    if (elementType.IsEntity())
                     {
-                        if (elementType.IsEntity())
-                        {
-                            nestedReadContext.ResourceType = typeof(EdmEntityObject);
-                        }
-                        else
-                        {
-                            nestedReadContext.ResourceType = typeof(EdmComplexObject);
-                        }
+                        nestedReadContext.ResourceType = typeof(EdmEntityObject);
                     }
                     else
                     {
-                        throw new ODataException(
-                            Error.Format(SRResources.MappingDoesNotContainResourceType, elementType.FullName()));
+                        nestedReadContext.ResourceType = typeof(EdmComplexObject);
                     }
                 }
                 else
                 {
+                    Type clrType = readContext.Model.GetClrType(elementType);
+                    if (clrType == null)
+                    {
+                        throw new ODataException(
+                            Error.Format(SRResources.MappingDoesNotContainResourceType, elementType.FullName()));
+                    }
+
                     nestedReadContext.ResourceType = clrType;
                 }
             }
