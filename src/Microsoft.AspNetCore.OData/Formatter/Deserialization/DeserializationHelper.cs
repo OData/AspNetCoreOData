@@ -129,6 +129,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Type resourceType = resource.GetType();
                 Type propertyType = GetPropertyType(resource, propertyName);
 
+                if (propertyType == typeof(object))
+                {
+                    SetProperty(resource, propertyName, collection);
+                    return;
+                }
+
                 Type elementType;
                 if (!TypeHelper.IsCollection(propertyType, out elementType))
                 {
@@ -365,11 +371,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             // Be noted: If a declared property (propertyType != null) is untyped (or collection),
             // It should be never come here. Because for collection untyped, it goes to nested resource set.
             // ODL reads the value as ODataResourceSet in a ODataNestedResourceInfo.
-            // So, if it comes here, there's a bad usage. for example, create a ODataProperty using ODataCollectionValue
+            // So, if it comes here, the untyped value is odata.type annotated. for example, create a ODataProperty using ODataCollectionValue
             IEdmCollectionTypeReference collectionType;
-            if (propertyType == null)
+            if (propertyType == null || propertyType.IsUntyped())
             {
-                // dynamic collection property
+                // dynamic collection property or untyped value @odata.type annotated
                 Contract.Assert(!String.IsNullOrEmpty(collection.TypeName),
                     "ODataLib should have verified that dynamic collection value has a type name " +
                     "since we provided metadata.");
@@ -428,9 +434,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IODataDeserializerProvider deserializerProvider, ODataDeserializerContext readContext)
         {
             IEdmEnumTypeReference edmEnumType;
-            if (propertyType == null)
+            if (propertyType == null || propertyType.IsUntyped())
             {
-                // dynamic enum property
+                // dynamic enum property or untyped property
                 Contract.Assert(!String.IsNullOrEmpty(enumValue.TypeName),
                     "ODataLib should have verified that dynamic enum value has a type name since we provided metadata.");
                 IEdmModel model = readContext.Model;

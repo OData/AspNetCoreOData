@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="model">The Edm model.</param>
         /// <param name="resourceSet">The given resource set.</param>
-        /// <returns></returns>
+        /// <returns>The resolved type.</returns>
         public static IEdmCollectionTypeReference ResolveResourceSetType(this IEdmModel model, ODataResourceSetBase resourceSet)
         {
             if (model == null)
@@ -55,6 +55,51 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             return collectionType;
+        }
+
+        /// <summary>
+        /// Resolve the type reference from the type name of <see cref="ODataResourceBase"/>
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="resource">The given resource.</param>
+        /// <returns>The resolved type.</returns>
+        public static IEdmStructuredTypeReference ResolveResourceType(this IEdmModel model, ODataResourceBase resource)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            if (resource == null)
+            {
+                throw Error.ArgumentNull(nameof(resource));
+            }
+
+            IEdmStructuredTypeReference resourceType;
+            if (string.IsNullOrEmpty(resource.TypeName) ||
+                string.Equals(resource.TypeName, "Edm.Untyped", StringComparison.OrdinalIgnoreCase))
+            {
+                resourceType = EdmUntypedStructuredTypeReference.NullableTypeReference;
+            }
+            else
+            {
+                IEdmStructuredType actualType = model.FindType(resource.TypeName) as IEdmStructuredType;
+                if (actualType == null)
+                {
+                    throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, resource.TypeName));
+                }
+
+                if (actualType is IEdmEntityType actualEntityType)
+                {
+                    resourceType = new EdmEntityTypeReference(actualEntityType, isNullable: false);
+                }
+                else
+                {
+                    resourceType = new EdmComplexTypeReference(actualType as IEdmComplexType, isNullable: false);
+                }
+            }
+
+            return resourceType;
         }
 
         /// <summary>

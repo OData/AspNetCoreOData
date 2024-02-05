@@ -191,7 +191,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 if (deserializer == null)
                 {
                     throw new SerializationException(
-                        Error.Format(SRResources.TypeCannotBeDeserialized, actualEntityType.FullName()));
+                        Error.Format(SRResources.TypeCannotBeDeserialized, actualStructuredType.FullName()));
                 }
 
                 object resource = deserializer.ReadInline(resourceWrapper, actualStructuredType, readContext);
@@ -611,8 +611,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
             if (edmType.IsUntyped())
             {
-                nestedReadContext.ResourceType = typeof(EdmUntypedObject);
-                return deserializer.ReadInline(resourceWrapper, edmType, nestedReadContext);
+                // We should use the given type name to replace the EdmType.
+                // If it's real untyped, use untyped object to read.
+                edmType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
+                if (edmType.IsUntyped())
+                {
+                    nestedReadContext.ResourceType = typeof(EdmUntypedObject);
+                    return deserializer.ReadInline(resourceWrapper, edmType, nestedReadContext);
+                }
             }
 
             IEdmStructuredTypeReference structuredType = edmType.AsStructured();

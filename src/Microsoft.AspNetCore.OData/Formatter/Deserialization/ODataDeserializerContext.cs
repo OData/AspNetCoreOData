@@ -90,14 +90,18 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
         }
 
+        // TODO: need refactor this part.
+        // We can't only use the resource type to identify there's no Clr Type or not.
+        // We should use the model type mapping to identify there's no Clr Type or not.
         internal bool IsNoClrType
         {
             get
             {
                 if (!_isNoClrType.HasValue)
                 {
-                    _isNoClrType = TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) ||
-                        typeof(ODataUntypedActionParameters) == ResourceType;
+                    _isNoClrType = (TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) &&
+                        (typeof(EdmUntypedObject) != ResourceType && typeof(EdmUntypedCollection) != ResourceType))
+                        || typeof(ODataUntypedActionParameters) == ResourceType;
                 }
 
                 return _isNoClrType.Value;

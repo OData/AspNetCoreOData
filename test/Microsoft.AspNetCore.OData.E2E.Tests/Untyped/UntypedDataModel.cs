@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
 
         public object Data { get; set; } // ==> Declared Edm.Untyped
 
-        public IList<object> Infos { get; set; } // ==> Declared Collection(Edm.Untyped)
+        public IList<object> Infos { get; set; } = new List<object>();// ==> Declared Collection(Edm.Untyped)
 
         public IDictionary<string, object> Containers { get; set; }
     }

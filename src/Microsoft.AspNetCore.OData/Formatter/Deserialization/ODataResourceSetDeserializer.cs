@@ -202,7 +202,44 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     Error.Format(SRResources.TypeCannotBeDeserialized, elementType.FullName()));
             }
 
-            return deserializer.ReadInline(resourceWrapper, elementType, readContext);
+            ODataDeserializerContext nestedReadContext = readContext.CloneWithoutType();
+            if (elementType == null || elementType.IsUntyped())
+            {
+                // We should use the given type name to read
+                elementType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
+                if (elementType.IsUntyped())
+                {
+                    nestedReadContext.ResourceType = typeof(EdmUntypedObject);
+                }
+            }
+
+            if (nestedReadContext.ResourceType == null)
+            {
+                if (readContext.IsNoClrType)
+                {
+                    if (elementType.IsEntity())
+                    {
+                        nestedReadContext.ResourceType = typeof(EdmEntityObject);
+                    }
+                    else
+                    {
+                        nestedReadContext.ResourceType = typeof(EdmComplexObject);
+                    }
+                }
+                else
+                {
+                    Type clrType = readContext.Model.GetClrType(elementType);
+                    if (clrType == null)
+                    {
+                        throw new ODataException(
+                            Error.Format(SRResources.MappingDoesNotContainResourceType, elementType.FullName()));
+                    }
+
+                    nestedReadContext.ResourceType = clrType;
+                }
+            }
+
+            return deserializer.ReadInline(resourceWrapper, elementType, nestedReadContext);
         }
 
         /// <summary>
