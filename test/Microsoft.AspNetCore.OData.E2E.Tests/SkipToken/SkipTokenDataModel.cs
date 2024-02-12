@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
@@ -16,6 +17,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
         public string Name { get; set; }
 
         public int Age { get; set; }
+
+        public DateTimeOffset Birthday { get; set; }
+
+        public int MagicNumber { get; set; } // for negative value test
 
         public StAddress FavoritePlace { get; set; }
 

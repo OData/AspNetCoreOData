@@ -107,10 +107,10 @@ namespace Microsoft.AspNetCore.OData.Query
                 return string.Empty;
             }
 
-            IList<OrderByClause> clauses = GetOrderByClauses(lastMember, model, clause);
+            List<OrderByClause> clauses = GetOrderByClauses(lastMember, model, clause);
 
             TimeZoneInfo timeZoneInfo = context?.TimeZone;
-            IList<KeyValuePair<string, object>> values = GetPropertyValues(lastMember, model, clauses, context);
+            List<KeyValuePair<string, object>> values = GetPropertyValues(lastMember, model, clauses, context);
             if (values == null || values.Count == 0 || values.Count != clauses.Count)
             {
                 return null;
@@ -166,7 +166,7 @@ namespace Microsoft.AspNetCore.OData.Query
             return skipTokenBuilder.ToString();
         }
 
-        private static IList<KeyValuePair<string, object>> GetPropertyValues(object source, IEdmModel model, IList<OrderByClause> clauses,
+        private static List<KeyValuePair<string, object>> GetPropertyValues(object source, IEdmModel model, List<OrderByClause> clauses,
             ODataSerializerContext context)
         {
             if (source == null || clauses == null || clauses.Count == 0)
@@ -204,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             structuredObj.TryGetPropertyValue(OrderByClauseHelpers.OrderByGlobalNameKey, out object orderByNameObject);
 
-            IList<KeyValuePair<string, object>> values = new List<KeyValuePair<string, object>>();
+            List<KeyValuePair<string, object>> values = new List<KeyValuePair<string, object>>();
             string[] orderByNames = orderByNameObject == null ? null : (orderByNameObject as string).Split(",");
             int index = 0;
             object value;
@@ -447,7 +447,7 @@ namespace Microsoft.AspNetCore.OData.Query
         /// <param name="model">The edm model.</param>
         /// <param name="clause">The original orderby clause.</param>
         /// <returns>The orderby clauses, since we don't need the 'ThenBy' for each clause, we didn't need to change it.</returns>
-        internal static IList<OrderByClause> GetOrderByClauses(object lastMember, IEdmModel model, OrderByClause clause)
+        internal static List<OrderByClause> GetOrderByClauses(object lastMember, IEdmModel model, OrderByClause clause)
         {
             IEdmType edmType = GetTypeFromObject(lastMember, model);
             IEdmEntityType entity = edmType as IEdmEntityType;
@@ -456,8 +456,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 return null;
             }
 
-            IList<OrderByClause> orderByClauses = new List<OrderByClause>();
-            ISet<IEdmProperty> properties = new HashSet<IEdmProperty>();
+            List<OrderByClause> orderByClauses = new List<OrderByClause>();
+            HashSet<IEdmProperty> properties = new HashSet<IEdmProperty>();
             while (clause != null)
             {
                 // Be noted, the 'ThenBy' doesn't reset to null. It doesn't matter since we don't use it.

@@ -24,9 +24,9 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// </summary>
         /// <param name="clause">The input orderby clause, the 'ThenBy' in each node does matter.</param>
         /// <returns>The output orderby clauses, the 'ThenBy' in each node does NOT matter.</returns>
-        public static IList<OrderByClause> ToList(this OrderByClause clause)
+        public static List<OrderByClause> ToList(this OrderByClause clause)
         {
-            IList<OrderByClause> clauses = new List<OrderByClause>();
+            List<OrderByClause> clauses = new List<OrderByClause>();
             while (clause != null)
             {
                 // Be noted, in order to save the memory, we don't need to create a new OrderByClause and set the 'ThenBy' to null.

@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +65,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     Id = 1,
                     Name = "Mars",
                     Age = 871,
+                    Birthday = new DateTimeOffset(1999, 1, 2, 1, 1, 2, 3, TimeSpan.Zero),
+                    MagicNumber = -88,
                     PhoneNumbers = new [] { "M-110", "M-019", "M-712"},
                     FavoritePlace = stAddresses[1],
                     Orders = new List<StOrder>
@@ -82,6 +85,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     Id = 2,
                     Name = "Earth",
                     Age = 79,
+                    Birthday = new DateTimeOffset(2001, 4, 6, 6, 1, 4, 3, TimeSpan.Zero),
+                    MagicNumber = -86,
                     PhoneNumbers = new [] { "E-819" },
                     FavoritePlace = stAddresses[2],
                     Orders = new List<StOrder>
@@ -99,6 +104,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     Id = 3,
                     Name = "Apply",
                     Age = 1001,
+                    Birthday = new DateTimeOffset(1948, 12, 6, 9, 11, 14, 5, TimeSpan.Zero),
+                    MagicNumber = -90,
                     PhoneNumbers = new [] { "A-123", "A-819" },
                     FavoritePlace = stAddresses[0],
                     Orders = new List<StOrder>
@@ -115,6 +122,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     Id = 4,
                     Name = "Apple",
                     Age = 11,
+                    Birthday = new DateTimeOffset(2024, 2, 12, 3, 5, 8, 13, TimeSpan.Zero),
+                    MagicNumber = -84,
                     PhoneNumbers = new [] { "A-444", "A-888", "A-111", "A-446" },
                     FavoritePlace = stAddresses[2],
                     Orders = new List<StOrder>
@@ -131,6 +140,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     Id = 5,
                     Name = "Kare",
                     Age = 101,
+                    Birthday = new DateTimeOffset(1978, 11, 15, 13, 15, 18, 23, TimeSpan.Zero),
+                    MagicNumber = -85,
                     PhoneNumbers = new [] { "K-023", "K-919", "K-119", "K-745" },
                     FavoritePlace = stAddresses[1],
                     Orders = new List<StOrder>

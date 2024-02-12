@@ -94,6 +94,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     "odata/customers?$orderby=tolower(Detail)&$select=id,age",
                     new int[] { 2, 3 },
                     "http://localhost/odata/customers?$orderby=tolower%28Detail%29&$select=id%2Cage&$skiptoken=%27regular%27,Id-3"
+                },
+                {
+                    "odata/customers?$orderby=birthday&$select=id,birthday",
+                    new int[] { 3, 5 },
+                    "http://localhost/odata/customers?$orderby=birthday&$select=id%2Cbirthday&$skiptoken=Birthday-1978-11-15T13%3A15%3A18.023Z,Id-5"
+                },
+                {
+                    "odata/customers?$orderby=year(birthday) desc&$select=id,birthday",
+                    new int[] { 4, 2 },
+                    "http://localhost/odata/customers?$orderby=year%28birthday%29%20desc&$select=id%2Cbirthday&$skiptoken=2001,Id-2"
+                },
+                {
+                    "odata/customers?$orderby=magicNumber desc&$select=id,magicNumber",
+                    new int[] { 4, 5 },
+                    "http://localhost/odata/customers?$orderby=magicNumber%20desc&$select=id%2CmagicNumber&$skiptoken=MagicNumber--85,Id-5"
                 }
             };
 

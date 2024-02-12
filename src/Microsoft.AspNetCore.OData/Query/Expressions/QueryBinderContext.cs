@@ -152,7 +152,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets/sets the orderby clause.
         /// Since we 'overlap' the orderby clause to list, then the 'ThenBy' does NOT matter again, please ignore it.
         /// </summary>
-        internal IList<OrderByClause> OrderByClauses { get; set; }
+        internal List<OrderByClause> OrderByClauses { get; set; }
 
         /// <summary>
         /// Gets/sets the enable skip token, it's for nested orderby.

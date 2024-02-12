@@ -1093,7 +1093,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             // Avoid duplicated binding.
-            ISet<string> usedPropertyNames = new HashSet<string>();
+            HashSet<string> usedPropertyNames = new HashSet<string>(includedProperties.Count);
             foreach (var p in includedProperties)
             {
                 if (p.Name is ConstantExpression constExp && constExp.Type == typeof(string))
@@ -1104,9 +1104,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression propertyName;
             Expression propertyValue;
-            IList<string> names = new List<string>();
+            List<string> names = new List<string>(context.OrderByClauses.Count);
             string name;
-            int start = 1;
+            int index = 1;
             foreach (OrderByClause clause in context.OrderByClauses)
             {
                 // It could do things duplicated, for example if we have:
@@ -1123,9 +1123,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     }
                 }
 
-                name = GetOrderByName(usedPropertyNames, ref start);
+                name = GetOrderByName(usedPropertyNames, ref index);
                 names.Add(name);
-                usedPropertyNames.Add(name);
+
+                // Since we generate the Unique name, it's safe NOT adding the generated name into set.
+                // Leave this code here for reference.
+                //usedPropertyNames.Add(name);
 
                 propertyName = Expression.Constant(name);
                 propertyValue = Bind(clause.Expression, context);
@@ -1147,7 +1150,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
-        private static string GetOrderByName(ISet<string> usedPropertyNames, ref int start)
+        private static string GetOrderByName(HashSet<string> usedPropertyNames, ref int start)
         {
             do
             {
