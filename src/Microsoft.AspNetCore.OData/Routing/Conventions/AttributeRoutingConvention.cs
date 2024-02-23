@@ -260,7 +260,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             // In order to avoiding ambiguous, let's compare non-empty route prefix first,
             // If no match, then compare empty route prefix.
             string emptyPrefix = null;
-            foreach (var prefix in prefixes)
+            foreach (var prefix in prefixes.OrderByDescending(p => p))
             {
                 if (string.IsNullOrEmpty(prefix))
                 {
