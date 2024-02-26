@@ -316,6 +316,39 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public async Task ReadAsync_ReturnTypedCollection_WithTypeMode()
+        {
+            // Arrange
+            HttpContent content = new StringContent("{ 'value': [ {'City' : 'Redmond' }, {'City' : 'Issaquah' } ] }");
+            HeaderDictionary headerDict = new HeaderDictionary
+            {
+                { "Content-Type", "application/json" }
+            };
+
+            IODataRequestMessage request = ODataMessageWrapperHelper.Create(await content.ReadAsStreamAsync(), headerDict);
+            ODataMessageReader reader = new ODataMessageReader(request, new ODataMessageReaderSettings(), _model);
+            IEdmComplexType addressType = _model.SchemaElements.OfType<IEdmComplexType>().First(c => c.Name == "Address");
+            var deserializer = new ODataResourceSetDeserializer(_deserializerProvider);
+            ODataDeserializerContext readContext = new ODataDeserializerContext
+            {
+                Model = _model,
+                ResourceType = typeof(IList<Address>),
+                ResourceEdmType = new EdmCollectionTypeReference(new EdmCollectionType(addressType.ToEdmTypeReference(true))),
+            };
+
+            // Act
+            var result = await deserializer.ReadAsync(reader, typeof(IList<Address>), readContext);
+
+            // Assert
+            IEnumerable<Address> addresses = (result as IEnumerable).Cast<Address>();
+
+            Assert.Equal(2, addresses.Count());
+            Assert.Collection(addresses,
+                e => Assert.Equal("Redmond", e.City),
+                e => Assert.Equal("Issaquah", e.City));
+        }
+
+        [Fact]
         public async Task ReadAsync_ReturnsEdmUntypedCollection_WithTypeMode()
         {
             // Arrange
