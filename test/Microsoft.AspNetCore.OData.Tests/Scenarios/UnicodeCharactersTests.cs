@@ -27,8 +27,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
         {
             // Arrange
             const string payload = "{" +
-                "\"LogonName\":\"Ärne Bjørn\"," +
-                "\"Email\":\"ärnebjørn@test.com\"" +
+                "\"LogonName\":\"Ã„rne BjÃ¸rn\"," +
+                "\"Email\":\"Ã¤rnebjÃ¸rn@test.com\"" +
                 "}";
 
             const string uri = "http://localhost/odata/UnicodeCharUsers";
@@ -53,8 +53,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Scenarios
         {
             // Arrange
             const string payload = "{" +
-                "\"LogonName\":\"Ärne Bjørn\"," +
-                "\"Email\":\"ärnebjørn@test.com\"" +
+                "\"LogonName\":\"Ã„rne BjÃ¸rn\"," +
+                "\"Email\":\"Ã¤rnebjÃ¸rn@test.com\"" +
                 "}";
 
             const string uri = "http://localhost/odata/UnicodeCharUsers";
