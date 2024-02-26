@@ -1102,6 +1102,20 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -2175,18 +2189,6 @@
             Get element type reference if it's collection or return itself
             </summary>
             <param name="typeReference">The test type reference.</param>
-            <returns>Element type or it.IsUntypedOrCollectionUntyped(Microsoft.OData.Edm.IEdmTypeReference)">
-            <summary>
-            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
-            </summary>
-            <param name="typeReference">The test type reference.</param>
-            <returns>True/false</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementTypeOrSelf(Microsoft.OData.Edm.IEdmTypeReference)">
-            <summary>
-            Get element type reference if it's collection or return itself
-            </summary>
-            <param name="typeReference">The test type reference.</param>
             <returns>Element type or itself.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetElementType(Microsoft.OData.Edm.IEdmTypeReference)">
@@ -2244,7 +2246,20 @@
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetClrPropertyName(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmProperty)">
             <summary>
             Get the CLR property name.
-            </summa.Edm.EdmModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmProperty">The Edm property.</param>
+            <returns>The property name.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetDynamicPropertyDictionary(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            Gets the dynamic property container name.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <returns>The dynamic property container property info.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Gets the model name.
             </summary>
@@ -2616,20 +2631,6 @@
             Encapsulates a navigation link factory and whether the link factory follows conventions or not.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,MicrosModelNameAnnotation"/> class.
-            </summary>
-            <param name="name">The model name.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Edm.ModelNameAnnotation.ModelName">
-            <summary>
-            Gets the backing CLR type for the EDM type.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder">
-            <summary>
-            Encapsulates a navigation link factory and whether the link factory follows conventions or not.
-            </summary>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder.#ctor(System.Func{Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.OData.Edm.IEdmNavigationProperty,System.Uri},System.Boolean)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder"/> class.
@@ -2683,7 +2684,14 @@
             Gets/sets the edit link builder.
             </summary>
         </member>
-        <member name="M:MiitySelfLinks" /> for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.AddNavigationPropertyLinkBuilder(Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.AspNetCore.OData.Edm.NavigationLinkBuilder)">
+            <summary>
+            Register a link builder for a <see cref="T:Microsoft.OData.Edm.IEdmNavigationProperty" /> that navigates from Entities in this navigation source. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildEntitySelfLinks(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel)">
+            <summary>
+            Constructs the <see cref="T:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks" /> for a particular <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext" /> and <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel" />.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.NavigationSourceLinkBuilderAnnotation.BuildIdLink(Microsoft.AspNetCore.OData.Formatter.ResourceContext,Microsoft.AspNetCore.OData.Formatter.ODataMetadataLevel)">
@@ -2824,11 +2832,12 @@
             <param name="propertyName">The output property name, it works for dynamic property.</param>
             <returns>true/false.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.RemoveDesc(System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.RemoveDirection(System.String,System.String)">
             <summary>
             Remove the ' desc' from the orderby clause.
             </summary>
-            <param name="orderby">The orderby clause</param>
+            <param name="orderby">The orderby clause.</param>
+            <param name="direction">The orderby direction.</param>
             <returns>changed orderby clause.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.SelectModelPath">
@@ -3148,20 +3157,6 @@
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpResponseExtensions.IsSuccessStatusCode(Microsoft.AspNetCore.Http.HttpResponse)">
-            <summary>
-            Determine if the response has a success status code.
-            </summary>
-            <param name="response">The response.</param>
-            <returns>True if the response has a success status code; false otherwise.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers">
-            <summary>
-            Extensions to generator the Link.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.LinkGeneratorHelpers.CreateODataLink(Microsoft.AspNetCore.Http.HttpRequest,Microsoft.OData.UriParser.ODataPathSegment[])">
-            <summary>
-            Generates an OData link usingpResponse)">
             <summary>
             Determine if the response has a success status code.
             </summary>

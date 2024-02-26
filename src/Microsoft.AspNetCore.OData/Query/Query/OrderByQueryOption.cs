@@ -326,6 +326,37 @@ namespace Microsoft.AspNetCore.OData.Query
             return querySoFar as IOrderedQueryable;
         }
 
+        internal List<string> GetOrderByRawValues()
+        {
+            // If the raw value doesn't contain ',', we don't need to process more.
+            // If only one expression (no matter whether it contains ','), we don't need to process more.
+            if (!RawValue.Contains(',') || OrderByClause.ThenBy == null)
+            {
+                return new List<string> { RawValue };
+            }
+
+            ODataUri oDataUri = new ODataUri
+            {
+                ServiceRoot = new Uri("http://localhost"),
+                Path = new ODataPath()
+            };
+            List<string> clauses = new List<string>();
+            OrderByClause clause = OrderByClause;
+            while (clause != null)
+            {
+                // Simply remove the 'thenBy'
+                OrderByClause newClause = new OrderByClause(null, clause.Expression, clause.Direction, clause.RangeVariable);
+                oDataUri.OrderBy = newClause;
+                Uri uri = oDataUri.BuildUri(ODataUrlKeyDelimiter.Parentheses);
+                string orderbyClause = uri.Query.Substring(10);// the length of "?$orderby=" is 10;
+                clauses.Add(Uri.UnescapeDataString(orderbyClause));
+
+                clause = clause.ThenBy;
+            }
+
+            return clauses;
+        }
+
         private static IQueryable AddOrderByQueryForProperty(IOrderByBinder orderByBinder,
             OrderByClause orderbyClause, IQueryable querySoFar, QueryBinderContext binderContext, bool alreadyOrdered)
         {

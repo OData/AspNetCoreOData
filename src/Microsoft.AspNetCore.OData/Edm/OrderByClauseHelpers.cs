@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -81,16 +82,17 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// <summary>
         /// Remove the ' desc' from the orderby clause.
         /// </summary>
-        /// <param name="orderby">The orderby clause</param>
+        /// <param name="orderby">The orderby clause.</param>
+        /// <param name="direction">The orderby direction.</param>
         /// <returns>changed orderby clause.</returns>
-        public static string RemoveDesc(this string orderby)
+        public static string RemoveDirection(this string orderby, string direction)
         {
             if (orderby == null)
             {
                 return orderby;
             }
 
-            int index = orderby.LastIndexOf(" desc");
+            int index = orderby.LastIndexOf(direction);
             if (index != -1)
             {
                 return orderby.Substring(0, index);

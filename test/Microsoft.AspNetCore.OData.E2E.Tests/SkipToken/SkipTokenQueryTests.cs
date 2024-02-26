@@ -61,6 +61,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     "http://localhost/odata/customers?$orderby=id&$skiptoken=Id-2"
                 },
                 {
+                    "odata/customers?$orderby=id asc",
+                    new int[] { 1, 2 },
+                    "http://localhost/odata/customers?$orderby=id%20asc&$skiptoken=Id-2"
+                },
+                {
                     "odata/customers?$orderby=id desc",
                     new int[] { 5, 4 },
                     "http://localhost/odata/customers?$orderby=id%20desc&$skiptoken=Id-4"
@@ -74,6 +79,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.SkipToken
                     "odata/customers?$orderby=substring(favoritePlace/state,1,1)",
                     new int[] { 3, 2 },
                     "http://localhost/odata/customers?$orderby=substring%28favoritePlace%2Fstate%2C1%2C1%29&$skiptoken=%27J%27,Id-2"
+                },
+                {
+                    "odata/customers?$orderby=substring(favoritePlace/state,1,1),substring(name,1,2)",
+                    new int[] { 3, 2 },
+                    "http://localhost/odata/customers?$orderby=substring%28favoritePlace%2Fstate%2C1%2C1%29%2Csubstring%28name%2C1%2C2%29&$skiptoken=%27J%27,%27ar%27,Id-2"
                 },
                 {
                     "odata/customers?$orderby=phoneNumbers/$count",

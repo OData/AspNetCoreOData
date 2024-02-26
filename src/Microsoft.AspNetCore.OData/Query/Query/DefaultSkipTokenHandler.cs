@@ -312,33 +312,30 @@ namespace Microsoft.AspNetCore.OData.Query
                 return query;
             }
 
-            // It's better to visit the nodes of OrderByClause reclusively to get the orderby raw value.
-            // Since we don't have such methods, let's simply split the request raw value.
-            IList<string> orderBys = orderByOption.RawValue.Split(',');
+            IList<string> orderBys = orderByOption.GetOrderByRawValues();
             IList<OrderByClause> orderByClauses = orderByOption.OrderByClause.ToList();
-            IList<string> tokenValueParis = PopulatePropertyValuePairs(skipTokenRawValue);
+            IList<string> tokenValues = PopulatePropertyValues(skipTokenRawValue);
 
-            if (orderBys.Count != orderByClauses.Count && orderByClauses.Count != tokenValueParis.Count)
+            if (orderBys.Count != orderByClauses.Count && orderByClauses.Count != tokenValues.Count)
             {
                 throw Error.InvalidOperation(SRResources.SkipTokenProcessingError);
             }
 
             string where = string.Empty;
-            string lastEquality = null;
+            string previousEquality = null;
             bool isFirst = true;
-            Contract.Assert(orderBys.Count == orderByClauses.Count);
             for (int i = 0; i < orderBys.Count; ++i)
             {
                 OrderByClause orderBy = orderByClauses[i];
                 string orderByRaw = orderBys[i];
-                string orderByValue = tokenValueParis[i];
+                string orderByValue = tokenValues[i];
                 bool isNullValue = string.Equals(orderByValue, "null", StringComparison.OrdinalIgnoreCase);
 
                 string compare;
                 if (orderBy.Direction == OrderByDirection.Descending)
                 {
                     // In descending ordering, the 'null' value goes later.
-                    orderByRaw = orderByRaw.RemoveDesc();
+                    orderByRaw = orderByRaw.RemoveDirection(" desc");
 
                     if (isNullValue)
                     {
@@ -352,6 +349,8 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
                 else
                 {
+                    orderByRaw = orderByRaw.RemoveDirection(" asc");
+
                     if (isNullValue)
                     {
                         // We are aiming for the following expression
@@ -370,15 +369,15 @@ namespace Microsoft.AspNetCore.OData.Query
 
                 if (isFirst)
                 {
-                    lastEquality = $"({orderByRaw} eq {orderByValue})";
+                    previousEquality = $"({orderByRaw} eq {orderByValue})";
                     where = compare;
                     isFirst = false;
                 }
                 else
                 {
-                    string condition = $"({lastEquality} and {compare})";
+                    string condition = $"({previousEquality} and {compare})";
                     where = $"({where} or {condition})";
-                    lastEquality = $"({lastEquality} and ({orderByRaw} eq {orderByValue}))";
+                    previousEquality = $"({previousEquality} and ({orderByRaw} eq {orderByValue}))";
                 }
             }
 
@@ -388,7 +387,7 @@ namespace Microsoft.AspNetCore.OData.Query
             return filter.ApplyTo(query, querySettings);
         }
 
-        internal static string[] PopulatePropertyValuePairs(string value)
+        internal static string[] PopulatePropertyValues(string value)
         {
             IList<string> keyValuesPairs = ParseValue(value, CommaDelimiter);
             string[] items = new string[keyValuesPairs.Count];
