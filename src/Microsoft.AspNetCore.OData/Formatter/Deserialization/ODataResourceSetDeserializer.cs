@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, "Collection of complex, entity or untyped");
             }
 
-            IEdmStructuredType structuredType = edmType.AsCollection().ElementType() as IEdmStructuredType;
+            IEdmStructuredType structuredType = edmType.AsCollection().ElementType().Definition as IEdmStructuredType;
 
             ODataReader resourceSetReader = await messageReader.CreateODataResourceSetReaderAsync(structuredType).ConfigureAwait(false);
             object resourceSet = await resourceSetReader.ReadResourceOrResourceSetAsync().ConfigureAwait(false);
