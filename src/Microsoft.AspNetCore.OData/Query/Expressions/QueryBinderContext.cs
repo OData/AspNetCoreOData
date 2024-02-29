@@ -120,6 +120,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             _lambdaParameters[DollarThis] = thisParameters;
 
             IsNested = true;
+            EnableSkipToken = context.EnableSkipToken;
         }
 
         /// <summary>
@@ -146,6 +147,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// Gets the compute expressions.
         /// </summary>
         public IDictionary<string, ComputeExpression> ComputedProperties { get; } = new Dictionary<string, ComputeExpression>();
+
+        /// <summary>
+        /// Gets/sets the orderby clause.
+        /// Since we 'overlap' the orderby clause to list, then the 'ThenBy' does NOT matter again, please ignore it.
+        /// </summary>
+        internal List<OrderByClause> OrderByClauses { get; set; }
+
+        /// <summary>
+        /// Gets/sets the enable skip token, it's for nested orderby.
+        /// </summary>
+        internal bool EnableSkipToken { get; set; } = false;
 
         /// <summary>
         /// Flattened list of properties from base query, for case when binder is applied for aggregated query.

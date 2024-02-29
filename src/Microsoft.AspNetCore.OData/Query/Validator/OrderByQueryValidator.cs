@@ -71,7 +71,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// Override this method if you want to visit each query node.
         /// </summary>
-        /// <remarks>
         /// <param name="node">The query node.</param>
         /// <param name="validatorContext">The validation context.</param>
         protected virtual void ValidateQueryNode(QueryNode node, OrderByValidatorContext validatorContext)
@@ -417,7 +416,6 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <summary>
         /// Override this method to validate the Not operator.
         /// </summary>
-        /// <remarks>
         /// <param name="unaryOperatorNode">The unary operator node.</param>
         /// <param name="validatorContext">The validation context.</param>
         protected virtual void ValidateUnaryOperatorNode(UnaryOperatorNode unaryOperatorNode, OrderByValidatorContext validatorContext)

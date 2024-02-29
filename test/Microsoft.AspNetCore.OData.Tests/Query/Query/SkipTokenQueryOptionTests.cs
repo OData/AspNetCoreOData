@@ -104,6 +104,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 HandleNullPropagation = HandleNullPropagationOption.False
             };
             ODataQueryContext context = new ODataQueryContext(model, typeof(SkipTokenCustomer));
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+            ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+
             SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Id-2", context);
 
             IQueryable<SkipTokenCustomer> customers = new List<SkipTokenCustomer>
@@ -114,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             }.AsQueryable();
 
             // Act
-            SkipTokenCustomer[] results = skipTokenQuery.ApplyTo(customers, settings, null).ToArray();
+            SkipTokenCustomer[] results = skipTokenQuery.ApplyTo(customers, settings, queryOptions).ToArray();
 
             // Assert
             SkipTokenCustomer skipTokenCustomer = Assert.Single(results);

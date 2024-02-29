@@ -2817,6 +2817,37 @@
             <param name="context">An feed context wrapping the feed instance.</param>
             <returns>The generated link.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers">
+            <summary>
+            Helper methods for <see cref="T:Microsoft.OData.UriParser.OrderByClause"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.ToList(Microsoft.OData.UriParser.OrderByClause)">
+            <summary>
+            Convert the OrderByClause to list.
+            </summary>
+            <param name="clause">The input orderby clause, the 'ThenBy' in each node does matter.</param>
+            <returns>The output orderby clauses, the 'ThenBy' in each node does NOT matter.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.IsTopLevelSingleProperty(Microsoft.OData.UriParser.OrderByClause,Microsoft.OData.Edm.IEdmProperty@,System.String@)">
+            <summary>
+            Test the OrderByClause to see whether it's an orderby like: $orderby=name
+            For others, for example, $orderby=location/city is not top-level single property orderby.
+            When we support key alias (key on sub-property or complex property), we should consider to update this.
+            </summary>
+            <param name="clause">The OrderbyClause.</param>
+            <param name="property">The output property.</param>
+            <param name="propertyName">The output property name, it works for dynamic property.</param>
+            <returns>true/false.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.OrderByClauseHelpers.RemoveDirection(System.String,System.String)">
+            <summary>
+            Remove the ' desc' from the orderby clause.
+            </summary>
+            <param name="orderby">The orderby clause.</param>
+            <param name="direction">The orderby direction.</param>
+            <returns>changed orderby clause.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.SelectModelPath">
             <summary>
             The select property path is a model path with the following restriction:
@@ -7645,6 +7676,11 @@
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenNotSupportedOrderByExpression">
+            <summary>
+              Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenParseError">
             <summary>
               Looks up a localized string similar to Unable to parse the skiptoken value &apos;{0}&apos;. Skiptoken value should always be server generated..
@@ -7652,7 +7688,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenProcessingError">
             <summary>
-              Looks up a localized string similar to Unable to get property values from the skiptoken value..
+              Looks up a localized string similar to Unable to get property values from the skiptoken value, or the token value can not match the orderby clause..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTopLimitExceeded">
@@ -9663,6 +9699,17 @@
             Gets the compute expressions.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.OrderByClauses">
+            <summary>
+            Gets/sets the orderby clause.
+            Since we 'overlap' the orderby clause to list, then the 'ThenBy' does NOT matter again, please ignore it.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.EnableSkipToken">
+            <summary>
+            Gets/sets the enable skip token, it's for nested orderby.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties">
             <summary>
             Flattened list of properties from base query, for case when binder is applied for aggregated query.
@@ -9844,6 +9891,17 @@
             <param name="source">The source contains the dynamic property.</param>
             <param name="structuredType">The structured type contains the dynamic property.</param>
             <param name="includedProperties">The container to hold the created property.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindOrderByProperties(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression},System.Boolean)">
+            <summary>
+            Build the orderby clause into the included properties.
+            For example: $orderby=tolower(substring(name,1,2))
+            </summary>
+            <param name="context">The query binder context.</param>
+            <param name="source">The source.</param>
+            <param name="structuredType">The structured type.</param>
+            <param name="includedProperties">The container to hold the created property.</param>
+            <param name="isSelectedAll">Is select all flag.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreateTypeNameExpression(System.Linq.Expressions.Expression,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel)">
             <summary>
@@ -11130,14 +11188,14 @@
             <param name="context">Serializer context</param>
             <returns>Returns the URI for NextPageLink. If a null object is passed for the instance, resorts to the default paging mechanism of using $skip and $top.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},System.TimeZoneInfo)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GenerateSkipTokenValue(System.Object,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Generates a string to be used as the skip token value within the next link.
             </summary>
             <param name="lastMember"> Object based on which SkipToken value will be generated.</param>
             <param name="model">The edm model.</param>
-            <param name="orderByNodes">List of orderByNodes used to generate the skiptoken value.</param>
-            <param name="timeZoneInfo">The timezone info.</param>
+            <param name="clause">The orderby clause to generate the skiptoken value.</param>
+            <param name="context">The serializer context.</param>
             <returns>Value for the skiptoken to be used in the next link.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyTo``1(System.Linq.IQueryable{``0},Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
@@ -11160,33 +11218,14 @@
             <param name="queryOptions">Information about the other query options, could be null.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.ApplyToCore(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode},Microsoft.AspNetCore.OData.Query.ODataQueryContext,System.String)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetOrderByClauses(System.Object,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.OrderByClause)">
             <summary>
-            Core logic for applying the query option to the IQueryable. 
+            Get all orderby clause and append the keys if apply
             </summary>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="querySettings">Query setting used for validating the query option.</param>
-            <param name="orderByNodes">OrderBy information required to correctly apply the query option for default implementation.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <param name="skipTokenRawValue">The raw string value of the skiptoken query parameter.</param>
-            <returns></returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.PopulatePropertyValuePairs(System.String,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
-            <summary>
-            Generates a dictionary with property name and property values specified in the skiptoken value.
-            </summary>
-            <param name="value">The skiptoken string value.</param>
-            <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
-            <returns>Dictionary with property name and property value in the skiptoken value.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetPropertiesForSkipToken(System.Object,Microsoft.OData.Edm.IEdmModel,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Query.OrderByNode})">
-            <summary>
-            Returns the list of properties that should be used for generating the skiptoken value. 
-            </summary>
-            <param name="lastMember">The last record that will be returned in the response.</param>
-            <param name="model">IEdmModel</param>
-            <param name="orderByNodes">OrderBy nodes in the original request.</param>
-            <returns>List of properties that should be used for generating the skiptoken value.</returns>
+            <param name="lastMember">The last object.</param>
+            <param name="model">The edm model.</param>
+            <param name="clause">The original orderby clause.</param>
+            <returns>The orderby clauses, since we don't need the 'ThenBy' for each clause, we didn't need to change it.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetTypeFromObject(System.Object,Microsoft.OData.Edm.IEdmModel)">
             <summary>
@@ -11487,6 +11526,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.Validator">
             <summary>
             Gets or sets the $select and $expand query validator.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.OrderBy">
+            <summary>
+            Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.OrderBy"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.SelectExpandClause">
@@ -12370,7 +12414,13 @@
             <param name="orderByClause">The <see cref="T:Microsoft.OData.UriParser.OrderByClause" />.</param>
             <param name="validatorContext">The validation context.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateQueryNode(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method if you want to visit each query node.
+            </summary>
+            <param name="node">The query node.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateSingleValueNode(Microsoft.OData.UriParser.SingleValueNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext,System.Boolean)">
             <summary>
             The recursive method that validate most of the SingleValueNode type.
@@ -12464,7 +12514,13 @@
             <param name="singleResourceCastNode">The single resource cast node.</param>
             <param name="validatorContext">The validation context.</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
+            <summary>
+            Override this method to validate the Not operator.
+            </summary>
+            <param name="unaryOperatorNode">The unary operator node.</param>
+            <param name="validatorContext">The validation context.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateNavigationPropertyNode(Microsoft.OData.UriParser.CollectionNavigationNode,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
             <summary>
             Override this method for the collection value navigation property node.

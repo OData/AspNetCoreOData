@@ -22,7 +22,6 @@ using Xunit;
 namespace Microsoft.AspNetCore.OData.Tests.Query
 {
     using Microsoft.AspNetCore.Http;
-    using System.Reflection;
     using System.Runtime.Serialization;
 
     public class DefaultSkipTokenHandlerTests
@@ -421,7 +420,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
                 lastMember,
                 edmModel,
-                null);
+                null
+                );
 
             // Assert
             Assert.Equal(
@@ -440,23 +440,33 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
                 .First(c => c.Name == "SkipCustomer");
             IEdmProperty property = entityType.FindProperty(propertyName);
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-                {
-                    new OrderByPropertyNode(
-                        property,
-                        OrderByDirection.Ascending)
-                };
+
+            OrderByClause clause = BuildOrderByClause(edmModel, propertyName);
 
             // Act
             string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
                 lastMember,
                 edmModel,
-                orderByNodes);
+                clause);
 
             // Assert
             Assert.Equal(
                 expectedSkipToken,
                 skipTokenValue);
+        }
+
+        private static OrderByClause BuildOrderByClause(IEdmModel edmModel, string propertyName)
+        {
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "SkipCustomer");
+            IEdmProperty property = entityType.FindProperty(propertyName);
+
+            IEdmNavigationSource entitySet = edmModel.FindDeclaredEntitySet("Customers");
+            ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", new EdmEntityTypeReference(entityType, true), entitySet);
+
+            ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+            SingleValuePropertyAccessNode node = new SingleValuePropertyAccessNode(source, property);
+            return new OrderByClause(null, node, OrderByDirection.Ascending, rangeVariable);
         }
 
         private static void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_IfNullValue_Implementation(
@@ -467,21 +477,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             // Arrange
             SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = null};
 
-            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
-                .First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty(propertyName);
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-                {
-                    new OrderByPropertyNode(
-                        property,
-                        OrderByDirection.Ascending)
-                };
+            OrderByClause clause = BuildOrderByClause(edmModel, propertyName);
 
             // Act
             string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
                 lastMember,
                 edmModel,
-                orderByNodes);
+                clause);
 
             // Assert
             Assert.Equal(
@@ -511,20 +513,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8
             IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
                 .First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty(propertyName);
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-                {
-                    new OrderByPropertyNode(
-                        property,
-                        OrderByDirection.Ascending)
-                };
+
+            OrderByClause clause = BuildOrderByClause(edmModel, propertyName);
+            ODataSerializerContext context = new ODataSerializerContext()
+            {
+                TimeZone = timeZone
+            };
 
             // Act
             string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
                 lastMember,
                 edmModel,
-                orderByNodes,
-                timeZone);
+                clause,
+                context);
 
             // Assert
             Assert.Equal(
@@ -540,21 +541,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             // Arrange
             SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX", Gender = Gender.Male};
 
-            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
-                .First(c => c.Name == "SkipCustomer");
-            IEdmProperty property = entityType.FindProperty(propertyName);
-            IList<OrderByNode> orderByNodes = new List<OrderByNode>
-                {
-                    new OrderByPropertyNode(
-                        property,
-                        OrderByDirection.Ascending)
-                };
+            OrderByClause clause = BuildOrderByClause(edmModel, propertyName);
 
             // Act
             string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
                 lastMember,
                 edmModel,
-                orderByNodes);
+                clause);
 
             // Assert
             Assert.Equal(
@@ -571,6 +564,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+            ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
 
             SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
                 "abc",
@@ -583,8 +578,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     customers,
                     skipTokenQuery,
                     new ODataQuerySettings(),
-                    null),
-                "Unable to parse the skiptoken value 'abc'. Skiptoken value should always be server generated.");
+                    queryOptions),
+                "Could not find a property named 'abc' on type 'Microsoft.AspNetCore.OData.Tests.Query.SkipCustomer'.");
         }
         
         private static void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
@@ -596,6 +591,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
+            HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+            ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
 
             SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(
                 skipTokenQueryOptionRawValue,
@@ -613,7 +610,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     customers,
                     skipTokenQuery,
                     settings,
-                    null)
+                    queryOptions)
                 .ToArray();
 
             // Assert
