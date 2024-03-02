@@ -1535,6 +1535,142 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         //    Assert.Equal("redmond", address0["City"].ToString());
         //}
 
+        public static List<Product> ProductApplyForTypeCastTestData
+        {
+            get
+            {
+                List<Product> productList = new List<Product>();
+
+                Product p1 = new DerivedProduct
+                {
+                    ProductID = 1,
+                    ProductName = "Product 1",
+                    DerivedProductName = "Product A",
+                    Category = new DerivedCategory
+                    {
+                        CategoryID = 1,
+                        CategoryName = "Category 1",
+                        DerivedCategoryName = "Category A",
+                    },
+                };
+                productList.Add(p1);
+                Product p2 = new DerivedProduct
+                {
+                    ProductID = 2,
+                    ProductName = "Product 1",
+                    DerivedProductName = "Product A",
+                    Category = new DerivedCategory
+                    {
+                        CategoryID = 1,
+                        CategoryName = "Category 1",
+                        DerivedCategoryName = "Category A",
+                    },
+                };
+                productList.Add(p2);
+                Product p3 = new DerivedProduct
+                {
+                    ProductID = 3,
+                    ProductName = "Product 2",
+                    DerivedProductName = "Product B",
+                    Category = new DerivedCategory
+                    {
+                        CategoryID = 2,
+                        CategoryName = "Category 2",
+                        DerivedCategoryName = "Category B",
+                    },
+                };
+                productList.Add(p3);
+
+                return productList;
+            }
+        }
+
+        public static TheoryDataSet<string, List<Dictionary<string, object>>> ProductTestAppliesForTypeCast
+        {
+            get
+            {
+                return new TheoryDataSet<string, List<Dictionary<string, object>>>
+                {
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.Product/ProductName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> {{"ProductName", "Product 1"}},
+                            new Dictionary<string, object> {{"ProductName", "Product 2"}}
+                        }
+                    },
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/DerivedProductName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> {{ "DerivedProductName", "Product A"}},
+                            new Dictionary<string, object> {{ "DerivedProductName", "Product B"}}
+                        }
+                    },
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/CategoryName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> {{ "Category/CategoryName", "Category 1" } },
+                            new Dictionary<string, object> {{ "Category/CategoryName", "Category 2" } }
+                        }
+                    },
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> {{ "Category/DerivedCategoryName", "Category A"}},
+                            new Dictionary<string, object> {{ "Category/DerivedCategoryName", "Category B" } }
+                        }
+                    }
+                };
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ProductTestAppliesForTypeCast))]
+        public void ApplyTo_Returns_Correct_Queryable_ForTypeCast(string apply, List<Dictionary<string, object>> aggregation)
+        {
+            // Arrange
+            var model = new ODataModelBuilder()
+                            .Add_Products_EntityType()
+                            .Add_DerivedProducts_EntityType()
+                            .Add_DerivedProducts_EntityType()
+                            .Add_Categories_EntityType()
+                            .Add_DerivedCategories_EntityType()
+                            .Add_Products_EntitySet()
+                            .GetEdmModel();
+            var context = new ODataQueryContext(model, typeof(Product)) { RequestContainer = new MockServiceProvider() };
+            var queryOptionParser = new ODataQueryOptionParser(
+                context.Model,
+                context.ElementType,
+                context.NavigationSource,
+                new Dictionary<string, string> { { "$apply", apply } });
+            var applyOption = new ApplyQueryOption(apply, context, queryOptionParser);
+            IEnumerable<Product> products = ProductApplyForTypeCastTestData;
+
+            // Act
+            IQueryable queryable = applyOption.ApplyTo(products.AsQueryable(), new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True });
+
+            // Assert
+            Assert.NotNull(queryable);
+            var actualProducts = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();
+
+            Assert.Equal(aggregation.Count(), actualProducts.Count());
+
+            var aggEnum = actualProducts.GetEnumerator();
+
+            foreach (var expected in aggregation)
+            {
+                aggEnum.MoveNext();
+                var agg = aggEnum.Current;
+                foreach (var key in expected.Keys)
+                {
+                    object value = GetValue(agg, key);
+                    Assert.Equal(expected[key], value);
+                }
+            }
+        }
 
         private object GetValue(DynamicTypeWrapper wrapper, string path)
         {
@@ -1582,6 +1718,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public IQueryable<Customer> Get()
         {
             return _customers.AsQueryable();
+        }
+    }
+
+    public class ProductsForTypeCastController : ODataController
+    {
+        private List<Product> _products;
+
+        public ProductsForTypeCastController()
+        {
+            _products = ApplyQueryOptionTest.ProductApplyForTypeCastTestData;
+        }
+
+        [EnableQuery]
+        public IQueryable<Product> Get()
+        {
+            return _products.AsQueryable();
         }
     }
 }

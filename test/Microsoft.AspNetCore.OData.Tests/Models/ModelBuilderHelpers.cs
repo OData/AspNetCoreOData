@@ -324,5 +324,45 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
             builder.EntitySet<Order>("Orders").HasRequiredBinding(o => o.Customer, "Customer");
             return builder;
         }
+
+        public static ODataModelBuilder Add_Products_EntityType(this ODataModelBuilder builder)
+        {
+            var product = builder.EntityType<Product>();
+            product.HasKey(p => new { p.ProductID });
+            product.Property(p => p.ProductID);
+            product.Property(p => p.ProductName);
+            product.ComplexProperty(p => p.Category);
+            return builder;
+        }
+
+        public static ODataModelBuilder Add_DerivedProducts_EntityType(this ODataModelBuilder builder)
+        {
+            var derivedProduct = builder.EntityType<DerivedProduct>();
+            derivedProduct.DerivesFrom<Product>();
+            derivedProduct.Property(p => p.DerivedProductName);
+            return builder;
+        }
+
+        public static ODataModelBuilder Add_Categories_EntityType(this ODataModelBuilder builder)
+        {
+            var category = builder.ComplexType<Category>();
+            category.Property(c => c.CategoryID);
+            category.Property(c => c.CategoryName);
+            return builder;
+        }
+
+        public static ODataModelBuilder Add_DerivedCategories_EntityType(this ODataModelBuilder builder)
+        {
+            var derivedCategory = builder.ComplexType<DerivedCategory>();
+            derivedCategory.DerivesFrom<Category>();
+            derivedCategory.Property(c => c.DerivedCategoryName);
+            return builder;
+        }
+
+        public static ODataModelBuilder Add_Products_EntitySet(this ODataModelBuilder builder)
+        {
+            builder.EntitySet<Product>("Products");
+            return builder;
+        }
     }
 }
