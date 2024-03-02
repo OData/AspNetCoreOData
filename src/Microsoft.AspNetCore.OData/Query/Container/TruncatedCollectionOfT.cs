@@ -29,8 +29,10 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="source">The collection to be truncated.</param>
         /// <param name="pageSize">The page size.</param>
         public TruncatedCollection(IEnumerable<T> source, int pageSize)
-            : base(source.Take(checked(pageSize + 1)))
+            : base(checked(pageSize + 1))
         {
+            var items = source.Take(checked(pageSize + 1));
+            AddRange(items);
             Initialize(pageSize);
         }
 
@@ -54,8 +56,10 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
         public TruncatedCollection(IQueryable<T> source, int pageSize, bool parameterize)
-            : base(Take(source, pageSize, parameterize))
+            : base(checked(pageSize + 1))
         {
+            var items = Take(source, pageSize, parameterize);
+            AddRange(items);
             Initialize(pageSize);
         }
 
