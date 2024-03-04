@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     {
         // The default capacity of the list.
         // https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/list.cs#L38
-        private const int defaultCapacity = 4;
+        private const int DefaultCapacity = 4;
         private const int MinPageSize = 1;
 
         private bool _isTruncated;
@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         public TruncatedCollection(IEnumerable<T> source, int pageSize, long? totalCount)
             : base(pageSize > 0
                 ? checked(pageSize + 1)
-                : (totalCount > 0 ? (totalCount < int.MaxValue ? (int)totalCount : int.MaxValue) : defaultCapacity))
+                : (totalCount > 0 ? (totalCount < int.MaxValue ? (int)totalCount : int.MaxValue) : DefaultCapacity))
         {
             if (pageSize > 0)
             {
