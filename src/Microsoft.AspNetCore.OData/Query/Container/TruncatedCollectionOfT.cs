@@ -17,6 +17,9 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// <typeparam name="T">The collection element type.</typeparam>
     public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable<T>, ICountOptionCollection
     {
+        // The default capacity of the list.
+        // https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/list.cs#L38
+        private const int defaultCapacity = 4;
         private const int MinPageSize = 1;
 
         private bool _isTruncated;
@@ -31,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         public TruncatedCollection(IEnumerable<T> source, int pageSize)
             : base(checked(pageSize + 1))
         {
-            var items = source.Take(checked(pageSize + 1));
+            var items = source.Take(Capacity);
             AddRange(items);
             Initialize(pageSize);
         }
@@ -70,8 +73,18 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalCount">The total count.</param>
         public TruncatedCollection(IEnumerable<T> source, int pageSize, long? totalCount)
-            : base(pageSize > 0 ? source.Take(checked(pageSize + 1)) : source)
+            : base(pageSize > 0
+                ? checked(pageSize + 1)
+                : (totalCount > 0 ? (totalCount < int.MaxValue ? (int)totalCount : int.MaxValue) : defaultCapacity))
         {
+            if (pageSize > 0)
+            {
+                AddRange(source.Take(Capacity));
+            }
+            else
+            {
+                AddRange(source);
+            }
             if (pageSize > 0)
             {
                 Initialize(pageSize);
