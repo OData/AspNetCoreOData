@@ -68,7 +68,7 @@ namespace ODataPerformanceProfile.Controllers
         }
 
         [HttpGet]
-        [EnableQuery]
+        [EnableQuery(PageSize = 3000)]
         public IActionResult Get()
         {
             return Ok(products);
