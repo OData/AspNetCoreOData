@@ -298,12 +298,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             get
             {
-                if (_isDeltaOfT is not null)
+                if (_isDeltaOfT.HasValue)
                 {
                     return _isDeltaOfT.Value;
                 }
                 
-                if (Type is not { IsGenericType: true })
+                if (!(Type is { IsGenericType: true }))
                 {
                     _isDeltaOfT = false;
                     return _isDeltaOfT.Value;
