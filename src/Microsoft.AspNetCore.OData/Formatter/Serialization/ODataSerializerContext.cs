@@ -298,11 +298,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
             get
             {
-                if (_isDeltaOfT == null)
+                if (_isDeltaOfT.HasValue)
                 {
-                    _isDeltaOfT = Type != null && Type.IsGenericType && (Type.GetGenericTypeDefinition() == typeof(Delta<>) ||
-                        Type.GetGenericTypeDefinition() == typeof(DeltaSet<>) || Type.GetGenericTypeDefinition() == typeof(DeltaDeletedResource<>));
+                    return _isDeltaOfT.Value;
                 }
+                
+                if (!(Type is { IsGenericType: true }))
+                {
+                    _isDeltaOfT = false;
+                    return _isDeltaOfT.Value;
+                }
+
+                var genericTypeDefinition = Type.GetGenericTypeDefinition();
+                _isDeltaOfT = genericTypeDefinition == typeof(Delta<>) ||
+                              genericTypeDefinition == typeof(DeltaSet<>) ||
+                              genericTypeDefinition == typeof(DeltaDeletedResource<>);
 
                 return _isDeltaOfT.Value;
             }
