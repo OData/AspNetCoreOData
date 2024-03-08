@@ -50,7 +50,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var rawResult = await response.Content.ReadAsStringAsync();
 
-            Assert.Equal("[{\"id\":2,\"isbn\":\"063-6-920-02371-5\"}]", rawResult);
+            Assert.Equal("[{\"isbn\":\"063-6-920-02371-5\",\"id\":2}]", rawResult);
         }
     }
 
