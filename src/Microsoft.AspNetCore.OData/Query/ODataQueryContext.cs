@@ -26,6 +26,8 @@ namespace Microsoft.AspNetCore.OData.Query
     /// </summary>
     public class ODataQueryContext
     {
+        internal static readonly ODataUriResolver DefaultCaseInsensitiveResolver = new ODataUriResolver { EnableCaseInsensitive = true };
+
         private DefaultQueryConfigurations _defaultQueryConfigurations;
 
         /// <summary>
