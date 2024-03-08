@@ -799,6 +799,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Instance Annotation name cannot have a &apos;@&apos; as the first character and cannot have a &apos;.&apos; as first or last character..
+        /// </summary>
+        internal static string InstanceAnnotationNotContain {
+            get {
+                return ResourceManager.GetString("InstanceAnnotationNotContain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Instance Annotation should have a &apos;.&apos; in it and should not be the first or last character, usually in a format Namespace.TermName.
+        /// </summary>
+        internal static string InstanceAnnotationShouldContain {
+            get {
+                return ResourceManager.GetString("InstanceAnnotationShouldContain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The attribute routing template contains invalid segment &apos;{0}&apos;. The template string does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
         /// </summary>
         internal static string InvalidAttributeRoutingTemplateSegment {

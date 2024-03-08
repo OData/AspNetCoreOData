@@ -172,6 +172,8 @@ Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler
 Microsoft.AspNetCore.OData.Batch.UnbufferedODataBatchHandler.UnbufferedODataBatchHandler() -> void
 Microsoft.AspNetCore.OData.Deltas.Delta
 Microsoft.AspNetCore.OData.Deltas.Delta.Delta() -> void
+Microsoft.AspNetCore.OData.Deltas.Delta.TransientInstanceAnnotationContainer.get -> Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer
+Microsoft.AspNetCore.OData.Deltas.Delta.TransientInstanceAnnotationContainer.set -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.CopyChangedValues(T original) -> void
 Microsoft.AspNetCore.OData.Deltas.Delta<T>.CopyUnchangedValues(T original) -> void
@@ -221,6 +223,8 @@ Microsoft.AspNetCore.OData.Deltas.IDeltaDeletedResource.Reason.set -> void
 Microsoft.AspNetCore.OData.Deltas.IDeltaSet
 Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem
 Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.Kind.get -> Microsoft.AspNetCore.OData.Deltas.DeltaItemKind
+Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.TransientInstanceAnnotationContainer.get -> Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer
+Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.TransientInstanceAnnotationContainer.set -> void
 Microsoft.AspNetCore.OData.Deltas.ITypedDelta
 Microsoft.AspNetCore.OData.Deltas.ITypedDelta.ExpectedClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Deltas.ITypedDelta.StructuredType.get -> System.Type
@@ -658,7 +662,22 @@ Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.IsDeletedResou
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedResourceInfos.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper>
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.ODataResourceWrapper(Microsoft.OData.ODataResourceBase resource) -> void
 Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource.get -> Microsoft.OData.ODataResourceBase
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.AddPropertyAnnotation(string propertyName, string annotationName, object value) -> void
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.AddResourceAnnotation(string annotationName, object value) -> void
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetPropertyAnnotation(string propertyName, string annotationName) -> object
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetPropertyAnnotations(string propertyName) -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetResourceAnnotation(string annotationName) -> object
+Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetResourceAnnotations() -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.AddPropertyAnnotation(string propertyName, string annotationName, object value) -> void
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.AddResourceAnnotation(string annotationName, object value) -> void
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetPropertyAnnotation(string propertyName, string annotationName) -> object
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetPropertyAnnotations(string propertyName) -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetResourceAnnotation(string annotationName) -> object
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetResourceAnnotations() -> System.Collections.Generic.IDictionary<string, object>
+Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.ODataInstanceAnnotationContainer() -> void
 Microsoft.AspNetCore.OData.ODataJsonOptionsSetup
 Microsoft.AspNetCore.OData.ODataJsonOptionsSetup.Configure(Microsoft.AspNetCore.Mvc.JsonOptions options) -> void
 Microsoft.AspNetCore.OData.ODataJsonOptionsSetup.ODataJsonOptionsSetup() -> void
@@ -1482,6 +1501,35 @@ Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment.get -> Microsoft.OData.UriParser.ValueSegment
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueSegmentTemplate(Microsoft.OData.Edm.IEdmType previousType) -> void
 Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.ValueSegmentTemplate(Microsoft.OData.UriParser.ValueSegment segment) -> void
+Org.OData.Core.V1.DataModificationExceptionType
+Org.OData.Core.V1.DataModificationExceptionType.DataModificationExceptionType(Org.OData.Core.V1.DataModificationOperationKind failedOperation) -> void
+Org.OData.Core.V1.DataModificationExceptionType.FailedOperation.get -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationExceptionType.ResponseCode.get -> short
+Org.OData.Core.V1.DataModificationExceptionType.ResponseCode.set -> void
+Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Delete = 3 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Insert = 0 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Invoke = 4 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Link = 5 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Unlink = 6 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Update = 1 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.DataModificationOperationKind.Upsert = 2 -> Org.OData.Core.V1.DataModificationOperationKind
+Org.OData.Core.V1.ExceptionType
+Org.OData.Core.V1.ExceptionType.ExceptionType() -> void
+Org.OData.Core.V1.ExceptionType.MessageType.get -> Org.OData.Core.V1.MessageType
+Org.OData.Core.V1.ExceptionType.MessageType.set -> void
+Org.OData.Core.V1.MessageType
+Org.OData.Core.V1.MessageType.Code.get -> string
+Org.OData.Core.V1.MessageType.Code.set -> void
+Org.OData.Core.V1.MessageType.Details.get -> string
+Org.OData.Core.V1.MessageType.Details.set -> void
+Org.OData.Core.V1.MessageType.Message.get -> string
+Org.OData.Core.V1.MessageType.Message.set -> void
+Org.OData.Core.V1.MessageType.MessageType() -> void
+Org.OData.Core.V1.MessageType.Severity.get -> string
+Org.OData.Core.V1.MessageType.Severity.set -> void
+Org.OData.Core.V1.MessageType.Target.get -> string
+Org.OData.Core.V1.MessageType.Target.set -> void
 override Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute.OnActionExecuted(Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext actionExecutedContext) -> void
 override Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute.BindingSource.get -> Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource
 override Microsoft.AspNetCore.OData.Batch.ChangeSetRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>
