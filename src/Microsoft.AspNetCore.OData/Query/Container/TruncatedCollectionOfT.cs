@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="totalCount">The total count.</param>
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
-        [Obsolete("should not used should be removed in the next major version")]
+        [Obsolete("should not be used, will be marked internal in the next major version")]
         public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount) : this(source, pageSize,
             totalCount, false)
         {
@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
-        [Obsolete("should not be used should be removed in the next major version")]
+        [Obsolete("should not be used, will be marked internal in the next major version")]
         public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount, bool parameterize)
             : base(pageSize > 0 ? Take(source, pageSize, parameterize) : source)
         {
