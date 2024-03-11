@@ -11,9 +11,11 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
@@ -48,9 +50,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
 
             //
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var rawResult = await response.Content.ReadAsStringAsync();
+            var resultArray = await response.Content.ReadAsObject<JArray>();
 
-            Assert.Equal("[{\"isbn\":\"063-6-920-02371-5\",\"id\":2}]", rawResult);
+            JObject objectItem = Assert.IsType<JObject>(Assert.Single(resultArray));
+            Assert.Equal(2, objectItem.Properties().Count());
+            Assert.Equal("063-6-920-02371-5", objectItem["isbn"]);
+            Assert.Equal(2, objectItem["id"]);
         }
     }
 
