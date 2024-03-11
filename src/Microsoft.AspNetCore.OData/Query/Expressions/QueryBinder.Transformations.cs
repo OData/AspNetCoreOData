@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
         /// <param name="baseElement">The <see cref="Expression"/> for the base element.</param>
         /// <returns>The created <see cref="Expression"/>.</returns>
-        protected Expression BindAccessor(QueryNode node, QueryBinderContext context, Expression baseElement = null)
+        public virtual Expression BindAccessor(QueryNode node, QueryBinderContext context, Expression baseElement = null)
         {
             if (node == null)
             {
@@ -121,7 +121,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
         }
 
-        internal IEnumerable<AggregateExpressionBase> GetAggregateExpressions(QueryBinderContext context, TransformationNode transformation)
+        /// <summary>
+        /// Get a collection of aggregate expressions from a <see cref="TransformationNode"/>.
+        /// </summary>
+        /// <param name="context">The query binder context.</param>
+        /// <param name="transformation">The <see cref="TransformationNode"/>.</param>
+        /// <returns>A collection of aggregate expressions.</returns>
+        public virtual IEnumerable<AggregateExpressionBase> GetAggregateExpressions(QueryBinderContext context, TransformationNode transformation)
         {
             Contract.Assert(context != null);
             Contract.Assert(transformation != null);
@@ -182,7 +188,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return new AggregateExpression(expression.Expression, expression.MethodDefinition, expression.Alias, typeReference);
         }
 
-        internal MethodInfo GetCustomMethod(AggregateExpression expression, QueryBinderContext context)
+        /// <summary>
+        /// Get a custom aggregation method from the aggregation expression.
+        /// </summary>
+        /// <param name="expression">The <see cref="AggregateExpression"/>.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The custom method.</returns>
+        public virtual MethodInfo GetCustomMethod(AggregateExpression expression, QueryBinderContext context)
         {
             LambdaExpression propertyLambda = Expression.Lambda(BindAccessor(expression.Expression, context), context.LambdaParameter);
             Type inputType = propertyLambda.Body.Type;
@@ -204,7 +216,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return customMethod;
         }
 
-        private Expression CreateOpenPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
+        /// <summary>
+        /// Creates a LINQ <see cref="Expression"/> that represents the semantics of the <see cref="SingleValueOpenPropertyAccessNode"/>.
+        /// </summary>
+        /// <param name="openNode">They query node to create an expression from.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+        public virtual Expression CreateOpenPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
         {
             Expression sourceAccessor = BindAccessor(openNode.Source, context);
 
