@@ -8827,10 +8827,10 @@
             B/C : $it.Container.Value
             B/D : $it.Container.Next.Value
             </summary>
-            <param name="query"></param>
-            <param name="context"></param>
-            <param name="flattenedPropertyContainer"></param>
-            <param name="transformationNode"></param>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">The query binder context</param>
+            <param name="flattenedPropertyContainer">Flattened list of properties from base query.</param>
+            <param name="transformationNode">The <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
             <returns>Query with Select that flattens properties</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">

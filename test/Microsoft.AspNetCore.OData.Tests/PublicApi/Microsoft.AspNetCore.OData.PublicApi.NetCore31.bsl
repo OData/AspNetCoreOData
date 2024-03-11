@@ -2793,7 +2793,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder {
 
 	protected static System.Linq.Expressions.Expression ApplyNullPropagationForFilterBody (System.Linq.Expressions.Expression body, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression Bind (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
-	protected System.Linq.Expressions.Expression BindAccessor (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, params System.Linq.Expressions.Expression baseElement)
+	public virtual System.Linq.Expressions.Expression BindAccessor (Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, params System.Linq.Expressions.Expression baseElement)
 	public virtual System.Linq.Expressions.Expression BindAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected System.Linq.Expressions.Expression[] BindArguments (System.Collections.Generic.IEnumerable`1[[Microsoft.OData.UriParser.QueryNode]] nodes, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
@@ -2841,6 +2841,9 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder {
 	protected virtual System.Linq.Expressions.Expression BindToUpper (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindTrim (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+	public virtual System.Linq.Expressions.Expression CreateOpenPropertyAccessExpression (Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+	public virtual System.Collections.Generic.IEnumerable`1[[Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase]] GetAggregateExpressions (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.UriParser.Aggregation.TransformationNode transformation)
+	public virtual System.Reflection.MethodInfo GetCustomMethod (Microsoft.OData.UriParser.Aggregation.AggregateExpression expression, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected static System.Reflection.PropertyInfo GetDynamicPropertyContainer (Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected System.Linq.Expressions.Expression GetFlattenedPropertyExpression (string propertyPath, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected static System.Linq.Expressions.Expression WrapConvert (System.Linq.Expressions.Expression expression)
