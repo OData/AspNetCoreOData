@@ -293,9 +293,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             if (query != null)
             {
                 this.HasInstancePropertyContainer = query.ElementType.IsGenericType && query.ElementType.GetGenericTypeDefinition() == typeof(ComputeWrapper<>);
-
-                AggregationBinderHelper binderHelper = new AggregationBinderHelper();
-                this.FlattenedProperties = binderHelper.GetFlattenedProperties(source, this, query);
+                this.FlattenedProperties = QueryBinder.GetFlattenedProperties(source, this, query);
             }
         }
     }
