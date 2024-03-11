@@ -9662,6 +9662,30 @@
             <param name="baseElement">The <see cref="T:System.Linq.Expressions.Expression"/> for the base element.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetAggregateExpressions(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.UriParser.Aggregation.TransformationNode)">
+            <summary>
+            Get a collection of aggregate expressions from a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.
+            </summary>
+            <param name="context">The query binder context.</param>
+            <param name="transformation">The <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <returns>A collection of aggregate expressions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetCustomMethod(Microsoft.OData.UriParser.Aggregation.AggregateExpression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Get a custom aggregation method from the aggregation expression.
+            </summary>
+            <param name="expression">The <see cref="T:Microsoft.OData.UriParser.Aggregation.AggregateExpression"/>.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The custom method.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateOpenPropertyAccessExpression(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/>.
+            </summary>
+            <param name="openNode">They query node to create an expression from.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext">
             <summary>
             Encapsulates all binder information about an individual OData query option binding.

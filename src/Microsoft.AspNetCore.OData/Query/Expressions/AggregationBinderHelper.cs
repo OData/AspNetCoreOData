@@ -42,10 +42,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// B/C : $it.Container.Value
         /// B/D : $it.Container.Next.Value
         /// </summary>
-        /// <param name="query"></param>
-        /// <param name="context"></param>
-        /// <param name="flattenedPropertyContainer"></param>
-        /// <param name="transformationNode"></param>
+        /// <param name="query">The original <see cref="IQueryable"/>.</param>
+        /// <param name="context">The query binder context</param>
+        /// <param name="flattenedPropertyContainer">Flattened list of properties from base query.</param>
+        /// <param name="transformationNode">The <see cref="TransformationNode"/>.</param>
         /// <returns>Query with Select that flattens properties</returns>
         internal IQueryable FlattenReferencedProperties(
             IQueryable query,
