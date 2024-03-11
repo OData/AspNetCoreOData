@@ -20,7 +20,7 @@ using Microsoft.OData.UriParser.Aggregation;
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
     /// <summary>
-    /// The default implementation to bind an OData $apply represented by <see cref="ApplyClause"/> to a <see cref="Expression"/>.
+    /// The default implementation to bind an OData $apply represented by <see cref="ApplyClause"/> to an <see cref="Expression"/>.
     /// </summary>
     [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
     public class AggregationBinder : QueryBinder, IAggregationBinder
@@ -46,26 +46,27 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 // Generates expression
                 // .GroupBy($it => new DynamicTypeWrapper()
-                //                                      {
-                //                                           GroupByContainer => new AggregationPropertyContainer() {
-                //                                               Name = "Prop1",
-                //                                               Value = $it.Prop1,
-                //                                               Next = new AggregationPropertyContainer() {
-                //                                                   Name = "Prop2",
-                //                                                   Value = $it.Prop2, // int
-                //                                                   Next = new LastInChain() {
-                //                                                       Name = "Prop3",
-                //                                                       Value = $it.Prop3
-                //                                                   }
-                //                                               }
-                //                                           }
-                //                                      })
+                //     {
+                //         GroupByContainer => new AggregationPropertyContainer() {
+                //             Name = "Prop1",
+                //             Value = $it.Prop1,
+                //             Next = new AggregationPropertyContainer() {
+                //                 Name = "Prop2",
+                //                 Value = $it.Prop2, // int
+                //                 Next = new LastInChain() {
+                //                     Name = "Prop3",
+                //                     Value = $it.Prop3
+                //                 }
+                //            }
+                //         }
+                //     }
+                // })
                 List<NamedPropertyExpression> properties = CreateGroupByMemberAssignments(groupingProperties, context);
 
                 PropertyInfo wrapperProperty = typeof(GroupByWrapper).GetProperty(GroupByContainerProperty);
-                List<MemberAssignment> wta = new List<MemberAssignment>();
-                wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
-                groupLambda = Expression.Lambda(Expression.MemberInit(Expression.New(typeof(GroupByWrapper)), wta), context.LambdaParameter);
+                List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
+                groupLambda = Expression.Lambda(Expression.MemberInit(Expression.New(typeof(GroupByWrapper)), wrapperTypeMemberAssignments), context.LambdaParameter);
             }
             else
             {

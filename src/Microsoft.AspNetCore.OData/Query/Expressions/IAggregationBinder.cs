@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         //                                      })
 
         /// <summary>
-        /// Translate an OData $apply parse tree represented by <see cref="TransformationNode"/> to
+        /// Translates an OData $apply parse tree represented by <see cref="TransformationNode"/> to
         /// an <see cref="Expression"/>.
         /// </summary>
         /// <param name="transformationNode">The OData $apply parse tree represented by <see cref="TransformationNode"/>.</param>
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         //                  }
 
         /// <summary>
-        /// Translate an OData $apply parse tree represented by <see cref="TransformationNode"/> to
+        /// Translates an OData $apply parse tree represented by <see cref="TransformationNode"/> to
         /// an <see cref="Expression"/>.
         /// </summary>
         /// <param name="transformationNode">The OData $apply parse tree represented by <see cref="TransformationNode"/>.</param>
