@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable<T>, ICountOptionCollection
     {
         // The default capacity of the list.
-        // https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/list.cs#L38
+        // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/List.cs#L23
         private const int DefaultCapacity = 4;
         private const int MinPageSize = 1;
 
