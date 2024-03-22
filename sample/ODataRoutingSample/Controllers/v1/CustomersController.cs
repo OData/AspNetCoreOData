@@ -25,7 +25,7 @@ namespace ODataRoutingSample.Controllers.v1
 
         public CustomersController(MyDataContext context)
         {
-            _context = context;
+            /*_context = context;
             if (_context.Customers.Count() == 0)
             {
                 IList<Customer> customers = GetCustomers();
@@ -36,7 +36,7 @@ namespace ODataRoutingSample.Controllers.v1
                 }
 
                 _context.SaveChanges();
-            }
+            }*/
         }
 
         // For example: http://localhost:5000/v1/customers?$apply=groupby((Name), aggregate($count as count))&$orderby=name desc
@@ -62,9 +62,41 @@ namespace ODataRoutingSample.Controllers.v1
             };
         }
 
+/*
+http://localhost:64771/v1/Customers
+{
+    "Name": "garrett",
+    "MyProperty": {
+        "prop1": "a value",
+        "nestedProperty": {
+            "moredata": "another value"
+        }
+    }
+}
+*/
         [HttpPost]
         public IActionResult Post([FromBody] Customer newCustomer)
         {
+            if (!newCustomer.MyProperty.DynamicProperties.TryGetValue("nestedProperty", out var nestedProperty))
+            {
+                throw new InvalidOperationException("nested property not deserialzied");
+            }
+
+            if (!(nestedProperty is Microsoft.AspNetCore.OData.Formatter.Value.EdmUntypedObject untypedObject))
+            {
+                throw new InvalidOperationException("nested property was deserialized as the wrong type");
+            }
+
+            if (!untypedObject.TryGetPropertyValue("moredata", out var theValue))
+            {
+                throw new InvalidOperationException("the nested property doesn't have the nested data");
+            }
+
+            if (!string.Equals(theValue, "another value"))
+            {
+                throw new InvalidOperationException("the nested data produced the wrong value");
+            }
+
             return Ok();
         }
 

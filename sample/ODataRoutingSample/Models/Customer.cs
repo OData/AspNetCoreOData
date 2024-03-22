@@ -22,6 +22,13 @@ namespace ODataRoutingSample.Models
         public virtual Address HomeAddress { get; set; }
 
         public virtual IList<Address> FavoriteAddresses { get; set; }
+
+        public CustomDictionary MyProperty { get; set; } = new CustomDictionary();
+    }
+
+    public class CustomDictionary
+    {
+        public Dictionary<string, object> DynamicProperties { get; set; } = new Dictionary<string, object>();
     }
 
     public class VipCustomer : Customer
