@@ -85,6 +85,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
             {
                 AddRange(source);
             }
+
             if (pageSize > 0)
             {
                 Initialize(pageSize);
