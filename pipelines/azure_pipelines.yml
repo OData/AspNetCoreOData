@@ -1,3 +1,7 @@
+# This Yaml Document has been converted by ESAI Yaml Pipeline Conversion Tool.
+# Please make sure to check all the converted content, it is your team's responsibility to make sure that the pipeline is still valid and functions as expected.
+# This pipeline will be extended to the OneESPT template
+# If you are not using the E+D shared hosted pool with windows-2022, replace the pool section with your hosted pool, os, and image name. If you are using a Linux image, you must specify an additional windows image for SDL: https://eng.ms/docs/cloud-ai-platform/devdiv/one-engineering-system-1es/1es-docs/1es-pipeline-templates/features/sdlanalysis/overview#how-to-specify-a-windows-pool-for-the-sdl-source-analysis-stage
 trigger:
   branches:
     include:
@@ -6,84 +10,113 @@ resources:
   repositories:
   - repository: self
     type: git
-    ref: main
-pr:
-  - main
-jobs:
-- job: Main
-  displayName: Main Build
-  timeoutInMinutes: 120
-  pool:
-    vmImage: windows-latest
-  steps:
-  - checkout: self
-  - task: NuGetToolInstaller@1
-    displayName: Use NuGet >=5.2.0
-    inputs:
-      versionSpec: '>=5.2.0'
-      checkLatest: true
-  - task: UseDotNet@2
-    displayName: Use .NET Core sdk 3.1
-    inputs:
-      version: 3.x
-  - task: UseDotNet@2
-    displayName: Use .NET Core sdk 5.x
-    inputs:
-      version: 5.x
-      includePreviewVersions: true
-  - task: UseDotNet@2
-    displayName: 'Use .NET Core SDK 6.x'
-    inputs:
-      version: 6.x
-      includePreviewVersions: true
-  - task: DotNetCoreCLI@2
-    displayName: Build Microsoft.AspNetCore.OData
-    inputs:
-      projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
-      arguments: --configuration $(BuildConfiguration) --no-incremental
-  - task: DotNetCoreCLI@2
-    displayName: Build Microsoft.AspNetCore.OData.NewtonsoftJson
-    inputs:
-      projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
-      arguments: --configuration $(BuildConfiguration) --no-incremental
-  - task: DotNetCoreCLI@2
-    displayName: Build UT(Microsoft.AspNetCore.OData.Tests)
-    inputs:
-      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
-      arguments: --configuration $(BuildConfiguration) --no-incremental
-  - task: DotNetCoreCLI@2
-    displayName: Build UT(Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
-    inputs:
-      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
-      arguments: --configuration $(BuildConfiguration) --no-incremental
-  - task: DotNetCoreCLI@2
-    displayName: Build E2E(Microsoft.AspNetCore.OData.E2E.Tests)
-    inputs:
-      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
-      arguments: --configuration $(BuildConfiguration) --no-incremental
-  - task: DotNetCoreCLI@2
-    displayName: Unit Tests (Microsoft.AspNetCore.OData.Tests)
-    inputs:
-      command: test
-      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
-      arguments: --configuration $(BuildConfiguration) --no-build
-  - task: DotNetCoreCLI@2
-    displayName: Unit Tests (Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
-    inputs:
-      command: test
-      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
-      arguments: --configuration $(BuildConfiguration) --no-build
-  - task: DotNetCoreCLI@2
-    displayName: E2E Tests (Microsoft.AspNetCore.OData.E2E.Tests)
-    inputs:
-      command: test
-      projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
-      arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed" --framework netcoreapp3.1
-  - task: DotNetCoreCLI@2
-    displayName: build Product(Microsoft.AspNetCore.OData.NewtonsoftJson)
-    enabled: False
-    inputs:
-      projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
-      arguments: --configuration $(BuildConfiguration) --no-incremental
-
-...
+    ref: refs/heads/main
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+name: $(Date:yyyyMMdd).$(Rev:r)
+variables:
+- name: __NugetSecurityAnalysisWarningLevel__
+  value: none
+- name: BuildConfiguration
+  value: release
+- name: BuildPlatform
+  value: anycpu
+- name: ProductBinPath
+  value: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
+- name: runCodesignValidationInjection
+  value: false
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    pool:
+      name: MSSecurity-1ES-Build-Agents-Pool
+      image: windows-2022
+      os: windows
+    customBuildTags:
+    - ES365AIMigrationTooling
+    stages:
+    - stage: stage
+      jobs:
+      - job: Job_1
+        displayName: Agent job 1
+        timeoutInMinutes: 120
+        steps:
+        - checkout: self
+          fetchTags: false
+        - task: NuGetToolInstaller@1
+          displayName: Use NuGet >=5.2.0
+          inputs:
+            versionSpec: '>=5.2.0'
+            checkLatest: true
+        - task: UseDotNet@2
+          displayName: Use .NET Core sdk 3.1
+          inputs:
+            version: 3.x
+        - task: UseDotNet@2
+          displayName: Use .NET Core sdk 5.x
+          inputs:
+            version: 5.x
+            includePreviewVersions: true
+        - task: UseDotNet@2
+          displayName: Use .NET Core sdk 6.x
+          inputs:
+            version: 6.x
+            includePreviewVersions: true
+        - task: DotNetCoreCLI@2
+          displayName: build Microsoft.AspNetCore.OData
+          inputs:
+            projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: build Microsoft.AspNetCore.OData.NewtonsoftJson
+          inputs:
+            projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Build UT(Microsoft.AspNetCore.OData.Tests)
+          inputs:
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Build UT(Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
+          inputs:
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Build E2E(Microsoft.AspNetCore.OData.E2E.Tests)
+          inputs:
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Unit Tests (Microsoft.AspNetCore.OData.Tests)
+          inputs:
+            command: test
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-build --collect "XPlat Code coverage"
+        - task: DotNetCoreCLI@2
+          displayName: Unit Tests (Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
+          inputs:
+            command: test
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-build
+        - task: DotNetCoreCLI@2
+          displayName: E2E Tests (Microsoft.AspNetCore.OData.E2E.Tests)
+          inputs:
+            command: test
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed" --framework netcoreapp3.1
+        - task: CmdLine@2
+          displayName: Install ReportGenerator tool for code coverage
+          inputs:
+            script: dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.5.8
+        - task: CmdLine@2
+          displayName: Create code coverage report
+          inputs:
+            script: reportgenerator -reports:$(Agent.TempDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/coverlet/reports -reporttypes:"Cobertura"
+        - task: PublishCodeCoverageResults@1
+          displayName: 'Publish code coverage '
+          inputs:
+            codeCoverageTool: Cobertura
+            summaryFileLocation: $(Build.SourcesDirectory)/coverlet/reports/Cobertura.xml
