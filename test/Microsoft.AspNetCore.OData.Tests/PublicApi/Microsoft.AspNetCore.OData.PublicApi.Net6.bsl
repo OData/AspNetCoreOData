@@ -2746,7 +2746,14 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize)
 	public TruncatedCollection`1 (IEnumerable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount)
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, bool parameterize)
+	[
+	ObsoleteAttribute(),
+	]
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount)
+
+	[
+	ObsoleteAttribute(),
+	]
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount, bool parameterize)
 
 	bool IsTruncated  { public virtual get; }

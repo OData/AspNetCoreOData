@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using System.Collections.Generic;
@@ -50,6 +51,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Container
         }
 
         [Fact]
+        [Obsolete]
         public void CtorTruncatedCollection_WithQueryable_SetsProperties()
         {
             // Arrange & Act

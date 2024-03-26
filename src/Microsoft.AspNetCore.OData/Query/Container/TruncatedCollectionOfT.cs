@@ -17,6 +17,9 @@ namespace Microsoft.AspNetCore.OData.Query.Container
     /// <typeparam name="T">The collection element type.</typeparam>
     public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable<T>, ICountOptionCollection
     {
+        // The default capacity of the list.
+        // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/List.cs#L23
+        private const int DefaultCapacity = 4;
         private const int MinPageSize = 1;
 
         private bool _isTruncated;
@@ -29,8 +32,10 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="source">The collection to be truncated.</param>
         /// <param name="pageSize">The page size.</param>
         public TruncatedCollection(IEnumerable<T> source, int pageSize)
-            : base(source.Take(checked(pageSize + 1)))
+            : base(checked(pageSize + 1))
         {
+            var items = source.Take(Capacity);
+            AddRange(items);
             Initialize(pageSize);
         }
 
@@ -54,8 +59,10 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
         public TruncatedCollection(IQueryable<T> source, int pageSize, bool parameterize)
-            : base(Take(source, pageSize, parameterize))
+            : base(checked(pageSize + 1))
         {
+            var items = Take(source, pageSize, parameterize);
+            AddRange(items);
             Initialize(pageSize);
         }
 
@@ -66,8 +73,19 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="pageSize">The page size.</param>
         /// <param name="totalCount">The total count.</param>
         public TruncatedCollection(IEnumerable<T> source, int pageSize, long? totalCount)
-            : base(pageSize > 0 ? source.Take(checked(pageSize + 1)) : source)
+            : base(pageSize > 0
+                ? checked(pageSize + 1)
+                : (totalCount > 0 ? (totalCount < int.MaxValue ? (int)totalCount : int.MaxValue) : DefaultCapacity))
         {
+            if (pageSize > 0)
+            {
+                AddRange(source.Take(Capacity));
+            }
+            else
+            {
+                AddRange(source);
+            }
+
             if (pageSize > 0)
             {
                 Initialize(pageSize);
@@ -84,7 +102,9 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="totalCount">The total count.</param>
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
-        public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount) : this(source, pageSize, totalCount, false)
+        [Obsolete("should not be used, will be marked internal in the next major version")]
+        public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount) : this(source, pageSize,
+            totalCount, false)
         {
         }
 
@@ -97,6 +117,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container
         /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         // NOTE: The queryable version calls Queryable.Take which actually gets translated to the backend query where as 
         // the enumerable version just enumerates and is inefficient.
+        [Obsolete("should not be used, will be marked internal in the next major version")]
         public TruncatedCollection(IQueryable<T> source, int pageSize, long? totalCount, bool parameterize)
             : base(pageSize > 0 ? Take(source, pageSize, parameterize) : source)
         {
