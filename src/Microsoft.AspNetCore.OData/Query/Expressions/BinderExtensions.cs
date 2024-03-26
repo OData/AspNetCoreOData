@@ -7,11 +7,14 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.UriParser;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
@@ -354,6 +357,66 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             Expression searchExp = binder.BindSearch(searchClause, context);
             return ExpressionHelpers.Where(source, searchExp, context.ElementClrType);
+        }
+
+        /// <summary>
+        /// Translate an OData $apply parse tree represented by <see cref="TransformationNode"/> to
+        /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
+        /// </summary>
+        /// <param name="binder">The built in <see cref="IAggregationBinder"/></param>
+        /// <param name="source">The original <see cref="IQueryable"/>.</param>
+        /// <param name="transformationNode">The OData $apply parse tree.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+        /// <returns>The applied result.</returns>
+        public static IQueryable ApplyBind(this IAggregationBinder binder, IQueryable source, TransformationNode transformationNode, QueryBinderContext context, out Type resultClrType)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (transformationNode == null)
+            {
+                throw Error.ArgumentNull(nameof(transformationNode));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            resultClrType = transformationNode.Kind == TransformationNodeKind.Aggregate ? typeof(NoGroupByAggregationWrapper) : typeof(AggregationWrapper);
+            context.EnsureFlattenedProperties(context.LambdaParameter, source);
+
+            AggregationBinderHelper binderHelper = new AggregationBinderHelper();
+            source = binderHelper.FlattenReferencedProperties(source, context, context.FlattenedProperties, transformationNode);
+
+            // Answer is query.GroupBy($it => new DynamicType1() {...}).Select($it => new DynamicType2() {...})
+            // We are doing Grouping even if only aggregate was specified to have a IQueryable after aggregation
+
+            // IAggregationBinder.BindGroupBy(transformationNode, context)
+            LambdaExpression groupLambda = binder.BindGroupBy(transformationNode, context) as LambdaExpression;
+            Contract.Assert(groupLambda != null, "groupLambda != null");
+
+            Type groupByType = transformationNode.Kind == TransformationNodeKind.GroupBy ? typeof(GroupByWrapper) : typeof(NoGroupByWrapper);
+
+            // Invoke GroupBy method
+            IQueryable grouping = ExpressionHelpers.GroupBy(source, groupLambda, source.ElementType, groupByType);
+
+            // IAggregationBinder.BindSelect(transformationNode, context)
+            LambdaExpression selectLambda = binder.BindSelect(transformationNode, context) as LambdaExpression;
+            Contract.Assert(selectLambda != null, "selectLambda != null");
+
+            // Invoke Select method
+            var groupingType = typeof(IGrouping<,>).MakeGenericType(groupByType, context.TransformationElementType);
+
+            return ExpressionHelpers.Select(grouping, selectLambda, groupingType);
         }
     }
 }

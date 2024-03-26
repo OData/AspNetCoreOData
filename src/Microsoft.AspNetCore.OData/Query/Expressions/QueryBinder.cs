@@ -1093,13 +1093,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                //   return GetFlattenedPropertyExpression(propertyPath, context)
-                //      ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (!propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
-
                 bool isAggregated = context.ElementClrType == typeof(AggregationWrapper);
 
                 return GetFlattenedPropertyExpression(propertyPath, context)
-                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyName, isAggregated), context);
+                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (context.HasInstancePropertyContainer && !propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
             }
         }
 
@@ -1211,7 +1208,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return source;
         }
 
-        internal Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
+        internal static Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
         {
             Type conversionType = context.Model.GetClrType(convertNode.TypeReference, context.AssembliesResolver);
 
@@ -1358,6 +1355,146 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     return NullConstant;
                 }
             }
+        }
+
+        internal static IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context, IQueryable query)
+        {
+            if (!typeof(GroupByWrapper).IsAssignableFrom(query.ElementType))
+            {
+                return null;
+            }
+
+            var expression = query.Expression as MethodCallExpression;
+            if (expression == null)
+            {
+                return null;
+            }
+
+            // After $apply we could have other clauses, like $filter, $orderby etc.
+            // Skip of filter expressions
+            expression = SkipFilters(expression);
+
+            if (expression == null)
+            {
+                return null;
+            }
+
+            var result = new Dictionary<string, Expression>();
+            CollectContainerAssignments(source, expression, result);
+            if (context.HasInstancePropertyContainer)
+            {
+                var instanceProperty = Expression.Property(source, "Instance");
+                if (typeof(DynamicTypeWrapper).IsAssignableFrom(instanceProperty.Type))
+                {
+                    var computeExpression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+                    computeExpression = SkipFilters(computeExpression);
+                    if (computeExpression != null)
+                    {
+                        CollectContainerAssignments(instanceProperty, computeExpression, result);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static MethodCallExpression SkipFilters(MethodCallExpression expression)
+        {
+            while (expression.Method.Name == "Where")
+            {
+                expression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+            }
+
+            return expression;
+        }
+
+        private static void CollectContainerAssignments(Expression source, MethodCallExpression expression, Dictionary<string, Expression> result)
+        {
+            CollectAssigments(result, Expression.Property(source, "GroupByContainer"), ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, "GroupByContainer"));
+            CollectAssigments(result, Expression.Property(source, "Container"), ExtractContainerExpression(expression, "Container"));
+        }
+
+        private static void CollectAssigments(IDictionary<string, Expression> flattenPropertyContainer, Expression source, MemberInitExpression expression, string prefix = null)
+        {
+            if (expression == null)
+            {
+                return;
+            }
+
+            string nameToAdd = null;
+            Type resultType = null;
+            MemberInitExpression nextExpression = null;
+            Expression nestedExpression = null;
+            foreach (var expr in expression.Bindings.OfType<MemberAssignment>())
+            {
+                var initExpr = expr.Expression as MemberInitExpression;
+                if (initExpr != null && expr.Member.Name == "Next")
+                {
+                    nextExpression = initExpr;
+                }
+                else if (expr.Member.Name == "Name")
+                {
+                    nameToAdd = (expr.Expression as ConstantExpression).Value as string;
+                }
+                else if (expr.Member.Name == "Value" || expr.Member.Name == "NestedValue")
+                {
+                    resultType = expr.Expression.Type;
+                    if (resultType == typeof(object) && expr.Expression.NodeType == ExpressionType.Convert)
+                    {
+                        resultType = ((UnaryExpression)expr.Expression).Operand.Type;
+                    }
+
+                    if (typeof(GroupByWrapper).IsAssignableFrom(resultType))
+                    {
+                        nestedExpression = expr.Expression;
+                    }
+                }
+            }
+
+            if (prefix != null)
+            {
+                nameToAdd = prefix + "\\" + nameToAdd;
+            }
+
+            if (typeof(GroupByWrapper).IsAssignableFrom(resultType))
+            {
+                flattenPropertyContainer.Add(nameToAdd, Expression.Property(source, "NestedValue"));
+            }
+            else
+            {
+                flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, "Value"), resultType));
+            }
+
+            if (nextExpression != null)
+            {
+                CollectAssigments(flattenPropertyContainer, Expression.Property(source, "Next"), nextExpression, prefix);
+            }
+
+            if (nestedExpression != null)
+            {
+                var nestedAccessor = ((nestedExpression as MemberInitExpression).Bindings.First() as MemberAssignment).Expression as MemberInitExpression;
+                var newSource = Expression.Property(Expression.Property(source, "NestedValue"), "GroupByContainer");
+                CollectAssigments(flattenPropertyContainer, newSource, nestedAccessor, nameToAdd);
+            }
+        }
+
+        private static MemberInitExpression ExtractContainerExpression(MethodCallExpression expression, string containerName)
+        {
+            if (expression == null || expression.Arguments.Count < 2)
+            {
+                return null;
+            }
+
+            var memberInitExpression = ((expression.Arguments[1] as UnaryExpression).Operand as LambdaExpression).Body as MemberInitExpression;
+            if (memberInitExpression != null)
+            {
+                var containerAssigment = memberInitExpression.Bindings.FirstOrDefault(m => m.Member.Name == containerName) as MemberAssignment;
+                if (containerAssigment != null)
+                {
+                    return containerAssigment.Expression as MemberInitExpression;
+                }
+            }
+            return null;
         }
 
         private static Expression Any(Expression source, Expression filter)
