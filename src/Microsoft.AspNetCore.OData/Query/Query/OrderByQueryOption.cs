@@ -82,6 +82,13 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.NavigationSource,
                 new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } },
                 context.RequestContainer);
+
+            if (context.RequestContainer == null)
+            {
+                // By default, let's enable the property name case-insensitive
+                _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
+            }
+
             _queryOptionParser.ParseApply();
         }
 
@@ -107,6 +114,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.NavigationSource,
                 new Dictionary<string, string> { { "$orderby", rawValue } },
                 context.RequestContainer);
+
+            if (context.RequestContainer == null)
+            {
+                // By default, let's enable the property name case-insensitive
+                _queryOptionParser.Resolver.EnableCaseInsensitive = true;
+            }
         }
 
         internal OrderByQueryOption(OrderByQueryOption orderBy)

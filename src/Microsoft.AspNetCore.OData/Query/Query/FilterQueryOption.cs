@@ -83,6 +83,12 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.NavigationSource,
                 new Dictionary<string, string> { { "$filter", rawValue } },
                 context.RequestContainer);
+
+            if (context.RequestContainer == null)
+            {
+                // By default, let's enable the property name case-insensitive
+                _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
+            }
         }
 
         /// <summary>
