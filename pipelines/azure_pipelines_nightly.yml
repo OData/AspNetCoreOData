@@ -256,3 +256,4 @@ extends:
                       "toolVersion": "1.0"
                   }
               ]
+            VersboseLogin: true
