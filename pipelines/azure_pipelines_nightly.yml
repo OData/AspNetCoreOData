@@ -206,6 +206,7 @@ extends:
                   "toolVersion": "6.2.9304.0"
                 }
               ]
+            VerboseLogin: true
         - task: MSBuild@1
           displayName: Get Nuget Package Metadata
           inputs:
