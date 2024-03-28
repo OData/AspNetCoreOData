@@ -142,10 +142,10 @@ extends:
           displayName: Use .NET Core SDK 2.x
           inputs:
             version: 2.x
-        - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        - task: EsrpCodeSigning@1
           displayName: ESRP CodeSigning - WebAPI OData Product Signing
           inputs:
-            ConnectedServiceName: ESRP CodeSigning - OData
+            ConnectedServiceName: 'ESRP CodeSigning - OData'
             FolderPath: $(ProductBinPath)
             Pattern: Microsoft.AspNetCore.OData.dll,Microsoft.AspNetCore.OData.NewtonsoftJson.dll
             signConfigType: inlineSignParams
