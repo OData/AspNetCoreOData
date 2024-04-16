@@ -57,7 +57,7 @@ extends:
             packageParentPath: '$(Build.ArtifactStagingDirectory)'
             packagesToPush: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*.nupkg
             nuGetFeedType: external
-            externalEndpoint: MyGet.org - WebApi Netcore Feed
+            publishFeedCredentials: MyGet.org - WebApi Netcore Feed
         steps:
         - checkout: self
           fetchTags: true
