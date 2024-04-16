@@ -51,6 +51,7 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish Artifact - Nuget Packages'
             targetPath: $(Build.ArtifactStagingDirectory)\Nuget
+            artifactName: dropNuGet
           - output: nuget
             displayName: 'MyGet push - Nightly packages to MyGet'
             packageParentPath: '$(Build.ArtifactStagingDirectory)'
