@@ -43,7 +43,7 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish Artifact - .NET output Build'
             targetPath: $(Build.ArtifactStagingDirectory)\output
-            artifactName: drop
+            artifactName: dropOutput
           - output: pipelineArtifact
             displayName: 'Publish Artifact - SBOM'
             targetPath: $(Build.ArtifactStagingDirectory)\output
@@ -51,11 +51,11 @@ extends:
           - output: pipelineArtifact
             displayName: 'Publish Artifact - Nuget Packages'
             targetPath: $(Build.ArtifactStagingDirectory)\Nuget
-            artifactName: dropNuGet
+            artifactName: drop
           - output: nuget
             displayName: 'MyGet push - Nightly packages to MyGet'
             packageParentPath: '$(Build.ArtifactStagingDirectory)'
-            searchPatternPush: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*.nupkg
+            packagesToPush: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*.nupkg
             nuGetFeedType: external
             externalEndpoint: MyGet.org - WebApi Netcore Feed
         steps:
