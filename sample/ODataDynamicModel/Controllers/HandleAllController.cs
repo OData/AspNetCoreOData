@@ -153,6 +153,8 @@ namespace ODataDynamicModel.Controllers
             var segment = odataPath.FirstSegment as EntitySetSegment;
             IEdmNavigationSource source = segment?.EntitySet;
             ODataQueryOptionParser parser = new(Request.GetModel(), edmEntityType, source, options);
+            parser.Resolver.EnableCaseInsensitive = true;
+
             //Set the SelectExpand Clause on the ODataFeature otherwise  Odata formatter won't show the expand and select properties in the response.
             Request.ODataFeature().SelectExpandClause = parser.ParseSelectAndExpand();
         }
