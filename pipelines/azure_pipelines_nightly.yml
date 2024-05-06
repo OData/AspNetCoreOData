@@ -36,7 +36,7 @@ extends:
     - stage: stage
       jobs:
       - job: Main
-        displayName: Main build
+        displayName: Main Build
         timeoutInMinutes: 360
         templateContext:
           outputs:
