@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
             // Act
             HttpResponseMessage response = await client.SendAsync(request);
 
-            //
+            // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var resultArray = await response.Content.ReadAsObject<JArray>();
 
