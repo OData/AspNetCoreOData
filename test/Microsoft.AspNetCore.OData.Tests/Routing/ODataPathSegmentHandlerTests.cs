@@ -374,7 +374,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
             // Arrange
             EdmEntityType entityType = new EdmEntityType("NS", "Entity");
             IEdmStructuralProperty key1 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(false));
-            IEdmStructuralProperty key2 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetString(false));
+            IEdmStructuralProperty key2 = entityType.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(false));
 
             entityType.AddKeys(key1, key2);
             IEnumerable<KeyValuePair<string, object>> keys = new KeyValuePair<string, object>[]
@@ -388,6 +388,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Routing
 
             // Assert
             Assert.Equal("Id=4,Name='abc'", actual);
+        }
+
+        [Fact]
+        public void ConvertKeysToString_ConvertKeysValues_ShouldEscapeUriString()
+        {
+            // Arrange
+            EdmEntityType entityType = new EdmEntityType("NS", "Entity");
+            IEdmStructuralProperty key1 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(false));
+            IEdmStructuralProperty key2 = entityType.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(false));
+
+            entityType.AddKeys(key1, key2);
+            IEnumerable<KeyValuePair<string, object>> keys = new KeyValuePair<string, object>[]
+            {
+                KeyValuePair.Create("Id", (object)4),
+                KeyValuePair.Create("Name", (object)"2425/&Foo")
+            };
+
+            // Act
+            string actual = ODataPathSegmentHandler.ConvertKeysToString(keys, entityType);
+
+            // Assert
+            Assert.Equal("Id=4,Name='2425%2F&Foo'", actual);
         }
 
         [Fact]
