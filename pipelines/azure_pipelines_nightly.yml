@@ -1,3 +1,4 @@
+trigger: none
 schedules:
 - cron: 0 5 * * 1,2,3,4,5
   branches:
@@ -7,160 +8,244 @@ resources:
   repositories:
   - repository: self
     type: git
-    ref: main
-
+    ref: refs/heads/main
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+name: $(Date:yyyyMMdd).$(Rev:r)
 variables:
-  BuildPlatformDirName: 'AnyCpu'
-  buildConfiguration: 'Release'
-  rootDir: '$(Build.SourcesDirectory)'
-  productBinPath: '$(rootDir)\bin\$(BuildPlatformDirName)\$(buildConfiguration)'
-  RELEASE_SEMANTICS: '$(ReleaseSemantics)'
-  SourcesRoot: '$(rootDir)'
-stages: 
-- stage: Build
-  jobs:
-  - job: Main
-    displayName: Main Build
-    timeoutInMinutes: 120
+- name: AzureServicesAuthConnectionString
+  value: ''
+- name: BuildConfiguration
+  value: release
+- name: BuildPlatform
+  value: anycpu
+- name: ProductBinPath
+  value: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
     pool:
-      vmImage: windows-latest
-    steps:
-    - checkout: self
-    - task: NuGetToolInstaller@1
-      displayName: Use NuGet >=5.2.0
-      inputs:
-        versionSpec: '>=5.2.0'
-        checkLatest: true
-    - task: UseDotNet@2
-      displayName: Use .NET Core sdk 3.1
-      inputs:
-        version: 3.x
-    - task: UseDotNet@2
-      displayName: Use .NET Core sdk 5.x
-      inputs:
-        version: 5.x
-        includePreviewVersions: true
-    - task: UseDotNet@2
-      displayName: 'Use .NET Core SDK 6.x'
-      inputs:
-        version: 6.x
-        includePreviewVersions: true
-    - task: DotNetCoreCLI@2
-      displayName: Build Microsoft.AspNetCore.OData
-      inputs:
-        projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
-        arguments: --configuration $(BuildConfiguration) --no-incremental
-    - task: DotNetCoreCLI@2
-      displayName: Build Microsoft.AspNetCore.OData.NewtonsoftJson
-      inputs:
-        projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
-        arguments: --configuration $(BuildConfiguration) --no-incremental
-    - task: DotNetCoreCLI@2
-      displayName: Build UT(Microsoft.AspNetCore.OData.Tests)
-      inputs:
-        projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
-        arguments: --configuration $(BuildConfiguration) --no-incremental
-    - task: DotNetCoreCLI@2
-      displayName: Build UT(Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
-      inputs:
-        projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
-        arguments: --configuration $(BuildConfiguration) --no-incremental
-    - task: DotNetCoreCLI@2
-      displayName: Build E2E(Microsoft.AspNetCore.OData.E2E.Tests)
-      inputs:
-        projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
-        arguments: --configuration $(BuildConfiguration) --no-incremental
-    - task: DotNetCoreCLI@2
-      displayName: Unit Tests (Microsoft.AspNetCore.OData.Tests)
-      inputs:
-        command: test
-        projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
-        arguments: --configuration $(BuildConfiguration) --no-build
-    - task: DotNetCoreCLI@2
-      displayName: Unit Tests (Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
-      inputs:
-        command: test
-        projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
-        arguments: --configuration $(BuildConfiguration) --no-build
-    - task: DotNetCoreCLI@2
-      displayName: E2E Tests (Microsoft.AspNetCore.OData.E2E.Tests)
-      inputs:
-        command: test
-        projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
-        arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed" --framework netcoreapp3.1
-    - task: DotNetCoreCLI@2
-      displayName: Build Microsoft.AspNetCore.OData.NewtonsoftJson
-      inputs:
-        projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
-        arguments: --configuration $(BuildConfiguration) --no-incremental
-
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: custom
-        custom: pack
-        arguments: >
-          $(rootDir)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
-          /p:NuspecFile=$(rootDir)\src\Microsoft.AspNetCore.OData.$(RELEASE_SEMANTICS).nuspec
-          --configuration=$(buildConfiguration) 
-          --output=$(Build.ArtifactStagingDirectory)\Packages 
-          -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
-      displayName: Packing ASP.NET Core OData
-
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: custom
-        custom: pack
-        arguments: >
-          $(rootDir)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj 
-          /p:NuspecFile=$(rootDir)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.$(RELEASE_SEMANTICS).nuspec
-          --configuration=$(buildConfiguration) 
-          --output=$(Build.ArtifactStagingDirectory)\Packages 
-          -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
-      displayName: Packing  NewtonsoftJson
-
-    - publish: $(Build.ArtifactStagingDirectory)\Packages
-      displayName: Publish Build Artifacts  
-      artifact: BuildPackages
-
-    - publish: configs
-      displayName: Publish Signing Scripts
-      artifact: configs
-
-- stage: CodeSign
-  condition: and(succeeded('Build'), not(eq(variables['build.reason'], 'PullRequest')))
-  jobs:
-  - deployment: CodeSign
-    displayName: Code Signing
-    pool:
-      vmImage: windows-latest    
-    environment: Code Sign - Approvals
-    variables:
-    - group: Code Signing
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: custom
-              custom: tool
-              arguments: install --tool-path . SignClient
-            displayName: Install SignTool tool
-
-          - pwsh: |
-              .\SignClient "Sign" `
-              --baseDirectory "$(Pipeline.Workspace)\BuildPackages" `
-              --input "**/*.nupkg" `
-              --config "$(Pipeline.Workspace)\configs\SignClient.json" `
-              --filelist "$(Pipeline.Workspace)\configs\filelist.txt" `
-              --user "$(SignClientUser)" `
-              --secret "$(SignClientSecret)" `
-              --name "Code Sign packages" `
-              --description "Signing packages" `
-              --descriptionUrl "https://github.com/OData/AspNetCoreOData"
-            displayName: Sign packages
-              
-          - publish: $(Pipeline.Workspace)/BuildPackages
-            displayName: Publish Signed Packages
-            artifact: SignedPackages
-...
+      name: MSSecurity-1ES-Build-Agents-Pool
+      image: MSSecurity-1ES-Windows-2022
+      os: windows
+    customBuildTags:
+    - ES365AIMigrationTooling
+    stages:
+    - stage: stage
+      jobs:
+      - job: Main
+        displayName: Main Build
+        timeoutInMinutes: 360
+        templateContext:
+          outputs:
+          - output: pipelineArtifact
+            displayName: 'Publish Artifact - .NET output Build'
+            targetPath: $(Build.ArtifactStagingDirectory)\output
+            artifactName: dropOutput
+          - output: pipelineArtifact
+            displayName: 'Publish Artifact - SBOM'
+            targetPath: $(Build.ArtifactStagingDirectory)\output
+            artifactName: dropSBOM
+          - output: pipelineArtifact
+            displayName: 'Publish Artifact - Nuget Packages'
+            targetPath: $(Build.ArtifactStagingDirectory)\Nuget
+            artifactName: drop
+          - output: nuget
+            displayName: 'MyGet push - Nightly packages to MyGet'
+            packageParentPath: '$(Build.ArtifactStagingDirectory)'
+            packagesToPush: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*.nupkg
+            nuGetFeedType: external
+            publishFeedCredentials: 'MyGet.org - AspNetCoreOData Feed'
+        steps:
+        - checkout: self
+          fetchTags: true
+        - task: NuGetToolInstaller@1
+          displayName: Use NuGet >=5.2.0
+          inputs:
+            versionSpec: '>=5.2.0'
+            checkLatest: true
+        - task: UseDotNet@2
+          displayName: Use .NET Core SDK 3.1
+          inputs:
+            version: 3.x
+        - task: UseDotNet@2
+          displayName: Use .NET Core SDK 5.x
+          inputs:
+            version: 5.x
+            includePreviewVersions: true
+        - task: UseDotNet@2
+          displayName: Use .NET Core SDK 6.x
+          inputs:
+            version: 6.x
+            includePreviewVersions: true
+        - task: DotNetCoreCLI@2
+          displayName: Build Microsoft.AspNetCore.OData
+          inputs:
+            projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Build Microsoft.AspNetCore.OData.NewtonsoftJson
+          inputs:
+            projects: $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson\Microsoft.AspNetCore.OData.NewtonsoftJson.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: CopyFiles@2
+          displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)\output'
+          inputs:
+            SourceFolder: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)\
+            Contents: '**\Microsoft.AspNetCore.OData.*'
+            TargetFolder: $(Build.ArtifactStagingDirectory)\output
+        - task: DotNetCoreCLI@2
+          displayName: Build UT (Microsoft.AspNetCore.OData.Tests)
+          inputs:
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: 'Build UT (Microsoft.AspNetCore.OData.NewtonsoftJson Tests) '
+          inputs:
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Build E2E (Microsoft.AspNetCore.OData.E2E.Tests)
+          inputs:
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-incremental
+        - task: DotNetCoreCLI@2
+          displayName: Unit Tests (Microsoft.AspNetCore.OData.Tests)
+          inputs:
+            command: test
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.Tests\Microsoft.AspNetCore.OData.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-build
+        - task: DotNetCoreCLI@2
+          displayName: Unit Tests (Microsoft.AspNetCore.OData.NewtonsoftJson.Tests)
+          inputs:
+            command: test
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests\Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-build
+        - task: DotNetCoreCLI@2
+          displayName: E2E Tests (Microsoft.AspNetCore.OData.E2E.Tests)
+          inputs:
+            command: test
+            projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
+            arguments: --configuration $(BuildConfiguration) --no-build
+        - task: UseDotNet@2
+          displayName: Use .NET Core SDK 2.x
+          inputs:
+            version: 2.x
+        - task: EsrpCodeSigning@1
+          displayName: ESRP CodeSigning - WebAPI OData Product Signing
+          inputs:
+            ConnectedServiceName: 'ESRP CodeSigning - OData'
+            FolderPath: $(ProductBinPath)
+            Pattern: Microsoft.AspNetCore.OData.dll,Microsoft.AspNetCore.OData.NewtonsoftJson.dll
+            signConfigType: inlineSignParams
+            inlineOperation: |-
+              [
+                {
+                  "keyCode": "MSSharedLibSnKey",
+                  "operationSetCode": "StrongNameSign",
+                  "parameters": null,
+                  "toolName": "sn.exe",
+                  "toolVersion": "V4.6.1586.0"
+                },
+                {
+                  "keyCode": "MSSharedLibSnKey",
+                  "operationSetCode": "StrongNameVerify",
+                  "parameters": null,
+                  "toolName": "sn.exe",
+                  "toolVersion": "V4.6.1586.0"
+                },
+                {
+                  "keyCode": "CP-230012",
+                  "operationSetCode": "SigntoolSign",
+                  "parameters": [
+                  {
+                    "parameterName": "OpusName",
+                    "parameterValue": "Microsoft"
+                  },
+                  {
+                    "parameterName": "OpusInfo",
+                    "parameterValue": "http://www.microsoft.com"
+                  },
+                  {
+                    "parameterName": "PageHash",
+                    "parameterValue": "/NPH"
+                  },
+                  {
+                    "parameterName": "FileDigest",
+                    "parameterValue": "/fd sha256"
+                  },
+                  {
+                    "parameterName": "TimeStamp",
+                    "parameterValue": "/tr \"http://rfc3161.gtm.corp.microsoft.com/TSS/HttpTspServer\" /td sha256"
+                  }
+                  ],
+                  "toolName": "signtool.exe",
+                  "toolVersion": "6.2.9304.0"
+                },
+                {
+                  "keyCode": "CP-230012",
+                  "operationSetCode": "SigntoolVerify",
+                  "parameters": [
+                  {
+                    "parameterName": "VerifyAll",
+                    "parameterValue": "/all"
+                  }
+                  ],
+                  "toolName": "signtool.exe",
+                  "toolVersion": "6.2.9304.0"
+                }
+              ]
+            VerboseLogin: true
+        - task: MSBuild@1
+          displayName: Get Nuget Package Metadata
+          inputs:
+            solution: tool/GetNugetPackageMetadata.proj
+            platform: $(BuildPlatform)
+            configuration: $(BuildConfiguration)
+        - task: NuGetCommand@2
+          displayName: NuGet - pack Microsoft.AspNetCore.OData Nightly
+          inputs:
+            command: custom
+            arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.Nightly.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Nuget -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic);ODataModelBuilderPackageDependency="$(ODataModelBuilderPackageDependency)";ODataLibPackageDependency="$(ODataLibPackageDependency)" -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
+        - task: NuGetCommand@2
+          displayName: NuGet - pack Microsoft.AspNetCore.OData Release
+          inputs:
+            command: custom
+            arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.Release.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Nuget -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic);ODataModelBuilderPackageDependency="$(ODataModelBuilderPackageDependency)";ODataLibPackageDependency="$(ODataLibPackageDependency)" -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
+        - task: NuGetCommand@2
+          displayName: NuGet - pack Microsoft.AspNetCore.OData.NewtonsoftJson Nightly
+          inputs:
+            command: custom
+            arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.Nightly.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Nuget -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic) -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
+        - task: NuGetCommand@2
+          displayName: NuGet - pack Microsoft.AspNetCore.OData.NewtonsoftJson Release
+          inputs:
+            command: custom
+            arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.Release.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Nuget -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic) -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
+        - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+          displayName: ESRP CodeSigning - WebAPI OData Packages Signing
+          inputs:
+            ConnectedServiceName: ESRP CodeSigning - OData
+            FolderPath: $(Build.ArtifactStagingDirectory)\Nuget
+            Pattern: '*.nupkg'
+            signConfigType: inlineSignParams
+            inlineOperation: |-
+              [
+                  {
+                      "keyCode": "CP-401405",
+                      "operationSetCode": "NuGetSign",
+                      "parameters": [ ],
+                      "toolName": "sign",
+                      "toolVersion": "1.0"
+                  },
+                  {
+                      "keyCode": "CP-401405",
+                      "operationSetCode": "NuGetVerify",
+                      "parameters": [ ],
+                      "toolName": "sign",
+                      "toolVersion": "1.0"
+                  }
+              ]
+            VersboseLogin: true
