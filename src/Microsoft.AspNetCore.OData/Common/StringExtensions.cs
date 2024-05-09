@@ -28,6 +28,21 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
+        /// Escape Uri string for '/'
+        /// </summary>
+        /// <param name="uriString">The Uri string.</param>
+        /// <returns>Escaped back slash Uri string.</returns>
+        public static string EscapeBackSlashUriString(this string uriString)
+        {
+            if (uriString == null)
+            {
+                return null;
+            }
+
+            return uriString.Replace("/", "%2F");
+        }
+
+        /// <summary>
         /// Normalize the http method.
         /// </summary>
         /// <param name="method">The http method.</param>

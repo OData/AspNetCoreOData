@@ -1055,6 +1055,13 @@
             <param name="uriString">The Uri string.</param>
             <returns>Unescaped back slash Uri string.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.EscapeBackSlashUriString(System.String)">
+            <summary>
+            Escape Uri string for '/'
+            </summary>
+            <param name="uriString">The Uri string.</param>
+            <returns>Escaped back slash Uri string.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.StringExtensions.NormalizeHttpMethod(System.String)">
             <summary>
             Normalize the http method.
@@ -1101,6 +1108,20 @@
             </summary>
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.DateOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a DateOnly; false otherwise.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
+            <summary>
+            Determine if a type is a <see cref="T:System.TimeOnly"/>.
+            </summary>
+            <param name="clrType">The type to test.</param>
+            <returns>True if the type is a TimeOnly; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
@@ -15564,22 +15585,6 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate" /> class.
             </summary>
-            <param name="segment">The value segment.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">
-            <summary>
-            Gets the value segment.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
-            <inheritdoc />
-        </member>
-    </members>
-</doc>
-ummary>
             <param name="segment">The value segment.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.Segment">

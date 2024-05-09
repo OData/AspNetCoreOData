@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -305,6 +306,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 return string.Empty;
             }
 
+            // only one key
             if (keyValuePairs.Count < 2)
             {
                 var keyValue = keyValuePairs.First();
@@ -316,16 +318,17 @@ namespace Microsoft.AspNetCore.OData.Routing
                     return string.Join(
                         ",",
                         keyValuePairs.Select(keyValuePair =>
-                            TranslateNode(keyValuePair.Value)).ToArray());
+                            TranslateNode(keyValuePair.Value).EscapeBackSlashUriString()).ToArray());
                 }
             }
 
+            // composite keys or alternate key(s)
             return string.Join(
                 ",",
                 keyValuePairs.Select(keyValuePair =>
                     (keyValuePair.Key +
                      "=" +
-                     TranslateNode(keyValuePair.Value))).ToArray());
+                     TranslateNode(keyValuePair.Value).EscapeBackSlashUriString())).ToArray());
         }
 
         internal static string TranslateNode(object node)
