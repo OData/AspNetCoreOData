@@ -94,6 +94,11 @@ namespace Microsoft.AspNetCore.OData.Query
                         context.RequestContainer)
                     : null)
         {
+            if (_queryOptionParser != null && context.RequestContainer == null)
+            {
+                // By default, let's enable the property name case-insensitive
+                _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
+            }
         }
 
         /// <summary>

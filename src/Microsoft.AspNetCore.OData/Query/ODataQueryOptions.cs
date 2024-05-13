@@ -843,6 +843,13 @@ namespace Microsoft.AspNetCore.OData.Query
                     Context.NavigationSource,
                     queryParameters,
                     Context.RequestContainer); // the Context.RequestContainer could be null for non-edm model
+
+                if (Context.RequestContainer == null)
+                {
+                    // By default, let's enable the property name case-insensitive
+                    _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
+                }
+
                 var originalSelectExpand = SelectExpand;
                 SelectExpand = new SelectExpandQueryOption(
                     autoSelectRawValue,
@@ -1160,7 +1167,7 @@ namespace Microsoft.AspNetCore.OData.Query
             else
             {
                 // By default, let's enable the property name case-insensitive
-                _queryOptionParser.Resolver = new ODataUriResolver { EnableCaseInsensitive = true };
+                _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
             }
 
             BuildQueryOptions(normalizedQueryParameters);
