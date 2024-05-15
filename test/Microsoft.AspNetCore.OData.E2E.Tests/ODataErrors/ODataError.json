@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "NRE",
+    "message": "Object reference not set to a instance of an object",
+    "target":  "Web API"
+  }
+}

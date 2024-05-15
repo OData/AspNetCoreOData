@@ -8,6 +8,8 @@
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
+using System.IO;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -193,6 +195,29 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
 
             string payload = await response.Content.ReadAsStringAsync();
             Assert.Equal(expectedResponse, payload);
+        }
+
+        [Fact]
+        public void TestDirectoryAccess()
+        {
+            var odataErrorJsonFile = Path.Combine(Environment.CurrentDirectory, "ODataErrors\\ODataError.json");
+
+            try
+            {
+
+                if (File.Exists(odataErrorJsonFile))
+                {
+                    Assert.True(true);
+                }
+                else
+                {
+                    Assert.True(false, "ODataError.json file not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                Assert.True(false, ex.Message);
+            }
         }
     }
 }
