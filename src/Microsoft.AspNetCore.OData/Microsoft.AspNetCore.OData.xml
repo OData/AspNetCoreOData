@@ -1109,20 +1109,6 @@
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
             Determine if a type is a TimeSpan.
@@ -1767,6 +1753,19 @@
             <summary>
             Overwrites the <paramref name="original"/> entity with the values stored in this Delta.
             <remarks>The semantics of this operation are equivalent to a HTTP PUT operation, hence the name.</remarks>
+            </summary>
+            <param name="original">The entity to be updated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.TryGetPropertyRef(`0,System.String,System.Object@)">
+            <summary>
+            Attempts to get the property by the specified name.
+            </summary>
+            <param name="structural">The structural object.</param>
+            <param name="propertyName">Name of the property.</param>
+            <param name="propertyRef">Output for property value.</param>
+            <returns>true if the property is found; false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Deltas.Detion, hence the name.</remarks>
             </summary>
             <param name="original">The entity to be updated.</param>
         </member>
@@ -4180,17 +4179,7 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseHeaders(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext)">
             <inheritdoc/>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseBodyAsync(Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext,System.Text.Encoding)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetDefaultBaseAddress(Microsoft.AspNetCore.Http.HttpRequest)">
-            <summary>
-            Returns a base address to be used in the service root when reading or writing OData uris.
-            </summary>
-            <param name="request">The HttpRequest object for the given request.</param>
-            <returns>The base address to be used as part of the service root in the OData uri; must terminate with a trailing '/'.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.GetBaseAddressInternal(Microsoft.AspNetCore.Http.HttpRequest)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter.WriteResponseBodyAsync(Microsoftter.GetBaseAddressInternal(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Internal method used for selecting the base address to be used with OData uris.
             If the consumer has provided a delegate for overriding our default implementation,
@@ -4392,6 +4381,12 @@
             </summary>
             <param name="writeContext">The serializer context.</param>
             <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
+            <returns>A new <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetormatter.ResourceSetContext.Create(Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext,System.Collections.Generic.IAsyncEnumerable{System.Object})">
+            <summary>
+            Create a <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/> from an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/> and <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/>.
+            </summary>
+            <param name="writeContext">The serializer context.</param>
+            <param name="resourceSetInstance">The instance representing the resourceSet being written.</param>
             <returns>A new <see cref="T:Microsoft.AspNetCore.OData.Formatter.ResourceSetContext"/>.</returns>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
@@ -4538,15 +4533,7 @@
             <param name="metadataLevel">The OData metadata level of the response.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer">
-            <summary>
-            OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" />
-            The Collection is of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmChangedObject"/> which is the base interface implemented by all objects which are a part of the DeltaResourceSet payload.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
-            <summary>
-            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer"/>.
-            </summary>
+            <summaryummary>
             <param name="serializerProvider">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider"/> to use to write nested entries.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
@@ -4740,6 +4727,15 @@
             <inheritdoc/>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.CreateODataPrimitiveValue(System.Object,Microsoft.OData.Edm.IEdmPrimitiveTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> for the object represented by <paramref name="graph"/>.
+            </summary>
+            <param name="graph">The primitive value.</param>
+            <param name="primitiveType">The EDM primitive type of the value.</param>
+            <param name="writeContext">The serializer write context.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataPrimitiveValue"/>.</returns>
+        </member>
+        <member name="T:Mierialization.ODataPrimitiveSerializer.CreateODataPrimitiveValue(System.Object,Microsoft.OData.Edm.IEdmPrimitiveTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
             Creates an <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> for the object represented by <paramref name="graph"/>.
             </summary>
@@ -6855,20 +6851,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingBody">
             <summary>
-              Looks up a localized string similar to The &apos;Body&apos; property on the batch request cannot be null..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingBoundary">
-            <summary>
-              Looks up a localized string similar to The batch request must have a boundary specification in the &quot;Content-Type&quot; header..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestMissingContentType">
-            <summary>
-              Looks up a localized string similar to The batch request must have a &quot;Content-Type&quot; header..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.BinaryOperatorNotSupported">
+            <member name="P:Microsoft.AspNetCore.OData.SRResources.BinaryOperatorNotSupported">
             <summary>
               Looks up a localized string similar to A binary operator with incompatible types was detected. Found operand types &apos;{0}&apos; and &apos;{1}&apos; for operator kind &apos;{2}&apos;..
             </summary>
@@ -6986,6 +6969,19 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.DeltaEntityTypeNotAssignable">
             <summary>
               Looks up a localized string similar to The actual entity type &apos;{0}&apos; is not assignable to the expected type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.DeltaNestedResourceNameNotFound">
+            <summary>
+              Looks up a localized string similar to Cannot find nested resource name &apos;{0}&apos; in parent resource type &apos;{1}&apos;.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.DeltaTypeMismatch">
+            <summary>
+              Looks up a localized string similar to Cannot use Delta of type &apos;{0}&apos; on an entity of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRRs; is not assignable to the expected type &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.DeltaNestedResourceNameNotFound">

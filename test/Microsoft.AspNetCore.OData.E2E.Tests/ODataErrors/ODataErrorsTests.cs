@@ -211,7 +211,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
                 }
                 else
                 {
-                    Assert.True(false, "ODataError.json file not found");
+                    Assert.True(false, $"ODataError.json file not found. Current Directory: {Environment.CurrentDirectory}");
                 }
             }
             catch (Exception ex)
