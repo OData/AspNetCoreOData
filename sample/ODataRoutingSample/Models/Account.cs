@@ -18,6 +18,8 @@ namespace ODataRoutingSample.Models
         public Address HomeAddress { get; set; }
 
         public AccountInfo AccountInfo { get; set; }
+
+        public string Temporary { get; set; }
     }
 
     public class AccountInfo
