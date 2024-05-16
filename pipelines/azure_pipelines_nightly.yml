@@ -33,7 +33,7 @@ extends:
     customBuildTags:
     - ES365AIMigrationTooling
     stages:
-    - stage: Main
+    - stage: build
       jobs:
       - job: Main
         displayName: Main Build
