@@ -5,10 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Parser;
@@ -26,6 +28,62 @@ namespace Microsoft.AspNetCore.OData
     /// </summary>
     public static class ODataServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds essential OData services to the specified <see cref="IServiceCollection" />.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <returns>A <see cref="IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        public static IServiceCollection AddOData(this IServiceCollection services)
+        {
+            return services.AddOData(opt => { });
+        }
+
+        /// <summary>
+        /// Adds essential OData services to the specified <see cref="IServiceCollection" />.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="setupAction">The OData options to configure the services with,
+        /// including access to a service provider which you can resolve services from.</param>
+        /// <returns>A <see cref="IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataOptions> setupAction)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            if (setupAction == null)
+            {
+                throw Error.ArgumentNull(nameof(setupAction));
+            }
+
+            services.AddODataCore().Configure(setupAction);
+            return services;
+        }
+
+        /// <summary>
+        /// Adds essential OData services to the specified <see cref="IServiceCollection" />.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="setupAction">The OData options to configure the services with,
+        /// including access to a service provider which you can resolve services from.</param>
+        /// <returns>A <see cref="IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataOptions, IServiceProvider> setupAction)
+        {
+            if (services == null)
+            {
+                throw Error.ArgumentNull(nameof(services));
+            }
+
+            if (setupAction == null)
+            {
+                throw Error.ArgumentNull(nameof(setupAction));
+            }
+
+            services.AddODataCore().AddOptions<ODataOptions>().Configure(setupAction);
+            return services;
+        }
+
         /// <summary>
         /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
         /// type. To avoid processing unexpected or malicious queries, use the validation settings on
@@ -80,6 +138,8 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, ODataMvcOptionsSetup>());
 
+            // For Minimal API, we should call 'ConfigureHttpJsonOptions' to config the JsonConverter,
+            // But, this extension has been introduced since .NET 7
             services.TryAddEnumerable(
                 ServiceDescriptor.Transient<IConfigureOptions<JsonOptions>, ODataJsonOptionsSetup>());
 
@@ -102,6 +162,11 @@ namespace Microsoft.AspNetCore.OData
             services.TryAddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
 
             services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
+
+            //
+            // For Minimal API endpoint and model mapping cache
+            //
+            services.TryAddSingleton<IODataEndpointModelMapper, DefaultODataEndpointModelMapper>();
 
             return services;
         }
