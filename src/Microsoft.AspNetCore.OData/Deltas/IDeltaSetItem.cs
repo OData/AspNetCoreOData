@@ -16,5 +16,10 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// Gets the delta item kind.
         /// </summary>
         DeltaItemKind Kind { get; }
+
+        /// <summary>
+        /// Gets or sets the annotation container to hold transient instance annotations.
+        /// </summary>
+        IODataInstanceAnnotationContainer TransientInstanceAnnotationContainer { get; set; }
     }
 }

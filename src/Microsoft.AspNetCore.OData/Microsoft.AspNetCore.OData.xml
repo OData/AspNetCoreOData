@@ -1355,6 +1355,9 @@
             DeltaKind for the objects part of the DeltaResourceSet Payload.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.Delta.TransientInstanceAnnotationContainer">
+            <inheritdoc/>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta.Clear">
             <summary>
             Clears the Delta and resets the underlying Entity.
@@ -1596,6 +1599,9 @@
             <summary>
             The name of the relationship property on the parent object.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.DeltaLinkBase`1.TransientInstanceAnnotationContainer">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.DeltaLink`1">
             <summary>
@@ -1899,6 +1905,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.Kind">
             <summary>
             Gets the delta item kind.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem.TransientInstanceAnnotationContainer">
+            <summary>
+            Gets or sets the annotation container to hold transient instance annotations.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.ITypedDelta">
@@ -6361,6 +6372,55 @@
             Gets the inner nested resource infos.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer">
+            <summary>
+            Identifies a container for holding instance annotations. A default implementation is provided.
+            Customers can have their own implementation.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.AddResourceAnnotation(System.String,System.Object)">
+            <summary>
+            Method to Add an Instance Annotation to the CLR type
+            </summary>
+            <param name="annotationName">Name of Annotation</param>
+            <param name="value">Value of Annotation</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.AddPropertyAnnotation(System.String,System.String,System.Object)">
+            <summary>
+            Method to Add an Instance Annotation to a property
+            </summary>
+            <param name="propertyName">Name of the property</param>
+            <param name="annotationName">Name of Annotation</param>
+            <param name="value">Value of Annotation</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetResourceAnnotation(System.String)">
+            <summary>
+            Get an Instance Annotation from CLR Type
+            </summary>
+            <param name="annotationName">Name of Annotation</param>
+            <returns>Get Annotation value for the given annotation</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetPropertyAnnotation(System.String,System.String)">
+            <summary>
+            Get an Instance Annotation from the Property
+            </summary>
+            <param name="propertyName">Name of the Property</param>
+            <param name="annotationName">Name of the Annotation</param>
+            <returns>Get Annotation value for the given annotation and property</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetResourceAnnotations">
+            <summary>
+            Get All Annotations from CLR Type
+            </summary>
+            <returns>Dictionary of string(annotation name) and object value(annotation value)</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer.GetPropertyAnnotations(System.String)">
+            <summary>
+            Get all Annotations for a Property
+            </summary>
+            <param name="propertyName">Name of Property</param>
+            <returns>Dictionary of string(annotation name) and object value(annotation value)</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">
             <summary>
             Provides extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to add OData routes.
@@ -6397,6 +6457,59 @@
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
             <param name="routePattern">The given route pattern.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer">
+             <summary>    
+            Default implementation for IODataInstanceAnnotationContainer
+             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.AddResourceAnnotation(System.String,System.Object)">
+            <summary>
+            Method to Add an Instance Annotation to the CLR type
+            </summary>
+            <param name="annotationName">Name of Annotation</param>
+            <param name="value">Value of Annotation</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.AddPropertyAnnotation(System.String,System.String,System.Object)">
+            <summary>
+            Method to Add an Instance Annotation to a property
+            </summary>
+            <param name="propertyName">Name of the property</param>
+            <param name="annotationName">Name of Annotation</param>
+            <param name="value">Value of Annotation</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetResourceAnnotation(System.String)">
+            <summary>
+            Get an Instance Annotation from CLR Type
+            </summary>
+            <param name="annotationName">Name of Annotation</param>
+            <returns>Get Annotation value for the given annotation</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetPropertyAnnotation(System.String,System.String)">
+            <summary>
+            Get an Instance Annotation from the Property
+            </summary>
+            <param name="propertyName">Name of the Property</param>
+            <param name="annotationName">Name of the Annotation</param>
+            <returns>Get Annotation value for the given annotation and property</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetResourceAnnotations">
+            <summary>
+            Get All Annotations from CLR Type
+            </summary>
+            <returns>Dictionary of string(annotation name) and object value(annotation value)</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer.GetPropertyAnnotations(System.String)">
+            <summary>
+            Get all Annotation for a Property
+            </summary>
+            <param name="propertyName">Name of Property</param>
+            <returns>Dictionary of string(annotation name) and object value(annotation value)</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
             <summary>
@@ -7171,6 +7284,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InputKeyNotMatchEntityTypeKey">
             <summary>
               Looks up a localized string similar to The input key count &apos;{0}&apos; does not match the number &apos;{1}&apos; of the key of entity type &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.InstanceAnnotationNotContain">
+            <summary>
+              Looks up a localized string similar to Instance Annotation name cannot have a &apos;@&apos; as the first character and cannot have a &apos;.&apos; as first or last character..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.InstanceAnnotationShouldContain">
+            <summary>
+              Looks up a localized string similar to Instance Annotation should have a &apos;.&apos; in it and should not be the first or last character, usually in a format Namespace.TermName.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidAttributeRoutingTemplateSegment">
@@ -15597,6 +15720,106 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate.TryTranslate(Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext)">
             <inheritdoc />
+        </member>
+        <member name="T:Org.OData.Core.V1.MessageType">
+            <summary>
+            Represents a message type.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.MessageType.Code">
+            <summary>
+            Code of message.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.MessageType.Message">
+            <summary>
+            Actual message.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.MessageType.Severity">
+            <summary>
+            Severity of message.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.MessageType.Target">
+            <summary>
+            Target of message.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.MessageType.Details">
+            <summary>
+            Details of message.
+            </summary>
+        </member>
+        <member name="T:Org.OData.Core.V1.ExceptionType">
+            <summary>
+            Represents an exception type.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.ExceptionType.MessageType">
+            <summary>
+            Represents a message type.
+            </summary>
+        </member>
+        <member name="T:Org.OData.Core.V1.DataModificationExceptionType">
+            <summary>
+            Represents the type of exception thrown during a data modification operation.
+            </summary>
+        </member>
+        <member name="M:Org.OData.Core.V1.DataModificationExceptionType.#ctor(Org.OData.Core.V1.DataModificationOperationKind)">
+            <summary>
+             Initializes a new instance of the <see cref="T:Org.OData.Core.V1.DataModificationExceptionType"/> class.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.DataModificationExceptionType.FailedOperation">
+            <summary>
+            Represents the kind of data modification operation.
+            </summary>
+        </member>
+        <member name="P:Org.OData.Core.V1.DataModificationExceptionType.ResponseCode">
+            <summary>
+            Represents the response code.
+            </summary>
+        </member>
+        <member name="T:Org.OData.Core.V1.DataModificationOperationKind">
+            <summary>
+            Enumerates the kind of data modification operations.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Insert">
+            <summary>
+            Represents an insert operation.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Update">
+            <summary>
+            Represents an update operation.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Upsert">
+            <summary>
+            Represents an insert or update operation if item already exists.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Delete">
+            <summary>
+            Represents a delete data modification operation.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Invoke">
+            <summary>
+            Represents an action or function invocation.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Link">
+            <summary>
+            Represents adding a link between entities.
+            </summary>
+        </member>
+        <member name="F:Org.OData.Core.V1.DataModificationOperationKind.Unlink">
+            <summary>
+            Represents removing a link between entities.
+            </summary>
         </member>
     </members>
 </doc>
