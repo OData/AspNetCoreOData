@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace Microsoft.AspNetCore.OData.Tests.Models
 {
     public class Address
@@ -22,5 +24,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
         public ZipCode ZipCode { get; set; }
 
         public string IgnoreThis { get; set; }
+
+        public Dictionary<string, object> DynamicProperties { get; set; }
     }
 }

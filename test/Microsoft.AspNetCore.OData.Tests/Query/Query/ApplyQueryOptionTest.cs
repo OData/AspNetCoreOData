@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -1297,6 +1298,66 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 }
             }
         }
+
+        [Fact]
+        public void SortOnNestedDynamicPropertyWorks()
+        {
+            // Arrange
+            var model = new ODataModelBuilder()
+                .Add_Customer_EntityType_With_Address()
+                .GetEdmModel();
+
+            var context = new ODataQueryContext(model, typeof(Customer));
+
+            var request = RequestFactory.Create("Get", "http://localhost/?$apply=groupby((Address/DynamicCity))&$orderby=Address/DynamicCity");
+
+            var options = new ODataQueryOptions(context, request);
+
+            Customer[] customers =
+            {
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 2" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 2" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
+                }
+            };
+
+            // Act
+            IQueryable queryable = options.ApplyTo(customers.AsQueryable());
+
+            // Assert
+            Dictionary<string, object>[] expectedGroups =
+            {
+                new Dictionary<string, object> { { "Address/DynamicCity", "City 1" } },
+                new Dictionary<string, object> { { "Address/DynamicCity", "City 2" } }
+            };
+            var actualGroups = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();
+            Assert.Equal(expectedGroups.Length, actualGroups.Count);
+
+            var aggEnum = actualGroups.GetEnumerator();
+            foreach (var expected in expectedGroups)
+            {
+                aggEnum.MoveNext();
+                var agg = aggEnum.Current;
+                foreach (var key in expected.Keys)
+                {
+                    object value = GetValue(agg, key);
+                    Assert.Equal(expected[key], value);
+                }
+            }
+        }
+
         /*
         [Theory]
         [MemberData(nameof(CustomerTestAppliesMixedWithOthers))]

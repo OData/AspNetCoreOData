@@ -83,6 +83,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
             address.Property(a => a.Street);
             address.Property(a => a.City);
             address.Property(a => a.State);
+            address.HasDynamicProperties(a => a.DynamicProperties);
             return builder;
         }
 

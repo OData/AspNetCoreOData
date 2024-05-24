@@ -1046,17 +1046,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     parent = complexNode.Source;
                     break;
                 case QueryNodeKind.SingleValuePropertyAccess:
-                    var propertyNode = ((SingleValuePropertyAccessNode)node);
+                    var propertyNode = (SingleValuePropertyAccessNode)node;
                     path = propertyNode.Property.Name;
                     parent = propertyNode.Source;
                     break;
                 case QueryNodeKind.SingleNavigationNode:
-                    var navNode = ((SingleNavigationNode)node);
+                    var navNode = (SingleNavigationNode)node;
                     path = navNode.NavigationProperty.Name;
                     parent = navNode.Source;
                     break;
                 case QueryNodeKind.SingleValueOpenPropertyAccess:
-                    var openPropertyNode = ((SingleValueOpenPropertyAccessNode)node);
+                    var openPropertyNode = (SingleValueOpenPropertyAccessNode)node;
                     path = openPropertyNode.Name;
                     parent = openPropertyNode.Source;
                     break;
