@@ -288,7 +288,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (context.ElementClrType.IsDynamicTypeWrapper())
             {
-                return GetFlattenedPropertyExpression(openNode.Name, context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
+                return GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
             }
 
             if (context.ComputedProperties.TryGetValue(openNode.Name, out var computedProperty))
@@ -713,7 +713,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             CheckArgumentNull(allNode, context);
 
-           // context.EnterLambdaScope();
+            // context.EnterLambdaScope();
 
             (string name, ParameterExpression allIt) = context.HandleLambdaParameters(allNode.RangeVariables);
 
@@ -1054,6 +1054,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     var navNode = ((SingleNavigationNode)node);
                     path = navNode.NavigationProperty.Name;
                     parent = navNode.Source;
+                    break;
+                case QueryNodeKind.SingleValueOpenPropertyAccess:
+                    var openPropertyNode = ((SingleValueOpenPropertyAccessNode)node);
+                    path = openPropertyNode.Name;
+                    parent = openPropertyNode.Source;
                     break;
             }
 
