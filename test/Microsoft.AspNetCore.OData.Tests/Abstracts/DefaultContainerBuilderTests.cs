@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,35 +22,35 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         public void AddServiceWithImplementationType_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
-            DefaultContainerBuilder builder = new DefaultContainerBuilder();
+            IServiceCollection services = new ServiceCollection();
             ExceptionAssert.ThrowsArgumentNull(
-                () => builder.AddService(ServiceLifetime.Singleton, serviceType: null, implementationType: null), "serviceType");
+                () => services.AddSingleton(serviceType: null, implementationType: null), "serviceType");
 
             ExceptionAssert.ThrowsArgumentNull(
-                () => builder.AddService(ServiceLifetime.Singleton, serviceType: typeof(int), implementationType: null), "implementationType");
+                () => services.AddSingleton(serviceType: typeof(int), implementationType: null), "implementationType");
         }
 
         [Fact]
         public void AddServiceWithImplementationFactory_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
-            DefaultContainerBuilder builder = new DefaultContainerBuilder();
+            IServiceCollection services = new ServiceCollection();
             ExceptionAssert.ThrowsArgumentNull(
-                () => builder.AddService(ServiceLifetime.Singleton, serviceType: null, implementationFactory: null), "serviceType");
+                () => services.AddSingleton(serviceType: null, implementationFactory: null), "serviceType");
 
             ExceptionAssert.ThrowsArgumentNull(
-                () => builder.AddService(ServiceLifetime.Singleton, serviceType: typeof(int), implementationFactory: null), "implementationFactory");
+                () => services.AddSingleton(serviceType: typeof(int), implementationFactory: null), "implementationFactory");
         }
 
         [Fact]
         public void AddService_WithImplementationType()
         {
             // Arrange
-            IContainerBuilder builder = new DefaultContainerBuilder();
-            builder.AddService<ITestService, TestService>(ServiceLifetime.Transient);
+            IServiceCollection services = new ServiceCollection();
+            services.AddTransient<ITestService, TestService>();
 
             // Act
-            IServiceProvider container = builder.BuildContainer();
+            IServiceProvider container = services.BuildServiceProvider();
 
             // Assert
             Assert.NotNull(container.GetService<ITestService>());
@@ -59,11 +60,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         public void AddService_WithImplementationFactory()
         {
             // Arrange
-            IContainerBuilder builder = new DefaultContainerBuilder();
-            builder.AddService<ITestService>(ServiceLifetime.Transient, sp => new TestService());
+            IServiceCollection services = new ServiceCollection();
+            services.AddTransient<ITestService>(sp => new TestService());
 
             // Act
-            IServiceProvider container = builder.BuildContainer();
+            IServiceProvider container = services.BuildServiceProvider();
 
             // Assert
             Assert.NotNull(container.GetService<ITestService>());
@@ -73,9 +74,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         public void AddSingletonService_Works()
         {
             // Arrange
-            IContainerBuilder builder = new DefaultContainerBuilder();
-            builder.AddService<ITestService, TestService>(ServiceLifetime.Singleton);
-            IServiceProvider container = builder.BuildContainer();
+            IServiceCollection services = new ServiceCollection();
+            services.AddSingleton<ITestService, TestService>();
+            IServiceProvider container = services.BuildServiceProvider();
 
             // Act
             ITestService o1 = container.GetService<ITestService>();
@@ -90,9 +91,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         public void AddTransientService_Works()
         {
             // Arrange
-            IContainerBuilder builder = new DefaultContainerBuilder();
-            builder.AddService<ITestService, TestService>(ServiceLifetime.Transient);
-            IServiceProvider container = builder.BuildContainer();
+            IServiceCollection services = new ServiceCollection();
+            services.AddTransient<ITestService, TestService>();
+            IServiceProvider container = services.BuildServiceProvider();
 
             // Act
             ITestService o1 = container.GetService<ITestService>();
@@ -108,9 +109,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         public void AddScopedService_Works()
         {
             // Arrange
-            IContainerBuilder builder = new DefaultContainerBuilder();
-            builder.AddService<ITestService, TestService>(ServiceLifetime.Scoped);
-            IServiceProvider container = builder.BuildContainer();
+            IServiceCollection services = new ServiceCollection();
+            services.AddScoped<ITestService, TestService>();
+            IServiceProvider container = services.BuildServiceProvider();
 
             // Act
             IServiceProvider scopedContainer1 = container.GetRequiredService<IServiceScopeFactory>()

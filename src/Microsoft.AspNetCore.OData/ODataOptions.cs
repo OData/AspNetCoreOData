@@ -311,19 +311,19 @@ namespace Microsoft.AspNetCore.OData
         {
             Contract.Assert(model != null);
 
-            DefaultContainerBuilder builder = new DefaultContainerBuilder();
+            IServiceCollection services = new ServiceCollection();
 
             // Inject the core odata services.
-            builder.AddDefaultODataServices(version);
+            services.AddDefaultODataServices(version);
 
             // Inject the default query configuration from this options.
-            builder.Services.AddSingleton(sp => this.QueryConfigurations);
+            services.AddSingleton(sp => this.QueryConfigurations);
 
             // Inject the default Web API OData services.
-            builder.AddDefaultWebApiServices();
+            services.AddDefaultWebApiServices();
 
             // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-            builder.Services.AddSingleton<ODataUriResolver>(sp =>
+            services.AddSingleton<ODataUriResolver>(sp =>
                 new UnqualifiedODataUriResolver
                 {
                     EnableCaseInsensitive = true, // by default to enable case insensitive
@@ -333,12 +333,12 @@ namespace Microsoft.AspNetCore.OData
             // Inject the Edm model.
             // From Current ODL implement, such injection only be used in reader and writer if the input
             // model is null.
-            builder.Services.AddSingleton(sp => model);
+            services.AddSingleton(sp => model);
 
             // Inject the customized services.
-            setupAction?.Invoke(builder.Services);
+            setupAction?.Invoke(services);
 
-            return builder.BuildContainer();
+            return services.BuildServiceProvider();
         }
 
         /// <summary>

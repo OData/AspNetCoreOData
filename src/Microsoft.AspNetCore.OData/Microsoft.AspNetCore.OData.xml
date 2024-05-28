@@ -4,43 +4,6 @@
         <name>Microsoft.AspNetCore.OData</name>
     </assembly>
     <members>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ContainerBuilderExtensions.AddDefaultWebApiServices(Microsoft.OData.IContainerBuilder)">
-            <summary>
-            Injects the default Web API OData services.
-            </summary>
-            <param name="builder">The container builder.</param>
-            <returns>The calling itself.</returns>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder">
-            <summary>
-            The default container builder implementation based on the Microsoft dependency injection framework.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder.AddService(Microsoft.OData.ServiceLifetime,System.Type,System.Type)">
-            <summary>
-            Adds a service of <paramref name="serviceType"/> with an <paramref name="implementationType"/>.
-            </summary>
-            <param name="lifetime">The lifetime of the service to register.</param>
-            <param name="serviceType">The type of the service to register.</param>
-            <param name="implementationType">The implementation type of the service.</param>
-            <returns>The <see cref="T:Microsoft.OData.IContainerBuilder"/> instance itself.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder.AddService(Microsoft.OData.ServiceLifetime,System.Type,System.Func{System.IServiceProvider,System.Object})">
-            <summary>
-            Adds a service of <paramref name="serviceType"/> with an <paramref name="implementationFactory"/>.
-            </summary>
-            <param name="lifetime">The lifetime of the service to register.</param>
-            <param name="serviceType">The type of the service to register.</param>
-            <param name="implementationFactory">The factory that creates the service.</param>
-            <returns>The <see cref="T:Microsoft.OData.IContainerBuilder"/> instance itself.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.DefaultContainerBuilder.BuildContainer">
-            <summary>
-            Builds a container which implements <see cref="T:System.IServiceProvider"/> and contains
-            all the services registered.
-            </summary>
-            <returns>The container built by this builder.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.ETagActionFilterAttribute">
             <summary>
             Defines a <see cref="T:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute"/> to add an ETag header value to an OData response when the response
@@ -318,6 +281,13 @@
             Gets the data store used routing conventions to store any custom route data.
             </summary>
             <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddDefaultWebApiServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Injects the default Web API OData services.
+            </summary>
+            <param name="services">The service collection.</param>
+            <returns>The calling itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
             <summary>
@@ -1108,20 +1078,6 @@
             </summary>
             <param name="clrType">The type to test.</param>
             <returns>True if the type is a DateTime; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsDateOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.DateOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a DateOnly; false otherwise.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeOnly(System.Type)">
-            <summary>
-            Determine if a type is a <see cref="T:System.TimeOnly"/>.
-            </summary>
-            <param name="clrType">The type to test.</param>
-            <returns>True if the type is a TimeOnly; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsTimeSpan(System.Type)">
             <summary>
