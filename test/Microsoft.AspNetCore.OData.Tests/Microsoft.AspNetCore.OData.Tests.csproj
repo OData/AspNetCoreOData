@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Microsoft.AspNetCore.OData.Tests</AssemblyName>
     <RootNamespace>Microsoft.AspNetCore.OData.Tests</RootNamespace>
 
@@ -23,7 +23,7 @@
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,15 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net6.bsl" />
-    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
-    <None Remove="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net6.bsl" />
-    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl" />
-    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net5.bsl" />
+    <EmbeddedResource Include="PublicApi\Microsoft.AspNetCore.OData.PublicApi.Net8.bsl" />
   </ItemGroup>
   
 </Project>

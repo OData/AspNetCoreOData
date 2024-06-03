@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Assert
             Assert.NotNull(error);
             Assert.Equal("key1:\r\nTest Error 1\r\nTest Error 2\r\n\r\nkey3:\r\nTest Error 3", error.Message);
-            Assert.Null(error.ErrorCode);
+            Assert.Null(error.Code);
             Assert.Null(error.InnerError);
             Assert.Equal(3, error.Details.Count);
         }
@@ -64,8 +64,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Assert
             Assert.NotNull(error);
             Assert.Equal("key1:\r\nTest Error 1\r\n\r\nkey2:\r\nTest Error 2", error.Message);
-            Assert.Null(error.ErrorCode);
-            Assert.Equal("key3:\r\nTest Error 3", error.InnerError.Message);
+            Assert.Null(error.Code);
+            Assert.True(error.InnerError.Properties.TryGetValue(SerializableErrorKeys.MessageKey, out ODataValue odataValue));
+            var exceptionMessage = Assert.IsType<ODataPrimitiveValue>(odataValue).Value as string;
+            Assert.Equal("key3:\r\nTest Error 3", exceptionMessage);
             Assert.Equal(2, error.Details.Count);
         }
 
@@ -77,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             modelState.AddModelError("key1", "Test Error 1");
             SerializableError serializableError = new SerializableError(modelState);
             serializableError["ErrorCode"] = "Error Code 1";
-            serializableError["Message"] = "Error Message 1";
+            serializableError["message"] = "Error Message 1";
             serializableError["ExceptionMessage"] = "Error ExceptionMessage 1";
 
             // Act
@@ -86,8 +88,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Assert
             Assert.NotNull(error);
             Assert.Equal("Error Message 1", error.Message);
-            Assert.Equal("Error Code 1", error.ErrorCode);
-            Assert.Equal("Error ExceptionMessage 1", error.InnerError.Message);
+            Assert.Equal("Error Code 1", error.Code);
+            Assert.True(error.InnerError.Properties.TryGetValue(SerializableErrorKeys.MessageKey, out ODataValue odataValue));
+            var exceptionMessage = Assert.IsType<ODataPrimitiveValue>(odataValue).Value as string;
+            Assert.Equal("Error ExceptionMessage 1", exceptionMessage);
             Assert.Single(error.Details);
         }
     }

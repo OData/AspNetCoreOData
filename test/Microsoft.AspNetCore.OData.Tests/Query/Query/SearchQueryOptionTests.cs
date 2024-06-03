@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -121,7 +122,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             IServiceProvider serviceProvider = new MockServiceProvider(
-                a => a.AddService<ISearchBinder, TestSearchBinder>(ServiceLifetime.Singleton));
+                a => a.AddSingleton<ISearchBinder, TestSearchBinder>());
 
             ODataQueryContext context = new ODataQueryContext(_model, typeof(SearchProduct)) { RequestContainer = serviceProvider };
 

@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// <summary>
     /// Wrapper for IODataRequestMessage and IODataResponseMessage.
     /// </summary>
-    internal class ODataMessageWrapper : IODataRequestMessageAsync, IODataResponseMessageAsync, IODataPayloadUriConverter, IContainerProvider, IDisposable
+    internal class ODataMessageWrapper : IODataRequestMessageAsync, IODataResponseMessageAsync, IODataPayloadUriConverter, IServiceCollectionProvider,  IDisposable
     {
         private Stream _stream;
         private Dictionary<string, string> _headers;
@@ -97,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             }
         }
 
-        public IServiceProvider Container { get; set; }
+        public IServiceProvider ServiceProvider { get; set; }
 
         public string GetHeader(string headerName)
         {

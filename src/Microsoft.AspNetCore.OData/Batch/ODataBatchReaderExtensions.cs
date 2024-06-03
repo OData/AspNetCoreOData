@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Batch
 
             if (!requestUri.IsAbsoluteUri)
             {
-                Uri baseUri = batchRequest.Container.GetRequiredService<ODataMessageReaderSettings>().BaseUri;
+                Uri baseUri = batchRequest.ServiceProvider.GetRequiredService<ODataMessageReaderSettings>().BaseUri;
                 requestUri = new Uri(baseUri, requestUri);
             }
 

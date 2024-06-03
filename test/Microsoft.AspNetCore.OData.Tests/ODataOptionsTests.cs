@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Tests
 
             Assert.Same(edmModel, model.Value.Item1);
             Assert.NotNull(model.Value.Item2);
-            ODataSimplifiedOptions actual = model.Value.Item2.GetService<ODataSimplifiedOptions>();
+            ODataMessageReaderSettings actual = model.Value.Item2.GetService<ODataMessageReaderSettings>();
             Assert.Equal(readingODataPrefixSetting, actual.EnableReadingODataAnnotationWithoutPrefix);
         }
 
