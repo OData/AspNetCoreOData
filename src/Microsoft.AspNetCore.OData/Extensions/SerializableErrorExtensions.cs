@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             return new ODataError
             {
-                ErrorCode = string.IsNullOrWhiteSpace(errorCode) ? null : errorCode,
+                Code = string.IsNullOrWhiteSpace(errorCode) ? null : errorCode,
                 Message = string.IsNullOrWhiteSpace(message) ? errors.ConvertModelStateErrors() : message,
                 Details = errors.CreateErrorDetails(),
                 InnerError = innerError
@@ -70,22 +70,35 @@ namespace Microsoft.AspNetCore.OData.Extensions
                     errors.Remove(SerializableErrorKeys.ModelStateKey);
 
                     return (modelStateError == null) ? null
-                        : new ODataInnerError { Message = ConvertModelStateErrors(modelStateError) };
+                        : new ODataInnerError(
+                            new Dictionary<string, ODataValue>
+                            {
+                                {
+                                    "Message", new ODataPrimitiveValue(ConvertModelStateErrors(modelStateError))
+                                }
+                            });
                 }
 
                 errors.Remove(SerializableErrorKeys.MessageDetailKey);
 
-                return new ODataInnerError { Message = messageDetail };
+                return new ODataInnerError(new Dictionary<string, ODataValue> { { "Message", new ODataPrimitiveValue(messageDetail)} });
             }
 
             errors.Remove(SerializableErrorKeys.ExceptionMessageKey);
 
-            ODataInnerError innerError = new ODataInnerError
-            {
-                Message = innerErrorMessage,
-                TypeName = errors.GetPropertyValue<string>(SerializableErrorKeys.ExceptionTypeKey),
-                StackTrace = errors.GetPropertyValue<string>(SerializableErrorKeys.StackTraceKey)
-            };
+            ODataInnerError innerError = new ODataInnerError(
+                new Dictionary<string, ODataValue>
+                {
+                    {
+                        "Message", new ODataPrimitiveValue(innerErrorMessage)
+                    },
+                    {
+                        "TypeName", new ODataPrimitiveValue(errors.GetPropertyValue<string>(SerializableErrorKeys.ExceptionTypeKey))
+                    },
+                    {
+                        "StackTrace", new ODataPrimitiveValue(errors.GetPropertyValue<string>(SerializableErrorKeys.StackTraceKey))
+                    }
+                });
 
             errors.Remove(SerializableErrorKeys.ExceptionTypeKey);
             errors.Remove(SerializableErrorKeys.StackTraceKey);

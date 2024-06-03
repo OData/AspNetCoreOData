@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Results
             Error = new ODataError
             {
                 Message = message,
-                ErrorCode = errorCode
+                Code = errorCode
             };
         }
 

@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             ODataError odataError = new ODataError()
             {
-                ErrorCode = "401",
+                Code = "401",
                 Message = "Not authorized to access this resource."
             };
             return Unauthorized(odataError);
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             ODataError odataError = new ODataError()
             {
-                ErrorCode = "404",
+                Code = "404",
                 Message = $"Order with key: {key} not found."
             };
             return NotFound(odataError);
@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             ODataError odataError = new ODataError()
             {
-                ErrorCode = "422",
+                Code = "422",
                 Message = "Unprocessable order object."
             };
             return UnprocessableEntity(odataError);
@@ -86,7 +86,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             ODataError odataError = new ODataError()
             {
-                ErrorCode = "409",
+                Code = "409",
                 Message = "Conflict during update."
             };
             return Conflict(odataError);
@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             ODataError odataError = new ODataError()
             {
-                ErrorCode = "400",
+                Code = "400",
                 Message = "Bad request during PUT."
             };
             return ODataErrorResult(odataError);
@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
         {
             ODataError odataError = new ODataError()
             {
-                ErrorCode = "400",
+                Code = "400",
                 Message = "Bad request on delete."
             };
             return BadRequest(odataError);

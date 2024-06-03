@@ -40,7 +40,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Assert
             Assert.NotNull(error);
             Assert.Equal("key1:\r\nTest Error 1\r\nTest Error 2\r\n\r\nkey3:\r\nTest Error 3", error.Message);
-            Assert.Null(error.ErrorCode);
+            Assert.Null(error.Code);
             Assert.Null(error.InnerError);
             Assert.Equal(3, error.Details.Count);
         }
@@ -62,10 +62,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             ODataError error = SerializableErrorExtensions.CreateODataError(serializableError);
 
             // Assert
+            string exceptionMessage = null;
+            if (error.InnerError.Properties.TryGetValue("Message", out ODataValue odataValue))
+            {
+                if (odataValue is ODataPrimitiveValue primitiveValue)
+                {
+                    exceptionMessage = primitiveValue.Value as string;
+                }
+            }
+
             Assert.NotNull(error);
             Assert.Equal("key1:\r\nTest Error 1\r\n\r\nkey2:\r\nTest Error 2", error.Message);
-            Assert.Null(error.ErrorCode);
-            Assert.Equal("key3:\r\nTest Error 3", error.InnerError.Message);
+            Assert.Null(error.Code);
+            Assert.Equal("key3:\r\nTest Error 3", exceptionMessage);
             Assert.Equal(2, error.Details.Count);
         }
 
@@ -83,11 +92,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Act
             ODataError error = SerializableErrorExtensions.CreateODataError(serializableError);
 
+            string exceptionMessage = null;
+            if (error.InnerError.Properties.TryGetValue("Message", out ODataValue odataValue))
+            {
+                if (odataValue is ODataPrimitiveValue primitiveValue)
+                {
+                    exceptionMessage = primitiveValue.Value as string;
+                }
+            }
+
             // Assert
             Assert.NotNull(error);
             Assert.Equal("Error Message 1", error.Message);
-            Assert.Equal("Error Code 1", error.ErrorCode);
-            Assert.Equal("Error ExceptionMessage 1", error.InnerError.Message);
+            Assert.Equal("Error Code 1", error.Code);
+            Assert.Equal("Error ExceptionMessage 1", exceptionMessage);
             Assert.Single(error.Details);
         }
     }
