@@ -4,6 +4,7 @@ schedules:
   branches:
     include:
     - main
+    - dev-9.x
 resources:
   repositories:
   - repository: self
@@ -76,9 +77,9 @@ extends:
             version: 5.x
             includePreviewVersions: true
         - task: UseDotNet@2
-          displayName: Use .NET Core SDK 6.x
+          displayName: Use .NET Core SDK 8.x
           inputs:
-            version: 6.x
+            version: 8.x
             includePreviewVersions: true
         - task: DotNetCoreCLI@2
           displayName: Build Microsoft.AspNetCore.OData
