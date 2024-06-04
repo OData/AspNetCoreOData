@@ -16,21 +16,15 @@
     <icon>images\odata.png</icon>
     <repository type="git" url="https://github.com/OData/AspNetCoreOData.git" branch="master" />
     <dependencies>
-      <group targetFramework=".net5.0">
-        <dependency id="Microsoft.AspNetCore.OData" version="$VersionNuGetSemantic$" />
-      </group>
-      <group targetFramework=".net6.0">
+      <group targetFramework=".net8.0">
         <dependency id="Microsoft.AspNetCore.OData" version="$VersionNuGetSemantic$" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="$ProductRoot$\net6.0\Microsoft.AspNetCore.OData.NewtonsoftJson.dll" target="lib\net6.0" />
-    <file src="$ProductRoot$\net6.0\Microsoft.AspNetCore.OData.NewtonsoftJson.xml" target="lib\net6.0" />
-    <file src="$ProductRoot$\net6.0\Microsoft.AspNetCore.OData.NewtonsoftJson.pdb" target="lib\net6.0" />
-    <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.NewtonsoftJson.dll" target="lib\net5.0" />
-    <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.NewtonsoftJson.xml" target="lib\net5.0" />
-    <file src="$ProductRoot$\net5.0\Microsoft.AspNetCore.OData.NewtonsoftJson.pdb" target="lib\net5.0" />
+    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.NewtonsoftJson.dll" target="lib\net8.0" />
+    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.NewtonsoftJson.xml" target="lib\net8.0" />
+    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.NewtonsoftJson.pdb" target="lib\net8.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
   </files>
 </package>
