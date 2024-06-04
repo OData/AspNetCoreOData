@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-#if NET6_0_OR_GREATER // AddSqlite extension method applies to .NET 6 or greater
 using System.Net.Http;
 using System.Net;
 using System.Threading.Tasks;
@@ -146,4 +145,3 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Regressions
         }
     }
 }
-#endif

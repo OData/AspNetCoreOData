@@ -25,10 +25,10 @@ namespace Microsoft.AspNetCore.OData.Formatter
             return Create(stream, headers, null, container);
         }
 
-        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping, IServiceProvider container)
+        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping, IServiceProvider serviceProvider)
         {
             ODataMessageWrapper responseMessageWrapper = Create(stream, headers, contentIdMapping);
-            responseMessageWrapper.Container = container;
+            responseMessageWrapper.ServiceProvider = serviceProvider;
 
             return responseMessageWrapper;
         }

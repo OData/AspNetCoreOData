@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             return new ODataError
             {
-                ErrorCode = string.IsNullOrWhiteSpace(errorCode) ? null : errorCode,
+                Code = string.IsNullOrWhiteSpace(errorCode) ? null : errorCode,
                 Message = string.IsNullOrWhiteSpace(message) ? errors.ConvertModelStateErrors() : message,
                 Details = errors.CreateErrorDetails(),
                 InnerError = innerError
@@ -70,22 +71,41 @@ namespace Microsoft.AspNetCore.OData.Extensions
                     errors.Remove(SerializableErrorKeys.ModelStateKey);
 
                     return (modelStateError == null) ? null
-                        : new ODataInnerError { Message = ConvertModelStateErrors(modelStateError) };
+                        : new ODataInnerError(
+                            new Dictionary<string, ODataValue>
+                            {
+                                {
+                                    SerializableErrorKeys.MessageKey, new ODataPrimitiveValue(ConvertModelStateErrors(modelStateError))
+                                }
+                            });
                 }
 
                 errors.Remove(SerializableErrorKeys.MessageDetailKey);
 
-                return new ODataInnerError { Message = messageDetail };
+                return new ODataInnerError(new Dictionary<string, ODataValue> { { SerializableErrorKeys.MessageKey, new ODataPrimitiveValue(messageDetail) } });
             }
 
             errors.Remove(SerializableErrorKeys.ExceptionMessageKey);
 
-            ODataInnerError innerError = new ODataInnerError
+            string typeName = errors.GetPropertyValue<string>(SerializableErrorKeys.ExceptionTypeKey);
+            string stackTrace = errors.GetPropertyValue<string>(SerializableErrorKeys.StackTraceKey);
+
+            Dictionary<string, ODataValue> properties = new Dictionary<string, ODataValue>
             {
-                Message = innerErrorMessage,
-                TypeName = errors.GetPropertyValue<string>(SerializableErrorKeys.ExceptionTypeKey),
-                StackTrace = errors.GetPropertyValue<string>(SerializableErrorKeys.StackTraceKey)
+                { SerializableErrorKeys.MessageKey, new ODataPrimitiveValue(innerErrorMessage) }
             };
+
+            if (typeName != null)
+            {
+                properties.Add(SerializableErrorKeys.ExceptionTypeKey, new ODataPrimitiveValue(typeName));
+            }
+
+            if (stackTrace != null)
+            {
+                properties.Add(SerializableErrorKeys.StackTraceKey, new ODataPrimitiveValue(stackTrace));
+            }
+
+            ODataInnerError innerError = new ODataInnerError(properties);
 
             errors.Remove(SerializableErrorKeys.ExceptionTypeKey);
             errors.Remove(SerializableErrorKeys.StackTraceKey);
@@ -190,7 +210,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Provides a key for the Message.
         /// </summary>
-        public static readonly string MessageKey = "Message";
+        public static readonly string MessageKey = "message";
 
         /// <summary>
         /// Provides a key for the MessageDetail.
@@ -210,12 +230,12 @@ namespace Microsoft.AspNetCore.OData.Extensions
         /// <summary>
         /// Provides a key for the ExceptionType.
         /// </summary>
-        public static readonly string ExceptionTypeKey = "ExceptionType";
+        public static readonly string ExceptionTypeKey = "type";
 
         /// <summary>
         /// Provides a key for the StackTrace.
         /// </summary>
-        public static readonly string StackTraceKey = "StackTrace";
+        public static readonly string StackTraceKey = "stacktrace";
 
         /// <summary>
         /// Provides a key for the InnerException.

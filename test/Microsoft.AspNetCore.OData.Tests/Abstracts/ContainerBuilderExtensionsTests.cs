@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Xunit;
 
@@ -18,8 +19,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
         public void AddDefaultWebApiServices_ThrowsArgumentNull_Builder()
         {
             // Arrange & Act & Assert
-            IContainerBuilder builder = null;
-            ExceptionAssert.ThrowsArgumentNull(() => builder.AddDefaultWebApiServices(), "builder");
+            IServiceCollection services = null;
+            ExceptionAssert.ThrowsArgumentNull(() => services.AddDefaultWebApiServices(), "services");
         }
     }
 }

@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <!--<SignAssembly>true</SignAssembly>
     <DelaySign>true</DelaySign>-->
     <!--<AssemblyOriginatorKeyFile>..\..\build\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>-->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.6" />
     <PackageReference Include="Microsoft.OpenApi.OData" Version="1.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
