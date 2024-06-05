@@ -27,7 +27,7 @@
   <files>
     <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.dll" target="lib\net8.0" />
     <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.xml" target="lib\net8.0" />
-    <file src="$ProductRoot$\8net.0\Microsoft.AspNetCore.OData.pdb" target="lib\net8.0" />
+    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.pdb" target="lib\net8.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
   </files>
 </package>
