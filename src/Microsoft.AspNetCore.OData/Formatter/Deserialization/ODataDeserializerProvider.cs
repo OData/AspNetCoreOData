@@ -61,7 +61,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     }
 
                     IEdmTypeReference elementType = edmType.AsCollection().ElementType();
-                    if (elementType.IsEntity() || elementType.IsComplex() || elementType.IsUntyped())
+                    if (elementType.IsUntyped())
+                    {
+                        if (typeof(IEdmStructuredType).IsAssignableFrom(elementType.Definition.GetType()))
+                        {
+                            return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
+                        }
+
+                        return _serviceProvider.GetRequiredService<ODataCollectionDeserializer>();
+                    }
+
+                    if (elementType.IsEntity() || elementType.IsComplex())
                     {
                         return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
                     }

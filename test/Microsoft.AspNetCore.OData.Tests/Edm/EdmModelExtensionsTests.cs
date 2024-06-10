@@ -6,11 +6,13 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Vocabularies;
 using Moq;
 using Xunit;
@@ -53,7 +55,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             ExceptionAssert.ThrowsArgumentNull(() => model.ResolveResourceSetType(null), "resourceSet");
         }
 
-
         [Fact]
         public void GetAllProperties_ThrowsArgumentNull()
         {
@@ -64,6 +65,43 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Arrange & Act & Assert
             model = new Mock<IEdmModel>().Object;
             ExceptionAssert.ThrowsArgumentNull(() => model.GetAllProperties(null), "structuredType");
+        }
+
+        [Fact]
+        public void ResolveTerm_ThrowsArgumentNull_ForModel()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.ResolveTerm(null), "model");
+        }
+
+        [Fact]
+        public void ResolveTerm_WorksForDefinedTerms_CaseSensitiveAndInsensitive()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+
+            // Act & Assert
+            IEdmTerm term = model.ResolveTerm("Org.OData.Core.V1.Description");
+            Assert.NotNull(term);
+
+            // We can't use 'Assert.Same' to compare the object since it's SemanticEdmTerm
+            Assert.Equal(term.Name, model.ResolveTerm("Org.odata.core.V1.description").Name);
+            Assert.Equal(term.Name, model.ResolveTerm("Org.OData.Core.V1.Description#any").Name);
+        }
+
+        [Fact]
+        public void ResolveTerm_WorksForUserDefinedTerms_CaseSensitiveAndInsensitive()
+        {
+            // Arrange
+            EdmModel model = new EdmModel();
+            EdmTerm term = new EdmTerm("NS", "TestTerm", EdmPrimitiveTypeKind.Guid);
+            model.AddElement(term);
+
+            // Act & Assert
+            Assert.Same(term, model.ResolveTerm("NS.TestTerm"));
+            Assert.Same(term, model.ResolveTerm("nS.testterm"));
+            Assert.Same(term, model.ResolveTerm("nS.testterm#any"));
         }
 
         [Fact]
@@ -121,7 +159,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void FindProperty_ThrowsArugmentNull_ForInputParameters()
+        public void FindProperty_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -182,7 +220,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void ResolveNavigationSource_ThrowsArugmentNull()
+        public void ResolveNavigationSource_ThrowsArgumentNull()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -195,11 +233,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             // Arrange
             EdmModel model = new EdmModel();
             EdmEntityType entityType = new EdmEntityType("NS", "Entity");
-            EdmEntityContainer containter = new EdmEntityContainer("NS", "Default");
+            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
             model.AddElement(entityType);
-            model.AddElement(containter);
-            containter.AddEntitySet("entities", entityType);
-            containter.AddEntitySet("enTIties", entityType);
+            model.AddElement(container);
+            container.AddEntitySet("entities", entityType);
+            container.AddEntitySet("enTIties", entityType);
 
             // Act & Assert
             Assert.NotNull(model.ResolveNavigationSource("enTIties"));

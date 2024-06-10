@@ -419,6 +419,40 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void ReadResource_Calls_ApplyResourceInstanceAnnotations()
+        {
+            // Arrange
+            Mock<ODataResourceDeserializer> deserializer = new Mock<ODataResourceDeserializer>(_deserializerProvider);
+            ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { Properties = Enumerable.Empty<ODataProperty>() });
+            deserializer.CallBase = true;
+            deserializer.Setup(d => d.CreateResourceInstance(_productEdmType, _readContext)).Returns(42);
+            deserializer.Setup(d => d.ApplyResourceInstanceAnnotations(42, resourceWrapper, _productEdmType, _readContext)).Verifiable();
+
+            // Act
+            deserializer.Object.ReadResource(resourceWrapper, _productEdmType, _readContext);
+
+            // Assert
+            deserializer.Verify();
+        }
+
+        [Fact]
+        public void ReadResource_Calls_ApplyNestedPropertyInfos()
+        {
+            // Arrange
+            Mock<ODataResourceDeserializer> deserializer = new Mock<ODataResourceDeserializer>(_deserializerProvider);
+            ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { Properties = Enumerable.Empty<ODataProperty>() });
+            deserializer.CallBase = true;
+            deserializer.Setup(d => d.CreateResourceInstance(_productEdmType, _readContext)).Returns(42);
+            deserializer.Setup(d => d.ApplyNestedPropertyInfos(42, resourceWrapper, _productEdmType, _readContext)).Verifiable();
+
+            // Act
+            deserializer.Object.ReadResource(resourceWrapper, _productEdmType, _readContext);
+
+            // Assert
+            deserializer.Verify();
+        }
+
+        [Fact]
         public void ReadResource_Calls_ApplyNestedProperties()
         {
             // Arrange
@@ -651,6 +685,232 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Assert.Equal(121, customer.Id);
             Assert.Equal(new DateTime(2015, 12, 12), customer.Birthday);
             Assert.Equal(new TimeSpan(0, 1, 2, 3, 4), customer.ReleaseTime);
+        }
+
+        [Fact]
+        public void ReadResource_CanReadInstanceAnnotations()
+        {
+            // Arrange
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntityType<SimpleOpenCustomer>();
+            builder.EnumType<SimpleEnum>();
+            IEdmModel model = builder.GetEdmModel();
+
+            IEdmEntityTypeReference customerTypeReference = model.GetEdmTypeReference(typeof(SimpleOpenCustomer)).AsEntity();
+
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+
+            ODataEnumValue enumValue = new ODataEnumValue("Third", typeof(SimpleEnum).FullName);
+            List<ODataInstanceAnnotation> instanceAnnotations = new List<ODataInstanceAnnotation>
+            {
+                new ODataInstanceAnnotation("NS.Test1", new ODataPrimitiveValue(42)),
+                new ODataInstanceAnnotation("NS.Test2", new ODataPrimitiveValue(true))
+            };
+
+            ODataResource odataResource = new ODataResource
+            {
+                Properties = new ODataProperty[]
+                {
+                    new ODataProperty
+                    {
+                        Name = "Name", Value = "AManWithExtraData",
+                        InstanceAnnotations = new List<ODataInstanceAnnotation> { new ODataInstanceAnnotation("NS.ExtraData", enumValue) }
+                    }
+                },
+                TypeName = typeof(SimpleOpenCustomer).FullName,
+                InstanceAnnotations = instanceAnnotations
+            };
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext()
+            {
+                Model = model
+            };
+
+            ODataResourceWrapper topLevelResourceWrapper = new ODataResourceWrapper(odataResource);
+
+            // Act
+            SimpleOpenCustomer customer = deserializer.ReadResource(topLevelResourceWrapper, customerTypeReference, readContext)
+                as SimpleOpenCustomer;
+
+            // Assert
+            Assert.NotNull(customer);
+
+            // Verify the declared properties
+            Assert.Equal("AManWithExtraData", customer.Name);
+
+            // Verify the instance annotations
+            Assert.NotNull(customer.InstanceAnnotations);
+            Assert.Equal(2, customer.InstanceAnnotations.InstanceAnnotations.Count);
+
+            // Verify instance annotations on resource/entity
+            IDictionary<string, object> annotationsOnResource = customer.InstanceAnnotations.GetResourceAnnotations();
+            Assert.Equal(2, annotationsOnResource.Count);
+
+            Assert.Equal(42, annotationsOnResource["NS.Test1"]);
+            Assert.True((bool)annotationsOnResource["NS.Test2"]);
+
+            // Verify the instance annotation on property
+            IDictionary<string, object> annotationsOnProperty = customer.InstanceAnnotations.GetPropertyAnnotations("Name");
+            KeyValuePair<string, object> annotationOnProperty = Assert.Single(annotationsOnProperty);
+
+            Assert.Equal("NS.ExtraData", annotationOnProperty.Key);
+            Assert.Equal(SimpleEnum.Third, annotationOnProperty.Value);
+        }
+
+        [Fact]
+        public void ReadResource_CanReadAdvancedInstanceAnnotations()
+        {
+            // Arrange
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntityType<SimpleOpenCustomer>();
+            builder.EnumType<SimpleEnum>();
+            IEdmModel model = builder.GetEdmModel();
+
+            IEdmEntityTypeReference customerTypeReference = model.GetEdmTypeReference(typeof(SimpleOpenCustomer)).AsEntity();
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+
+            ODataResource odataResource = new ODataResource
+            {
+                Properties = new ODataProperty[]
+                {
+                    new ODataProperty
+                    {
+                        Name = "Name", Value = "AManWithExtraResourceValueData",
+                        InstanceAnnotations = new List<ODataInstanceAnnotation>
+                        {
+                            new ODataInstanceAnnotation("NS.AnnotationOnProperty", new ODataResourceValue
+                            {
+                                TypeName = typeof(SimpleOpenAddress).FullName,
+                                Properties = new[]
+                                {
+                                    // declared properties
+                                    new ODataProperty {Name = "Street", Value = "Street in property"},
+                                    new ODataProperty {Name = "City", Value = "City in property"},
+                                }
+                            })
+                        }
+                    }
+                },
+                TypeName = typeof(SimpleOpenCustomer).FullName,
+                InstanceAnnotations = new List<ODataInstanceAnnotation>
+                {
+                    new ODataInstanceAnnotation("NS.AnnotationOnResource", new ODataResourceValue
+                    {
+                        TypeName = typeof(SimpleOpenAddress).FullName,
+                        Properties = new[]
+                        {
+                            // declared properties
+                            new ODataProperty {Name = "Street", Value = "Street in Resource"},
+                            new ODataProperty {Name = "City", Value = "City in Resource"},
+                        }
+                    })
+                }
+            };
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext()
+            {
+                Model = model
+            };
+
+            ODataResourceWrapper topLevelResourceWrapper = new ODataResourceWrapper(odataResource);
+
+            // Act
+            SimpleOpenCustomer customer = deserializer.ReadResource(topLevelResourceWrapper, customerTypeReference, readContext)
+                as SimpleOpenCustomer;
+
+            // Assert
+            Assert.NotNull(customer);
+
+            // Verify the declared properties
+            Assert.Equal("AManWithExtraResourceValueData", customer.Name);
+
+            // Verify the instance annotations
+            Assert.NotNull(customer.InstanceAnnotations);
+            Assert.Equal(2, customer.InstanceAnnotations.InstanceAnnotations.Count);
+
+            // Verify instance annotations on resource/entity
+            IDictionary<string, object> annotationsOnResource = customer.InstanceAnnotations.GetResourceAnnotations();
+            KeyValuePair<string, object> annotationOnResource = Assert.Single(annotationsOnResource);
+
+            Assert.Equal("NS.AnnotationOnResource", annotationOnResource.Key);
+            SimpleOpenAddress addressOnResource = Assert.IsType<SimpleOpenAddress>(annotationOnResource.Value);
+            Assert.Equal("City in Resource", addressOnResource.City);
+            Assert.Equal("Street in Resource", addressOnResource.Street);
+
+            // Verify the instance annotation on property
+            IDictionary<string, object> annotationsOnProperty = customer.InstanceAnnotations.GetPropertyAnnotations("Name");
+            KeyValuePair<string, object> annotationOnProperty = Assert.Single(annotationsOnProperty);
+
+            Assert.Equal("NS.AnnotationOnProperty", annotationOnProperty.Key);
+            SimpleOpenAddress addressOnProperty = Assert.IsType<SimpleOpenAddress>(annotationOnProperty.Value);
+            Assert.Equal("City in property", addressOnProperty.City);
+            Assert.Equal("Street in property", addressOnProperty.Street);
+        }
+
+        [Fact]
+        public void ReadResource_CanReadNestedPropertyInfo()
+        {
+            // Arrange
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntityType<SimpleOpenCustomer>();
+            builder.EnumType<SimpleEnum>();
+            IEdmModel model = builder.GetEdmModel();
+
+            IEdmEntityTypeReference customerTypeReference = model.GetEdmTypeReference(typeof(SimpleOpenCustomer)).AsEntity();
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+
+            ODataPropertyInfo propertyInfo = new ODataPropertyInfo
+            {
+                Name = "Address",
+                InstanceAnnotations = new List<ODataInstanceAnnotation>
+                {
+                    new ODataInstanceAnnotation("NS.AnnotationOnPropertyWithoutValue", new ODataCollectionValue
+                    {
+                        TypeName = "Collection(Edm.Int32)",
+                        Items = new object[] { 15, 16 }
+                    })
+                }
+            };
+
+            ODataResource odataResource = new ODataResource
+            {
+                Properties = new ODataProperty[]
+                {
+                    new ODataProperty { Name = "Name", Value = "AManWithNestedPropertyInfo" }
+                },
+                TypeName = typeof(SimpleOpenCustomer).FullName
+            };
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext()
+            {
+                Model = model
+            };
+
+            ODataResourceWrapper topLevelResourceWrapper = new ODataResourceWrapper(odataResource);
+            topLevelResourceWrapper.NestedPropertyInfos.Add(propertyInfo);
+
+            // Act
+            SimpleOpenCustomer customer = deserializer.ReadResource(topLevelResourceWrapper, customerTypeReference, readContext)
+                as SimpleOpenCustomer;
+
+            // Assert
+            Assert.NotNull(customer);
+
+            // Verify the declared properties
+            Assert.Equal("AManWithNestedPropertyInfo", customer.Name);
+
+            // Verify the instance annotations
+            Assert.NotNull(customer.InstanceAnnotations);
+            KeyValuePair<string, IDictionary<string, object>> annotation = Assert.Single(customer.InstanceAnnotations.InstanceAnnotations);
+
+            // Verify instance annotations on resource/entity
+            Assert.Equal("Address", annotation.Key);
+
+            KeyValuePair<string, object> annotationOnProperty = Assert.Single(annotation.Value);
+
+            Assert.Equal("NS.AnnotationOnPropertyWithoutValue", annotationOnProperty.Key);
+            IEnumerable<int> collectionValue = annotationOnProperty.Value as IEnumerable<int>;
+            Assert.Equal(new int[] { 15, 16 }, collectionValue);
         }
 
         [Fact]
@@ -1215,7 +1475,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         [InlineData("Data")] // ==> declared Edm.Untyped property
         [InlineData("Sources")]  // ==> declared Collection(Edm.Untyped) property
         [InlineData("AnyDynamicPropertyName")] // ==> un-declared (or dynamic) property
-        public void ApplyNestedProperty_Works_ForDeclaredOrUndelcaredUntypedProperty_NestedCollectionofCollection(string propertyName)
+        public void ApplyNestedProperty_Works_ForDeclaredOrUndeclaredUntypedProperty_NestedCollectionOfCollection(string propertyName)
         {
             // Arrange
             /*
@@ -1280,8 +1540,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             {
                 KeyValuePair<string, object> singleProperty = Assert.Single(o);
                 Assert.Equal("Aws/Name", singleProperty.Key);
-                EdmUntypedCollection aswNameValuecol = Assert.IsType<EdmUntypedCollection>(singleProperty.Value);
-                EdmUntypedCollection colInAwsNameCol = Assert.IsType<EdmUntypedCollection>(Assert.Single(aswNameValuecol));
+                EdmUntypedCollection aswNameValueCol = Assert.IsType<EdmUntypedCollection>(singleProperty.Value);
+                EdmUntypedCollection colInAwsNameCol = Assert.IsType<EdmUntypedCollection>(Assert.Single(aswNameValueCol));
                 Assert.Equal(2, colInAwsNameCol.Count);
                 Assert.Collection(colInAwsNameCol,
                     e => Assert.True((bool)e),
@@ -1378,6 +1638,32 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void ApplyResourceInstanceAnnotations_ThrowsArgumentNull_ResourceWrapper()
+        {
+            // Arrange
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => deserializer.ApplyResourceInstanceAnnotations(resource: null, resourceWrapper: null,
+                    structuredType: _productEdmType, readContext: _readContext),
+                "resourceWrapper");
+        }
+
+        [Fact]
+        public void ApplyNestedPropertyInfos_ThrowsArgumentNull_ResourceWrapper()
+        {
+            // Arrange
+            var deserializer = new ODataResourceDeserializer(_deserializerProvider);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => deserializer.ApplyNestedPropertyInfos(resource: null, resourceWrapper: null,
+                    structuredType: _productEdmType, readContext: _readContext),
+                "resourceWrapper");
+        }
+
+        [Fact]
         public void ApplyStructuralProperties_ThrowsArgumentNull_resourceWrapper()
         {
             // Arrange
@@ -1440,6 +1726,27 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Assert
             Assert.Equal(42, product.ID);
+        }
+
+        [Fact]
+        public void ApplyNestedPropertyInfos_Calls_ApplyPropertyInstanceAnnotationsOnEachPropertyInfo()
+        {
+            // Arrange
+            var deserializer = new Mock<ODataResourceDeserializer>(_deserializerProvider);
+            ODataPropertyInfo[] properties = new[] { new ODataPropertyInfo(), new ODataPropertyInfo() };
+            ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource());
+            resourceWrapper.NestedPropertyInfos.Add(properties[0]);
+            resourceWrapper.NestedPropertyInfos.Add(properties[1]);
+
+            deserializer.CallBase = true;
+            deserializer.Setup(d => d.ApplyPropertyInstanceAnnotations(42, properties[0], _productEdmType, _readContext)).Verifiable();
+            deserializer.Setup(d => d.ApplyPropertyInstanceAnnotations(42, properties[1], _productEdmType, _readContext)).Verifiable();
+
+            // Act
+            deserializer.Object.ApplyNestedPropertyInfos(42, resourceWrapper, _productEdmType, _readContext);
+
+            // Assert
+            deserializer.Verify();
         }
 
         [Fact]

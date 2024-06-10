@@ -159,7 +159,6 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (enumerable != null)
             {
-                IODataEdmTypeSerializer itemSerializer = null;
                 foreach (object item in enumerable)
                 {
                     if (item == null)
@@ -176,7 +175,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     IEdmTypeReference actualType = writeContext.GetEdmType(item, item.GetType());
                     Contract.Assert(actualType != null);
 
-                    itemSerializer = itemSerializer ?? SerializerProvider.GetEdmTypeSerializer(actualType);
+                    IODataEdmTypeSerializer itemSerializer = SerializerProvider.GetEdmTypeSerializer(actualType);
                     if (itemSerializer == null)
                     {
                         throw new SerializationException(

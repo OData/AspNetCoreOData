@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Deltas
 {
@@ -46,6 +47,9 @@ namespace Microsoft.AspNetCore.OData.Deltas
         private readonly PropertyInfo _dynamicDictionaryPropertyinfo;
         private HashSet<string> _changedDynamicProperties;
         private IDictionary<string, object> _dynamicDictionaryCache;
+
+        private PropertyInfo _instanceAnnotationContainerPropertyInfo;
+        private IODataInstanceAnnotationContainer _instanceAnnotationContainer;
 
         /// <summary>
         /// Initializes a new instance of <see cref="Delta{T}"/>.
@@ -148,6 +152,20 @@ namespace Microsoft.AspNetCore.OData.Deltas
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw Error.ArgumentNull(nameof(name));
+            }
+
+            if (IsInstanceAnnotation(name, out PropertyInfo annotationContainerPropertyInfo))
+            {
+                IODataInstanceAnnotationContainer annotationContainer = value as IODataInstanceAnnotationContainer;
+                if (value != null && annotationContainer == null)
+                {
+                    return false;
+                }
+
+                annotationContainerPropertyInfo.SetValue(_instance, annotationContainer);
+                _instanceAnnotationContainer = annotationContainer;
+                _instanceAnnotationContainerPropertyInfo = annotationContainerPropertyInfo;
+                return true;
             }
 
             if (_dynamicDictionaryPropertyinfo != null)
@@ -373,6 +391,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
             }
 
             CopyChangedDynamicValues(original);
+
+            CopyInstanceAnnotations(original);
 
             // For nested resources.
             foreach (string nestedResourceName in _deltaNestedResources.Keys)
@@ -685,6 +705,44 @@ namespace Microsoft.AspNetCore.OData.Deltas
             return propertyInfo.GetCustomAttributes(typeof(IgnoreDataMemberAttribute), inherit: true).Any();
         }
 
+        private void CopyInstanceAnnotations(T targetEntity)
+        {
+            if (_instanceAnnotationContainerPropertyInfo == null)
+            {
+                return;
+            }
+
+            IODataInstanceAnnotationContainer sourceContainer =
+                _instanceAnnotationContainerPropertyInfo.GetValue(_instance) as IODataInstanceAnnotationContainer;
+            if (sourceContainer == null)
+            {
+                return;
+            }
+
+            IODataInstanceAnnotationContainer desContainer =
+                _instanceAnnotationContainerPropertyInfo.GetValue(targetEntity) as IODataInstanceAnnotationContainer;
+            if (desContainer == null)
+            {
+                _instanceAnnotationContainerPropertyInfo.SetValue(targetEntity, sourceContainer);
+                return;
+            }
+
+            foreach (var item in sourceContainer.InstanceAnnotations)
+            {
+                foreach (var annotation in item.Value)
+                {
+                    if (item.Key == null || item.Key == string.Empty)
+                    {
+                        desContainer.AddResourceAnnotation(annotation.Key, annotation.Value);
+                    }
+                    else
+                    {
+                        desContainer.AddPropertyAnnotation(item.Key, annotation.Key, annotation.Value);
+                    }
+                }
+            }
+        }
+
         // Copy changed dynamic properties and leave the unchanged dynamic properties
         private void CopyChangedDynamicValues(T targetEntity)
         {
@@ -841,6 +899,25 @@ namespace Microsoft.AspNetCore.OData.Deltas
             _deltaNestedResources[name] = deltaNestedResource;
 
             return true;
+        }
+
+        private bool IsInstanceAnnotation(string name, out PropertyInfo propertyInfo)
+        {
+            propertyInfo = null;
+            if (!_allProperties.TryGetValue(name, out PropertyAccessor<T> propertyAccessor))
+            {
+                return false;
+            }
+
+            propertyInfo = propertyAccessor.Property;
+
+            if (propertyInfo.PropertyType == typeof(ODataInstanceAnnotationContainer) ||
+                typeof(IODataInstanceAnnotationContainer).IsAssignableFrom(propertyInfo.PropertyType))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

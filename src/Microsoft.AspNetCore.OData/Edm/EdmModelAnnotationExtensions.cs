@@ -218,6 +218,34 @@ namespace Microsoft.AspNetCore.OData.Edm
         }
 
         /// <summary>
+        /// Gets the instance annotation container property info.
+        /// </summary>
+        /// <param name="edmModel">The Edm model.</param>
+        /// <param name="edmType">The Edm type.</param>
+        /// <returns>The instance annotation container property info.</returns>
+        public static PropertyInfo GetInstanceAnnotationsContainer(this IEdmModel edmModel, IEdmStructuredType edmType)
+        {
+            if (edmModel == null)
+            {
+                throw Error.ArgumentNull(nameof(edmModel));
+            }
+
+            if (edmType == null)
+            {
+                throw Error.ArgumentNull(nameof(edmType));
+            }
+
+            InstanceAnnotationContainerAnnotation annotation =
+                edmModel.GetAnnotationValue<InstanceAnnotationContainerAnnotation>(edmType);
+            if (annotation != null)
+            {
+                return annotation.PropertyInfo;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Gets the model name.
         /// </summary>
         /// <param name="model">The Edm model.</param>

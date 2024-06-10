@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 {
@@ -276,28 +277,30 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         internal static object ConvertValue(object oDataValue, ref IEdmTypeReference propertyType, IODataDeserializerProvider deserializerProvider,
             ODataDeserializerContext readContext, out EdmTypeKind typeKind)
         {
-            if (oDataValue == null)
+            if (oDataValue == null || oDataValue is ODataNullValue)
             {
                 typeKind = EdmTypeKind.None;
                 return null;
             }
 
-            ODataEnumValue enumValue = oDataValue as ODataEnumValue;
-            if (enumValue != null)
+            if (oDataValue is ODataEnumValue enumValue)
             {
                 typeKind = EdmTypeKind.Enum;
                 return ConvertEnumValue(enumValue, ref propertyType, deserializerProvider, readContext);
             }
 
-            ODataCollectionValue collection = oDataValue as ODataCollectionValue;
-            if (collection != null)
+            if (oDataValue is ODataCollectionValue collectionValue)
             {
                 typeKind = EdmTypeKind.Collection;
-                return ConvertCollectionValue(collection, ref propertyType, deserializerProvider, readContext);
+                return ConvertCollectionValue(collectionValue, ref propertyType, deserializerProvider, readContext);
             }
 
-            ODataUntypedValue untypedValue = oDataValue as ODataUntypedValue;
-            if (untypedValue != null)
+            if (oDataValue is ODataResourceValue resourceValue)
+            {
+                return ConvertResourceValue(resourceValue, ref propertyType, deserializerProvider, readContext, out typeKind);
+            }
+
+            if (oDataValue is ODataUntypedValue untypedValue)
             {
                 Contract.Assert(!String.IsNullOrEmpty(untypedValue.RawValue));
 
@@ -308,6 +311,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
 
                 oDataValue = ConvertPrimitiveValue(untypedValue.RawValue);
+            }
+
+            if (oDataValue is ODataPrimitiveValue primitiveValue)
+            {
+                typeKind = EdmTypeKind.Primitive;
+                return EdmPrimitiveHelper.ConvertPrimitiveValue(primitiveValue.Value, primitiveValue.Value.GetType());
             }
 
             typeKind = EdmTypeKind.Primitive;
@@ -365,38 +374,104 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         private static object ConvertCollectionValue(ODataCollectionValue collection,
-            ref IEdmTypeReference propertyType, IODataDeserializerProvider deserializerProvider,
+            ref IEdmTypeReference valueType, IODataDeserializerProvider deserializerProvider,
             ODataDeserializerContext readContext)
         {
             // Be noted: If a declared property (propertyType != null) is untyped (or collection),
             // It should be never come here. Because for collection untyped, it goes to nested resource set.
             // ODL reads the value as ODataResourceSet in a ODataNestedResourceInfo.
             // So, if it comes here, the untyped value is odata.type annotated. for example, create a ODataProperty using ODataCollectionValue
-            IEdmCollectionTypeReference collectionType;
-            if (propertyType == null || propertyType.IsUntyped())
-            {
-                // dynamic collection property or untyped value @odata.type annotated
-                Contract.Assert(!String.IsNullOrEmpty(collection.TypeName),
-                    "ODataLib should have verified that dynamic collection value has a type name " +
-                    "since we provided metadata.");
 
+            // 05/01/2024: new scenario, if we specify an instance annotation using the collection value as:
+            // ""Magics@NS.StringCollection"":[""Skyline"",7,""Beaver""],
+            // ODL generates 'ODataCollectionValue' without providing the 'TypeName' on ODataCollectionValue.
+            // So the above assumption could not be correct again.
+            IEdmCollectionTypeReference collectionType;
+            if (valueType == null || valueType.IsUntyped())
+            {
                 string elementTypeName = GetCollectionElementTypeName(collection.TypeName, isNested: false);
-                IEdmModel model = readContext.Model;
-                IEdmSchemaType elementType = model.FindType(elementTypeName);
-                Contract.Assert(elementType != null);
-                collectionType =
-                    new EdmCollectionTypeReference(
-                        new EdmCollectionType(elementType.ToEdmTypeReference(isNullable: false)));
-                propertyType = collectionType;
+                if (elementTypeName != null)
+                {
+                    IEdmModel model = readContext.Model;
+                    IEdmSchemaType elementType = model.FindType(elementTypeName);
+                    Contract.Assert(elementType != null);
+                    collectionType =
+                        new EdmCollectionTypeReference(
+                            new EdmCollectionType(elementType.ToEdmTypeReference(isNullable: false)));
+                }
+                else
+                {
+                    // 05/01/2024: If we don't have the property type info meanwhile we don't have 'TypeName' on ODataCollectionValue,
+                    // Let's use the "Collection(Edm.Untyped)" as the collection type.
+                    collectionType = EdmUntypedHelpers.NullablePrimitiveUntypedCollectionReference;
+                }
+
+                valueType = collectionType;
             }
             else
             {
-                collectionType = propertyType as IEdmCollectionTypeReference;
+                collectionType = valueType as IEdmCollectionTypeReference;
                 Contract.Assert(collectionType != null, "The type for collection must be a IEdmCollectionType.");
             }
 
             IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(collectionType);
             return deserializer.ReadInline(collection, collectionType, readContext);
+        }
+
+        private static object ConvertResourceValue(ODataResourceValue resourceValue,
+            ref IEdmTypeReference valueType, IODataDeserializerProvider deserializerProvider,
+            ODataDeserializerContext readContext, out EdmTypeKind typeKind)
+        {
+            ODataDeserializerContext nestedReadContext = new ODataDeserializerContext
+            {
+                Path = readContext.Path,
+                Model = readContext.Model,
+                Request = readContext.Request,
+                TimeZone = readContext.TimeZone
+            };
+
+            IODataEdmTypeDeserializer deserializer;
+            if (string.IsNullOrEmpty(resourceValue.TypeName))
+            {
+                // If we don't have the type name, treat it as untyped.
+                valueType = EdmUntypedStructuredTypeReference.NullableTypeReference;
+                nestedReadContext.ResourceType = typeof(EdmUntypedObject);
+                deserializer = deserializerProvider.GetEdmTypeDeserializer(valueType);
+                typeKind = EdmTypeKind.Complex;
+                return deserializer.ReadInline(resourceValue, valueType, nestedReadContext);
+            }
+
+            // If we do have the type name, make sure we can resolve the type using type name
+            IEdmType edmType = readContext.Model.FindType(resourceValue.TypeName);
+            if (edmType == null)
+            {
+                throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, resourceValue.TypeName));
+            }
+
+            valueType = edmType.ToEdmTypeReference(true);
+            deserializer = deserializerProvider.GetEdmTypeDeserializer(valueType);
+
+            IEdmStructuredTypeReference structuredType = valueType.AsStructured();
+            typeKind = structuredType.IsEntity() ? EdmTypeKind.Entity : EdmTypeKind.Complex;
+            Type clrType;
+            if (readContext.IsNoClrType)
+            {
+                clrType = structuredType.IsEntity()
+                    ? typeof(EdmEntityObject)
+                    : typeof(EdmComplexObject);
+            }
+            else
+            {
+                clrType = readContext.Model.GetClrType(structuredType);
+                if (clrType == null)
+                {
+                    throw new ODataException(
+                        Error.Format(SRResources.MappingDoesNotContainResourceType, structuredType.FullName()));
+                }
+            }
+
+            nestedReadContext.ResourceType = clrType;
+            return deserializer.ReadInline(resourceValue, valueType, nestedReadContext);
         }
 
         private static object ConvertPrimitiveValue(string value)

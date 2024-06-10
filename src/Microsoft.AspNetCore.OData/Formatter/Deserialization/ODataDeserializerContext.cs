@@ -6,11 +6,15 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
@@ -127,6 +131,79 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 Request = this.Request,
                 TimeZone = this.TimeZone
             };
+        }
+
+        private CachedItem _cached = new CachedItem();
+
+        internal IODataInstanceAnnotationContainer GetContainer(object resource, IEdmStructuredType structuredType)
+        {
+            if (resource == null || structuredType == null)
+            {
+                return null;
+            }
+
+            // looking for cached first, we use the "reference equality"
+            if (object.ReferenceEquals(_cached.Resource, resource))
+            {
+                return _cached.Container;
+            }
+
+            _cached.Resource = resource; // update the cache
+            _cached.Container = null;
+            PropertyInfo propertyInfo = Model.GetInstanceAnnotationsContainer(structuredType);
+            if (propertyInfo == null)
+            {
+                return null;
+            }
+
+            object value;
+            IDelta delta = resource as IDelta;
+            if (delta != null)
+            {
+                delta.TryGetPropertyValue(propertyInfo.Name, out value);
+            }
+            else
+            {
+                value = propertyInfo.GetValue(resource);
+            }
+
+            IODataInstanceAnnotationContainer instanceAnnotationContainer = value as IODataInstanceAnnotationContainer;
+            if (instanceAnnotationContainer == null)
+            {
+                try
+                {
+                    if (propertyInfo.PropertyType == typeof(ODataInstanceAnnotationContainer) || propertyInfo.PropertyType == typeof(IODataInstanceAnnotationContainer))
+                    {
+                        instanceAnnotationContainer = new ODataInstanceAnnotationContainer();
+                    }
+                    else
+                    {
+                        instanceAnnotationContainer = Activator.CreateInstance(propertyInfo.PropertyType) as IODataInstanceAnnotationContainer;
+                    }
+
+                    if (delta != null)
+                    {
+                        delta.TrySetPropertyValue(propertyInfo.Name, instanceAnnotationContainer);
+                    }
+                    else
+                    {
+                        propertyInfo.SetValue(resource, instanceAnnotationContainer);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new ODataException(Error.Format(SRResources.CannotCreateInstanceForProperty, propertyInfo.Name), ex);
+                }
+            }
+
+            _cached.Container = instanceAnnotationContainer;
+            return instanceAnnotationContainer;
+        }
+
+        private struct CachedItem
+        {
+            public object Resource;
+            public IODataInstanceAnnotationContainer Container;
         }
     }
 }

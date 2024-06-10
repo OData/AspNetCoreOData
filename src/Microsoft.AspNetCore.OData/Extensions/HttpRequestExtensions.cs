@@ -26,6 +26,8 @@ namespace Microsoft.AspNetCore.OData.Extensions
     /// </summary>
     public static class HttpRequestExtensions
     {
+        private static readonly string ODataInstanceAnnotationContainerKey = "odataInstanceAnnotation_14802D58-69EF-4B28-9BDC-963D3648F06A";
+
         /// <summary>
         /// Returns the <see cref="IODataFeature"/> from the DI container.
         /// </summary>
@@ -84,6 +86,42 @@ namespace Microsoft.AspNetCore.OData.Extensions
             }
 
             return request.ODataFeature().Model;
+        }
+
+        /// <summary>
+        /// Set the top-level instance annotations for the request.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <param name="instanceAnnotations">The instance annotations</param>
+        public static HttpRequest SetInstanceAnnotations(this HttpRequest request, IDictionary<string, object> instanceAnnotations)
+        {
+            IODataFeature odataFeature = request.ODataFeature();
+
+            // The last wins.
+            odataFeature.RoutingConventionsStore[ODataInstanceAnnotationContainerKey] = instanceAnnotations;
+
+            return request;
+        }
+
+        /// <summary>
+        /// Get the top-level instance annotations for the request.
+        /// </summary>
+        /// <param name="request">The <see cref="HttpRequest"/> instance to extend.</param>
+        /// <returns>null or top-level instance annotations.</returns>
+        public static IDictionary<string, object> GetInstanceAnnotations(this HttpRequest request)
+        {
+            if (request == null)
+            {
+                return null;
+            }
+
+            IODataFeature odataFeature = request.ODataFeature();
+            if (!odataFeature.RoutingConventionsStore.TryGetValue(ODataInstanceAnnotationContainerKey, out object annotations))
+            {
+                return null;
+            }
+
+            return annotations as IDictionary<string, object>;
         }
 
         /// <summary>

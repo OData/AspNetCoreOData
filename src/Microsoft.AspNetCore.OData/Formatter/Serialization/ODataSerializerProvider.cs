@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Common;
@@ -60,15 +61,23 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     {
                         return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
                     }
-                    else if (collectionType.ElementType().IsEntity() || collectionType.ElementType().IsComplex() 
-                        || collectionType.ElementType().IsUntyped())
+
+                    var elementType = collectionType.ElementType();
+                    if (elementType.IsEntity() || elementType.IsComplex())
                     {
                         return _serviceProvider.GetRequiredService<ODataResourceSetSerializer>();
                     }
-                    else
+
+                    // Collection of untyped, one is collection of resource, the other is collection of value
+                    if (elementType.IsUntyped())
                     {
-                        return _serviceProvider.GetRequiredService<ODataCollectionSerializer>();
+                        if (typeof(IEdmStructuredTypeReference).IsAssignableFrom(elementType.GetType()))
+                        {
+                            return _serviceProvider.GetRequiredService<ODataResourceSetSerializer>();
+                        }
                     }
+
+                    return _serviceProvider.GetRequiredService<ODataCollectionSerializer>();
 
                 case EdmTypeKind.Complex:
                 case EdmTypeKind.Entity:

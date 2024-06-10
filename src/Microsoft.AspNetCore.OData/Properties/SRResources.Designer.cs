@@ -295,6 +295,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot Create an instance for the property &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotCreateInstanceForProperty {
+            get {
+                return ResourceManager.GetString("CannotCreateInstanceForProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The property &apos;{0}&apos; does not exist on type &apos;{1}&apos;. Make sure to only use property names that are defined by the type..
         /// </summary>
         internal static string CannotDeserializeUnknownProperty {

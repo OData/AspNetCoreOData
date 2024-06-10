@@ -125,6 +125,16 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmStructuredTypeReference elementType = GetResourceType(resourceSetType);
             ODataResourceSet resourceSet = CreateResourceSet(enumerable, resourceSetType.AsCollection(), writeContext);
 
+            if (writeContext.InstanceAnnotations != null)
+            {
+                ODataSerializerHelper.AppendInstanceAnnotations(writeContext.InstanceAnnotations,
+                    resourceSet.InstanceAnnotations, writeContext, SerializerProvider);
+            }
+
+            // Since the 'writeContext' is used for each item, let's clear the instance annotations for items.
+            IDictionary<string, object> instanceAnnotationsBackup = writeContext.InstanceAnnotations;
+            writeContext.InstanceAnnotations = null;
+
             Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(resourceSet, enumerable, writeContext);
 
             WriteResourceSetInternal(resourceSet, elementType, resourceSetType, writeContext, out bool isUntypedCollection, out IODataEdmTypeSerializer resourceSerializer);
@@ -138,6 +148,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
             }
+
+            writeContext.InstanceAnnotations = instanceAnnotationsBackup;
 
             // Subtle and surprising behavior: If the NextPageLink property is set before calling WriteStart(resourceSet),
             // the next page link will be written early in a manner not compatible with odata.streaming=true. Instead, if
@@ -160,6 +172,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             IEdmStructuredTypeReference elementType = GetResourceType(resourceSetType);
             ODataResourceSet resourceSet = CreateResourceSet(asyncEnumerable, resourceSetType.AsCollection(), writeContext);
+            if (writeContext.InstanceAnnotations != null)
+            {
+                ODataSerializerHelper.AppendInstanceAnnotations(writeContext.InstanceAnnotations,
+                    resourceSet.InstanceAnnotations, writeContext, SerializerProvider);
+            }
+
+            // Since the 'writeContext' is used for each item, let's clear the instance annotations for items.
+            IDictionary<string, object> instanceAnnotationsBackup = writeContext.InstanceAnnotations;
+            writeContext.InstanceAnnotations = null;
 
             Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(resourceSet, asyncEnumerable, writeContext);
 
@@ -174,6 +195,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                 await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
             }
+
+            writeContext.InstanceAnnotations = instanceAnnotationsBackup;
 
             // Subtle and surprising behavior: If the NextPageLink property is set before calling WriteStart(resourceSet),
             // the next page link will be written early in a manner not compatible with odata.streaming=true. Instead, if
@@ -285,7 +308,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             if (itemEdmType.IsCollection())
             {
-                // If the value is a IList<int>, or other similars, the TryGetEdmType(...) return Collection(Edm.Int32).
+                // If the value is a IList<int>, or other similar, the TryGetEdmType(...) return Collection(Edm.Int32).
                 // But, ODL doesn't support to write ODataCollectionValue.
                 // Let's directly use untyped collection serialization no matter what type this collection is.
                 itemEdmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
