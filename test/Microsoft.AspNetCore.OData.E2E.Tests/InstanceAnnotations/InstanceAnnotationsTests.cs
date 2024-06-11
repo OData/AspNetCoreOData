@@ -61,8 +61,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.InstanceAnnotations
             Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#Customers(Name)\"," +
                 "\"@NS.TestAnnotation\":1978," +
                 "\"value\":[" +
-                  "{\"@NS.TestAnnotation\":1978,\"Name\":\"Peter\"}," +
-                  "{\"@NS.TestAnnotation\":1978,\"Name\":\"Sam\"}" +
+                  "{\"Name\":\"Peter\"}," +
+                  "{\"Name\":\"Sam\"}" +
                 "]" +
               "}", payloadBody);
         }
