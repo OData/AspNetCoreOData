@@ -2266,6 +2266,14 @@
             <param name="edmType">The Edm type.</param>
             <returns>The dynamic property container property info.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetInstanceAnnotationsContainer(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
+            <summary>
+            Gets the instance annotation container property info.
+            </summary>
+            <param name="edmModel">The Edm model.</param>
+            <param name="edmType">The Edm type.</param>
+            <returns>The instance annotation container property info.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions.GetModelName(Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Gets the model name.
@@ -2311,13 +2319,22 @@
             <param name="resourceSet">The given resource set.</param>
             <returns>The resolved type.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveResourceType(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.ODataResourceBase)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveResourceType(Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper)">
             <summary>
             Resolve the type reference from the type name of <see cref="T:Microsoft.OData.ODataResourceBase"/>
             </summary>
             <param name="model">The Edm model.</param>
-            <param name="resource">The given resource.</param>
+            <param name="resourceWrapper">The given resource wrapper.</param>
             <returns>The resolved type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.ResolveTerm(Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Resolve the term using the annotation identifier.
+            </summary>
+            <param name="model">The Edm model.</param>
+            <param name="annotationIdentifier"> It consists of the namespace or alias of the schema that defines the term, followed by a dot (.),
+            followed by the name of the term, optionally followed by a hash (#) and a qualifier.</param>
+            <returns>The resolved term or null if not found.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.GetAllProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType)">
             <summary>
@@ -3052,6 +3069,20 @@
             <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
             <returns>The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> from the request container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.SetInstanceAnnotations(Microsoft.AspNetCore.Http.HttpRequest,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Set the top-level instance annotations for the request.
+            </summary>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <param name="instanceAnnotations">The instance annotations</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetInstanceAnnotations(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Get the top-level instance annotations for the request.
+            </summary>
+            <param name="request">The <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> instance to extend.</param>
+            <returns>null or top-level instance annotations.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions.GetTimeZoneInfo(Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
             Gets the <see cref="T:System.TimeZoneInfo"/> setting.
@@ -3636,6 +3667,25 @@
             <param name="structuredType">The type of the resource.</param>
             <param name="readContext">The deserializer context.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyResourceInstanceAnnotations(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the instance annotations from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the annotations should be read.</param>
+            <param name="resourceWrapper">The resource object containing the annotations.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyNestedPropertyInfos(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the nested property info from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            Nested property info contains annotations for the property but without the property value.
+            </summary>
+            <param name="resource">The object into which the structural properties should be read.</param>
+            <param name="resourceWrapper">The resource object containing the structural properties.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyStructuralProperties(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the structural properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
@@ -3651,6 +3701,15 @@
             </summary>
             <param name="resource">The object into which the structural property should be read.</param>
             <param name="structuralProperty">The structural property.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyPropertyInstanceAnnotations(System.Object,Microsoft.OData.ODataPropertyInfo,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the instance annotations <paramref name="structuralProperty"/> into <paramref name="resource"/>.
+            </summary>
+            <param name="resource">The object into which the structural property should be read.</param>
+            <param name="structuralProperty">The structural property info.</param>
             <param name="structuredType">The type of the resource.</param>
             <param name="readContext">The deserializer context.</param>
         </member>
@@ -4733,6 +4792,11 @@
             Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer"/>.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
         </member>
@@ -4820,6 +4884,26 @@
             <param name="resource">The <see cref="T:Microsoft.OData.ODataResource"/> describing the resource.</param>
             <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
             <param name="resourceContext">The context for the resource instance being written.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.AppendResourceInstanceAnnotations(Microsoft.OData.ODataResourceBase,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Appends the instance annotations to the ODataResource.
+            </summary>
+            <param name="resource">The <see cref="T:Microsoft.OData.ODataResource"/> describing the resource, which is being annotated.</param>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.OData.ODataResource"/> describing the resource, which is being annotated.</param>
+            <param name="resourceContext">The context for the resource instance, which is being annotated.</param> 
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateODataValue(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateODataResourceValue(System.Object,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataResourceValue"/> for the object represented by <paramref name="value"/>.
+            </summary>
+            <param name="value">The enum value.</param>
+            <param name="structuredType">The EDM structured type of the value.</param>
+            <param name="writeContext">The serializer write context.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataResourceValue"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateETag(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -5174,6 +5258,11 @@
             Gets a property bag associated with this context to store any generic data.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.InstanceAnnotations">
+            <summary>
+            Gets/sets the dictionary to store the instance annotations from the source.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ExpandedResource">
             <summary>
             Gets or sets the resource that is being expanded.
@@ -5193,6 +5282,15 @@
             <summary>
             Gets or sets the navigation property being expanded.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerHelper.AppendInstanceAnnotations(System.Collections.Generic.IDictionary{System.String,System.Object},System.Collections.Generic.ICollection{Microsoft.OData.ODataInstanceAnnotation},Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext,Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
+            <summary>
+            Appends instance annotations to the destination.
+            </summary>
+            <param name="annotations">The annotations to write.</param>
+            <param name="destination">The destination to hold the instance annotation created.</param>
+            <param name="writeContext">The serializer context.</param>
+            <param name="serializerProvider">The SerializerProvider to use to write annotations</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerPropertyHelper.CreateProperty(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataEdmTypeSerializer,System.Object,Microsoft.OData.Edm.IEdmTypeReference,System.String,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <summary>
@@ -6337,7 +6435,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper">
             <summary>
-            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/>.
+            Encapsulates an <see cref="T:Microsoft.OData.ODataResource"/> and <see cref="T:Microsoft.OData.ODataResourceValue"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResourceBase)">
@@ -6346,9 +6444,27 @@
             </summary>
             <param name="resource">The wrapped resource item, it could be null.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.#ctor(Microsoft.OData.ODataResourceValue)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper"/>.
+            </summary>
+            <param name="resourceValue">The wrapped resource value, it could NOT be null.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.Resource">
             <summary>
             Gets the wrapped <see cref="T:Microsoft.OData.ODataResource"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.ResourceValue">
+            <summary>
+            Gets the wrapped <see cref="T:Microsoft.OData.ODataResourceValue"/>.
+            Since the ODataResource can't allow the 'ODataResourceValue' as property value,
+            We have to create a ODataResourceValue to hold the properties.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.IsResourceValue">
+            <summary>
+            Gets a boolean indicating whether the resource is resource value.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.IsDeletedResource">
@@ -6359,6 +6475,12 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedResourceInfos">
             <summary>
             Gets the inner nested resource infos.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedPropertyInfos">
+            <summary>
+            Gets the nested property infos.
+            The nested property info is a property without value but could have instance annotations.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">
@@ -6891,6 +7013,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotCastFilter">
             <summary>
               Looks up a localized string similar to Cannot cast $filter of type &apos;{0}&apos; to type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotCreateInstanceForProperty">
+            <summary>
+              Looks up a localized string similar to Cannot Create an instance for the property &apos;{0}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotDeserializeUnknownProperty">

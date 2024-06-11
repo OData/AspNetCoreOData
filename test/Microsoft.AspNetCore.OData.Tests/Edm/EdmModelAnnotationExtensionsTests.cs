@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
@@ -15,6 +16,7 @@ using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.Edm.Vocabularies.Community.V1;
 using Microsoft.OData.Edm.Vocabularies.V1;
+using Microsoft.OData.ModelBuilder;
 using Moq;
 using Xunit;
 
@@ -124,7 +126,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void GetClrEnumMemberAnnotation_ThrowsArugmentNull_ForInputParameters()
+        public void GetClrEnumMemberAnnotation_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -135,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void GetClrPropertyName_ThrowsArugmentNull_ForInputParameters()
+        public void GetClrPropertyName_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -146,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void GetDynamicPropertyDictionary_ThrowsArugmentNull_ForInputParameters()
+        public void GetDynamicPropertyDictionary_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -157,7 +159,44 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void GetModelName_ThrowsArugmentNull_Model()
+        public void GetInstanceAnnotationsContainer_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange & Act & Assert
+            IEdmModel model = null;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetInstanceAnnotationsContainer(null), "edmModel");
+
+            model = new Mock<IEdmModel>().Object;
+            ExceptionAssert.ThrowsArgumentNull(() => model.GetInstanceAnnotationsContainer(null), "edmType");
+        }
+
+        [Fact]
+        public void GetInstanceAnnotationsContainer_ReturnsCorrectPropertyInfo()
+        {
+            // Arrange
+            PropertyInfo propertyInfo = typeof(InstanceAnnotationTest).GetProperty("Container");
+            InstanceAnnotationContainerAnnotation annotation = new InstanceAnnotationContainerAnnotation(propertyInfo);
+
+            EdmModel model = new EdmModel();
+            EdmComplexType complex = new EdmComplexType("NS", "Test");
+            model.AddElement(complex);
+
+            // Act & Assert
+            PropertyInfo actual = model.GetInstanceAnnotationsContainer(complex);
+            Assert.Null(actual);
+
+            // Act & Assert
+            model.SetAnnotationValue(complex, annotation);
+            actual = model.GetInstanceAnnotationsContainer(complex);
+            Assert.Same(propertyInfo, actual);
+        }
+
+        public class InstanceAnnotationTest
+        {
+            public IODataInstanceAnnotationContainer Container { get;}
+        }
+
+        [Fact]
+        public void GetModelName_ThrowsArgumentNull_Model()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -165,7 +204,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void SetModelName_ThrowsArugmentNull_Model()
+        public void SetModelName_ThrowsArgumentNull_Model()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -221,7 +260,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void SetTypeMapper_ThrowsArugmentNull_Model()
+        public void SetTypeMapper_ThrowsArgumentNull_Model()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;
@@ -247,7 +286,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
         }
 
         [Fact]
-        public void GetAlternateKeys_ThrowsArugmentNull_ForInputParameters()
+        public void GetAlternateKeys_ThrowsArgumentNull_ForInputParameters()
         {
             // Arrange & Act & Assert
             IEdmModel model = null;

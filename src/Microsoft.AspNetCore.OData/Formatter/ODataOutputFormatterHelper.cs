@@ -154,6 +154,9 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 writeContext.SetComputedProperties(queryOptions?.Compute?.ComputeClause);
                 writeContext.Type = type;
 
+                // Retrieve the instance annotations for top-level
+                writeContext.InstanceAnnotations = request.GetInstanceAnnotations();
+
                 //Set the SelectExpandClause on the context if it was explicitly specified.
                 if (selectExpandDifferentFromQueryOptions != null)
                 {

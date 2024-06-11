@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Deltas
@@ -97,6 +98,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             object retrievedValue;
             delta.TryGetPropertyValue(propertyName, out retrievedValue);
             Assert.Equal(value, retrievedValue);
+        }
+
+        [Fact]
+        public void RoundTrip_PropertyForInstanceAnnotationContainer()
+        {
+            // Arrange
+            string propertyName = "InstanceAnnotations";
+            Type dynamicType = typeof(AddressWithDynamicContainer);
+            PropertyInfo instanceAnnotationContainer = dynamicType.GetProperty(propertyName);
+            Delta<AddressWithDynamicContainer> delta = new Delta<AddressWithDynamicContainer>();
+
+            // Act & Assert
+            Assert.True(delta.TryGetPropertyType(propertyName, out _));
+
+            // Act & Assert
+            IODataInstanceAnnotationContainer container = new ODataInstanceAnnotationContainer();
+            Assert.True(delta.TrySetPropertyValue(propertyName, container));
+
+            // Act & Assert
+            Assert.True(delta.TryGetPropertyType(propertyName, out Type propertyType));
+            Assert.Same(propertyType, instanceAnnotationContainer.PropertyType);
+
+            delta.TryGetPropertyValue(propertyName, out object retrievedValue);
+            Assert.Same(container, retrievedValue);
         }
 
         [Fact]
@@ -1139,6 +1164,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Deltas
             public IDictionary<string, object> Dynamics { get; set; }
 
             public IDictionary<string, object> NonSetDynamics { get; }
+
+            public IODataInstanceAnnotationContainer InstanceAnnotations { get; set; }
         }
     }
 }

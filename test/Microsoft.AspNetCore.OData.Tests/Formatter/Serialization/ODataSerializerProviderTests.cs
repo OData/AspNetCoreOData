@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Results;
@@ -413,6 +414,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
 
             // Assert
             Assert.Same(serializer2, serializer1);
+        }
+
+        [Fact]
+        public void GetEdmTypeSerializer_ReturnsCorrectSerializer_ForCollectionOfEdmUntypedStructural()
+        {
+            // Arrange
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
+
+            // Act
+            IODataSerializer serializer = _serializerProvider.GetEdmTypeSerializer(edmType);
+
+            // Assert
+            ODataResourceSetSerializer setSerializer = Assert.IsType<ODataResourceSetSerializer>(serializer);
+            Assert.Equal(ODataPayloadKind.ResourceSet, setSerializer.ODataPayloadKind);
+        }
+
+        [Fact]
+        public void GetEdmTypeSerializer_ReturnsCorrectSerializer_ForCollectionOfEdmUntypedPrimitive()
+        {
+            // Arrange
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullablePrimitiveUntypedCollectionReference;
+
+            // Act
+            IODataSerializer serializer = _serializerProvider.GetEdmTypeSerializer(edmType);
+
+            // Assert
+            ODataCollectionSerializer collectionSerializer = Assert.IsType<ODataCollectionSerializer>(serializer);
+            Assert.Equal(ODataPayloadKind.Collection, collectionSerializer.ODataPayloadKind);
         }
 
         private static IServiceProvider GetServiceProvider()

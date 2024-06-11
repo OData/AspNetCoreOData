@@ -260,7 +260,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
-        public void GetEdmTypeDeserializer_ReturnsCorrectDeserializer_ForCollectionOfEdmUntyped()
+        public void GetEdmTypeDeserializer_ReturnsCorrectDeserializer_ForCollectionOfEdmUntypedStructural()
         {
             // Arrange
             IEdmTypeReference edmType = EdmUntypedHelpers.NullableUntypedCollectionReference;
@@ -271,6 +271,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Assert
             ODataResourceSetDeserializer setSerializer = Assert.IsType<ODataResourceSetDeserializer>(deserializer);
             Assert.Equal(ODataPayloadKind.ResourceSet, setSerializer.ODataPayloadKind);
+        }
+
+        [Fact]
+        public void GetEdmTypeDeserializer_ReturnsCorrectDeserializer_ForCollectionOfEdmUntypedPrimitive()
+        {
+            // Arrange
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullablePrimitiveUntypedCollectionReference;
+
+            // Act
+            var deserializer = _deserializerProvider.GetEdmTypeDeserializer(edmType);
+
+            // Assert
+            ODataCollectionDeserializer collectionDeserializer = Assert.IsType<ODataCollectionDeserializer>(deserializer);
+            Assert.Equal(ODataPayloadKind.Collection, collectionDeserializer.ODataPayloadKind);
         }
 
         private static IServiceProvider GetServiceProvider()

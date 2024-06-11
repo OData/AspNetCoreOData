@@ -8,11 +8,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.AspNetCore.OData.Formatter.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Validation;
+using Microsoft.OData.Edm.Vocabularies;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm
@@ -61,32 +65,36 @@ namespace Microsoft.AspNetCore.OData.Edm
         /// Resolve the type reference from the type name of <see cref="ODataResourceBase"/>
         /// </summary>
         /// <param name="model">The Edm model.</param>
-        /// <param name="resource">The given resource.</param>
+        /// <param name="resourceWrapper">The given resource wrapper.</param>
         /// <returns>The resolved type.</returns>
-        public static IEdmStructuredTypeReference ResolveResourceType(this IEdmModel model, ODataResourceBase resource)
+        public static IEdmStructuredTypeReference ResolveResourceType(this IEdmModel model, ODataResourceWrapper resourceWrapper)
         {
             if (model == null)
             {
                 throw Error.ArgumentNull(nameof(model));
             }
 
-            if (resource == null)
+            if (resourceWrapper == null)
             {
-                throw Error.ArgumentNull(nameof(resource));
+                throw Error.ArgumentNull(nameof(resourceWrapper));
             }
 
+            string typeName = resourceWrapper.IsResourceValue ?
+                resourceWrapper.ResourceValue.TypeName :
+                resourceWrapper.Resource.TypeName;
+
             IEdmStructuredTypeReference resourceType;
-            if (string.IsNullOrEmpty(resource.TypeName) ||
-                string.Equals(resource.TypeName, "Edm.Untyped", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(typeName) ||
+                string.Equals(typeName, "Edm.Untyped", StringComparison.OrdinalIgnoreCase))
             {
                 resourceType = EdmUntypedStructuredTypeReference.NullableTypeReference;
             }
             else
             {
-                IEdmStructuredType actualType = model.FindType(resource.TypeName) as IEdmStructuredType;
+                IEdmStructuredType actualType = model.FindType(typeName) as IEdmStructuredType;
                 if (actualType == null)
                 {
-                    throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, resource.TypeName));
+                    throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, typeName));
                 }
 
                 if (actualType is IEdmEntityType actualEntityType)
@@ -100,6 +108,51 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             return resourceType;
+        }
+
+        /// <summary>
+        /// Resolve the term using the annotation identifier.
+        /// </summary>
+        /// <param name="model">The Edm model.</param>
+        /// <param name="annotationIdentifier"> It consists of the namespace or alias of the schema that defines the term, followed by a dot (.),
+        /// followed by the name of the term, optionally followed by a hash (#) and a qualifier.</param>
+        /// <returns>The resolved term or null if not found.</returns>
+        public static IEdmTerm ResolveTerm(this IEdmModel model, string annotationIdentifier)
+        {
+            if (model == null)
+            {
+                throw Error.ArgumentNull(nameof(model));
+            }
+
+            string[] identifier = annotationIdentifier.Split('#');
+
+            IEdmTerm term = model.FindTerm(identifier[0]);
+            if (term != null)
+            {
+                return term;
+            }
+
+            // TODO: Let's support namespace alias when we get requirement and ODL publics 'ReplaceAlias' extension method.
+            // identifier = model.ReplaceAlias(identifier);
+
+            string termName = identifier[0];
+            var terms = model.SchemaElements.OfType<IEdmTerm>()
+                .Where(e => string.Equals(termName, e.FullName(), StringComparison.OrdinalIgnoreCase));
+
+            foreach (var refModels in model.ReferencedModels)
+            {
+                var refedTerms = refModels.SchemaElements.OfType<IEdmTerm>()
+                    .Where(e => string.Equals(termName, e.FullName(), StringComparison.OrdinalIgnoreCase));
+
+                terms = terms.Concat(refedTerms);
+            }
+
+            if (terms.Count() > 1)
+            {
+                throw new ODataException(Error.Format(SRResources.AmbiguousTypeNameFound, termName));
+            }
+
+            return terms.SingleOrDefault();
         }
 
         /// <summary>

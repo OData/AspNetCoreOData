@@ -548,6 +548,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 resource.SetSerializationInfo(serializationInfo);
             }
 
+            // Try to add the instance annotations for the resource
+            AppendResourceInstanceAnnotations(resource, selectExpandNode, resourceContext);
+
             // Try to add the dynamic properties if the structural type is open.
             AppendDynamicProperties(resource, selectExpandNode, resourceContext);
 
@@ -754,6 +757,96 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
+        /// Appends the instance annotations to the ODataResource.
+        /// </summary>
+        /// <param name="resource">The <see cref="ODataResource"/> describing the resource, which is being annotated.</param>
+        /// <param name="selectExpandNode">The <see cref="ODataResource"/> describing the resource, which is being annotated.</param>
+        /// <param name="resourceContext">The context for the resource instance, which is being annotated.</param> 
+        public virtual void AppendResourceInstanceAnnotations(ODataResourceBase resource, SelectExpandNode selectExpandNode,
+            ResourceContext resourceContext)
+        {
+            if (resource == null)
+            {
+                throw Error.ArgumentNull(nameof(resource));
+            }
+
+            if (resourceContext == null)
+            {
+                throw Error.ArgumentNull(nameof(resourceContext));
+            }
+
+            // Annotations as property annotation from the parent annotation container
+            ODataSerializerHelper.AppendInstanceAnnotations(resourceContext.SerializerContext.InstanceAnnotations,
+                resource.InstanceAnnotations, resourceContext.SerializerContext, SerializerProvider);
+
+            // Annotations as resource annotation from its own annotation container
+            IODataInstanceAnnotationContainer instanceAnnotationContainer = resourceContext.GetAnnotationContainer();
+            if (instanceAnnotationContainer != null)
+            {
+                IDictionary<string, object> annotationsOnResource = instanceAnnotationContainer.GetResourceAnnotations();
+                ODataSerializerHelper.AppendInstanceAnnotations(annotationsOnResource, resource.InstanceAnnotations, resourceContext.SerializerContext, SerializerProvider);
+            }
+        }
+
+        /// <inheritdoc/>
+        public sealed override ODataValue CreateODataValue(object value, IEdmTypeReference expectedType, ODataSerializerContext writeContext)
+        {
+            if (!expectedType.IsStructuredOrUntypedStructured())
+            {
+                throw Error.InvalidOperation(SRResources.CannotWriteType, typeof(ODataResourceSerializer).Name, expectedType.FullName());
+            }
+
+            ODataResourceValue resourceValue = CreateODataResourceValue(value, expectedType.AsStructured(), writeContext);
+            if (resourceValue == null)
+            {
+                return ODataNullValueExtensions.NullValue;
+            }
+
+            return resourceValue;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="ODataResourceValue"/> for the object represented by <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The enum value.</param>
+        /// <param name="structuredType">The EDM structured type of the value.</param>
+        /// <param name="writeContext">The serializer write context.</param>
+        /// <returns>The created <see cref="ODataResourceValue"/>.</returns>
+        public virtual ODataResourceValue CreateODataResourceValue(object value, IEdmStructuredTypeReference structuredType, ODataSerializerContext writeContext)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (writeContext == null)
+            {
+                throw Error.ArgumentNull(nameof(writeContext));
+            }
+
+            IEdmStructuredTypeReference actualType = GetResourceType(value, writeContext);
+            ResourceContext resourceContext = new ResourceContext(writeContext, actualType, value);
+
+            SelectExpandNode selectExpandNode = CreateSelectExpandNode(resourceContext);
+
+            ODataResourceValue resourceValue = new ODataResourceValue
+            {
+                TypeName = actualType.FullName(),
+                Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext)
+            };
+
+            // Annotation from its own annotation container as resource annotation
+            IODataInstanceAnnotationContainer instanceAnnotationContainer = resourceContext.GetAnnotationContainer();
+            if (instanceAnnotationContainer != null)
+            {
+                IDictionary<string, object> annotationsOnResource = instanceAnnotationContainer.GetResourceAnnotations();
+                ODataSerializerHelper.AppendInstanceAnnotations(annotationsOnResource, resourceValue.InstanceAnnotations, resourceContext.SerializerContext, SerializerProvider);
+            }
+
+            return resourceValue;
+        }
+
+        /// <summary>
         /// Creates the ETag for the given entity.
         /// </summary>
         /// <param name="resourceContext">The context for the resource instance being written.</param>
@@ -849,8 +942,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
                     if (nestedResourceInfo != null)
                     {
+                        IDictionary<string, object> annotations = null;
+                        IODataInstanceAnnotationContainer instanceAnnotationContainer = resourceContext.GetAnnotationContainer();
+                        if (instanceAnnotationContainer != null)
+                        {
+                            annotations = instanceAnnotationContainer.GetPropertyAnnotations(dynamicComplexProperty.Key);
+                        }
+
                         await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
-                        await WriteDynamicComplexPropertyAsync(dynamicComplexProperty.Value, edmTypeReference, resourceContext, writer)
+                        await WriteDynamicComplexPropertyAsync(dynamicComplexProperty.Value, edmTypeReference, resourceContext, writer, annotations)
                             .ConfigureAwait(false);
                         await writer.WriteEndAsync().ConfigureAwait(false);
                     }
@@ -858,7 +958,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             }
         }
 
-        private async Task WriteDynamicComplexPropertyAsync(object propertyValue, IEdmTypeReference edmType, ResourceContext resourceContext, ODataWriter writer)
+        private async Task WriteDynamicComplexPropertyAsync(object propertyValue, IEdmTypeReference edmType, ResourceContext resourceContext, ODataWriter writer,
+            IDictionary<string, object> annotations = null)
         {
             Contract.Assert(resourceContext != null);
             Contract.Assert(writer != null);
@@ -868,6 +969,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             // Create the serializer context for the nested and expanded item.
             ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, null, null);
+            nestedWriteContext.InstanceAnnotations = annotations;
 
             // Write object.
             IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmType);
@@ -909,8 +1011,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     continue;
                 }
 
+                IDictionary<string, object> annotations = null;
+                IODataInstanceAnnotationContainer instanceAnnotationContainer = resourceContext.GetAnnotationContainer();
+                if (instanceAnnotationContainer != null)
+                {
+                    string clrPropertyName = resourceContext.EdmModel.GetClrPropertyName(structuralProperty);
+                    annotations = instanceAnnotationContainer.GetPropertyAnnotations(clrPropertyName);
+                }
+
                 if (propertyValue is ODataProperty odataProperty)
                 {
+                    ODataSerializerHelper.AppendInstanceAnnotations(annotations, odataProperty.InstanceAnnotations, resourceContext.SerializerContext, SerializerProvider);
                     await writer.WriteStartAsync(odataProperty).ConfigureAwait(false);
                     await writer.WriteEndAsync().ConfigureAwait(false);
                     continue;
@@ -925,7 +1036,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     if (nestedResourceInfo != null)
                     {
                         await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
-                        await WriteDynamicComplexPropertyAsync(propertyValue, actualType, resourceContext, writer).ConfigureAwait(false);
+                        await WriteDynamicComplexPropertyAsync(propertyValue, actualType, resourceContext, writer, annotations).ConfigureAwait(false);
                         await writer.WriteEndAsync().ConfigureAwait(false);
                     }
                 }
@@ -1082,6 +1193,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             object propertyValue = resourceContext.GetPropertyValue(edmProperty.Name);
 
+            // We could have the instance annotations for nested complex/entity on the parent's instance annotation bag.
+            IDictionary<string, object> annotations = resourceContext.GetPropertyInstanceAnnotations(edmProperty);
+
             if (propertyValue == null || propertyValue is NullEdmComplexObject)
             {
                 if (edmProperty.Type.IsCollection())
@@ -1090,15 +1204,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     // it may just be empty.
                     // If a collection of complex or entities can be related, it is represented as a JSON array. An empty
                     // collection of resources (one that contains no resource) is represented as an empty JSON array.
-                    await writer.WriteStartAsync(new ODataResourceSet
+                    ODataResourceSet resourceSet = new ODataResourceSet
                     {
                         TypeName = edmProperty.Type.FullName()
-                    }).ConfigureAwait(false);
+                    };
+
+                    ODataSerializerHelper.AppendInstanceAnnotations(annotations, resourceSet.InstanceAnnotations, resourceContext.SerializerContext, SerializerProvider);
+                    await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
                 }
                 else
                 {
                     // If at most one resource can be related, the value is null if no resource is currently related.
                     await writer.WriteStartAsync(resource: null).ConfigureAwait(false);
+
+                    // TODO: What shall we do if the resource is null but contains the instance annotations? (@mike)
                 }
 
                 await writer.WriteEndAsync().ConfigureAwait(false);
@@ -1107,6 +1226,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 // create the serializer context for the complex and expanded item.
                 ODataSerializerContext nestedWriteContext = new ODataSerializerContext(resourceContext, edmProperty, resourceContext.SerializerContext.QueryContext, selectItem);
+                nestedWriteContext.InstanceAnnotations = annotations;
 
                 // write object.
                 IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
@@ -1458,7 +1578,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 return propertyValue;
             }
 
-            // Ok, we have the Edm type associated and it's not strctured or untyped.
+            // Ok, we have the Edm type associated and it's not structured or untyped.
             // we only handle the 'Primitive', the defined 'Enum' or collection of them.
             IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(actualType);
             if (serializer == null)
@@ -1511,7 +1631,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 }
             }
 
-            return serializer.CreateProperty(propertyValue, propertyType, structuralProperty.Name, writeContext);
+            ODataProperty property = serializer.CreateProperty(propertyValue, propertyType, structuralProperty.Name, writeContext);
+
+            IODataInstanceAnnotationContainer instanceAnnotationContainer = resourceContext.GetAnnotationContainer();
+            if (instanceAnnotationContainer != null)
+            {
+                string clrPropertyName = writeContext.Model.GetClrPropertyName(structuralProperty);
+                ODataSerializerHelper.AppendInstanceAnnotations(
+                    instanceAnnotationContainer.GetPropertyAnnotations(clrPropertyName), property.InstanceAnnotations, writeContext, SerializerProvider);
+            }
+
+            return property;
         }
 
         private IEnumerable<ODataAction> CreateODataActions(

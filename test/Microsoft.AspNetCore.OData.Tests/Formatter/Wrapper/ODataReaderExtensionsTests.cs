@@ -117,6 +117,51 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
         }
 
         [Fact]
+        public async Task ReadResourceWithPropertyWithoutValueButWithInstanceAnnotationsWorksAsExpected()
+        {
+            // Arrange
+            // Property 'Name' without value but with instance annotations
+            const string payload =
+            "{" +
+                "\"@odata.context\":\"http://localhost/$metadata#Customers/$entity\"," +
+                "\"CustomerID\": 17," +
+                "\"Name@Custom.PrimitiveAnnotation\":123," +
+                "\"Name@Custom.BooleanAnnotation\":true," +
+                "\"Location\": { \"Street\":\"154TH AVE\"}" +
+            "}";
+
+            IEdmEntitySet customers = Model.EntityContainer.FindEntitySet("Customers");
+            Assert.NotNull(customers); // Guard
+
+            // Act
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V4, false, "*");
+
+            // Assert
+            Assert.NotNull(item);
+            ODataResourceWrapper resource = Assert.IsType<ODataResourceWrapper>(item);
+            Assert.NotNull(resource.Resource);
+            ODataProperty customerIdProp = Assert.Single(resource.Resource.Properties);
+            Assert.Equal("CustomerID", customerIdProp.Name);
+            Assert.Equal(17, customerIdProp.Value);
+
+            ODataPropertyInfo nameProp = Assert.Single(resource.NestedPropertyInfos);
+            Assert.Equal("Name", nameProp.Name);
+            Assert.Equal(2, nameProp.InstanceAnnotations.Count);
+
+            ODataInstanceAnnotation primitiveAnnotation = nameProp.InstanceAnnotations.First(i => i.Name == "Custom.PrimitiveAnnotation");
+            ODataPrimitiveValue primitiveValue = Assert.IsType<ODataPrimitiveValue>(primitiveAnnotation.Value);
+            Assert.Equal(123, primitiveValue.Value);
+
+            ODataInstanceAnnotation booleanAnnotation = nameProp.InstanceAnnotations.First(i => i.Name == "Custom.BooleanAnnotation");
+            ODataPrimitiveValue booleanValue = Assert.IsType<ODataPrimitiveValue>(booleanAnnotation.Value);
+            Assert.True((bool)booleanValue.Value);
+
+            ODataNestedResourceInfoWrapper nestedInfoWrapper = Assert.Single(resource.NestedResourceInfos);
+            Assert.Equal("Location", nestedInfoWrapper.NestedResourceInfo.Name);
+        }
+
+        [Fact]
         public async Task ReadResourceSetWorksAsExpected()
         {
             // Arrange
@@ -575,7 +620,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
 
         private async Task<ODataItemWrapper> ReadPayloadAsync(string payload,
             IEdmModel edmModel, Func<ODataMessageReader, Task<ODataReader>> createReader, ODataVersion version = ODataVersion.V4,
-            bool readUntypedAsString = false)
+            bool readUntypedAsString = false,
+            string annotationFilter = null)
         {
             var message = new InMemoryMessage()
             {
@@ -590,6 +636,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 ReadUntypedAsString = readUntypedAsString,
                 Version = version,
             };
+
+            if (annotationFilter != null)
+            {
+                readerSettings.ShouldIncludeAnnotation = ODataUtils.CreateAnnotationFilter(annotationFilter);
+            }
 
             using (var msgReader = new ODataMessageReader((IODataRequestMessageAsync)message, readerSettings, edmModel))
             {

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions
@@ -32,6 +33,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
             // Arrange & Act & Assert
             HttpRequest request = null;
             ExceptionAssert.ThrowsArgumentNull(() => request.ODataBatchFeature(), "request");
+        }
+
+        [Fact]
+        public void SetInstanceAnnotations_ThrowsArgumentNull_Request()
+        {
+            // Arrange & Act & Assert
+            HttpRequest request = null;
+            ExceptionAssert.ThrowsArgumentNull(() => request.SetInstanceAnnotations(null), "request");
+        }
+
+        [Fact]
+        public void SetAndGetInstanceAnnotations_Correctly()
+        {
+            // Arrange & Act & Assert
+            HttpRequest request = RequestFactory.Create();
+            Assert.Null(request.GetInstanceAnnotations());
+
+            // Arrange & Act & Assert
+            Mock<IDictionary<string, object>> annotations = new Mock<IDictionary<string, object>>();
+            request.SetInstanceAnnotations(annotations.Object);
+
+            Assert.Same(annotations.Object, request.GetInstanceAnnotations());
         }
 
         [Fact]

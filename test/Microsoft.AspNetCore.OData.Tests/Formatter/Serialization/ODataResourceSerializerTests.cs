@@ -787,6 +787,26 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         }
 
         [Fact]
+        public void CreateResource_Calls_AppendResourceInstanceAnnotations()
+        {
+            // Arrange
+            SelectExpandNode selectExpandNode = new SelectExpandNode();
+
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
+            serializer.CallBase = true;
+
+            serializer
+                .Setup(s => s.AppendResourceInstanceAnnotations(It.IsAny<ODataResource>(), selectExpandNode, _entityContext))
+                .Verifiable();
+
+            // Act
+            serializer.Object.CreateResource(selectExpandNode, _entityContext);
+
+            // Assert
+            serializer.Verify();
+        }
+
+        [Fact]
         public void CreateResource_SetsETagToNull_IfRequestIsNull()
         {
             // Arrange
@@ -1314,6 +1334,34 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 "Name",
                 partialMatch: true);
         }
+
+        [Fact]
+        public void CreateODataResourceValue_ThrowsArgumentNull_ForInputParameters()
+        {
+            // Arrange
+            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
+            ODataResourceSerializer serializer = new ODataResourceSerializer(provider);
+
+            // Act & Assert
+            ExceptionAssert.ThrowsArgumentNull(
+                () => serializer.CreateODataResourceValue(new object(), null, writeContext: null),
+                "writeContext");
+        }
+
+        [Fact]
+        public void CreateODataResourceValue_ReturnsODataNullValue_ForNUll()
+        {
+            // Arrange
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            ODataResourceSerializer serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            // Act
+            object result = serializer.CreateODataResourceValue(null, null, null);
+
+            // Assert
+            Assert.Null(result);
+        }
+
         [Fact]
         public void CreateUntypedPropertyValue_ThrowsArgumentNull_StructuralProperty()
         {
@@ -1488,6 +1536,108 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(propertyValue, createdProperty.Value);
         }
 
+        public class CustomerWithInstanceAnnotation
+        {
+            public int Id { get; set; }
+
+            public IODataInstanceAnnotationContainer Container { get; set; }
+        }
+
+        [Fact]
+        public void CreateResource_Adds_InstanceAnnotationsForResource()
+        {
+            // Arrange
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<CustomerWithInstanceAnnotation>("Customers");
+            IEdmModel model = builder.GetEdmModel();
+            IEdmEntitySet customerSet = model.FindDeclaredEntitySet("Customers");
+            var customerType = customerSet.EntityType();
+            var idProperty = customerType.FindProperty("Id") as IEdmStructuralProperty;
+
+            ODataSerializerContext writeContext = new ODataSerializerContext()
+            {
+                NavigationSource = customerSet,
+                Model = model
+            };
+
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>(MockBehavior.Strict);
+            var entity = new CustomerWithInstanceAnnotation
+            {
+                Id = 42,
+                Container = new ODataInstanceAnnotationContainer()
+            };
+            entity.Container.AddResourceAnnotation("NS.TestAnnotation", 88);
+
+            Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Property);
+            ODataValue propertyValue = new Mock<ODataValue>().Object;
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(innerSerializer.Object);
+            innerSerializer.Setup(s => s.CreateODataValue(88, It.IsAny<IEdmTypeReference>(), writeContext)).Returns(propertyValue).Verifiable();
+
+            var serializer = new ODataResourceSerializer(serializerProvider.Object);
+            ResourceContext entityContext = new ResourceContext(writeContext, customerType.ToEdmTypeReference(true).AsEntity(), entity);
+            SelectExpandNode selectExpandNode = new SelectExpandNode(null, customerType, model);
+
+            // Act
+            ODataResource resource = serializer.CreateResource(selectExpandNode, entityContext);
+
+            // Assert
+            innerSerializer.Verify();
+
+            ODataInstanceAnnotation annotation = Assert.Single(resource.InstanceAnnotations);
+            Assert.Equal("NS.TestAnnotation", annotation.Name);
+            Assert.Same(propertyValue, annotation.Value);
+        }
+
+        [Fact]
+        public void CreateStructuralProperty_Adds_InstanceAnnotationsForProperty()
+        {
+            // Arrange
+            var builder = new ODataConventionModelBuilder();
+            builder.EntitySet<CustomerWithInstanceAnnotation>("Customers");
+            IEdmModel model = builder.GetEdmModel();
+            IEdmEntitySet customerSet = model.FindDeclaredEntitySet("Customers");
+            var customerType = customerSet.EntityType().ToEdmTypeReference(true).AsEntity();
+            var idProperty = customerType.FindProperty("Id") as IEdmStructuralProperty;
+
+            ODataSerializerContext writeContext = new ODataSerializerContext()
+            {
+                NavigationSource = customerSet,
+                Model = model
+            };
+
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>(MockBehavior.Strict);
+            var entity = new CustomerWithInstanceAnnotation
+            {
+                Id = 42,
+                Container = new ODataInstanceAnnotationContainer()
+            };
+            entity.Container.AddPropertyAnnotation("Id", "NS.TestAnnotation", 23);
+
+            Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Property);
+
+            ODataValue propertyValue = new Mock<ODataValue>().Object;
+
+            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(innerSerializer.Object);
+            innerSerializer.Setup(s => s.CreateODataValue(42, idProperty.Type, writeContext)).Returns(propertyValue).Verifiable();
+            innerSerializer.Setup(s => s.CreateODataValue(23, It.IsAny<IEdmTypeReference>(), writeContext)).Returns(propertyValue).Verifiable();
+
+            var serializer = new ODataResourceSerializer(serializerProvider.Object);
+
+            ResourceContext entityContext = new ResourceContext(writeContext, customerType, entity);
+
+            // Act
+            ODataProperty createdProperty = serializer.CreateStructuralProperty(idProperty, entityContext);
+
+            // Assert
+            innerSerializer.Verify();
+            Assert.Equal("Id", createdProperty.Name);
+            Assert.Equal(propertyValue, createdProperty.Value);
+
+            ODataInstanceAnnotation annotation = Assert.Single(createdProperty.InstanceAnnotations);
+            Assert.Equal("NS.TestAnnotation", annotation.Name);
+            Assert.Same(propertyValue, annotation.Value);
+        }
+
         private bool Verify(ResourceContext instanceContext, object instance, ODataSerializerContext writeContext)
         {
             Assert.Same(instance, (instanceContext.EdmObject as TypedEdmEntityObject).Instance);
@@ -1496,6 +1646,25 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(writeContext.Request, instanceContext.Request);
             Assert.Equal(writeContext.SkipExpensiveAvailabilityChecks, instanceContext.SkipExpensiveAvailabilityChecks);
             return true;
+        }
+
+        [Fact]
+        public void CreateODataValue_Calls_CreateODataResourceValue()
+        {
+            // Arrange
+            object value = new object();
+            IEdmTypeReference typeRefence = EdmUntypedStructuredTypeReference.NullableTypeReference;
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+
+            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+            Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+            serializer.Setup(s => s.CreateODataResourceValue(value, It.IsAny<IEdmStructuredTypeReference>(), writeContext)).Verifiable();
+
+            // Act
+            object createdProperty = serializer.Object.CreateODataValue(value, typeRefence, writeContext);
+
+            // Assert
+            serializer.Verify();
         }
 
         [Fact]
