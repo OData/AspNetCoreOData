@@ -1034,7 +1034,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
         #endregion
 
-        internal string GetFullPropertyPath(SingleValueNode node)
+        internal static string GetFullPropertyPath(SingleValueNode node)
         {
             string path = null;
             SingleValueNode parent = null;

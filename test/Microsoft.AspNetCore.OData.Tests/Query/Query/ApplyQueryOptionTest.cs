@@ -1303,9 +1303,15 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         public void SortOnNestedDynamicPropertyWorks()
         {
             // Arrange
-            var model = new ODataModelBuilder()
-                .Add_Customer_EntityType_With_Address()
-                .GetEdmModel();
+            var modelBuilder = new ODataModelBuilder();
+
+            var addressType = modelBuilder.ComplexType<Address>();
+            addressType.HasDynamicProperties(a => a.DynamicProperties);
+
+            var customerType = modelBuilder.EntityType<Customer>();
+            customerType.ComplexProperty(c => c.Address);
+
+            var model = modelBuilder.GetEdmModel();
 
             var context = new ODataQueryContext(model, typeof(Customer));
 
