@@ -99,7 +99,7 @@ extends:
           inputs:
             command: test
             projects: $(Build.SourcesDirectory)\test\Microsoft.AspNetCore.OData.E2E.Tests\Microsoft.AspNetCore.OData.E2E.Tests.csproj
-            arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed" --framework netcoreapp3.1
+            arguments: --configuration $(BuildConfiguration) --no-build -l "console;verbosity=detailed"
         - task: CmdLine@2
           displayName: Install ReportGenerator tool for code coverage
           inputs:
