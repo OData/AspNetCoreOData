@@ -288,7 +288,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (context.ElementClrType.IsDynamicTypeWrapper())
             {
-                return GetFlattenedPropertyExpression(openNode.Name, context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
+                return GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
             }
 
             if (context.ComputedProperties.TryGetValue(openNode.Name, out var computedProperty))
@@ -713,7 +713,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             CheckArgumentNull(allNode, context);
 
-           // context.EnterLambdaScope();
+            // context.EnterLambdaScope();
 
             (string name, ParameterExpression allIt) = context.HandleLambdaParameters(allNode.RangeVariables);
 
@@ -1034,7 +1034,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
         #endregion
 
-        internal string GetFullPropertyPath(SingleValueNode node)
+        internal static string GetFullPropertyPath(SingleValueNode node)
         {
             string path = null;
             SingleValueNode parent = null;
@@ -1046,14 +1046,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     parent = complexNode.Source;
                     break;
                 case QueryNodeKind.SingleValuePropertyAccess:
-                    var propertyNode = ((SingleValuePropertyAccessNode)node);
+                    var propertyNode = (SingleValuePropertyAccessNode)node;
                     path = propertyNode.Property.Name;
                     parent = propertyNode.Source;
                     break;
                 case QueryNodeKind.SingleNavigationNode:
-                    var navNode = ((SingleNavigationNode)node);
+                    var navNode = (SingleNavigationNode)node;
                     path = navNode.NavigationProperty.Name;
                     parent = navNode.Source;
+                    break;
+                case QueryNodeKind.SingleValueOpenPropertyAccess:
+                    var openPropertyNode = (SingleValueOpenPropertyAccessNode)node;
+                    path = openPropertyNode.Name;
+                    parent = openPropertyNode.Source;
                     break;
             }
 
