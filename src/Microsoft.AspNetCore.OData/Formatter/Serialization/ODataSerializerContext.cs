@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Common;
+using System.Threading;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -161,6 +162,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         /// Gets or sets the HTTP Request whose response is being serialized.
         /// </summary>
         public HttpRequest Request { get;set; }
+
+        /// <summary>
+        /// Get the <see cref="CancellationToken"/> from <see cref="Request"/> if defined or <see cref="System.Threading.CancellationToken.None"/>
+        /// </summary>
+        public CancellationToken CancellationToken => Request?.HttpContext.RequestAborted ?? CancellationToken.None;
 
         /// <summary>
         /// Gets or sets the root element name which is used when writing primitive and enum types

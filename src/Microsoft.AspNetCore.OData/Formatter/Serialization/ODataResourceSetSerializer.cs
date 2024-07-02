@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -131,9 +132,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
             object lastResource = null;
+            CancellationToken cancellationToken = writeContext.CancellationToken;
 
             foreach (object item in enumerable)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 lastResource = item;
 
                 await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
@@ -168,7 +171,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
             object lastResource = null;
 
-            await foreach (object item in asyncEnumerable)
+            await foreach (object item in asyncEnumerable.WithCancellation(writeContext.CancellationToken).ConfigureAwait(false))
             {
                 lastResource = item;
 
