@@ -202,6 +202,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 oDataReaderSettings.BaseUri = baseAddress;
                 oDataReaderSettings.Validations = oDataReaderSettings.Validations & ~ValidationKinds.ThrowOnUndeclaredPropertyForNonOpenType;
                 oDataReaderSettings.Version = version;
+                oDataReaderSettings.MaxProtocolVersion = version;
 
                 IODataRequestMessage oDataRequestMessage =
                     ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetRouteServices());
