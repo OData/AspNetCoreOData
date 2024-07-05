@@ -14,10 +14,17 @@ namespace Microsoft.AspNetCore.OData.Formatter.Attributes
 
         public ReplaceIllegalFieldNameCharactersAttribute(string replaceAt, string replaceColon, string replaceDot)
         {
-            //assert that the replacements are not illegal either
-            if (illegalChars.Contains(replaceAt) || illegalChars.Contains(replaceColon) || illegalChars.Contains(replaceDot))
+            //check if the replacement characters are not null
+            if (replaceAt == null || replaceColon == null || replaceDot == null)
             {
-                throw new ArgumentException("Replacement characters cannot be illegal characters");
+                throw new ArgumentNullException("Replacement characters cannot be null");
+            }
+
+            // check if any of the the replacement characters provided contain any of the illegal characters
+            // ex. if replaceAt contains any of the illegal characters checked one by one
+            if (illegalChars.Any(illegalChar => replaceAt.Contains(illegalChar) || replaceColon.Contains(illegalChar) || replaceDot.Contains(illegalChar)))
+            {
+                throw new ArgumentException("Replacement character cannot be an illegal character");
             }
 
             ReplaceAt = replaceAt;
@@ -27,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Attributes
 
         public ReplaceIllegalFieldNameCharactersAttribute(string replaceAnyIllegal)
         {
-            if (illegalChars.Contains(replaceAnyIllegal))
+            if (illegalChars.Any(illegalChar => replaceAnyIllegal.Contains(illegalChar)))
             {
                 throw new ArgumentException("Replacement character cannot be an illegal character");
             }
