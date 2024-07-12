@@ -19,13 +19,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
     public class DynamicTypeWrapperConverterTests
     {
         [Theory]
-        [InlineData(typeof(AggregationWrapper), true)]
+        [InlineData(typeof(AggregationWrapper<object>), true)]
         [InlineData(typeof(ComputeWrapper<object>), true)]
-        [InlineData(typeof(EntitySetAggregationWrapper), true)]
+        [InlineData(typeof(EntitySetAggregationWrapper<object>), true)]
         [InlineData(typeof(FlatteningWrapper<object>), true)]
         [InlineData(typeof(GroupByWrapper), true)]
-        [InlineData(typeof(NoGroupByAggregationWrapper), true)]
-        [InlineData(typeof(NoGroupByWrapper), true)]
+        [InlineData(typeof(NoGroupByAggregationWrapper<object>), true)]
+        [InlineData(typeof(NoGroupByWrapper<object>), true)]
         [InlineData(typeof(object), false)]
         [InlineData(typeof(SelectExpandWrapper), false)]
         [InlineData(null, false)]
@@ -39,13 +39,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Theory]
-        [InlineData(typeof(AggregationWrapper), typeof(AggregationWrapperConverter))]
+        [InlineData(typeof(AggregationWrapper<object>), typeof(AggregationWrapperConverter<object>))]
         [InlineData(typeof(ComputeWrapper<object>), typeof(ComputeWrapperConverter<object>))]
-        [InlineData(typeof(EntitySetAggregationWrapper), typeof(EntitySetAggregationWrapperConverter))]
+        [InlineData(typeof(EntitySetAggregationWrapper<object>), typeof(EntitySetAggregationWrapperConverter<object>))]
         [InlineData(typeof(FlatteningWrapper<object>), typeof(FlatteningWrapperConverter<object>))]
-        [InlineData(typeof(GroupByWrapper), typeof(GroupByWrapperConverter))]
-        [InlineData(typeof(NoGroupByAggregationWrapper), typeof(NoGroupByAggregationWrapperConverter))]
-        [InlineData(typeof(NoGroupByWrapper), typeof(NoGroupByWrapperConverter))]
+        [InlineData(typeof(GroupByWrapper), typeof(GroupByWrapperConverter<object>))]
+        [InlineData(typeof(NoGroupByAggregationWrapper<object>), typeof(NoGroupByAggregationWrapperConverter<object>))]
+        [InlineData(typeof(NoGroupByWrapper<object>), typeof(NoGroupByWrapperConverter<object>))]
         [InlineData(typeof(object), null)]
         [InlineData(typeof(SelectExpandWrapper), null)]
         [InlineData(null, null)]
@@ -73,20 +73,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         public void AggregationWrapperConverter_Works_AggregationWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterRead<AggregationWrapper>();
+            TestDynamicTypeWrapperConverterRead<AggregationWrapper<object>>();
 
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterWrite<AggregationWrapper>();
+            TestDynamicTypeWrapperConverterWrite<AggregationWrapper<object>>();
         }
 
         [Fact]
         public void EntitySetAggregationWrapperConverter_Works_EntitySetAggregationWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterRead<EntitySetAggregationWrapper>();
+            TestDynamicTypeWrapperConverterRead<EntitySetAggregationWrapper<object>>();
 
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterWrite<EntitySetAggregationWrapper>();
+            TestDynamicTypeWrapperConverterWrite<EntitySetAggregationWrapper<object>>();
         }
 
         [Fact]
@@ -103,20 +103,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         public void NoGroupByAggregationWrapperConverter_Works_NoGroupByAggregationWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterRead<NoGroupByAggregationWrapper>();
+            TestDynamicTypeWrapperConverterRead<NoGroupByAggregationWrapper<object>>();
 
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterWrite<NoGroupByAggregationWrapper>();
+            TestDynamicTypeWrapperConverterWrite<NoGroupByAggregationWrapper<object>>();
         }
 
         [Fact]
         public void NoGroupByWrapperWrapperConverter_Works_NoGroupByWrapper()
         {
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterRead<NoGroupByWrapper>();
+            TestDynamicTypeWrapperConverterRead<NoGroupByWrapper<object>>();
 
             // Arrange & Act & Assert
-            TestDynamicTypeWrapperConverterWrite<NoGroupByWrapper>();
+            TestDynamicTypeWrapperConverterWrite<NoGroupByWrapper<object>>();
         }
 
         internal static void TestDynamicTypeWrapperConverterRead<T>() where T : GroupByWrapper
@@ -131,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
                 // Act
                 ReadOnlySpan<byte> jsonReadOnlySpan = Encoding.UTF8.GetBytes("any");
                 Utf8JsonReader reader = new Utf8JsonReader(jsonReadOnlySpan);
-                typeConverter.Read(ref reader, typeof(AggregationWrapper), options);
+                typeConverter.Read(ref reader, typeof(AggregationWrapper<object>), options);
             }
             catch (NotImplementedException ex)
             {

@@ -6,13 +6,12 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
-    internal class FlatteningWrapper<T> : GroupByWrapper
+    internal class FlatteningWrapper<T> : GroupByWrapper<T>
     {
         // TODO: how to use 'Source'?
         public T Source { get; set; }
