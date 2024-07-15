@@ -1009,30 +1009,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(6, resource.Properties.Count());
 
             // Verify the declared properties
-            ODataProperty street = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "CustomerId"));
+            ODataProperty street = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "CustomerId")));
             Assert.Equal(991, street.Value);
 
-            ODataProperty city = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "Name"));
+            ODataProperty city = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "Name")));
             Assert.Equal("Name #991", city.Value);
 
             // Verify the nested open complex property
             Assert.Empty(resource.Properties.Where(p => p.Name == "Address"));
 
             // Verify the dynamic properties
-            ODataProperty enumProperty = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "EnumProperty"));
+            ODataProperty enumProperty = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "EnumProperty")));
             ODataEnumValue enumValue = Assert.IsType<ODataEnumValue>(enumProperty.Value);
             Assert.Equal("Fourth", enumValue.Value);
             Assert.Equal("Default.SimpleEnum", enumValue.TypeName);
 
-            ODataProperty guidProperty = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "GuidProperty"));
+            ODataProperty guidProperty = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "GuidProperty")));
             Assert.Equal(new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"), guidProperty.Value);
 
-            ODataProperty listProperty = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "ListProperty"));
+            ODataProperty listProperty = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "ListProperty")));
             ODataCollectionValue collectionValue = Assert.IsType<ODataCollectionValue>(listProperty.Value);
             Assert.Equal(new List<int> { 5, 4, 3, 2, 1 }, collectionValue.Items.OfType<int>().ToList());
             Assert.Equal("Collection(Edm.Int32)", collectionValue.TypeName);
 
-            ODataProperty dateTimeProperty = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "DateTimeProperty"));
+            ODataProperty dateTimeProperty = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "DateTimeProperty")));
             Assert.Equal(new DateTimeOffset(dateTime), dateTimeProperty.Value);
         }
 
@@ -1101,17 +1101,17 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             Assert.Equal(4, resource.Properties.Count());
 
             // Verify the declared properties
-            ODataProperty street = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "CustomerId"));
+            ODataProperty street = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "CustomerId")));
             Assert.Equal(991, street.Value);
 
-            ODataProperty city = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "Name"));
+            ODataProperty city = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "Name")));
             Assert.Equal("Name #991", city.Value);
 
             // Verify the nested open complex property
             Assert.Empty(resource.Properties.Where(p => p.Name == "Address"));
 
             // Verify the dynamic properties
-            ODataProperty guidProperty = Assert.Single(resource.Properties.OfType<ODataProperty>().Where(p => p.Name == "GuidProperty"));
+            ODataProperty guidProperty = Assert.IsType<ODataProperty>(Assert.Single(resource.Properties.Where(p => p.Name == "GuidProperty")));
             Assert.Equal(new Guid("181D3A20-B41A-489F-9F15-F91F0F6C9ECA"), guidProperty.Value);
 
             ODataProperty nullProperty = resource.Properties.OfType<ODataProperty>().Single(p => p.Name == "NullProperty");

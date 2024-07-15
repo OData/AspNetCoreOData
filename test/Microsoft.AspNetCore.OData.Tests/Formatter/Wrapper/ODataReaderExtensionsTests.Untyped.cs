@@ -146,7 +146,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(item);
             ODataResourceWrapper resourceWrapper = Assert.IsType<ODataResourceWrapper>(item);
 
-            ODataProperty property = Assert.Single(resourceWrapper.Resource.Properties.OfType<ODataProperty>());
+            ODataProperty property = Assert.IsType<ODataProperty>(Assert.Single(resourceWrapper.Resource.Properties));
             // Declared property with 'Edm.Int32'
             Assert.Equal("ID", property.Name);
             Assert.Equal(17, property.Value);
@@ -213,7 +213,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(item);
             ODataResourceWrapper resourceWrapper = Assert.IsType<ODataResourceWrapper>(item);
 
-            ODataProperty property = Assert.Single(resourceWrapper.Resource.Properties.OfType<ODataProperty>());
+            ODataProperty property = Assert.IsType<ODataProperty>(Assert.Single(resourceWrapper.Resource.Properties));
             // Declared property with 'Edm.Int32'
             Assert.Equal("ID", property.Name);
             Assert.Equal(17, property.Value);
@@ -349,7 +349,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                     Assert.Equal("NS.Info", p.Resource.TypeName);
 
                     Assert.Empty(p.NestedResourceInfos);
-                    ODataProperty property = Assert.Single(p.Resource.Properties.OfType<ODataProperty>());
+                    ODataProperty property = Assert.IsType<ODataProperty>(Assert.Single(p.Resource.Properties));
                     Assert.Equal("Key1", property.Name);
                     Assert.Equal("Value1", property.Value);
                 },
