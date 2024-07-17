@@ -97,19 +97,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             int? modelBoundPageSize = null)
         {
             Type elementType;
-            bool isCollection, isPrimitiveCollection = false;
+            bool isCollection, isStringCollection = false;
             isCollection = TypeHelper.IsCollection(source.Type, out elementType);
 
             if (isCollection)
             {
-                if (elementType == typeof(string)
-                    || elementType == typeof(int)
-                    || elementType == typeof(bool)
-                    || elementType == typeof(double)
-                    || elementType == typeof(Guid))
+                if (elementType == typeof(string))
                 {
-                    isPrimitiveCollection = true;
+                    isStringCollection = true;
                 }
+
+                
             }
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
@@ -123,9 +121,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             if (isCollection
-                && !isPrimitiveCollection
+                && !isStringCollection
                 )
             {
+                
                 // new CollectionWrapper<ElementType> { Instance = source.Select(s => new Wrapper { ... }) };
                 return ProjectCollection(subContext, source, elementType, selectExpandClause, structuredType, navigationSource, orderByClause,
                     topOption,
