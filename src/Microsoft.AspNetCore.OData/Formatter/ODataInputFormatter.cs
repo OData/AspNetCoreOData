@@ -205,8 +205,6 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 IODataRequestMessage oDataRequestMessage =
                     ODataMessageWrapperHelper.Create(new StreamWrapper(request.Body), request.Headers, request.GetODataContentIdMapping(), request.GetRouteServices());
-                ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
-                disposes.Add(oDataMessageReader);
 
                 ODataPath path = request.ODataFeature().Path;
                 ODataDeserializerContext readContext = BuildDeserializerContext(request);
@@ -215,6 +213,22 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 readContext.Model = model;
                 readContext.ResourceType = type;
                 readContext.ResourceEdmType = expectedPayloadType;
+
+                string preferHeader = RequestPreferenceHelpers.GetRequestPreferHeader(request.Headers);
+                string annotationFilter = null;
+                if (!string.IsNullOrEmpty(preferHeader))
+                {
+                    oDataRequestMessage.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
+                    annotationFilter = oDataRequestMessage.PreferHeader().AnnotationFilter;
+                }
+
+                if (annotationFilter != null)
+                {
+                    oDataReaderSettings.ShouldIncludeAnnotation = ODataUtils.CreateAnnotationFilter(annotationFilter);
+                }
+
+                ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, oDataReaderSettings, model);
+                disposes.Add(oDataMessageReader);
 
                 result = await deserializer.ReadAsync(oDataMessageReader, type, readContext).ConfigureAwait(false);
             }

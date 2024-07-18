@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Deltas;
@@ -18,6 +19,8 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.VisualBasic;
 
 namespace Microsoft.AspNetCore.OData.Formatter
 {
@@ -27,6 +30,8 @@ namespace Microsoft.AspNetCore.OData.Formatter
     public class ResourceContext
     {
         private object _resourceInstance;
+        private bool _annotationProcessed = false;
+        private IODataInstanceAnnotationContainer _annotationContainer = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceContext"/> class.
@@ -181,6 +186,44 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
                 throw Error.InvalidOperation(SRResources.PropertyNotFound, edmType.ToTraceString(), propertyName);
             }
+        }
+
+        internal IDictionary<string, object> GetPropertyInstanceAnnotations(IEdmProperty edmProperty)
+        {
+            IODataInstanceAnnotationContainer container = GetAnnotationContainer();
+            if (container == null)
+            {
+                return null;
+            }
+
+            string clrPropertyName = EdmModel.GetClrPropertyName(edmProperty);
+            return container.GetPropertyAnnotations(clrPropertyName);
+        }
+
+        internal IODataInstanceAnnotationContainer GetAnnotationContainer()
+        {
+            if (_annotationProcessed)
+            {
+                return _annotationContainer;
+            }
+
+            _annotationProcessed = true;
+            _annotationContainer = null;
+            if (EdmObject == null)
+            {
+                return _annotationContainer;
+            }
+
+            object value;
+            PropertyInfo annotationPropertyInfo = EdmModel.GetInstanceAnnotationsContainer(StructuredType);
+            if (annotationPropertyInfo == null ||
+                !EdmObject.TryGetPropertyValue(annotationPropertyInfo.Name, out value) || value == null)
+            {
+                return _annotationContainer;
+            }
+
+            _annotationContainer = value as IODataInstanceAnnotationContainer;
+            return _annotationContainer;
         }
 
         private object BuildResourceInstance()

@@ -252,6 +252,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         }
 
         /// <summary>
+        /// Gets/sets the dictionary to store the instance annotations from the source.
+        /// </summary>
+        internal IDictionary<string, object> InstanceAnnotations { get; set; }
+
+        /// <summary>
         /// Gets or sets the resource that is being expanded.
         /// </summary>
         public ResourceContext ExpandedResource { get; set; }

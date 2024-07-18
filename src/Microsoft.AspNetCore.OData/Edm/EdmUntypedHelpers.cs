@@ -11,8 +11,13 @@ namespace Microsoft.AspNetCore.OData.Edm
 {
     internal class EdmUntypedHelpers
     {
+        // Collection(Edm.Untyped) for resource set
         public readonly static EdmCollectionTypeReference NullableUntypedCollectionReference
             = new EdmCollectionTypeReference(
                 new EdmCollectionType(EdmUntypedStructuredTypeReference.NullableTypeReference));
+
+        // Collection(Edm.Untyped) for collection of (Primitive, enum)
+        public readonly static EdmCollectionTypeReference NullablePrimitiveUntypedCollectionReference
+            = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetUntyped()));
     }
 }

@@ -29,6 +29,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="ODataPrimitiveSerializer"/>.
+        /// </summary>
+        public ODataPrimitiveSerializer(IODataSerializerProvider serializerProvider)
+            : base(ODataPayloadKind.Property, serializerProvider)
+        {
+        }
+
         /// <inheritdoc/>
         public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
         {
@@ -50,7 +58,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
             Contract.Assert(edmType != null);
 
-            await messageWriter.WritePropertyAsync(this.CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
+            ODataProperty property = this.CreateProperty(graph, edmType, writeContext.RootElementName, writeContext);
+
+            if (writeContext.InstanceAnnotations != null)
+            {
+                ODataSerializerHelper.AppendInstanceAnnotations(writeContext.InstanceAnnotations,
+                    property.InstanceAnnotations, writeContext, SerializerProvider);
+            }
+
+            await messageWriter.WritePropertyAsync(property).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
