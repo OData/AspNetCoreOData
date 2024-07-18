@@ -5,20 +5,17 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.AspNetCore.OData.Routing.Controllers;
-using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData.Edm;
 using System.Net.Http;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Net.Http.Headers;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.Edm;
 using Xunit;
 using Xunit.Abstractions;
-using Newtonsoft.Json.Linq;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Xml.Linq;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
 {
@@ -215,6 +212,36 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
             Assert.Equal(expected, payloadBody);
         }
 
+        [Fact]
+        public async Task QueryUntypedEntitySet_WithDollarSelectOnUntypedProperties()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync($"odata/managers?$select=data,infos");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#Managers(Data,Infos)\"," +
+                "\"value\":[" +
+                  "{" +
+                    "\"Data\":{\"City\":\"Shanghai\",\"Street\":\"Fengjin RD\"}," +
+                    "\"Infos\":[1,\"abc\",3]" +
+                  "}," +
+                  "{" +
+                    "\"Data\":[42,null,\"abc\",{\"ACity\":\"Shanghai\",\"AData\":[42,\"Red\"]}]," +
+                    "\"Infos\":[42,\"Red\"]" +
+                  "}" +
+                "]" +
+              "}", payloadBody);
+        }
+
         public static TheoryDataSet<string, string> DeclaredPropertyQueryCases
         {
             get
@@ -322,6 +349,55 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Untyped
             string payloadBody = await response.Content.ReadAsStringAsync();
 
             Assert.Equal(expected, payloadBody);
+        }
+
+        [Fact]
+        public async Task QueryUntypedEntitySet_WithDollarFilterOnUntypedProperties_IsTypeOf()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync($"odata/people?$filter=isof(data,'Edm.Int32')");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People\"," +
+                "\"value\":[" +
+                  "{\"Id\":1,\"Name\":\"Kerry\",\"Dynamic1\":13,\"Dynamic2\":true,\"Data@odata.type\":\"#Int32\",\"Data\":13,\"Infos\":[1,2,3]}" +
+                "]}", payloadBody);
+        }
+
+        [Fact]
+        public async Task QueryUntypedEntitySet_WithDollarFilterOnUntypedProperties_IsNotTypeOf()
+        {
+            // Arrange
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.GetAsync($"odata/people?$filter=not isof(data,'Edm.Int32')&$select=Id,data");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            string payloadBody = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#People(Id,Data)\"," +
+                "\"value\":[" +
+                "{\"Id\":2,\"Data\":\"Red\"}," +
+                "{\"Id\":22,\"Data@odata.type\":\"#String\",\"Data\":\"Apple\"}," +
+                "{\"Id\":3,\"Data\":{\"City\":\"Redmond\",\"Street\":\"134TH AVE\"}}," +
+                "{\"Id\":4,\"Data\":{\"ZipCode\":\"<--->\",\"Location\":\"******\"}}," +
+                "{\"Id\":5,\"Data\":[null,42,{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress\",\"City\":\"Redmond\",\"Street\":\"134TH AVE\"}]}," +
+                "{\"Id\":99,\"Data\":[null,[42,{\"@odata.type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.Untyped.InModelAddress\",\"City\":\"Redmond\",\"Street\":\"134TH AVE\"}]]}" +
+              "]}", payloadBody);
         }
 
         [Fact]
