@@ -36,6 +36,11 @@ property selection combination possible. */
             set { UntypedInstance = value; }
         }
 
+        /// <summary>
+        /// Gets the instance value.
+        /// </summary>
+        public override object InstanceValue => Instance;
+
         protected override Type GetElementType()
         {
             return UntypedInstance == null ? typeof(TElement) : UntypedInstance.GetType();
