@@ -63,7 +63,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
             // Check if element type is null and not of AggregationWrapper type and not of NoGroupByAggregationWrapper type.
-            if (ElementType == null && ElementClrType != typeof(AggregationWrapper) && ElementClrType != typeof(NoGroupByAggregationWrapper))
+            if (ElementType == null && !typeof(GroupByWrapper).IsAssignableFrom(ElementClrType))
             {
                 throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
             }

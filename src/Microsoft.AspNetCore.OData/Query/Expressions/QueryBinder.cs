@@ -1096,7 +1096,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 //   return GetFlattenedPropertyExpression(propertyPath, context)
                 //      ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (!propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
 
-                bool isAggregated = context.ElementClrType == typeof(AggregationWrapper);
+                bool isAggregated = context.ElementClrType == typeof(AggregationWrapper<>);
 
                 return GetFlattenedPropertyExpression(propertyPath, context)
                     ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyName, isAggregated), context);

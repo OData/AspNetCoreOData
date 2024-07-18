@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 case TransformationNodeKind.Aggregate:
                     var aggregateClause = this._transformation as AggregateTransformationNode;
                     _aggregateExpressions = FixCustomMethodReturnTypes(aggregateClause.AggregateExpressions);
-                    ResultClrType = typeof(NoGroupByAggregationWrapper);
+                    ResultClrType = typeof(NoGroupByAggregationWrapper<>).MakeGenericType(elementType);
                     break;
                 case TransformationNodeKind.GroupBy:
                     var groupByClause = this._transformation as GroupByTransformationNode;
@@ -66,15 +66,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         }
                     }
 
-                    _groupByClrType = typeof(GroupByWrapper);
-                    ResultClrType = typeof(AggregationWrapper);
+                    _groupByClrType = typeof(GroupByWrapper<>).MakeGenericType(elementType);
+                    ResultClrType = typeof(AggregationWrapper<>).MakeGenericType(elementType);
                     break;
                 default:
                     throw new NotSupportedException(String.Format(CultureInfo.InvariantCulture,
                         SRResources.NotSupportedTransformationKind, transformation.Kind));
             }
 
-            _groupByClrType = _groupByClrType ?? typeof(NoGroupByWrapper);
+            _groupByClrType = _groupByClrType ?? typeof(NoGroupByWrapper<>).MakeGenericType(elementType);
         }
 
         private static Expression WrapDynamicCastIfNeeded(Expression propertyAccessor)
@@ -393,7 +393,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 properties.Add(new NamedPropertyExpression(Expression.Constant(aggExpression.Alias), CreateAggregationExpression(innerAccum, aggExpression, selectedElementType)));
             }
 
-            var nestedResultType = typeof(EntitySetAggregationWrapper);
+            var nestedResultType = typeof(EntitySetAggregationWrapper<>).MakeGenericType(this.ElementType);
             var wrapperProperty = nestedResultType.GetProperty("Container");
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
@@ -589,10 +589,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 //                                      })
                 List<NamedPropertyExpression> properties = CreateGroupByMemberAssignments(_groupingProperties);
 
-                var wrapperProperty = typeof(GroupByWrapper).GetProperty(GroupByContainerProperty);
+                var wrapperProperty = typeof(GroupByWrapper<>).GetProperty(GroupByContainerProperty);
                 List<MemberAssignment> wta = new List<MemberAssignment>();
                 wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
-                groupLambda = Expression.Lambda(Expression.MemberInit(Expression.New(typeof(GroupByWrapper)), wta), LambdaParameter);
+                groupLambda = Expression.Lambda(Expression.MemberInit(Expression.New(typeof(GroupByWrapper<>).MakeGenericType(ElementType)), wta), LambdaParameter);
             }
             else
             {
@@ -616,7 +616,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else
                 {
-                    var wrapperProperty = typeof(GroupByWrapper).GetProperty(GroupByContainerProperty);
+                    var wrapperProperty = typeof(GroupByWrapper<>).GetProperty(GroupByContainerProperty);
                     List<MemberAssignment> wta = new List<MemberAssignment>();
                     wta.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(CreateGroupByMemberAssignments(grpProp.ChildTransformations))));
                     properties.Add(new NamedPropertyExpression(Expression.Constant(propertyName), Expression.MemberInit(Expression.New(typeof(GroupByWrapper)), wta)));
