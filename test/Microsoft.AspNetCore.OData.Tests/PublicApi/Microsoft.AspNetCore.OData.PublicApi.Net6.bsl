@@ -1,3 +1,12 @@
+public interface Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer {
+	void AddPropertyAnnotation (string propertyName, string annotationName, object value)
+	void AddResourceAnnotation (string annotationName, object value)
+	object GetPropertyAnnotation (string propertyName, string annotationName)
+	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetPropertyAnnotations (string propertyName)
+	object GetResourceAnnotation (string annotationName)
+	System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetResourceAnnotations ()
+}
+
 [
 ExtensionAttribute(),
 ]
@@ -81,6 +90,17 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
 	public static void AddCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
+}
+
+public class Microsoft.AspNetCore.OData.ODataInstanceAnnotationContainer {
+	public ODataInstanceAnnotationContainer ()
+
+	public void AddPropertyAnnotation (string propertyName, string annotationName, object value)
+	public void AddResourceAnnotation (string annotationName, object value)
+	public object GetPropertyAnnotation (string propertyName, string annotationName)
+	public System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetPropertyAnnotations (string propertyName)
+	public object GetResourceAnnotation (string annotationName)
+	public System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetResourceAnnotations ()
 }
 
 public class Microsoft.AspNetCore.OData.ODataJsonOptionsSetup : IConfigureOptions`1 {
@@ -478,6 +498,7 @@ public interface Microsoft.AspNetCore.OData.Deltas.IDeltaSet : IEnumerable, ICol
 
 public interface Microsoft.AspNetCore.OData.Deltas.IDeltaSetItem {
 	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
+	Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer TransientInstanceAnnotationContainer  { public abstract get; public abstract set; }
 }
 
 public interface Microsoft.AspNetCore.OData.Deltas.ITypedDelta {
@@ -489,6 +510,7 @@ public abstract class Microsoft.AspNetCore.OData.Deltas.Delta : System.Dynamic.D
 	protected Delta ()
 
 	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public abstract get; }
+	Microsoft.AspNetCore.OData.IODataInstanceAnnotationContainer TransientInstanceAnnotationContainer  { public virtual get; public virtual set; }
 
 	public abstract void Clear ()
 	public abstract System.Collections.Generic.IEnumerable`1[[System.String]] GetChangedPropertyNames ()
@@ -1890,6 +1912,39 @@ public sealed class Microsoft.AspNetCore.OData.Routing.ODataRoutingMetadata : IO
 	Microsoft.OData.Edm.IEdmModel Model  { public virtual get; }
 	string Prefix  { public virtual get; }
 	Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate Template  { public virtual get; }
+}
+
+public enum Org.OData.Core.V1.DataModificationOperationKind : int {
+	Delete = 3
+	Insert = 0
+	Invoke = 4
+	Link = 5
+	Unlink = 6
+	Update = 1
+	Upsert = 2
+}
+
+public abstract class Org.OData.Core.V1.ExceptionType {
+	protected ExceptionType ()
+
+	Org.OData.Core.V1.MessageType MessageType  { public get; public set; }
+}
+
+public class Org.OData.Core.V1.DataModificationExceptionType : Org.OData.Core.V1.ExceptionType {
+	public DataModificationExceptionType (Org.OData.Core.V1.DataModificationOperationKind failedOperation)
+
+	Org.OData.Core.V1.DataModificationOperationKind FailedOperation  { public get; }
+	short ResponseCode  { public get; public set; }
+}
+
+public class Org.OData.Core.V1.MessageType {
+	public MessageType ()
+
+	string Code  { public get; public set; }
+	string Details  { public get; public set; }
+	string Message  { public get; public set; }
+	string Severity  { public get; public set; }
+	string Target  { public get; public set; }
 }
 
 public interface Microsoft.AspNetCore.OData.Formatter.Deserialization.IODataDeserializer {
