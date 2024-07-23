@@ -10,6 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -129,6 +130,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     return BindSingleValueFunctionCallNode(node as SingleValueFunctionCallNode);
                 case QueryNodeKind.Constant:
                     return BindConstantNode(node as ConstantNode);
+                case QueryNodeKind.SingleResourceCast:
+                    var singleResourceCastNode = node as SingleResourceCastNode;
+                    return BindSingleResourceCastNode(singleResourceCastNode, baseElement);
                 default:
                     throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, node.Kind,
                         typeof(AggregationBinder).Name);
@@ -171,6 +175,17 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     readDictionaryIndexerExpression,
                     nullExpression);
             }
+        }
+
+        private Expression BindSingleResourceCastNode(SingleResourceCastNode node, Expression baseElement = null)
+        {
+            IEdmStructuredTypeReference structured = node.StructuredTypeReference;
+            Contract.Assert(structured != null, "NS casts can contain only structured types");
+
+            Type clrType = Model.GetClrType(structured);
+
+            Expression source = Bind(node.Source);
+            return Expression.TypeAs(source, clrType);
         }
     }
 }
