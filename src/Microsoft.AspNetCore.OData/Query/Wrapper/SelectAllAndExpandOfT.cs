@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
+    [JsonConverter(typeof(SelectExpandWrapperConverter))]
     internal class SelectAllAndExpand<TEntity> : SelectExpandWrapper<TEntity>
     {
     }
