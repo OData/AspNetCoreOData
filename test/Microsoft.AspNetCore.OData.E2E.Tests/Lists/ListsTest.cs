@@ -6,30 +6,25 @@
 //------------------------------------------------------------------------------
 #if NET8_0_OR_GREATER
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
 {
     public class ListsTest : WebApiTestBase<ListsTest>
     {
         private Dictionary<string, string> _map;
-        // following the Fixture convention.
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             string currentDirectory = Environment.CurrentDirectory;
@@ -121,7 +116,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.Content.ReadAsObject<JObject>();
-            //throw new Exception(result.ToString());
             if (format == "application/json;odata.metadata=full")
             {
                 var typeOfListTestString = result["ListTestString@odata.type"].ToString();
