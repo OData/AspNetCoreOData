@@ -15,9 +15,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         public static IEdmModel GetConventionModel()
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            EntitySetConfiguration<Employee> employees = builder.EntitySet<Employee>("Employees");          
+            EntitySetConfiguration<Product> Products = builder.EntitySet<Product>("Products");          
 
-            builder.Namespace = typeof(Employee).Namespace;
+            builder.Namespace = typeof(Product).Namespace;
 
             var edmModel = builder.GetEdmModel();
             return edmModel;
