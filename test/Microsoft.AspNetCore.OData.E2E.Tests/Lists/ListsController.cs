@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         [EnableQuery(PageSize = 10, MaxExpansionDepth = 5)]
         public IActionResult Get()
         {
-            return Ok(_dbContext.Set<Product>().ToList());
+            return Ok(_dbContext.Set<Product>());
         }
 
         public IActionResult Get(string key)
