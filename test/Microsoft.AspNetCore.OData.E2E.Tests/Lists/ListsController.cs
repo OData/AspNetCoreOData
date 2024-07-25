@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="EnumsController.cs" company=".NET Foundation">
+// <copyright file="ListsController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>

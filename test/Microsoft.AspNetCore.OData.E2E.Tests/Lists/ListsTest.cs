@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="EnumsTest.cs" company=".NET Foundation">
+// <copyright file="ListsTest.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
             services.AddDbContext<ListsContext>(options =>
             options.UseSqlite("Data Source=../../../../test/Microsoft.AspNetCore.OData.E2E.Tests/Lists/DataBaseSrc.db"));
 
-            IEdmModel model1 = EnumsEdmModel.GetConventionModel();
+            IEdmModel model1 = ListsEdmModel.GetConventionModel();
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddRouteComponents("convention", model1));
