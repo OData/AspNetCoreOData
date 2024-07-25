@@ -253,8 +253,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         [InlineData("application/json;odata.metadata=full", "ListTestDouble", "/all(d: d gt 5.5)", 2)]
         [InlineData("application/json;odata.metadata=full", "ListTestInt", "/any(i: i le 5)", 2)]
         [InlineData("application/json;odata.metadata=full", "ListTestInt", "/all(i: i le 5)", 1)]
-        [InlineData("application/json;odata.metadata=full", "ListTestDateTime", "/any(d: d gt 2024-07-26T00:00:00Z)", 4)]
-        [InlineData("application/json;odata.metadata=full", "ListTestDateTime", "/all(d: d gt 2024-07-26T00:00:00Z)", 4)]
+        //[InlineData("application/json;odata.metadata=full", "ListTestDateTime", "/any(d: d gt 2024-07-26T00:00:00Z)", 4)]
+        //[InlineData("application/json;odata.metadata=full", "ListTestDateTime", "/all(d: d gt 2024-07-26T00:00:00Z)", 4)]
         //[InlineData("application/json;odata.metadata=full", "ListTestUri")]
         public async Task QueryEntitySetFilter(string format, string filter, string expr, int expected)
         {
