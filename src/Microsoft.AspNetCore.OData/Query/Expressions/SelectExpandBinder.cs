@@ -100,13 +100,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             bool isCollection, isPrimitiveCollection = false;
             isCollection = TypeHelper.IsCollection(source.Type, out elementType);
 
-            #if NET8_0_OR_GREATER
             if (isCollection)
             {
                 if (elementType == typeof(string)
                     || elementType == typeof(Uri)
                     || elementType == typeof(DateTime)
+#if NET6_0_OR_GREATER
                     || elementType == typeof(DateOnly)
+#endif
                     || elementType == typeof(DateTimeOffset)
                     || elementType == typeof(int)
                     || elementType == typeof(uint)
@@ -126,7 +127,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     isPrimitiveCollection = true;
                 }
             }
-            #endif
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
             {
