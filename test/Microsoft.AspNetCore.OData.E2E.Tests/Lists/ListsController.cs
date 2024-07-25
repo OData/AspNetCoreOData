@@ -90,31 +90,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
             return this.StatusCode(StatusCodes.Status204NoContent);
         }
 
-        [HttpPost]
-        //public IActionResult AddSkill([FromODataUri] int key, [FromBody] ODataActionParameters parameters)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    Skill skill = (Skill)parameters["skill"];
-
-        //    if (key == 6)
-        //    {
-        //        Assert.Equal(Skill.Sql, skill);
-        //        return Ok();
-        //    }
-
-        //    Product Product = Products.FirstOrDefault(e => e.ProductId == key);
-        //    if (!Product.SkillSet.Contains(skill))
-        //    {
-        //        Product.SkillSet.Add(skill);
-        //    }
-
-        //    return Ok(Product.SkillSet);
-        //}
-
         [HttpPost("ResetDataSource")]
         public IActionResult ResetDataSource()
         {
