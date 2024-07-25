@@ -4,7 +4,7 @@
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
-//#if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
 using System;
 using System.Linq;
 using System.Net;
@@ -292,4 +292,4 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         }
     }
 }
-//#endif
+#endif
