@@ -97,17 +97,32 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             int? modelBoundPageSize = null)
         {
             Type elementType;
-            bool isCollection, isStringCollection = false;
+            bool isCollection, isPrimitiveCollection = false;
             isCollection = TypeHelper.IsCollection(source.Type, out elementType);
 
             if (isCollection)
             {
-                if (elementType == typeof(string))
+                if (elementType == typeof(string)
+                    || elementType == typeof(Uri)
+                    || elementType == typeof(DateTime)
+                    || elementType == typeof(DateTimeOffset)
+                    || elementType == typeof(int)
+                    || elementType == typeof(uint)
+                    || elementType == typeof(long)
+                    || elementType == typeof(bool)
+                    || elementType == typeof(double)
+                    || elementType == typeof(float)
+                    || elementType == typeof(byte)
+                    || elementType == typeof(sbyte)
+                    || elementType == typeof(char)
+                    || elementType == typeof(decimal)
+                    || elementType == typeof(ulong)
+                    || elementType == typeof(short)
+                    || elementType == typeof(ushort)
+                    || elementType == typeof(Guid))
                 {
-                    isStringCollection = true;
+                    isPrimitiveCollection = true;
                 }
-
-                
             }
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
@@ -121,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             if (isCollection
-                && !isStringCollection
+                && !isPrimitiveCollection
                 )
             {
                 

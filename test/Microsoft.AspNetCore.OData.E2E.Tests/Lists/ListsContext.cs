@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
@@ -8,9 +9,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         public ListsContext(DbContextOptions<ListsContext> options)
             : base(options)
         {
+       
         }
 
-        public DbSet<Employee> Employees{ get; set; }
+        public DbSet<Product> Products{ get; set; }
+
+       
+       
     }
 }
 
