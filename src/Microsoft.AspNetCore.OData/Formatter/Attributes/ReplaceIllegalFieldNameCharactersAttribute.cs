@@ -7,12 +7,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Attributes
     sealed class ReplaceIllegalFieldNameCharactersAttribute : Attribute
     {
         //constant collection of illegal characters
-        private static readonly string[] illegalChars = new string[] { "@", ":", "." };
+        private static readonly string[] illegalChars = new string[] { "@", ":", ".", "#" };
         public string ReplaceAt { get; }
         public string ReplaceColon { get; }
         public string ReplaceDot { get; }
+        public string ReplaceHash { get; }
 
-        public ReplaceIllegalFieldNameCharactersAttribute(string replaceAt, string replaceColon, string replaceDot)
+        public ReplaceIllegalFieldNameCharactersAttribute(string replaceAt, string replaceColon, string replaceDot, string replaceHash)
         {
             //check if the replacement characters are not null
             if (replaceAt == null || replaceColon == null || replaceDot == null)
@@ -30,6 +31,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Attributes
             ReplaceAt = replaceAt;
             ReplaceColon = replaceColon;
             ReplaceDot = replaceDot;
+            ReplaceHash = replaceHash;
         }
 
         public ReplaceIllegalFieldNameCharactersAttribute(string replaceAnyIllegal)
@@ -42,6 +44,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Attributes
             ReplaceAt = replaceAnyIllegal;
             ReplaceColon = replaceAnyIllegal;
             ReplaceDot = replaceAnyIllegal;
+            ReplaceHash = replaceAnyIllegal;
         }
 
         public ReplaceIllegalFieldNameCharactersAttribute()
@@ -49,11 +52,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Attributes
             ReplaceAt = "_";
             ReplaceColon = "_";
             ReplaceDot = "_";
+            ReplaceHash = "_";
         }
 
         public string Replace(string fieldName)
         {
-            return fieldName.Replace("@", ReplaceAt).Replace(":", ReplaceColon).Replace(".", ReplaceDot);
+            return fieldName.Replace("@", ReplaceAt).Replace(":", ReplaceColon).Replace(".", ReplaceDot).Replace("#",ReplaceHash);
         }
     }
 }

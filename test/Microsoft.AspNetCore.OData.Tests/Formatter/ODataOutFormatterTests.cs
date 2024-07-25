@@ -279,7 +279,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             {
                 DynamicProperties = new Dictionary<string, object>
                 {
-                    { "Inv@l:d.", 1 }
+                    { "I#v@l:d.", 1 }
                 }
             };
 
@@ -316,7 +316,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
 
             // Assert
             // check that the JSON response contains the fixed property name and its value is 1
-            Assert.Equal(1, root.GetProperty("Inv_l_d_").GetInt32());
+            Assert.Equal(1, root.GetProperty("I_v_l_d_").GetInt32());
         }
 
         private class Customer
