@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Container;
+using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
@@ -182,19 +183,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 fixedQueryOptionName = "$" + queryOptionName;
             }
 
-            return fixedQueryOptionName.Equals("$orderby", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$filter", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$top", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$skip", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$count", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$expand", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$select", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$search", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$compute", StringComparison.Ordinal) ||
-                 fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
+            return QueryOptionsConstants.SupportedQueryOptions.Contains(fixedQueryOptionName);
         }
 
         /// <summary>
@@ -817,7 +806,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!String.IsNullOrEmpty(autoExpandRawValue) && !autoExpandRawValue.Equals(RawValues.Expand, StringComparison.Ordinal))
             {
-                queryParameters["$expand"] = autoExpandRawValue;
+                queryParameters[QueryOptionsConstants.Expand] = autoExpandRawValue;
                 containsAutoSelectExpandProperties = true;
             }
             else
@@ -827,7 +816,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!String.IsNullOrEmpty(autoSelectRawValue) && !autoSelectRawValue.Equals(RawValues.Select, StringComparison.Ordinal))
             {
-                queryParameters["$select"] = autoSelectRawValue;
+                queryParameters[QueryOptionsConstants.Select] = autoSelectRawValue;
                 containsAutoSelectExpandProperties = true;
             }
             else
@@ -984,59 +973,59 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 switch (kvp.Key.ToLowerInvariant())
                 {
-                    case "$filter":
-                        ThrowIfEmpty(kvp.Value, "$filter");
+                    case QueryOptionsConstants.Filter:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Filter);
                         RawValues.Filter = kvp.Value;
                         Filter = new FilterQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$orderby":
-                        ThrowIfEmpty(kvp.Value, "$orderby");
+                    case QueryOptionsConstants.OrderBy:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.OrderBy);
                         RawValues.OrderBy = kvp.Value;
                         OrderBy = new OrderByQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$top":
-                        ThrowIfEmpty(kvp.Value, "$top");
+                    case QueryOptionsConstants.Top:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Top);
                         RawValues.Top = kvp.Value;
                         Top = new TopQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$skip":
-                        ThrowIfEmpty(kvp.Value, "$skip");
+                    case QueryOptionsConstants.Skip:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Skip);
                         RawValues.Skip = kvp.Value;
                         Skip = new SkipQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$select":
+                    case QueryOptionsConstants.Select:
                         RawValues.Select = kvp.Value;
                         break;
-                    case "$count":
-                        ThrowIfEmpty(kvp.Value, "$count");
+                    case QueryOptionsConstants.Count:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Count);
                         RawValues.Count = kvp.Value;
                         Count = new CountQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$expand":
+                    case QueryOptionsConstants.Expand:
                         RawValues.Expand = kvp.Value;
                         break;
-                    case "$format":
+                    case QueryOptionsConstants.Format:
                         RawValues.Format = kvp.Value;
                         break;
-                    case "$skiptoken":
+                    case QueryOptionsConstants.SkipToken:
                         RawValues.SkipToken = kvp.Value;
                         SkipToken = new SkipTokenQueryOption(kvp.Value, Context);
                         break;
-                    case "$deltatoken":
+                    case QueryOptionsConstants.DeltaToken:
                         RawValues.DeltaToken = kvp.Value;
                         break;
-                    case "$apply":
-                        ThrowIfEmpty(kvp.Value, "$apply");
+                    case QueryOptionsConstants.Apply:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Apply);
                         RawValues.Apply = kvp.Value;
                         Apply = new ApplyQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$compute":
-                        ThrowIfEmpty(kvp.Value, "$compute");
+                    case QueryOptionsConstants.Compute:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Compute);
                         RawValues.Compute = kvp.Value;
                         Compute = new ComputeQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case "$search":
-                        ThrowIfEmpty(kvp.Value, "$search");
+                    case QueryOptionsConstants.Search:
+                        ThrowIfEmpty(kvp.Value, QueryOptionsConstants.Search);
                         RawValues.Search = kvp.Value;
                         Search = new SearchQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
@@ -1061,7 +1050,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         Context.Model,
                         Context.ElementType,
                         Context.NavigationSource,
-                        new Dictionary<string, string> { { "$count", "true" } },
+                        new Dictionary<string, string> { { QueryOptionsConstants.Count, "true" } },
                         Context.RequestContainer));
             }
         }

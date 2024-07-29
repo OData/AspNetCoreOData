@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -74,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$search", rawValue } },
+                new Dictionary<string, string> { { QueryOptionsConstants.Search, rawValue } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)

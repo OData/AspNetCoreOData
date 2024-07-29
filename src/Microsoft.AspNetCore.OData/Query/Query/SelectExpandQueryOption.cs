@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -88,8 +89,8 @@ namespace Microsoft.AspNetCore.OData.Query
                         context.NavigationSource,
                         new Dictionary<string, string>
                         {
-                            { "$select", select },
-                            { "$expand", expand }
+                            { QueryOptionsConstants.Select, select },
+                            { QueryOptionsConstants.Expand, expand }
                         },
                         context.RequestContainer)
                     : null)

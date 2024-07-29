@@ -11449,6 +11449,76 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Apply">
+            <summary>
+            The $apply query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Compute">
+            <summary>
+            The $compute query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Count">
+            <summary>
+            The $count query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.DeltaToken">
+            <summary>
+            The $deltatoken query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Expand">
+            <summary>
+            The $expand query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Filter">
+            <summary>
+            The $filter query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Format">
+            <summary>
+            The $format query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.OrderBy">
+            <summary>
+            The $orderby query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Search">
+            <summary>
+            The $search query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Select">
+            <summary>
+            The $select query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Skip">
+            <summary>
+            The $skip query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.SkipToken">
+            <summary>
+            The $skiptoken query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.Top">
+            <summary>
+            The $top query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.QueryOptionsConstants.SupportedQueryOptions">
+            <summary>
+            Query options that are currently supported in OData.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SearchQueryOption">
             <summary>
             This defines a $search OData query option for querying.
