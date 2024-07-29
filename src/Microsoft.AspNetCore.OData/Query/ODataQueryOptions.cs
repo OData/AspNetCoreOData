@@ -873,7 +873,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             foreach (var query in Request.Query)
             {
-                string key = query.Key.Trim();
+                string key = query.Key.Trim().ToLowerInvariant();
                 string value = query.Value.ToString();
                 // Check supported system query options per $-sign-prefix option.
                 if (!_enableNoDollarSignQueryOptions)
