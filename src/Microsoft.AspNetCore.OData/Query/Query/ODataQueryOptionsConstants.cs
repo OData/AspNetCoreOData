@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Query.Query
 {
-    internal static class QueryOptionsConstants
+    internal static class ODataQueryOptionsConstants
     {
         /// <summary>
         /// The $apply query option.
@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.OData.Query.Query
         /// <summary>
         /// Query options that are currently supported in OData.
         /// </summary>
-        public static readonly HashSet<string> SupportedQueryOptions = new HashSet<string>
+        public static readonly HashSet<string> QueryOptionSet = new HashSet<string>
         {
             Apply,
             Compute,

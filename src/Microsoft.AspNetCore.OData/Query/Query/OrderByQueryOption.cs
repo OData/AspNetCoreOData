@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { QueryOptionsConstants.OrderBy, rawValue }, { QueryOptionsConstants.Apply, applyRaw } },
+                new Dictionary<string, string> { { ODataQueryOptionsConstants.OrderBy, rawValue }, { ODataQueryOptionsConstants.Apply, applyRaw } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)
@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { QueryOptionsConstants.OrderBy, rawValue } },
+                new Dictionary<string, string> { { ODataQueryOptionsConstants.OrderBy, rawValue } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)

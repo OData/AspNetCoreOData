@@ -89,8 +89,8 @@ namespace Microsoft.AspNetCore.OData.Query
                         context.NavigationSource,
                         new Dictionary<string, string>
                         {
-                            { QueryOptionsConstants.Select, select },
-                            { QueryOptionsConstants.Expand, expand }
+                            { ODataQueryOptionsConstants.Select, select },
+                            { ODataQueryOptionsConstants.Expand, expand }
                         },
                         context.RequestContainer)
                     : null)

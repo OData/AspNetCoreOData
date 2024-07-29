@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { QueryOptionsConstants.Compute, rawValue } },
+                new Dictionary<string, string> { { ODataQueryOptionsConstants.Compute, rawValue } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)

@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { QueryOptionsConstants.Filter, rawValue } },
+                new Dictionary<string, string> { { ODataQueryOptionsConstants.Filter, rawValue } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)
