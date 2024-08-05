@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { ODataQueryOptionsConstants.Top, rawValue } });
+                new Dictionary<string, string> { { ODataQueryOptionConstants.Top, rawValue } });
         }
 
         /// <summary>

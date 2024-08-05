@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
                 switch (key)
                 {
-                    case ODataQueryOptionsConstants.Top:
+                    case ODataQueryOptionConstants.Top:
                         int top;
                         if (Int32.TryParse(value, out top))
                         {
@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                             }
                         }
                         break;
-                    case ODataQueryOptionsConstants.Skip:
+                    case ODataQueryOptionConstants.Skip:
                         if (useDefaultSkip)
                         {
                             //Need to increment skip only if we are not using skiptoken 
@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                             }
                         }
                         continue;
-                    case ODataQueryOptionsConstants.SkipToken:
+                    case ODataQueryOptionConstants.SkipToken:
                         continue;
                     default:
                         key = kvp.Key; // Leave parameters that are not OData query options in initial form
@@ -99,11 +99,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             if (useDefaultSkip)
             {
-                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, ODataQueryOptionsConstants.Skip + "={0}", nextPageSkip);
+                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, ODataQueryOptionConstants.Skip + "={0}", nextPageSkip);
             }
             else
             {
-                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, ODataQueryOptionsConstants.SkipToken + "={0}", skipTokenValue);
+                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, ODataQueryOptionConstants.SkipToken + "={0}", skipTokenValue);
             }
 
             UriBuilder uriBuilder = new UriBuilder(requestUri)

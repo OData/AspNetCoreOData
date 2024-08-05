@@ -183,7 +183,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 fixedQueryOptionName = "$" + queryOptionName;
             }
 
-            return ODataQueryOptionsConstants.QueryOptionSet.Contains(fixedQueryOptionName);
+            return ODataQueryOptionConstants.QueryOptionSet.Contains(fixedQueryOptionName);
         }
 
         /// <summary>
@@ -806,7 +806,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!String.IsNullOrEmpty(autoExpandRawValue) && !autoExpandRawValue.Equals(RawValues.Expand, StringComparison.Ordinal))
             {
-                queryParameters[ODataQueryOptionsConstants.Expand] = autoExpandRawValue;
+                queryParameters[ODataQueryOptionConstants.Expand] = autoExpandRawValue;
                 containsAutoSelectExpandProperties = true;
             }
             else
@@ -816,7 +816,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!String.IsNullOrEmpty(autoSelectRawValue) && !autoSelectRawValue.Equals(RawValues.Select, StringComparison.Ordinal))
             {
-                queryParameters[ODataQueryOptionsConstants.Select] = autoSelectRawValue;
+                queryParameters[ODataQueryOptionConstants.Select] = autoSelectRawValue;
                 containsAutoSelectExpandProperties = true;
             }
             else
@@ -973,59 +973,59 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 switch (kvp.Key.ToLowerInvariant())
                 {
-                    case ODataQueryOptionsConstants.Filter:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Filter);
+                    case ODataQueryOptionConstants.Filter:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Filter);
                         RawValues.Filter = kvp.Value;
                         Filter = new FilterQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.OrderBy:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.OrderBy);
+                    case ODataQueryOptionConstants.OrderBy:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.OrderBy);
                         RawValues.OrderBy = kvp.Value;
                         OrderBy = new OrderByQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.Top:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Top);
+                    case ODataQueryOptionConstants.Top:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Top);
                         RawValues.Top = kvp.Value;
                         Top = new TopQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.Skip:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Skip);
+                    case ODataQueryOptionConstants.Skip:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Skip);
                         RawValues.Skip = kvp.Value;
                         Skip = new SkipQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.Select:
+                    case ODataQueryOptionConstants.Select:
                         RawValues.Select = kvp.Value;
                         break;
-                    case ODataQueryOptionsConstants.Count:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Count);
+                    case ODataQueryOptionConstants.Count:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Count);
                         RawValues.Count = kvp.Value;
                         Count = new CountQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.Expand:
+                    case ODataQueryOptionConstants.Expand:
                         RawValues.Expand = kvp.Value;
                         break;
-                    case ODataQueryOptionsConstants.Format:
+                    case ODataQueryOptionConstants.Format:
                         RawValues.Format = kvp.Value;
                         break;
-                    case ODataQueryOptionsConstants.SkipToken:
+                    case ODataQueryOptionConstants.SkipToken:
                         RawValues.SkipToken = kvp.Value;
                         SkipToken = new SkipTokenQueryOption(kvp.Value, Context);
                         break;
-                    case ODataQueryOptionsConstants.DeltaToken:
+                    case ODataQueryOptionConstants.DeltaToken:
                         RawValues.DeltaToken = kvp.Value;
                         break;
-                    case ODataQueryOptionsConstants.Apply:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Apply);
+                    case ODataQueryOptionConstants.Apply:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Apply);
                         RawValues.Apply = kvp.Value;
                         Apply = new ApplyQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.Compute:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Compute);
+                    case ODataQueryOptionConstants.Compute:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Compute);
                         RawValues.Compute = kvp.Value;
                         Compute = new ComputeQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case ODataQueryOptionsConstants.Search:
-                        ThrowIfEmpty(kvp.Value, ODataQueryOptionsConstants.Search);
+                    case ODataQueryOptionConstants.Search:
+                        ThrowIfEmpty(kvp.Value, ODataQueryOptionConstants.Search);
                         RawValues.Search = kvp.Value;
                         Search = new SearchQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
@@ -1050,7 +1050,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         Context.Model,
                         Context.ElementType,
                         Context.NavigationSource,
-                        new Dictionary<string, string> { { ODataQueryOptionsConstants.Count, "true" } },
+                        new Dictionary<string, string> { { ODataQueryOptionConstants.Count, "true" } },
                         Context.RequestContainer));
             }
         }

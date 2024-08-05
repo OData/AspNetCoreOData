@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// </summary>
     public static class ODataOutputFormatterFactory
     {
-        private const string DollarFormat = ODataQueryOptionsConstants.Format;
+        private const string DollarFormat = ODataQueryOptionConstants.Format;
 
         private const string JsonFormat = "json";
 
