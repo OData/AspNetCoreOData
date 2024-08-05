@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Formatter.MediaType;
-using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Formatter
@@ -19,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
     /// </summary>
     public static class ODataOutputFormatterFactory
     {
-        private const string DollarFormat = ODataQueryOptionConstants.Format;
+        private const string DollarFormat = "$format";
 
         private const string JsonFormat = "json";
 

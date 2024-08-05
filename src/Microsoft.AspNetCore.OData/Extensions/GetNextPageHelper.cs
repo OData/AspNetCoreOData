@@ -12,7 +12,6 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 
@@ -44,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
                 switch (key)
                 {
-                    case ODataQueryOptionConstants.Top:
+                    case "$top":
                         int top;
                         if (Int32.TryParse(value, out top))
                         {
@@ -60,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                             }
                         }
                         break;
-                    case ODataQueryOptionConstants.Skip:
+                    case "$skip":
                         if (useDefaultSkip)
                         {
                             //Need to increment skip only if we are not using skiptoken 
@@ -72,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                             }
                         }
                         continue;
-                    case ODataQueryOptionConstants.SkipToken:
+                    case "$skiptoken":
                         continue;
                     default:
                         key = kvp.Key; // Leave parameters that are not OData query options in initial form
@@ -99,11 +98,11 @@ namespace Microsoft.AspNetCore.OData.Extensions
 
             if (useDefaultSkip)
             {
-                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, ODataQueryOptionConstants.Skip + "={0}", nextPageSkip);
+                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, "$skip={0}", nextPageSkip);
             }
             else
             {
-                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, ODataQueryOptionConstants.SkipToken + "={0}", skipTokenValue);
+                queryBuilder.AppendFormat(CultureInfo.CurrentCulture, "$skiptoken={0}", skipTokenValue);
             }
 
             UriBuilder uriBuilder = new UriBuilder(requestUri)

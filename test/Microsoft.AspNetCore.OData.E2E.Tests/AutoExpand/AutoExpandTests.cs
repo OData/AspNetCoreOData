@@ -69,7 +69,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
-            await VerifyNavigationPropertiesAndLevels(response, propCount);
+            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            this.output.WriteLine(customer.ToString());
+            Assert.Equal(customer.Properties().Count(), propCount);
+            VerifyOrderAndChoiceOrder(customer);
+            VerifyHomeAddress(customer);
+
+            // level one
+            JObject friend = customer["Friend"] as JObject;
+            JObject order = friend["Order"] as JObject;
+            Assert.NotNull(order);
+            Assert.Null(order["Choice"]);
+
+            // level two
+            friend = friend["Friend"] as JObject;
+            Assert.Null(friend["Order"]);
         }
 
         [Theory]

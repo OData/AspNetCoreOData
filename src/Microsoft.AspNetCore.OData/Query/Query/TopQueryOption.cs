@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -75,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { ODataQueryOptionConstants.Top, rawValue } });
+                new Dictionary<string, string> { { "$top", rawValue } });
         }
 
         /// <summary>

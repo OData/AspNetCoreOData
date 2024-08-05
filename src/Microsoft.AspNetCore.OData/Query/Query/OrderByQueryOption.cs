@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -81,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { ODataQueryOptionConstants.OrderBy, rawValue }, { ODataQueryOptionConstants.Apply, applyRaw } },
+                new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)
@@ -113,7 +112,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { ODataQueryOptionConstants.OrderBy, rawValue } },
+                new Dictionary<string, string> { { "$orderby", rawValue } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)

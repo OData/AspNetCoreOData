@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -82,7 +81,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { ODataQueryOptionConstants.Filter, rawValue } },
+                new Dictionary<string, string> { { "$filter", rawValue } },
                 context.RequestContainer);
 
             if (context.RequestContainer == null)
