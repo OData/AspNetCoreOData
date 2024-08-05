@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
-            var customer = await response.Content.ReadAsObject<JObject>();
+            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
             this.output.WriteLine(customer.ToString());
             Assert.Equal(customer.Properties().Count(), propCount);
             VerifyOrderAndChoiceOrder(customer);
@@ -84,6 +84,73 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             // level two
             friend = friend["Friend"] as JObject;
             Assert.Null(friend["Order"]);
+        }
+
+        [Theory]
+        [InlineData("$Select=Id", 4)]
+        [InlineData("$Select=Order", 3)]
+        public async Task QueryForResources_WithSelectQueryParamCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        {
+            // Arrange
+            string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            await VerifyNavigationPropertiesAndLevels(response, propCount);
+        }
+
+        [Theory]
+        [InlineData("$Expand=Order,HomeAddress/CountryOrRegion&$Select=Id", 4)]
+        [InlineData("$Expand=HomeAddress/CountryOrRegion,HomeAddress/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress/ZipCode,Order", 4)]
+        [InlineData("$Expand=Friend", 4)]
+        public async Task QueryForResources_WithExpandQueryParamsCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        {
+            // Arrange
+            string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            await VerifyNavigationPropertiesAndLevels(response, propCount);
+        }
+
+        [Theory]
+        [InlineData("$Expand=Order,HomeAddress/CountryOrRegion & $Select=Id", 4)]
+        [InlineData("$Expand=HomeAddress/CountryOrRegion,HomeAddress/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress/ZipCode,Order & $Select=Order", 3)]
+        public async Task QueryForResources_WithExpandSelectQueryParamsCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        {
+            // Arrange
+            string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            await VerifyNavigationPropertiesAndLevels(response, propCount);
         }
 
         private static void VerifyHomeAddress(JObject customer)
@@ -487,6 +554,25 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
                     Assert.Contains(expectedOrder, json);
                 }
             }
+        }
+
+        private async Task VerifyNavigationPropertiesAndLevels(HttpResponseMessage response, int propCount)
+        {
+            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            this.output.WriteLine(customer.ToString());
+            Assert.Equal(customer.Properties().Count(), propCount);
+            VerifyOrderAndChoiceOrder(customer);
+            VerifyHomeAddress(customer);
+
+            // level one
+            JObject friend = customer["Friend"] as JObject;
+            JObject order = friend["Order"] as JObject;
+            Assert.NotNull(order);
+            Assert.Null(order["Choice"]);
+
+            // level two
+            friend = friend["Friend"] as JObject;
+            Assert.Null(friend["Order"]);
         }
     }
 }
