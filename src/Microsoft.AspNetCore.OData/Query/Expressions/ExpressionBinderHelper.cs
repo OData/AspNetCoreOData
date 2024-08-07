@@ -96,7 +96,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 right = CreateTimeBinaryExpression(right, querySettings);
             }
 
-#if NET6_0
+#if NET6_0_OR_GREATER
             if ((IsType<DateOnly>(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
                 (IsDate(leftUnderlyingType) && IsType<DateOnly>(rightUnderlyingType)))
             {
@@ -396,7 +396,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 return MakePropertyAccess(ClrCanonicalFunctions.TimeSpanProperties[propertyName], source, querySettings);
             }
-#if NET6_0
+#if NET6_0_OR_GREATER
             else if (IsType<DateOnly>(source.Type))
             {
                 return MakePropertyAccess(ClrCanonicalFunctions.DateOnlyProperties[propertyName], source, querySettings);
@@ -477,7 +477,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     return Expression.Constant(timeOfDay.Value, typeof(TimeOfDay));
                 }
 
-#if NET6_0
+#if NET6_0_OR_GREATER
                 if (parameterizedConstantValue is DateOnly dateOnly)
                 {
                     return Expression.Constant(dateOnly, typeof(DateOnly));
@@ -510,7 +510,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 || IsType<DateTimeOffset>(type)
                 || IsType<TimeOfDay>(type)
                 || IsType<TimeSpan>(type)
-#if NET6_0
+#if NET6_0_OR_GREATER
                 || IsType<DateOnly>(type)
                 || IsType<TimeOnly>(type)
 #endif
@@ -519,7 +519,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         public static bool IsDateRelated(Type type)
         {
-#if NET6_0
+#if NET6_0_OR_GREATER
             return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<DateOnly>(type);
 #else
             return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type);
@@ -528,7 +528,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         public static bool IsTimeRelated(Type type)
         {
-#if NET6_0
+#if NET6_0_OR_GREATER
             return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type) || IsType<TimeOnly>(type);
 #else
             return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type);
@@ -560,7 +560,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return IsType<Date>(type);
         }
 
-#if NET6_0
+#if NET6_0_OR_GREATER
         public static bool IsDateOnly(this Type type)
         {
             return IsType<DateOnly>(type);

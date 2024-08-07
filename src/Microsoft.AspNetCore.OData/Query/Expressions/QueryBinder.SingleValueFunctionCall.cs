@@ -384,7 +384,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 Contract.Assert(ClrCanonicalFunctions.DateProperties.ContainsKey(node.Name));
                 property = ClrCanonicalFunctions.DateProperties[node.Name];
             }
-#if NET6_0
+#if NET6_0_OR_GREATER
             else if (parameter.Type.IsDateOnly())
             {
                 Contract.Assert(ClrCanonicalFunctions.DateOnlyProperties.ContainsKey(node.Name));
@@ -428,7 +428,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 Contract.Assert(ClrCanonicalFunctions.TimeOfDayProperties.ContainsKey(node.Name));
                 property = ClrCanonicalFunctions.TimeOfDayProperties[node.Name];
             }
-#if NET6_0
+#if NET6_0_OR_GREATER
             else if (parameter.Type.IsTimeOnly())
             {
                 Contract.Assert(ClrCanonicalFunctions.TimeOnlyProperties.ContainsKey(node.Name));

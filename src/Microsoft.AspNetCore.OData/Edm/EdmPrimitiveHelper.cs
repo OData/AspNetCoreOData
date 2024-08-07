@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Edm
 
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeBoolean));
                 }
-#if NET6_0
+#if NET6_0_OR_GREATER
                 else if (type == typeof(DateOnly))
                 {
                     if (value is Date dt)

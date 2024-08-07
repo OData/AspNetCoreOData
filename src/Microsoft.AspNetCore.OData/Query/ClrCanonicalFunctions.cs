@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Query
             new KeyValuePair<string, PropertyInfo>(MillisecondFunctionName, typeof(TimeOfDay).GetProperty("Milliseconds")),
         }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-#if NET6_0
+#if NET6_0_OR_GREATER
         // DateOnly properties
         public static readonly Dictionary<string, PropertyInfo> DateOnlyProperties = new Dictionary<string, PropertyInfo>
         {

@@ -91,7 +91,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             BuildValueTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
             BuildValueTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
 
-#if NET6_0
+#if NET6_0_OR_GREATER
             BuildValueTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date, isStandard: false);
             BuildValueTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
 #endif

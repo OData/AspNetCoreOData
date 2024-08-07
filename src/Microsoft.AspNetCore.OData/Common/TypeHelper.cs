@@ -93,7 +93,7 @@ namespace Microsoft.AspNetCore.OData.Common
             return Type.GetTypeCode(underlyingTypeOrSelf) == TypeCode.DateTime;
         }
 
-#if NET6_0
+#if NET6_0_OR_GREATER
         /// <summary>
         /// Determine if a type is a <see cref="DateOnly"/>.
         /// </summary>
