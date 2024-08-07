@@ -277,6 +277,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
+            if (string.IsNullOrEmpty(context.QueryProvider))
+            {
+                context.QueryProvider = source.Provider.GetType().Namespace;
+            }
+
             Type elementType = context.ElementClrType;
 
             LambdaExpression projectionLambda = binder.BindSelectExpand(selectExpandClause, context) as LambdaExpression;
