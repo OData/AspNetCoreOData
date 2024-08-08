@@ -96,7 +96,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 right = CreateTimeBinaryExpression(right, querySettings);
             }
 
-#if NET6_0_OR_GREATER
             if ((IsType<DateOnly>(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
                 (IsDate(leftUnderlyingType) && IsType<DateOnly>(rightUnderlyingType)))
             {
@@ -109,7 +108,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 left = CreateTimeBinaryExpression(left, querySettings);
                 right = CreateTimeBinaryExpression(right, querySettings);
             }
-#endif
 
             if (left.Type != right.Type)
             {
@@ -396,7 +394,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 return MakePropertyAccess(ClrCanonicalFunctions.TimeSpanProperties[propertyName], source, querySettings);
             }
-#if NET6_0_OR_GREATER
             else if (IsType<DateOnly>(source.Type))
             {
                 return MakePropertyAccess(ClrCanonicalFunctions.DateOnlyProperties[propertyName], source, querySettings);
@@ -405,7 +402,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             {
                 return MakePropertyAccess(ClrCanonicalFunctions.TimeOnlyProperties[propertyName], source, querySettings);
             }
-#endif
 
             return source;
         }
@@ -477,7 +473,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     return Expression.Constant(timeOfDay.Value, typeof(TimeOfDay));
                 }
 
-#if NET6_0_OR_GREATER
                 if (parameterizedConstantValue is DateOnly dateOnly)
                 {
                     return Expression.Constant(dateOnly, typeof(DateOnly));
@@ -487,7 +482,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 {
                     return Expression.Constant(timeOnly, typeof(TimeOnly));
                 }
-#endif
             }
 
             return source;
@@ -510,29 +504,19 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 || IsType<DateTimeOffset>(type)
                 || IsType<TimeOfDay>(type)
                 || IsType<TimeSpan>(type)
-#if NET6_0_OR_GREATER
                 || IsType<DateOnly>(type)
                 || IsType<TimeOnly>(type)
-#endif
                 ;
         }
 
         public static bool IsDateRelated(Type type)
         {
-#if NET6_0_OR_GREATER
             return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<DateOnly>(type);
-#else
-            return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type);
-#endif
         }
 
         public static bool IsTimeRelated(Type type)
         {
-#if NET6_0_OR_GREATER
             return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type) || IsType<TimeOnly>(type);
-#else
-            return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type);
-#endif
         }
 
         public static bool IsDateOrOffset(Type type)
@@ -560,7 +544,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return IsType<Date>(type);
         }
 
-#if NET6_0_OR_GREATER
         public static bool IsDateOnly(this Type type)
         {
             return IsType<DateOnly>(type);
@@ -570,7 +553,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             return IsType<TimeOnly>(type);
         }
-#endif
 
         public static bool IsInteger(Type type)
         {
