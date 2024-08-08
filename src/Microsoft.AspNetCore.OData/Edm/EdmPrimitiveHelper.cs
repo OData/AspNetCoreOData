@@ -137,7 +137,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeBoolean));
                 }
-#if NET6_0
                 else if (type == typeof(DateOnly))
                 {
                     if (value is Date dt)
@@ -156,7 +155,6 @@ namespace Microsoft.AspNetCore.OData.Edm
 
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
                 }
-#endif
                 else
                 {
                     if (TypeHelper.TryGetInstance(type, value, out var result))
