@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (isCollection)
             {
-                if (elementType == typeof(string)
+                isPrimitiveCollection = TypeHelper.IsPrimitive(elementType);
                     || elementType == typeof(Uri)
                     || elementType == typeof(DateTime)
 #if NET6_0_OR_GREATER
