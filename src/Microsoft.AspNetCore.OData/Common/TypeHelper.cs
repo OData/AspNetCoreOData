@@ -252,6 +252,24 @@ namespace Microsoft.AspNetCore.OData.Common
             return false;
         }
 
+        /// <summary>
+        /// Checks if element is Primitive
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <returns></returns>
+        public static bool IsPrimitive(Type elementType)
+        {
+            // Boolean, Byte, SByte, Int16, UInt16, Int32, UInt32, Int64, UInt64, IntPtr, UIntPtr, Char, Double, and Single.
+            return elementType.IsPrimitive || elementType == typeof(string)
+                   || elementType == typeof(Uri)
+                   || elementType == typeof(DateTime)
+#if NET6_0_OR_GREATER
+        || elementType == typeof(DateOnly)
+#endif
+                   || elementType == typeof(DateTimeOffset)
+                   || elementType == typeof(Guid);
+        }
+
         internal static bool IsDictionary(Type clrType)
         {
             if (clrType == null)
