@@ -11,6 +11,7 @@
 *.sql binary
 *.nupkg binary
 *.exe binary
+*.db binary
 
 *.ascx text
 *.cd text

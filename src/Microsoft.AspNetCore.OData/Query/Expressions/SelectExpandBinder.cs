@@ -97,7 +97,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             int? modelBoundPageSize = null)
         {
             Type elementType;
-            bool isCollection = TypeHelper.IsCollection(source.Type, out elementType);
+            bool isCollection, isPrimitiveCollection = false;
+            isCollection = TypeHelper.IsCollection(source.Type, out elementType);
+
+            if (isCollection)
+            {
+                isPrimitiveCollection = TypeHelper.IsPrimitiveOrKnownType(elementType);
+            }
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
             {
@@ -109,8 +115,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 subContext.OrderByClauses = orderByClause.ToList();
             }
 
-            if (isCollection)
+            if (isCollection
+                && !isPrimitiveCollection
+                )
             {
+
                 // new CollectionWrapper<ElementType> { Instance = source.Select(s => new Wrapper { ... }) };
                 return ProjectCollection(subContext, source, elementType, selectExpandClause, structuredType, navigationSource, orderByClause,
                     topOption,
@@ -232,7 +241,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // Expression:  source.Property
             string propertyName = model.GetClrPropertyName(edmProperty);
-            
+
             PropertyInfo propertyInfo = source.Type.GetProperty(propertyName, BindingFlags.DeclaredOnly);
             if (propertyInfo == null)
             {
@@ -253,7 +262,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                  */
                 propertyInfo = source.Type.GetProperties().Where(m => m.Name.Equals(propertyName, StringComparison.Ordinal)).FirstOrDefault();
             }
-            
+
             Expression propertyValue = Expression.Property(source, propertyInfo);
             Type nullablePropertyType = TypeHelper.ToNullable(propertyValue.Type);
             Expression nullablePropertyValue = ExpressionHelpers.ToNullable(propertyValue);
