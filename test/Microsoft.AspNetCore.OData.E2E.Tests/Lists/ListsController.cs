@@ -32,18 +32,19 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         [EnableQuery(PageSize = 10, MaxExpansionDepth = 5)]
         public IActionResult Get()
         {
-            return Ok(_dbContext.Set<Product>());
+            return Ok(_dbContext.Products);
         }
 
+        [EnableQuery]
         public IActionResult Get(string key)
         {
-            return Ok(_dbContext.Set<Product>().Find(key));
+            return Ok(_dbContext.Products.Find(key));
         }
 
         public IActionResult Post([FromBody] Product Product)
         {
-            Product.ProductId = _dbContext.Set<Product>().Count() + 1+"";
-            _dbContext.Set<Product>().Add(Product);
+            Product.ProductId = _dbContext.Products.Count() + 1+"";
+            _dbContext.Products.Add(Product);
             _dbContext.SaveChanges();
 
             return Created(Product);
@@ -52,29 +53,29 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         public IActionResult Put(int key, [FromBody] Product Product)
         {
             Product.ProductId = key+"";
-            Product originalProduct = _dbContext.Set<Product>().Find(key);
+            Product originalProduct = _dbContext.Products.Find(key);
 
             if (originalProduct == null)
             {
-                _dbContext.Set<Product>().Add(Product);
+                _dbContext.Products.Add(Product);
 
                 return Created(Product);
             }
 
-            _dbContext.Set<Product>().Remove(originalProduct);
-            _dbContext.Set<Product>().Add(Product);
+            _dbContext.Products.Remove(originalProduct);
+            _dbContext.Products.Add(Product);
             return Ok(Product);
         }
 
         public IActionResult Patch(int key, [FromBody] Delta<Product> delta)
         {
-            Product originalProduct = _dbContext.Set<Product>().Find(key);
+            Product originalProduct = _dbContext.Products.Find(key);
 
             if (originalProduct == null)
             {
                 Product temp = new Product();
                 delta.Patch(temp);
-                _dbContext.Set<Product>().Add(temp);
+                _dbContext.Products.Add(temp);
                 return Created(temp);
             }
 
@@ -84,20 +85,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
 
         public IActionResult Delete(int key)
         {
-            Product Product = _dbContext.Set<Product>().Find(key);
+            Product Product = _dbContext.Products.Find(key);
 
-            _dbContext.Set<Product>().Remove(Product);
+            _dbContext.Products.Remove(Product);
             return this.StatusCode(StatusCodes.Status204NoContent);
         }
 
         [HttpPost("ResetDataSource")]
         public IActionResult ResetDataSource()
         {
-            _dbContext.Set<Product>().RemoveRange(_dbContext.Set<Product>());
+            _dbContext.Orders.RemoveRange(_dbContext.Orders);
+            _dbContext.Products.RemoveRange(_dbContext.Products);
             _dbContext.SaveChanges();
 
             // Add new seed data
-            _dbContext.Set<Product>().AddRange(
+            _dbContext.Products.AddRange(
                new Product
                {
                    ProductId = "1",
