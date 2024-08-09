@@ -253,14 +253,10 @@ namespace Microsoft.AspNetCore.OData.Common
         }
 
         /// <summary>
-        /// Checks if element is Primitive
-        /// </summary>
-        /// <summary>
         /// Check whether the given type is a primitive type or known type.
         /// </summary>
         /// <param name="type">The type to validate.</param>
         /// <returns>True if type is primitive or known type, otherwise False.</returns>
-        /// <returns>true/false</returns>
         public static bool IsPrimitiveOrKnownType(Type type)
         {
             return type.IsPrimitive 
