@@ -193,6 +193,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         [InlineData("application/json;odata.metadata=full", "ListTestInt")]
         [InlineData("application/json;odata.metadata=full", "ListTestDateTime")]
         //[InlineData("application/json;odata.metadata=full", "ListTestUri")]
+        [InlineData("application/json;odata.metadata=full", "ListTestOrder")]
         public async Task QueryEntitySetSelect(string format, string select)
         {
             // Arrange
@@ -223,6 +224,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         [InlineData("application/json;odata.metadata=full", "ListTestInt")]
         [InlineData("application/json;odata.metadata=full", "ListTestDateTime")]
         //[InlineData("application/json;odata.metadata=full", "ListTestUri")]
+        [InlineData("application/json;odata.metadata=full", "ListTestOrder")]
         public async Task QueryEntitySelect(string format, string select)
         {
             // Arrange
