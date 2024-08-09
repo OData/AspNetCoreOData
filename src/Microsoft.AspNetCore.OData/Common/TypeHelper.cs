@@ -268,7 +268,8 @@ namespace Microsoft.AspNetCore.OData.Common
         || type == typeof(TimeOnly)
 #endif
                    || type == typeof(DateTimeOffset)
-                   || type == typeof(Guid);
+                   || type == typeof(Guid)
+                   || type == typeof(Decimal);
         }
 
         internal static bool IsDictionary(Type clrType)
