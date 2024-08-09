@@ -16,8 +16,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             EntitySetConfiguration<Product> Products = builder.EntitySet<Product>("Products");          
+            EntitySetConfiguration<Order> Orders = builder.EntitySet<Order>("Orders");          
 
             builder.Namespace = typeof(Product).Namespace;
+            builder.Namespace = typeof(Order).Namespace;
 
             var edmModel = builder.GetEdmModel();
             return edmModel;
