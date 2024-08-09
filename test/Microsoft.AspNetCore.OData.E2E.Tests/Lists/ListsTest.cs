@@ -53,7 +53,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
                     {"ListTestFloat", "Single"},
                     {"ListTestDateTime", "DateTimeOffset"},
                     {"ListTestUri", "Microsoft.AspNetCore.OData.E2E.Tests.Lists.Uri"},
-                    {"ListTestUint", "UInt32"}
+                    {"ListTestOrder", "Microsoft.AspNetCore.OData.E2E.Tests.Lists.Order"},
+                    {"ListTestUint", "UInt32"},
                 };
         }
 
@@ -198,7 +199,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         {
             // Arrange
             await ResetDatasource();
-            string requestUri = "/convention/Products?$format=" + format + "&$select=" + select;
+            string requestUri = "/convention/Products?$expand=ListTestOrder&$format=" + format + "&$select=" + select;
             HttpClient client = CreateClient();
 
             // Act
@@ -229,7 +230,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         {
             // Arrange
             await ResetDatasource();
-            string requestUri = "/convention/Products('1')?$format=" + format + "&$select=" + select;
+            string requestUri = "/convention/Products('1')?$expand=ListTestOrder&$format=" + format + "&$select=" + select;
             HttpClient client = CreateClient();
 
             // Act
