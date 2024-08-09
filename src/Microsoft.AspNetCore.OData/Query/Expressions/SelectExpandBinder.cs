@@ -102,7 +102,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (isCollection)
             {
-                isPrimitiveCollection = TypeHelper.IsPrimitive(elementType);
+                isPrimitiveCollection = TypeHelper.IsPrimitiveOrKnownType(elementType);
             }
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
