@@ -103,29 +103,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             if (isCollection)
             {
                 isPrimitiveCollection = TypeHelper.IsPrimitive(elementType);
-                    || elementType == typeof(Uri)
-                    || elementType == typeof(DateTime)
-#if NET6_0_OR_GREATER
-                    || elementType == typeof(DateOnly)
-#endif
-                    || elementType == typeof(DateTimeOffset)
-                    || elementType == typeof(int)
-                    || elementType == typeof(uint)
-                    || elementType == typeof(long)
-                    || elementType == typeof(bool)
-                    || elementType == typeof(double)
-                    || elementType == typeof(float)
-                    || elementType == typeof(byte)
-                    || elementType == typeof(sbyte)
-                    || elementType == typeof(char)
-                    || elementType == typeof(decimal)
-                    || elementType == typeof(ulong)
-                    || elementType == typeof(short)
-                    || elementType == typeof(ushort)
-                    || elementType == typeof(Guid))
-                {
-                    isPrimitiveCollection = true;
-                }
             }
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
