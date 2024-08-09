@@ -256,7 +256,7 @@ namespace Microsoft.AspNetCore.OData.Common
         /// Checks if element is Primitive
         /// </summary>
         /// <param name="elementType"></param>
-        /// <returns></returns>
+        /// <returns>true/false</returns>
         public static bool IsPrimitiveOrKnownType(Type type)
         {
             return type.IsPrimitive 
