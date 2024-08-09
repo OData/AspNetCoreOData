@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
                    ListTestDateTime = new List<DateTimeOffset> { DateTime.Now, DateTime.UtcNow },
                    ListTestUri = new List<Uri> { new Uri("https://example.com") },
                    ListTestUint = new uint[] { 1, 2, 3 },
-                   ListTestOrders = new List<Order>
+                   ListTestOrder = new List<Order>
                     {
                         new Order { OrderId = "Order1" },
                         new Order { OrderId = "Order2" }
