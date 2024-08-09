@@ -26,5 +26,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         public IList<DateTimeOffset> ListTestDateTime { get; set; }
         public IList<Uri> ListTestUri { get; set; }
         public uint[] ListTestUint { get; set; }
+       public IList<Order>? ListTestOrders { get; set; }
+    }
+    public class Order
+    {
+        [Key]
+        public string OrderId { get; set; }
     }
 }
