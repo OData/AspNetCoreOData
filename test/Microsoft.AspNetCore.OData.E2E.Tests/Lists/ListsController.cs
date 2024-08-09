@@ -110,7 +110,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
                    ListTestFloat = new List<float> { 1.1f, 2.2f },
                    ListTestDateTime = new List<DateTimeOffset> { DateTime.Now, DateTime.UtcNow },
                    ListTestUri = new List<Uri> { new Uri("https://example.com") },
-                   ListTestUint = new uint[] { 1, 2, 3 }
+                   ListTestUint = new uint[] { 1, 2, 3 },
+                   ListTestOrders = new List<Order>
+                    {
+                        new Order { OrderId = "Order1" },
+                        new Order { OrderId = "Order2" }
+                    }
                },
                 new Product
                 {
