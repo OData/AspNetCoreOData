@@ -28,8 +28,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             string currentDirectory = Environment.CurrentDirectory;
-            //Console.WriteLine("Current Working Directory: " + currentDirectory);
-            //throw new InvalidOperationException("Current Working Directory: " + currentDirectory);
             services.ConfigureControllers(typeof(ProductsController), typeof(MetadataController));
             services.AddDbContext<ListsContext>(options =>
             options.UseSqlite("Data Source=../../../../test/Microsoft.AspNetCore.OData.E2E.Tests/Lists/DataBaseSrc.db"));
