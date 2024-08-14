@@ -10956,6 +10956,52 @@
             <param name="nodeIn">The node to be translated.</param> 
             <returns>The translated node.</returns> 
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider">
+            <summary>
+            An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.Filters.IFilterProvider" /> that applies an action filter to
+            any action with an <see cref="T:System.Linq.IQueryable" /> or <see cref="T:System.Linq.IQueryable`1" /> return type
+            that doesn't bind a parameter of type <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.#ctor(Microsoft.AspNetCore.Mvc.Filters.IActionFilter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider" /> class.
+            </summary>
+            <param name="queryFilter">The action filter that executes the query.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilter">
+            <summary>
+            Gets the action filter that executes the query.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.Order">
+            <summary>
+            Gets the order value for determining the order of execution of providers. Providers
+            execute in ascending numeric value of the Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order
+            property.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
+            <summary>
+            Provides filters to apply to the specified action.
+            </summary>
+            <param name="context">The filter context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
+            <summary>
+            Summary:
+            Called in decreasing Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order,
+            after all Microsoft.AspNetCore.Mvc.Filters.IFilterProviders have executed once.
+            </summary>
+            <param name="context">The Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.IsIQueryable(System.Type)">
+            <summary>
+            Determines whether the given type is IQueryable.
+            </summary>
+            <param name="type">The type</param>
+            <returns><c>true</c> if the type is IQueryable.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption">
             <summary>
             This defines a $apply OData query option for querying.
@@ -11706,52 +11752,6 @@
             Validate the top query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider">
-            <summary>
-            An implementation of <see cref="T:Microsoft.AspNetCore.Mvc.Filters.IFilterProvider" /> that applies an action filter to
-            any action with an <see cref="T:System.Linq.IQueryable" /> or <see cref="T:System.Linq.IQueryable`1" /> return type
-            that doesn't bind a parameter of type <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions" />.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.#ctor(Microsoft.AspNetCore.Mvc.Filters.IActionFilter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider" /> class.
-            </summary>
-            <param name="queryFilter">The action filter that executes the query.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.QueryFilter">
-            <summary>
-            Gets the action filter that executes the query.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.Order">
-            <summary>
-            Gets the order value for determining the order of execution of providers. Providers
-            execute in ascending numeric value of the Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order
-            property.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuting(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
-            <summary>
-            Provides filters to apply to the specified action.
-            </summary>
-            <param name="context">The filter context.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.OnProvidersExecuted(Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext)">
-            <summary>
-            Summary:
-            Called in decreasing Microsoft.AspNetCore.Mvc.Filters.IFilterProvider.Order,
-            after all Microsoft.AspNetCore.Mvc.Filters.IFilterProviders have executed once.
-            </summary>
-            <param name="context">The Microsoft.AspNetCore.Mvc.Filters.FilterProviderContext.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.QueryFilterProvider.IsIQueryable(System.Type)">
-            <summary>
-            Determines whether the given type is IQueryable.
-            </summary>
-            <param name="type">The type</param>
-            <returns><c>true</c> if the type is IQueryable.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty._propertySegment">
             <summary>
