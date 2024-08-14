@@ -75,25 +75,5 @@ namespace Microsoft.AspNetCore.OData.Query.Query
         /// The $top query option.
         /// </summary>
         public const string Top = "$top";
-
-        /// <summary>
-        /// Query options that are currently supported in OData.
-        /// </summary>
-        public static readonly HashSet<string> QueryOptionSet = new HashSet<string>
-        {
-            Apply,
-            Compute,
-            Count,
-            DeltaToken,
-            Expand,
-            Filter,
-            Format,
-            OrderBy,
-            Search,
-            Select,
-            Skip,
-            SkipToken,
-            Top
-        };
     }
 }

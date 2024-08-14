@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -97,10 +98,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
 
+            HttpResponseMessage response = null;
+            Exception exception = null;
+
             // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+            try
+            {
+                response = await client.SendAsync(request);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
 
             // Assert
+            Assert.Null(exception);
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
@@ -120,10 +132,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
 
+            HttpResponseMessage response = null;
+            Exception exception = null;
+
             // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+            try
+            {
+                response = await client.SendAsync(request);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
 
             // Assert
+            Assert.Null(exception);
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
@@ -132,9 +155,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         }
 
         [Theory]
-        [InlineData("$Expand=Order,HomeAddress/CountryOrRegion & $Select=Id", 4)]
-        [InlineData("$Expand=HomeAddress/CountryOrRegion,HomeAddress/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress/ZipCode,Order & $Select=Order", 3)]
-        public async Task QueryForResources_WithExpandSelectQueryParamsCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        [InlineData("$Expand=Order,HomeAddress/CountryOrRegion($Select=Name)", 4)]
+        [InlineData("$Expand=HomeAddress/CountryOrRegion,HomeAddress/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress/ZipCode,Order($Expand=Choice($Select=Amount))", 4)]
+        public async Task QueryForResources_WithExpandSelectQueryParamsCapitalized_IncludesAutoExpandNavigationProperty_(string queryParams, int propCount)
         {
             // Arrange
             string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
@@ -142,10 +165,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
 
+            HttpResponseMessage response = null;
+            Exception exception = null;
+
             // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+            try
+            {
+                response = await client.SendAsync(request);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+            }
 
             // Assert
+            Assert.Null(exception);
             Assert.NotNull(response);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
@@ -559,7 +593,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         private async Task VerifyNavigationPropertiesAndLevels(HttpResponseMessage response, int propCount)
         {
             var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
-            this.output.WriteLine(customer.ToString());
             Assert.Equal(customer.Properties().Count(), propCount);
             VerifyOrderAndChoiceOrder(customer);
             VerifyHomeAddress(customer);

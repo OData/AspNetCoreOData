@@ -183,7 +183,19 @@ namespace Microsoft.AspNetCore.OData.Query
                 fixedQueryOptionName = "$" + queryOptionName;
             }
 
-            return ODataQueryOptionConstants.QueryOptionSet.Contains(fixedQueryOptionName);
+            return fixedQueryOptionName.Equals(ODataQueryOptionConstants.OrderBy, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Filter, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Top, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Skip, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Count, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Expand, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Select, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Format, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.SkipToken, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.DeltaToken, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Search, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Compute, StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals(ODataQueryOptionConstants.Apply, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -858,11 +870,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private IDictionary<string, string> GetODataQueryParameters()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var query in Request.Query)
             {
-                string key = query.Key.Trim().ToLowerInvariant();
+                string key = query.Key.Trim();
                 string value = query.Value.ToString();
                 // Check supported system query options per $-sign-prefix option.
                 if (!_enableNoDollarSignQueryOptions)

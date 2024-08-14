@@ -11364,11 +11364,6 @@
             The $top query option.
             </summary>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.QueryOptionSet">
-            <summary>
-            Query options that are currently supported in OData.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions">
             <summary>
             Represents the raw query values in the string format from the incoming request.
