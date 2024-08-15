@@ -25,18 +25,29 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
     public class ListsTest : WebApiTestBase<ListsTest>
     {
         private Dictionary<string, string> _map;
+
         protected static void UpdateConfigureServices(IServiceCollection services)
         {
             string currentDirectory = Environment.CurrentDirectory;
             services.ConfigureControllers(typeof(ProductsController), typeof(MetadataController));
+            var keepAliveConnection = new SqliteConnection("DataSource=:memory:");
+            keepAliveConnection.Open();
+
             services.AddDbContext<ListsContext>(options =>
-            options.UseSqlite("Data Source=../../../../test/Microsoft.AspNetCore.OData.E2E.Tests/Lists/DataBaseSrc.db"));
+                options.UseSqlite(keepAliveConnection));
 
             IEdmModel model1 = ListsEdmModel.GetConventionModel();
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddRouteComponents("convention", model1));
 
+            var serviceProvider = services.BuildServiceProvider();
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ListsContext>();
+                context.Database.OpenConnection(); // Open connection to in-memory database
+                context.Database.EnsureCreated(); // Ensure the schema is created
+            }
         }
 
         public ListsTest(WebApiTestFixture<ListsTest> fixture)
