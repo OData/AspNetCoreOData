@@ -564,7 +564,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         private async Task VerifyNavigationPropertiesAndLevels(HttpResponseMessage response, int propCount)
         {
             var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
-            this.output.WriteLine(customer.ToString());
             Assert.Equal(customer.Properties().Count(), propCount);
             VerifyOrderAndChoiceOrder(customer);
             VerifyHomeAddress(customer);
