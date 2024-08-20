@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Query.Query
 {
-    internal static class ODataQueryOptionConstants
+    internal static class UriQueryConstants
     {
         /// <summary>
         /// The $apply query option.

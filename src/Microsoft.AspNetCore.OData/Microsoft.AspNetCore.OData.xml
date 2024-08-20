@@ -11299,71 +11299,6 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Apply">
-            <summary>
-            The $apply query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Compute">
-            <summary>
-            The $compute query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Count">
-            <summary>
-            The $count query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.DeltaToken">
-            <summary>
-            The $deltatoken query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Expand">
-            <summary>
-            The $expand query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Filter">
-            <summary>
-            The $filter query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Format">
-            <summary>
-            The $format query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.OrderBy">
-            <summary>
-            The $orderby query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Search">
-            <summary>
-            The $search query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Select">
-            <summary>
-            The $select query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Skip">
-            <summary>
-            The $skip query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.SkipToken">
-            <summary>
-            The $skiptoken query option.
-            </summary>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.Query.Query.ODataQueryOptionConstants.Top">
-            <summary>
-            The $top query option.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions">
             <summary>
             Represents the raw query values in the string format from the incoming request.
@@ -11847,6 +11782,71 @@
             Validate the top query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Apply">
+            <summary>
+            The $apply query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Compute">
+            <summary>
+            The $compute query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Count">
+            <summary>
+            The $count query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.DeltaToken">
+            <summary>
+            The $deltatoken query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Expand">
+            <summary>
+            The $expand query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Filter">
+            <summary>
+            The $filter query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Format">
+            <summary>
+            The $format query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.OrderBy">
+            <summary>
+            The $orderby query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Search">
+            <summary>
+            The $search query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Select">
+            <summary>
+            The $select query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Skip">
+            <summary>
+            The $skip query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.SkipToken">
+            <summary>
+            The $skiptoken query option.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Query.UriQueryConstants.Top">
+            <summary>
+            The $top query option.
+            </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty._propertySegment">
             <summary>
