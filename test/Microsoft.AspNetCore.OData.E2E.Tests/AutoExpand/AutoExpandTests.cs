@@ -96,12 +96,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await SendRequestAsync(request);
+            HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
-            Assert.NotNull(response);
+            Assert.True(response.IsSuccessStatusCode);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
@@ -122,12 +123,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
 
             // Act
-            HttpResponseMessage response = await SendRequestAsync(request);
+            HttpResponseMessage response = await client.SendAsync(request);
 
             // Assert
-            Assert.NotNull(response);
+            Assert.True(response.IsSuccessStatusCode);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
@@ -553,27 +555,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             // level two
             friend = friend["Friend"] as JObject;
             Assert.Null(friend["Order"]);
-        }
-
-        private async Task<HttpResponseMessage> SendRequestAsync(HttpRequestMessage request)
-        {
-            HttpClient client = CreateClient();
-
-            HttpResponseMessage response = null;
-            Exception exception = null;
-
-            try
-            {
-                response = await client.SendAsync(request).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-            }
-
-            Assert.Null(exception);
-
-            return response;
         }
     }
 }
