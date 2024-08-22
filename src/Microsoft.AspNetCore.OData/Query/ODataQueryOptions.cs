@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Container;
-using Microsoft.AspNetCore.OData.Query.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
@@ -183,19 +182,19 @@ namespace Microsoft.AspNetCore.OData.Query
                 fixedQueryOptionName = "$" + queryOptionName;
             }
 
-            return fixedQueryOptionName.Equals(UriQueryConstants.OrderBy, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Filter, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Top, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Skip, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Count, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Expand, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Select, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Format, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.SkipToken, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.DeltaToken, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Search, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Compute, StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals(UriQueryConstants.Apply, StringComparison.Ordinal);
+            return fixedQueryOptionName.Equals("$orderby", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$filter", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$top", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$skip", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$count", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$expand", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$select", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$search", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$compute", StringComparison.Ordinal) ||
+                fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -818,7 +817,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!String.IsNullOrEmpty(autoExpandRawValue) && !autoExpandRawValue.Equals(RawValues.Expand, StringComparison.Ordinal))
             {
-                queryParameters[UriQueryConstants.Expand] = autoExpandRawValue;
+                queryParameters["$expand"] = autoExpandRawValue;
                 containsAutoSelectExpandProperties = true;
             }
             else
@@ -828,7 +827,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
             if (!String.IsNullOrEmpty(autoSelectRawValue) && !autoSelectRawValue.Equals(RawValues.Select, StringComparison.Ordinal))
             {
-                queryParameters[UriQueryConstants.Select] = autoSelectRawValue;
+                queryParameters["$select"] = autoSelectRawValue;
                 containsAutoSelectExpandProperties = true;
             }
             else
@@ -985,59 +984,59 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 switch (kvp.Key.ToLowerInvariant())
                 {
-                    case UriQueryConstants.Filter:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Filter);
+                    case "$filter":
+                        ThrowIfEmpty(kvp.Value, "$filter");
                         RawValues.Filter = kvp.Value;
                         Filter = new FilterQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.OrderBy:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.OrderBy);
+                    case "$orderby":
+                        ThrowIfEmpty(kvp.Value, "$orderby");
                         RawValues.OrderBy = kvp.Value;
                         OrderBy = new OrderByQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.Top:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Top);
+                    case "$top":
+                        ThrowIfEmpty(kvp.Value, "$top");
                         RawValues.Top = kvp.Value;
                         Top = new TopQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.Skip:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Skip);
+                    case "$skip":
+                        ThrowIfEmpty(kvp.Value, "$skip");
                         RawValues.Skip = kvp.Value;
                         Skip = new SkipQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.Select:
+                    case "$select":
                         RawValues.Select = kvp.Value;
                         break;
-                    case UriQueryConstants.Count:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Count);
+                    case "$count":
+                        ThrowIfEmpty(kvp.Value, "$count");
                         RawValues.Count = kvp.Value;
                         Count = new CountQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.Expand:
+                    case "$expand":
                         RawValues.Expand = kvp.Value;
                         break;
-                    case UriQueryConstants.Format:
+                    case "$format":
                         RawValues.Format = kvp.Value;
                         break;
-                    case UriQueryConstants.SkipToken:
+                    case "$skiptoken":
                         RawValues.SkipToken = kvp.Value;
                         SkipToken = new SkipTokenQueryOption(kvp.Value, Context);
                         break;
-                    case UriQueryConstants.DeltaToken:
+                    case "$deltatoken":
                         RawValues.DeltaToken = kvp.Value;
                         break;
-                    case UriQueryConstants.Apply:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Apply);
+                    case "$apply":
+                        ThrowIfEmpty(kvp.Value, "$apply");
                         RawValues.Apply = kvp.Value;
                         Apply = new ApplyQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.Compute:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Compute);
+                    case "$compute":
+                        ThrowIfEmpty(kvp.Value, "$compute");
                         RawValues.Compute = kvp.Value;
                         Compute = new ComputeQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
-                    case UriQueryConstants.Search:
-                        ThrowIfEmpty(kvp.Value, UriQueryConstants.Search);
+                    case "$search":
+                        ThrowIfEmpty(kvp.Value, "$search");
                         RawValues.Search = kvp.Value;
                         Search = new SearchQueryOption(kvp.Value, Context, _queryOptionParser);
                         break;
@@ -1062,7 +1061,7 @@ namespace Microsoft.AspNetCore.OData.Query
                         Context.Model,
                         Context.ElementType,
                         Context.NavigationSource,
-                        new Dictionary<string, string> { { UriQueryConstants.Count, "true" } },
+                        new Dictionary<string, string> { { "$count", "true" } },
                         Context.RequestContainer));
             }
         }
