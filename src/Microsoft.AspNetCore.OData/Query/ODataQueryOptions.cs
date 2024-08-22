@@ -183,18 +183,18 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             return fixedQueryOptionName.Equals("$orderby", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$filter", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$top", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$skip", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$count", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$expand", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$select", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$search", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$compute", StringComparison.Ordinal) ||
-                fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
+                 fixedQueryOptionName.Equals("$filter", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$top", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$skip", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$count", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$expand", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$select", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$format", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$skiptoken", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$deltatoken", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$search", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$compute", StringComparison.Ordinal) ||
+                 fixedQueryOptionName.Equals("$apply", StringComparison.Ordinal);
         }
 
         /// <summary>
