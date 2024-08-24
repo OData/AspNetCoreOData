@@ -419,6 +419,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         }
 
         [Fact]
+        public void ReadResource_Calls_ApplyNestedPropertyInfos()
+        {
+            // Arrange
+            Mock<ODataResourceDeserializer> deserializer = new Mock<ODataResourceDeserializer>(_deserializerProvider);
+            ODataResourceWrapper resourceWrapper = new ODataResourceWrapper(new ODataResource { Properties = Enumerable.Empty<ODataProperty>() });
+            deserializer.CallBase = true;
+            deserializer.Setup(d => d.CreateResourceInstance(_productEdmType, _readContext)).Returns(42);
+            deserializer.Setup(d => d.ApplyNestedPropertyInfos(42, resourceWrapper, _productEdmType, _readContext)).Verifiable();
+
+            // Act
+            deserializer.Object.ReadResource(resourceWrapper, _productEdmType, _readContext);
+
+            // Assert
+            deserializer.Verify();
+        }
+
+        [Fact]
         public void ReadResource_Calls_ApplyNestedProperties()
         {
             // Arrange

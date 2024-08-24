@@ -26,6 +26,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
             IsDeletedResource = resource != null && resource is ODataDeletedResource;
 
             NestedResourceInfos = new List<ODataNestedResourceInfoWrapper>();
+
+            NestedPropertyInfos = new List<ODataPropertyInfo>();
         }
 
         /// <summary>
@@ -42,5 +44,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
         /// Gets the inner nested resource infos.
         /// </summary>
         public IList<ODataNestedResourceInfoWrapper> NestedResourceInfos { get; }
+
+        /// <summary>
+        /// Gets the nested property infos.
+        /// The nested property info is a property without value but could have instance annotations.
+        /// </summary>
+        public IList<ODataPropertyInfo> NestedPropertyInfos { get; }
     }
 }

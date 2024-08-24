@@ -2018,6 +2018,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceD
 	public virtual void ApplyDeletedResource (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyNestedProperties (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyNestedProperty (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper resourceInfoWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual void ApplyNestedPropertyInfos (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyStructuralProperties (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyStructuralProperty (object resource, Microsoft.OData.ODataProperty structuralProperty, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object CreateResourceInstance (Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
@@ -2716,6 +2717,7 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWr
 	public ODataResourceWrapper (Microsoft.OData.ODataResourceBase resource)
 
 	bool IsDeletedResource  { public get; }
+	System.Collections.Generic.IList`1[[Microsoft.OData.ODataPropertyInfo]] NestedPropertyInfos  { public get; }
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper]] NestedResourceInfos  { public get; }
 	Microsoft.OData.ODataResourceBase Resource  { public get; }
 }

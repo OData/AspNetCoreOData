@@ -475,6 +475,21 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <summary>
+        /// Deserializes the nested property info from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+        /// Nested property info contains annotations for the property but without the property value.
+        /// </summary>
+        /// <param name="resource">The object into which the properties should be read.</param>
+        /// <param name="resourceWrapper">The resource object containing the structural properties.</param>
+        /// <param name="structuredType">The type of the resource.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        public virtual void ApplyNestedPropertyInfos(object resource, ODataResourceWrapper resourceWrapper,
+            IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
+        {
+            // Add this method to provide customers an solution to customize the deserializer to handle the properties without value.
+            // We Will fill this method later when we enable the instance annotation feature.
+        }
+
+        /// <summary>
         /// Deserializes the structural properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
         /// </summary>
         /// <param name="resource">The object into which the structural properties should be read.</param>
@@ -489,7 +504,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(resourceWrapper));
             }
 
-            foreach (ODataProperty property in resourceWrapper.Resource.Properties)
+            foreach (ODataProperty property in resourceWrapper.Resource.Properties.OfType<ODataProperty>())
             {
                 ApplyStructuralProperty(resource, property, structuredType, readContext);
             }
@@ -532,6 +547,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
         {
             ApplyStructuralProperties(resource, resourceWrapper, structuredType, readContext);
+            ApplyNestedPropertyInfos(resource, resourceWrapper, structuredType, readContext);
             ApplyNestedProperties(resource, resourceWrapper, structuredType, readContext);
         }
 

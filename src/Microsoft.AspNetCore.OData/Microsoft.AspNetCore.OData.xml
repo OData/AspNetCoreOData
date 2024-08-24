@@ -3606,6 +3606,16 @@
             <param name="structuredType">The type of the resource.</param>
             <param name="readContext">The deserializer context.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyNestedPropertyInfos(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <summary>
+            Deserializes the nested property info from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+            Nested property info contains annotations for the property but without the property value.
+            </summary>
+            <param name="resource">The object into which the properties should be read.</param>
+            <param name="resourceWrapper">The resource object containing the structural properties.</param>
+            <param name="structuredType">The type of the resource.</param>
+            <param name="readContext">The deserializer context.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceDeserializer.ApplyStructuralProperties(System.Object,Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper,Microsoft.OData.Edm.IEdmStructuredTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <summary>
             Deserializes the structural properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
@@ -6331,6 +6341,12 @@
             Gets the inner nested resource infos.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper.NestedPropertyInfos">
+            <summary>
+            Gets the nested property infos.
+            The nested property info is a property without value but could have instance annotations.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">
             <summary>
             Provides extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to add OData routes.
@@ -8668,7 +8684,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetODataQueryContext(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Get the ODaya query context.
+            Get the OData query context.
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
