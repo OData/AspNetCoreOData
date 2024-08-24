@@ -200,6 +200,12 @@ namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
                     resourceSetParentWrapper.Items.Add(new ODataPrimitiveWrapper((ODataPrimitiveValue)reader.Item));
                     break;
 
+                case ODataReaderState.NestedProperty:
+                    Contract.Assert(itemsStack.Count > 0, "The nested property info should be a non-null primitive value within resource wrapper.");
+                    ODataResourceWrapper resourceParentWrapper = (ODataResourceWrapper)itemsStack.Peek();
+                    resourceParentWrapper.NestedPropertyInfos.Add((ODataPropertyInfo)reader.Item);
+                    break;
+
                 default:
                     Contract.Assert(false, "We should never get here, it means the ODataReader reported a wrong state.");
                     break;
