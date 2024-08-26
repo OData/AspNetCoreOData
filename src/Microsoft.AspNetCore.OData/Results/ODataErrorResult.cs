@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Results
 
             Error = new ODataError
             {
-                ErrorCode = errorCode,
+                Code = errorCode,
                 Message = message
             };
         }
@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             ObjectResult objectResult = new ObjectResult(Error)
             {
-                StatusCode = Convert.ToInt32(Error.ErrorCode, CultureInfo.InvariantCulture)
+                StatusCode = Convert.ToInt32(Error.Code, CultureInfo.InvariantCulture)
             };
 
             await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);

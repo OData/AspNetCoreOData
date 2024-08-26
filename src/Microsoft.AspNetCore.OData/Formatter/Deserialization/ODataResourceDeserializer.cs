@@ -877,8 +877,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
             else
             {
-                IDictionary<string, ODataProperty> newPropertiesDic = resourceWrapper.Resource.Properties.ToDictionary(p => p.Name, p => p);
-                foreach (ODataProperty key in keys)
+                IDictionary<string, ODataPropertyInfo> newPropertiesDic = resourceWrapper.Resource.Properties.ToDictionary(p => p.Name, p => p);
+                foreach (ODataPropertyInfo key in keys)
                 {
                     // Logic: if we have the key property, try to keep the key property and get rid of the key value from ID.
                     // Need to double confirm whether it is the right logic?

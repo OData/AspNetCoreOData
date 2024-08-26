@@ -103,8 +103,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 + 2 + 3 + 4 + 5 + 6, totalId); 
         }
 
-#if NET6_0_OR_GREATER
-
         [Fact]
         public async Task GroupByWithAggregationAndOrderByWorks()
         {
@@ -207,8 +205,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 
             Assert.Equal(expectedResult, stringObject.ToString());
         }
-
-#endif
 
         [Fact(Skip = "See the comments above")]
         public async Task AggregationOnEntitySetWorksWithPropertyAggregation()

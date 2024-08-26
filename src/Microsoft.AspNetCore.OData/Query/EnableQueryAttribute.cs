@@ -656,7 +656,7 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
-        /// Get the ODaya query context.
+        /// Get the OData query context.
         /// </summary>
         /// <param name="responseValue">The response value.</param>
         /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>

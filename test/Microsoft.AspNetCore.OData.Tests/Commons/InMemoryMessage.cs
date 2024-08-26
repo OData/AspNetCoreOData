@@ -13,7 +13,7 @@ using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Commons
 {
-    public class InMemoryMessage : IODataRequestMessageAsync, IODataResponseMessageAsync, IContainerProvider, IDisposable
+    public class InMemoryMessage : IODataRequestMessageAsync, IODataResponseMessageAsync, IDisposable
     {
         private readonly Dictionary<string, string> headers;
 

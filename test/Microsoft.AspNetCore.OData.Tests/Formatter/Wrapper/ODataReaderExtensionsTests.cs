@@ -189,12 +189,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 r =>
                 {
                     Assert.Equal("NS.Order", r.Resource.TypeName);
-                    Assert.Equal(82, r.Resource.Properties.First(p => p.Name == "Price").Value);
+                    Assert.Equal(82, r.Resource.Properties.OfType<ODataProperty>().First(p => p.Name == "Price").Value);
                 },
                 r =>
                 {
                     Assert.Equal("NS.VipOrder", r.Resource.TypeName);
-                    Assert.Equal("abc@efg.com", r.Resource.Properties.First(p => p.Name == "Email").Value);
+                    Assert.Equal("abc@efg.com", r.Resource.Properties.OfType<ODataProperty>().First(p => p.Name == "Email").Value);
                 });
         }
 
@@ -257,7 +257,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
 
             ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(ordersDeltaResourceSet.DeltaItems.ElementAt(1));
             Assert.Equal("NS.VipOrder", resource2.Resource.TypeName);
-            Assert.Collection(resource2.Resource.Properties,
+            Assert.Collection(resource2.Resource.Properties.OfType<ODataProperty>(),
                 p =>
                 {
                     Assert.Equal("OrderId", p.Name);
@@ -335,7 +335,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                     // 1) Resource
                     ODataResourceWrapper resource1 = Assert.IsType<ODataResourceWrapper>(e);
                     Assert.Equal("Customers(42)", resource1.Resource.Id.OriginalString);
-                    Assert.Equal("Sammy", resource1.Resource.Properties.First(p => p.Name == "Name").Value);
+                    Assert.Equal("Sammy", resource1.Resource.Properties.OfType<ODataProperty>().First(p => p.Name == "Name").Value);
                 },
                 e =>
                 {
@@ -358,7 +358,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                     // 4) Resource
                     ODataResourceWrapper resource2 = Assert.IsType<ODataResourceWrapper>(e);
                     Assert.Equal("Orders(10643)", resource2.Resource.Id.OriginalString);
-                    Assert.Equal(82, resource2.Resource.Properties.First(p => p.Name == "Price").Value);
+                    Assert.Equal(82, resource2.Resource.Properties.OfType<ODataProperty>().First(p => p.Name == "Price").Value);
                 },
                 e =>
                 {
@@ -418,7 +418,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             ODataDeletedResource innerDeletedResource = Assert.IsType<ODataDeletedResource>(orderResource.Resource);
             Assert.Equal(DeltaDeletedEntryReason.Deleted, innerDeletedResource.Reason);
 
-            ODataProperty property = Assert.Single(innerDeletedResource.Properties);
+            ODataProperty property = Assert.Single(innerDeletedResource.Properties.OfType<ODataProperty>());
             Assert.Equal("OrderId", property.Name);
             Assert.Equal(10, property.Value);
         }

@@ -16,13 +16,7 @@ namespace Microsoft.AspNetCore.OData.Tests.PublicApi
         private const string AssemblyName = "Microsoft.AspNetCore.OData.dll";
         private const string OutputFileName = "Microsoft.AspNetCore.OData.PublicApi.out";
 
-#if NET5_0
-        private const string BaseLineFileName = "Microsoft.AspNetCore.OData.PublicApi.Net5.bsl";
-#elif NET6_0
-        private const string BaseLineFileName = "Microsoft.AspNetCore.OData.PublicApi.Net6.bsl";
-#else
-        private const string BaseLineFileName = "Microsoft.AspNetCore.OData.PublicApi.NetCore31.bsl";
-#endif
+        private const string BaseLineFileName = "Microsoft.AspNetCore.OData.PublicApi.Net8.bsl";
 
         private const string BaseLineFileFolder = @"test\Microsoft.AspNetCore.OData.Tests\PublicApi\";
 
