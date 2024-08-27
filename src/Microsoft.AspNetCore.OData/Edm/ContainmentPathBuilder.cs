@@ -159,19 +159,19 @@ namespace Microsoft.AspNetCore.OData.Edm
             EntitySetSegment entitySetSegment = segment as EntitySetSegment;
             if (entitySetSegment != null)
             {
-                return entitySetSegment.EntitySet.EntityType();
+                return entitySetSegment.EntitySet.EntityType;
             }
 
             SingletonSegment singletonSegment = segment as SingletonSegment;
             if (singletonSegment != null)
             {
-                return singletonSegment.Singleton.EntityType();
+                return singletonSegment.Singleton.EntityType;
             }
 
             NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
             if (navigationPropertySegment != null)
             {
-                return navigationPropertySegment.NavigationSource.EntityType();
+                return navigationPropertySegment.NavigationSource.EntityType;
             }
 
             return null;

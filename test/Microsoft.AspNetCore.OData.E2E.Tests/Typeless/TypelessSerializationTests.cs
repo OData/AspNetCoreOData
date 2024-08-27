@@ -298,7 +298,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Typeless
 
             IEdmEntitySet entitySet = Request.GetModel().EntityContainer.FindEntitySet("TypelessCustomers");
             return Created(Request.CreateODataLink(new EntitySetSegment(entitySet),
-                new KeySegment(new[] { new KeyValuePair<string, object>("Id", id) }, entitySet.EntityType(), null)), customer);
+                new KeySegment(new[] { new KeyValuePair<string, object>("Id", id) }, entitySet.EntityType, null)), customer);
         }
 
         [HttpPost]

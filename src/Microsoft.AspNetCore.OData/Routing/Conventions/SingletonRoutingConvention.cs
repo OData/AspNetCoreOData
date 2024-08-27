@@ -75,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     return false;
                 }
 
-                IEdmEntityType entityType = context.Singleton.EntityType();
+                IEdmEntityType entityType = context.Singleton.EntityType;
 
                 // Shall we cast to base type and the type itself? I think yes.
                 IEdmStructuredType castType = entityType.FindTypeInInheritance(context.Model, castTypeName, context.Options?.RouteOptions?.EnableActionNameCaseInsensitive == true);

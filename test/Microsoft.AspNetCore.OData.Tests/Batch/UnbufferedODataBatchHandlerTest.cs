@@ -155,7 +155,7 @@ foo
                     context.Response.WriteAsync("OTHER VALUE");
                 }
 
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
@@ -299,7 +299,7 @@ bar
 
             if (preferenceHeader != null)
             {
-                httpContext.Request.Headers.Add("prefer", preferenceHeader);
+                httpContext.Request.Headers.Append("prefer", preferenceHeader);
             }
 
             httpContext.Response.Body = new MemoryStream();
@@ -376,7 +376,7 @@ bar
             RequestDelegate handler = context =>
             {
                 context.Features[typeof(UnbufferedODataBatchHandlerTest)] = "bar";
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
@@ -431,10 +431,9 @@ foo
                 if (context.Request.Method.ToUpperInvariant() == "POST")
                 {
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                    return Task.FromResult(context.Response);
                 }
 
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();
@@ -503,7 +502,7 @@ Host: example.com
             RequestDelegate handler = context =>
             {
                 context.Features[typeof(UnbufferedODataBatchHandlerTest)] = "foo";
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             UnbufferedODataBatchHandler batchHandler = new UnbufferedODataBatchHandler();

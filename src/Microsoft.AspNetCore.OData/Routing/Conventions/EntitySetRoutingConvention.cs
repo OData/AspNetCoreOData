@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             ActionModel action = context.Action;
             IEdmEntitySet entitySet = context.EntitySet;
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
 
             // if the action has key parameter, skip it.
             if (action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))
@@ -110,7 +110,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                     castCollectionType = castType.ToCollection(true);
                 }
 
-                IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
+                IEdmCollectionType entityCollectionType = entitySet.EntityType.ToCollection(true);
 
                 // GET ~/Customers or GET ~/Customers/Ns.VipCustomer
                 IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
@@ -147,7 +147,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
                 return true;
             }
-            else if (actionName.Equals("Post", actionNameComparison) || actionName.Equals($"Post{entitySet.EntityType().Name}", actionNameComparison))
+            else if (actionName.Equals("Post", actionNameComparison) || actionName.Equals($"Post{entitySet.EntityType.Name}", actionNameComparison))
             {
                 // POST ~/Customers
                 IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>
@@ -158,7 +158,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 if (castType != null)
                 {
                     IEdmCollectionType castCollectionType = castType.ToCollection(true);
-                    IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
+                    IEdmCollectionType entityCollectionType = entitySet.EntityType.ToCollection(true);
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
                 ODataPathTemplate template = new ODataPathTemplate(segments);
@@ -176,7 +176,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
                 if (castType != null)
                 {
                     IEdmCollectionType castCollectionType = castType.ToCollection(true);
-                    IEdmCollectionType entityCollectionType = entitySet.EntityType().ToCollection(true);
+                    IEdmCollectionType entityCollectionType = entitySet.EntityType.ToCollection(true);
                     segments.Add(new CastSegmentTemplate(castCollectionType, entityCollectionType, entitySet));
                 }
 

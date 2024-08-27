@@ -187,7 +187,7 @@ namespace Microsoft.AspNetCore.OData.Query
             }
 
             List<IEdmEntitySet> matchedNavigationSources =
-                entityContainer.EntitySets().Where(e => e.EntityType() == elementType).ToList();
+                entityContainer.EntitySets().Where(e => e.EntityType == elementType).ToList();
 
             return (matchedNavigationSources.Count != 1) ? null : matchedNavigationSources[0];
         }

@@ -77,7 +77,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
         /// Gets the associated <see cref="IEdmEntityType"/>.
         /// It might be null.
         /// </summary>
-        public IEdmEntityType EntityType => NavigationSource?.EntityType();
+        public IEdmEntityType EntityType => NavigationSource?.EntityType;
 
         /// <summary>
         /// Gets the associated <see cref=" IEdmSingleton"/> for this controller.

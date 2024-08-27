@@ -2264,7 +2264,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             builder.EntitySet<DataTypes>("Customers");
             IEdmModel model = builder.GetEdmModel();
             IEdmEntitySet entitySet = model.FindDeclaredEntitySet("Customers");
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
             var parser = new ODataQueryOptionParser(model, entityType, entitySet,
                 new Dictionary<string, string> { { "$filter", filter } });
 
@@ -2281,7 +2281,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             builder.EntitySet<DataTypes>("Customers");
             IEdmModel model = builder.GetEdmModel();
             IEdmEntitySet entitySet = model.FindDeclaredEntitySet("Customers");
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
             var parser = new ODataQueryOptionParser(model, entityType, entitySet,
                 new Dictionary<string, string>
                 {

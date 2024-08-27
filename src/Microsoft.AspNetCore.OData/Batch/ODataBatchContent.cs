@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.OData.Batch
             Headers = new HeaderDictionary();
             Headers["Content-Type"] = contentType;
             ODataVersion version = _writerSettings.Version ?? ODataVersionConstraint.DefaultODataVersion;
-            Headers.Add(ODataVersionConstraint.ODataServiceVersionHeader, ODataUtils.ODataVersionToString(version));
+            Headers.Append(ODataVersionConstraint.ODataServiceVersionHeader, ODataUtils.ODataVersionToString(version));
         }
 
         /// <summary>

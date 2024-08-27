@@ -310,7 +310,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Results
             var request = RequestFactory.Create();
             if (!string.IsNullOrEmpty(preferHeaderValue))
             {
-                request.Headers.Add("Prefer", new StringValues(preferHeaderValue));
+                request.Headers.Append("Prefer", new StringValues(preferHeaderValue));
             }
 
             return request;

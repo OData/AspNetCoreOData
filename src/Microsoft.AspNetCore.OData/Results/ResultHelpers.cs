@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Results
         {
             if (response.StatusCode == (int)HttpStatusCode.NoContent)
             {
-                response.Headers.Add(EntityIdHeaderName, entityId().AbsoluteUri);
+                response.Headers.Append(EntityIdHeaderName, entityId().AbsoluteUri);
             }
         }
 
@@ -148,7 +148,7 @@ namespace Microsoft.AspNetCore.OData.Results
             if (entitySet == null)
             {
                 EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
-                entitySet = new EdmEntitySet(container, resourceContext.NavigationSource.Name, resourceContext.NavigationSource.EntityType());
+                entitySet = new EdmEntitySet(container, resourceContext.NavigationSource.Name, resourceContext.NavigationSource.EntityType);
             }
 
             odataPath.Add(new EntitySetSegment(entitySet));
@@ -157,7 +157,7 @@ namespace Microsoft.AspNetCore.OData.Results
 
             if (!isEntityId)
             {
-                bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType();
+                bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType;
                 if (!isSameType)
                 {
                     odataPath.Add(new TypeSegment(resourceContext.StructuredType, resourceContext.NavigationSource));

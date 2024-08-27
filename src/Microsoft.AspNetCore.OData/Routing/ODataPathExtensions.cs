@@ -247,7 +247,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 {
                     if (structuredType == null)
                     {
-                        structuredType = entitySetSegment.EntitySet.EntityType();
+                        structuredType = entitySetSegment.EntitySet.EntityType;
                     }
 
                     string name = entitySetSegment.EntitySet.Name + typeCast;
@@ -258,7 +258,7 @@ namespace Microsoft.AspNetCore.OData.Routing
                 {
                     if (structuredType == null)
                     {
-                        structuredType = singletonSegment.Singleton.EntityType();
+                        structuredType = singletonSegment.Singleton.EntityType;
                     }
 
                     string name = singletonSegment.Singleton.Name + typeCast;

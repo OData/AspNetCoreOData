@@ -201,7 +201,7 @@ bar
 
             if (preferenceHeader != null)
             {
-                httpContext.Request.Headers.Add("prefer", preferenceHeader);
+                httpContext.Request.Headers.Append("prefer", preferenceHeader);
             }
 
             httpContext.Response.Body = new MemoryStream();

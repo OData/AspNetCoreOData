@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmNavigationSource navigationSource = context.NavigationSource;
 
             // filter by action parameter
-            IEdmEntityType entityType = navigationSource.EntityType();
+            IEdmEntityType entityType = navigationSource.EntityType;
             bool hasKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
             if (!(context.Singleton != null ^ hasKeyParameter))
             {
@@ -154,7 +154,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             IEdmNavigationProperty navigationProperty, bool hasKey, bool dollarCount)
         {
             IEdmEntitySet entitySet = context.EntitySet;
-            IEdmEntityType entityType = navigationSource.EntityType();
+            IEdmEntityType entityType = navigationSource.EntityType;
 
             // Starts the routing template
             IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();

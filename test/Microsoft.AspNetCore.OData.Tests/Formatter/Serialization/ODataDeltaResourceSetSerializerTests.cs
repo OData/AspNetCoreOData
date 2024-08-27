@@ -41,7 +41,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             _model = SerializationTestsHelpers.SimpleCustomerOrderModel();
             _customerSet = _model.EntityContainer.FindEntitySet("Customers");
-            _model.SetAnnotationValue(_customerSet.EntityType(), new ClrTypeAnnotation(typeof(Customer)));
+            _model.SetAnnotationValue(_customerSet.EntityType, new ClrTypeAnnotation(typeof(Customer)));
             _path = new ODataPath(new EntitySetSegment(_customerSet));
             _customers = new[] {
                 new Customer()
@@ -63,8 +63,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 }
             };
 
-            _deltaResourceSetCustomers = new EdmChangedObjectCollection(_customerSet.EntityType());
-            EdmDeltaResourceObject newCustomer = new EdmDeltaResourceObject(_customerSet.EntityType());
+            _deltaResourceSetCustomers = new EdmChangedObjectCollection(_customerSet.EntityType);
+            EdmDeltaResourceObject newCustomer = new EdmDeltaResourceObject(_customerSet.EntityType);
             newCustomer.TrySetPropertyValue("ID", 10);
             newCustomer.TrySetPropertyValue("FirstName", "Foo");
             EdmComplexObject newCustomerAddress = new EdmComplexObject(_model.FindType("Default.Address") as IEdmComplexType);

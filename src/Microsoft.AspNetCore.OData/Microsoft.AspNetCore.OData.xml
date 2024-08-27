@@ -8668,7 +8668,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetODataQueryContext(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Get the ODaya query context.
+            Get the OData query context.
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>

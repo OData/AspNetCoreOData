@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
             }
 
             IEdmNavigationSource navigationSource = context.NavigationSource;
-            IEdmEntityType entityType = navigationSource.EntityType();
+            IEdmEntityType entityType = navigationSource.EntityType;
 
             // action should have the [HttpPost]
             if (!context.Action.Attributes.Any(a => a is HttpPostAttribute))

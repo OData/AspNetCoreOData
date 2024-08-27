@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.OData.Routing.Conventions
 
             ActionModel action = context.Action;
             IEdmEntitySet entitySet = context.EntitySet;
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
 
             // if the action has no key parameter, skip it.
             if (!action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))

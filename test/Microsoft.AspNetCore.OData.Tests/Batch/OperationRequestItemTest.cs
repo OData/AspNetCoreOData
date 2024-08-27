@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             RequestDelegate handler = context =>
             {
                 context.Response.StatusCode = StatusCodes.Status304NotModified;
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             // Act

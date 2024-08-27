@@ -277,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                         string preferencesToInherit = GetPreferencesToInheritFromBatch(header.Value);
                         if (!string.IsNullOrEmpty(preferencesToInherit))
                         {
-                            context.Request.Headers.Add(header.Key, preferencesToInherit);
+                            context.Request.Headers.Append(header.Key, preferencesToInherit);
                         }
                     }
                     // do not copy already existing headers, such as Cookie

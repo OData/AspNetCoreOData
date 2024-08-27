@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             RequestDelegate handler = context =>
             {
                 context.Response.StatusCode = StatusCodes.Status201Created;
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             // Act
@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Arrange
             DefaultHttpContext context = new DefaultHttpContext();
             HttpResponseMessage response = new HttpResponseMessage();
-            RequestDelegate handler = (c) => { return Task.FromResult(response); };
+            RequestDelegate handler = (c) => Task.CompletedTask;
             Dictionary<string, string> contentIdLocationMappings = new Dictionary<string, string>();
             contentIdLocationMappings.Add("1", "http://localhost:12345/odata/Customers(42)");
             Uri unresolvedUri = new Uri("http://localhost:12345/odata/$1/Orders");

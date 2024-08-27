@@ -106,7 +106,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func);
 
             // Assert
@@ -137,7 +137,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceSetReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceSetReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func);
 
             // Assert
@@ -171,7 +171,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceSetReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceSetReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func);
 
             // Assert
@@ -226,7 +226,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V401);
 
             // Assert
@@ -312,7 +312,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func);
 
             // Assert
@@ -392,7 +392,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataDeltaResourceSetReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V401);
 
             // Assert
@@ -439,7 +439,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, version);
 
             // Assert
@@ -484,7 +484,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V4);
 
             // Assert
@@ -538,7 +538,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(customers); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(customers, customers.EntityType);
             ODataItemWrapper item = await ReadPayloadAsync(payload, Model, func, ODataVersion.V401);
 
             // Assert
@@ -583,6 +583,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             };
             message.SetHeader("Content-Type", "application/json;odata.metadata=minimal");
 
+#pragma warning disable CS0618 // Type or member is obsolete
             ODataMessageReaderSettings readerSettings = new ODataMessageReaderSettings()
             {
                 BaseUri = new Uri("http://localhost/$metadata"),
@@ -590,6 +591,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
                 ReadUntypedAsString = readUntypedAsString,
                 Version = version,
             };
+#pragma warning restore CS0618 // Type or member is obsolete
 
             using (var msgReader = new ODataMessageReader((IODataRequestMessageAsync)message, readerSettings, edmModel))
             {

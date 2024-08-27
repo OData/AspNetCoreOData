@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             _customerSet = _model.EntityContainer.FindEntitySet("Customers");
             IEdmComplexType addressType = _model.SchemaElements.OfType<IEdmComplexType>()
                 .First(c => c.Name == "Address");
-            _model.SetAnnotationValue(_customerSet.EntityType(), new ClrTypeAnnotation(typeof(Customer)));
+            _model.SetAnnotationValue(_customerSet.EntityType, new ClrTypeAnnotation(typeof(Customer)));
             _model.SetAnnotationValue(addressType, new ClrTypeAnnotation(typeof(Address)));
             _customers = new[] {
                 new Customer()
@@ -637,7 +637,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             var request = RequestFactory.Create();
             request.ODataFeature().NextLink = nextLink;
             var result = new object[0];
-            IEdmNavigationProperty navProp = _customerSet.EntityType().NavigationProperties().First();
+            IEdmNavigationProperty navProp = _customerSet.EntityType.NavigationProperties().First();
             SelectExpandClause selectExpandClause = new SelectExpandClause(new SelectItem[0], allSelected: true);
             ResourceContext entity = new ResourceContext
             {
@@ -662,7 +662,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             var request = RequestFactory.Create();
             request.ODataFeature().TotalCount = 42;
             var result = new object[0];
-            IEdmNavigationProperty navProp = _customerSet.EntityType().NavigationProperties().First();
+            IEdmNavigationProperty navProp = _customerSet.EntityType.NavigationProperties().First();
             SelectExpandClause selectExpandClause = new SelectExpandClause(new SelectItem[0], allSelected: true);
             ResourceContext entity = new ResourceContext
             {

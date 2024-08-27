@@ -95,7 +95,7 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             IList<IEdmStructuralProperty> results = new List<IEdmStructuralProperty>();
-            IEdmEntityType entityType = navigationSource.EntityType();
+            IEdmEntityType entityType = navigationSource.EntityType;
             IEdmVocabularyAnnotatable annotatable = navigationSource as IEdmVocabularyAnnotatable;
             if (annotatable != null)
             {

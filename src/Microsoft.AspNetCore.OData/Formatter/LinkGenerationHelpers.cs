@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
 
             IList<ODataPathSegment> idLinkPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
-            bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType();
+            bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType;
             if (includeCast && !isSameType)
             {
                 idLinkPathSegments.Add(new TypeSegment(resourceContext.StructuredType, navigationSource: null));
@@ -257,7 +257,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IList<ODataPathSegment> actionPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
             // generate link with cast if the navigation source doesn't match the entity type the action is bound to.
-            if (resourceContext.NavigationSource.EntityType() != bindingParameterType.Definition)
+            if (resourceContext.NavigationSource.EntityType != bindingParameterType.Definition)
             {
                 actionPathSegments.Add(new TypeSegment((IEdmEntityType)bindingParameterType.Definition, null));
                 // entity set can be null
@@ -305,7 +305,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
             IList<ODataPathSegment> functionPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
             // generate link with cast if the navigation source type doesn't match the entity type the function is bound to.
-            if (resourceContext.NavigationSource.EntityType() != bindingParameterType.Definition)
+            if (resourceContext.NavigationSource.EntityType != bindingParameterType.Definition)
             {
                 functionPathSegments.Add(new TypeSegment(bindingParameterType.Definition, null));
             }
@@ -443,7 +443,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 {
                     EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
                     IEdmEntitySet entitySet = new EdmEntitySet(container, navigationSource.Name,
-                        navigationSource.EntityType());
+                        navigationSource.EntityType);
                     odataPath.Add(new EntitySetSegment(entitySet));
                 }
                 else
@@ -487,7 +487,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 if (currentResourceContext.NavigationSource is IEdmContainedEntitySet containedEntitySet)
                 {
                     // Type-cast segment for the expanded resource that is passed into the method is added by the caller
-                    if (currentResourceContext != resourceContext && currentResourceContext.StructuredType != containedEntitySet.EntityType())
+                    if (currentResourceContext != resourceContext && currentResourceContext.StructuredType != containedEntitySet.EntityType)
                     {
                         navigationPathSegments.Add(new TypeSegment(currentResourceContext.StructuredType, currentResourceContext.NavigationSource));
                     }
@@ -506,7 +506,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 else if (currentResourceContext.NavigationSource is IEdmEntitySet entitySet)
                 {
                     // We will get here if there's a non-contained entity set on the $expand expression
-                    if (currentResourceContext.StructuredType != entitySet.EntityType())
+                    if (currentResourceContext.StructuredType != entitySet.EntityType)
                     {
                         navigationPathSegments.Add(new TypeSegment(currentResourceContext.StructuredType, currentResourceContext.NavigationSource));
                     }
@@ -527,7 +527,7 @@ namespace Microsoft.AspNetCore.OData.Formatter
                 else if (currentResourceContext.NavigationSource is IEdmSingleton singleton)
                 {
                     // We will get here if there's a singleton on the $expand expression
-                    if (currentResourceContext.StructuredType != singleton.EntityType())
+                    if (currentResourceContext.StructuredType != singleton.EntityType)
                     {
                         navigationPathSegments.Add(new TypeSegment(currentResourceContext.StructuredType, currentResourceContext.NavigationSource));
                     }

@@ -85,7 +85,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             _serializer = new ODataResourceSerializer(_serializerProvider);
             _path = new ODataPath(new EntitySetSegment(_customerSet));
             _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
-            _entityContext = new ResourceContext(_writeContext, _customerSet.EntityType().AsReference(), _customer);
+            _entityContext = new ResourceContext(_writeContext, _customerSet.EntityType.AsReference(), _customer);
         }
 
         [Fact]
@@ -405,7 +405,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_ExpandsUsingInnerSerializerUsingRightContext_ExpandedNavigationProperties()
         {
             // Arrange
-            IEdmEntityType customerType = _customerSet.EntityType();
+            IEdmEntityType customerType = _customerSet.EntityType;
             IEdmNavigationProperty ordersProperty = customerType.NavigationProperties().Single(p => p.Name == "Orders");
 
             ODataQueryOptionParser parser = new ODataQueryOptionParser(_model, customerType, _customerSet,
@@ -454,7 +454,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_CanExpandNavigationProperty_ContainingEdmObject()
         {
             // Arrange
-            IEdmEntityType customerType = _customerSet.EntityType();
+            IEdmEntityType customerType = _customerSet.EntityType;
             IEdmNavigationProperty ordersProperty = customerType.NavigationProperties().Single(p => p.Name == "Orders");
 
             Mock<IEdmObject> orders = new Mock<IEdmObject>();
@@ -498,7 +498,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_CanWriteExpandedNavigationProperty_ExpandedCollectionValuedNavigationPropertyIsNull()
         {
             // Arrange
-            IEdmEntityType customerType = _customerSet.EntityType();
+            IEdmEntityType customerType = _customerSet.EntityType;
             IEdmNavigationProperty ordersProperty = customerType.NavigationProperties().Single(p => p.Name == "Orders");
 
             Mock<IEdmEntityObject> customer = new Mock<IEdmEntityObject>();
@@ -546,7 +546,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public async Task WriteObjectInlineAsync_CanWriteExpandedNavigationProperty_ExpandedSingleValuedNavigationPropertyIsNull()
         {
             // Arrange
-            IEdmEntityType orderType = _orderSet.EntityType();
+            IEdmEntityType orderType = _orderSet.EntityType;
             IEdmNavigationProperty customerProperty = orderType.NavigationProperties().Single(p => p.Name == "Customer");
 
             Mock<IEdmEntityObject> order = new Mock<IEdmEntityObject>();
@@ -597,7 +597,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             customer.Setup(c => c.TryGetPropertyValue("SpecialOrders", out specialOrdersValue)).Returns(true);
             customer.Setup(c => c.GetEdmType()).Returns(_specialCustomerType);
 
-            IEdmEntityType customerType = _customerSet.EntityType();
+            IEdmEntityType customerType = _customerSet.EntityType;
             ODataQueryOptionParser parser = new ODataQueryOptionParser(
                 _model,
                 customerType,
@@ -828,7 +828,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             };
 
             _writeContext.NavigationSource = orderSet;
-            _entityContext = new ResourceContext(_writeContext, orderSet.EntityType().AsReference(), order);
+            _entityContext = new ResourceContext(_writeContext, orderSet.EntityType.AsReference(), order);
 
             SelectExpandNode selectExpandNode = new SelectExpandNode
             {
@@ -2244,7 +2244,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         {
             // Arrange
             ODataWriter mockWriter = new Mock<ODataWriter>().Object;
-            IEdmNavigationProperty ordersProperty = _customerSet.EntityType().DeclaredNavigationProperties().Single();
+            IEdmNavigationProperty ordersProperty = _customerSet.EntityType.DeclaredNavigationProperties().Single();
             Mock<ODataEdmTypeSerializer> expandedItemSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.ResourceSet);
             Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
             serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type))
@@ -2347,7 +2347,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateSelectExpandNode_Caches_SelectExpandNode()
         {
             // Arrange
-            IEdmEntityTypeReference customerType = _customerSet.EntityType().AsReference();
+            IEdmEntityTypeReference customerType = _customerSet.EntityType.AsReference();
             ResourceContext entity1 = new ResourceContext(_writeContext, customerType, new Customer());
             ResourceContext entity2 = new ResourceContext(_writeContext, customerType, new Customer());
 
@@ -2363,7 +2363,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateSelectExpandNode_ReturnsDifferentSelectExpandNode_IfEntityTypeIsDifferent()
         {
             // Arrange
-            IEdmEntityType customerType = _customerSet.EntityType();
+            IEdmEntityType customerType = _customerSet.EntityType;
             IEdmEntityType derivedCustomerType = new EdmEntityType("NS", "DerivedCustomer", customerType);
 
             ResourceContext entity1 = new ResourceContext(_writeContext, customerType.AsReference(), new Customer());
@@ -2381,7 +2381,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         public void CreateSelectExpandNode_ReturnsDifferentSelectExpandNode_IfSelectExpandClauseIsDifferent()
         {
             // Arrange
-            IEdmEntityType customerType = _customerSet.EntityType();
+            IEdmEntityType customerType = _customerSet.EntityType;
 
             ResourceContext entity1 = new ResourceContext(_writeContext, customerType.AsReference(), new Customer());
             ResourceContext entity2 = new ResourceContext(_writeContext, customerType.AsReference(), new Customer());

@@ -199,7 +199,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
 
             if (accept != null)
             {
-                request.Headers.Add("Accept", accept);
+                request.Headers.Append("Accept", accept);
             }
 
             await request.CreateODataBatchResponseAsync(responses, _odataMessageQuotas);

@@ -47,7 +47,7 @@ namespace ODataDynamicModel.Extensions
             if (edmEntitySet != null)
             {
                 EntitySetSegment entitySet = new EntitySetSegment(edmEntitySet);
-                IEdmEntityType entityType = entitySet.EntitySet.EntityType();
+                IEdmEntityType entityType = entitySet.EntitySet.EntityType;
 
                 IEdmProperty keyProperty = entityType.Key().First();
 

@@ -37,6 +37,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
 
             // ReaderSettings and WriterSettings are registered as prototype services.
             // There will be a copy (if it is accessed) of each prototype for each request.
+#pragma warning disable CS0618 // ReadUntypedAsString is obsolete in ODL 8.
             services.AddSingleton(new ODataMessageReaderSettings
             {
                 EnableMessageStreamDisposal = false,
@@ -50,6 +51,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
                 EnablePropertyNameCaseInsensitive = true,
                 EnableReadingODataAnnotationWithoutPrefix = true
             });
+#pragma warning restore CS0618 // Type or member is obsolete
 
             services.AddSingleton(new ODataMessageWriterSettings
             {

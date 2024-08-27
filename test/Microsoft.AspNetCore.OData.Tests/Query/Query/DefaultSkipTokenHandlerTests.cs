@@ -346,7 +346,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         private ODataSerializerContext GetSerializerContext(IEdmModel model, bool enableSkipToken = false)
         {
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Customers");
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
             IEdmProperty edmProperty = entityType.FindProperty("Name");
             IEdmType edmType = entitySet.Type;
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet));

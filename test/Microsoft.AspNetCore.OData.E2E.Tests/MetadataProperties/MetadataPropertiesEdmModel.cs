@@ -32,12 +32,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.MetadataProperties
             var model = modelBuilder.GetEdmModel();
 
             var sitesEntitySet = (EdmEntitySet)model.FindDeclaredEntitySet("Default.Container.Sites");
-            var plantsNavigationProperty = sitesEntitySet.EntityType().DeclaredNavigationProperties().Single(d => d.Name.Equals("Plants"));
+            var plantsNavigationProperty = sitesEntitySet.EntityType.DeclaredNavigationProperties().Single(d => d.Name.Equals("Plants"));
             var plantsContainedEntitySet = sitesEntitySet.FindNavigationTarget(plantsNavigationProperty);
-            var siteNavigationProperty = plantsContainedEntitySet.EntityType().DeclaredNavigationProperties().Single(d => d.Name.Equals("Site"));
-            var pipelinesNavigationProperty = plantsContainedEntitySet.EntityType().DeclaredNavigationProperties().Single(d => d.Name.Equals("Pipelines"));
+            var siteNavigationProperty = plantsContainedEntitySet.EntityType.DeclaredNavigationProperties().Single(d => d.Name.Equals("Site"));
+            var pipelinesNavigationProperty = plantsContainedEntitySet.EntityType.DeclaredNavigationProperties().Single(d => d.Name.Equals("Pipelines"));
             var pipelineContainedEntitySet = plantsContainedEntitySet.FindNavigationTarget(pipelinesNavigationProperty, new EdmPathExpression("Plants", "Pipelines"));
-            var plantNavigationProperty = pipelineContainedEntitySet.EntityType().DeclaredNavigationProperties().Single(d => d.Name.Equals("Plant"));
+            var plantNavigationProperty = pipelineContainedEntitySet.EntityType.DeclaredNavigationProperties().Single(d => d.Name.Equals("Plant"));
 
             sitesEntitySet.AddNavigationTarget(siteNavigationProperty, sitesEntitySet, new EdmPathExpression("Plants", "Site"));
             sitesEntitySet.AddNavigationTarget(plantNavigationProperty, plantsContainedEntitySet, new EdmPathExpression("Plants", "Pipelines", "Plant"));

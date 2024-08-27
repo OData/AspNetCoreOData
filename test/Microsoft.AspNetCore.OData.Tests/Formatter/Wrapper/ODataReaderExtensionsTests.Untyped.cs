@@ -94,7 +94,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(people); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType);
             ODataItemWrapper item = await ReadUntypedPayloadAsync(payload, UntypedModel, func);
 
             // Assert
@@ -139,7 +139,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(people); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType);
             ODataItemWrapper item = await ReadUntypedPayloadAsync(payload, UntypedModel, func);
 
             // Assert
@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(people); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType);
             ODataItemWrapper item = await ReadUntypedPayloadAsync(payload, UntypedModel, func);
 
             // Assert
@@ -321,7 +321,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(people); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType);
             ODataItemWrapper item = await ReadUntypedPayloadAsync(payload, UntypedModel, func);
 
             // Assert
@@ -414,7 +414,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Wrapper
             Assert.NotNull(people); // Guard
 
             // Act
-            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType());
+            Func<ODataMessageReader, Task<ODataReader>> func = mr => mr.CreateODataResourceReaderAsync(people, people.EntityType);
             ODataItemWrapper item = await ReadUntypedPayloadAsync(payload, UntypedModel, func);
 
             // Assert

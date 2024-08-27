@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             odataModel.EntitySet<Customer>(setName);
             IEdmModel model = odataModel.GetEdmModel();
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(setName);
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
 
             // Act
@@ -113,7 +113,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             }
 
             IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet(setName);
-            IEdmEntityType entityType = entitySet.EntityType();
+            IEdmEntityType entityType = entitySet.EntityType;
             IEnumerable<IEdmOperation> operations = model.FindDeclaredOperations(qualifiedName);
 
             ODataPath path = new ODataPath(new EntitySetSegment(entitySet), new OperationSegment(operations, entitySet));

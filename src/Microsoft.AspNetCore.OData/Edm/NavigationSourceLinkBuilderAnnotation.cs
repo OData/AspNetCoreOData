@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 throw Error.ArgumentNull(nameof(model));
             }
 
-            IEdmEntityType elementType = navigationSource.EntityType();
+            IEdmEntityType elementType = navigationSource.EntityType;
             IEnumerable<IEdmEntityType> derivedTypes = model.FindAllDerivedTypes(elementType).Cast<IEdmEntityType>();
 
             // Add navigation link builders for all navigation properties of entity.

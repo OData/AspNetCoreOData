@@ -1582,8 +1582,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             request.Body = new MemoryStream(contentBytes);
             request.ContentType = "application/json";
             request.ContentLength = contentBytes.Length;
-            request.Headers.Add("OData-Version", "4.0");
-            request.Headers.Add("Accept", "application/json;odata.metadata=full");
+            request.Headers.Append("OData-Version", "4.0");
+            request.Headers.Append("Accept", "application/json;odata.metadata=full");
 
             return new HttpRequestODataMessage(request);
         }

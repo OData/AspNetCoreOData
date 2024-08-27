@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
             _model = builder.GetEdmModel();
             _customersEntitySet = _model.FindDeclaredEntitySet("Customers");
-            _customerEntityType = _customersEntitySet.EntityType();
+            _customerEntityType = _customersEntitySet.EntityType;
             _parameterAliasMappedNode = new ConstantNode(123);
         }
 

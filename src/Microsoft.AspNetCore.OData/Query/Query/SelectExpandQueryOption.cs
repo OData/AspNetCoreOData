@@ -454,7 +454,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     }
 
                     GetAutoSelectExpandItems(
-                        currentEdmNavigationSource.EntityType(),
+                        currentEdmNavigationSource.EntityType,
                         model,
                         item.NavigationSource,
                         true,
@@ -577,7 +577,7 @@ namespace Microsoft.AspNetCore.OData.Query
             SelectExpandClause selectExpandClause = null;
             bool levelsEncounteredInInnerExpand = false;
             bool isMaxLevelInInnerExpand = false;
-            var entityType = expandItem.NavigationSource.EntityType();
+            var entityType = expandItem.NavigationSource.EntityType;
             IEdmNavigationProperty navigationProperty =
                 (expandItem.PathToNavigationProperty.LastSegment as NavigationPropertySegment).NavigationProperty;
             ModelBoundQuerySettings nestQuerySettings = Context.Model.GetModelBoundQuerySettings(navigationProperty, navigationProperty.ToEntityType());

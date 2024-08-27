@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             };
             ChangeSetRequestItem requestItem = new ChangeSetRequestItem(contexts);
 
-            RequestDelegate handler = context => Task.FromResult(context.Response);
+            RequestDelegate handler = context => Task.CompletedTask;
 
             // Act
             ODataBatchResponseItem response = await requestItem.SendRequestAsync(handler);
@@ -88,7 +88,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 }
 
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             // Act
@@ -121,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
                 }
 
                 responses.Add(context.Response);
-                return Task.FromResult(context.Response);
+                return Task.CompletedTask;
             };
 
             // Act

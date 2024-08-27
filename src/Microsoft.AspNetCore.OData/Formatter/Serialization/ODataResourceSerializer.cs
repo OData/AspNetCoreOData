@@ -540,7 +540,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo();
                 serializationInfo.NavigationSourceName = resourceContext.NavigationSource.Name;
                 serializationInfo.NavigationSourceKind = resourceContext.NavigationSource.NavigationSourceKind();
-                IEdmEntityType sourceType = resourceContext.NavigationSource.EntityType();
+                IEdmEntityType sourceType = resourceContext.NavigationSource.EntityType;
                 if (sourceType != null)
                 {
                     serializationInfo.NavigationSourceEntityTypeName = sourceType.Name;
@@ -1708,7 +1708,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                 // figure out the type from the navigation source
                 if (serializerContext.NavigationSource != null)
                 {
-                    edmType = serializerContext.NavigationSource.EntityType();
+                    edmType = serializerContext.NavigationSource.EntityType;
                     if (edmType.TypeKind == EdmTypeKind.Collection)
                     {
                         edmType = (edmType as IEdmCollectionType).ElementType.Definition;
