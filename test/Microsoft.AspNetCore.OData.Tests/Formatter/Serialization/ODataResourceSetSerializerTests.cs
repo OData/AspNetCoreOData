@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             };
 
             // Act
-            cancellationTokenSource.CancelAfter(100);
+            cancellationTokenSource.CancelAfter(50);
             await Assert.ThrowsAnyAsync<OperationCanceledException>(() => serializer.WriteObjectAsync(graph, type, writer, writeContext));
         }
 
@@ -258,6 +258,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
         /// </summary>
         public class AddressesEnumerableDataGenerator : IEnumerable<object[]>
         {
+            private static readonly TimeSpan s_generationDelay = TimeSpan.FromMilliseconds(500);
+
             private readonly List<object[]> _addressesData = new()
             {
                 new object[]{ GetIAsyncEnumerableAddressDataSource(), typeof(IAsyncEnumerable<Address>) },
@@ -267,7 +269,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             private static async IAsyncEnumerable<Address> GetIAsyncEnumerableAddressDataSource([EnumeratorCancellation] CancellationToken cancellationToken = default)
             {
                 yield return new Address { City = "Bordeaux" };
-                await Task.Delay(1000, cancellationToken);
+                await Task.Delay(s_generationDelay, cancellationToken);
                 yield return new Address { City = "Paris" };
             }
 
@@ -279,7 +281,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                     {
                         if (i >= 1)
                         {
-                            Task.Delay(1000).Wait();
+                            Task.Delay(s_generationDelay).Wait();
                         }
 
                         return new Address { City = $"City{i}" };
