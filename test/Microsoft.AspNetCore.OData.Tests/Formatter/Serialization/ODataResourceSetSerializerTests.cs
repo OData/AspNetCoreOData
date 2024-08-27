@@ -269,7 +269,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             private static async IAsyncEnumerable<Address> GetIAsyncEnumerableAddressDataSource([EnumeratorCancellation] CancellationToken cancellationToken = default)
             {
                 yield return new Address { City = "Bordeaux" };
-                await Task.Delay(s_generationDelay, cancellationToken);
+                await Task.Delay(s_generationDelay, cancellationToken).ConfigureAwait(false);
                 yield return new Address { City = "Paris" };
             }
 
