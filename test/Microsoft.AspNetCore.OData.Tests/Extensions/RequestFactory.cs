@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -113,10 +114,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Extensions
         /// <summary>
         /// Create the default HttpRequest.
         /// </summary>
+        /// <param name="cancellationToken">A token to test request cancellation</param>
         /// <returns>The built default HttpRequest.</returns>
-        public static HttpRequest Create()
+        public static HttpRequest Create(CancellationToken cancellationToken = default)
         {
-            HttpContext context = new DefaultHttpContext();
+            HttpContext context = new DefaultHttpContext
+            {
+                RequestAborted = cancellationToken
+            };
             return context.Request;
         }
 

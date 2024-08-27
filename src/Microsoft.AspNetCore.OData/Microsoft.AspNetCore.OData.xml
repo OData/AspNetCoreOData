@@ -5093,6 +5093,11 @@
             Gets or sets the HTTP Request whose response is being serialized.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CancellationToken">
+            <summary>
+            Get the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CancellationToken"/> from <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Request"/> if defined or <see cref="P:System.Threading.CancellationToken.None"/>
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.RootElementName">
             <summary>
             Gets or sets the root element name which is used when writing primitive and enum types
@@ -8668,7 +8673,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetODataQueryContext(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor,Microsoft.AspNetCore.Http.HttpRequest)">
             <summary>
-            Get the ODaya query context.
+            Get the OData query context.
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>

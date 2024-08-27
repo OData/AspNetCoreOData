@@ -10,7 +10,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -217,6 +219,76 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
                 }
                 ]
             }"), result);
+        }
+
+        [Theory]
+        [ClassData(typeof(AddressesEnumerableDataGenerator))]
+        public async Task WriteObjectAsync_ThrowsOperationCancelled_TokenCancelled(object graph, Type type)
+        {
+            // Arrange
+            IODataSerializerProvider serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
+            ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
+            MemoryStream stream = new MemoryStream();
+            IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+
+            ODataMessageWriterSettings settings = new ODataMessageWriterSettings
+            {
+                ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/") },
+            };
+            settings.SetContentType(ODataFormat.Json);
+
+            ODataMessageWriter writer = new ODataMessageWriter(message, settings);
+            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            var request = RequestFactory.Create(cancellationTokenSource.Token);
+            ODataSerializerContext writeContext = new ODataSerializerContext
+            {
+                Model = _model,
+                Type = type,
+                Request = request
+            };
+
+            // Act
+            cancellationTokenSource.CancelAfter(100);
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => serializer.WriteObjectAsync(graph, type, writer, writeContext));
+        }
+
+        /// <summary>
+        /// Data generator that setup some enumerable with long delay on second object returned
+        /// Used to test cancellation support on resource set serialization
+        /// </summary>
+        public class AddressesEnumerableDataGenerator : IEnumerable<object[]>
+        {
+            private readonly List<object[]> _addressesData = new()
+            {
+                new object[]{ GetIAsyncEnumerableAddressDataSource(), typeof(IAsyncEnumerable<Address>) },
+                new object[]{ GetIEnumerableAddressDataSource(), typeof(IEnumerable<Address>) }
+            };
+
+            private static async IAsyncEnumerable<Address> GetIAsyncEnumerableAddressDataSource([EnumeratorCancellation] CancellationToken cancellationToken = default)
+            {
+                yield return new Address { City = "Bordeaux" };
+                await Task.Delay(1000, cancellationToken);
+                yield return new Address { City = "Paris" };
+            }
+
+            private static IEnumerable<Address> GetIEnumerableAddressDataSource()
+            {
+                return Enumerable
+                    .Range(0, 2)
+                    .Select(i =>
+                    {
+                        if (i >= 1)
+                        {
+                            Task.Delay(1000).Wait();
+                        }
+
+                        return new Address { City = $"City{i}" };
+                    });
+            }
+
+            public IEnumerator<object[]> GetEnumerator() => _addressesData.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         [Fact]
