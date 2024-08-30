@@ -10,14 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
+
+public class PeopleController : ODataController
 {
-    public class PeopleController : ODataController
+    [EnableQuery]
+    public ActionResult<IEnumerable<Person>> Get()
     {
-        [EnableQuery]
-        public ActionResult<IEnumerable<Person>> Get()
-        {
-            return Ok(DollarFilterDataSource.People);
-        }
+        return Ok(DollarFilterDataSource.People);
     }
 }

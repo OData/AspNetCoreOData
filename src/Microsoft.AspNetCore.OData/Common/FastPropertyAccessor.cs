@@ -9,60 +9,59 @@ using System;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 
-namespace Microsoft.AspNetCore.OData.Common
+namespace Microsoft.AspNetCore.OData.Common;
+
+/// <summary>
+/// FastPropertyAccessor is a <see cref="PropertyAccessor{TStructuralType}"/> that speeds up (compares to reflection)
+/// a Getter and Setter for the PropertyInfo of TEntityType provided via the constructor.
+/// </summary>
+/// <typeparam name="TStructuralType">The type on which the PropertyInfo exists</typeparam>
+internal class FastPropertyAccessor<TStructuralType> : PropertyAccessor<TStructuralType> where TStructuralType : class
 {
-    /// <summary>
-    /// FastPropertyAccessor is a <see cref="PropertyAccessor{TStructuralType}"/> that speeds up (compares to reflection)
-    /// a Getter and Setter for the PropertyInfo of TEntityType provided via the constructor.
-    /// </summary>
-    /// <typeparam name="TStructuralType">The type on which the PropertyInfo exists</typeparam>
-    internal class FastPropertyAccessor<TStructuralType> : PropertyAccessor<TStructuralType> where TStructuralType : class
+    private bool _isCollection;
+    private PropertyInfo _property;
+    private Action<TStructuralType, object> _setter;
+    private Func<object, object> _getter;
+
+    public FastPropertyAccessor(PropertyInfo property)
+        : base(property)
     {
-        private bool _isCollection;
-        private PropertyInfo _property;
-        private Action<TStructuralType, object> _setter;
-        private Func<object, object> _getter;
+        _property = property;
+        _isCollection = TypeHelper.IsCollection(property.PropertyType);
 
-        public FastPropertyAccessor(PropertyInfo property)
-            : base(property)
+        if (!_isCollection)
         {
-            _property = property;
-            _isCollection = TypeHelper.IsCollection(property.PropertyType);
-
-            if (!_isCollection)
-            {
-                _setter = PropertyHelper.MakeFastPropertySetter<TStructuralType>(property);
-            }
-
-            _getter = PropertyHelper.MakeFastPropertyGetter(property);
+            _setter = PropertyHelper.MakeFastPropertySetter<TStructuralType>(property);
         }
 
-        public override object GetValue(TStructuralType instance)
-        {
-            if (instance == null)
-            {
-                throw Error.ArgumentNull(nameof(instance));
-            }
+        _getter = PropertyHelper.MakeFastPropertyGetter(property);
+    }
 
-            return _getter(instance);
+    public override object GetValue(TStructuralType instance)
+    {
+        if (instance == null)
+        {
+            throw Error.ArgumentNull(nameof(instance));
         }
 
-        public override void SetValue(TStructuralType instance, object value)
-        {
-            if (instance == null)
-            {
-                throw Error.ArgumentNull(nameof(instance));
-            }
+        return _getter(instance);
+    }
 
-            if (_isCollection)
-            {
-                DeserializationHelpers.SetCollectionProperty(instance, _property.Name, edmPropertyType: null,
-                    value: value, clearCollection: true);
-            }
-            else
-            {
-                _setter(instance, value);
-            }
+    public override void SetValue(TStructuralType instance, object value)
+    {
+        if (instance == null)
+        {
+            throw Error.ArgumentNull(nameof(instance));
+        }
+
+        if (_isCollection)
+        {
+            DeserializationHelpers.SetCollectionProperty(instance, _property.Name, edmPropertyType: null,
+                value: value, clearCollection: true);
+        }
+        else
+        {
+            _setter(instance, value);
         }
     }
 }

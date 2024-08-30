@@ -21,164 +21,163 @@ using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
+namespace Microsoft.AspNetCore.OData.Tests.Routing.Template;
+
+public class ActionSegmentTemplateTests
 {
-    public class ActionSegmentTemplateTests
+    [Fact]
+    public void CtorActionSegmentTemplate_ThrowsArgumentNull_Action()
     {
-        [Fact]
-        public void CtorActionSegmentTemplate_ThrowsArgumentNull_Action()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ActionSegmentTemplate(action: null, null), "action");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new ActionSegmentTemplate(action: null, null), "action");
+    }
 
-        [Fact]
-        public void CtorActionSegmentTemplate_ThrowsArgumentNull_Segment()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ActionSegmentTemplate(null), "segment");
-        }
+    [Fact]
+    public void CtorActionSegmentTemplate_ThrowsArgumentNull_Segment()
+    {
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new ActionSegmentTemplate(null), "segment");
+    }
 
-        [Fact]
-        public void CtorActionSegmentTemplate_ThrowsArgument_NonboundAction()
-        {
-            // Arrange
-            var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
-            EdmAction action = new EdmAction("NS", "MyAction", primitive, false, null);
+    [Fact]
+    public void CtorActionSegmentTemplate_ThrowsArgument_NonboundAction()
+    {
+        // Arrange
+        var primitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
+        EdmAction action = new EdmAction("NS", "MyAction", primitive, false, null);
 
-            // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => new ActionSegmentTemplate(action, null),
-                "The input operation 'MyAction' is not a bound 'action'.");
-        }
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(() => new ActionSegmentTemplate(action, null),
+            "The input operation 'MyAction' is not a bound 'action'.");
+    }
 
-        [Fact]
-        public void CtorActionSegmentTemplate_ThrowsODataException_NonAction()
-        {
-            // Arrange
-            IEdmPrimitiveTypeReference intPrimitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
-            EdmFunction function = new EdmFunction("NS", "MyFunction", intPrimitive, false, null, false);
-            OperationSegment operationSegment = new OperationSegment(function, null);
+    [Fact]
+    public void CtorActionSegmentTemplate_ThrowsODataException_NonAction()
+    {
+        // Arrange
+        IEdmPrimitiveTypeReference intPrimitive = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, false);
+        EdmFunction function = new EdmFunction("NS", "MyFunction", intPrimitive, false, null, false);
+        OperationSegment operationSegment = new OperationSegment(function, null);
 
-            // Act
-            Action test = () => new ActionSegmentTemplate(operationSegment);
+        // Act
+        Action test = () => new ActionSegmentTemplate(operationSegment);
 
-            // Assert
-            ExceptionAssert.Throws<ODataException>(test, "The input segment should be 'Action' in 'ActionSegmentTemplate'.");
-        }
+        // Assert
+        ExceptionAssert.Throws<ODataException>(test, "The input segment should be 'Action' in 'ActionSegmentTemplate'.");
+    }
 
-        [Fact]
-        public void CtorActionSegmentTemplate_SetsProperties()
-        {
-            // Arrange & Act
-            EdmAction action = new EdmAction("NS", "action", null, true, null);
-            ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
+    [Fact]
+    public void CtorActionSegmentTemplate_SetsProperties()
+    {
+        // Arrange & Act
+        EdmAction action = new EdmAction("NS", "action", null, true, null);
+        ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
 
-            // Assert
-            Assert.Same(action, segment.Action);
-            Assert.NotNull(segment.Segment);
-            Assert.Null(segment.NavigationSource);
+        // Assert
+        Assert.Same(action, segment.Action);
+        Assert.NotNull(segment.Segment);
+        Assert.Null(segment.NavigationSource);
 
-            // Act & Assert
-            ActionSegmentTemplate segment1 = new ActionSegmentTemplate(segment.Segment);
-            Assert.Same(segment.Segment, segment1.Segment);
-        }
+        // Act & Assert
+        ActionSegmentTemplate segment1 = new ActionSegmentTemplate(segment.Segment);
+        Assert.Same(segment.Segment, segment1.Segment);
+    }
 
-        [Fact]
-        public void GetTemplatesActionSegmentTemplate_ReturnsTemplates()
-        {
-            // Assert
-            EdmAction action = new EdmAction("NS", "action", null, true, null);
-            ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
+    [Fact]
+    public void GetTemplatesActionSegmentTemplate_ReturnsTemplates()
+    {
+        // Assert
+        EdmAction action = new EdmAction("NS", "action", null, true, null);
+        ActionSegmentTemplate segment = new ActionSegmentTemplate(action, null);
 
-            // 1- Act & Assert
-            IEnumerable<string> templates = segment.GetTemplates();
-            Assert.Collection(templates,
-                e =>
-                {
-                    Assert.Equal("/NS.action", e);
-                },
-                e =>
-                {
-                    Assert.Equal("/action", e);
-                });
-
-            // 2- Act & Assert
-            templates = segment.GetTemplates(new ODataRouteOptions
+        // 1- Act & Assert
+        IEnumerable<string> templates = segment.GetTemplates();
+        Assert.Collection(templates,
+            e =>
             {
-                EnableQualifiedOperationCall = false
-            });
-            string template = Assert.Single(templates);
-            Assert.Equal("/action", template);
-
-            // 3- Act & Assert
-            templates = segment.GetTemplates(new ODataRouteOptions
+                Assert.Equal("/NS.action", e);
+            },
+            e =>
             {
-                EnableUnqualifiedOperationCall = false
+                Assert.Equal("/action", e);
             });
-            template = Assert.Single(templates);
-            Assert.Equal("/NS.action", template);
-        }
 
-        [Fact]
-        public void TryTranslateActionSegmentTemplate_ThrowsArgumentNull_Context()
+        // 2- Act & Assert
+        templates = segment.GetTemplates(new ODataRouteOptions
         {
-            // Arrange
-            EdmAction action = new EdmAction("NS", "action", null, true, null);
-            ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
+            EnableQualifiedOperationCall = false
+        });
+        string template = Assert.Single(templates);
+        Assert.Equal("/action", template);
 
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => template.TryTranslate(null), "context");
-        }
-
-        [Fact]
-        public void TryTranslateActionSegmentTemplate_ReturnsODataActionImportSegment()
+        // 3- Act & Assert
+        templates = segment.GetTemplates(new ODataRouteOptions
         {
-            // Arrange
-            EdmAction action = new EdmAction("NS", "action", null, true, null);
-            ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
+            EnableUnqualifiedOperationCall = false
+        });
+        template = Assert.Single(templates);
+        Assert.Equal("/NS.action", template);
+    }
 
-            // Act
-            bool ok = template.TryTranslate(context);
+    [Fact]
+    public void TryTranslateActionSegmentTemplate_ThrowsArgumentNull_Context()
+    {
+        // Arrange
+        EdmAction action = new EdmAction("NS", "action", null, true, null);
+        ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
 
-            // Assert
-            Assert.True(ok);
-            ODataPathSegment actual = Assert.Single(context.Segments);
-            OperationSegment actionSegment = Assert.IsType<OperationSegment>(actual);
-            Assert.Same(action, actionSegment.Operations.First());
-        }
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => template.TryTranslate(null), "context");
+    }
 
-        [Fact]
-        public void TryTranslateActionSegmentTemplate_ReturnsODataActionSegment_WithReturnedEntitySet()
-        {
-            // Arrange
-            var httpContext = new Mock<HttpContext>().Object;
-            var endpoint = new Endpoint(c => Task.CompletedTask, EndpointMetadataCollection.Empty, "Test");
-            var routeValues = new RouteValueDictionary();
+    [Fact]
+    public void TryTranslateActionSegmentTemplate_ReturnsODataActionImportSegment()
+    {
+        // Arrange
+        EdmAction action = new EdmAction("NS", "action", null, true, null);
+        ActionSegmentTemplate template = new ActionSegmentTemplate(action, null);
+        ODataTemplateTranslateContext context = new ODataTemplateTranslateContext();
 
-            var model = new EdmModel();
-            var entityType = new EdmEntityType("NS", "Entity");
-            entityType.AddKeys(entityType.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
-            model.AddElement(entityType);
-            EdmAction action = new EdmAction("NS", "Action", new EdmEntityTypeReference(entityType, true), true, null);
-            model.AddElement(action);
-            var entityContainer = new EdmEntityContainer("NS", "Default");
-            var entitySet = entityContainer.AddEntitySet("EntitySet", entityType);
-            model.AddElement(entityContainer);
-            model.SetAnnotationValue(action, new ReturnedEntitySetAnnotation("EntitySet"));
+        // Act
+        bool ok = template.TryTranslate(context);
 
-            var template = new ActionSegmentTemplate(action, null);
-            var translateContext = new ODataTemplateTranslateContext(httpContext, endpoint, routeValues, model);
+        // Assert
+        Assert.True(ok);
+        ODataPathSegment actual = Assert.Single(context.Segments);
+        OperationSegment actionSegment = Assert.IsType<OperationSegment>(actual);
+        Assert.Same(action, actionSegment.Operations.First());
+    }
 
-            // Act
-            bool ok = template.TryTranslate(translateContext);
+    [Fact]
+    public void TryTranslateActionSegmentTemplate_ReturnsODataActionSegment_WithReturnedEntitySet()
+    {
+        // Arrange
+        var httpContext = new Mock<HttpContext>().Object;
+        var endpoint = new Endpoint(c => Task.CompletedTask, EndpointMetadataCollection.Empty, "Test");
+        var routeValues = new RouteValueDictionary();
 
-            // Assert
-            Assert.True(ok);
-            var actual = Assert.Single(translateContext.Segments);
-            var actionSegment = Assert.IsType<OperationSegment>(actual);
-            Assert.Equal(actionSegment.EdmType, entityType);
-            Assert.Equal(actionSegment.EntitySet, entitySet);
-        }
+        var model = new EdmModel();
+        var entityType = new EdmEntityType("NS", "Entity");
+        entityType.AddKeys(entityType.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+        model.AddElement(entityType);
+        EdmAction action = new EdmAction("NS", "Action", new EdmEntityTypeReference(entityType, true), true, null);
+        model.AddElement(action);
+        var entityContainer = new EdmEntityContainer("NS", "Default");
+        var entitySet = entityContainer.AddEntitySet("EntitySet", entityType);
+        model.AddElement(entityContainer);
+        model.SetAnnotationValue(action, new ReturnedEntitySetAnnotation("EntitySet"));
+
+        var template = new ActionSegmentTemplate(action, null);
+        var translateContext = new ODataTemplateTranslateContext(httpContext, endpoint, routeValues, model);
+
+        // Act
+        bool ok = template.TryTranslate(translateContext);
+
+        // Assert
+        Assert.True(ok);
+        var actual = Assert.Single(translateContext.Segments);
+        var actionSegment = Assert.IsType<OperationSegment>(actual);
+        Assert.Equal(actionSegment.EdmType, entityType);
+        Assert.Equal(actionSegment.EntitySet, entitySet);
     }
 }

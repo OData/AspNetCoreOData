@@ -7,18 +7,17 @@
 
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
-{
-    internal static class EdmTestHelpers
-    {
-        public static IEdmEntityTypeReference AsReference(this IEdmEntityType entity)
-        {
-            return new EdmEntityTypeReference(entity, isNullable: false);
-        }
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
 
-        public static IEdmComplexTypeReference AsReference(this IEdmComplexType complex)
-        {
-            return new EdmComplexTypeReference(complex, isNullable: false);
-        }
+internal static class EdmTestHelpers
+{
+    public static IEdmEntityTypeReference AsReference(this IEdmEntityType entity)
+    {
+        return new EdmEntityTypeReference(entity, isNullable: false);
+    }
+
+    public static IEdmComplexTypeReference AsReference(this IEdmComplexType complex)
+    {
+        return new EdmComplexTypeReference(complex, isNullable: false);
     }
 }

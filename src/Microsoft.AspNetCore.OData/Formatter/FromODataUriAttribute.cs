@@ -8,20 +8,19 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Microsoft.AspNetCore.OData.Formatter
+namespace Microsoft.AspNetCore.OData.Formatter;
+
+/// <summary>
+/// An implementation of <see cref="ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = true, AllowMultiple = false)]
+public sealed class FromODataUriAttribute : ModelBinderAttribute
 {
     /// <summary>
-    /// An implementation of <see cref="ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
+    /// Instantiates a new instance of the <see cref="FromODataUriAttribute"/> class.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = true, AllowMultiple = false)]
-    public sealed class FromODataUriAttribute : ModelBinderAttribute
+    public FromODataUriAttribute()
+        : base(typeof(ODataModelBinder))
     {
-        /// <summary>
-        /// Instantiates a new instance of the <see cref="FromODataUriAttribute"/> class.
-        /// </summary>
-        public FromODataUriAttribute()
-            : base(typeof(ODataModelBinder))
-        {
-        }
     }
 }

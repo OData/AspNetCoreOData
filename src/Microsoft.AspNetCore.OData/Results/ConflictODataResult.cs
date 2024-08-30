@@ -11,62 +11,61 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData;
 using ErrorUtils = Microsoft.AspNetCore.OData.Error;
 
-namespace Microsoft.AspNetCore.OData.Results
+namespace Microsoft.AspNetCore.OData.Results;
+
+/// <summary>
+/// Represents a result that when executed will produce a Conflict (409) response.
+/// </summary>
+/// <remarks>This result creates an <see cref="ODataError"/> with status code: 409.</remarks>
+public class ConflictODataResult : ConflictResult, IODataErrorResult
 {
+    private const string errorCode = "409";
+
     /// <summary>
-    /// Represents a result that when executed will produce a Conflict (409) response.
+    /// OData error.
     /// </summary>
-    /// <remarks>This result creates an <see cref="ODataError"/> with status code: 409.</remarks>
-    public class ConflictODataResult : ConflictResult, IODataErrorResult
+    public ODataError Error { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the class.
+    /// </summary>
+    /// <param name="message">Error message.</param>
+    public ConflictODataResult(string message)
     {
-        private const string errorCode = "409";
-
-        /// <summary>
-        /// OData error.
-        /// </summary>
-        public ODataError Error { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="message">Error message.</param>
-        public ConflictODataResult(string message)
+        if (string.IsNullOrEmpty(message))
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
-            }
-
-            Error = new ODataError
-            {
-                Message = message,
-                Code = errorCode
-            };
+            throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
         }
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
-        public ConflictODataResult(ODataError odataError)
+        Error = new ODataError
         {
-            if (odataError == null)
-            {
-                throw ErrorUtils.ArgumentNull(nameof(odataError));
-            }
+            Message = message,
+            Code = errorCode
+        };
+    }
 
-            Error = odataError;
+    /// <summary>
+    /// Initializes a new instance of the class.
+    /// </summary>
+    /// <param name="odataError">An <see cref="ODataError"/> object.</param>
+    public ConflictODataResult(ODataError odataError)
+    {
+        if (odataError == null)
+        {
+            throw ErrorUtils.ArgumentNull(nameof(odataError));
         }
 
-        /// <inheritdoc/>
-        public async override Task ExecuteResultAsync(ActionContext context)
-        {
-            ObjectResult objectResult = new ObjectResult(Error)
-            {
-                StatusCode = StatusCodes.Status409Conflict
-            };
+        Error = odataError;
+    }
 
-            await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);
-        }
+    /// <inheritdoc/>
+    public async override Task ExecuteResultAsync(ActionContext context)
+    {
+        ObjectResult objectResult = new ObjectResult(Error)
+        {
+            StatusCode = StatusCodes.Status409Conflict
+        };
+
+        await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);
     }
 }

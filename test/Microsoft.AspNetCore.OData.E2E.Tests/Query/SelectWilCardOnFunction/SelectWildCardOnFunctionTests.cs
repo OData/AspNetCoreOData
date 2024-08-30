@@ -20,94 +20,93 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.SelectWilCardOnFunction;
+
+public sealed class SelectWildCardOnFunctionTests : WebODataTestBase<SelectWildCardOnFunctionTests.Startup>
 {
-    public sealed class SelectWildCardOnFunctionTests : WebODataTestBase<SelectWildCardOnFunctionTests.Startup>
+    public class Startup : TestStartupBase
     {
-        public class Startup : TestStartupBase
+        public override void ConfigureServices(IServiceCollection services)
         {
-            public override void ConfigureServices(IServiceCollection services)
+            services.ConfigureControllers(typeof(CustomersController));
+
+            IEdmModel model = GetEdmModel();
+            services.AddControllers().AddOData(opt =>
             {
-                services.ConfigureControllers(typeof(CustomersController));
-
-                IEdmModel model = GetEdmModel();
-                services.AddControllers().AddOData(opt =>
-                {
-                    opt.Select();
-                    opt.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
-                    opt.AddRouteComponents("odata", model);
-                });
-            }
-
-            public static IEdmModel GetEdmModel()
-            {
-                ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-                builder.EntitySet<Customer>("Customers").EntityType
-                    .Collection.Function("GetAllCustomers")
-                    .ReturnsCollectionFromEntitySet<Customer>("Customers");
-
-                return builder.GetEdmModel();
-            }
+                opt.Select();
+                opt.RouteOptions.EnableNonParenthesisForEmptyParameterFunction = true;
+                opt.AddRouteComponents("odata", model);
+            });
         }
 
-        public SelectWildCardOnFunctionTests(WebODataTestFixture<Startup> fixture)
-            : base(fixture)
+        public static IEdmModel GetEdmModel()
         {
-        }
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Customer>("Customers").EntityType
+                .Collection.Function("GetAllCustomers")
+                .ReturnsCollectionFromEntitySet<Customer>("Customers");
 
-        /// <summary>
-        /// For Select query with wildcard on Function
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task SelectWildCardOnFunction_Success()
-        {
-            //Arrange
-            string queryUrl = "odata/Customers/GetAllCustomers?$select=*";
+            return builder.GetEdmModel();
+        }
+    }
+
+    public SelectWildCardOnFunctionTests(WebODataTestFixture<Startup> fixture)
+        : base(fixture)
+    {
+    }
+
+    /// <summary>
+    /// For Select query with wildcard on Function
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task SelectWildCardOnFunction_Success()
+    {
+        //Arrange
+        string queryUrl = "odata/Customers/GetAllCustomers?$select=*";
             
-            using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl))
+        using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl))
+        {
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+
+            //Act
+            using (HttpResponseMessage response = await this.Client.SendAsync(request))
             {
-                request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+                // Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-                //Act
-                using (HttpResponseMessage response = await this.Client.SendAsync(request))
+                List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
+                foreach(Customer c in customers)
                 {
-                    // Assert
-                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-                    List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
-                    foreach(Customer c in customers)
-                    {
-                        Assert.Equal("custId1", c.Id);
-                        Assert.Equal("John", c.Name);
-                        Assert.Equal("Active", c.Status);
-                    }
+                    Assert.Equal("custId1", c.Id);
+                    Assert.Equal("John", c.Name);
+                    Assert.Equal("Active", c.Status);
                 }
             }
         }
     }
+}
 
-    public class Customer
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Status { get; set; }
-    }
+public class Customer
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Status { get; set; }
+}
 
-    public class CustomersController : ODataController
+public class CustomersController : ODataController
+{
+    [HttpGet]
+    public IEnumerable<Customer> GetAllCustomers()
     {
-        [HttpGet]
-        public IEnumerable<Customer> GetAllCustomers()
+        return new List<Customer>()
         {
-            return new List<Customer>()
+            new Customer
             {
-                new Customer
-                {
-                    Id = "custId1",
-                    Name = "John",
-                    Status = "Active"
-                }
-             };
-        }
+                Id = "custId1",
+                Name = "John",
+                Status = "Active"
+            }
+         };
     }
 }

@@ -21,346 +21,345 @@ using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
+
+public class ODataCollectionSerializerTests
 {
-    public class ODataCollectionSerializerTests
+    private IEdmPrimitiveTypeReference _edmIntType;
+    private IEdmCollectionTypeReference _collectionType;
+
+    public ODataCollectionSerializerTests()
     {
-        private IEdmPrimitiveTypeReference _edmIntType;
-        private IEdmCollectionTypeReference _collectionType;
+        _edmIntType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
+        _collectionType = new EdmCollectionTypeReference(new EdmCollectionType(_edmIntType));
+    }
 
-        public ODataCollectionSerializerTests()
+    [Fact]
+    public void Ctor_ThrowsArgumentNull_SerializerProvider()
+    {
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new ODataCollectionSerializer(serializerProvider: null), "serializerProvider");
+    }
+
+    [Fact]
+    public async Task WriteObjectAsync_Throws_ArgumentNull_MessageWriter()
+    {
+        // Arrange
+        IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => serializer.WriteObjectAsync(graph: null, type: typeof(int[]), messageWriter: null, writeContext: null),
+            "messageWriter");
+    }
+
+    [Fact]
+    public async Task WriteObjectAsync_Throws_ArgumentNull_WriteContext()
+    {
+        // Arrange
+        ODataMessageWriter messageWriter = ODataTestUtil.GetMockODataMessageWriter();
+        IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => serializer.WriteObjectAsync(graph: null, type: typeof(int[]), messageWriter, writeContext: null),
+            "writeContext");
+    }
+
+    [Fact]
+    public async Task WriteObjectAsync_WritesValueReturnedFrom_CreateODataCollectionValue()
+    {
+        // Arrange
+        MemoryStream stream = new MemoryStream();
+        IODataResponseMessage message = new ODataMessageWrapper(stream);
+        ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
         {
-            _edmIntType = EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.Int32, isNullable: false);
-            _collectionType = new EdmCollectionTypeReference(new EdmCollectionType(_edmIntType));
+            ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/") }
+        };
+
+        settings.SetContentType(ODataFormat.Json);
+
+        ODataMessageWriter messageWriter = new ODataMessageWriter(message, settings);
+        IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
+        Mock<ODataCollectionSerializer> serializer = new Mock<ODataCollectionSerializer>(provider);
+        ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "CollectionName", Model = EdmCoreModel.Instance };
+        IEnumerable enumerable = new int[0];
+        ODataCollectionValue collectionValue = new ODataCollectionValue { TypeName = "NS.Name", Items = new object[] { 0, 1, 2 } };
+
+        serializer.CallBase = true;
+        serializer
+            .Setup(s => s.CreateODataCollectionValue(enumerable, It.Is<IEdmTypeReference>(e => e.Definition == this._edmIntType.Definition), writeContext))
+            .Returns(collectionValue).Verifiable();
+
+        // Act
+        await serializer.Object.WriteObjectAsync(enumerable, typeof(int[]), messageWriter, writeContext);
+
+        // Assert
+        serializer.Verify();
+        stream.Seek(0, SeekOrigin.Begin);
+        string result = new StreamReader(stream).ReadToEnd();
+        Assert.Equal("{\"@odata.context\":\"http://any/$metadata#Collection(Edm.Int32)\",\"value\":[0,1,2]}", result);
+    }
+
+    [Fact]
+    public async Task WriteCollectionAsync_ThrowsArgumentNull_ForInputParameters()
+    {
+        // Arrange
+        IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteCollectionAsync(writer: null, graph: null, collectionType: null, writeContext: null),
+            "writer");
+
+        // Arrange & Act & Assert
+        ODataCollectionWriter writer = new Mock<ODataCollectionWriter>().Object;
+        await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteCollectionAsync(writer, graph: null, collectionType: null, writeContext: null),
+            "writeContext");
+    }
+
+    [Fact]
+    public void CreateODataCollectionValue_ThrowsArgumentNull_ForInputParameters()
+    {
+        // Arrange
+        IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(
+            () => serializer.CreateODataCollectionValue(Enumerable.Empty<object>(), null, writeContext: null),
+            "elementType");
+
+        ExceptionAssert.ThrowsArgumentNull(
+            () => serializer.CreateODataCollectionValue(Enumerable.Empty<object>(), this._edmIntType, writeContext: null),
+            "writeContext");
+    }
+
+    [Fact]
+    public void CreateODataValue_ThrowsArgument_IfGraphIsNotEnumerable()
+    {
+        // Arrange
+        object nonEnumerable = new object();
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        var serializer = new ODataCollectionSerializer(serializerProvider.Object);
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns<IEdmTypeReference>(null);
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgument(
+            () => serializer.CreateODataValue(graph: nonEnumerable, expectedType: null, writeContext: new ODataSerializerContext()),
+            "graph",
+            "The argument must be of type 'IEnumerable'.");
+    }
+
+    [Fact]
+    public void CreateODataCollectionValue_ThrowsSerializationException_TypeCannotBeSerialized()
+    {
+        // Arrange
+        IEnumerable enumerable = new[] { 0 };
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        var serializer = new ODataCollectionSerializer(serializerProvider.Object);
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns<IEdmTypeReference>(null);
+
+        // Act & Assert
+        ExceptionAssert.Throws<SerializationException>(
+            () => serializer.CreateODataCollectionValue(enumerable, this._edmIntType, new ODataSerializerContext { Model = EdmCoreModel.Instance }),
+            "'Edm.Int32' cannot be serialized using the OData output formatter.");
+    }
+
+    [Fact]
+    public void CreateODataValue_Calls_CreateODataCollectionValue()
+    {
+        // Arrange
+        ODataCollectionValue oDataCollectionValue = new ODataCollectionValue();
+        var collection = new object[0];
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        Mock<ODataCollectionSerializer> serializer = new Mock<ODataCollectionSerializer>(serializerProvider.Object);
+        ODataSerializerContext writeContext = new ODataSerializerContext();
+        serializer.CallBase = true;
+        serializer
+            .Setup(s => s.CreateODataCollectionValue(collection, _edmIntType, writeContext))
+            .Returns(oDataCollectionValue)
+            .Verifiable();
+
+        // Act
+        ODataValue value = serializer.Object.CreateODataValue(collection, _collectionType, writeContext);
+
+        // Assert
+        serializer.Verify();
+        Assert.Same(oDataCollectionValue, value);
+    }
+
+    [Fact]
+    public void CreateODataCollectionValue_Serializes_AllElementsInTheCollection()
+    {
+        // Arrange
+        ODataPrimitiveSerializer primitiveSerializer = new ODataPrimitiveSerializer();
+        ODataSerializerContext writeContext = new ODataSerializerContext { Model = EdmCoreModel.Instance };
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(primitiveSerializer);
+
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
+
+        // Act
+        var oDataValue = serializer.CreateODataCollectionValue(new int[] { 1, 2, 3 }, _edmIntType, writeContext);
+
+        // Assert
+        var values = Assert.IsType<ODataCollectionValue>(oDataValue);
+
+        List<int> elements = new List<int>();
+        foreach (var item in values.Items)
+        {
+            elements.Add(Assert.IsType<int>(item));
         }
 
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_SerializerProvider()
+        Assert.Equal(elements, new int[] { 1, 2, 3 });
+    }
+
+    [Fact]
+    public void CreateODataCollectionValue_CanSerialize_IEdmObjects()
+    {
+        // Arrange
+        Mock<IEdmEnumObject> edmEnumObject = new Mock<IEdmEnumObject>();
+        IEdmEnumObject[] collection = { edmEnumObject.Object };
+        ODataSerializerContext serializerContext = new ODataSerializerContext();
+        IEdmEnumTypeReference elementType = new EdmEnumTypeReference(new EdmEnumType("NS", "EnumType"), isNullable: true);
+        edmEnumObject.Setup(s => s.GetEdmType()).Returns(elementType);
+
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        Mock<ODataEnumSerializer> elementSerializer = new Mock<ODataEnumSerializer>(MockBehavior.Strict, serializerProvider.Object);
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(elementType)).Returns(elementSerializer.Object);
+        elementSerializer.Setup(s => s.CreateODataEnumValue(collection[0], elementType, serializerContext)).Returns(new ODataEnumValue("1", "NS.EnumType")).Verifiable();
+
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
+
+        // Act
+        serializer.CreateODataCollectionValue(collection, elementType, serializerContext);
+
+        // Assert
+        elementSerializer.Verify();
+    }
+
+    [Fact]
+    public void CreateODataCollectionValue_Returns_EmptyODataCollectionValue_ForNull()
+    {
+        // Arrange
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
+
+        // Act
+        var oDataValue = serializer.CreateODataCollectionValue(null, _edmIntType, new ODataSerializerContext());
+
+        // Assert
+        Assert.NotNull(oDataValue);
+        ODataCollectionValue collection = Assert.IsType<ODataCollectionValue>(oDataValue);
+        Assert.Empty(collection.Items);
+    }
+
+    [Fact]
+    public void CreateODataCollectionValue_SetsTypeName()
+    {
+        // Arrange
+        IEnumerable enumerable = new int[] { 1, 2, 3 };
+        ODataSerializerContext context = new ODataSerializerContext { Model = EdmCoreModel.Instance };
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(new ODataPrimitiveSerializer());
+        ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
+
+        // Act
+        ODataValue oDataValue = serializer.CreateODataCollectionValue(enumerable, _edmIntType, context);
+
+        // Assert
+        ODataCollectionValue collection = Assert.IsType<ODataCollectionValue>(oDataValue);
+        Assert.Equal("Collection(Edm.Int32)", collection.TypeName);
+    }
+
+    [Fact]
+    public void AddTypeNameAnnotationAsNeeded_DoesNotAddAnnotation_InDefaultMetadataMode()
+    {
+        // Arrange
+        ODataCollectionValue value = new ODataCollectionValue();
+
+        // Act
+        ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(value, ODataMetadataLevel.Minimal);
+
+        // Assert
+        Assert.Null(value.TypeAnnotation);
+    }
+
+    [Fact]
+    public void AddTypeNameAnnotationAsNeeded_AddsAnnotation_InJsonLightMetadataMode()
+    {
+        // Arrange
+        string expectedTypeName = "TypeName";
+        ODataCollectionValue value = new ODataCollectionValue
         {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ODataCollectionSerializer(serializerProvider: null), "serializerProvider");
-        }
+            TypeName = expectedTypeName
+        };
 
-        [Fact]
-        public async Task WriteObjectAsync_Throws_ArgumentNull_MessageWriter()
+        // Act
+        ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(value, ODataMetadataLevel.Full);
+
+        // Assert
+        ODataTypeAnnotation annotation = value.TypeAnnotation;
+        Assert.NotNull(annotation); // Guard
+        Assert.Equal(expectedTypeName, annotation.TypeName);
+    }
+
+    [Fact]
+    public void AddTypeNameAnnotationAsNeeded_AddsAnnotationWithNull_InJsonLightNoMetadataMode()
+    {
+        // Arrange
+        string expectedTypeName = "TypeName";
+        ODataCollectionValue value = new ODataCollectionValue
         {
-            // Arrange
-            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+            TypeName = expectedTypeName
+        };
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => serializer.WriteObjectAsync(graph: null, type: typeof(int[]), messageWriter: null, writeContext: null),
-                "messageWriter");
-        }
+        // Act
+        ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(value, ODataMetadataLevel.None);
 
-        [Fact]
-        public async Task WriteObjectAsync_Throws_ArgumentNull_WriteContext()
-        {
-            // Arrange
-            ODataMessageWriter messageWriter = ODataTestUtil.GetMockODataMessageWriter();
-            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
+        // Assert
+        ODataTypeAnnotation annotation = value.TypeAnnotation;
+        Assert.NotNull(annotation); // Guard
+        Assert.Null(annotation.TypeName);
+    }
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => serializer.WriteObjectAsync(graph: null, type: typeof(int[]), messageWriter, writeContext: null),
-                "writeContext");
-        }
+    [Theory]
+    [InlineData(ODataMetadataLevel.Full, true)]
+    [InlineData(ODataMetadataLevel.Minimal, false)]
+    [InlineData(ODataMetadataLevel.None, true)]
+    public void ShouldAddTypeNameAnnotation(ODataMetadataLevel metadataLevel, bool expectedResult)
+    {
+        // Act
+        bool actualResult = ODataCollectionSerializer.ShouldAddTypeNameAnnotation(metadataLevel);
 
-        [Fact]
-        public async Task WriteObjectAsync_WritesValueReturnedFrom_CreateODataCollectionValue()
-        {
-            // Arrange
-            MemoryStream stream = new MemoryStream();
-            IODataResponseMessage message = new ODataMessageWrapper(stream);
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
-            {
-                ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/") }
-            };
+        // Assert
+        Assert.Equal(expectedResult, actualResult);
+    }
 
-            settings.SetContentType(ODataFormat.Json);
+    [Theory]
+    [InlineData(ODataMetadataLevel.Full, false)]
+    [InlineData(ODataMetadataLevel.None, true)]
+    public void ShouldSuppressTypeNameSerialization(ODataMetadataLevel metadataLevel, bool expectedResult)
+    {
+        // Act
+        bool actualResult = ODataCollectionSerializer.ShouldSuppressTypeNameSerialization(metadataLevel);
 
-            ODataMessageWriter messageWriter = new ODataMessageWriter(message, settings);
-            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
-            Mock<ODataCollectionSerializer> serializer = new Mock<ODataCollectionSerializer>(provider);
-            ODataSerializerContext writeContext = new ODataSerializerContext { RootElementName = "CollectionName", Model = EdmCoreModel.Instance };
-            IEnumerable enumerable = new int[0];
-            ODataCollectionValue collectionValue = new ODataCollectionValue { TypeName = "NS.Name", Items = new object[] { 0, 1, 2 } };
+        // Assert
+        Assert.Equal(expectedResult, actualResult);
+    }
 
-            serializer.CallBase = true;
-            serializer
-                .Setup(s => s.CreateODataCollectionValue(enumerable, It.Is<IEdmTypeReference>(e => e.Definition == this._edmIntType.Definition), writeContext))
-                .Returns(collectionValue).Verifiable();
+    [Fact]
+    public void GetElementType_ThrowsSerializationException_NonCollectionType()
+    {
+        // Arrange
+        IEdmTypeReference edmType = EdmCoreModel.Instance.GetString(false);
 
-            // Act
-            await serializer.Object.WriteObjectAsync(enumerable, typeof(int[]), messageWriter, writeContext);
-
-            // Assert
-            serializer.Verify();
-            stream.Seek(0, SeekOrigin.Begin);
-            string result = new StreamReader(stream).ReadToEnd();
-            Assert.Equal("{\"@odata.context\":\"http://any/$metadata#Collection(Edm.Int32)\",\"value\":[0,1,2]}", result);
-        }
-
-        [Fact]
-        public async Task WriteCollectionAsync_ThrowsArgumentNull_ForInputParameters()
-        {
-            // Arrange
-            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
-
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteCollectionAsync(writer: null, graph: null, collectionType: null, writeContext: null),
-                "writer");
-
-            // Arrange & Act & Assert
-            ODataCollectionWriter writer = new Mock<ODataCollectionWriter>().Object;
-            await ExceptionAssert.ThrowsArgumentNullAsync(() => serializer.WriteCollectionAsync(writer, graph: null, collectionType: null, writeContext: null),
-                "writeContext");
-        }
-
-        [Fact]
-        public void CreateODataCollectionValue_ThrowsArgumentNull_ForInputParameters()
-        {
-            // Arrange
-            IODataSerializerProvider provider = new Mock<IODataSerializerProvider>().Object;
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(provider);
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.CreateODataCollectionValue(Enumerable.Empty<object>(), null, writeContext: null),
-                "elementType");
-
-            ExceptionAssert.ThrowsArgumentNull(
-                () => serializer.CreateODataCollectionValue(Enumerable.Empty<object>(), this._edmIntType, writeContext: null),
-                "writeContext");
-        }
-
-        [Fact]
-        public void CreateODataValue_ThrowsArgument_IfGraphIsNotEnumerable()
-        {
-            // Arrange
-            object nonEnumerable = new object();
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            var serializer = new ODataCollectionSerializer(serializerProvider.Object);
-            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns<IEdmTypeReference>(null);
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgument(
-                () => serializer.CreateODataValue(graph: nonEnumerable, expectedType: null, writeContext: new ODataSerializerContext()),
-                "graph",
-                "The argument must be of type 'IEnumerable'.");
-        }
-
-        [Fact]
-        public void CreateODataCollectionValue_ThrowsSerializationException_TypeCannotBeSerialized()
-        {
-            // Arrange
-            IEnumerable enumerable = new[] { 0 };
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            var serializer = new ODataCollectionSerializer(serializerProvider.Object);
-            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns<IEdmTypeReference>(null);
-
-            // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => serializer.CreateODataCollectionValue(enumerable, this._edmIntType, new ODataSerializerContext { Model = EdmCoreModel.Instance }),
-                "'Edm.Int32' cannot be serialized using the OData output formatter.");
-        }
-
-        [Fact]
-        public void CreateODataValue_Calls_CreateODataCollectionValue()
-        {
-            // Arrange
-            ODataCollectionValue oDataCollectionValue = new ODataCollectionValue();
-            var collection = new object[0];
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            Mock<ODataCollectionSerializer> serializer = new Mock<ODataCollectionSerializer>(serializerProvider.Object);
-            ODataSerializerContext writeContext = new ODataSerializerContext();
-            serializer.CallBase = true;
-            serializer
-                .Setup(s => s.CreateODataCollectionValue(collection, _edmIntType, writeContext))
-                .Returns(oDataCollectionValue)
-                .Verifiable();
-
-            // Act
-            ODataValue value = serializer.Object.CreateODataValue(collection, _collectionType, writeContext);
-
-            // Assert
-            serializer.Verify();
-            Assert.Same(oDataCollectionValue, value);
-        }
-
-        [Fact]
-        public void CreateODataCollectionValue_Serializes_AllElementsInTheCollection()
-        {
-            // Arrange
-            ODataPrimitiveSerializer primitiveSerializer = new ODataPrimitiveSerializer();
-            ODataSerializerContext writeContext = new ODataSerializerContext { Model = EdmCoreModel.Instance };
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(primitiveSerializer);
-
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
-
-            // Act
-            var oDataValue = serializer.CreateODataCollectionValue(new int[] { 1, 2, 3 }, _edmIntType, writeContext);
-
-            // Assert
-            var values = Assert.IsType<ODataCollectionValue>(oDataValue);
-
-            List<int> elements = new List<int>();
-            foreach (var item in values.Items)
-            {
-                elements.Add(Assert.IsType<int>(item));
-            }
-
-            Assert.Equal(elements, new int[] { 1, 2, 3 });
-        }
-
-        [Fact]
-        public void CreateODataCollectionValue_CanSerialize_IEdmObjects()
-        {
-            // Arrange
-            Mock<IEdmEnumObject> edmEnumObject = new Mock<IEdmEnumObject>();
-            IEdmEnumObject[] collection = { edmEnumObject.Object };
-            ODataSerializerContext serializerContext = new ODataSerializerContext();
-            IEdmEnumTypeReference elementType = new EdmEnumTypeReference(new EdmEnumType("NS", "EnumType"), isNullable: true);
-            edmEnumObject.Setup(s => s.GetEdmType()).Returns(elementType);
-
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            Mock<ODataEnumSerializer> elementSerializer = new Mock<ODataEnumSerializer>(MockBehavior.Strict, serializerProvider.Object);
-            serializerProvider.Setup(s => s.GetEdmTypeSerializer(elementType)).Returns(elementSerializer.Object);
-            elementSerializer.Setup(s => s.CreateODataEnumValue(collection[0], elementType, serializerContext)).Returns(new ODataEnumValue("1", "NS.EnumType")).Verifiable();
-
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
-
-            // Act
-            serializer.CreateODataCollectionValue(collection, elementType, serializerContext);
-
-            // Assert
-            elementSerializer.Verify();
-        }
-
-        [Fact]
-        public void CreateODataCollectionValue_Returns_EmptyODataCollectionValue_ForNull()
-        {
-            // Arrange
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
-
-            // Act
-            var oDataValue = serializer.CreateODataCollectionValue(null, _edmIntType, new ODataSerializerContext());
-
-            // Assert
-            Assert.NotNull(oDataValue);
-            ODataCollectionValue collection = Assert.IsType<ODataCollectionValue>(oDataValue);
-            Assert.Empty(collection.Items);
-        }
-
-        [Fact]
-        public void CreateODataCollectionValue_SetsTypeName()
-        {
-            // Arrange
-            IEnumerable enumerable = new int[] { 1, 2, 3 };
-            ODataSerializerContext context = new ODataSerializerContext { Model = EdmCoreModel.Instance };
-            Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-            serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(new ODataPrimitiveSerializer());
-            ODataCollectionSerializer serializer = new ODataCollectionSerializer(serializerProvider.Object);
-
-            // Act
-            ODataValue oDataValue = serializer.CreateODataCollectionValue(enumerable, _edmIntType, context);
-
-            // Assert
-            ODataCollectionValue collection = Assert.IsType<ODataCollectionValue>(oDataValue);
-            Assert.Equal("Collection(Edm.Int32)", collection.TypeName);
-        }
-
-        [Fact]
-        public void AddTypeNameAnnotationAsNeeded_DoesNotAddAnnotation_InDefaultMetadataMode()
-        {
-            // Arrange
-            ODataCollectionValue value = new ODataCollectionValue();
-
-            // Act
-            ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(value, ODataMetadataLevel.Minimal);
-
-            // Assert
-            Assert.Null(value.TypeAnnotation);
-        }
-
-        [Fact]
-        public void AddTypeNameAnnotationAsNeeded_AddsAnnotation_InJsonLightMetadataMode()
-        {
-            // Arrange
-            string expectedTypeName = "TypeName";
-            ODataCollectionValue value = new ODataCollectionValue
-            {
-                TypeName = expectedTypeName
-            };
-
-            // Act
-            ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(value, ODataMetadataLevel.Full);
-
-            // Assert
-            ODataTypeAnnotation annotation = value.TypeAnnotation;
-            Assert.NotNull(annotation); // Guard
-            Assert.Equal(expectedTypeName, annotation.TypeName);
-        }
-
-        [Fact]
-        public void AddTypeNameAnnotationAsNeeded_AddsAnnotationWithNull_InJsonLightNoMetadataMode()
-        {
-            // Arrange
-            string expectedTypeName = "TypeName";
-            ODataCollectionValue value = new ODataCollectionValue
-            {
-                TypeName = expectedTypeName
-            };
-
-            // Act
-            ODataCollectionSerializer.AddTypeNameAnnotationAsNeeded(value, ODataMetadataLevel.None);
-
-            // Assert
-            ODataTypeAnnotation annotation = value.TypeAnnotation;
-            Assert.NotNull(annotation); // Guard
-            Assert.Null(annotation.TypeName);
-        }
-
-        [Theory]
-        [InlineData(ODataMetadataLevel.Full, true)]
-        [InlineData(ODataMetadataLevel.Minimal, false)]
-        [InlineData(ODataMetadataLevel.None, true)]
-        public void ShouldAddTypeNameAnnotation(ODataMetadataLevel metadataLevel, bool expectedResult)
-        {
-            // Act
-            bool actualResult = ODataCollectionSerializer.ShouldAddTypeNameAnnotation(metadataLevel);
-
-            // Assert
-            Assert.Equal(expectedResult, actualResult);
-        }
-
-        [Theory]
-        [InlineData(ODataMetadataLevel.Full, false)]
-        [InlineData(ODataMetadataLevel.None, true)]
-        public void ShouldSuppressTypeNameSerialization(ODataMetadataLevel metadataLevel, bool expectedResult)
-        {
-            // Act
-            bool actualResult = ODataCollectionSerializer.ShouldSuppressTypeNameSerialization(metadataLevel);
-
-            // Assert
-            Assert.Equal(expectedResult, actualResult);
-        }
-
-        [Fact]
-        public void GetElementType_ThrowsSerializationException_NonCollectionType()
-        {
-            // Arrange
-            IEdmTypeReference edmType = EdmCoreModel.Instance.GetString(false);
-
-            // Act & Assert
-            ExceptionAssert.Throws<SerializationException>(
-                () => ODataCollectionSerializer.GetElementType(edmType),
-                "ODataCollectionSerializer cannot write an object of type 'Edm.String'.");
-        }
+        // Act & Assert
+        ExceptionAssert.Throws<SerializationException>(
+            () => ODataCollectionSerializer.GetElementType(edmType),
+            "ODataCollectionSerializer cannot write an object of type 'Edm.String'.");
     }
 }

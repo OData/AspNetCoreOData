@@ -5,21 +5,20 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class ZipCode
 {
-    public class ZipCode
-    {
-        public string Part1 { get; set; }
+    public string Part1 { get; set; }
 
-        public string Part2 { get; set; }
-    }
+    public string Part2 { get; set; }
+}
 
-    public class RecursiveZipCode
-    {
-        public string Part1 { get; set; }
+public class RecursiveZipCode
+{
+    public string Part1 { get; set; }
 
-        public string Part2 { get; set; }
+    public string Part2 { get; set; }
 
-        public RecursiveZipCode Recursive { get; set; }
-    }
+    public RecursiveZipCode Recursive { get; set; }
 }

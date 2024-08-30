@@ -10,24 +10,23 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
+
+public class ModelNameAnnotationTests
 {
-    public class ModelNameAnnotationTests
+    [Fact]
+    public void Ctor_ThrowsArgumentNull_Name()
     {
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_Name()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ModelNameAnnotation(null), "name");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new ModelNameAnnotation(null), "name");
+    }
 
-        [Fact]
-        public void Ctor_SetsProperties()
-        {
-            // Arrange & Act & Assert
-            ModelNameAnnotation annotation = new ModelNameAnnotation("any");
+    [Fact]
+    public void Ctor_SetsProperties()
+    {
+        // Arrange & Act & Assert
+        ModelNameAnnotation annotation = new ModelNameAnnotation("any");
 
-            Assert.Equal("any", annotation.ModelName);
-        }
+        Assert.Equal("any", annotation.ModelName);
     }
 }

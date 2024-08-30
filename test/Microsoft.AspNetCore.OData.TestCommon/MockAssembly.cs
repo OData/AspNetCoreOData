@@ -10,52 +10,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.TestCommon
+namespace Microsoft.AspNetCore.OData.TestCommon;
+
+/// <summary>
+/// A mock to represent an assembly
+/// </summary>
+public sealed class MockAssembly : Assembly
 {
+    private Type[] _types;
+
     /// <summary>
-    /// A mock to represent an assembly
+    /// Initializes a new instance of the <see cref="MockAssembly"/> class.
     /// </summary>
-    public sealed class MockAssembly : Assembly
+    /// <param name="types">The types in this assembly.</param>
+    public MockAssembly(params Type[] types)
     {
-        private Type[] _types;
+        _types = types;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MockAssembly"/> class.
-        /// </summary>
-        /// <param name="types">The types in this assembly.</param>
-        public MockAssembly(params Type[] types)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MockAssembly"/> class.
+    /// </summary>
+    /// <param name="types">The mock types in this assembly.</param>
+    public MockAssembly(params MockType[] types)
+    {
+        foreach (var type in types)
         {
-            _types = types;
+            type.SetupGet(t => t.Assembly).Returns(this);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MockAssembly"/> class.
-        /// </summary>
-        /// <param name="types">The mock types in this assembly.</param>
-        public MockAssembly(params MockType[] types)
-        {
-            foreach (var type in types)
-            {
-                type.SetupGet(t => t.Assembly).Returns(this);
-            }
+        _types = types.Select(t => t.Object).ToArray();
+    }
 
-            _types = types.Select(t => t.Object).ToArray();
-        }
+    /// <remarks>
+    /// AspNet uses GetTypes as opposed to DefinedTypes()
+    /// </remarks>
+    public override Type[] GetTypes()
+    {
+        return _types;
+    }
 
-        /// <remarks>
-        /// AspNet uses GetTypes as opposed to DefinedTypes()
-        /// </remarks>
-        public override Type[] GetTypes()
-        {
-            return _types;
-        }
-
-        /// <remarks>
-        /// AspNetCore uses DefinedTypes as opposed to GetTypes()
-        /// </remarks>
-        public override IEnumerable<TypeInfo> DefinedTypes
-        {
-            get { return _types.AsEnumerable().Select(a => a.GetTypeInfo()); }
-        }
+    /// <remarks>
+    /// AspNetCore uses DefinedTypes as opposed to GetTypes()
+    /// </remarks>
+    public override IEnumerable<TypeInfo> DefinedTypes
+    {
+        get { return _types.AsEnumerable().Select(a => a.GetTypeInfo()); }
     }
 }

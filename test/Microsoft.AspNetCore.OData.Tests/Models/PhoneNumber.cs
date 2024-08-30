@@ -5,24 +5,23 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public struct PhoneNumber
 {
-    public struct PhoneNumber
-    {
-        public int CountryCode { get; set; }
+    public int CountryCode { get; set; }
 
-        public int AreaCode { get; set; }
+    public int AreaCode { get; set; }
 
-        public int Number { get; set; }
+    public int Number { get; set; }
 
-        public PhoneType PhoneType { get; set; }
-    }
+    public PhoneType PhoneType { get; set; }
+}
 
-    public enum PhoneType
-    {
-        HomePhone,
-        CellPhone,
-        WorkPhone,
-        Fax
-    }
+public enum PhoneType
+{
+    HomePhone,
+    CellPhone,
+    WorkPhone,
+    Fax
 }

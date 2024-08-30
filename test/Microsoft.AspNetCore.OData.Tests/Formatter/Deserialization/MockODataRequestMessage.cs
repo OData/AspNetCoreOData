@@ -11,74 +11,73 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
+
+internal class MockODataRequestMessage : IODataRequestMessageAsync
 {
-    internal class MockODataRequestMessage : IODataRequestMessageAsync
+    Dictionary<string, string> _headers;
+    MemoryStream _body;
+
+    public MockODataRequestMessage()
     {
-        Dictionary<string, string> _headers;
-        MemoryStream _body;
+        _headers = new Dictionary<string, string>();
+        _body = new MemoryStream();
+    }
 
-        public MockODataRequestMessage()
+    public MockODataRequestMessage(MockODataRequestMessage requestMessage)
+    {
+        _headers = new Dictionary<string, string>(requestMessage._headers);
+        _body = new MemoryStream(requestMessage._body.ToArray());
+    }
+
+    public string GetHeader(string headerName)
+    {
+        string value;
+        _headers.TryGetValue(headerName, out value);
+        return value;
+    }
+
+    public Stream GetStream()
+    {
+        return _body;
+    }
+
+    public IEnumerable<KeyValuePair<string, string>> Headers
+    {
+        get { return _headers; }
+    }
+
+    public string Method
+    {
+        get
         {
-            _headers = new Dictionary<string, string>();
-            _body = new MemoryStream();
+            return "Get";
         }
-
-        public MockODataRequestMessage(MockODataRequestMessage requestMessage)
+        set
         {
-            _headers = new Dictionary<string, string>(requestMessage._headers);
-            _body = new MemoryStream(requestMessage._body.ToArray());
+            throw new NotImplementedException();
         }
+    }
 
-        public string GetHeader(string headerName)
+    public void SetHeader(string headerName, string headerValue)
+    {
+        _headers[headerName] = headerValue;
+    }
+
+    public Task<Stream> GetStreamAsync()
+    {
+        return Task.FromResult<Stream>(_body);
+    }
+
+    public Uri Url
+    {
+        get
         {
-            string value;
-            _headers.TryGetValue(headerName, out value);
-            return value;
+            throw new NotImplementedException();
         }
-
-        public Stream GetStream()
+        set
         {
-            return _body;
-        }
-
-        public IEnumerable<KeyValuePair<string, string>> Headers
-        {
-            get { return _headers; }
-        }
-
-        public string Method
-        {
-            get
-            {
-                return "Get";
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public void SetHeader(string headerName, string headerValue)
-        {
-            _headers[headerName] = headerValue;
-        }
-
-        public Task<Stream> GetStreamAsync()
-        {
-            return Task.FromResult<Stream>(_body);
-        }
-
-        public Uri Url
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            throw new NotImplementedException();
         }
     }
 }

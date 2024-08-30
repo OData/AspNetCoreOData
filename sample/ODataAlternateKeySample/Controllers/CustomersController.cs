@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // <copyright file="CustomersController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
@@ -11,71 +11,70 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataAlternateKeySample.Models;
 
-namespace ODataAlternateKeySample.Controllers
+namespace ODataAlternateKeySample.Controllers;
+
+public class CustomersController : ODataController
 {
-    public class CustomersController : ODataController
+    private readonly IAlternateKeyRepository _repository;
+
+    public CustomersController(IAlternateKeyRepository repository)
     {
-        private readonly IAlternateKeyRepository _repository;
+        _repository = repository;
+    }
 
-        public CustomersController(IAlternateKeyRepository repository)
+    [HttpGet]
+    [EnableQuery]
+    public IActionResult Get()
+    {
+        return Ok(_repository.GetCustomers());
+    }
+
+    [HttpGet]
+    [EnableQuery]
+    public IActionResult Get(int key)
+    {
+        var c = _repository.GetCustomers().FirstOrDefault(c => c.Id == key);
+        if (c == null)
         {
-            _repository = repository;
+            return NotFound();
         }
 
-        [HttpGet]
-        [EnableQuery]
-        public IActionResult Get()
+        return Ok(c);
+    }
+
+    [HttpPost]
+    [EnableQuery]
+    public IActionResult Post([FromBody]Customer c)
+    {
+        return Ok(c);
+    }
+
+    // Alternate key: SSN
+    [HttpGet("odata/Customers(SSN={ssn})")] // use community alternate key
+    [HttpGet("odata/Customers(CoreSN={ssn})")] // use core alternate key
+    public IActionResult GetCustomerBySSN(string ssn)
+    {
+        ssn = ssn.Replace("%", "%25");
+        var c = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssn);
+        if (c == null)
         {
-            return Ok(_repository.GetCustomers());
+            return NotFound();
         }
 
-        [HttpGet]
-        [EnableQuery]
-        public IActionResult Get(int key)
-        {
-            var c = _repository.GetCustomers().FirstOrDefault(c => c.Id == key);
-            if (c == null)
-            {
-                return NotFound();
-            }
+        return Ok(c);
+    }
 
-            return Ok(c);
+    [HttpPatch("odata/Customers(SSN={ssnKey})")] // use community alternate key
+    [HttpPatch("odata/Customers(CoreSN={ssnKey})")] // use core alternate key
+    public IActionResult PatchCustomerBySSN(string ssnKey, Delta<Customer> delta)
+    {
+        var originalCustomer = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssnKey);
+        if (originalCustomer == null)
+        {
+            return NotFound();
         }
 
-        [HttpPost]
-        [EnableQuery]
-        public IActionResult Post([FromBody]Customer c)
-        {
-            return Ok(c);
-        }
-
-        // Alternate key: SSN
-        [HttpGet("odata/Customers(SSN={ssn})")] // use community alternate key
-        [HttpGet("odata/Customers(CoreSN={ssn})")] // use core alternate key
-        public IActionResult GetCustomerBySSN(string ssn)
-        {
-            ssn = ssn.Replace("%", "%25");
-            var c = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssn);
-            if (c == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(c);
-        }
-
-        [HttpPatch("odata/Customers(SSN={ssnKey})")] // use community alternate key
-        [HttpPatch("odata/Customers(CoreSN={ssnKey})")] // use core alternate key
-        public IActionResult PatchCustomerBySSN(string ssnKey, Delta<Customer> delta)
-        {
-            var originalCustomer = _repository.GetCustomers().FirstOrDefault(c => c.SSN == ssnKey);
-            if (originalCustomer == null)
-            {
-                return NotFound();
-            }
-
-            delta.Patch(originalCustomer);
-            return Updated(originalCustomer);
-        }
+        delta.Patch(originalCustomer);
+        return Updated(originalCustomer);
     }
 }

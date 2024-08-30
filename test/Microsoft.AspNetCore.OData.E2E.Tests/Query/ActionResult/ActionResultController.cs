@@ -10,28 +10,27 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult;
+
+public class CustomersController : ControllerBase
 {
-    public class CustomersController : ControllerBase
+    [HttpGet]
+    [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Expand | AllowedQueryOptions.Filter)]
+    public async Task<ActionResult<IEnumerable<Customer>>> Get()
     {
-        [HttpGet]
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Expand | AllowedQueryOptions.Filter)]
-        public async Task<ActionResult<IEnumerable<Customer>>> Get()
-        {
-            return await Task.FromResult(new List<Customer>
-            { 
-                new Customer
+        return await Task.FromResult(new List<Customer>
+        { 
+            new Customer
+            {
+                Id = "CustId",
+                Books = new List<Book>
                 {
-                    Id = "CustId",
-                    Books = new List<Book>
+                    new Book
                     {
-                        new Book
-                        {
-                            Id = "BookId",
-                        },
+                        Id = "BookId",
                     },
                 },
-            });
-        }
+            },
+        });
     }
 }

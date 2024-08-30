@@ -12,69 +12,68 @@ using Microsoft.AspNetCore.OData.Tests.Query.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
+namespace Microsoft.AspNetCore.OData.Tests.Query.Validator;
+
+internal static class ValidationTestHelper
 {
-    internal static class ValidationTestHelper
+    internal static ODataQueryContext CreateCustomerContext()
     {
-        internal static ODataQueryContext CreateCustomerContext()
-        {
-            return CreateCustomerContext(true);
-        }
+        return CreateCustomerContext(true);
+    }
 
-        internal static ODataQueryContext CreateCustomerContext(bool setRequestContainer)
+    internal static ODataQueryContext CreateCustomerContext(bool setRequestContainer)
+    {
+        ODataQueryContext context = new ODataQueryContext(GetCustomersModel(), typeof(QueryCompositionCustomer), null);
+        if (setRequestContainer)
         {
-            ODataQueryContext context = new ODataQueryContext(GetCustomersModel(), typeof(QueryCompositionCustomer), null);
-            if (setRequestContainer)
-            {
-                context.RequestContainer = new MockServiceProvider();
-            }
-
-            context.DefaultQueryConfigurations.EnableOrderBy = true;
-            context.DefaultQueryConfigurations.MaxTop = null;
-            return context;
-        }
-
-        internal static ODataQueryContext CreateProductContext()
-        {
-            return new ODataQueryContext(GetProductsModel(), typeof(Product));
-        }
-
-        internal static ODataQueryContext CreateDerivedProductsContext()
-        {
-            ODataQueryContext context = new ODataQueryContext(GetDerivedProductsModel(), typeof(Product), null);
             context.RequestContainer = new MockServiceProvider();
-            context.DefaultQueryConfigurations.EnableFilter = true;
-            return context;
         }
 
-        private static IEdmModel GetCustomersModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<QueryCompositionCustomer>("Customer");
-            builder.EntityType<QueryCompositionCustomerBase>();
-            return builder.GetEdmModel();
-        }
+        context.DefaultQueryConfigurations.EnableOrderBy = true;
+        context.DefaultQueryConfigurations.MaxTop = null;
+        return context;
+    }
 
-        private static IEdmModel GetProductsModel()
-        {
-            var builder = GetProductsBuilder();
-            return builder.GetEdmModel();
-        }
+    internal static ODataQueryContext CreateProductContext()
+    {
+        return new ODataQueryContext(GetProductsModel(), typeof(Product));
+    }
 
-        private static IEdmModel GetDerivedProductsModel()
-        {
-            var builder = GetProductsBuilder();
-            builder.EntitySet<Product>("Product");
-            builder.EntityType<DerivedProduct>().DerivesFrom<Product>();
-            builder.EntityType<DerivedCategory>().DerivesFrom<Category>();
-            return builder.GetEdmModel();
-        }
+    internal static ODataQueryContext CreateDerivedProductsContext()
+    {
+        ODataQueryContext context = new ODataQueryContext(GetDerivedProductsModel(), typeof(Product), null);
+        context.RequestContainer = new MockServiceProvider();
+        context.DefaultQueryConfigurations.EnableFilter = true;
+        return context;
+    }
 
-        private static ODataConventionModelBuilder GetProductsBuilder()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Product>("Product");
-            return builder;
-        }
+    private static IEdmModel GetCustomersModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<QueryCompositionCustomer>("Customer");
+        builder.EntityType<QueryCompositionCustomerBase>();
+        return builder.GetEdmModel();
+    }
+
+    private static IEdmModel GetProductsModel()
+    {
+        var builder = GetProductsBuilder();
+        return builder.GetEdmModel();
+    }
+
+    private static IEdmModel GetDerivedProductsModel()
+    {
+        var builder = GetProductsBuilder();
+        builder.EntitySet<Product>("Product");
+        builder.EntityType<DerivedProduct>().DerivesFrom<Product>();
+        builder.EntityType<DerivedCategory>().DerivesFrom<Category>();
+        return builder.GetEdmModel();
+    }
+
+    private static ODataConventionModelBuilder GetProductsBuilder()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Product>("Product");
+        return builder;
     }
 }

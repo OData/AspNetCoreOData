@@ -8,18 +8,17 @@
 using Microsoft.AspNetCore.OData.Formatter;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter
-{
-    public class FromODataBodyAttributeTests
-    {
-        [Fact]
-        public void Ctor_ConfigureODataBodyModelBinder()
-        {
-            // Arrange
-            FromODataBodyAttribute attribute = new FromODataBodyAttribute();
+namespace Microsoft.AspNetCore.OData.Tests.Formatter;
 
-            // Act & Assert
-            Assert.Equal(typeof(ODataBodyModelBinder), attribute.BinderType);
-        }
+public class FromODataBodyAttributeTests
+{
+    [Fact]
+    public void Ctor_ConfigureODataBodyModelBinder()
+    {
+        // Arrange
+        FromODataBodyAttribute attribute = new FromODataBodyAttribute();
+
+        // Act & Assert
+        Assert.Equal(typeof(ODataBodyModelBinder), attribute.BinderType);
     }
 }

@@ -13,61 +13,60 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Abstracts
-{
-    //public class PerRouteContainerTests
-    //{
-    //    [Fact]
-    //    public void Ctor_BuildServiceContainer_WithOneModel()
-    //    {
-    //        // Arrange
-    //        IEdmModel model = EdmCoreModel.Instance;
-    //        var options = new ODataOptions();
-    //        options.AddModel("odata", model);
+namespace Microsoft.AspNetCore.OData.Tests.Abstracts;
 
-    //        // Act
-    //        PerRouteContainer container = CreateContainer(options);
+//public class PerRouteContainerTests
+//{
+//    [Fact]
+//    public void Ctor_BuildServiceContainer_WithOneModel()
+//    {
+//        // Arrange
+//        IEdmModel model = EdmCoreModel.Instance;
+//        var options = new ODataOptions();
+//        options.AddModel("odata", model);
 
-    //        // Assert
-    //        KeyValuePair<string, IServiceProvider> service = Assert.Single(container.Services);
-    //        Assert.Equal("odata", service.Key);
-    //        Assert.NotNull(service.Value);
+//        // Act
+//        PerRouteContainer container = CreateContainer(options);
 
-    //        IEdmModel actualModel =service.Value.GetService<IEdmModel>();
-    //        Assert.Same(model, actualModel);
-    //    }
+//        // Assert
+//        KeyValuePair<string, IServiceProvider> service = Assert.Single(container.Services);
+//        Assert.Equal("odata", service.Key);
+//        Assert.NotNull(service.Value);
 
-    //    [Fact]
-    //    public void Ctor_BuildServiceContainer_WithTwoModels()
-    //    {
-    //        // Arrange
-    //        IEdmModel model = new EdmModel();
-    //        var options = new ODataOptions();
-    //        options.AddModel("odata", EdmCoreModel.Instance);
-    //        options.AddModel("my{data}", model);
+//        IEdmModel actualModel =service.Value.GetService<IEdmModel>();
+//        Assert.Same(model, actualModel);
+//    }
 
-    //        // Act
-    //        PerRouteContainer container = CreateContainer(options);
+//    [Fact]
+//    public void Ctor_BuildServiceContainer_WithTwoModels()
+//    {
+//        // Arrange
+//        IEdmModel model = new EdmModel();
+//        var options = new ODataOptions();
+//        options.AddModel("odata", EdmCoreModel.Instance);
+//        options.AddModel("my{data}", model);
 
-    //        // Assert
-    //        Assert.Equal(2, container.Services.Count);
-    //        IServiceProvider sp1 = container.GetServiceProvider("odata");
-    //        Assert.NotNull(sp1);
-    //        IEdmModel actualModel = sp1.GetService<IEdmModel>();
-    //        Assert.Same(EdmCoreModel.Instance, actualModel);
+//        // Act
+//        PerRouteContainer container = CreateContainer(options);
 
-    //        IServiceProvider sp2 = container.GetServiceProvider("my{data}");
-    //        Assert.NotNull(sp2);
-    //        actualModel = sp2.GetService<IEdmModel>();
-    //        Assert.Same(model, actualModel);
+//        // Assert
+//        Assert.Equal(2, container.Services.Count);
+//        IServiceProvider sp1 = container.GetServiceProvider("odata");
+//        Assert.NotNull(sp1);
+//        IEdmModel actualModel = sp1.GetService<IEdmModel>();
+//        Assert.Same(EdmCoreModel.Instance, actualModel);
 
-    //        Assert.Null(container.GetServiceProvider("any"));
-    //    }
+//        IServiceProvider sp2 = container.GetServiceProvider("my{data}");
+//        Assert.NotNull(sp2);
+//        actualModel = sp2.GetService<IEdmModel>();
+//        Assert.Same(model, actualModel);
 
-    //    private static PerRouteContainer CreateContainer(ODataOptions options)
-    //    {
-    //        IOptions<ODataOptions> odataOptions = Options.Create(options);
-    //        return new PerRouteContainer(odataOptions);
-    //    }
-    //}
-}
+//        Assert.Null(container.GetServiceProvider("any"));
+//    }
+
+//    private static PerRouteContainer CreateContainer(ODataOptions options)
+//    {
+//        IOptions<ODataOptions> odataOptions = Options.Create(options);
+//        return new PerRouteContainer(odataOptions);
+//    }
+//}

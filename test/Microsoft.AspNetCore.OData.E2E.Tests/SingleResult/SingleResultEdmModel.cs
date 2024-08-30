@@ -8,16 +8,15 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.SingleResultTest
+namespace Microsoft.AspNetCore.OData.E2E.Tests.SingleResultTest;
+
+public class SingleResultEdmModel
 {
-    public class SingleResultEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
-            builder.EntitySet<Order>("Orders");
-            return builder.GetEdmModel();
-        }
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Customer>("Customers");
+        builder.EntitySet<Order>("Orders");
+        return builder.GetEdmModel();
     }
 }

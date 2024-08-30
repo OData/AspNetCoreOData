@@ -9,12 +9,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.Tests.Commons
-{
-    public class TestAssemblyResolver : IAssemblyResolver
-    {
-        public static TestAssemblyResolver Instance = new TestAssemblyResolver();
+namespace Microsoft.AspNetCore.OData.Tests.Commons;
 
-        public IEnumerable<Assembly> Assemblies => new[] { typeof(TestAssemblyResolver).Assembly };
-    }
+public class TestAssemblyResolver : IAssemblyResolver
+{
+    public static TestAssemblyResolver Instance = new TestAssemblyResolver();
+
+    public IEnumerable<Assembly> Assemblies => new[] { typeof(TestAssemblyResolver).Assembly };
 }

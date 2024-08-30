@@ -9,23 +9,22 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class SimpleOpenOrder
 {
-    public class SimpleOpenOrder
-    {
-        [Key]
-        public int OrderId { get; set; }
+    [Key]
+    public int OrderId { get; set; }
 
-        public decimal Cost { get; set; }
+    public decimal Cost { get; set; }
 
-        public decimal Price { get; set; }
+    public decimal Price { get; set; }
 
-        public SimpleOpenCustomer Customer { get; set; }
+    public SimpleOpenCustomer Customer { get; set; }
 
-        public DateTimeOffset OrderDate { get; set; }
+    public DateTimeOffset OrderDate { get; set; }
 
-        public SimpleOpenAddress Address { get; set; }
+    public SimpleOpenAddress Address { get; set; }
 
-        public IDictionary<string, object> OrderProperties { get; set; }
-    }
+    public IDictionary<string, object> OrderProperties { get; set; }
 }

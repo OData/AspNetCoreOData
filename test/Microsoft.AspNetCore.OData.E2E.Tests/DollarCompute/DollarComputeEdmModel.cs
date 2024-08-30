@@ -8,17 +8,16 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute;
+
+public class DollarComputeEdmModel
 {
-    public class DollarComputeEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<ComputeCustomer>("Customers");
-            builder.EntitySet<ComputeSale>("Sales");
-            IEdmModel model = builder.GetEdmModel();
-            return model;
-        }
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<ComputeCustomer>("Customers");
+        builder.EntitySet<ComputeSale>("Sales");
+        IEdmModel model = builder.GetEdmModel();
+        return model;
     }
 }

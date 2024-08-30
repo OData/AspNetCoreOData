@@ -17,224 +17,223 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Tests.Extensions
+namespace Microsoft.AspNetCore.OData.Tests.Extensions;
+
+/// <summary>
+/// A class to create HttpRequest for tests.
+/// </summary>
+public static class RequestFactory
 {
     /// <summary>
-    /// A class to create HttpRequest for tests.
+    /// Reads the request body as string.
     /// </summary>
-    public static class RequestFactory
+    /// <param name="request">The Http request.</param>
+    /// <param name="multipleRead">true/false for multiple read.</param>
+    /// <returns>The request body or empty string.</returns>
+    public static string ReadBody(this HttpRequest request, bool multipleRead = false)
     {
-        /// <summary>
-        /// Reads the request body as string.
-        /// </summary>
-        /// <param name="request">The Http request.</param>
-        /// <param name="multipleRead">true/false for multiple read.</param>
-        /// <returns>The request body or empty string.</returns>
-        public static string ReadBody(this HttpRequest request, bool multipleRead = false)
+        if (request == null || request.Body == null)
         {
-            if (request == null || request.Body == null)
-            {
-                return "";
-            }
-
-            // Allows using several time the stream in ASP.Net Core
-            if (multipleRead)
-            {
-                request.EnableBuffering();
-            }
-
-            string requestBody = "";
-            using (StreamReader reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
-            {
-                requestBody = reader.ReadToEnd();
-            }
-
-            // Rewind, so the core is not lost when it looks the body for the request
-            if (multipleRead)
-            {
-                request.Body.Position = 0;
-            }
-
-            return requestBody;
+            return "";
         }
 
-        /// <summary>
-        /// Creates the <see cref="HttpRequest"/> with OData configuration.
-        /// </summary>
-        /// <param name="setupAction">The OData options configuration.</param>
-        /// <returns>The Http Request.</returns>
-        public static HttpRequest Create(Action<ODataOptions> setupAction)
+        // Allows using several time the stream in ASP.Net Core
+        if (multipleRead)
         {
-            return Create("Get", "http://localhost", setupAction);
+            request.EnableBuffering();
         }
 
-        /// <summary>
-        /// Creates the <see cref="HttpRequest"/> with OData configuration.
-        /// </summary>
-        /// <param name="method">The http method.</param>
-        /// <param name="uri">The http request uri.</param>
-        /// <param name="setupAction">The OData configuration.</param>
-        /// <returns>The HttpRequest.</returns>
-        public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction = null)
+        string requestBody = "";
+        using (StreamReader reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
         {
-            HttpContext context = new DefaultHttpContext();
-            HttpRequest request = context.Request;
-
-            IServiceCollection services = new ServiceCollection();
-            if (setupAction != null)
-            {
-                services.Configure(setupAction);
-            }
-
-            context.RequestServices = services.BuildServiceProvider();
-
-            request.Method = method;
-            Uri requestUri = new Uri(uri);
-            request.Scheme = requestUri.Scheme;
-            request.Host = requestUri.IsDefaultPort ? new HostString(requestUri.Host) : new HostString(requestUri.Host, requestUri.Port);
-            request.QueryString = new QueryString(requestUri.Query);
-            request.Path = new PathString(requestUri.AbsolutePath);
-
-            //request.Host = HostString.FromUriComponent(BaseAddress);
-            //if (BaseAddress.IsDefaultPort)
-            //{
-            //    request.Host = new HostString(request.Host.Host);
-            //}
-            //var pathBase = PathString.FromUriComponent(BaseAddress);
-            //if (pathBase.HasValue && pathBase.Value.EndsWith("/"))
-            //{
-            //    pathBase = new PathString(pathBase.Value[..^1]); // All but the last character.
-            //}
-            //request.PathBase = pathBase;
-
-            return request;
+            requestBody = reader.ReadToEnd();
         }
 
-        /// <summary>
-        /// Create the default HttpRequest.
-        /// </summary>
-        /// <returns>The built default HttpRequest.</returns>
-        public static HttpRequest Create()
+        // Rewind, so the core is not lost when it looks the body for the request
+        if (multipleRead)
         {
-            HttpContext context = new DefaultHttpContext();
-            return context.Request;
+            request.Body.Position = 0;
         }
 
-        /// <summary>
-        /// Create the HttpRequest with IEdmModel.
-        /// </summary>
-        /// <param name="model">The given Edm model.</param>
-        /// <returns>The created HttpRequest.</returns>
-        public static HttpRequest Create(IEdmModel model) => Create("Get", "http://localhost/", model);
+        return requestBody;
+    }
 
-        /// <summary>
-        /// Create the HttpRequest with IEdmModel.
-        /// </summary>
-        /// <param name="model">The given Edm model.</param>
-        /// <param name="setupAction">The OData configuration.</param>
-        /// <returns>The created HttpRequest.</returns>
-        public static HttpRequest Create(IEdmModel model, Action<ODataOptions> setupAction)
+    /// <summary>
+    /// Creates the <see cref="HttpRequest"/> with OData configuration.
+    /// </summary>
+    /// <param name="setupAction">The OData options configuration.</param>
+    /// <returns>The Http Request.</returns>
+    public static HttpRequest Create(Action<ODataOptions> setupAction)
+    {
+        return Create("Get", "http://localhost", setupAction);
+    }
+
+    /// <summary>
+    /// Creates the <see cref="HttpRequest"/> with OData configuration.
+    /// </summary>
+    /// <param name="method">The http method.</param>
+    /// <param name="uri">The http request uri.</param>
+    /// <param name="setupAction">The OData configuration.</param>
+    /// <returns>The HttpRequest.</returns>
+    public static HttpRequest Create(string method, string uri, Action<ODataOptions> setupAction = null)
+    {
+        HttpContext context = new DefaultHttpContext();
+        HttpRequest request = context.Request;
+
+        IServiceCollection services = new ServiceCollection();
+        if (setupAction != null)
         {
-            HttpRequest request = Create("Get", "http://localhost/", setupAction);
-            IODataFeature feature = request.ODataFeature();
-            feature.RoutePrefix = "";
-            feature.Model = model;
-            return request;
+            services.Configure(setupAction);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        public static HttpRequest Create(IEdmModel model, ODataPath path)
+        context.RequestServices = services.BuildServiceProvider();
+
+        request.Method = method;
+        Uri requestUri = new Uri(uri);
+        request.Scheme = requestUri.Scheme;
+        request.Host = requestUri.IsDefaultPort ? new HostString(requestUri.Host) : new HostString(requestUri.Host, requestUri.Port);
+        request.QueryString = new QueryString(requestUri.Query);
+        request.Path = new PathString(requestUri.AbsolutePath);
+
+        //request.Host = HostString.FromUriComponent(BaseAddress);
+        //if (BaseAddress.IsDefaultPort)
+        //{
+        //    request.Host = new HostString(request.Host.Host);
+        //}
+        //var pathBase = PathString.FromUriComponent(BaseAddress);
+        //if (pathBase.HasValue && pathBase.Value.EndsWith("/"))
+        //{
+        //    pathBase = new PathString(pathBase.Value[..^1]); // All but the last character.
+        //}
+        //request.PathBase = pathBase;
+
+        return request;
+    }
+
+    /// <summary>
+    /// Create the default HttpRequest.
+    /// </summary>
+    /// <returns>The built default HttpRequest.</returns>
+    public static HttpRequest Create()
+    {
+        HttpContext context = new DefaultHttpContext();
+        return context.Request;
+    }
+
+    /// <summary>
+    /// Create the HttpRequest with IEdmModel.
+    /// </summary>
+    /// <param name="model">The given Edm model.</param>
+    /// <returns>The created HttpRequest.</returns>
+    public static HttpRequest Create(IEdmModel model) => Create("Get", "http://localhost/", model);
+
+    /// <summary>
+    /// Create the HttpRequest with IEdmModel.
+    /// </summary>
+    /// <param name="model">The given Edm model.</param>
+    /// <param name="setupAction">The OData configuration.</param>
+    /// <returns>The created HttpRequest.</returns>
+    public static HttpRequest Create(IEdmModel model, Action<ODataOptions> setupAction)
+    {
+        HttpRequest request = Create("Get", "http://localhost/", setupAction);
+        IODataFeature feature = request.ODataFeature();
+        feature.RoutePrefix = "";
+        feature.Model = model;
+        return request;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="model"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static HttpRequest Create(IEdmModel model, ODataPath path)
+    {
+        HttpContext context = new DefaultHttpContext();
+        context.ODataFeature().Model = model;
+        context.ODataFeature().Path = path;
+        return context.Request;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="setupAction"></param>
+    /// <returns></returns>
+    public static HttpRequest Create(Action<IODataFeature> setupAction)
+    {
+        HttpContext context = new DefaultHttpContext();
+        IODataFeature odataFeature = context.ODataFeature();
+        setupAction?.Invoke(odataFeature);
+        return context.Request;
+    }
+
+    public static HttpRequest Create(string method, string uri, IEdmModel model)
+    {
+      //  HttpRequest request = Create(method, uri, opt => opt.AddModel("odata", model));
+        HttpRequest request = Create(method, uri, setupAction: null);
+        IODataFeature feature = request.ODataFeature();
+        feature.RoutePrefix = "";
+        feature.Model = model;
+        return request;
+    }
+
+    /// <summary>
+    /// Configures the http request with OData values.
+    /// </summary>
+    /// <param name="request">The http request.</param>
+    /// <param name="prefix">The prefix.</param>
+    /// <param name="model">The Edm model.</param>
+    /// <param name="path">The OData path.</param>
+    /// <returns></returns>
+    public static HttpRequest Configure(this HttpRequest request, string prefix, IEdmModel model, ODataPath path)
+    {
+        if (request == null)
         {
-            HttpContext context = new DefaultHttpContext();
-            context.ODataFeature().Model = model;
-            context.ODataFeature().Path = path;
-            return context.Request;
+            throw new ArgumentNullException(nameof(request));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="setupAction"></param>
-        /// <returns></returns>
-        public static HttpRequest Create(Action<IODataFeature> setupAction)
+        IODataFeature feature = request.ODataFeature();
+        feature.RoutePrefix = prefix;
+        feature.Model = model;
+        feature.Path = path;
+        return request;
+    }
+
+    private static HttpRequest CreateRequest(IHeaderDictionary headers)
+    {
+        var context = new DefaultHttpContext();
+        context.Features.Get<IHttpRequestFeature>().Headers = headers;
+        return context.Request;
+    }
+
+    public static TKey GetKeyFromLinkUri<TKey>(this HttpRequest request, Uri link)
+    {
+        if (request == null)
         {
-            HttpContext context = new DefaultHttpContext();
-            IODataFeature odataFeature = context.ODataFeature();
-            setupAction?.Invoke(odataFeature);
-            return context.Request;
+            throw new ArgumentNullException(nameof(request));
         }
 
-        public static HttpRequest Create(string method, string uri, IEdmModel model)
+        if (link == null)
         {
-          //  HttpRequest request = Create(method, uri, opt => opt.AddModel("odata", model));
-            HttpRequest request = Create(method, uri, setupAction: null);
-            IODataFeature feature = request.ODataFeature();
-            feature.RoutePrefix = "";
-            feature.Model = model;
-            return request;
+            throw new ArgumentNullException(nameof(link));
         }
 
-        /// <summary>
-        /// Configures the http request with OData values.
-        /// </summary>
-        /// <param name="request">The http request.</param>
-        /// <param name="prefix">The prefix.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="path">The OData path.</param>
-        /// <returns></returns>
-        public static HttpRequest Configure(this HttpRequest request, string prefix, IEdmModel model, ODataPath path)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+        var serviceRoot = request.CreateODataLink();
+        IEdmModel model = request.GetModel();
 
-            IODataFeature feature = request.ODataFeature();
-            feature.RoutePrefix = prefix;
-            feature.Model = model;
-            feature.Path = path;
-            return request;
-        }
+        ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), new Uri(link.LocalPath, UriKind.Relative),
+            request.GetRouteServices());
 
-        private static HttpRequest CreateRequest(IHeaderDictionary headers)
-        {
-            var context = new DefaultHttpContext();
-            context.Features.Get<IHttpRequestFeature>().Headers = headers;
-            return context.Request;
-        }
+        var odataPath = uriParser.ParsePath();
 
-        public static TKey GetKeyFromLinkUri<TKey>(this HttpRequest request, Uri link)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+        var keySegment = odataPath.Where(p => p is KeySegment).FirstOrDefault() as KeySegment;
 
-            if (link == null)
-            {
-                throw new ArgumentNullException(nameof(link));
-            }
+        if (keySegment == null || !keySegment.Keys.Any())
+            throw new InvalidOperationException("This link does not contain a key.");
 
-            var serviceRoot = request.CreateODataLink();
-            IEdmModel model = request.GetModel();
-
-            ODataUriParser uriParser = new ODataUriParser(model, new Uri(serviceRoot), new Uri(link.LocalPath, UriKind.Relative),
-                request.GetRouteServices());
-
-            var odataPath = uriParser.ParsePath();
-
-            var keySegment = odataPath.Where(p => p is KeySegment).FirstOrDefault() as KeySegment;
-
-            if (keySegment == null || !keySegment.Keys.Any())
-                throw new InvalidOperationException("This link does not contain a key.");
-
-            // Return the key value of the first segment
-            return (TKey)keySegment.Keys.First().Value;
-        }
+        // Return the key value of the first segment
+        return (TKey)keySegment.Keys.First().Value;
     }
 }

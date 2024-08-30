@@ -12,87 +12,86 @@ using Microsoft.AspNetCore.OData.E2E.Tests.MetadataProperties.Core;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.MetadataProperties
+namespace Microsoft.AspNetCore.OData.E2E.Tests.MetadataProperties;
+
+[Route("NonContainedNavPropInContainedNavSource")]
+[Route("ContainedNavPropInContainedNavSource")]
+public class SitesController : ODataController
 {
-    [Route("NonContainedNavPropInContainedNavSource")]
-    [Route("ContainedNavPropInContainedNavSource")]
-    public class SitesController : ODataController
+    [EnableQuery]
+    [HttpGet("Sites")]
+    public ActionResult<IEnumerable<Site>> Get()
     {
-        [EnableQuery]
-        [HttpGet("Sites")]
-        public ActionResult<IEnumerable<Site>> Get()
+        return MetadataPropertiesDataSource.Sites;
+    }
+
+    [EnableQuery]
+    [HttpGet("Sites({key})")]
+    public ActionResult<Site> Get(int key)
+    {
+        var site = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == key);
+
+        if (site == null)
         {
-            return MetadataPropertiesDataSource.Sites;
+            return NotFound();
         }
 
-        [EnableQuery]
-        [HttpGet("Sites({key})")]
-        public ActionResult<Site> Get(int key)
+        return site;
+    }
+
+    [EnableQuery]
+    [HttpGet("Sites({key})/Plants")]
+    public ActionResult<IEnumerable<Plant>> GetPlants(int key)
+    {
+        var site = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == key);
+
+        if (site == null || site.Plants == null)
         {
-            var site = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == key);
-
-            if (site == null)
-            {
-                return NotFound();
-            }
-
-            return site;
+            return Enumerable.Empty<Plant>().ToList();
         }
 
-        [EnableQuery]
-        [HttpGet("Sites({key})/Plants")]
-        public ActionResult<IEnumerable<Plant>> GetPlants(int key)
+        return site.Plants.ToList();
+    }
+
+    [EnableQuery]
+    [HttpGet("Sites({siteKey})/Plants({plantKey})")]
+    public ActionResult<Plant> GetPlant(int siteKey, int plantKey)
+    {
+        var plant = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == siteKey)?.Plants?.SingleOrDefault(d => d.Id == plantKey);
+
+        if (plant == null)
         {
-            var site = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == key);
-
-            if (site == null || site.Plants == null)
-            {
-                return Enumerable.Empty<Plant>().ToList();
-            }
-
-            return site.Plants.ToList();
+            return NotFound();
         }
 
-        [EnableQuery]
-        [HttpGet("Sites({siteKey})/Plants({plantKey})")]
-        public ActionResult<Plant> GetPlant(int siteKey, int plantKey)
+        return plant;
+    }
+
+    [EnableQuery]
+    [HttpGet("Sites({siteKey})/Plants({plantKey})/Pipelines")]
+    public ActionResult<IEnumerable<PipelineBase>> GetPipelines(int siteKey, int plantKey)
+    {
+        var plant = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == siteKey)?.Plants?.SingleOrDefault(d => d.Id == plantKey);
+
+        if (plant == null || plant.Pipelines == null)
         {
-            var plant = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == siteKey)?.Plants?.SingleOrDefault(d => d.Id == plantKey);
-
-            if (plant == null)
-            {
-                return NotFound();
-            }
-
-            return plant;
+            return Enumerable.Empty<PipelineBase>().ToList();
         }
 
-        [EnableQuery]
-        [HttpGet("Sites({siteKey})/Plants({plantKey})/Pipelines")]
-        public ActionResult<IEnumerable<PipelineBase>> GetPipelines(int siteKey, int plantKey)
+        return plant.Pipelines.ToList();
+    }
+
+    [EnableQuery]
+    [HttpGet("Sites({siteKey})/Plants({plantKey})/Pipelines({pipelineKey})")]
+    public ActionResult<PipelineBase> GetPlantPipeline(int siteKey, int plantKey, int pipelineKey)
+    {
+        var pipeline = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == siteKey)?.Plants?.SingleOrDefault(d => d.Id == plantKey)?.Pipelines?.SingleOrDefault(d => d.Id == pipelineKey);
+
+        if (pipeline == null)
         {
-            var plant = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == siteKey)?.Plants?.SingleOrDefault(d => d.Id == plantKey);
-
-            if (plant == null || plant.Pipelines == null)
-            {
-                return Enumerable.Empty<PipelineBase>().ToList();
-            }
-
-            return plant.Pipelines.ToList();
+            return NotFound();
         }
 
-        [EnableQuery]
-        [HttpGet("Sites({siteKey})/Plants({plantKey})/Pipelines({pipelineKey})")]
-        public ActionResult<PipelineBase> GetPlantPipeline(int siteKey, int plantKey, int pipelineKey)
-        {
-            var pipeline = MetadataPropertiesDataSource.Sites.SingleOrDefault(d => d.Id == siteKey)?.Plants?.SingleOrDefault(d => d.Id == plantKey)?.Pipelines?.SingleOrDefault(d => d.Id == pipelineKey);
-
-            if (pipeline == null)
-            {
-                return NotFound();
-            }
-
-            return pipeline;
-        }
+        return pipeline;
     }
 }

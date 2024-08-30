@@ -8,15 +8,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 
-namespace ODataRoutingSample.Controllers.v1
+namespace ODataRoutingSample.Controllers.v1;
+
+[ODataRouteComponent("v1")]
+public class ODataOperationImportController : ControllerBase
 {
-    [ODataRouteComponent("v1")]
-    public class ODataOperationImportController : ControllerBase
+    [HttpGet]
+    public int RateByOrder(int order)
     {
-        [HttpGet]
-        public int RateByOrder(int order)
-        {
-            return order;
-        }
+        return order;
     }
 }

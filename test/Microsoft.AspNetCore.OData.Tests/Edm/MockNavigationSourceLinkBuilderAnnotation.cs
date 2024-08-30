@@ -10,50 +10,49 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
+
+internal class MockNavigationSourceLinkBuilderAnnotation : NavigationSourceLinkBuilderAnnotation
 {
-    internal class MockNavigationSourceLinkBuilderAnnotation : NavigationSourceLinkBuilderAnnotation
+    public Func<ResourceContext, IEdmNavigationProperty, ODataMetadataLevel, Uri> NavigationLinkBuilder { get; set; }
+
+    public override Uri BuildEditLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel, Uri idLink)
     {
-        public Func<ResourceContext, IEdmNavigationProperty, ODataMetadataLevel, Uri> NavigationLinkBuilder { get; set; }
-
-        public override Uri BuildEditLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel, Uri idLink)
+        if (EditLinkBuilder != null)
         {
-            if (EditLinkBuilder != null)
-            {
-                return EditLinkBuilder.Factory(instanceContext);
-            }
-
-            return null;
+            return EditLinkBuilder.Factory(instanceContext);
         }
 
-        public override Uri BuildIdLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel)
-        {
-            if (IdLinkBuilder != null)
-            {
-                return IdLinkBuilder.Factory(instanceContext);
-            }
+        return null;
+    }
 
-            return null;
+    public override Uri BuildIdLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel)
+    {
+        if (IdLinkBuilder != null)
+        {
+            return IdLinkBuilder.Factory(instanceContext);
         }
 
-        public override Uri BuildReadLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel, Uri editLink)
-        {
-            if (ReadLinkBuilder != null)
-            {
-                return ReadLinkBuilder.Factory(instanceContext);
-            }
+        return null;
+    }
 
-            return null;
+    public override Uri BuildReadLink(ResourceContext instanceContext, ODataMetadataLevel metadataLevel, Uri editLink)
+    {
+        if (ReadLinkBuilder != null)
+        {
+            return ReadLinkBuilder.Factory(instanceContext);
         }
 
-        public override Uri BuildNavigationLink(ResourceContext context, IEdmNavigationProperty navigationProperty, ODataMetadataLevel metadataLevel)
-        {
-            if (NavigationLinkBuilder != null)
-            {
-                return NavigationLinkBuilder(context, navigationProperty, metadataLevel);
-            }
+        return null;
+    }
 
-            return null;
+    public override Uri BuildNavigationLink(ResourceContext context, IEdmNavigationProperty navigationProperty, ODataMetadataLevel metadataLevel)
+    {
+        if (NavigationLinkBuilder != null)
+        {
+            return NavigationLinkBuilder(context, navigationProperty, metadataLevel);
         }
+
+        return null;
     }
 }

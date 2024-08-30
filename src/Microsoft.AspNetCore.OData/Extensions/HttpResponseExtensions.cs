@@ -7,21 +7,20 @@
 
 using Microsoft.AspNetCore.Http;
 
-namespace Microsoft.AspNetCore.OData.Extensions
+namespace Microsoft.AspNetCore.OData.Extensions;
+
+/// <summary>
+/// Provides extension methods for the <see cref="HttpResponse"/>.
+/// </summary>
+public static class HttpResponseExtensions
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="HttpResponse"/>.
+    /// Determine if the response has a success status code.
     /// </summary>
-    public static class HttpResponseExtensions
+    /// <param name="response">The response.</param>
+    /// <returns>True if the response has a success status code; false otherwise.</returns>
+    public static bool IsSuccessStatusCode(this HttpResponse response)
     {
-        /// <summary>
-        /// Determine if the response has a success status code.
-        /// </summary>
-        /// <param name="response">The response.</param>
-        /// <returns>True if the response has a success status code; false otherwise.</returns>
-        public static bool IsSuccessStatusCode(this HttpResponse response)
-        {
-            return response?.StatusCode >= 200 && response.StatusCode < 300;
-        }
+        return response?.StatusCode >= 200 && response.StatusCode < 300;
     }
 }

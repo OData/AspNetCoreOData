@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // <copyright file="DefaultODataBatchHandlerController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
@@ -15,62 +15,61 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch;
+
+public class DefaultBatchCustomersController : ODataController
 {
-    public class DefaultBatchCustomersController : ODataController
+    private static IList<DefaultBatchCustomer> _customers = Enumerable.Range(0, 10).Select(i =>
+        new DefaultBatchCustomer
+        {
+            Id = i,
+            Name = string.Format("Name {0}", i)
+        }).ToList();
+
+    public IActionResult Get(int key)
     {
-        private static IList<DefaultBatchCustomer> _customers = Enumerable.Range(0, 10).Select(i =>
-            new DefaultBatchCustomer
-            {
-                Id = i,
-                Name = string.Format("Name {0}", i)
-            }).ToList();
-
-        public IActionResult Get(int key)
+        DefaultBatchCustomer customers = _customers.FirstOrDefault(c => c.Id == key);
+        if (customers == null)
         {
-            DefaultBatchCustomer customers = _customers.FirstOrDefault(c => c.Id == key);
-            if (customers == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(customers);
+            return BadRequest();
         }
 
-        [EnableQuery]
-        public IQueryable<DefaultBatchCustomer> OddCustomers()
-        {
-            return _customers.Where(x => x.Id % 2 == 1).AsQueryable();
-        }
-
-        public IActionResult Post([FromBody] DefaultBatchCustomer customer)
-        {
-            _customers.Add(customer);
-            return Created(customer);
-        }
-
-        public IActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
-        {
-            return NoContent();
-        }
+        return Ok(customers);
     }
 
-    public class DefaultBatchOrdersController : ODataController
+    [EnableQuery]
+    public IQueryable<DefaultBatchCustomer> OddCustomers()
     {
-        private static IList<DefaultBatchOrder> _orders = Enumerable.Range(0, 13).Select(i =>
-            new DefaultBatchOrder
-            {
-                Id = i
-            }).ToList();
+        return _customers.Where(x => x.Id % 2 == 1).AsQueryable();
+    }
 
-        public DefaultBatchOrdersController()
-        {
-        }
+    public IActionResult Post([FromBody] DefaultBatchCustomer customer)
+    {
+        _customers.Add(customer);
+        return Created(customer);
+    }
 
-        public IActionResult Post([FromBody] DefaultBatchOrder order)
+    public IActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
+    {
+        return NoContent();
+    }
+}
+
+public class DefaultBatchOrdersController : ODataController
+{
+    private static IList<DefaultBatchOrder> _orders = Enumerable.Range(0, 13).Select(i =>
+        new DefaultBatchOrder
         {
-            _orders.Add(order);
-            return Created(order);
-        }
+            Id = i
+        }).ToList();
+
+    public DefaultBatchOrdersController()
+    {
+    }
+
+    public IActionResult Post([FromBody] DefaultBatchOrder order)
+    {
+        _orders.Add(order);
+        return Created(order);
     }
 }

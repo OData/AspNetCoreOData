@@ -7,26 +7,25 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OData.Edm
+namespace Microsoft.AspNetCore.OData.Edm;
+
+/// <summary>
+/// EntitySelfLinks contains the Id, Edit and Read links for an entity.
+/// </summary>
+public class EntitySelfLinks
 {
     /// <summary>
-    /// EntitySelfLinks contains the Id, Edit and Read links for an entity.
+    /// A string that uniquely identifies the resource.
     /// </summary>
-    public class EntitySelfLinks
-    {
-        /// <summary>
-        /// A string that uniquely identifies the resource.
-        /// </summary>
-        public Uri IdLink { get; set; }
+    public Uri IdLink { get; set; }
 
-        /// <summary>
-        /// A URL that can be used to edit a copy of the resource.
-        /// </summary>
-        public Uri EditLink { get; set; }
+    /// <summary>
+    /// A URL that can be used to edit a copy of the resource.
+    /// </summary>
+    public Uri EditLink { get; set; }
 
-        /// <summary>
-        /// A URL that can be used to retrieve a copy of the resource.
-        /// </summary>
-        public Uri ReadLink { get; set; }
-    }
+    /// <summary>
+    /// A URL that can be used to retrieve a copy of the resource.
+    /// </summary>
+    public Uri ReadLink { get; set; }
 }

@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Deltas
+namespace Microsoft.AspNetCore.OData.Deltas;
+
+/// <summary>
+/// <see cref="IDeltaLink" /> allows and tracks changes to an added link.
+/// </summary>
+internal interface IDeltaLink : IDeltaLinkBase
 {
-    /// <summary>
-    /// <see cref="IDeltaLink" /> allows and tracks changes to an added link.
-    /// </summary>
-    internal interface IDeltaLink : IDeltaLinkBase
-    {
-    }
 }

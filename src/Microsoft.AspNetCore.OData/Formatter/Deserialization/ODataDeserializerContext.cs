@@ -13,120 +13,119 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Formatter.Deserialization;
+
+/// <summary>
+/// This class encapsulates the state and settings that get passed to <see cref="IODataDeserializer"/>.
+/// </summary>
+public class ODataDeserializerContext
 {
+    private bool? _isDeltaOfT;
+    private bool? _isDeltaDeleted;
+    private bool? _isNoClrType;
+
     /// <summary>
-    /// This class encapsulates the state and settings that get passed to <see cref="IODataDeserializer"/>.
+    /// Gets or sets the type of the top-level object the request needs to be deserialized into.
     /// </summary>
-    public class ODataDeserializerContext
+    public Type ResourceType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="IEdmTypeReference"/> of the top-level object the request needs to be deserialized into.
+    /// </summary>
+    public IEdmTypeReference ResourceEdmType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="ODataPath"/> of the request.
+    /// </summary>
+    public ODataPath Path { get; set; }
+
+    /// <summary>
+    /// Gets or sets the EDM model associated with the request.
+    /// </summary>
+    public IEdmModel Model { get; set; }
+
+    /// <summary>
+    /// Gets or sets the HTTP Request whose response is being serialized.
+    /// </summary>
+    public HttpRequest Request { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="TimeZoneInfo"/>.
+    /// </summary>
+    public TimeZoneInfo TimeZone { get; set; }
+
+    internal bool IsDeltaOfT
     {
-        private bool? _isDeltaOfT;
-        private bool? _isDeltaDeleted;
-        private bool? _isNoClrType;
-
-        /// <summary>
-        /// Gets or sets the type of the top-level object the request needs to be deserialized into.
-        /// </summary>
-        public Type ResourceType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="IEdmTypeReference"/> of the top-level object the request needs to be deserialized into.
-        /// </summary>
-        public IEdmTypeReference ResourceEdmType { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ODataPath"/> of the request.
-        /// </summary>
-        public ODataPath Path { get; set; }
-
-        /// <summary>
-        /// Gets or sets the EDM model associated with the request.
-        /// </summary>
-        public IEdmModel Model { get; set; }
-
-        /// <summary>
-        /// Gets or sets the HTTP Request whose response is being serialized.
-        /// </summary>
-        public HttpRequest Request { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="TimeZoneInfo"/>.
-        /// </summary>
-        public TimeZoneInfo TimeZone { get; set; }
-
-        internal bool IsDeltaOfT
+        get
         {
-            get
+            if (!_isDeltaOfT.HasValue)
             {
-                if (!_isDeltaOfT.HasValue)
+                _isDeltaOfT = ResourceType != null && ResourceType.IsGenericType &&
+                    ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
+            }
+
+            return _isDeltaOfT.Value;
+        }
+    }
+
+    internal bool IsDeltaDeleted
+    {
+        get
+        {
+            if (_isDeltaDeleted == null)
+            {
+                if (typeof(IEdmDeltaDeletedResourceObject).IsAssignableFrom(ResourceType))
                 {
-                    _isDeltaOfT = ResourceType != null && ResourceType.IsGenericType &&
-                        ResourceType.GetGenericTypeDefinition() == typeof(Delta<>);
+                    _isDeltaDeleted = true;
                 }
-
-                return _isDeltaOfT.Value;
-            }
-        }
-
-        internal bool IsDeltaDeleted
-        {
-            get
-            {
-                if (_isDeltaDeleted == null)
+                else
                 {
-                    if (typeof(IEdmDeltaDeletedResourceObject).IsAssignableFrom(ResourceType))
-                    {
-                        _isDeltaDeleted = true;
-                    }
-                    else
-                    {
-                        _isDeltaDeleted = ResourceType != null &&
-                            ResourceType.IsGenericType &&
-                            ResourceType.GetGenericTypeDefinition() == typeof(DeltaDeletedResource<>);
-                    }
+                    _isDeltaDeleted = ResourceType != null &&
+                        ResourceType.IsGenericType &&
+                        ResourceType.GetGenericTypeDefinition() == typeof(DeltaDeletedResource<>);
                 }
-
-                return _isDeltaDeleted.Value;
-            }
-        }
-
-        // TODO: need refactor this part.
-        // We can't only use the resource type to identify there's no Clr Type or not.
-        // We should use the model type mapping to identify there's no Clr Type or not.
-        internal bool IsNoClrType
-        {
-            get
-            {
-                if (!_isNoClrType.HasValue)
-                {
-                    _isNoClrType = (TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) &&
-                        (typeof(EdmUntypedObject) != ResourceType && typeof(EdmUntypedCollection) != ResourceType))
-                        || typeof(ODataUntypedActionParameters) == ResourceType;
-                }
-
-                return _isNoClrType.Value;
-            }
-        }
-
-        internal IEdmTypeReference GetEdmType(Type type)
-        {
-            if (ResourceEdmType != null)
-            {
-                return ResourceEdmType;
             }
 
-            return EdmLibHelper.GetExpectedPayloadType(type, Path, Model);
+            return _isDeltaDeleted.Value;
+        }
+    }
+
+    // TODO: need refactor this part.
+    // We can't only use the resource type to identify there's no Clr Type or not.
+    // We should use the model type mapping to identify there's no Clr Type or not.
+    internal bool IsNoClrType
+    {
+        get
+        {
+            if (!_isNoClrType.HasValue)
+            {
+                _isNoClrType = (TypeHelper.IsTypeAssignableFrom(typeof(IEdmObject), ResourceType) &&
+                    (typeof(EdmUntypedObject) != ResourceType && typeof(EdmUntypedCollection) != ResourceType))
+                    || typeof(ODataUntypedActionParameters) == ResourceType;
+            }
+
+            return _isNoClrType.Value;
+        }
+    }
+
+    internal IEdmTypeReference GetEdmType(Type type)
+    {
+        if (ResourceEdmType != null)
+        {
+            return ResourceEdmType;
         }
 
-        internal ODataDeserializerContext CloneWithoutType()
+        return EdmLibHelper.GetExpectedPayloadType(type, Path, Model);
+    }
+
+    internal ODataDeserializerContext CloneWithoutType()
+    {
+        return new ODataDeserializerContext
         {
-            return new ODataDeserializerContext
-            {
-                Path = this.Path,
-                Model = this.Model,
-                Request = this.Request,
-                TimeZone = this.TimeZone
-            };
-        }
+            Path = this.Path,
+            Model = this.Model,
+            Request = this.Request,
+            TimeZone = this.TimeZone
+        };
     }
 }

@@ -13,31 +13,30 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
-namespace ODataRoutingSample.Controllers.v1
-{
-    [ODataRouteComponent("v1")]
-    public class CompaniesController : ControllerBase
-    {
-        [HttpGet]
-        [EnableQuery]
-        public IEnumerable<Company> Get()
-        {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new Company
-            {
-                Id = (short)index
-            })
-            .ToArray();
-        }
+namespace ODataRoutingSample.Controllers.v1;
 
-        [HttpGet]
-        [EnableQuery]
-        public Company Get(short key)
+[ODataRouteComponent("v1")]
+public class CompaniesController : ControllerBase
+{
+    [HttpGet]
+    [EnableQuery]
+    public IEnumerable<Company> Get()
+    {
+        var rng = new Random();
+        return Enumerable.Range(1, 5).Select(index => new Company
         {
-            return new Company
-            {
-                Id = key
-            };
-        }
+            Id = (short)index
+        })
+        .ToArray();
+    }
+
+    [HttpGet]
+    [EnableQuery]
+    public Company Get(short key)
+    {
+        return new Company
+        {
+            Id = key
+        };
     }
 }

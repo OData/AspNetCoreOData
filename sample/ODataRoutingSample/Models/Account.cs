@@ -7,23 +7,22 @@
 
 using System;
 
-namespace ODataRoutingSample.Models
+namespace ODataRoutingSample.Models;
+
+public class Account
 {
-    public class Account
-    {
-        public Guid AccountId { get; set; }
+    public Guid AccountId { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public Address HomeAddress { get; set; }
+    public Address HomeAddress { get; set; }
 
-        public AccountInfo AccountInfo { get; set; }
-    }
+    public AccountInfo AccountInfo { get; set; }
+}
 
-    public class AccountInfo
-    {
-        public int Id { get; set; }
+public class AccountInfo
+{
+    public int Id { get; set; }
 
-        public double Balance { get; set; }
-    }
+    public double Balance { get; set; }
 }

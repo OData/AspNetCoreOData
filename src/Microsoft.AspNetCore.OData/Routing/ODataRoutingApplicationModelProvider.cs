@@ -16,154 +16,153 @@ using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Routing
-{
-    /// <summary>
-    /// Builds or modifies <see cref="ApplicationModel" /> for OData convention action discovery.
-    /// </summary>
-    internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
-    {
-        private readonly IODataControllerActionConvention[] _controllerActionConventions;
-        private readonly ODataOptions _options;
+namespace Microsoft.AspNetCore.OData.Routing;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataRoutingApplicationModelProvider" /> class.
-        /// </summary>
-        /// <param name="options">The registered OData options.</param>
-        public ODataRoutingApplicationModelProvider(IOptions<ODataOptions> options)
+/// <summary>
+/// Builds or modifies <see cref="ApplicationModel" /> for OData convention action discovery.
+/// </summary>
+internal class ODataRoutingApplicationModelProvider : IApplicationModelProvider
+{
+    private readonly IODataControllerActionConvention[] _controllerActionConventions;
+    private readonly ODataOptions _options;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ODataRoutingApplicationModelProvider" /> class.
+    /// </summary>
+    /// <param name="options">The registered OData options.</param>
+    public ODataRoutingApplicationModelProvider(IOptions<ODataOptions> options)
+    {
+        _options = options.Value;
+        _controllerActionConventions = _options.Conventions
+            .Where(c => c.GetType() != typeof(AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
+    }
+
+    /// <summary>
+    /// Gets the order value for determining the order of execution of providers.
+    /// </summary>
+    public int Order => 100;
+
+    /// <summary>
+    /// Executed for the second pass of <see cref="ApplicationModel"/> built.
+    /// </summary>
+    /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
+    public void OnProvidersExecuted(ApplicationModelProviderContext context)
+    {
+        // apply attribute routing.
+        if (_options.EnableAttributeRouting)
         {
-            _options = options.Value;
-            _controllerActionConventions = _options.Conventions
-                .Where(c => c.GetType() != typeof(AttributeRoutingConvention)).OrderBy(p => p.Order).ToArray();
+            ApplyAttributeRouting(context.Result.Controllers);
         }
 
-        /// <summary>
-        /// Gets the order value for determining the order of execution of providers.
-        /// </summary>
-        public int Order => 100;
-
-        /// <summary>
-        /// Executed for the second pass of <see cref="ApplicationModel"/> built.
-        /// </summary>
-        /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
-        public void OnProvidersExecuted(ApplicationModelProviderContext context)
+        // apply non-attribute convention routing.
+        foreach (var route in _options.RouteComponents)
         {
-            // apply attribute routing.
-            if (_options.EnableAttributeRouting)
+            IEdmModel model = route.Value.EdmModel;
+            if (model == null || model.EntityContainer == null)
             {
-                ApplyAttributeRouting(context.Result.Controllers);
+                continue;
             }
 
-            // apply non-attribute convention routing.
-            foreach (var route in _options.RouteComponents)
+            foreach (var controller in context.Result.Controllers)
             {
-                IEdmModel model = route.Value.EdmModel;
-                if (model == null || model.EntityContainer == null)
+                // Skip the controller with [NonODataController] attribute decorated.
+                if (controller.HasAttribute<ODataIgnoredAttribute>())
                 {
                     continue;
                 }
 
-                foreach (var controller in context.Result.Controllers)
+                // Apply to ODataModelAttribute
+                if (!CanApply(route.Key, () => controller.GetAttribute<ODataRouteComponentAttribute>()))
                 {
-                    // Skip the controller with [NonODataController] attribute decorated.
-                    if (controller.HasAttribute<ODataIgnoredAttribute>())
+                    continue;
+                }
+
+                ODataControllerActionContext odataContext = new ODataControllerActionContext(route.Key, model, controller);
+
+                odataContext.NavigationSource = model.ResolveNavigationSource(controller.ControllerName,
+                    _options.RouteOptions.EnableControllerNameCaseInsensitive);
+
+                odataContext.Options = _options;
+
+                IODataControllerActionConvention[] conventions =
+                    _controllerActionConventions.Where(c => c.AppliesToController(odataContext)).ToArray();
+
+                if (conventions.Length > 0)
+                {
+                    foreach (var action in controller.Actions.Where(a => !a.IsODataIgnored()))
                     {
-                        continue;
-                    }
-
-                    // Apply to ODataModelAttribute
-                    if (!CanApply(route.Key, () => controller.GetAttribute<ODataRouteComponentAttribute>()))
-                    {
-                        continue;
-                    }
-
-                    ODataControllerActionContext odataContext = new ODataControllerActionContext(route.Key, model, controller);
-
-                    odataContext.NavigationSource = model.ResolveNavigationSource(controller.ControllerName,
-                        _options.RouteOptions.EnableControllerNameCaseInsensitive);
-
-                    odataContext.Options = _options;
-
-                    IODataControllerActionConvention[] conventions =
-                        _controllerActionConventions.Where(c => c.AppliesToController(odataContext)).ToArray();
-
-                    if (conventions.Length > 0)
-                    {
-                        foreach (var action in controller.Actions.Where(a => !a.IsODataIgnored()))
+                        if (!CanApply(route.Key, () => action.GetAttribute<ODataRouteComponentAttribute>()))
                         {
-                            if (!CanApply(route.Key, () => action.GetAttribute<ODataRouteComponentAttribute>()))
-                            {
-                                continue;
-                            }
+                            continue;
+                        }
 
-                            // Reset the action on the context.
-                            odataContext.Action = action;
+                        // Reset the action on the context.
+                        odataContext.Action = action;
 
-                            foreach (var convention in conventions)
+                        foreach (var convention in conventions)
+                        {
+                            if (convention.AppliesToAction(odataContext))
                             {
-                                if (convention.AppliesToAction(odataContext))
-                                {
-                                    break;
-                                }
+                                break;
                             }
                         }
                     }
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Executed for the first pass of <see cref="ApplicationModel"/> building.
-        /// </summary>
-        /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
-        public void OnProvidersExecuting(ApplicationModelProviderContext context)
+    /// <summary>
+    /// Executed for the first pass of <see cref="ApplicationModel"/> building.
+    /// </summary>
+    /// <param name="context">The <see cref="ApplicationModelProviderContext"/>.</param>
+    public void OnProvidersExecuting(ApplicationModelProviderContext context)
+    {
+        // Nothing here.
+    }
+
+    /// <summary>
+    /// Apply Default OData attribute routing
+    /// </summary>
+    /// <param name="controllers">The controller models</param>
+    internal void ApplyAttributeRouting(IList<ControllerModel> controllers)
+    {
+        AttributeRoutingConvention attributeRouting = _options.Conventions.OfType<AttributeRoutingConvention>().FirstOrDefault();
+        if (attributeRouting == null)
         {
-            // Nothing here.
+            return;
         }
 
-        /// <summary>
-        /// Apply Default OData attribute routing
-        /// </summary>
-        /// <param name="controllers">The controller models</param>
-        internal void ApplyAttributeRouting(IList<ControllerModel> controllers)
+        ODataControllerActionContext controllerActionContext = new ODataControllerActionContext
         {
-            AttributeRoutingConvention attributeRouting = _options.Conventions.OfType<AttributeRoutingConvention>().FirstOrDefault();
-            if (attributeRouting == null)
+            Options = _options
+        };
+
+        foreach (var controllerModel in controllers.Where(c => !c.IsODataIgnored()))
+        {
+            controllerActionContext.Controller = controllerModel;
+
+            foreach (var actionModel in controllerModel.Actions.Where(a => !a.IsODataIgnored()))
             {
-                return;
-            }
+                controllerActionContext.Action = actionModel;
 
-            ODataControllerActionContext controllerActionContext = new ODataControllerActionContext
-            {
-                Options = _options
-            };
-
-            foreach (var controllerModel in controllers.Where(c => !c.IsODataIgnored()))
-            {
-                controllerActionContext.Controller = controllerModel;
-
-                foreach (var actionModel in controllerModel.Actions.Where(a => !a.IsODataIgnored()))
-                {
-                    controllerActionContext.Action = actionModel;
-
-                    attributeRouting.AppliesToAction(controllerActionContext);
-                }
+                attributeRouting.AppliesToAction(controllerActionContext);
             }
         }
+    }
 
-        internal static bool CanApply(string prefix, Func<ODataRouteComponentAttribute> func)
+    internal static bool CanApply(string prefix, Func<ODataRouteComponentAttribute> func)
+    {
+        ODataRouteComponentAttribute odataModel = func?.Invoke();
+        if (odataModel == null)
         {
-            ODataRouteComponentAttribute odataModel = func?.Invoke();
-            if (odataModel == null)
-            {
-                return true; // apply to all model
-            }
-            else if (prefix == odataModel.RoutePrefix)
-            {
-                return true;
-            }
-
-            return false;
+            return true; // apply to all model
         }
+        else if (prefix == odataModel.RoutePrefix)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

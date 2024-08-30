@@ -10,28 +10,27 @@ using Microsoft.OData.Edm;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
+
+public class EdmObjectHelperTests
 {
-    public class EdmObjectHelperTests
+    [Fact]
+    public void ConvertToEdmObject_Converts_ComplexCollection()
     {
-        [Fact]
-        public void ConvertToEdmObject_Converts_ComplexCollection()
+        // Arrange
+        EdmComplexType complexType = new EdmComplexType("NS", "Complex");
+        IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(new EdmComplexTypeReference(complexType, true)));
+        var source = new List<EdmComplexObject>
         {
-            // Arrange
-            EdmComplexType complexType = new EdmComplexType("NS", "Complex");
-            IEdmCollectionTypeReference collectionType = new EdmCollectionTypeReference(new EdmCollectionType(new EdmComplexTypeReference(complexType, true)));
-            var source = new List<EdmComplexObject>
-            {
-                new EdmComplexObject(complexType, true),
-                new EdmComplexObject(complexType, true)
-            };
+            new EdmComplexObject(complexType, true),
+            new EdmComplexObject(complexType, true)
+        };
 
-            // Act
-            IEdmObject obj = source.ConvertToEdmObject(collectionType);
+        // Act
+        IEdmObject obj = source.ConvertToEdmObject(collectionType);
 
-            // Assert
-            EdmComplexObjectCollection complexCollection = Assert.IsType<EdmComplexObjectCollection>(obj);
-            Assert.Equal(2, complexCollection.Count);
-        }
+        // Assert
+        EdmComplexObjectCollection complexCollection = Assert.IsType<EdmComplexObjectCollection>(obj);
+        Assert.Equal(2, complexCollection.Count);
     }
 }

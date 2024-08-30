@@ -11,29 +11,28 @@ using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Deltas
+namespace Microsoft.AspNetCore.OData.Tests.Deltas;
+
+public class DeltaHelperTests
 {
-    public class DeltaHelperTests
+    [Fact]
+    public void IsDeltaOfT_Returns_BooleanAsExpected()
     {
-        [Fact]
-        public void IsDeltaOfT_Returns_BooleanAsExpected()
-        {
-            // Arrange & Act & Assert
-            Assert.False(DeltaHelper.IsDeltaOfT(null));
-            Assert.False(DeltaHelper.IsDeltaOfT(typeof(int)));
-            Assert.False(DeltaHelper.IsDeltaOfT(typeof(DeltaSet<>)));
-        }
+        // Arrange & Act & Assert
+        Assert.False(DeltaHelper.IsDeltaOfT(null));
+        Assert.False(DeltaHelper.IsDeltaOfT(typeof(int)));
+        Assert.False(DeltaHelper.IsDeltaOfT(typeof(DeltaSet<>)));
+    }
 
-        [Fact]
-        public void IsDeltaResourceSet_Returns_BooleanAsExpected()
-        {
-            // Arrange & Act & Assert
-            Assert.False(DeltaHelper.IsDeltaResourceSet(null));
-            Assert.False(DeltaHelper.IsDeltaResourceSet(42));
-            Assert.True(DeltaHelper.IsDeltaResourceSet(new DeltaSet<DeltaHelperTests>()));
+    [Fact]
+    public void IsDeltaResourceSet_Returns_BooleanAsExpected()
+    {
+        // Arrange & Act & Assert
+        Assert.False(DeltaHelper.IsDeltaResourceSet(null));
+        Assert.False(DeltaHelper.IsDeltaResourceSet(42));
+        Assert.True(DeltaHelper.IsDeltaResourceSet(new DeltaSet<DeltaHelperTests>()));
 
-            IEdmEntityType entityType = new Mock<IEdmEntityType>().Object;
-            Assert.True(DeltaHelper.IsDeltaResourceSet(new EdmChangedObjectCollection(entityType)));
-        }
+        IEdmEntityType entityType = new Mock<IEdmEntityType>().Object;
+        Assert.True(DeltaHelper.IsDeltaResourceSet(new EdmChangedObjectCollection(entityType)));
     }
 }

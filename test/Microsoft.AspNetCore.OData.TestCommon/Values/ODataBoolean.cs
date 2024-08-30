@@ -5,22 +5,21 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.TestCommon.Values
+namespace Microsoft.AspNetCore.OData.TestCommon.Values;
+
+/// <summary>
+/// A OData boolean value.
+/// </summary>
+public class ODataBoolean : IODataValue
 {
-    /// <summary>
-    /// A OData boolean value.
-    /// </summary>
-    public class ODataBoolean : IODataValue
+    public static ODataBoolean True = new ODataBoolean(true);
+
+    public static ODataBoolean False = new ODataBoolean(false);
+
+    private ODataBoolean(bool value)
     {
-        public static ODataBoolean True = new ODataBoolean(true);
-
-        public static ODataBoolean False = new ODataBoolean(false);
-
-        private ODataBoolean(bool value)
-        {
-            Value = value;
-        }
-
-        public bool Value { get; }
+        Value = value;
     }
+
+    public bool Value { get; }
 }

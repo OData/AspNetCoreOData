@@ -11,27 +11,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes
+namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes;
+
+public class OrdersController : ODataController
 {
-    public class OrdersController : ODataController
+    [EnableQuery]
+    public ActionResult<IEnumerable<Order>> Get()
     {
-        [EnableQuery]
-        public ActionResult<IEnumerable<Order>> Get()
+        return MediaTypesDataSource.Orders;
+    }
+
+    [EnableQuery]
+    public ActionResult<Order> Get(int key)
+    {
+        var order = MediaTypesDataSource.Orders.SingleOrDefault(d => d.Id == key);
+
+        if (order == null)
         {
-            return MediaTypesDataSource.Orders;
+            return NotFound();
         }
 
-        [EnableQuery]
-        public ActionResult<Order> Get(int key)
-        {
-            var order = MediaTypesDataSource.Orders.SingleOrDefault(d => d.Id == key);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return order;
-        }
+        return order;
     }
 }

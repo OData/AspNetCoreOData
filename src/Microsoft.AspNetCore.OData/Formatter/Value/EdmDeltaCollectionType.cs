@@ -7,26 +7,25 @@
 
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+/// <summary>
+/// Implementing IEdmCollectionType to identify collection of DeltaResourceSet.
+/// </summary>
+internal class EdmDeltaCollectionType : IEdmCollectionType
 {
     /// <summary>
-    /// Implementing IEdmCollectionType to identify collection of DeltaResourceSet.
+    /// Initializes a new instance of the <see cref="EdmDeltaCollectionType"/> class.
     /// </summary>
-    internal class EdmDeltaCollectionType : IEdmCollectionType
+    /// <param name="typeReference">The element type reference.</param>
+    internal EdmDeltaCollectionType(IEdmTypeReference typeReference)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EdmDeltaCollectionType"/> class.
-        /// </summary>
-        /// <param name="typeReference">The element type reference.</param>
-        internal EdmDeltaCollectionType(IEdmTypeReference typeReference)
-        {
-            ElementType = typeReference ?? throw Error.ArgumentNull(nameof(typeReference));
-        }
-
-        /// <inheritdoc />
-        public EdmTypeKind TypeKind => EdmTypeKind.Collection;
-
-        /// <inheritdoc />
-        public IEdmTypeReference ElementType { get; }
+        ElementType = typeReference ?? throw Error.ArgumentNull(nameof(typeReference));
     }
+
+    /// <inheritdoc />
+    public EdmTypeKind TypeKind => EdmTypeKind.Collection;
+
+    /// <inheritdoc />
+    public IEdmTypeReference ElementType { get; }
 }

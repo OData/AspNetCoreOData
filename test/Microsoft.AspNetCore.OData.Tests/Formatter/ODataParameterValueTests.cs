@@ -9,15 +9,14 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter
+namespace Microsoft.AspNetCore.OData.Tests.Formatter;
+
+public class ODataParameterValueTests
 {
-    public class ODataParameterValueTests
+    [Fact]
+    public void Ctor_ThrowsArgumentNull_ParameterType()
     {
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_ParameterType()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new ODataParameterValue(null, null), "paramType");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new ODataParameterValue(null, null), "paramType");
     }
 }

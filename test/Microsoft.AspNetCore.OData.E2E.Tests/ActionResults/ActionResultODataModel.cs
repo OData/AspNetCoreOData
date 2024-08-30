@@ -7,28 +7,27 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ActionResults;
+
+public class Customer
 {
-    public class Customer
-    {
-        public string Id { get; set; }
+    public string Id { get; set; }
 
-        public IEnumerable<Book> Books { get; set; }
-    }
+    public IEnumerable<Book> Books { get; set; }
+}
 
-    public class Book
-    {
-        public string Id { get; set; }
-    }
+public class Book
+{
+    public string Id { get; set; }
+}
 
-    public class Weather
-    {
-        public int Id { get; set; }
+public class Weather
+{
+    public int Id { get; set; }
 
-        public int TemperatureC { get; set; }
+    public int TemperatureC { get; set; }
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
-        public string Summary { get; set; }
-    }
+    public string Summary { get; set; }
 }

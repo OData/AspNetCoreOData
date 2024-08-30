@@ -5,10 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
-{
-    public enum Gender
-    {
+namespace Microsoft.AspNetCore.OData.Tests.Models;
 
-    }
+public enum Gender
+{
+
 }

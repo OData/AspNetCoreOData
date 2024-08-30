@@ -7,33 +7,32 @@
 
 using System.Linq;
 
-namespace Microsoft.AspNetCore.OData.Results
+namespace Microsoft.AspNetCore.OData.Results;
+
+/// <summary>
+/// Represents an <see cref="IQueryable{T}"/> containing zero or one entities. Use together with an
+/// <c>[EnableQuery]</c>.
+/// </summary>
+/// <typeparam name="T">The type of the data in the data source.</typeparam>
+public sealed class SingleResult<T> : SingleResult
 {
     /// <summary>
-    /// Represents an <see cref="IQueryable{T}"/> containing zero or one entities. Use together with an
-    /// <c>[EnableQuery]</c>.
+    /// Initializes a new instance of the <see cref="SingleResult{T}"/> class.
     /// </summary>
-    /// <typeparam name="T">The type of the data in the data source.</typeparam>
-    public sealed class SingleResult<T> : SingleResult
+    /// <param name="queryable">The <see cref="IQueryable{T}"/> containing zero or one entities.</param>
+    public SingleResult(IQueryable<T> queryable)
+        : base(queryable)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SingleResult{T}"/> class.
-        /// </summary>
-        /// <param name="queryable">The <see cref="IQueryable{T}"/> containing zero or one entities.</param>
-        public SingleResult(IQueryable<T> queryable)
-            : base(queryable)
-        {
-        }
+    }
 
-        /// <summary>
-        /// The <see cref="IQueryable{T}"/> containing zero or one entities.
-        /// </summary>
-        public new IQueryable<T> Queryable
+    /// <summary>
+    /// The <see cref="IQueryable{T}"/> containing zero or one entities.
+    /// </summary>
+    public new IQueryable<T> Queryable
+    {
+        get
         {
-            get
-            {
-                return base.Queryable as IQueryable<T>;
-            }
+            return base.Queryable as IQueryable<T>;
         }
     }
 }

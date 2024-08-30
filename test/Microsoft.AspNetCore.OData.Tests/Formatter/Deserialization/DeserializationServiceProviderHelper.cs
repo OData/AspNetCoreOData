@@ -11,28 +11,27 @@ using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
+
+internal static class DeserializationServiceProviderHelper
 {
-    internal static class DeserializationServiceProviderHelper
+    public static IServiceProvider GetServiceProvider()
     {
-        public static IServiceProvider GetServiceProvider()
-        {
-            IServiceCollection services = new ServiceCollection();
+        IServiceCollection services = new ServiceCollection();
 
-            services.AddSingleton<IODataDeserializerProvider, ODataDeserializerProvider>();
+        services.AddSingleton<IODataDeserializerProvider, ODataDeserializerProvider>();
 
-            // Deserializers.
-            services.AddSingleton<ODataResourceDeserializer>();
-            services.AddSingleton<ODataEnumDeserializer>();
-            services.AddSingleton<ODataPrimitiveDeserializer>();
-            services.AddSingleton<ODataResourceSetDeserializer>();
-            services.AddSingleton<ODataCollectionDeserializer>();
-            services.AddSingleton<ODataEntityReferenceLinkDeserializer>();
-            services.AddSingleton<ODataActionPayloadDeserializer>();
+        // Deserializers.
+        services.AddSingleton<ODataResourceDeserializer>();
+        services.AddSingleton<ODataEnumDeserializer>();
+        services.AddSingleton<ODataPrimitiveDeserializer>();
+        services.AddSingleton<ODataResourceSetDeserializer>();
+        services.AddSingleton<ODataCollectionDeserializer>();
+        services.AddSingleton<ODataEntityReferenceLinkDeserializer>();
+        services.AddSingleton<ODataActionPayloadDeserializer>();
 
-            services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+        services.AddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
-            return services.BuildServiceProvider();
-        }
+        return services.BuildServiceProvider();
     }
 }

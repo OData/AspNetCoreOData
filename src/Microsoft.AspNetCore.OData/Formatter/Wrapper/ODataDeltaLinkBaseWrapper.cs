@@ -7,12 +7,11 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
+namespace Microsoft.AspNetCore.OData.Formatter.Wrapper;
+
+/// <summary>
+/// Encapsulates an <see cref="ODataDeltaLinkBase"/>
+/// </summary>
+public abstract class ODataDeltaLinkBaseWrapper : ODataItemWrapper
 {
-    /// <summary>
-    /// Encapsulates an <see cref="ODataDeltaLinkBase"/>
-    /// </summary>
-    public abstract class ODataDeltaLinkBaseWrapper : ODataItemWrapper
-    {
-    }
 }

@@ -11,32 +11,31 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Extensions
+namespace Microsoft.AspNetCore.OData.Tests.Extensions;
+
+public class ControllerModelExtensionsTests
 {
-    public class ControllerModelExtensionsTests
+    [Fact]
+    public void IsODataIgnored_ThrowsArgumentNull_Controller()
     {
-        [Fact]
-        public void IsODataIgnored_ThrowsArgumentNull_Controller()
-        {
-            // Arrange & Act & Assert
-            ControllerModel controller = null;
-            ExceptionAssert.ThrowsArgumentNull(() => controller.IsODataIgnored(), "controller");
-        }
+        // Arrange & Act & Assert
+        ControllerModel controller = null;
+        ExceptionAssert.ThrowsArgumentNull(() => controller.IsODataIgnored(), "controller");
+    }
 
-        [Fact]
-        public void HasAttribute_ThrowsArgumentNull_Controller()
-        {
-            // Arrange & Act & Assert
-            ControllerModel controller = null;
-            ExceptionAssert.ThrowsArgumentNull(() => controller.HasAttribute<Attribute>(), "controller");
-        }
+    [Fact]
+    public void HasAttribute_ThrowsArgumentNull_Controller()
+    {
+        // Arrange & Act & Assert
+        ControllerModel controller = null;
+        ExceptionAssert.ThrowsArgumentNull(() => controller.HasAttribute<Attribute>(), "controller");
+    }
 
-        [Fact]
-        public void GetAttribute_ThrowsArgumentNull_Controller()
-        {
-            // Arrange & Act & Assert
-            ControllerModel controller = null;
-            ExceptionAssert.ThrowsArgumentNull(() => controller.GetAttribute<Attribute>(), "controller");
-        }
+    [Fact]
+    public void GetAttribute_ThrowsArgumentNull_Controller()
+    {
+        // Arrange & Act & Assert
+        ControllerModel controller = null;
+        ExceptionAssert.ThrowsArgumentNull(() => controller.GetAttribute<Attribute>(), "controller");
     }
 }

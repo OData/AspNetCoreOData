@@ -11,20 +11,19 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using ODataRoutingSample.Models;
 
-namespace ODataRoutingSample.Controllers
+namespace ODataRoutingSample.Controllers;
+
+public class ODataOperationImportController : ControllerBase
 {
-    public class ODataOperationImportController : ControllerBase
+    [HttpPost]
+    public IEnumerable<Product> ResetData()
     {
-        [HttpPost]
-        public IEnumerable<Product> ResetData()
+        var rng = new Random();
+        return Enumerable.Range(1, 5).Select(index => new Product
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new Product
-            {
-                Id = index,
-                Category = "Category + " + index
-            })
-            .ToArray();
-        }
+            Id = index,
+            Category = "Category + " + index
+        })
+        .ToArray();
     }
 }

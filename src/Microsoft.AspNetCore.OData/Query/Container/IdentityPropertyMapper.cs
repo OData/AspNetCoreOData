@@ -5,13 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Query.Container
+namespace Microsoft.AspNetCore.OData.Query.Container;
+
+internal class IdentityPropertyMapper : IPropertyMapper
 {
-    internal class IdentityPropertyMapper : IPropertyMapper
+    public string MapProperty(string propertyName)
     {
-        public string MapProperty(string propertyName)
-        {
-            return propertyName;
-        }
+        return propertyName;
     }
 }

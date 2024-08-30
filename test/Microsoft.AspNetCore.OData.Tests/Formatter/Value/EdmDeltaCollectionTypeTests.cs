@@ -11,27 +11,26 @@ using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
+
+public class EdmDeltaCollectionTypeTests
 {
-    public class EdmDeltaCollectionTypeTests
+    [Fact]
+    public void CtorEdmDeltaCollectionType_ThrowsArgumentNull_Type()
     {
-        [Fact]
-        public void CtorEdmDeltaCollectionType_ThrowsArgumentNull_Type()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaCollectionType(null), "typeReference");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaCollectionType(null), "typeReference");
+    }
 
-        [Fact]
-        public void CtorEdmDeltaCollectionType_SetsProperties()
-        {
-            // Arrange & Act
-            IEdmTypeReference typeRef = new Mock<IEdmTypeReference>().Object;
-            EdmDeltaCollectionType deltaType = new EdmDeltaCollectionType(typeRef);
+    [Fact]
+    public void CtorEdmDeltaCollectionType_SetsProperties()
+    {
+        // Arrange & Act
+        IEdmTypeReference typeRef = new Mock<IEdmTypeReference>().Object;
+        EdmDeltaCollectionType deltaType = new EdmDeltaCollectionType(typeRef);
 
-            // Assert
-            Assert.Equal(EdmTypeKind.Collection, deltaType.TypeKind);
-            Assert.Same(typeRef, deltaType.ElementType);
-        }
+        // Assert
+        Assert.Equal(EdmTypeKind.Collection, deltaType.TypeKind);
+        Assert.Same(typeRef, deltaType.ElementType);
     }
 }

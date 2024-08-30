@@ -18,90 +18,89 @@ using Microsoft.OData;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Test.Batch
+namespace Microsoft.AspNetCore.OData.Test.Batch;
+
+public class ODataBatchReaderExtensionsTest
 {
-    public class ODataBatchReaderExtensionsTest
+    [Fact]
+    public async Task ReadChangeSetRequest_NullReader_Throws()
     {
-        [Fact]
-        public async Task ReadChangeSetRequest_NullReader_Throws()
-        {
-            // Arrange
-            Mock<HttpContext> mockContext = new Mock<HttpContext>();
+        // Arrange
+        Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchReaderExtensions.ReadChangeSetRequestAsync(null, mockContext.Object, Guid.NewGuid(), CancellationToken.None),
-                "reader");
-        }
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => ODataBatchReaderExtensions.ReadChangeSetRequestAsync(null, mockContext.Object, Guid.NewGuid(), CancellationToken.None),
+            "reader");
+    }
 
-        [Fact]
-        public async Task ReadChangeSetRequest_InvalidState_Throws()
-        {
-            // Arrange
-            StringContent httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            ODataMessageReader reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
-            Mock<HttpContext> mockContext = new Mock<HttpContext>();
+    [Fact]
+    public async Task ReadChangeSetRequest_InvalidState_Throws()
+    {
+        // Arrange
+        StringContent httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
+        httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
+        ODataMessageReader reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
+        Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
-                () => ODataBatchReaderExtensions.ReadChangeSetRequestAsync(reader.CreateODataBatchReader(), mockContext.Object, Guid.NewGuid(), CancellationToken.None),
-                "The current batch reader state 'Initial' is invalid. The expected state is 'ChangesetStart'.");
-        }
+        // Act & Assert
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => ODataBatchReaderExtensions.ReadChangeSetRequestAsync(reader.CreateODataBatchReader(), mockContext.Object, Guid.NewGuid(), CancellationToken.None),
+            "The current batch reader state 'Initial' is invalid. The expected state is 'ChangesetStart'.");
+    }
 
-        [Fact]
-        public async Task ReadOperationRequest_NullReader_Throws()
-        {
-            // Arrange
-            Mock<HttpContext> mockContext = new Mock<HttpContext>();
+    [Fact]
+    public async Task ReadOperationRequest_NullReader_Throws()
+    {
+        // Arrange
+        Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchReaderExtensions.ReadOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), CancellationToken.None),
-                "reader");
-        }
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => ODataBatchReaderExtensions.ReadOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), CancellationToken.None),
+            "reader");
+    }
 
-        [Fact]
-        public async Task ReadOperationRequest_InvalidState_Throws()
-        {
-            // Arrange
-            StringContent httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
+    [Fact]
+    public async Task ReadOperationRequest_InvalidState_Throws()
+    {
+        // Arrange
+        StringContent httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
 
-            httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            ODataMessageReader reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
-            Mock<HttpContext> mockContext = new Mock<HttpContext>();
+        httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
+        ODataMessageReader reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
+        Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
-            // Act & Assert
-            ExceptionAssert.Throws<InvalidOperationException>(
-                () => ODataBatchReaderExtensions.ReadOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object, Guid.NewGuid(), CancellationToken.None),
-                "The current batch reader state 'Initial' is invalid. The expected state is 'Operation'.");
-        }
+        // Act & Assert
+        ExceptionAssert.Throws<InvalidOperationException>(
+            () => ODataBatchReaderExtensions.ReadOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object, Guid.NewGuid(), CancellationToken.None),
+            "The current batch reader state 'Initial' is invalid. The expected state is 'Operation'.");
+    }
 
-        [Fact]
-        public async Task ReadChangeSetOperationRequest_NullReader_Throws()
-        {
-            // Arrange
-            Mock<HttpContext> mockContext = new Mock<HttpContext>();
+    [Fact]
+    public async Task ReadChangeSetOperationRequest_NullReader_Throws()
+    {
+        // Arrange
+        Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None),
-                "reader");
-        }
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(null, mockContext.Object, Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None),
+            "reader");
+    }
 
-        [Fact]
-        public async Task ReadChangeSetOperationRequest_InvalidState_Throws()
-        {
-            // Arrange
-            StringContent httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
-            httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
-            ODataMessageReader reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
-            Mock<HttpContext> mockContext = new Mock<HttpContext>();
+    [Fact]
+    public async Task ReadChangeSetOperationRequest_InvalidState_Throws()
+    {
+        // Arrange
+        StringContent httpContent = new StringContent(String.Empty, Encoding.UTF8, "multipart/mixed");
+        httpContent.Headers.ContentType.Parameters.Add(new NameValueHeaderValue("boundary", Guid.NewGuid().ToString()));
+        ODataMessageReader reader = await httpContent.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None);
+        Mock<HttpContext> mockContext = new Mock<HttpContext>();
 
-            // Act & Assert
-            ExceptionAssert.Throws<InvalidOperationException>(
-                () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object,
-                    Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None),
-                "The current batch reader state 'Initial' is invalid. The expected state is 'Operation'.");
-        }
+        // Act & Assert
+        ExceptionAssert.Throws<InvalidOperationException>(
+            () => ODataBatchReaderExtensions.ReadChangeSetOperationRequestAsync(reader.CreateODataBatchReader(), mockContext.Object,
+                Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None),
+            "The current batch reader state 'Initial' is invalid. The expected state is 'Operation'.");
     }
 }

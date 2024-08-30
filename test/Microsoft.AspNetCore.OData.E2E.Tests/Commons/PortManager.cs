@@ -10,39 +10,38 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons;
+
+public class PortArranger
 {
-    public class PortArranger
+    private static int nextPort = 11000;
+
+    public static int Reserve()
     {
-        private static int nextPort = 11000;
-
-        public static int Reserve()
+        int attempts = 0;
+        while (attempts++ < 10)
         {
-            int attempts = 0;
-            while (attempts++ < 10)
+            int port = Interlocked.Increment(ref nextPort);
+            if (port >= 65535)
             {
-                int port = Interlocked.Increment(ref nextPort);
-                if (port >= 65535)
-                {
-                    throw new OverflowException("Cannot get an available port, port value overflowed");
-                }
-
-                if (IsFree(port))
-                {
-                    return port;
-                }
+                throw new OverflowException("Cannot get an available port, port value overflowed");
             }
 
-            throw new TimeoutException(string.Format("Cannot get an available port in {0} attempts.", attempts));
+            if (IsFree(port))
+            {
+                return port;
+            }
         }
 
-        private static bool IsFree(int port)
-        {
-            IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
-            TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
-            var isInUse = connections.Any(c =>
-                c.LocalEndPoint.Port == port || c.RemoteEndPoint.Port == port);
-            return !isInUse;
-        }
+        throw new TimeoutException(string.Format("Cannot get an available port in {0} attempts.", attempts));
+    }
+
+    private static bool IsFree(int port)
+    {
+        IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+        TcpConnectionInformation[] connections = properties.GetActiveTcpConnections();
+        var isInUse = connections.Any(c =>
+            c.LocalEndPoint.Port == port || c.RemoteEndPoint.Port == port);
+        return !isInUse;
     }
 }

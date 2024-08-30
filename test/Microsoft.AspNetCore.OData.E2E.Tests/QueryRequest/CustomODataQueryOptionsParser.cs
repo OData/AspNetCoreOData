@@ -15,37 +15,36 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest;
+
+public class CustomODataQueryOptionsParser : IODataQueryRequestParser
 {
-    public class CustomODataQueryOptionsParser : IODataQueryRequestParser
+    private static MediaTypeHeaderValue SupportedMediaType = MediaTypeHeaderValue.Parse("text/xml");
+
+    public bool CanParse(HttpRequest request)
     {
-        private static MediaTypeHeaderValue SupportedMediaType = MediaTypeHeaderValue.Parse("text/xml");
+        return request.ContentType?.StartsWith(SupportedMediaType.MediaType, StringComparison.Ordinal) == true ? true : false;
+    }
 
-        public bool CanParse(HttpRequest request)
+    public async Task<string> ParseAsync(HttpRequest request)
+    {
+        using (var reader = new StreamReader(
+                request.Body,
+                encoding: Encoding.UTF8,
+                detectEncodingFromByteOrderMarks: false,
+                bufferSize: 1024,
+                leaveOpen: true))
         {
-            return request.ContentType?.StartsWith(SupportedMediaType.MediaType, StringComparison.Ordinal) == true ? true : false;
-        }
-
-        public async Task<string> ParseAsync(HttpRequest request)
-        {
-            using (var reader = new StreamReader(
-                    request.Body,
-                    encoding: Encoding.UTF8,
-                    detectEncodingFromByteOrderMarks: false,
-                    bufferSize: 1024,
-                    leaveOpen: true))
+            var content = await reader.ReadToEndAsync();
+            var document = XDocument.Parse(content);
+            var queryOptions = document.Descendants("QueryOption").Select(d =>
+            new
             {
-                var content = await reader.ReadToEndAsync();
-                var document = XDocument.Parse(content);
-                var queryOptions = document.Descendants("QueryOption").Select(d =>
-                new
-                {
-                    Option = d.Attribute("Option").Value,
-                    d.Attribute("Value").Value
-                });
+                Option = d.Attribute("Option").Value,
+                d.Attribute("Value").Value
+            });
 
-                return string.Join("&", queryOptions.Select(d => d.Option + "=" + d.Value));
-            }
+            return string.Join("&", queryOptions.Select(d => d.Option + "=" + d.Value));
         }
     }
 }

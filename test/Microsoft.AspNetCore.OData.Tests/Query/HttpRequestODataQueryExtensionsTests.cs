@@ -25,58 +25,57 @@ using Moq;
 using NuGet.Frameworks;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query
+namespace Microsoft.AspNetCore.OData.Tests.Query;
+
+public class HttpRequestODataQueryExtensionsTests
 {
-    public class HttpRequestODataQueryExtensionsTests
+    [Fact]
+    public void GetETag_ThrowsArgumentNull_Request()
     {
-        [Fact]
-        public void GetETag_ThrowsArgumentNull_Request()
-        {
-            // Arrange & Act & Assert
-            HttpRequest request = null;
-            ExceptionAssert.ThrowsArgumentNull(() => request.GetETag(null), "request");
-        }
+        // Arrange & Act & Assert
+        HttpRequest request = null;
+        ExceptionAssert.ThrowsArgumentNull(() => request.GetETag(null), "request");
+    }
 
-        [Fact]
-        public void GetETag_Returns_Null()
-        {
-            // Arrange & Act & Assert
-            HttpRequest request = new Mock<HttpRequest>().Object;
+    [Fact]
+    public void GetETag_Returns_Null()
+    {
+        // Arrange & Act & Assert
+        HttpRequest request = new Mock<HttpRequest>().Object;
 
-            // Act
-            ETag etag = request.GetETag(null);
+        // Act
+        ETag etag = request.GetETag(null);
 
-            // Assert
-            Assert.Null(etag);
-        }
+        // Assert
+        Assert.Null(etag);
+    }
 
-        [Fact]
-        public void GetETag_Returns_ETagAny()
-        {
-            // Arrange & Act & Assert
-            HttpRequest request = new Mock<HttpRequest>().Object;
+    [Fact]
+    public void GetETag_Returns_ETagAny()
+    {
+        // Arrange & Act & Assert
+        HttpRequest request = new Mock<HttpRequest>().Object;
 
-            // Act
-            ETag etag = request.GetETag(EntityTagHeaderValue.Any);
+        // Act
+        ETag etag = request.GetETag(EntityTagHeaderValue.Any);
 
-            // Assert
-            Assert.NotNull(etag);
-            Assert.True(etag.IsAny);
-        }
+        // Assert
+        Assert.NotNull(etag);
+        Assert.True(etag.IsAny);
+    }
 
-        [Fact]
-        public void GetETagOfEntity_Returns_ETagAny()
-        {
-            // Arrange & Act & Assert
-            HttpRequest request = new Mock<HttpRequest>().Object;
+    [Fact]
+    public void GetETagOfEntity_Returns_ETagAny()
+    {
+        // Arrange & Act & Assert
+        HttpRequest request = new Mock<HttpRequest>().Object;
 
-            // Act
-            ETag etag = request.GetETag<HttpRequestODataQueryExtensionsTests>(EntityTagHeaderValue.Any);
+        // Act
+        ETag etag = request.GetETag<HttpRequestODataQueryExtensionsTests>(EntityTagHeaderValue.Any);
 
-            // Assert
-            Assert.NotNull(etag);
-            Assert.IsType<ETag<HttpRequestODataQueryExtensionsTests>>(etag);
-            Assert.True(etag.IsAny);
-        }
+        // Assert
+        Assert.NotNull(etag);
+        Assert.IsType<ETag<HttpRequestODataQueryExtensionsTests>>(etag);
+        Assert.True(etag.IsAny);
     }
 }
