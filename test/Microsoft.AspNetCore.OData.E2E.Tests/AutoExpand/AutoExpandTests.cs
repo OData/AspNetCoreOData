@@ -92,7 +92,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         [InlineData("$Select=Order", 3)]
         [InlineData("$SELECT=Order", 3)]
         [InlineData("select=Order", 3)]
-        public async Task QueryForResources_WithSelectQueryParamCapitalized(string queryParams, int propCount)
+        public async Task QueryForResources_WithSelectQueryParam_IncludesAutoSelectProperty(string queryParams, int propCount)
         {
             // Arrange
             string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
@@ -117,7 +117,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         [InlineData("$Expand=Order", 4)]
         [InlineData("$EXPAND=Order", 4)]
         [InlineData("expand=Order", 4)]
-        public async Task QueryForResources_WithExpandQueryParamCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        public async Task QueryForResources_WithExpandQueryParam_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
         {
             // Arrange
             string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
