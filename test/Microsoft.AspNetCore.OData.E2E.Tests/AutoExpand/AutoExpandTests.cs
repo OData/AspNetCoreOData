@@ -88,9 +88,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         }
 
         [Theory]
-        [InlineData("$Select=Id", 4)]
+        [InlineData("$select=Order", 3)]
         [InlineData("$Select=Order", 3)]
-        public async Task QueryForResources_WithSelectQueryParamCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        [InlineData("$SELECT=Order", 3)]
+        [InlineData("select=Order", 3)]
+        public async Task QueryForResources_WithSelectQueryParamCapitalized(string queryParams, int propCount)
         {
             // Arrange
             string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
@@ -106,17 +108,43 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
-            await VerifyNavigationPropertiesAndLevels(response, propCount);
+            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            VerifyNavigationProperties(customer, propCount);
         }
 
         [Theory]
-        [InlineData("$Expand=Order & Select=Friend", 3)]
-        [InlineData("Expand=Order & $Select=Order", 3)]
+        [InlineData("$expand=Order", 4)]
+        [InlineData("$Expand=Order", 4)]
+        [InlineData("$EXPAND=Order", 4)]
+        [InlineData("expand=Order", 4)]
+        public async Task QueryForResources_WithExpandQueryParamCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        {
+            // Arrange
+            string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            VerifyNavigationProperties(customer, propCount);
+        }
+
+        [Theory]
+        [InlineData("$Expand=Order&Select=Friend", 3)]
+        [InlineData("Expand=Order&$Select=Order", 3)]
         [InlineData("$Expand=Order,HomeAddress/CountryOrRegion($Select=Name)", 4)]
         [InlineData("$Expand=HomeAddress/CountryOrRegion,HomeAddress/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress/ZipCode,Order($Expand=Choice)", 4)]
         [InlineData("Expand=HomeAddress/Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand.UsAddress/ZipCode", 4)]
-        [InlineData("Expand=Friend(Select=Order) & $Select=Order", 3)]
-        [InlineData("Select=Order & Expand=Order(Expand=Choice(Select=Amount))", 3)]
+        [InlineData("Expand=Friend(Select=Order)&$Select=Order", 3)]
+        [InlineData("Select=Order&Expand=Order(Expand=Choice(Select=Amount))", 3)]
         public async Task QueryForResources_WithExpandSelectQueryParamsCapitalized_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
         {
             // Arrange
@@ -133,7 +161,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
-            await VerifyNavigationPropertiesAndLevels(response, propCount);
+            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            VerifyNavigationProperties(customer, propCount);
         }
 
         private static void VerifyHomeAddress(JObject customer)
@@ -539,9 +568,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             }
         }
 
-        private async Task VerifyNavigationPropertiesAndLevels(HttpResponseMessage response, int propCount)
+        private void VerifyNavigationProperties(JObject customer, int propCount)
         {
-            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
             Assert.Equal(customer.Properties().Count(), propCount);
             VerifyOrderAndChoiceOrder(customer);
             VerifyHomeAddress(customer);
