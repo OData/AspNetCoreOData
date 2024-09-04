@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             builder.EntityType<DerivedOrder>();
             builder.EntityType<DerivedOrder2>();
             builder.EntitySet<OrderDetail>("OrderDetails");
-            builder.EntitySet<People>("People");
+            builder.EntitySet<Person>("People");
             builder.EntitySet<Menu>("EnableQueryMenus");
             builder.EntitySet<Menu>("QueryOptionsOfTMenus");
             builder.EntitySet<Tab>("Tabs");

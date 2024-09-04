@@ -88,14 +88,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
         }
 
         [Theory]
-        [InlineData("$select=Order", 3)]
-        [InlineData("$Select=Order", 3)]
-        [InlineData("$SELECT=Order", 3)]
-        [InlineData("select=Order", 3)]
-        public async Task QueryForResources_WithSelectQueryParam_IncludesAutoSelectProperty(string queryParams, int propCount)
+        [InlineData("$select=Order", 1)]
+        [InlineData("$Select=Order", 1)]
+        [InlineData("$SELECT=Order", 1)]
+        [InlineData("select=Order", 1)]
+        public async Task QueryForResources_WithSelectQueryParam_SelectAutoExpandProperty(string queryParams, int propCount)
         {
             // Arrange
-            string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
+            string queryUrl = $"autoexpand/People(1)?{queryParams}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -108,19 +108,22 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
-            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
-            VerifyNavigationProperties(customer, propCount);
+            var person = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            Assert.Equal(person.Properties().Count(), propCount); // Only Order is selected
+            Assert.NotNull(person["Order"]);
+
+            VerifyOrderAndChoiceOrder(person);
         }
 
         [Theory]
-        [InlineData("$expand=Order", 4)]
-        [InlineData("$Expand=Order", 4)]
-        [InlineData("$EXPAND=Order", 4)]
-        [InlineData("expand=Order", 4)]
-        public async Task QueryForResources_WithExpandQueryParam_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        [InlineData("$select=Id", 2)]
+        [InlineData("$Select=Id", 2)]
+        [InlineData("$SELECT=Id", 2)]
+        [InlineData("select=Id", 2)]
+        public async Task QueryForResources_WithSelectQueryParam_IncludesAutoSelectProperty(string queryParams, int propCount)
         {
             // Arrange
-            string queryUrl = $"autoexpand/Customers(5)?{queryParams}";
+            string queryUrl = $"autoexpand/People(1)?{queryParams}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -133,8 +136,71 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
 
-            var customer = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
-            VerifyNavigationProperties(customer, propCount);
+            var person = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            Assert.Equal(person.Properties().Count(), propCount); // Id and Order are selected
+            Assert.NotNull(person["Order"]); // Order is auto-expanded
+            Assert.NotNull(person["Id"]);
+
+            VerifyOrderAndChoiceOrder(person);
+        }
+
+        [Theory]
+        [InlineData("$expand=Order", 2)]
+        [InlineData("$Expand=Order", 2)]
+        [InlineData("$EXPAND=Order", 2)]
+        [InlineData("expand=Order", 2)]
+        public async Task QueryForResources_WithExpandQueryParam_IncludesAutoExpandNavigationProperty(string queryParams, int propCount)
+        {
+            // Arrange
+            string queryUrl = $"autoexpand/People(1)?{queryParams}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            var person = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            Assert.Equal(person.Properties().Count(), propCount); // Id and Order are selected
+            Assert.NotNull(person["Order"]); // Order is auto-expanded
+            Assert.NotNull(person["Id"]);
+
+            VerifyOrderAndChoiceOrder(person);
+        }
+
+        [Theory]
+        [InlineData("$expand=Friend", 3)]
+        [InlineData("$Expand=Friend", 3)]
+        [InlineData("$EXPAND=Friend", 3)]
+        [InlineData("expand=Friend", 3)]
+        public async Task QueryForResources_WithExpandQueryParam_IncludesNonAutoExpandNavigationProperty(string queryParams, int propCount)
+        {
+            // Arrange
+            string queryUrl = $"autoexpand/People(1)?{queryParams}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            // Act
+            HttpResponseMessage response = await client.SendAsync(request);
+
+            // Assert
+            Assert.True(response.IsSuccessStatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            var person = await response.Content.ReadAsObject<JObject>().ConfigureAwait(false);
+            Assert.Equal(person.Properties().Count(), propCount); // Id and Order are selected
+            Assert.NotNull(person["Order"]); // Order is auto-expanded
+            Assert.NotNull($"{person["Friend"]}"); // Friend is expanded
+            Assert.NotNull(person["Id"]);
+
+            VerifyOrderAndChoiceOrder(person);
         }
 
         [Theory]
@@ -568,14 +634,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
             }
         }
 
-        private void VerifyNavigationProperties(JObject customer, int propCount)
+        private void VerifyNavigationProperties(JObject responseContent, int propCount)
         {
-            Assert.Equal(customer.Properties().Count(), propCount);
-            VerifyOrderAndChoiceOrder(customer);
-            VerifyHomeAddress(customer);
+            Assert.Equal(responseContent.Properties().Count(), propCount);
+            VerifyOrderAndChoiceOrder(responseContent);
+            VerifyHomeAddress(responseContent);
 
             // level one
-            JObject friend = customer["Friend"] as JObject;
+            JObject friend = responseContent["Friend"] as JObject;
             JObject order = friend["Order"] as JObject;
             Assert.NotNull(order);
             Assert.Null(order["Choice"]);
