@@ -9,74 +9,73 @@ using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Routing.Template
+namespace Microsoft.AspNetCore.OData.Routing.Template;
+
+/// <summary>
+/// Represents a template that could match a type cast segment.
+/// </summary>
+public class CastSegmentTemplate : ODataSegmentTemplate
 {
     /// <summary>
-    /// Represents a template that could match a type cast segment.
+    /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
     /// </summary>
-    public class CastSegmentTemplate : ODataSegmentTemplate
+    /// <param name="castType">The cast Edm type.</param>
+    /// <param name="expectedType">The expected Edm type.</param>
+    /// <param name="navigationSource">The target navigation source. it could be null.</param>
+    public CastSegmentTemplate(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="castType">The cast Edm type.</param>
-        /// <param name="expectedType">The expected Edm type.</param>
-        /// <param name="navigationSource">The target navigation source. it could be null.</param>
-        public CastSegmentTemplate(IEdmType castType, IEdmType expectedType, IEdmNavigationSource navigationSource)
+        if (castType == null)
         {
-            if (castType == null)
-            {
-                throw Error.ArgumentNull(nameof(castType));
-            }
-
-            if (expectedType == null)
-            {
-                throw Error.ArgumentNull(nameof(expectedType));
-            }
-
-            TypeSegment = new TypeSegment(castType, expectedType, navigationSource);
+            throw Error.ArgumentNull(nameof(castType));
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="typeSegment">The type segment.</param>
-        public CastSegmentTemplate(TypeSegment typeSegment)
+        if (expectedType == null)
         {
-            TypeSegment = typeSegment ?? throw Error.ArgumentNull(nameof(typeSegment));
+            throw Error.ArgumentNull(nameof(expectedType));
         }
 
-        /// <summary>
-        /// Gets the cast type.
-        /// </summary>
-        public IEdmType CastType => TypeSegment.EdmType;
+        TypeSegment = new TypeSegment(castType, expectedType, navigationSource);
+    }
 
-        /// <summary>
-        /// Gets the expected type.
-        /// </summary>
-        public IEdmType ExpectedType => TypeSegment.ExpectedType;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CastSegmentTemplate" /> class.
+    /// </summary>
+    /// <param name="typeSegment">The type segment.</param>
+    public CastSegmentTemplate(TypeSegment typeSegment)
+    {
+        TypeSegment = typeSegment ?? throw Error.ArgumentNull(nameof(typeSegment));
+    }
 
-        /// <summary>
-        /// Gets the expected type.
-        /// </summary>
-        public TypeSegment TypeSegment { get; }
+    /// <summary>
+    /// Gets the cast type.
+    /// </summary>
+    public IEdmType CastType => TypeSegment.EdmType;
 
-        /// <inheritdoc />
-        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+    /// <summary>
+    /// Gets the expected type.
+    /// </summary>
+    public IEdmType ExpectedType => TypeSegment.ExpectedType;
+
+    /// <summary>
+    /// Gets the expected type.
+    /// </summary>
+    public TypeSegment TypeSegment { get; }
+
+    /// <inheritdoc />
+    public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+    {
+        yield return $"/{CastType.AsElementType().FullTypeName()}";
+    }
+
+    /// <inheritdoc />
+    public override bool TryTranslate(ODataTemplateTranslateContext context)
+    {
+        if (context == null)
         {
-            yield return $"/{CastType.AsElementType().FullTypeName()}";
+            throw Error.ArgumentNull(nameof(context));
         }
 
-        /// <inheritdoc />
-        public override bool TryTranslate(ODataTemplateTranslateContext context)
-        {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            context.Segments.Add(TypeSegment);
-            return true;
-        }
+        context.Segments.Add(TypeSegment);
+        return true;
     }
 }

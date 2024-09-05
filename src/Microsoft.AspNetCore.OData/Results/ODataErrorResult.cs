@@ -12,66 +12,65 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData;
 using ErrorUtils = Microsoft.AspNetCore.OData.Error;
 
-namespace Microsoft.AspNetCore.OData.Results
+namespace Microsoft.AspNetCore.OData.Results;
+
+/// <summary>
+/// Represents a result that when executed will produce an <see cref="ActionResult"/>.
+/// </summary>
+/// <remarks>This result creates an <see cref="ODataError"/> response.</remarks>
+public class ODataErrorResult : ActionResult, IODataErrorResult
 {
     /// <summary>
-    /// Represents a result that when executed will produce an <see cref="ActionResult"/>.
+    /// OData error.
     /// </summary>
-    /// <remarks>This result creates an <see cref="ODataError"/> response.</remarks>
-    public class ODataErrorResult : ActionResult, IODataErrorResult
+    public ODataError Error { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the class.
+    /// </summary>
+    /// <param name="errorCode">Error code.</param>
+    /// <param name="message">Error message.</param>
+    public ODataErrorResult(string errorCode, string message)
     {
-        /// <summary>
-        /// OData error.
-        /// </summary>
-        public ODataError Error { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="errorCode">Error code.</param>
-        /// <param name="message">Error message.</param>
-        public ODataErrorResult(string errorCode, string message)
+        if (string.IsNullOrEmpty(errorCode))
         {
-            if (string.IsNullOrEmpty(errorCode))
-            {
-                throw ErrorUtils.ArgumentNullOrEmpty(nameof(errorCode));
-            }
-
-            if (string.IsNullOrEmpty(message))
-            {
-                throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
-            }
-
-            Error = new ODataError
-            {
-                Code = errorCode,
-                Message = message
-            };
+            throw ErrorUtils.ArgumentNullOrEmpty(nameof(errorCode));
         }
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
-        public ODataErrorResult(ODataError odataError)
+        if (string.IsNullOrEmpty(message))
         {
-            if (odataError == null)
-            {
-                throw ErrorUtils.ArgumentNull(nameof(odataError));
-            }
-
-            Error = odataError;
+            throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
         }
 
-        /// <inheritdoc/>
-        public async override Task ExecuteResultAsync(ActionContext context)
+        Error = new ODataError
         {
-            ObjectResult objectResult = new ObjectResult(Error)
-            {
-                StatusCode = Convert.ToInt32(Error.Code, CultureInfo.InvariantCulture)
-            };
+            Code = errorCode,
+            Message = message
+        };
+    }
 
-            await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);
+    /// <summary>
+    /// Initializes a new instance of the class.
+    /// </summary>
+    /// <param name="odataError">An <see cref="ODataError"/> object.</param>
+    public ODataErrorResult(ODataError odataError)
+    {
+        if (odataError == null)
+        {
+            throw ErrorUtils.ArgumentNull(nameof(odataError));
         }
+
+        Error = odataError;
+    }
+
+    /// <inheritdoc/>
+    public async override Task ExecuteResultAsync(ActionContext context)
+    {
+        ObjectResult objectResult = new ObjectResult(Error)
+        {
+            StatusCode = Convert.ToInt32(Error.Code, CultureInfo.InvariantCulture)
+        };
+
+        await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);
     }
 }

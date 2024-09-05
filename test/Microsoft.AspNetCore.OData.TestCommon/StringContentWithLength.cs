@@ -8,39 +8,38 @@
 using System.Net.Http;
 using System.Text;
 
-namespace Microsoft.AspNetCore.OData.TestCommon
+namespace Microsoft.AspNetCore.OData.TestCommon;
+
+public class StringContentWithLength : StringContent
 {
-    public class StringContentWithLength : StringContent
+    public StringContentWithLength(string content)
+        : base(content)
     {
-        public StringContentWithLength(string content)
-            : base(content)
-        {
-            EnsureContentLength();
-        }
+        EnsureContentLength();
+    }
 
-        public StringContentWithLength(string content, Encoding encoding)
-            : base(content, encoding)
-        {
-            EnsureContentLength();
-        }
+    public StringContentWithLength(string content, Encoding encoding)
+        : base(content, encoding)
+    {
+        EnsureContentLength();
+    }
 
-        public StringContentWithLength(string content, Encoding encoding, string mediaType)
-            : base(content, encoding, mediaType)
-        {
-            EnsureContentLength();
-        }
+    public StringContentWithLength(string content, Encoding encoding, string mediaType)
+        : base(content, encoding, mediaType)
+    {
+        EnsureContentLength();
+    }
 
-        public StringContentWithLength(string content, string unvalidatedContentType)
-            : base(content)
-        {
-            Headers.TryAddWithoutValidation("Content-Type", unvalidatedContentType);
-            EnsureContentLength();
-        }
+    public StringContentWithLength(string content, string unvalidatedContentType)
+        : base(content)
+    {
+        Headers.TryAddWithoutValidation("Content-Type", unvalidatedContentType);
+        EnsureContentLength();
+    }
 
-        private void EnsureContentLength()
-        {
-            // See: https://github.com/dotnet/aspnetcore/issues/18463
-            _ = Headers.ContentLength;
-        }
+    private void EnsureContentLength()
+    {
+        // See: https://github.com/dotnet/aspnetcore/issues/18463
+        _ = Headers.ContentLength;
     }
 }

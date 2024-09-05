@@ -8,52 +8,51 @@
 using System;
 using System.Reflection;
 
-namespace Microsoft.AspNetCore.OData.Common
+namespace Microsoft.AspNetCore.OData.Common;
+
+/// <summary>
+/// Represents a strategy for Getting and Setting a PropertyInfo on <typeparamref name="TStructuralType"/>
+/// </summary>
+/// <typeparam name="TStructuralType">The type that contains the PropertyInfo</typeparam>
+internal abstract class PropertyAccessor<TStructuralType> where TStructuralType : class
 {
-    /// <summary>
-    /// Represents a strategy for Getting and Setting a PropertyInfo on <typeparamref name="TStructuralType"/>
-    /// </summary>
-    /// <typeparam name="TStructuralType">The type that contains the PropertyInfo</typeparam>
-    internal abstract class PropertyAccessor<TStructuralType> where TStructuralType : class
+    protected PropertyAccessor(PropertyInfo property)
     {
-        protected PropertyAccessor(PropertyInfo property)
+        if (property == null)
         {
-            if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
-
-            Property = property;
-            if (Property.GetGetMethod() == null ||
-                (!TypeHelper.IsCollection(property.PropertyType) && Property.GetSetMethod() == null))
-            {
-                throw Error.Argument("property", SRResources.PropertyMustHavePublicGetterAndSetter);
-            }
+            throw new ArgumentNullException(nameof(property));
         }
 
-        public PropertyInfo Property
+        Property = property;
+        if (Property.GetGetMethod() == null ||
+            (!TypeHelper.IsCollection(property.PropertyType) && Property.GetSetMethod() == null))
         {
-            get;
-            private set;
+            throw Error.Argument("property", SRResources.PropertyMustHavePublicGetterAndSetter);
         }
-
-        public void Copy(TStructuralType from, TStructuralType to)
-        {
-            if (from == null)
-            {
-                throw Error.ArgumentNull(nameof(from));
-            }
-
-            if (to == null)
-            {
-                throw Error.ArgumentNull(nameof(to));
-            }
-
-            SetValue(to, GetValue(from));
-        }
-
-        public abstract object GetValue(TStructuralType instance);
-
-        public abstract void SetValue(TStructuralType instance, object value);
     }
+
+    public PropertyInfo Property
+    {
+        get;
+        private set;
+    }
+
+    public void Copy(TStructuralType from, TStructuralType to)
+    {
+        if (from == null)
+        {
+            throw Error.ArgumentNull(nameof(from));
+        }
+
+        if (to == null)
+        {
+            throw Error.ArgumentNull(nameof(to));
+        }
+
+        SetValue(to, GetValue(from));
+    }
+
+    public abstract object GetValue(TStructuralType instance);
+
+    public abstract void SetValue(TStructuralType instance, object value);
 }

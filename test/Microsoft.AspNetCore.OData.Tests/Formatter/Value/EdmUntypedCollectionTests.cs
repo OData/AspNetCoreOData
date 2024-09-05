@@ -9,21 +9,20 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
+
+public class EdmUntypedCollectionTests
 {
-    public class EdmUntypedCollectionTests
+    [Fact]
+    public void GetEdmType_OnEdmUntypedCollection_Returns_EdmType()
     {
-        [Fact]
-        public void GetEdmType_OnEdmUntypedCollection_Returns_EdmType()
-        {
-            // Arrange
-            EdmUntypedCollection untypedCollection = new EdmUntypedCollection();
+        // Arrange
+        EdmUntypedCollection untypedCollection = new EdmUntypedCollection();
 
-            // Act
-            IEdmTypeReference edmType = untypedCollection.GetEdmType();
+        // Act
+        IEdmTypeReference edmType = untypedCollection.GetEdmType();
 
-            // Assert
-            Assert.Equal("Collection(Edm.Untyped)", edmType.FullName());
-        }
+        // Assert
+        Assert.Equal("Collection(Edm.Untyped)", edmType.FullName());
     }
 }

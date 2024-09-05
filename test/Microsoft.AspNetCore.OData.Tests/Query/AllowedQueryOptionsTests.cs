@@ -9,50 +9,49 @@ using System;
 using Microsoft.AspNetCore.OData.Query;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query
+namespace Microsoft.AspNetCore.OData.Tests.Query;
+
+public class AllowedQueryOptionsTests
 {
-    public class AllowedQueryOptionsTests
+    [Fact]
+    public void None_MatchesNone()
     {
-        [Fact]
-        public void None_MatchesNone()
-        {
-            Assert.Equal(AllowedQueryOptions.None, AllowedQueryOptions.All & AllowedQueryOptions.None);
-        }
+        Assert.Equal(AllowedQueryOptions.None, AllowedQueryOptions.All & AllowedQueryOptions.None);
+    }
 
-        [Theory]
-        [InlineData(AllowedQueryOptions.Filter)]
-        [InlineData(AllowedQueryOptions.OrderBy)]
-        [InlineData(AllowedQueryOptions.Skip)]
-        [InlineData(AllowedQueryOptions.Top)]
-        [InlineData(AllowedQueryOptions.Count)]
-        [InlineData(AllowedQueryOptions.Select)]
-        [InlineData(AllowedQueryOptions.Expand)]
-        [InlineData(AllowedQueryOptions.Format)]
-        [InlineData(AllowedQueryOptions.SkipToken)]
-        public void Supported_Contains_SupportedQueryOptions(AllowedQueryOptions queryOption)
-        {
-            Assert.Equal(queryOption, AllowedQueryOptions.Supported & queryOption);
-        }
+    [Theory]
+    [InlineData(AllowedQueryOptions.Filter)]
+    [InlineData(AllowedQueryOptions.OrderBy)]
+    [InlineData(AllowedQueryOptions.Skip)]
+    [InlineData(AllowedQueryOptions.Top)]
+    [InlineData(AllowedQueryOptions.Count)]
+    [InlineData(AllowedQueryOptions.Select)]
+    [InlineData(AllowedQueryOptions.Expand)]
+    [InlineData(AllowedQueryOptions.Format)]
+    [InlineData(AllowedQueryOptions.SkipToken)]
+    public void Supported_Contains_SupportedQueryOptions(AllowedQueryOptions queryOption)
+    {
+        Assert.Equal(queryOption, AllowedQueryOptions.Supported & queryOption);
+    }
 
-        [Fact]
-        public void Supported_DoesNotContain_UnsupportedQueryOptions()
-        {
-            Assert.Equal(AllowedQueryOptions.None, AllowedQueryOptions.Supported & (AllowedQueryOptions.DeltaToken));
-        }
+    [Fact]
+    public void Supported_DoesNotContain_UnsupportedQueryOptions()
+    {
+        Assert.Equal(AllowedQueryOptions.None, AllowedQueryOptions.Supported & (AllowedQueryOptions.DeltaToken));
+    }
 
-        [Fact]
-        public void All_Contains_AllQueryOptions()
+    [Fact]
+    public void All_Contains_AllQueryOptions()
+    {
+        AllowedQueryOptions allQueryOptions = 0;
+        foreach (AllowedQueryOptions allowedQueryOption in Enum.GetValues(typeof(AllowedQueryOptions)))
         {
-            AllowedQueryOptions allQueryOptions = 0;
-            foreach (AllowedQueryOptions allowedQueryOption in Enum.GetValues(typeof(AllowedQueryOptions)))
+            if (allowedQueryOption != AllowedQueryOptions.All)
             {
-                if (allowedQueryOption != AllowedQueryOptions.All)
-                {
-                    allQueryOptions = allQueryOptions | allowedQueryOption;
-                }
+                allQueryOptions = allQueryOptions | allowedQueryOption;
             }
-
-            Assert.Equal(AllowedQueryOptions.All, allQueryOptions);
         }
+
+        Assert.Equal(AllowedQueryOptions.All, allQueryOptions);
     }
 }

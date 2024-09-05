@@ -9,78 +9,77 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums;
+
+public class Employee
 {
-    public class Employee
-    {
-        public int ID { get; set; }
+    public int ID { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public List<Skill> SkillSet { get; set; }
+    public List<Skill> SkillSet { get; set; }
 
-        public Gender Gender { get; set; }
+    public Gender Gender { get; set; }
 
-        public AccessLevel AccessLevel { get; set; }
+    public AccessLevel AccessLevel { get; set; }
 
-        public FavoriteSports FavoriteSports { get; set; }
-    }
+    public FavoriteSports FavoriteSports { get; set; }
+}
 
-    [Flags]
-    public enum AccessLevel
-    {
-        Read = 1,
+[Flags]
+public enum AccessLevel
+{
+    Read = 1,
 
-        Write = 2,
+    Write = 2,
 
-        Execute = 4
-    }
+    Execute = 4
+}
 
-    public enum Gender
-    {
-        Male = 1,
+public enum Gender
+{
+    Male = 1,
 
-        Female = 2
-    }
+    Female = 2
+}
 
-    public enum Skill
-    {
-        CSharp,
+public enum Skill
+{
+    CSharp,
 
-        Sql,
+    Sql,
 
-        Web,
-    }
+    Web,
+}
 
-    public enum Sport
-    {
-        Pingpong,
+public enum Sport
+{
+    Pingpong,
 
-        Basketball
-    }
+    Basketball
+}
 
-    public class FavoriteSports
-    {
-        public Sport LikeMost { get; set; }
-        public List<Sport> Like { get; set; }
-    }
+public class FavoriteSports
+{
+    public Sport LikeMost { get; set; }
+    public List<Sport> Like { get; set; }
+}
 
-    [DataContract]
-    public enum Status
-    {
-        [EnumMember(Value = "Sold out")]
-        SoldOut,
+[DataContract]
+public enum Status
+{
+    [EnumMember(Value = "Sold out")]
+    SoldOut,
 
-        [EnumMember(Value = "In store")]
-        InStore
-    }
+    [EnumMember(Value = "In store")]
+    InStore
+}
 
-    public class WeatherForecast
-    {
-        public int Id { get; set; }
+public class WeatherForecast
+{
+    public int Id { get; set; }
 
-        public Status Status { get; set; }
+    public Status Status { get; set; }
 
-        public Skill Skill { get; set; }
-    }
+    public Skill Skill { get; set; }
 }

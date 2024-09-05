@@ -9,32 +9,31 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests
+namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests;
+
+/// <summary>
+/// Serialize Utils
+/// </summary>
+public static class SerializeUtils
 {
-    /// <summary>
-    /// Serialize Utils
-    /// </summary>
-    public static class SerializeUtils
+    public static string WriteJson(JsonConverter converter, object value, bool indented = false)
     {
-        public static string WriteJson(JsonConverter converter, object value, bool indented = false)
+        StringBuilder sb = new StringBuilder();
+        StringWriter sw = new StringWriter(sb);
+
+        using (JsonWriter writer = new JsonTextWriter(sw))
         {
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.Formatting = indented ? Formatting.Indented : Formatting.None;
+            settings.Converters.Add(converter);
 
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.Formatting = indented ? Formatting.Indented : Formatting.None;
-                settings.Converters.Add(converter);
+            JsonSerializer serializer = JsonSerializer.Create(settings);
 
-                JsonSerializer serializer = JsonSerializer.Create(settings);
+            converter.WriteJson(writer, value, serializer);
 
-                converter.WriteJson(writer, value, serializer);
+            writer.Flush();
 
-                writer.Flush();
-
-                return sb.ToString();
-            }
+            return sb.ToString();
         }
     }
 }

@@ -5,13 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+/// <summary>
+/// Represents an instance of an <see cref="IEdmChangedObject"/>.
+/// Holds the properties necessary to create the ODataDeltaDeletedLink.
+/// </summary>
+public interface IEdmDeltaDeletedLink : IEdmDeltaLinkBase, IEdmChangedObject
 {
-    /// <summary>
-    /// Represents an instance of an <see cref="IEdmChangedObject"/>.
-    /// Holds the properties necessary to create the ODataDeltaDeletedLink.
-    /// </summary>
-    public interface IEdmDeltaDeletedLink : IEdmDeltaLinkBase, IEdmChangedObject
-    {
-    }
 }

@@ -8,24 +8,23 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Query.Container;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
+namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper;
+
+internal class MockPropertyContainer : PropertyContainer
 {
-    internal class MockPropertyContainer : PropertyContainer
+    public MockPropertyContainer()
     {
-        public MockPropertyContainer()
-        {
-            Properties = new Dictionary<string, object>();
-        }
+        Properties = new Dictionary<string, object>();
+    }
 
-        public Dictionary<string, object> Properties { get; private set; }
+    public Dictionary<string, object> Properties { get; private set; }
 
-        public override void ToDictionaryCore(Dictionary<string, object> dictionary, IPropertyMapper propertyMapper,
-            bool includeAutoSelected)
+    public override void ToDictionaryCore(Dictionary<string, object> dictionary, IPropertyMapper propertyMapper,
+        bool includeAutoSelected)
+    {
+        foreach (var kvp in Properties)
         {
-            foreach (var kvp in Properties)
-            {
-                dictionary.Add(kvp.Key, kvp.Value);
-            }
+            dictionary.Add(kvp.Key, kvp.Value);
         }
     }
 }

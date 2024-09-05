@@ -5,10 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace ODataRoutingSample.Models
+namespace ODataRoutingSample.Models;
+
+public class Company
 {
-    public class Company
-    {
-        public short Id { get; set; }
-    }
+    public short Id { get; set; }
 }

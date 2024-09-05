@@ -5,10 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery;
+
+public class Customer
 {
-    public class Customer
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

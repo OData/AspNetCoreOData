@@ -7,23 +7,22 @@
 
 using System.Collections.Generic;
 
-namespace ODataRoutingSample.Models
+namespace ODataRoutingSample.Models;
+
+public class Organization
 {
-    public class Organization
-    {
-        public int OrganizationId { get; set; }
+    public int OrganizationId { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public IList<Department> Departs { get; set; }
-    }
+    public IList<Department> Departs { get; set; }
+}
 
-    public class Department
-    {
-        public int DepartmentId { get; set; }
+public class Department
+{
+    public int DepartmentId { get; set; }
 
-        public string Alias { get; set; }
+    public string Alias { get; set; }
 
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

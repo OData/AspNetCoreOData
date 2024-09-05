@@ -8,16 +8,15 @@
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
 
-namespace ODataDynamicModel.Extensions
+namespace ODataDynamicModel.Extensions;
+
+public interface IDataSource
 {
-    public interface IDataSource
-    {
-        IEdmModel GetEdmModel();
+    IEdmModel GetEdmModel();
 
-        void Get(IEdmEntityTypeReference entityType, EdmEntityObjectCollection collection);
+    void Get(IEdmEntityTypeReference entityType, EdmEntityObjectCollection collection);
 
-        void Get(string key, EdmEntityObject entity);
+    void Get(string key, EdmEntityObject entity);
 
-        object GetProperty(string property, EdmEntityObject entity);
-    }
+    object GetProperty(string property, EdmEntityObject entity);
 }

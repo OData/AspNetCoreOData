@@ -5,14 +5,13 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class OrderLine
 {
-    public class OrderLine
-    {
-        public int ID { get; set; }
+    public int ID { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public int OrderId { get; set; }
-    }
+    public int OrderId { get; set; }
 }

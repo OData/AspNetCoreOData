@@ -8,17 +8,16 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
+namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation;
+
+public class EntitySetAggregationEdmModel
 {
-    public class EntitySetAggregationEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder =new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
-            builder.EntitySet<Order>("Orders");
-            IEdmModel model = builder.GetEdmModel();
-            return model;
-        }
+        var builder =new ODataConventionModelBuilder();
+        builder.EntitySet<Customer>("Customers");
+        builder.EntitySet<Order>("Orders");
+        IEdmModel model = builder.GetEdmModel();
+        return model;
     }
 }

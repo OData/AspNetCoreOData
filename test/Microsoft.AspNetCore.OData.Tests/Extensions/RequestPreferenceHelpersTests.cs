@@ -12,35 +12,34 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.Primitives;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Extensions
+namespace Microsoft.AspNetCore.OData.Tests.Extensions;
+
+public class RequestPreferenceHelpersTests
 {
-    public class RequestPreferenceHelpersTests
+    [Fact]
+    public void RequestPrefersMaxPageSize_ReturnsFalse_WithPreferHeader()
     {
-        [Fact]
-        public void RequestPrefersMaxPageSize_ReturnsFalse_WithPreferHeader()
-        {
-            // Arrange
-            HeaderDictionary headers = new HeaderDictionary();
+        // Arrange
+        HeaderDictionary headers = new HeaderDictionary();
 
-            // Act & Assert
-            Assert.False(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out _));
-        }
+        // Act & Assert
+        Assert.False(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out _));
+    }
 
-        [Theory]
-        [InlineData("maxpagesize=5")]
-        [InlineData("odata.maxpagesize=5")]
-        public void RequestPrefersMaxPageSize_ReturnsPageSize_WithPreferValue(string preferValue)
-        {
-            // Arrange
-            HeaderDictionary headers = new HeaderDictionary(
-                new Dictionary<string, StringValues>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "Prefer", preferValue }
-                });
+    [Theory]
+    [InlineData("maxpagesize=5")]
+    [InlineData("odata.maxpagesize=5")]
+    public void RequestPrefersMaxPageSize_ReturnsPageSize_WithPreferValue(string preferValue)
+    {
+        // Arrange
+        HeaderDictionary headers = new HeaderDictionary(
+            new Dictionary<string, StringValues>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Prefer", preferValue }
+            });
 
-            // Act & Assert
-            Assert.True(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out int pageSize));
-            Assert.Equal(5, pageSize);
-        }
+        // Act & Assert
+        Assert.True(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out int pageSize));
+        Assert.Equal(5, pageSize);
     }
 }

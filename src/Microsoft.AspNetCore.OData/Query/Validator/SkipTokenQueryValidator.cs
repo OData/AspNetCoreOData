@@ -8,37 +8,36 @@
 using Microsoft.OData;
 using Microsoft.OData.ModelBuilder.Config;
 
-namespace Microsoft.AspNetCore.OData.Query.Validator
+namespace Microsoft.AspNetCore.OData.Query.Validator;
+
+/// <summary>
+/// Represents a validator used to validate a <see cref="SkipTokenQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
+/// </summary>
+public class SkipTokenQueryValidator : ISkipTokenQueryValidator
 {
     /// <summary>
-    /// Represents a validator used to validate a <see cref="SkipTokenQueryOption"/> based on the <see cref="ODataValidationSettings"/>.
+    /// Validates a <see cref="SkipTokenQueryOption" />.
     /// </summary>
-    public class SkipTokenQueryValidator : ISkipTokenQueryValidator
+    /// <param name="skipToken">The $skiptoken query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    public virtual void Validate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings)
     {
-        /// <summary>
-        /// Validates a <see cref="SkipTokenQueryOption" />.
-        /// </summary>
-        /// <param name="skipToken">The $skiptoken query.</param>
-        /// <param name="validationSettings">The validation settings.</param>
-        public virtual void Validate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings)
+        if (skipToken == null)
         {
-            if (skipToken == null)
-            {
-                throw Error.ArgumentNull(nameof(skipToken));
-            }
+            throw Error.ArgumentNull(nameof(skipToken));
+        }
 
-            if (validationSettings == null)
-            {
-                throw Error.ArgumentNull(nameof(validationSettings));
-            }
+        if (validationSettings == null)
+        {
+            throw Error.ArgumentNull(nameof(validationSettings));
+        }
 
-            if (skipToken.Context != null)
+        if (skipToken.Context != null)
+        {
+            DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
+            if (!defaultConfigs.EnableSkipToken)
             {
-                DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
-                if (!defaultConfigs.EnableSkipToken)
-                {
-                    throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
-                }
+                throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
             }
         }
     }

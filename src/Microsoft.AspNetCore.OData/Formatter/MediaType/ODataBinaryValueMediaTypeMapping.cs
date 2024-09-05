@@ -8,26 +8,25 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Formatter.MediaType
+namespace Microsoft.AspNetCore.OData.Formatter.MediaType;
+
+/// <summary>
+/// Media type mapping that associates requests for the raw value of binary properties to
+/// the application/octet-stream content type.
+/// </summary>
+public class ODataBinaryValueMediaTypeMapping : ODataRawValueMediaTypeMapping
 {
     /// <summary>
-    /// Media type mapping that associates requests for the raw value of binary properties to
-    /// the application/octet-stream content type.
+    /// Initializes a new instance of the <see cref="ODataBinaryValueMediaTypeMapping"/> class.
     /// </summary>
-    public class ODataBinaryValueMediaTypeMapping : ODataRawValueMediaTypeMapping
+    public ODataBinaryValueMediaTypeMapping()
+        : base("application/octet-stream")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataBinaryValueMediaTypeMapping"/> class.
-        /// </summary>
-        public ODataBinaryValueMediaTypeMapping()
-            : base("application/octet-stream")
-        {
-        }
+    }
 
-        /// <inheritdoc/>
-        protected override bool IsMatch(PropertySegment propertySegment)
-        {
-            return propertySegment != null && propertySegment.Property.Type.IsBinary();
-        }
+    /// <inheritdoc/>
+    protected override bool IsMatch(PropertySegment propertySegment)
+    {
+        return propertySegment != null && propertySegment.Property.Type.IsBinary();
     }
 }

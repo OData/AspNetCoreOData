@@ -7,16 +7,15 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.Formatter.MediaType
+namespace Microsoft.AspNetCore.OData.Formatter.MediaType;
+
+/// <summary>
+/// An interface that defines a property to access a collection of <see cref="MediaTypeMapping"/> objects.
+/// </summary>
+interface IMediaTypeMappingCollection
 {
     /// <summary>
-    /// An interface that defines a property to access a collection of <see cref="MediaTypeMapping"/> objects.
+    /// Gets a collection of <see cref="MediaTypeMapping"/> objects.
     /// </summary>
-    interface IMediaTypeMappingCollection
-    {
-        /// <summary>
-        /// Gets a collection of <see cref="MediaTypeMapping"/> objects.
-        /// </summary>
-        ICollection<MediaTypeMapping> MediaTypeMappings { get; }
-    }
+    ICollection<MediaTypeMapping> MediaTypeMappings { get; }
 }

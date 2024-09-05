@@ -15,116 +15,115 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Formatter.Deserialization;
+
+/// <summary>
+/// The default <see cref="IODataDeserializerProvider"/>.
+/// </summary>
+public class ODataDeserializerProvider: IODataDeserializerProvider
 {
+    private readonly IServiceProvider _serviceProvider;
+
     /// <summary>
-    /// The default <see cref="IODataDeserializerProvider"/>.
+    /// Initializes a new instance of the <see cref="ODataDeserializerProvider"/> class.
     /// </summary>
-    public class ODataDeserializerProvider: IODataDeserializerProvider
+    /// <param name="serviceProvider">The service provider.</param>
+    public ODataDeserializerProvider(IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataDeserializerProvider"/> class.
-        /// </summary>
-        /// <param name="serviceProvider">The service provider.</param>
-        public ODataDeserializerProvider(IServiceProvider serviceProvider)
+    /// <inheritdoc />
+    public virtual IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
+    {
+        if (edmType == null)
         {
-            _serviceProvider = serviceProvider ?? throw Error.ArgumentNull(nameof(serviceProvider));
+            throw Error.ArgumentNull(nameof(edmType));
         }
 
-        /// <inheritdoc />
-        public virtual IODataEdmTypeDeserializer GetEdmTypeDeserializer(IEdmTypeReference edmType, bool isDelta = false)
+        switch (edmType.TypeKind())
         {
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull(nameof(edmType));
-            }
+            case EdmTypeKind.Entity:
+            case EdmTypeKind.Complex:
+            case EdmTypeKind.Untyped:
+                return _serviceProvider.GetRequiredService<ODataResourceDeserializer>();
 
-            switch (edmType.TypeKind())
-            {
-                case EdmTypeKind.Entity:
-                case EdmTypeKind.Complex:
-                case EdmTypeKind.Untyped:
-                    return _serviceProvider.GetRequiredService<ODataResourceDeserializer>();
+            case EdmTypeKind.Enum:
+                return _serviceProvider.GetRequiredService<ODataEnumDeserializer>();
 
-                case EdmTypeKind.Enum:
-                    return _serviceProvider.GetRequiredService<ODataEnumDeserializer>();
+            case EdmTypeKind.Primitive:
+                return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
 
-                case EdmTypeKind.Primitive:
-                    return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
+            case EdmTypeKind.Collection:
+                if (isDelta)
+                {
+                    return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+                }
 
-                case EdmTypeKind.Collection:
-                    if (isDelta)
-                    {
-                        return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
-                    }
+                IEdmTypeReference elementType = edmType.AsCollection().ElementType();
+                if (elementType.IsEntity() || elementType.IsComplex() || elementType.IsUntyped())
+                {
+                    return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
+                }
+                else
+                {
+                    return _serviceProvider.GetRequiredService<ODataCollectionDeserializer>();
+                }
 
-                    IEdmTypeReference elementType = edmType.AsCollection().ElementType();
-                    if (elementType.IsEntity() || elementType.IsComplex() || elementType.IsUntyped())
-                    {
-                        return _serviceProvider.GetRequiredService<ODataResourceSetDeserializer>();
-                    }
-                    else
-                    {
-                        return _serviceProvider.GetRequiredService<ODataCollectionDeserializer>();
-                    }
-
-                default:
-                    return null;
-            }
-        }
-
-        /// <inheritdoc />
-        public virtual IODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
-        {
-            if (type == null)
-            {
-                throw Error.ArgumentNull(nameof(type));
-            }
-
-            if (request == null)
-            {
-                throw Error.ArgumentNull(nameof(request));
-            }
-
-            if (type == typeof(Uri))
-            {
-                return _serviceProvider.GetRequiredService<ODataEntityReferenceLinkDeserializer>();
-            }
-
-            if (type == typeof(ODataActionParameters) || type == typeof(ODataUntypedActionParameters))
-            {
-                return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
-            }
-
-            if (IsDelta(type))
-            {
-                return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
-            }
-
-            IEdmModel model = request.GetModel();
-            IEdmTypeReference edmType = model.GetEdmTypeReference(type);
-
-            if (edmType == null)
-            {
+            default:
                 return null;
-            }
-            else
-            {
-                return GetEdmTypeDeserializer(edmType);
-            }
         }
+    }
 
-        private static bool IsDelta(Type type)
+    /// <inheritdoc />
+    public virtual IODataDeserializer GetODataDeserializer(Type type, HttpRequest request)
+    {
+        if (type == null)
         {
-            if (type == typeof(EdmChangedObjectCollection) ||
-                (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
-            {
-                return true;
-            }
-
-            return false;
+            throw Error.ArgumentNull(nameof(type));
         }
+
+        if (request == null)
+        {
+            throw Error.ArgumentNull(nameof(request));
+        }
+
+        if (type == typeof(Uri))
+        {
+            return _serviceProvider.GetRequiredService<ODataEntityReferenceLinkDeserializer>();
+        }
+
+        if (type == typeof(ODataActionParameters) || type == typeof(ODataUntypedActionParameters))
+        {
+            return _serviceProvider.GetRequiredService<ODataActionPayloadDeserializer>();
+        }
+
+        if (IsDelta(type))
+        {
+            return _serviceProvider.GetRequiredService<ODataDeltaResourceSetDeserializer>();
+        }
+
+        IEdmModel model = request.GetModel();
+        IEdmTypeReference edmType = model.GetEdmTypeReference(type);
+
+        if (edmType == null)
+        {
+            return null;
+        }
+        else
+        {
+            return GetEdmTypeDeserializer(edmType);
+        }
+    }
+
+    private static bool IsDelta(Type type)
+    {
+        if (type == typeof(EdmChangedObjectCollection) ||
+            (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(DeltaSet<>)))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

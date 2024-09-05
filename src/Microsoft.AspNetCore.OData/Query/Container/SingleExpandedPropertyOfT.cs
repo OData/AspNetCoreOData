@@ -5,15 +5,14 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Query.Container
-{
-    internal class SingleExpandedProperty<T> : NamedProperty<T>
-    {
-        public bool IsNull { get; set; }
+namespace Microsoft.AspNetCore.OData.Query.Container;
 
-        public override object GetValue()
-        {
-            return IsNull ? (object)null : Value;
-        }
+internal class SingleExpandedProperty<T> : NamedProperty<T>
+{
+    public bool IsNull { get; set; }
+
+    public override object GetValue()
+    {
+        return IsNull ? (object)null : Value;
     }
 }

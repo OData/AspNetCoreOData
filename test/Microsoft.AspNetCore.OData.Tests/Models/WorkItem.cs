@@ -5,24 +5,23 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class WorkItem
 {
-    public class WorkItem
-    {
-        //Automatically is made Key
-        public int ID { get; set; }
+    //Automatically is made Key
+    public int ID { get; set; }
 
-        public int EmployeeID { get; set; }
+    public int EmployeeID { get; set; }
 
-        public bool IsCompleted { get; set; }
+    public bool IsCompleted { get; set; }
 
-        public float NumberOfHours { get; set; }
+    public float NumberOfHours { get; set; }
 
-        public int Field;
-    }
+    public int Field;
+}
 
-    // Used as a type on which keys can be explicitly set
-    public class DerivedWorkItem : WorkItem
-    {
-    }
+// Used as a type on which keys can be explicitly set
+public class DerivedWorkItem : WorkItem
+{
 }

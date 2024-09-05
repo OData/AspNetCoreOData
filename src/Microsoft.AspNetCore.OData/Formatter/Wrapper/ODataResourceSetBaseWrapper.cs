@@ -7,12 +7,11 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
+namespace Microsoft.AspNetCore.OData.Formatter.Wrapper;
+
+/// <summary>
+/// Encapsulates an <see cref="ODataResourceSetBase"/> and the <see cref="ODataResourceBase"/>'s that are part of it.
+/// </summary>
+public abstract class ODataResourceSetBaseWrapper : ODataItemWrapper
 {
-    /// <summary>
-    /// Encapsulates an <see cref="ODataResourceSetBase"/> and the <see cref="ODataResourceBase"/>'s that are part of it.
-    /// </summary>
-    public abstract class ODataResourceSetBaseWrapper : ODataItemWrapper
-    {
-    }
 }

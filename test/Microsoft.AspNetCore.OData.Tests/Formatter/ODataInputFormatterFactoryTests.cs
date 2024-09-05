@@ -21,25 +21,95 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter
+namespace Microsoft.AspNetCore.OData.Tests.Formatter;
+
+public class ODataInputFormatterFactoryTests
 {
-    public class ODataInputFormatterFactoryTests
+    private static IEdmModel _edmModel = GetEdmModel();
+    private static IList<ODataInputFormatter> _formatters = ODataInputFormatterFactory.Create();
+
+    [Fact]
+    public void CreateReturnsCorrectInputFormattersCount()
     {
-        private static IEdmModel _edmModel = GetEdmModel();
-        private static IList<ODataInputFormatter> _formatters = ODataInputFormatterFactory.Create();
+        // Arrange & Act & Assert
+        Assert.Equal(3, _formatters.Count);
+    }
 
-        [Fact]
-        public void CreateReturnsCorrectInputFormattersCount()
+    [Fact]
+    public void ODataInputFormattersContainsSupportedMediaTypes()
+    {
+        // Arrange
+        string[] expectedMediaTypes = new string[]
         {
-            // Arrange & Act & Assert
-            Assert.Equal(3, _formatters.Count);
-        }
+            "application/json;odata.metadata=minimal;odata.streaming=true",
+            "application/json;odata.metadata=minimal;odata.streaming=false",
+            "application/json;odata.metadata=minimal",
+            "application/json;odata.metadata=full;odata.streaming=true",
+            "application/json;odata.metadata=full;odata.streaming=false",
+            "application/json;odata.metadata=full",
+            "application/json;odata.metadata=none;odata.streaming=true",
+            "application/json;odata.metadata=none;odata.streaming=false",
+            "application/json;odata.metadata=none",
+            "application/json;odata.streaming=true",
+            "application/json;odata.streaming=false",
+            "application/json",
+            "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=false",
+            "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=true",
+            "application/json;odata.metadata=minimal;odata.streaming=false;IEEE754Compatible=false",
+            "application/json;odata.metadata=minimal;odata.streaming=false;IEEE754Compatible=true",
+            "application/json;odata.metadata=minimal;IEEE754Compatible=false",
+            "application/json;odata.metadata=minimal;IEEE754Compatible=true",
+            "application/json;odata.metadata=full;odata.streaming=true;IEEE754Compatible=false",
+            "application/json;odata.metadata=full;odata.streaming=true;IEEE754Compatible=true",
+            "application/json;odata.metadata=full;odata.streaming=false;IEEE754Compatible=false",
+            "application/json;odata.metadata=full;odata.streaming=false;IEEE754Compatible=true",
+            "application/json;odata.metadata=full;IEEE754Compatible=false",
+            "application/json;odata.metadata=full;IEEE754Compatible=true",
+            "application/json;odata.metadata=none;odata.streaming=true;IEEE754Compatible=false",
+            "application/json;odata.metadata=none;odata.streaming=true;IEEE754Compatible=true",
+            "application/json;odata.metadata=none;odata.streaming=false;IEEE754Compatible=true",
+            "application/json;odata.metadata=none;odata.streaming=false;IEEE754Compatible=false",
+            "application/json;odata.metadata=none;IEEE754Compatible=false",
+            "application/json;odata.metadata=none;IEEE754Compatible=true",
+            "application/json;odata.streaming=true;IEEE754Compatible=false",
+            "application/json;odata.streaming=true;IEEE754Compatible=true",
+            "application/json;odata.streaming=false;IEEE754Compatible=false",
+            "application/json;odata.streaming=false;IEEE754Compatible=true",
+            "application/json;IEEE754Compatible=false",
+            "application/json;IEEE754Compatible=true",
+            "application/xml",
+            "text/plain"
+        };
 
-        [Fact]
-        public void ODataInputFormattersContainsSupportedMediaTypes()
+        // Act
+        IEnumerable<string> supportedMediaTypes = _formatters.SelectMany(f => f.SupportedMediaTypes).Distinct();
+
+        // Assert
+        Assert.True(expectedMediaTypes.SequenceEqual(supportedMediaTypes));
+    }
+
+    [Fact]
+    public void ODataInputFormattersContainsSupportedEncodings()
+    {
+        // Arrange
+        string[] expectedEncodings = new string[]
         {
-            // Arrange
-            string[] expectedMediaTypes = new string[]
+            "Unicode (UTF-8)",
+            "Unicode"
+        };
+
+        // Act
+        IEnumerable<string> supportedEncodings = _formatters.SelectMany(f => f.SupportedEncodings).Distinct().Select(c => c.EncodingName);
+
+        // Assert
+        Assert.True(expectedEncodings.SequenceEqual(supportedEncodings));
+    }
+
+    public static TheoryDataSet<Type, string[]> InputFormatterSupportedMediaTypesTests
+    {
+        get
+        {
+            string[] applicationJsonMediaTypes = new[]
             {
                 "application/json;odata.metadata=minimal;odata.streaming=true",
                 "application/json;odata.metadata=minimal;odata.streaming=false",
@@ -76,127 +146,56 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                 "application/json;odata.streaming=false;IEEE754Compatible=false",
                 "application/json;odata.streaming=false;IEEE754Compatible=true",
                 "application/json;IEEE754Compatible=false",
-                "application/json;IEEE754Compatible=true",
-                "application/xml",
-                "text/plain"
+                "application/json;IEEE754Compatible=true"
             };
 
-            // Act
-            IEnumerable<string> supportedMediaTypes = _formatters.SelectMany(f => f.SupportedMediaTypes).Distinct();
-
-            // Assert
-            Assert.True(expectedMediaTypes.SequenceEqual(supportedMediaTypes));
-        }
-
-        [Fact]
-        public void ODataInputFormattersContainsSupportedEncodings()
-        {
-            // Arrange
-            string[] expectedEncodings = new string[]
+            return new TheoryDataSet<Type, string[]>
             {
-                "Unicode (UTF-8)",
-                "Unicode"
+                { typeof(SampleType), applicationJsonMediaTypes },
+                { typeof(Uri), applicationJsonMediaTypes },
+                { typeof(ODataActionParameters), applicationJsonMediaTypes }
             };
-
-            // Act
-            IEnumerable<string> supportedEncodings = _formatters.SelectMany(f => f.SupportedEncodings).Distinct().Select(c => c.EncodingName);
-
-            // Assert
-            Assert.True(expectedEncodings.SequenceEqual(supportedEncodings));
         }
+    }
 
-        public static TheoryDataSet<Type, string[]> InputFormatterSupportedMediaTypesTests
-        {
-            get
-            {
-                string[] applicationJsonMediaTypes = new[]
-                {
-                    "application/json;odata.metadata=minimal;odata.streaming=true",
-                    "application/json;odata.metadata=minimal;odata.streaming=false",
-                    "application/json;odata.metadata=minimal",
-                    "application/json;odata.metadata=full;odata.streaming=true",
-                    "application/json;odata.metadata=full;odata.streaming=false",
-                    "application/json;odata.metadata=full",
-                    "application/json;odata.metadata=none;odata.streaming=true",
-                    "application/json;odata.metadata=none;odata.streaming=false",
-                    "application/json;odata.metadata=none",
-                    "application/json;odata.streaming=true",
-                    "application/json;odata.streaming=false",
-                    "application/json",
-                    "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=false",
-                    "application/json;odata.metadata=minimal;odata.streaming=true;IEEE754Compatible=true",
-                    "application/json;odata.metadata=minimal;odata.streaming=false;IEEE754Compatible=false",
-                    "application/json;odata.metadata=minimal;odata.streaming=false;IEEE754Compatible=true",
-                    "application/json;odata.metadata=minimal;IEEE754Compatible=false",
-                    "application/json;odata.metadata=minimal;IEEE754Compatible=true",
-                    "application/json;odata.metadata=full;odata.streaming=true;IEEE754Compatible=false",
-                    "application/json;odata.metadata=full;odata.streaming=true;IEEE754Compatible=true",
-                    "application/json;odata.metadata=full;odata.streaming=false;IEEE754Compatible=false",
-                    "application/json;odata.metadata=full;odata.streaming=false;IEEE754Compatible=true",
-                    "application/json;odata.metadata=full;IEEE754Compatible=false",
-                    "application/json;odata.metadata=full;IEEE754Compatible=true",
-                    "application/json;odata.metadata=none;odata.streaming=true;IEEE754Compatible=false",
-                    "application/json;odata.metadata=none;odata.streaming=true;IEEE754Compatible=true",
-                    "application/json;odata.metadata=none;odata.streaming=false;IEEE754Compatible=true",
-                    "application/json;odata.metadata=none;odata.streaming=false;IEEE754Compatible=false",
-                    "application/json;odata.metadata=none;IEEE754Compatible=false",
-                    "application/json;odata.metadata=none;IEEE754Compatible=true",
-                    "application/json;odata.streaming=true;IEEE754Compatible=false",
-                    "application/json;odata.streaming=true;IEEE754Compatible=true",
-                    "application/json;odata.streaming=false;IEEE754Compatible=false",
-                    "application/json;odata.streaming=false;IEEE754Compatible=true",
-                    "application/json;IEEE754Compatible=false",
-                    "application/json;IEEE754Compatible=true"
-                };
+    [Theory]
+    [MemberData(nameof(InputFormatterSupportedMediaTypesTests))]
+    public void ODataInputFormattersForReadTypeReturnsSupportedMediaTypes(Type type, string[] expectedMediaTypes)
+    {
+        // Arrange
+        HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", _edmModel));
+        request.Configure("odata", _edmModel, new ODataPath());
 
-                return new TheoryDataSet<Type, string[]>
-                {
-                    { typeof(SampleType), applicationJsonMediaTypes },
-                    { typeof(Uri), applicationJsonMediaTypes },
-                    { typeof(ODataActionParameters), applicationJsonMediaTypes }
-                };
-            }
-        }
+        IEnumerable<ODataInputFormatter> odataFormatters = _formatters.Where(f => CanReadType(f, type, request));
 
-        [Theory]
-        [MemberData(nameof(InputFormatterSupportedMediaTypesTests))]
-        public void ODataInputFormattersForReadTypeReturnsSupportedMediaTypes(Type type, string[] expectedMediaTypes)
-        {
-            // Arrange
-            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", _edmModel));
-            request.Configure("odata", _edmModel, new ODataPath());
+        // Act
+        IEnumerable<string> supportedMediaTypes = odataFormatters.SelectMany(f => f.SupportedMediaTypes).Distinct();
 
-            IEnumerable<ODataInputFormatter> odataFormatters = _formatters.Where(f => CanReadType(f, type, request));
+        // Assert
+        Assert.True(expectedMediaTypes.SequenceEqual(supportedMediaTypes));
+    }
 
-            // Act
-            IEnumerable<string> supportedMediaTypes = odataFormatters.SelectMany(f => f.SupportedMediaTypes).Distinct();
+    private static IEdmModel GetEdmModel()
+    {
+        ODataConventionModelBuilder model = new ODataConventionModelBuilder();
+        model.EntityType<SampleType>();
+        return model.GetEdmModel();
+    }
 
-            // Assert
-            Assert.True(expectedMediaTypes.SequenceEqual(supportedMediaTypes));
-        }
+    private static bool CanReadType(ODataInputFormatter formatter, Type type, HttpRequest request)
+    {
+        InputFormatterContext context = new InputFormatterContext(
+            request.HttpContext,
+            "modelName",
+            new ModelStateDictionary(),
+            new EmptyModelMetadataProvider().GetMetadataForType(type),
+            (stream, encoding) => new StreamReader(stream, encoding));
 
-        private static IEdmModel GetEdmModel()
-        {
-            ODataConventionModelBuilder model = new ODataConventionModelBuilder();
-            model.EntityType<SampleType>();
-            return model.GetEdmModel();
-        }
+        return formatter.CanRead(context);
+    }
 
-        private static bool CanReadType(ODataInputFormatter formatter, Type type, HttpRequest request)
-        {
-            InputFormatterContext context = new InputFormatterContext(
-                request.HttpContext,
-                "modelName",
-                new ModelStateDictionary(),
-                new EmptyModelMetadataProvider().GetMetadataForType(type),
-                (stream, encoding) => new StreamReader(stream, encoding));
-
-            return formatter.CanRead(context);
-        }
-
-        private class SampleType
-        {
-            public int Id { get; set; }
-        }
+    private class SampleType
+    {
+        public int Id { get; set; }
     }
 }

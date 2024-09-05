@@ -5,13 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Query.Container
+namespace Microsoft.AspNetCore.OData.Query.Container;
+
+internal class AutoSelectedNamedProperty<T> : NamedProperty<T>
 {
-    internal class AutoSelectedNamedProperty<T> : NamedProperty<T>
+    public AutoSelectedNamedProperty()
     {
-        public AutoSelectedNamedProperty()
-        {
-            AutoSelected = true;
-        }
+        AutoSelected = true;
     }
 }

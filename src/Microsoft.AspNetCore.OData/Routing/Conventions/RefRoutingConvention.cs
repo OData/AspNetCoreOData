@@ -15,267 +15,266 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Routing.Conventions
+namespace Microsoft.AspNetCore.OData.Routing.Conventions;
+
+/// <summary>
+/// An implementation of <see cref="IODataControllerActionConvention"/> that handles entity reference manipulations.
+/// Conventions:
+/// GET|DELETE ~/entityset/key/navigationproperty/$ref
+/// GET|POST|PUT|DELETE ~/entityset/key/navigationproperty/key/$ref
+/// GET|POST|PUT|DELETE ~/entityset/key/cast/navigationproperty/key/$ref
+/// </summary>
+public class RefRoutingConvention : IODataControllerActionConvention
 {
-    /// <summary>
-    /// An implementation of <see cref="IODataControllerActionConvention"/> that handles entity reference manipulations.
-    /// Conventions:
-    /// GET|DELETE ~/entityset/key/navigationproperty/$ref
-    /// GET|POST|PUT|DELETE ~/entityset/key/navigationproperty/key/$ref
-    /// GET|POST|PUT|DELETE ~/entityset/key/cast/navigationproperty/key/$ref
-    /// </summary>
-    public class RefRoutingConvention : IODataControllerActionConvention
+    /// <inheritdoc />
+    public virtual int Order => 1000;
+
+    /// <inheritdoc />
+    public virtual bool AppliesToController(ODataControllerActionContext context)
     {
-        /// <inheritdoc />
-        public virtual int Order => 1000;
-
-        /// <inheritdoc />
-        public virtual bool AppliesToController(ODataControllerActionContext context)
+        if (context == null)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            // $ref supports for entity set and singleton
-            return context.NavigationSource != null;
+            throw Error.ArgumentNull(nameof(context));
         }
 
-        /// <inheritdoc />
-        public bool AppliesToAction(ODataControllerActionContext context)
+        // $ref supports for entity set and singleton
+        return context.NavigationSource != null;
+    }
+
+    /// <inheritdoc />
+    public bool AppliesToAction(ODataControllerActionContext context)
+    {
+        if (context == null)
         {
-            if (context == null)
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        Debug.Assert(context.Action != null);
+
+        ActionModel action = context.Action;
+        string actionMethodName = action.ActionName;
+
+        // Need to refactor the following
+        // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
+        // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
+        string method = SplitRefActionName(actionMethodName, out string httpMethod, out string property, out string declaring);
+        if (method == null || (property != null && property.Length == 0))
+        {
+            // Early return for the following cases: Get|Create|DeleteRefTo
+            return false;
+        }
+
+        IEdmNavigationSource navigationSource = context.NavigationSource;
+        IEdmEntityType entityType = context.EntityType;
+
+        // For entity set, we should have the key parameter
+        // For Singleton, we should not have the key parameter
+        bool hasODataKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
+        if ((context.EntitySet != null && !hasODataKeyParameter) ||
+            (context.Singleton != null && hasODataKeyParameter))
+        {
+            return false;
+        }
+
+        // Find the navigation property declaring type
+        IEdmStructuredType declaringType = entityType;
+        if (declaring != null)
+        {
+            if (declaring.Length == 0)
             {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            Debug.Assert(context.Action != null);
-
-            ActionModel action = context.Action;
-            string actionMethodName = action.ActionName;
-
-            // Need to refactor the following
-            // for example:  CreateRef( with the navigation property parameter) should for all navigation properties
-            // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
-            string method = SplitRefActionName(actionMethodName, out string httpMethod, out string property, out string declaring);
-            if (method == null || (property != null && property.Length == 0))
-            {
-                // Early return for the following cases: Get|Create|DeleteRefTo
+                // Early return for the following cases: Get|Create|DeleteRefTo{NavigationProperty}From
                 return false;
             }
 
-            IEdmNavigationSource navigationSource = context.NavigationSource;
-            IEdmEntityType entityType = context.EntityType;
-
-            // For entity set, we should have the key parameter
-            // For Singleton, we should not have the key parameter
-            bool hasODataKeyParameter = action.HasODataKeyParameter(entityType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false);
-            if ((context.EntitySet != null && !hasODataKeyParameter) ||
-                (context.Singleton != null && hasODataKeyParameter))
+            declaringType = entityType.FindTypeInInheritance(context.Model, declaring);
+            if (declaringType == null)
             {
                 return false;
             }
+        }
 
-            // Find the navigation property declaring type
-            IEdmStructuredType declaringType = entityType;
-            if (declaring != null)
+        // Process the generic scenario
+        if (property == null)
+        {
+            return ProcessNonNavigationProperty(httpMethod, context, action, navigationSource, entityType, declaringType);
+        }
+
+        // Find the navigation property if have
+        IEdmNavigationProperty navigationProperty = null;
+        navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name.Equals(property, StringComparison.Ordinal));
+
+        if (navigationProperty is null && (context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))
+        {
+            IEdmNavigationProperty[] navigationProperties = declaringType.DeclaredNavigationProperties().Where(p => p.Name.Equals(property, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (navigationProperties.Length > 1)
             {
-                if (declaring.Length == 0)
-                {
-                    // Early return for the following cases: Get|Create|DeleteRefTo{NavigationProperty}From
-                    return false;
-                }
-
-                declaringType = entityType.FindTypeInInheritance(context.Model, declaring);
-                if (declaringType == null)
-                {
-                    return false;
-                }
+                throw Error.InvalidOperation(SRResources.UnableToIdentifyUniqueProperty, property);
             }
 
-            // Process the generic scenario
-            if (property == null)
-            {
-                return ProcessNonNavigationProperty(httpMethod, context, action, navigationSource, entityType, declaringType);
-            }
+            navigationProperty = navigationProperties.FirstOrDefault();
+        }
 
-            // Find the navigation property if have
-            IEdmNavigationProperty navigationProperty = null;
-            navigationProperty = declaringType.DeclaredNavigationProperties().FirstOrDefault(p => p.Name.Equals(property, StringComparison.Ordinal));
+        if (navigationProperty == null)
+        {
+            return false;
+        }
 
-            if (navigationProperty is null && (context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false))
-            {
-                IEdmNavigationProperty[] navigationProperties = declaringType.DeclaredNavigationProperties().Where(p => p.Name.Equals(property, StringComparison.OrdinalIgnoreCase)).ToArray();
-                if (navigationProperties.Length > 1)
-                {
-                    throw Error.InvalidOperation(SRResources.UnableToIdentifyUniqueProperty, property);
-                }
+        IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+        if (context.EntitySet != null)
+        {
+            segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+            segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, context.EntitySet));
+        }
+        else
+        {
+            segments.Add(new SingletonSegmentTemplate(context.Singleton));
+        }
 
-                navigationProperty = navigationProperties.FirstOrDefault();
-            }
+        if (entityType != declaringType)
+        {
+            segments.Add(new CastSegmentTemplate(declaringType, entityType, navigationSource));
+        }
 
-            if (navigationProperty == null)
-            {
-                return false;
-            }
+        IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
+        NavigationLinkSegmentTemplate linkTemplate = new NavigationLinkSegmentTemplate(navigationProperty, targetNavigationSource);
 
-            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-            if (context.EntitySet != null)
-            {
-                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, context.EntitySet));
-            }
-            else
-            {
-                segments.Add(new SingletonSegmentTemplate(context.Singleton));
-            }
-
-            if (entityType != declaringType)
-            {
-                segments.Add(new CastSegmentTemplate(declaringType, entityType, navigationSource));
-            }
-
-            IEdmNavigationSource targetNavigationSource = navigationSource.FindNavigationTarget(navigationProperty, segments, out _);
-            NavigationLinkSegmentTemplate linkTemplate = new NavigationLinkSegmentTemplate(navigationProperty, targetNavigationSource);
-
-            IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
-            bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedKey");
+        IEdmEntityType navigationPropertyType = navigationProperty.Type.GetElementTypeOrSelf().AsEntity().EntityDefinition();
+        bool hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedKey");
+        if (hasNavigationPropertyKeyParameter)
+        {
+            linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey");
+        }
+        else
+        {
+            hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedId");
             if (hasNavigationPropertyKeyParameter)
             {
-                linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedKey");
+                linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedId");
             }
-            else
-            {
-                hasNavigationPropertyKeyParameter = action.HasODataKeyParameter(navigationPropertyType, context.Options?.RouteOptions?.EnablePropertyNameCaseInsensitive ?? false, "relatedId");
-                if (hasNavigationPropertyKeyParameter)
-                {
-                    linkTemplate.Key = KeySegmentTemplate.CreateKeySegment(navigationPropertyType, targetNavigationSource, "relatedId");
-                }
-            }
-
-            segments.Add(linkTemplate);
-
-            ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
-
-            // processed
-            return true;
         }
 
-        internal static bool ProcessNonNavigationProperty(string httpMethod, ODataControllerActionContext context,
-            ActionModel action,
-            IEdmNavigationSource navigationSource,
-            IEdmEntityType entityType, IEdmStructuredType castType)
+        segments.Add(linkTemplate);
+
+        ODataPathTemplate template = new ODataPathTemplate(segments);
+        action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
+
+        // processed
+        return true;
+    }
+
+    internal static bool ProcessNonNavigationProperty(string httpMethod, ODataControllerActionContext context,
+        ActionModel action,
+        IEdmNavigationSource navigationSource,
+        IEdmEntityType entityType, IEdmStructuredType castType)
+    {
+        // Action parameter should have a (string navigationProperty) parameter
+        if (!action.HasParameter<string>("navigationProperty"))
         {
-            // Action parameter should have a (string navigationProperty) parameter
-            if (!action.HasParameter<string>("navigationProperty"))
-            {
-                return false;
-            }
-
-            // Let's only handle single-key convention, for composite key, use attribute routing or non-generic navigation.
-            bool hasRelatedKey = action.Parameters.Any(p => p.Name == "relatedKey"); // case sensitive?
-            bool hasRelatedId = action.Parameters.Any(p => p.Name == "relatedId");
-
-            IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
-            if (context.EntitySet != null)
-            {
-                segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
-                segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, context.EntitySet));
-            }
-            else
-            {
-                segments.Add(new SingletonSegmentTemplate(context.Singleton));
-            }
-
-            if (entityType != castType)
-            {
-                segments.Add(new CastSegmentTemplate(castType, entityType, navigationSource));
-            }
-
-            if (hasRelatedKey)
-            {
-                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
-                {
-                    RelatedKey = "relatedKey"
-                });
-            }
-            else if (hasRelatedId)
-            {
-                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
-                {
-                    RelatedKey = "relatedId"
-                });
-            }
-            else
-            {
-                segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource));
-            }
-
-            ODataPathTemplate template = new ODataPathTemplate(segments);
-            action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
-
-            return true;
+            return false;
         }
 
-        internal static string SplitRefActionName(string actionName, out string httpMethod, out string property, out string declaring)
+        // Let's only handle single-key convention, for composite key, use attribute routing or non-generic navigation.
+        bool hasRelatedKey = action.Parameters.Any(p => p.Name == "relatedKey"); // case sensitive?
+        bool hasRelatedId = action.Parameters.Any(p => p.Name == "relatedId");
+
+        IList<ODataSegmentTemplate> segments = new List<ODataSegmentTemplate>();
+        if (context.EntitySet != null)
         {
-            string method;
-            httpMethod = null;
-            property = null;
-            declaring = null;
-            string remaining;
+            segments.Add(new EntitySetSegmentTemplate(context.EntitySet));
+            segments.Add(KeySegmentTemplate.CreateKeySegment(entityType, context.EntitySet));
+        }
+        else
+        {
+            segments.Add(new SingletonSegmentTemplate(context.Singleton));
+        }
 
-            // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
-            if (actionName.StartsWith("CreateRef", StringComparison.Ordinal))
-            {
-                method = "CreateRef";
-                httpMethod = "Post,Put";
-                remaining = actionName.Substring(9);
-            }
-            else if (actionName.StartsWith("GetRef", StringComparison.Ordinal))
-            {
-                method = "GetRef";
-                httpMethod = "Get";
-                remaining = actionName.Substring(6);
-            }
-            else if (actionName.StartsWith("DeleteRef", StringComparison.Ordinal))
-            {
-                method = "DeleteRef";
-                httpMethod = "Delete";
-                remaining = actionName.Substring(9);
-            }
-            else
-            {
-                return null;
-            }
+        if (entityType != castType)
+        {
+            segments.Add(new CastSegmentTemplate(castType, entityType, navigationSource));
+        }
 
-            if (string.IsNullOrEmpty(remaining))
+        if (hasRelatedKey)
+        {
+            segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
             {
-                return method;
-            }
+                RelatedKey = "relatedKey"
+            });
+        }
+        else if (hasRelatedId)
+        {
+            segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource)
+            {
+                RelatedKey = "relatedId"
+            });
+        }
+        else
+        {
+            segments.Add(new NavigationLinkTemplateSegmentTemplate(entityType, navigationSource));
+        }
 
-            if (remaining.StartsWith("To", StringComparison.OrdinalIgnoreCase))
-            {
-                remaining = remaining.Substring(2);
-            }
-            else
-            {
-                return null;
-            }
+        ODataPathTemplate template = new ODataPathTemplate(segments);
+        action.AddSelector(httpMethod, context.Prefix, context.Model, template, context.Options?.RouteOptions);
 
-            int index = remaining.IndexOf("From", StringComparison.OrdinalIgnoreCase);
-            if (index > 0)
-            {
-                property = remaining.Substring(0, index);
-                declaring = remaining.Substring(index + 4);
-            }
-            else
-            {
-                property = remaining;
-            }
+        return true;
+    }
 
+    internal static string SplitRefActionName(string actionName, out string httpMethod, out string property, out string declaring)
+    {
+        string method;
+        httpMethod = null;
+        property = null;
+        declaring = null;
+        string remaining;
+
+        // CreateRefToOrdersFromCustomer, CreateRefToOrders, CreateRef.
+        if (actionName.StartsWith("CreateRef", StringComparison.Ordinal))
+        {
+            method = "CreateRef";
+            httpMethod = "Post,Put";
+            remaining = actionName.Substring(9);
+        }
+        else if (actionName.StartsWith("GetRef", StringComparison.Ordinal))
+        {
+            method = "GetRef";
+            httpMethod = "Get";
+            remaining = actionName.Substring(6);
+        }
+        else if (actionName.StartsWith("DeleteRef", StringComparison.Ordinal))
+        {
+            method = "DeleteRef";
+            httpMethod = "Delete";
+            remaining = actionName.Substring(9);
+        }
+        else
+        {
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(remaining))
+        {
             return method;
         }
+
+        if (remaining.StartsWith("To", StringComparison.OrdinalIgnoreCase))
+        {
+            remaining = remaining.Substring(2);
+        }
+        else
+        {
+            return null;
+        }
+
+        int index = remaining.IndexOf("From", StringComparison.OrdinalIgnoreCase);
+        if (index > 0)
+        {
+            property = remaining.Substring(0, index);
+            declaring = remaining.Substring(index + 4);
+        }
+        else
+        {
+            property = remaining;
+        }
+
+        return method;
     }
 }

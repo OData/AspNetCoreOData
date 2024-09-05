@@ -12,305 +12,246 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.ModelBuilder.Config;
 
-namespace Microsoft.AspNetCore.OData.Edm
+namespace Microsoft.AspNetCore.OData.Edm;
+
+/// <summary>
+/// Provides the functionalities related to the Edm type.
+/// </summary>
+internal static class EdmHelpers
 {
-    /// <summary>
-    /// Provides the functionalities related to the Edm type.
-    /// </summary>
-    internal static class EdmHelpers
+    public static IEdmStructuredTypeReference ToStructuredTypeReference(this IEdmTypeReference edmTypeReference)
     {
-        public static IEdmStructuredTypeReference ToStructuredTypeReference(this IEdmTypeReference edmTypeReference)
+        if (edmTypeReference == null)
         {
-            if (edmTypeReference == null)
-            {
-                return null;
-            }
-
-            if (edmTypeReference is IEdmStructuredTypeReference structuredTypeReference)
-            {
-                return structuredTypeReference;
-            }
-
-            if (edmTypeReference.IsUntyped())
-            {
-                return EdmUntypedStructuredTypeReference.NullableTypeReference;
-            }
-
-            return edmTypeReference.AsStructured();
+            return null;
         }
 
-        public static bool IsStructuredOrUntypedStructuredCollection(this IEdmTypeReference edmTypeReference)
+        if (edmTypeReference is IEdmStructuredTypeReference structuredTypeReference)
         {
-            if (edmTypeReference == null)
-            {
-                return false;
-            }
-
-            if (!edmTypeReference.IsCollection())
-            {
-                return false;
-            }
-
-            IEdmTypeReference elementType = edmTypeReference.AsCollection().ElementType();
-
-            return elementType.IsStructuredOrUntypedStructured();
+            return structuredTypeReference;
         }
 
-        public static bool IsStructuredOrUntypedStructured(this IEdmTypeReference edmTypeReference)
+        if (edmTypeReference.IsUntyped())
         {
-            if (edmTypeReference == null)
-            {
-                return false;
-            }
+            return EdmUntypedStructuredTypeReference.NullableTypeReference;
+        }
 
-            if (edmTypeReference.IsStructured())
-            {
-                return true;
-            }
+        return edmTypeReference.AsStructured();
+    }
 
-            if (edmTypeReference.IsUntyped() &&
-                typeof(IEdmStructuredTypeReference).IsAssignableFrom(edmTypeReference.GetType()))
-            {
-                return true;
-            }
-
+    public static bool IsStructuredOrUntypedStructuredCollection(this IEdmTypeReference edmTypeReference)
+    {
+        if (edmTypeReference == null)
+        {
             return false;
         }
 
-        /// <summary>
-        /// Tests whether a <see cref="IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
-        /// </summary>
-        /// <param name="edmTypeReference">The test type reference.</param>
-        /// <returns>True/false.</returns>
-        public static bool IsStructuredOrUntyped(this IEdmTypeReference edmTypeReference)
+        if (!edmTypeReference.IsCollection())
         {
-            IEdmTypeReference elementType = edmTypeReference.IsCollection() ?
-                edmTypeReference.AsCollection().ElementType() :
-                edmTypeReference;
-
-            return elementType.IsUntyped() || elementType.IsStructured();
+            return false;
         }
 
-        /// <summary>
-        /// Tests whether a <see cref="IEdmTypeReference"/> is 'Collection(Edm.Untyped)'.
-        /// </summary>
-        /// <param name="typeReference">The test type reference.</param>
-        /// <returns>True/false.</returns>
-        public static bool IsCollectionUntyped(this IEdmTypeReference typeReference)
+        IEdmTypeReference elementType = edmTypeReference.AsCollection().ElementType();
+
+        return elementType.IsStructuredOrUntypedStructured();
+    }
+
+    public static bool IsStructuredOrUntypedStructured(this IEdmTypeReference edmTypeReference)
+    {
+        if (edmTypeReference == null)
         {
-            return typeReference != null &&
-                typeReference.IsCollection() && typeReference.AsCollection().ElementType().IsUntyped();
+            return false;
         }
 
-        /// <summary>
-        /// Tests whether a <see cref="IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
-        /// </summary>
-        /// <param name="typeReference">The test type reference.</param>
-        /// <returns>True/false</returns>
-        public static bool IsUntypedOrCollectionUntyped(this IEdmTypeReference typeReference)
+        if (edmTypeReference.IsStructured())
         {
-            return typeReference != null &&
-                (typeReference.IsUntyped() ||
-                    (typeReference.IsCollection() && typeReference.AsCollection().ElementType().IsUntyped()));
+            return true;
         }
 
-        /// <summary>
-        /// Get element type reference if it's collection or return itself
-        /// </summary>
-        /// <param name="typeReference">The test type reference.</param>
-        /// <returns>Element type or itself.</returns>
-        public static IEdmTypeReference GetElementTypeOrSelf(this IEdmTypeReference typeReference)
+        if (edmTypeReference.IsUntyped() &&
+            typeof(IEdmStructuredTypeReference).IsAssignableFrom(edmTypeReference.GetType()))
         {
-            if (typeReference == null)
-            {
-                return typeReference;
-            }
+            return true;
+        }
 
-            if (typeReference.TypeKind() == EdmTypeKind.Collection)
-            {
-                IEdmCollectionTypeReference collectType = typeReference.AsCollection();
-                return collectType.ElementType();
-            }
+        return false;
+    }
 
+    /// <summary>
+    /// Tests whether a <see cref="IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
+    /// </summary>
+    /// <param name="edmTypeReference">The test type reference.</param>
+    /// <returns>True/false.</returns>
+    public static bool IsStructuredOrUntyped(this IEdmTypeReference edmTypeReference)
+    {
+        IEdmTypeReference elementType = edmTypeReference.IsCollection() ?
+            edmTypeReference.AsCollection().ElementType() :
+            edmTypeReference;
+
+        return elementType.IsUntyped() || elementType.IsStructured();
+    }
+
+    /// <summary>
+    /// Tests whether a <see cref="IEdmTypeReference"/> is 'Collection(Edm.Untyped)'.
+    /// </summary>
+    /// <param name="typeReference">The test type reference.</param>
+    /// <returns>True/false.</returns>
+    public static bool IsCollectionUntyped(this IEdmTypeReference typeReference)
+    {
+        return typeReference != null &&
+            typeReference.IsCollection() && typeReference.AsCollection().ElementType().IsUntyped();
+    }
+
+    /// <summary>
+    /// Tests whether a <see cref="IEdmTypeReference"/> is 'Edm.Untyped' or 'Collection(Edm.Untyped)'.
+    /// </summary>
+    /// <param name="typeReference">The test type reference.</param>
+    /// <returns>True/false</returns>
+    public static bool IsUntypedOrCollectionUntyped(this IEdmTypeReference typeReference)
+    {
+        return typeReference != null &&
+            (typeReference.IsUntyped() ||
+                (typeReference.IsCollection() && typeReference.AsCollection().ElementType().IsUntyped()));
+    }
+
+    /// <summary>
+    /// Get element type reference if it's collection or return itself
+    /// </summary>
+    /// <param name="typeReference">The test type reference.</param>
+    /// <returns>Element type or itself.</returns>
+    public static IEdmTypeReference GetElementTypeOrSelf(this IEdmTypeReference typeReference)
+    {
+        if (typeReference == null)
+        {
             return typeReference;
         }
 
-        /// <summary>
-        /// Get the elementType if it's collection or return itself
-        /// </summary>
-        /// <param name="edmTypeReference">The test type reference.</param>
-        /// <returns>Element type or itself.</returns>
-        public static IEdmType GetElementType(this IEdmTypeReference edmTypeReference)
+        if (typeReference.TypeKind() == EdmTypeKind.Collection)
         {
-            return edmTypeReference.GetElementTypeOrSelf()?.Definition;
+            IEdmCollectionTypeReference collectType = typeReference.AsCollection();
+            return collectType.ElementType();
         }
 
-        /// <summary>
-        /// Converts the <see cref="IEdmType"/> to <see cref="IEdmCollectionType"/>.
-        /// </summary>
-        /// <param name="edmType">The given Edm type.</param>
-        /// <param name="isNullable">Nullable or not.</param>
-        /// <returns>The collection type.</returns>
-        public static IEdmCollectionType ToCollection(this IEdmType edmType, bool isNullable)
-        {
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull(nameof(edmType));
-            }
+        return typeReference;
+    }
 
-            return new EdmCollectionType(edmType.ToEdmTypeReference(isNullable));
+    /// <summary>
+    /// Get the elementType if it's collection or return itself
+    /// </summary>
+    /// <param name="edmTypeReference">The test type reference.</param>
+    /// <returns>Element type or itself.</returns>
+    public static IEdmType GetElementType(this IEdmTypeReference edmTypeReference)
+    {
+        return edmTypeReference.GetElementTypeOrSelf()?.Definition;
+    }
+
+    /// <summary>
+    /// Converts the <see cref="IEdmType"/> to <see cref="IEdmCollectionType"/>.
+    /// </summary>
+    /// <param name="edmType">The given Edm type.</param>
+    /// <param name="isNullable">Nullable or not.</param>
+    /// <returns>The collection type.</returns>
+    public static IEdmCollectionType ToCollection(this IEdmType edmType, bool isNullable)
+    {
+        if (edmType == null)
+        {
+            throw Error.ArgumentNull(nameof(edmType));
         }
 
-        /// <summary>
-        /// Converts an Edm Type to Edm type reference.
-        /// </summary>
-        /// <param name="edmType">The Edm type.</param>
-        /// <param name="isNullable">Nullable value.</param>
-        /// <returns>The Edm type reference.</returns>
-        public static IEdmTypeReference ToEdmTypeReference(this IEdmType edmType, bool isNullable)
+        return new EdmCollectionType(edmType.ToEdmTypeReference(isNullable));
+    }
+
+    /// <summary>
+    /// Converts an Edm Type to Edm type reference.
+    /// </summary>
+    /// <param name="edmType">The Edm type.</param>
+    /// <param name="isNullable">Nullable value.</param>
+    /// <returns>The Edm type reference.</returns>
+    public static IEdmTypeReference ToEdmTypeReference(this IEdmType edmType, bool isNullable)
+    {
+        if (edmType == null)
         {
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull(nameof(edmType));
-            }
-
-            switch (edmType.TypeKind)
-            {
-                case EdmTypeKind.Collection:
-                    return new EdmCollectionTypeReference((IEdmCollectionType)edmType);
-
-                case EdmTypeKind.Complex:
-                    return new EdmComplexTypeReference((IEdmComplexType)edmType, isNullable);
-
-                case EdmTypeKind.Entity:
-                    return new EdmEntityTypeReference((IEdmEntityType)edmType, isNullable);
-
-                case EdmTypeKind.EntityReference:
-                    return new EdmEntityReferenceTypeReference((IEdmEntityReferenceType)edmType, isNullable);
-
-                case EdmTypeKind.Enum:
-                    return new EdmEnumTypeReference((IEdmEnumType)edmType, isNullable);
-
-                case EdmTypeKind.Primitive:
-                    return EdmCoreModel.Instance.GetPrimitive(((IEdmPrimitiveType)edmType).PrimitiveKind, isNullable);
-
-                case EdmTypeKind.Path:
-                    return new EdmPathTypeReference((IEdmPathType)edmType, isNullable);
-
-                case EdmTypeKind.TypeDefinition:
-                    return new EdmTypeDefinitionReference((IEdmTypeDefinition)edmType, isNullable);
-
-                default:
-                    throw Error.NotSupported(SRResources.EdmTypeNotSupported, edmType.ToTraceString());
-            }
+            throw Error.ArgumentNull(nameof(edmType));
         }
 
-        public static bool IsTopLimitExceeded(IEdmProperty property, IEdmStructuredType structuredType,
-           IEdmModel edmModel, int top, DefaultQueryConfigurations defaultQueryConfigs, out int maxTop)
+        switch (edmType.TypeKind)
         {
-            maxTop = 0;
-            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType, defaultQueryConfigs);
-            if (querySettings != null && top > querySettings.MaxTop)
-            {
-                maxTop = querySettings.MaxTop.Value;
-                return true;
-            }
+            case EdmTypeKind.Collection:
+                return new EdmCollectionTypeReference((IEdmCollectionType)edmType);
 
-            return false;
+            case EdmTypeKind.Complex:
+                return new EdmComplexTypeReference((IEdmComplexType)edmType, isNullable);
+
+            case EdmTypeKind.Entity:
+                return new EdmEntityTypeReference((IEdmEntityType)edmType, isNullable);
+
+            case EdmTypeKind.EntityReference:
+                return new EdmEntityReferenceTypeReference((IEdmEntityReferenceType)edmType, isNullable);
+
+            case EdmTypeKind.Enum:
+                return new EdmEnumTypeReference((IEdmEnumType)edmType, isNullable);
+
+            case EdmTypeKind.Primitive:
+                return EdmCoreModel.Instance.GetPrimitive(((IEdmPrimitiveType)edmType).PrimitiveKind, isNullable);
+
+            case EdmTypeKind.Path:
+                return new EdmPathTypeReference((IEdmPathType)edmType, isNullable);
+
+            case EdmTypeKind.TypeDefinition:
+                return new EdmTypeDefinitionReference((IEdmTypeDefinition)edmType, isNullable);
+
+            default:
+                throw Error.NotSupported(SRResources.EdmTypeNotSupported, edmType.ToTraceString());
+        }
+    }
+
+    public static bool IsTopLimitExceeded(IEdmProperty property, IEdmStructuredType structuredType,
+       IEdmModel edmModel, int top, DefaultQueryConfigurations defaultQueryConfigs, out int maxTop)
+    {
+        maxTop = 0;
+        ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType, defaultQueryConfigs);
+        if (querySettings != null && top > querySettings.MaxTop)
+        {
+            maxTop = querySettings.MaxTop.Value;
+            return true;
         }
 
-        public static bool IsNotCountable(IEdmProperty property, IEdmStructuredType structuredType, IEdmModel edmModel,
-           bool enableCount)
+        return false;
+    }
+
+    public static bool IsNotCountable(IEdmProperty property, IEdmStructuredType structuredType, IEdmModel edmModel,
+       bool enableCount)
+    {
+        if (property != null)
         {
-            if (property != null)
-            {
-                QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(property, edmModel);
-                if (annotation != null && annotation.Restrictions.NotCountable)
-                {
-                    return true;
-                }
-            }
-
-            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType);
-            if (querySettings != null &&
-                ((!querySettings.Countable.HasValue && !enableCount) ||
-                 querySettings.Countable == false))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public static bool IsNotFilterable(IEdmProperty edmProperty, IEdmProperty pathEdmProperty,
-            IEdmStructuredType pathEdmStructuredType,
-            IEdmModel edmModel, bool enableFilter)
-        {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
-            if (annotation != null && annotation.Restrictions.NotFilterable)
+            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(property, edmModel);
+            if (annotation != null && annotation.Restrictions.NotCountable)
             {
                 return true;
             }
-            else
-            {
-                if (pathEdmStructuredType == null)
-                {
-                    pathEdmStructuredType = edmProperty.DeclaringType;
-                }
-
-                ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(pathEdmProperty, pathEdmStructuredType);
-                if (!enableFilter)
-                {
-                    return !querySettings.Filterable(edmProperty.Name);
-                }
-
-                bool enable;
-                if (querySettings.FilterConfigurations.TryGetValue(edmProperty.Name, out enable))
-                {
-                    return !enable;
-                }
-                else
-                {
-                    return querySettings.DefaultEnableFilter == false;
-                }
-            }
         }
 
-        public static bool IsNotSortable(IEdmProperty edmProperty, IEdmProperty pathEdmProperty,
-            IEdmStructuredType pathEdmStructuredType, IEdmModel edmModel, bool enableOrderBy)
+        ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType);
+        if (querySettings != null &&
+            ((!querySettings.Countable.HasValue && !enableCount) ||
+             querySettings.Countable == false))
         {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
-            if (annotation != null && annotation.Restrictions.NotSortable)
-            {
-                return true;
-            }
-            else
-            {
-                if (pathEdmStructuredType == null)
-                {
-                    pathEdmStructuredType = edmProperty.DeclaringType;
-                }
-
-                ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(pathEdmProperty, pathEdmStructuredType);
-                if (!enableOrderBy)
-                {
-                    return !querySettings.Sortable(edmProperty.Name);
-                }
-
-                bool enable;
-                if (querySettings.OrderByConfigurations.TryGetValue(edmProperty.Name, out enable))
-                {
-                    return !enable;
-                }
-                else
-                {
-                    return querySettings.DefaultEnableOrderBy == false;
-                }
-            }
+            return true;
         }
 
-        public static bool IsNotSelectable(IEdmProperty edmProperty, IEdmProperty pathEdmProperty,
-            IEdmStructuredType pathEdmStructuredType, IEdmModel edmModel, bool enableSelect)
+        return false;
+    }
+
+    public static bool IsNotFilterable(IEdmProperty edmProperty, IEdmProperty pathEdmProperty,
+        IEdmStructuredType pathEdmStructuredType,
+        IEdmModel edmModel, bool enableFilter)
+    {
+        QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+        if (annotation != null && annotation.Restrictions.NotFilterable)
+        {
+            return true;
+        }
+        else
         {
             if (pathEdmStructuredType == null)
             {
@@ -318,207 +259,265 @@ namespace Microsoft.AspNetCore.OData.Edm
             }
 
             ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(pathEdmProperty, pathEdmStructuredType);
-            if (!enableSelect)
+            if (!enableFilter)
             {
-                return !querySettings.Selectable(edmProperty.Name);
+                return !querySettings.Filterable(edmProperty.Name);
             }
 
-            SelectExpandType enable;
-            if (querySettings.SelectConfigurations.TryGetValue(edmProperty.Name, out enable))
+            bool enable;
+            if (querySettings.FilterConfigurations.TryGetValue(edmProperty.Name, out enable))
             {
-                return enable == SelectExpandType.Disabled;
-            }
-            else
-            {
-                return querySettings.DefaultSelectType == SelectExpandType.Disabled;
-            }
-        }
-
-        public static bool IsNotNavigable(IEdmProperty edmProperty, IEdmModel edmModel)
-        {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
-            return annotation == null ? false : annotation.Restrictions.NotNavigable;
-        }
-
-        public static bool IsNotExpandable(IEdmProperty edmProperty, IEdmModel edmModel)
-        {
-            QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
-            return annotation == null ? false : annotation.Restrictions.NotExpandable;
-        }
-
-        public static bool IsExpandable(string propertyName, IEdmProperty property, IEdmStructuredType structuredType,
-            IEdmModel edmModel,
-            out ExpandConfiguration expandConfiguration)
-        {
-            expandConfiguration = null;
-            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType);
-            if (querySettings != null)
-            {
-                bool result = querySettings.Expandable(propertyName);
-                if (!querySettings.ExpandConfigurations.TryGetValue(propertyName, out expandConfiguration) && result)
-                {
-                    expandConfiguration = new ExpandConfiguration
-                    {
-                        ExpandType = querySettings.DefaultExpandType.Value,
-                        MaxDepth = querySettings.DefaultMaxDepth
-                    };
-                }
-
-                return result;
-            }
-
-            return false;
-        }
-
-        public static ModelBoundQuerySettings GetModelBoundQuerySettingsOrNull(this IEdmModel edmModel, IEdmStructuredType structuredType, IEdmProperty property)
-        {
-            if (edmModel == null)
-            {
-                throw Error.ArgumentNull(nameof(edmModel));
-            }
-
-            ModelBoundQuerySettings querySettingsOnType = null;
-            if (structuredType != null)
-            {
-                querySettingsOnType = edmModel.GetAnnotationValue<ModelBoundQuerySettings>(structuredType);
-            }
-
-            if (property == null)
-            {
-                return querySettingsOnType;
-            }
-
-            ModelBoundQuerySettings querySettingsOnProperty = edmModel.GetAnnotationValue<ModelBoundQuerySettings>(property);
-            if (querySettingsOnProperty == null)
-            {
-                return querySettingsOnType;
+                return !enable;
             }
             else
             {
-                if (querySettingsOnType == null)
-                {
-                    return querySettingsOnProperty;
-                }
-                else
-                {
-                    // Settings on property is higher priority than the ones on type.
-                    return GetMergedPropertyQuerySettings(querySettingsOnProperty, querySettingsOnType);
-                }
+                return querySettings.DefaultEnableFilter == false;
             }
         }
+    }
 
-        public static ModelBoundQuerySettings GetModelBoundQuerySettings(this IEdmModel edmModel, IEdmProperty property,
-           IEdmStructuredType structuredType, DefaultQueryConfigurations defaultQueryConfigs = null)
+    public static bool IsNotSortable(IEdmProperty edmProperty, IEdmProperty pathEdmProperty,
+        IEdmStructuredType pathEdmStructuredType, IEdmModel edmModel, bool enableOrderBy)
+    {
+        QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+        if (annotation != null && annotation.Restrictions.NotSortable)
         {
-            if (edmModel == null)
+            return true;
+        }
+        else
+        {
+            if (pathEdmStructuredType == null)
             {
-                throw Error.ArgumentNull(nameof(edmModel));
+                pathEdmStructuredType = edmProperty.DeclaringType;
             }
 
-            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(structuredType, defaultQueryConfigs);
-            if (property == null)
+            ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(pathEdmProperty, pathEdmStructuredType);
+            if (!enableOrderBy)
             {
-                return querySettings;
+                return !querySettings.Sortable(edmProperty.Name);
+            }
+
+            bool enable;
+            if (querySettings.OrderByConfigurations.TryGetValue(edmProperty.Name, out enable))
+            {
+                return !enable;
+            }
+            else
+            {
+                return querySettings.DefaultEnableOrderBy == false;
+            }
+        }
+    }
+
+    public static bool IsNotSelectable(IEdmProperty edmProperty, IEdmProperty pathEdmProperty,
+        IEdmStructuredType pathEdmStructuredType, IEdmModel edmModel, bool enableSelect)
+    {
+        if (pathEdmStructuredType == null)
+        {
+            pathEdmStructuredType = edmProperty.DeclaringType;
+        }
+
+        ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(pathEdmProperty, pathEdmStructuredType);
+        if (!enableSelect)
+        {
+            return !querySettings.Selectable(edmProperty.Name);
+        }
+
+        SelectExpandType enable;
+        if (querySettings.SelectConfigurations.TryGetValue(edmProperty.Name, out enable))
+        {
+            return enable == SelectExpandType.Disabled;
+        }
+        else
+        {
+            return querySettings.DefaultSelectType == SelectExpandType.Disabled;
+        }
+    }
+
+    public static bool IsNotNavigable(IEdmProperty edmProperty, IEdmModel edmModel)
+    {
+        QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+        return annotation == null ? false : annotation.Restrictions.NotNavigable;
+    }
+
+    public static bool IsNotExpandable(IEdmProperty edmProperty, IEdmModel edmModel)
+    {
+        QueryableRestrictionsAnnotation annotation = GetPropertyRestrictions(edmProperty, edmModel);
+        return annotation == null ? false : annotation.Restrictions.NotExpandable;
+    }
+
+    public static bool IsExpandable(string propertyName, IEdmProperty property, IEdmStructuredType structuredType,
+        IEdmModel edmModel,
+        out ExpandConfiguration expandConfiguration)
+    {
+        expandConfiguration = null;
+        ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(property, structuredType);
+        if (querySettings != null)
+        {
+            bool result = querySettings.Expandable(propertyName);
+            if (!querySettings.ExpandConfigurations.TryGetValue(propertyName, out expandConfiguration) && result)
+            {
+                expandConfiguration = new ExpandConfiguration
+                {
+                    ExpandType = querySettings.DefaultExpandType.Value,
+                    MaxDepth = querySettings.DefaultMaxDepth
+                };
+            }
+
+            return result;
+        }
+
+        return false;
+    }
+
+    public static ModelBoundQuerySettings GetModelBoundQuerySettingsOrNull(this IEdmModel edmModel, IEdmStructuredType structuredType, IEdmProperty property)
+    {
+        if (edmModel == null)
+        {
+            throw Error.ArgumentNull(nameof(edmModel));
+        }
+
+        ModelBoundQuerySettings querySettingsOnType = null;
+        if (structuredType != null)
+        {
+            querySettingsOnType = edmModel.GetAnnotationValue<ModelBoundQuerySettings>(structuredType);
+        }
+
+        if (property == null)
+        {
+            return querySettingsOnType;
+        }
+
+        ModelBoundQuerySettings querySettingsOnProperty = edmModel.GetAnnotationValue<ModelBoundQuerySettings>(property);
+        if (querySettingsOnProperty == null)
+        {
+            return querySettingsOnType;
+        }
+        else
+        {
+            if (querySettingsOnType == null)
+            {
+                return querySettingsOnProperty;
             }
             else
             {
                 // Settings on property is higher priority than the ones on type.
-                ModelBoundQuerySettings propertyQuerySettings = edmModel.GetModelBoundQuerySettings(property, defaultQueryConfigs);
-                return GetMergedPropertyQuerySettings(propertyQuerySettings, querySettings);
+                return GetMergedPropertyQuerySettings(querySettingsOnProperty, querySettingsOnType);
             }
         }
+    }
 
-        private static ModelBoundQuerySettings GetModelBoundQuerySettings<T>(this IEdmModel edmModel, T key, DefaultQueryConfigurations defaultQueryConfigs = null)
-            where T : IEdmElement
+    public static ModelBoundQuerySettings GetModelBoundQuerySettings(this IEdmModel edmModel, IEdmProperty property,
+       IEdmStructuredType structuredType, DefaultQueryConfigurations defaultQueryConfigs = null)
+    {
+        if (edmModel == null)
         {
-            if (key == null)
+            throw Error.ArgumentNull(nameof(edmModel));
+        }
+
+        ModelBoundQuerySettings querySettings = edmModel.GetModelBoundQuerySettings(structuredType, defaultQueryConfigs);
+        if (property == null)
+        {
+            return querySettings;
+        }
+        else
+        {
+            // Settings on property is higher priority than the ones on type.
+            ModelBoundQuerySettings propertyQuerySettings = edmModel.GetModelBoundQuerySettings(property, defaultQueryConfigs);
+            return GetMergedPropertyQuerySettings(propertyQuerySettings, querySettings);
+        }
+    }
+
+    private static ModelBoundQuerySettings GetModelBoundQuerySettings<T>(this IEdmModel edmModel, T key, DefaultQueryConfigurations defaultQueryConfigs = null)
+        where T : IEdmElement
+    {
+        if (key == null)
+        {
+            return null;
+        }
+        else
+        {
+            ModelBoundQuerySettings querySettings = edmModel.GetAnnotationValue<ModelBoundQuerySettings>(key);
+            if (querySettings == null)
             {
-                return null;
+                querySettings = new ModelBoundQuerySettings();
+                if (defaultQueryConfigs != null &&
+                    (!defaultQueryConfigs.MaxTop.HasValue || defaultQueryConfigs.MaxTop > 0))
+                {
+                    querySettings.MaxTop = defaultQueryConfigs.MaxTop;
+                }
             }
-            else
+
+            return querySettings;
+        }
+    }
+
+    private static ModelBoundQuerySettings GetMergedPropertyQuerySettings(ModelBoundQuerySettings propertyQuerySettings, ModelBoundQuerySettings propertyTypeQuerySettings)
+    {
+        ModelBoundQuerySettings mergedQuerySettings = new ModelBoundQuerySettings(propertyQuerySettings);
+        if (propertyTypeQuerySettings != null)
+        {
+            if (!mergedQuerySettings.PageSize.HasValue)
             {
-                ModelBoundQuerySettings querySettings = edmModel.GetAnnotationValue<ModelBoundQuerySettings>(key);
-                if (querySettings == null)
-                {
-                    querySettings = new ModelBoundQuerySettings();
-                    if (defaultQueryConfigs != null &&
-                        (!defaultQueryConfigs.MaxTop.HasValue || defaultQueryConfigs.MaxTop > 0))
-                    {
-                        querySettings.MaxTop = defaultQueryConfigs.MaxTop;
-                    }
-                }
-
-                return querySettings;
+                mergedQuerySettings.PageSize = propertyTypeQuerySettings.PageSize;
             }
-        }
 
-        private static ModelBoundQuerySettings GetMergedPropertyQuerySettings(ModelBoundQuerySettings propertyQuerySettings, ModelBoundQuerySettings propertyTypeQuerySettings)
-        {
-            ModelBoundQuerySettings mergedQuerySettings = new ModelBoundQuerySettings(propertyQuerySettings);
-            if (propertyTypeQuerySettings != null)
+            if (mergedQuerySettings.MaxTop == 0 && propertyTypeQuerySettings.MaxTop != 0)
             {
-                if (!mergedQuerySettings.PageSize.HasValue)
-                {
-                    mergedQuerySettings.PageSize = propertyTypeQuerySettings.PageSize;
-                }
-
-                if (mergedQuerySettings.MaxTop == 0 && propertyTypeQuerySettings.MaxTop != 0)
-                {
-                    mergedQuerySettings.MaxTop = propertyTypeQuerySettings.MaxTop;
-                }
-
-                if (!mergedQuerySettings.Countable.HasValue)
-                {
-                    mergedQuerySettings.Countable = propertyTypeQuerySettings.Countable;
-                }
-
-                if (mergedQuerySettings.OrderByConfigurations.Count == 0 && !mergedQuerySettings.DefaultEnableOrderBy.HasValue)
-                {
-                    mergedQuerySettings.CopyOrderByConfigurations(propertyTypeQuerySettings.OrderByConfigurations);
-                    mergedQuerySettings.DefaultEnableOrderBy = propertyTypeQuerySettings.DefaultEnableOrderBy;
-                }
-
-                if (mergedQuerySettings.FilterConfigurations.Count == 0 && !mergedQuerySettings.DefaultEnableFilter.HasValue)
-                {
-                    mergedQuerySettings.CopyFilterConfigurations(propertyTypeQuerySettings.FilterConfigurations);
-                    mergedQuerySettings.DefaultEnableFilter = propertyTypeQuerySettings.DefaultEnableFilter;
-                }
-
-                if (mergedQuerySettings.SelectConfigurations.Count == 0 && !mergedQuerySettings.DefaultSelectType.HasValue)
-                {
-                    mergedQuerySettings.CopySelectConfigurations(propertyTypeQuerySettings.SelectConfigurations);
-                    mergedQuerySettings.DefaultSelectType = propertyTypeQuerySettings.DefaultSelectType;
-                }
-
-                if (mergedQuerySettings.ExpandConfigurations.Count == 0 && !mergedQuerySettings.DefaultExpandType.HasValue)
-                {
-                    mergedQuerySettings.CopyExpandConfigurations(propertyTypeQuerySettings.ExpandConfigurations);
-                    mergedQuerySettings.DefaultExpandType = propertyTypeQuerySettings.DefaultExpandType;
-                    mergedQuerySettings.DefaultMaxDepth = propertyTypeQuerySettings.DefaultMaxDepth;
-                }
+                mergedQuerySettings.MaxTop = propertyTypeQuerySettings.MaxTop;
             }
 
-            return mergedQuerySettings;
+            if (!mergedQuerySettings.Countable.HasValue)
+            {
+                mergedQuerySettings.Countable = propertyTypeQuerySettings.Countable;
+            }
+
+            if (mergedQuerySettings.OrderByConfigurations.Count == 0 && !mergedQuerySettings.DefaultEnableOrderBy.HasValue)
+            {
+                mergedQuerySettings.CopyOrderByConfigurations(propertyTypeQuerySettings.OrderByConfigurations);
+                mergedQuerySettings.DefaultEnableOrderBy = propertyTypeQuerySettings.DefaultEnableOrderBy;
+            }
+
+            if (mergedQuerySettings.FilterConfigurations.Count == 0 && !mergedQuerySettings.DefaultEnableFilter.HasValue)
+            {
+                mergedQuerySettings.CopyFilterConfigurations(propertyTypeQuerySettings.FilterConfigurations);
+                mergedQuerySettings.DefaultEnableFilter = propertyTypeQuerySettings.DefaultEnableFilter;
+            }
+
+            if (mergedQuerySettings.SelectConfigurations.Count == 0 && !mergedQuerySettings.DefaultSelectType.HasValue)
+            {
+                mergedQuerySettings.CopySelectConfigurations(propertyTypeQuerySettings.SelectConfigurations);
+                mergedQuerySettings.DefaultSelectType = propertyTypeQuerySettings.DefaultSelectType;
+            }
+
+            if (mergedQuerySettings.ExpandConfigurations.Count == 0 && !mergedQuerySettings.DefaultExpandType.HasValue)
+            {
+                mergedQuerySettings.CopyExpandConfigurations(propertyTypeQuerySettings.ExpandConfigurations);
+                mergedQuerySettings.DefaultExpandType = propertyTypeQuerySettings.DefaultExpandType;
+                mergedQuerySettings.DefaultMaxDepth = propertyTypeQuerySettings.DefaultMaxDepth;
+            }
         }
 
-        internal static QueryableRestrictionsAnnotation GetPropertyRestrictions(IEdmProperty edmProperty, IEdmModel edmModel)
-        {
-            Contract.Assert(edmProperty != null);
-            Contract.Assert(edmModel != null);
+        return mergedQuerySettings;
+    }
 
-            return edmModel.GetAnnotationValue<QueryableRestrictionsAnnotation>(edmProperty);
-        }
+    internal static QueryableRestrictionsAnnotation GetPropertyRestrictions(IEdmProperty edmProperty, IEdmModel edmModel)
+    {
+        Contract.Assert(edmProperty != null);
+        Contract.Assert(edmModel != null);
 
-        internal static void SetOperationTitleAnnotation(this IEdmModel model, IEdmOperation action, OperationTitleAnnotation title)
-        {
-            Contract.Assert(model != null);
-            model.SetAnnotationValue(action, title);
-        }
+        return edmModel.GetAnnotationValue<QueryableRestrictionsAnnotation>(edmProperty);
+    }
 
-        internal static OperationTitleAnnotation GetOperationTitleAnnotation(this IEdmModel model, IEdmOperation operation)
-        {
-            Contract.Assert(model != null);
-            return model.GetAnnotationValue<OperationTitleAnnotation>(operation);
-        }
+    internal static void SetOperationTitleAnnotation(this IEdmModel model, IEdmOperation action, OperationTitleAnnotation title)
+    {
+        Contract.Assert(model != null);
+        model.SetAnnotationValue(action, title);
+    }
+
+    internal static OperationTitleAnnotation GetOperationTitleAnnotation(this IEdmModel model, IEdmOperation operation)
+    {
+        Contract.Assert(model != null);
+        return model.GetAnnotationValue<OperationTitleAnnotation>(operation);
     }
 }

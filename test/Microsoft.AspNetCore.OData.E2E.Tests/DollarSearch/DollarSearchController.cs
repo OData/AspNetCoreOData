@@ -10,26 +10,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch;
+
+public class ProductsController : ODataController
 {
-    public class ProductsController : ODataController
+    [EnableQuery]
+    public IActionResult Get()
     {
-        [EnableQuery]
-        public IActionResult Get()
+        return Ok(DollarSearchDataSource.Products);
+    }
+
+    [EnableQuery]
+    public IActionResult Get(int key)
+    {
+        SearchProduct c = DollarSearchDataSource.Products.FirstOrDefault(c => c.Id == key);
+        if (c == null)
         {
-            return Ok(DollarSearchDataSource.Products);
+            return NotFound($"Cannot find product with key = {key}");
         }
 
-        [EnableQuery]
-        public IActionResult Get(int key)
-        {
-            SearchProduct c = DollarSearchDataSource.Products.FirstOrDefault(c => c.Id == key);
-            if (c == null)
-            {
-                return NotFound($"Cannot find product with key = {key}");
-            }
-
-            return Ok(c);
-        }
+        return Ok(c);
     }
 }

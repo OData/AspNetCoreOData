@@ -8,20 +8,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
-{
-    public class DollarQueryCustomer
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public IList<DollarQueryOrder> Orders { get; set; }
-        public DollarQueryOrder SpecialOrder { get; set; }
-    }
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest;
 
-    public class DollarQueryOrder
-    {
-        public int Id { get; set; }
-        public DateTimeOffset PurchaseDate { get; set; }
-        public string Detail { get; set; }
-    }
+public class DollarQueryCustomer
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public IList<DollarQueryOrder> Orders { get; set; }
+    public DollarQueryOrder SpecialOrder { get; set; }
+}
+
+public class DollarQueryOrder
+{
+    public int Id { get; set; }
+    public DateTimeOffset PurchaseDate { get; set; }
+    public string Detail { get; set; }
 }

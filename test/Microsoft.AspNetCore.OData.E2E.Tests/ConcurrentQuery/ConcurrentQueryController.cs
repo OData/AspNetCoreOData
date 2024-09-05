@@ -9,23 +9,22 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery;
+
+public class CustomersController : Controller
 {
-    public class CustomersController : Controller
+    [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Count | AllowedQueryOptions.Filter | AllowedQueryOptions.Expand)]
+    public IQueryable<Customer> GetCustomers()
     {
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.Count | AllowedQueryOptions.Filter | AllowedQueryOptions.Expand)]
-        public IQueryable<Customer> GetCustomers()
-        {
-            return Enumerable.Range(1, 100)
-                .Select(i => new Customer
+        return Enumerable.Range(1, 100)
+            .Select(i => new Customer
+            {
+                Id = i,
+                Orders = Enumerable.Range(1, 5)
+                .Select(x => new Order
                 {
-                    Id = i,
-                    Orders = Enumerable.Range(1, 5)
-                    .Select(x => new Order
-                    {
-                        Id = x
-                    })
-                }).AsQueryable();
-        }
+                    Id = x
+                })
+            }).AsQueryable();
     }
 }

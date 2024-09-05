@@ -9,42 +9,41 @@ using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
+namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions;
+
+public class Linq2ObjectsComparisonMethodsTest
 {
-    public class Linq2ObjectsComparisonMethodsTest
+    public static TheoryDataSet<byte[], byte[], bool> AreByteArraysEqualDataset
     {
-        public static TheoryDataSet<byte[], byte[], bool> AreByteArraysEqualDataset
+        get
         {
-            get
+            return new TheoryDataSet<byte[], byte[], bool>
             {
-                return new TheoryDataSet<byte[], byte[], bool>
-                {
-                    { new byte[] { 1, 2, 3}, new byte[] { 1, 2, 3} , true},
-                    { new byte[] { 1,2,3}, new byte[] { 1, 2} , false},
-                    { new byte[] { 1,2}, new byte[] { 1, 2, 3} , false},
-                    { null, new byte[] { 1, 2, 3} , false},
-                    { new byte[] { 1, 2, 3}, null , false},
-                    { null, null , true},
-                };
-            }
+                { new byte[] { 1, 2, 3}, new byte[] { 1, 2, 3} , true},
+                { new byte[] { 1,2,3}, new byte[] { 1, 2} , false},
+                { new byte[] { 1,2}, new byte[] { 1, 2, 3} , false},
+                { null, new byte[] { 1, 2, 3} , false},
+                { new byte[] { 1, 2, 3}, null , false},
+                { null, null , true},
+            };
         }
+    }
 
-        [Theory]
-        [MemberData(nameof(AreByteArraysEqualDataset))]
-        public void AreByteArraysEqual(byte[] left, byte[] right, bool result)
-        {
-            Assert.Equal(
-                result,
-                Linq2ObjectsComparisonMethods.AreByteArraysEqual(left, right));
-        }
+    [Theory]
+    [MemberData(nameof(AreByteArraysEqualDataset))]
+    public void AreByteArraysEqual(byte[] left, byte[] right, bool result)
+    {
+        Assert.Equal(
+            result,
+            Linq2ObjectsComparisonMethods.AreByteArraysEqual(left, right));
+    }
 
-        [Theory]
-        [MemberData(nameof(AreByteArraysEqualDataset))]
-        public void AreByteArraysNotEqual(byte[] left, byte[] right, bool result)
-        {
-            Assert.Equal(
-                !result,
-                Linq2ObjectsComparisonMethods.AreByteArraysNotEqual(left, right));
-        }
+    [Theory]
+    [MemberData(nameof(AreByteArraysEqualDataset))]
+    public void AreByteArraysNotEqual(byte[] left, byte[] right, bool result)
+    {
+        Assert.Equal(
+            !result,
+            Linq2ObjectsComparisonMethods.AreByteArraysNotEqual(left, right));
     }
 }

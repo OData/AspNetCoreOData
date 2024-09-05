@@ -8,93 +8,92 @@
 using System;
 using Microsoft.AspNetCore.OData.Formatter;
 
-namespace Microsoft.AspNetCore.OData.Edm
+namespace Microsoft.AspNetCore.OData.Edm;
+
+/// <summary>
+/// <see cref="OperationLinkBuilder"/> can be used to annotate an action or a function.
+/// This is how formatters create links to invoke bound actions or functions.
+/// </summary>
+public class OperationLinkBuilder
 {
     /// <summary>
-    /// <see cref="OperationLinkBuilder"/> can be used to annotate an action or a function.
-    /// This is how formatters create links to invoke bound actions or functions.
+    /// Create a new <see cref="OperationLinkBuilder"/> based on an entity link factory.
     /// </summary>
-    public class OperationLinkBuilder
+    /// <param name="linkFactory">The link factory this <see cref="OperationLinkBuilder"/> should use when building links.</param>
+    /// <param name="followsConventions">
+    /// A value indicating whether the link factory generates links that follow OData conventions.
+    /// </param>
+    public OperationLinkBuilder(Func<ResourceContext, Uri> linkFactory, bool followsConventions)
     {
-        /// <summary>
-        /// Create a new <see cref="OperationLinkBuilder"/> based on an entity link factory.
-        /// </summary>
-        /// <param name="linkFactory">The link factory this <see cref="OperationLinkBuilder"/> should use when building links.</param>
-        /// <param name="followsConventions">
-        /// A value indicating whether the link factory generates links that follow OData conventions.
-        /// </param>
-        public OperationLinkBuilder(Func<ResourceContext, Uri> linkFactory, bool followsConventions)
+        if (linkFactory == null)
         {
-            if (linkFactory == null)
-            {
-                throw Error.ArgumentNull(nameof(linkFactory));
-            }
-
-            LinkFactory = linkFactory;
-            FollowsConventions = followsConventions;
+            throw Error.ArgumentNull(nameof(linkFactory));
         }
 
-        /// <summary>
-        /// Create a new <see cref="OperationLinkBuilder"/> based on a feed link factory.
-        /// </summary>
-        /// <param name="linkFactory">The link factory this <see cref="OperationLinkBuilder"/> should use when building links.</param>
-        /// <param name="followsConventions">
-        /// A value indicating whether the action link factory generates links that follow OData conventions.
-        /// </param>
-        public OperationLinkBuilder(Func<ResourceSetContext, Uri> linkFactory, bool followsConventions)
-        {
-            if (linkFactory == null)
-            {
-                throw Error.ArgumentNull(nameof(linkFactory));
-            }
+        LinkFactory = linkFactory;
+        FollowsConventions = followsConventions;
+    }
 
-            FeedLinkFactory = linkFactory;
-            FollowsConventions = followsConventions;
+    /// <summary>
+    /// Create a new <see cref="OperationLinkBuilder"/> based on a feed link factory.
+    /// </summary>
+    /// <param name="linkFactory">The link factory this <see cref="OperationLinkBuilder"/> should use when building links.</param>
+    /// <param name="followsConventions">
+    /// A value indicating whether the action link factory generates links that follow OData conventions.
+    /// </param>
+    public OperationLinkBuilder(Func<ResourceSetContext, Uri> linkFactory, bool followsConventions)
+    {
+        if (linkFactory == null)
+        {
+            throw Error.ArgumentNull(nameof(linkFactory));
         }
 
-        /// <summary>
-        /// Gets the resource link factory.
-        /// </summary>
-        internal Func<ResourceContext, Uri> LinkFactory { get; }
+        FeedLinkFactory = linkFactory;
+        FollowsConventions = followsConventions;
+    }
 
-        /// <summary>
-        /// Gets the feed link factory.
-        /// </summary>
-        internal Func<ResourceSetContext, Uri> FeedLinkFactory { get; }
+    /// <summary>
+    /// Gets the resource link factory.
+    /// </summary>
+    internal Func<ResourceContext, Uri> LinkFactory { get; }
 
-        /// <summary>
-        /// Gets a Boolean indicating whether the link factory follows OData conventions or not.
-        /// </summary>
-        public bool FollowsConventions { get; }
+    /// <summary>
+    /// Gets the feed link factory.
+    /// </summary>
+    internal Func<ResourceSetContext, Uri> FeedLinkFactory { get; }
 
-        /// <summary>
-        /// Builds the operation link for the given resource.
-        /// </summary>
-        /// <param name="context">An instance context wrapping the resource instance.</param>
-        /// <returns>The generated link.</returns>
-        public virtual Uri BuildLink(ResourceContext context)
+    /// <summary>
+    /// Gets a Boolean indicating whether the link factory follows OData conventions or not.
+    /// </summary>
+    public bool FollowsConventions { get; }
+
+    /// <summary>
+    /// Builds the operation link for the given resource.
+    /// </summary>
+    /// <param name="context">An instance context wrapping the resource instance.</param>
+    /// <returns>The generated link.</returns>
+    public virtual Uri BuildLink(ResourceContext context)
+    {
+        if (LinkFactory == null)
         {
-            if (LinkFactory == null)
-            {
-                return null;
-            }
-
-            return LinkFactory(context);
+            return null;
         }
 
-        /// <summary>
-        /// Builds the operation link for the given feed.
-        /// </summary>
-        /// <param name="context">An feed context wrapping the feed instance.</param>
-        /// <returns>The generated link.</returns>
-        public virtual Uri BuildLink(ResourceSetContext context)
-        {
-            if (FeedLinkFactory == null)
-            {
-                return null;
-            }
+        return LinkFactory(context);
+    }
 
-            return FeedLinkFactory(context);
+    /// <summary>
+    /// Builds the operation link for the given feed.
+    /// </summary>
+    /// <param name="context">An feed context wrapping the feed instance.</param>
+    /// <returns>The generated link.</returns>
+    public virtual Uri BuildLink(ResourceSetContext context)
+    {
+        if (FeedLinkFactory == null)
+        {
+            return null;
         }
+
+        return FeedLinkFactory(context);
     }
 }

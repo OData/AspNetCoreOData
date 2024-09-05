@@ -11,48 +11,47 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
+
+public class AutoSelectExpandHelperTests
 {
-    public class AutoSelectExpandHelperTests
+    [Fact]
+    public void HasAutoSelectProperty_ThrowsArgumentNull_ForParameters()
     {
-        [Fact]
-        public void HasAutoSelectProperty_ThrowsArgumentNull_ForParameters()
-        {
-            IEdmModel edmModel = null;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoSelectProperty(null, null), "edmModel");
+        IEdmModel edmModel = null;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoSelectProperty(null, null), "edmModel");
 
-            edmModel = EdmCoreModel.Instance;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoSelectProperty(null, null), "structuredType");
-        }
+        edmModel = EdmCoreModel.Instance;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoSelectProperty(null, null), "structuredType");
+    }
 
-        [Fact]
-        public void HasAutoExpandProperty_ThrowsArgumentNull_ForParameters()
-        {
-            IEdmModel edmModel = null;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoExpandProperty(null, null), "edmModel");
+    [Fact]
+    public void HasAutoExpandProperty_ThrowsArgumentNull_ForParameters()
+    {
+        IEdmModel edmModel = null;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoExpandProperty(null, null), "edmModel");
 
-            edmModel = EdmCoreModel.Instance;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoExpandProperty(null, null), "structuredType");
-        }
+        edmModel = EdmCoreModel.Instance;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.HasAutoExpandProperty(null, null), "structuredType");
+    }
 
-        [Fact]
-        public void GetAutoSelectPaths_ThrowsArgumentNull_ForParameters()
-        {
-            IEdmModel edmModel = null;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoSelectPaths(null, null), "edmModel");
+    [Fact]
+    public void GetAutoSelectPaths_ThrowsArgumentNull_ForParameters()
+    {
+        IEdmModel edmModel = null;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoSelectPaths(null, null), "edmModel");
 
-            edmModel = EdmCoreModel.Instance;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoSelectPaths(null, null), "structuredType");
-        }
+        edmModel = EdmCoreModel.Instance;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoSelectPaths(null, null), "structuredType");
+    }
 
-        [Fact]
-        public void GetAutoExpandPaths_ThrowsArgumentNull_ForParameters()
-        {
-            IEdmModel edmModel = null;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoExpandPaths(null, null), "edmModel");
+    [Fact]
+    public void GetAutoExpandPaths_ThrowsArgumentNull_ForParameters()
+    {
+        IEdmModel edmModel = null;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoExpandPaths(null, null), "edmModel");
 
-            edmModel = EdmCoreModel.Instance;
-            ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoExpandPaths(null, null), "structuredType");
-        }
+        edmModel = EdmCoreModel.Instance;
+        ExceptionAssert.ThrowsArgumentNull(() => edmModel.GetAutoExpandPaths(null, null), "structuredType");
     }
 }

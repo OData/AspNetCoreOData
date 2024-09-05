@@ -9,21 +9,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 using ODataRoutingSample.Models;
 
-namespace ODataRoutingSample.Controllers
-{
-    [ODataRouteComponent("v2{data}")]
-    public class VipOrderController : ControllerBase
-    {
-        [HttpGet]
-        public Order Get()
-        {
-            return new Order { Id = 9, Title = "Singleton Title" };
-        }
+namespace ODataRoutingSample.Controllers;
 
-        [HttpGet]
-        public string GetTitleFromOrder()
-        {
-            return "Singleton Title";
-        }
+[ODataRouteComponent("v2{data}")]
+public class VipOrderController : ControllerBase
+{
+    [HttpGet]
+    public Order Get()
+    {
+        return new Order { Id = 9, Title = "Singleton Title" };
+    }
+
+    [HttpGet]
+    public string GetTitleFromOrder()
+    {
+        return "Singleton Title";
     }
 }

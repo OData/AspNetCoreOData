@@ -8,24 +8,23 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Microsoft.AspNetCore.OData.Formatter
+namespace Microsoft.AspNetCore.OData.Formatter;
+
+/// <summary>
+/// An implementation of <see cref="ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
+/// </summary>
+/// <remarks>
+/// I'd like to use this attribute for the action parameters whose value are from request body.
+/// It's not finished yet.
+/// </remarks>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = true, AllowMultiple = false)]
+public sealed class FromODataBodyAttribute : ModelBinderAttribute
 {
     /// <summary>
-    /// An implementation of <see cref="ModelBinderAttribute"/> that can bind URI parameters using OData conventions.
+    /// Instantiates a new instance of the <see cref="FromODataUriAttribute"/> class.
     /// </summary>
-    /// <remarks>
-    /// I'd like to use this attribute for the action parameters whose value are from request body.
-    /// It's not finished yet.
-    /// </remarks>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = true, AllowMultiple = false)]
-    public sealed class FromODataBodyAttribute : ModelBinderAttribute
+    public FromODataBodyAttribute()
+        : base(typeof(ODataBodyModelBinder))
     {
-        /// <summary>
-        /// Instantiates a new instance of the <see cref="FromODataUriAttribute"/> class.
-        /// </summary>
-        public FromODataBodyAttribute()
-            : base(typeof(ODataBodyModelBinder))
-        {
-        }
     }
 }

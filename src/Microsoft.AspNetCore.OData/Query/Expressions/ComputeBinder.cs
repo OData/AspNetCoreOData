@@ -17,76 +17,75 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace Microsoft.AspNetCore.OData.Query.Expressions
+namespace Microsoft.AspNetCore.OData.Query.Expressions;
+
+internal class ComputeBinder : TransformationBinderBase
 {
-    internal class ComputeBinder : TransformationBinderBase
+    private ComputeTransformationNode _transformation;
+    private IEdmModel _model;
+
+    internal ComputeBinder(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType,
+        IEdmModel model, ComputeTransformationNode transformation)
+        : base(settings, assembliesResolver, elementType, model)
     {
-        private ComputeTransformationNode _transformation;
-        private IEdmModel _model;
+        Contract.Assert(transformation != null);
 
-        internal ComputeBinder(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType,
-            IEdmModel model, ComputeTransformationNode transformation)
-            : base(settings, assembliesResolver, elementType, model)
+        _transformation = transformation;
+        _model = model;
+
+        this.ResultClrType = typeof(ComputeWrapper<>).MakeGenericType(this.ElementType);
+    }
+
+    public IQueryable Bind(IQueryable query)
+    {
+        PreprocessQuery(query);
+        // compute(X add Y as Z, A mul B as C) adds new properties to the output
+        // Should return following expression
+        // .Select($it => new ComputeWrapper<T> {
+        //      Instance = $it,
+        //      Model = parametrized(IEdmModel),
+        //      Container => new AggregationPropertyContainer() {
+        //          Name = "Z", 
+        //          Value = $it.X + $it.Y, 
+        //          Next = new LastInChain() {
+        //              Name = "C",
+        //              Value = $it.A * $it.B
+        //      }
+        // })
+
+        List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
+
+        // Set Instance property
+        var wrapperProperty = this.ResultClrType.GetProperty("Instance");
+        wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, this.LambdaParameter));
+        var properties = new List<NamedPropertyExpression>();
+        foreach (var computeExpression in this._transformation.Expressions)
         {
-            Contract.Assert(transformation != null);
-
-            _transformation = transformation;
-            _model = model;
-
-            this.ResultClrType = typeof(ComputeWrapper<>).MakeGenericType(this.ElementType);
+            properties.Add(new NamedPropertyExpression(Expression.Constant(computeExpression.Alias), CreateComputeExpression(computeExpression)));
         }
 
-        public IQueryable Bind(IQueryable query)
-        {
-            PreprocessQuery(query);
-            // compute(X add Y as Z, A mul B as C) adds new properties to the output
-            // Should return following expression
-            // .Select($it => new ComputeWrapper<T> {
-            //      Instance = $it,
-            //      Model = parametrized(IEdmModel),
-            //      Container => new AggregationPropertyContainer() {
-            //          Name = "Z", 
-            //          Value = $it.X + $it.Y, 
-            //          Next = new LastInChain() {
-            //              Name = "C",
-            //              Value = $it.A * $it.B
-            //      }
-            // })
+        // Initialize property 'Model' on the wrapper class.
+        // source = new Wrapper { Model = parameterized(a-edm-model) }
+        // Always parameterize as EntityFramework does not let you inject non primitive constant values (like IEdmModel).
+        wrapperProperty = this.ResultClrType.GetProperty("Model");
+        var wrapperPropertyValueExpression = LinqParameterContainer.Parameterize(typeof(IEdmModel), _model);
+        wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, wrapperPropertyValueExpression));
 
-            List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>();
+        // Set new compute properties
+        wrapperProperty = ResultClrType.GetProperty("Container");
+        wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
-            // Set Instance property
-            var wrapperProperty = this.ResultClrType.GetProperty("Instance");
-            wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, this.LambdaParameter));
-            var properties = new List<NamedPropertyExpression>();
-            foreach (var computeExpression in this._transformation.Expressions)
-            {
-                properties.Add(new NamedPropertyExpression(Expression.Constant(computeExpression.Alias), CreateComputeExpression(computeExpression)));
-            }
+        var initilizedMember =
+            Expression.MemberInit(Expression.New(ResultClrType), wrapperTypeMemberAssignments);
+        var selectLambda = Expression.Lambda(initilizedMember, this.LambdaParameter);
 
-            // Initialize property 'Model' on the wrapper class.
-            // source = new Wrapper { Model = parameterized(a-edm-model) }
-            // Always parameterize as EntityFramework does not let you inject non primitive constant values (like IEdmModel).
-            wrapperProperty = this.ResultClrType.GetProperty("Model");
-            var wrapperPropertyValueExpression = LinqParameterContainer.Parameterize(typeof(IEdmModel), _model);
-            wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, wrapperPropertyValueExpression));
+        var result = ExpressionHelpers.Select(query, selectLambda, this.ElementType);
+        return result;
+    }
 
-            // Set new compute properties
-            wrapperProperty = ResultClrType.GetProperty("Container");
-            wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
-
-            var initilizedMember =
-                Expression.MemberInit(Expression.New(ResultClrType), wrapperTypeMemberAssignments);
-            var selectLambda = Expression.Lambda(initilizedMember, this.LambdaParameter);
-
-            var result = ExpressionHelpers.Select(query, selectLambda, this.ElementType);
-            return result;
-        }
-
-        private Expression CreateComputeExpression(ComputeExpression expression)
-        {
-            Expression body = BindAccessor(expression.Expression);
-            return WrapConvert(body);
-        }
+    private Expression CreateComputeExpression(ComputeExpression expression)
+    {
+        Expression body = BindAccessor(expression.Expression);
+        return WrapConvert(body);
     }
 }

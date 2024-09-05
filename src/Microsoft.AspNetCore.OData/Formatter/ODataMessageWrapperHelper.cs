@@ -11,34 +11,33 @@ using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 
-namespace Microsoft.AspNetCore.OData.Formatter
+namespace Microsoft.AspNetCore.OData.Formatter;
+
+internal static class ODataMessageWrapperHelper
 {
-    internal static class ODataMessageWrapperHelper
+    internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers)
     {
-        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers)
-        {
-            return Create(stream, headers, contentIdMapping: null);
-        }
+        return Create(stream, headers, contentIdMapping: null);
+    }
 
-        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IServiceProvider container)
-        {
-            return Create(stream, headers, null, container);
-        }
+    internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IServiceProvider container)
+    {
+        return Create(stream, headers, null, container);
+    }
 
-        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping, IServiceProvider serviceProvider)
-        {
-            ODataMessageWrapper responseMessageWrapper = Create(stream, headers, contentIdMapping);
-            responseMessageWrapper.ServiceProvider = serviceProvider;
+    internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping, IServiceProvider serviceProvider)
+    {
+        ODataMessageWrapper responseMessageWrapper = Create(stream, headers, contentIdMapping);
+        responseMessageWrapper.ServiceProvider = serviceProvider;
 
-            return responseMessageWrapper;
-        }
+        return responseMessageWrapper;
+    }
 
-        internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping)
-        {
-            return new ODataMessageWrapper(
-                stream,
-                headers.ToDictionary(kvp => kvp.Key, kvp => string.Join(";", kvp.Value)),
-                contentIdMapping);
-        }
+    internal static ODataMessageWrapper Create(Stream stream, IHeaderDictionary headers, IDictionary<string, string> contentIdMapping)
+    {
+        return new ODataMessageWrapper(
+            stream,
+            headers.ToDictionary(kvp => kvp.Key, kvp => string.Join(";", kvp.Value)),
+            contentIdMapping);
     }
 }

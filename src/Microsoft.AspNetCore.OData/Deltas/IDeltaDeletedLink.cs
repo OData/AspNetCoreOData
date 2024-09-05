@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Deltas
+namespace Microsoft.AspNetCore.OData.Deltas;
+
+/// <summary>
+/// <see cref="IDeltaDeletedLink" /> allows and tracks changes to an delta deleted link.
+/// </summary>
+internal interface IDeltaDeletedLink : IDeltaLinkBase
 {
-    /// <summary>
-    /// <see cref="IDeltaDeletedLink" /> allows and tracks changes to an delta deleted link.
-    /// </summary>
-    internal interface IDeltaDeletedLink : IDeltaLinkBase
-    {
-    }
 }

@@ -10,27 +10,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Microsoft.AspNetCore.OData.Abstracts
-{
-    /// <summary>
-    /// An attribute to disable model validation for a particular type.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public class NonValidatingParameterBindingAttribute : ModelBinderAttribute, IPropertyValidationFilter
-    {
-        /// <inheritdoc />
-        public bool ShouldValidateEntry(ValidationEntry entry, ValidationEntry parentEntry)
-        {
-            return false;
-        }
+namespace Microsoft.AspNetCore.OData.Abstracts;
 
-        /// <inheritdoc/>
-        public override BindingSource BindingSource
+/// <summary>
+/// An attribute to disable model validation for a particular type.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
+public class NonValidatingParameterBindingAttribute : ModelBinderAttribute, IPropertyValidationFilter
+{
+    /// <inheritdoc />
+    public bool ShouldValidateEntry(ValidationEntry entry, ValidationEntry parentEntry)
+    {
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public override BindingSource BindingSource
+    {
+        get
         {
-            get
-            {
-                return BindingSource.Body;
-            }
+            return BindingSource.Body;
         }
     }
 }

@@ -10,45 +10,44 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Routing.Controllers
+namespace Microsoft.AspNetCore.OData.Tests.Routing.Controllers;
+
+public class ODataControllerTests
 {
-    public class ODataControllerTests
+    [Fact]
+    public void CreatedOnODataController_ThrowsArgumentNull_Entity()
     {
-        [Fact]
-        public void CreatedOnODataController_ThrowsArgumentNull_Entity()
-        {
-            // Arrange
-            MyController myController = new MyController();
+        // Arrange
+        MyController myController = new MyController();
 
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => myController.MyCreated<Customer>(null), "entity");
-        }
-
-        [Fact]
-        public void UpdatedOnODataController_ThrowsArgumentNull_Entity()
-        {
-            // Arrange
-            MyController myController = new MyController();
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => myController.MyUpdated<Customer>(null), "entity");
-        }
-
-        private class Customer
-        {
-        }
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => myController.MyCreated<Customer>(null), "entity");
     }
 
-    public class MyController : ODataController
+    [Fact]
+    public void UpdatedOnODataController_ThrowsArgumentNull_Entity()
     {
-        public CreatedODataResult<TEntity> MyCreated<TEntity>(TEntity entity)
-        {
-            return base.Created(entity);
-        }
+        // Arrange
+        MyController myController = new MyController();
 
-        public UpdatedODataResult<TEntity> MyUpdated<TEntity>(TEntity entity)
-        {
-            return base.Updated(entity);
-        }
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => myController.MyUpdated<Customer>(null), "entity");
+    }
+
+    private class Customer
+    {
+    }
+}
+
+public class MyController : ODataController
+{
+    public CreatedODataResult<TEntity> MyCreated<TEntity>(TEntity entity)
+    {
+        return base.Created(entity);
+    }
+
+    public UpdatedODataResult<TEntity> MyUpdated<TEntity>(TEntity entity)
+    {
+        return base.Updated(entity);
     }
 }

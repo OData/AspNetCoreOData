@@ -7,25 +7,24 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
+namespace Microsoft.AspNetCore.OData.Formatter.Wrapper;
+
+/// <summary>
+/// Encapsulates <see cref="ODataPrimitiveValue"/> in an Untyped (declared or undeclared) collection.
+/// </summary>
+public class ODataPrimitiveWrapper : ODataItemWrapper
 {
     /// <summary>
-    /// Encapsulates <see cref="ODataPrimitiveValue"/> in an Untyped (declared or undeclared) collection.
+    /// Initializes a new instance of <see cref="ODataPrimitiveWrapper"/>.
     /// </summary>
-    public class ODataPrimitiveWrapper : ODataItemWrapper
+    /// <param name="value">The wrapped primitive value.</param>
+    public ODataPrimitiveWrapper(ODataPrimitiveValue value)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ODataPrimitiveWrapper"/>.
-        /// </summary>
-        /// <param name="value">The wrapped primitive value.</param>
-        public ODataPrimitiveWrapper(ODataPrimitiveValue value)
-        {
-            Value = value ?? throw Error.ArgumentNull(nameof(value));
-        }
-
-        /// <summary>
-        /// Gets the wrapped <see cref="ODataPrimitiveValue"/>.
-        /// </summary>
-        public ODataPrimitiveValue Value { get; }
+        Value = value ?? throw Error.ArgumentNull(nameof(value));
     }
+
+    /// <summary>
+    /// Gets the wrapped <see cref="ODataPrimitiveValue"/>.
+    /// </summary>
+    public ODataPrimitiveValue Value { get; }
 }

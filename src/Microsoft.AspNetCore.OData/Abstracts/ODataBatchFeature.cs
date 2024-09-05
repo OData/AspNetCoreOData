@@ -8,31 +8,30 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.Abstracts
+namespace Microsoft.AspNetCore.OData.Abstracts;
+
+/// <summary>
+/// Provide the interface for the details of a given OData batch request.
+/// </summary>
+public class ODataBatchFeature : IODataBatchFeature
 {
     /// <summary>
-    /// Provide the interface for the details of a given OData batch request.
+    /// Gets or sets the batch id.
     /// </summary>
-    public class ODataBatchFeature : IODataBatchFeature
-    {
-        /// <summary>
-        /// Gets or sets the batch id.
-        /// </summary>
-        public Guid? BatchId { get; set; }
+    public Guid? BatchId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the change set id.
-        /// </summary>
-        public Guid? ChangeSetId { get; set; }
+    /// <summary>
+    /// Gets or sets the change set id.
+    /// </summary>
+    public Guid? ChangeSetId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the content id.
-        /// </summary>
-        public string ContentId { get; set; }
+    /// <summary>
+    /// Gets or sets the content id.
+    /// </summary>
+    public string ContentId { get; set; }
 
-        /// <summary>
-        /// Gets or sets the content id mapping.
-        /// </summary>
-        public IDictionary<string, string> ContentIdMapping { get; } = new Dictionary<string, string>();
-    }
+    /// <summary>
+    /// Gets or sets the content id mapping.
+    /// </summary>
+    public IDictionary<string, string> ContentIdMapping { get; } = new Dictionary<string, string>();
 }

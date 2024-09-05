@@ -9,22 +9,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore;
+
+public class DominiosController : ODataController
 {
-    public class DominiosController : ODataController
+    private ETagCurrencyTokenEfContext _db;
+
+    public DominiosController(ETagCurrencyTokenEfContext context)
     {
-        private ETagCurrencyTokenEfContext _db;
+        _db = context;
+        ETagCurrencyTokenEfContextInitializer.Seed(_db);
+    }
 
-        public DominiosController(ETagCurrencyTokenEfContext context)
-        {
-            _db = context;
-            ETagCurrencyTokenEfContextInitializer.Seed(_db);
-        }
-
-        [EnableQuery]
-        public IActionResult Get()
-        {
-            return Ok(_db.Dominios);
-        }
+    [EnableQuery]
+    public IActionResult Get()
+    {
+        return Ok(_db.Dominios);
     }
 }

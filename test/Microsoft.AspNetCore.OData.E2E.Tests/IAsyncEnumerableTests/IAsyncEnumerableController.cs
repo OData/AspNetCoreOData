@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // <copyright file="IAsyncEnumerableController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
@@ -12,124 +12,123 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.IAsyncEnumerableTests
+namespace Microsoft.AspNetCore.OData.E2E.Tests.IAsyncEnumerableTests;
+
+public class CustomersController : ODataController
 {
-    public class CustomersController : ODataController
+    private readonly IAsyncEnumerableContext _context;
+
+    public CustomersController(IAsyncEnumerableContext context)
     {
-        private readonly IAsyncEnumerableContext _context;
+        context.Database.EnsureCreated();
+        _context = context;
 
-        public CustomersController(IAsyncEnumerableContext context)
+        if (!_context.Customers.Any())
         {
-            context.Database.EnsureCreated();
-            _context = context;
+            Generate();
+        }
+    }
 
-            if (!_context.Customers.Any())
+    [EnableQuery]
+    [HttpGet("v1/Customers")]
+    public IAsyncEnumerable<Customer> CustomersData()
+    {
+        IAsyncEnumerable<Customer> customers = CreateCollectionAsync<Customer>();
+
+        return customers;
+    }
+
+    [EnableQuery]
+    [HttpGet("odata/Customers")]
+    public IAsyncEnumerable<Customer> Get()
+    {
+        return _context.Customers.AsAsyncEnumerable();
+    }
+
+    [EnableQuery]
+    [HttpGet("v2/Customers")]
+    public ActionResult<IAsyncEnumerable<Customer>> CustomersDataNew()
+    {
+        return Ok(_context.Customers.AsAsyncEnumerable());
+    }
+
+    public async IAsyncEnumerable<Customer> CreateCollectionAsync<T>()
+    {
+        await Task.Delay(5);
+        // Yield the items one by one asynchronously
+        yield return new Customer
+        {
+            Id = 1,
+            Name = "Customer1",
+            Orders = new List<Order> {
+                new Order {
+                    Name = "Order1",
+                    Price = 25
+                },
+                new Order {
+                     Name = "Order2",
+                     Price = 75
+                }
+            },
+            Address = new Address
             {
-                Generate();
+                Name = "City1",
+                Street = "Street1"
             }
-        }
+        };
 
-        [EnableQuery]
-        [HttpGet("v1/Customers")]
-        public IAsyncEnumerable<Customer> CustomersData()
+        await Task.Delay(5);
+
+        yield return new Customer
         {
-            IAsyncEnumerable<Customer> customers = CreateCollectionAsync<Customer>();
-
-            return customers;
-        }
-
-        [EnableQuery]
-        [HttpGet("odata/Customers")]
-        public IAsyncEnumerable<Customer> Get()
-        {
-            return _context.Customers.AsAsyncEnumerable();
-        }
-
-        [EnableQuery]
-        [HttpGet("v2/Customers")]
-        public ActionResult<IAsyncEnumerable<Customer>> CustomersDataNew()
-        {
-            return Ok(_context.Customers.AsAsyncEnumerable());
-        }
-
-        public async IAsyncEnumerable<Customer> CreateCollectionAsync<T>()
-        {
-            await Task.Delay(5);
-            // Yield the items one by one asynchronously
-            yield return new Customer
-            {
-                Id = 1,
-                Name = "Customer1",
-                Orders = new List<Order> {
-                    new Order {
-                        Name = "Order1",
-                        Price = 25
-                    },
-                    new Order {
-                         Name = "Order2",
-                         Price = 75
-                    }
+            Id = 2,
+            Name = "Customer2",
+            Orders = new List<Order> {
+                new Order {
+                    Name = "Order1",
+                    Price = 35
                 },
-                Address = new Address
-                {
-                    Name = "City1",
-                    Street = "Street1"
+                new Order {
+                     Name = "Order2",
+                     Price = 65
                 }
-            };
-
-            await Task.Delay(5);
-
-            yield return new Customer
+            },
+            Address = new Address
             {
-                Id = 2,
-                Name = "Customer2",
-                Orders = new List<Order> {
-                    new Order {
-                        Name = "Order1",
-                        Price = 35
-                    },
-                    new Order {
-                         Name = "Order2",
-                         Price = 65
-                    }
-                },
-                Address = new Address
-                {
-                    Name = "City2",
-                    Street = "Street2"
-                }
-            };
-        }
+                Name = "City2",
+                Street = "Street2"
+            }
+        };
+    }
 
-        public void Generate()
+    public void Generate()
+    {
+        for (int i = 1; i <= 3; i++)
         {
-            for (int i = 1; i <= 3; i++)
+            var customer = new Customer
             {
-                var customer = new Customer
-                {
-                    Name = "Customer" + (i + 1) % 2,
-                    Orders =
-                        new List<Order> {
-                            new Order {
-                                Name = "Order" + 2*i,
-                                Price = i * 25  
-                            },
-                            new Order {
-                                Name = "Order" + 2*i+1,
-                                Price = i * 75
-                            }
+                Name = "Customer" + (i + 1) % 2,
+                Orders =
+                    new List<Order> {
+                        new Order {
+                            Name = "Order" + 2*i,
+                            Price = i * 25  
                         },
-                    Address = new Address
-                    {
-                        Name = "City" + i % 2,
-                        Street = "Street" + i % 2,
-                    }
-                };
+                        new Order {
+                            Name = "Order" + 2*i+1,
+                            Price = i * 75
+                        }
+                    },
+                Address = new Address
+                {
+                    Name = "City" + i % 2,
+                    Street = "Street" + i % 2,
+                }
+            };
 
-                _context.Customers.Add(customer);
-            }
-
-            _context.SaveChanges();
+            _context.Customers.Add(customer);
         }
+
+        _context.SaveChanges();
     }
 }

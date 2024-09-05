@@ -10,41 +10,40 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
+
+/// <summary>
+/// Represents an <see cref="ODataSerializer"/> for serializing <see cref="ODataServiceDocument" />'s for generating service document.
+/// </summary>
+public class ODataServiceDocumentSerializer : ODataSerializer
 {
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> for serializing <see cref="ODataServiceDocument" />'s for generating service document.
+    /// Initializes a new instance of <see cref="ODataServiceDocumentSerializer"/>.
     /// </summary>
-    public class ODataServiceDocumentSerializer : ODataSerializer
+    public ODataServiceDocumentSerializer()
+        : base(ODataPayloadKind.ServiceDocument)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ODataServiceDocumentSerializer"/>.
-        /// </summary>
-        public ODataServiceDocumentSerializer()
-            : base(ODataPayloadKind.ServiceDocument)
+    }
+
+    /// <inheritdoc/>
+    public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+    {
+        if (graph == null)
         {
+            throw Error.ArgumentNull(nameof(graph));
         }
 
-        /// <inheritdoc/>
-        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        if (messageWriter == null)
         {
-            if (graph == null)
-            {
-                throw Error.ArgumentNull(nameof(graph));
-            }
-
-            if (messageWriter == null)
-            {
-                throw Error.ArgumentNull(nameof(messageWriter));
-            }
-
-            ODataServiceDocument serviceDocument = graph as ODataServiceDocument;
-            if (serviceDocument == null)
-            {
-                throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type?.Name));
-            }
-
-            await messageWriter.WriteServiceDocumentAsync(serviceDocument).ConfigureAwait(false);
+            throw Error.ArgumentNull(nameof(messageWriter));
         }
+
+        ODataServiceDocument serviceDocument = graph as ODataServiceDocument;
+        if (serviceDocument == null)
+        {
+            throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, type?.Name));
+        }
+
+        await messageWriter.WriteServiceDocumentAsync(serviceDocument).ConfigureAwait(false);
     }
 }

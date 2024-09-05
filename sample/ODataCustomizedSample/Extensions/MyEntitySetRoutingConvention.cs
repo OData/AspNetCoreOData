@@ -9,36 +9,35 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.AspNetCore.OData.Routing.Template;
 
-namespace ODataCustomizedSample.Extensions
+namespace ODataCustomizedSample.Extensions;
+
+public class MyEntitySetRoutingConvention : IODataControllerActionConvention
 {
-    public class MyEntitySetRoutingConvention : IODataControllerActionConvention
+    public virtual int Order => 0;
+
+    public virtual bool AppliesToController(ODataControllerActionContext context)
     {
-        public virtual int Order => 0;
+        return context.Controller.ControllerName == "GenericOData";
+    }
 
-        public virtual bool AppliesToController(ODataControllerActionContext context)
+    public virtual bool AppliesToAction(ODataControllerActionContext context)
+    {
+        if (context.Prefix == "v{version}")
         {
-            return context.Controller.ControllerName == "GenericOData";
+            // let's only allow this prefix
+            return false;
         }
 
-        public virtual bool AppliesToAction(ODataControllerActionContext context)
+        if (context.Action.ActionName != "GetTest")
         {
-            if (context.Prefix == "v{version}")
-            {
-                // let's only allow this prefix
-                return false;
-            }
-
-            if (context.Action.ActionName != "GetTest")
-            {
-                return false;
-            }
-
-            ODataPathTemplate path = new ODataPathTemplate(
-                new EntitySetTemplateSegment()
-                );
-
-            context.Action.AddSelector("Get", context.Prefix, context.Model, path);
-            return true;
+            return false;
         }
+
+        ODataPathTemplate path = new ODataPathTemplate(
+            new EntitySetTemplateSegment()
+            );
+
+        context.Action.AddSelector("Get", context.Prefix, context.Model, path);
+        return true;
     }
 }

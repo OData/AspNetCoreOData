@@ -7,31 +7,30 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.Query.Container
+namespace Microsoft.AspNetCore.OData.Query.Container;
+
+internal class CollectionExpandedProperty<T> : NamedProperty<T>
 {
-    internal class CollectionExpandedProperty<T> : NamedProperty<T>
+    public int PageSize { get; set; }
+
+    public long? TotalCount { get; set; }
+
+    public IEnumerable<T> Collection { get; set; }
+
+    public override object GetValue()
     {
-        public int PageSize { get; set; }
-
-        public long? TotalCount { get; set; }
-
-        public IEnumerable<T> Collection { get; set; }
-
-        public override object GetValue()
+        if (Collection == null)
         {
-            if (Collection == null)
-            {
-                return null;
-            }
+            return null;
+        }
 
-            if (TotalCount == null)
-            {
-                return new TruncatedCollection<T>(Collection, PageSize);
-            }
-            else
-            {
-                return new TruncatedCollection<T>(Collection, PageSize, TotalCount);
-            }
+        if (TotalCount == null)
+        {
+            return new TruncatedCollection<T>(Collection, PageSize);
+        }
+        else
+        {
+            return new TruncatedCollection<T>(Collection, PageSize, TotalCount);
         }
     }
 }

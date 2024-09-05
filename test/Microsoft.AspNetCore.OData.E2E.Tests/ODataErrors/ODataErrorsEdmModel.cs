@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // <copyright file="ODataErrorsEdmModel.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved. 
 //      See License.txt in the project root for license information.
@@ -8,17 +8,16 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataErrors;
+
+public class ODataErrorsEdmModel
 {
-    public class ODataErrorsEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
-            builder.EntitySet<Order>("Orders");
-            IEdmModel model = builder.GetEdmModel();
-            return model;
-        }
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Customer>("Customers");
+        builder.EntitySet<Order>("Orders");
+        IEdmModel model = builder.GetEdmModel();
+        return model;
     }
 }

@@ -5,40 +5,39 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch;
+
+public class SearchProduct
 {
-    public class SearchProduct
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public SearchColor Color { get; set; }
+    public SearchColor Color { get; set; }
 
-        public double Price { get; set; }
+    public double Price { get; set; }
 
-        public int Qty { get; set; }
+    public int Qty { get; set; }
 
-        public SearchCategory Category { get; set; }
-    }
+    public SearchCategory Category { get; set; }
+}
 
-    public class SearchCategory
-    {
-        public int Id { get; set; }
+public class SearchCategory
+{
+    public int Id { get; set; }
 
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
+}
 
-    public enum SearchColor
-    {
-        White,
+public enum SearchColor
+{
+    White,
 
-        Red,
+    Red,
 
-        Green,
+    Green,
 
-        Blue,
+    Blue,
 
-        Brown
-    }
+    Brown
 }

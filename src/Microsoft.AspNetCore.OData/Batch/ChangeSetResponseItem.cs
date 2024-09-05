@@ -13,54 +13,53 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Batch
+namespace Microsoft.AspNetCore.OData.Batch;
+
+/// <summary>
+/// Represents a ChangeSet response.
+/// </summary>
+public class ChangeSetResponseItem : ODataBatchResponseItem
 {
     /// <summary>
-    /// Represents a ChangeSet response.
+    /// Initializes a new instance of the <see cref="ChangeSetResponseItem"/> class.
     /// </summary>
-    public class ChangeSetResponseItem : ODataBatchResponseItem
+    /// <param name="contexts">The response contexts for the ChangeSet requests.</param>
+    public ChangeSetResponseItem(IEnumerable<HttpContext> contexts)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ChangeSetResponseItem"/> class.
-        /// </summary>
-        /// <param name="contexts">The response contexts for the ChangeSet requests.</param>
-        public ChangeSetResponseItem(IEnumerable<HttpContext> contexts)
+        Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts));
+    }
+
+    /// <summary>
+    /// Gets the response contexts for the ChangeSet.
+    /// </summary>
+    public IEnumerable<HttpContext> Contexts { get; }
+
+    /// <summary>
+    /// Writes the responses as a ChangeSet.
+    /// </summary>
+    /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
+    public override async Task WriteResponseAsync(ODataBatchWriter writer)
+    {
+        if (writer == null)
         {
-            Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts));
+            throw new ArgumentNullException(nameof(writer));
         }
 
-        /// <summary>
-        /// Gets the response contexts for the ChangeSet.
-        /// </summary>
-        public IEnumerable<HttpContext> Contexts { get; }
+        await writer.WriteStartChangesetAsync().ConfigureAwait(false);
 
-        /// <summary>
-        /// Writes the responses as a ChangeSet.
-        /// </summary>
-        /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
-        public override async Task WriteResponseAsync(ODataBatchWriter writer)
+        foreach (HttpContext context in Contexts)
         {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
-            await writer.WriteStartChangesetAsync().ConfigureAwait(false);
-
-            foreach (HttpContext context in Contexts)
-            {
-                await WriteMessageAsync(writer, context).ConfigureAwait(false);
-            }
-
-            await writer.WriteEndChangesetAsync().ConfigureAwait(false);
+            await WriteMessageAsync(writer, context).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Gets a value that indicates if the responses in this item are successful.
-        /// </summary>
-        internal override bool IsResponseSuccessful()
-        {
-            return Contexts.All(c => c.Response.IsSuccessStatusCode());
-        }
+        await writer.WriteEndChangesetAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Gets a value that indicates if the responses in this item are successful.
+    /// </summary>
+    internal override bool IsResponseSuccessful()
+    {
+        return Contexts.All(c => c.Response.IsSuccessStatusCode());
     }
 }

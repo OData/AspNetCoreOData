@@ -5,16 +5,15 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.Models
+namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.Models;
+
+public class Customer
 {
-    public class Customer
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public Address Location { get; set; }
+    public Address Location { get; set; }
 
-        public Order[] Orders { get; set; }
-    }
+    public Order[] Orders { get; set; }
 }

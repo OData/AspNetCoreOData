@@ -20,412 +20,411 @@ using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
+
+/// <summary>
+/// Represents an <see cref="ODataSerializer"/> for serializing the raw value of an <see cref="IEdmPrimitiveType"/>.
+/// </summary>
+public class ODataSerializerContext
 {
+    private IDictionary<object, object> _items;
+    private ODataQueryContext _queryContext;
+    private SelectExpandClause _selectExpandClause;
+    private bool _isSelectExpandClauseSet;
+    internal Type Type { get; set; }
+    private bool? _isDeltaOfT;
+
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> for serializing the raw value of an <see cref="IEdmPrimitiveType"/>.
+    /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
     /// </summary>
-    public class ODataSerializerContext
+    public ODataSerializerContext()
     {
-        private IDictionary<object, object> _items;
-        private ODataQueryContext _queryContext;
-        private SelectExpandClause _selectExpandClause;
-        private bool _isSelectExpandClauseSet;
-        internal Type Type { get; set; }
-        private bool? _isDeltaOfT;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
-        /// </summary>
-        public ODataSerializerContext()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
+    /// </summary>
+    /// <param name="resource">The resource whose property is being nested.</param>
+    /// <param name="selectExpandClause">The <see cref="SelectExpandClause"/> for the property being nested.</param>
+    /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
+    /// If the resource property is the dynamic complex, the resource property is null.
+    /// </param>
+    /// <remarks>This constructor is used to construct the serializer context for writing nested and expanded properties.</remarks>
+    public ODataSerializerContext(ResourceContext resource, SelectExpandClause selectExpandClause, IEdmProperty edmProperty)
+        : this(resource, edmProperty, null, null)
+    {
+        SelectExpandClause = selectExpandClause;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class for nested resources.
+    /// </summary>
+    /// <param name="resource">The resource whose property is being nested.</param>
+    /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
+    /// If the resource property is the dynamic complex, the resource property is null.
+    /// </param>
+    /// <param name="queryContext">The <see cref="ODataQueryContext"/> for the property being nested.</param>
+    /// <param name="currentSelectItem">The <see cref="SelectItem"/> for the property being nested.></param>
+    internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryContext queryContext, SelectItem currentSelectItem)
+    {
+        if (resource == null)
         {
+            throw Error.ArgumentNull("resource");
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
-        /// </summary>
-        /// <param name="resource">The resource whose property is being nested.</param>
-        /// <param name="selectExpandClause">The <see cref="SelectExpandClause"/> for the property being nested.</param>
-        /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
-        /// If the resource property is the dynamic complex, the resource property is null.
-        /// </param>
-        /// <remarks>This constructor is used to construct the serializer context for writing nested and expanded properties.</remarks>
-        public ODataSerializerContext(ResourceContext resource, SelectExpandClause selectExpandClause, IEdmProperty edmProperty)
-            : this(resource, edmProperty, null, null)
-        {
-            SelectExpandClause = selectExpandClause;
-        }
+        // Clone the resource's context. Use a helper function so it can
+        // handle platform-specific differences in ODataSerializerContext.
+        ODataSerializerContext context = resource.SerializerContext;
+        this.Request = context.Request;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class for nested resources.
-        /// </summary>
-        /// <param name="resource">The resource whose property is being nested.</param>
-        /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
-        /// If the resource property is the dynamic complex, the resource property is null.
-        /// </param>
-        /// <param name="queryContext">The <see cref="ODataQueryContext"/> for the property being nested.</param>
-        /// <param name="currentSelectItem">The <see cref="SelectItem"/> for the property being nested.></param>
-        internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryContext queryContext, SelectItem currentSelectItem)
+        Model = context.Model;
+        Path = context.Path;
+        RootElementName = context.RootElementName;
+        SkipExpensiveAvailabilityChecks = context.SkipExpensiveAvailabilityChecks;
+        MetadataLevel = context.MetadataLevel;
+        Items = context.Items;
+        ExpandReference = context.ExpandReference;
+        TimeZone = context.TimeZone;
+        Type = context.Type;
+
+        QueryContext = queryContext;
+
+        ExpandedResource = resource; // parent resource
+
+        CurrentSelectItem = currentSelectItem;
+
+        var expandedNavigationSelectItem = currentSelectItem as ExpandedNavigationSelectItem;
+        if (expandedNavigationSelectItem != null)
         {
-            if (resource == null)
+            SelectExpandClause = expandedNavigationSelectItem.SelectAndExpand;
+            NavigationSource = expandedNavigationSelectItem.NavigationSource;
+
+            SetComputedProperties(expandedNavigationSelectItem.ComputeOption);
+        }
+        else
+        {
+            var pathSelectItem = currentSelectItem as PathSelectItem;
+            if (pathSelectItem != null)
             {
-                throw Error.ArgumentNull("resource");
+                SelectExpandClause = pathSelectItem.SelectAndExpand;
+                NavigationSource = resource.NavigationSource; // Use it's parent navigation source.
+
+                SetComputedProperties(pathSelectItem.ComputeOption);
             }
 
-            // Clone the resource's context. Use a helper function so it can
-            // handle platform-specific differences in ODataSerializerContext.
-            ODataSerializerContext context = resource.SerializerContext;
-            this.Request = context.Request;
-
-            Model = context.Model;
-            Path = context.Path;
-            RootElementName = context.RootElementName;
-            SkipExpensiveAvailabilityChecks = context.SkipExpensiveAvailabilityChecks;
-            MetadataLevel = context.MetadataLevel;
-            Items = context.Items;
-            ExpandReference = context.ExpandReference;
-            TimeZone = context.TimeZone;
-            Type = context.Type;
-
-            QueryContext = queryContext;
-
-            ExpandedResource = resource; // parent resource
-
-            CurrentSelectItem = currentSelectItem;
-
-            var expandedNavigationSelectItem = currentSelectItem as ExpandedNavigationSelectItem;
-            if (expandedNavigationSelectItem != null)
+            var referencedNavigation = currentSelectItem as ExpandedReferenceSelectItem;
+            if (referencedNavigation != null)
             {
-                SelectExpandClause = expandedNavigationSelectItem.SelectAndExpand;
-                NavigationSource = expandedNavigationSelectItem.NavigationSource;
+                ExpandReference = true;
+                NavigationSource = referencedNavigation.NavigationSource;
 
-                SetComputedProperties(expandedNavigationSelectItem.ComputeOption);
+                SetComputedProperties(referencedNavigation.ComputeOption);
+            }
+        }
+
+        EdmProperty = edmProperty; // should be nested property
+
+        if (currentSelectItem == null || (NavigationSource as IEdmUnknownEntitySet) != null)
+        {
+            IEdmNavigationProperty navigationProperty = edmProperty as IEdmNavigationProperty;
+            if (navigationProperty != null && context.NavigationSource != null)
+            {
+                NavigationSource = context.NavigationSource.FindNavigationTarget(NavigationProperty);
             }
             else
             {
-                var pathSelectItem = currentSelectItem as PathSelectItem;
-                if (pathSelectItem != null)
-                {
-                    SelectExpandClause = pathSelectItem.SelectAndExpand;
-                    NavigationSource = resource.NavigationSource; // Use it's parent navigation source.
-
-                    SetComputedProperties(pathSelectItem.ComputeOption);
-                }
-
-                var referencedNavigation = currentSelectItem as ExpandedReferenceSelectItem;
-                if (referencedNavigation != null)
-                {
-                    ExpandReference = true;
-                    NavigationSource = referencedNavigation.NavigationSource;
-
-                    SetComputedProperties(referencedNavigation.ComputeOption);
-                }
-            }
-
-            EdmProperty = edmProperty; // should be nested property
-
-            if (currentSelectItem == null || (NavigationSource as IEdmUnknownEntitySet) != null)
-            {
-                IEdmNavigationProperty navigationProperty = edmProperty as IEdmNavigationProperty;
-                if (navigationProperty != null && context.NavigationSource != null)
-                {
-                    NavigationSource = context.NavigationSource.FindNavigationTarget(NavigationProperty);
-                }
-                else
-                {
-                    NavigationSource = resource.NavigationSource;
-                }
+                NavigationSource = resource.NavigationSource;
             }
         }
+    }
 
-        /// <summary>
-        /// Gets or sets the navigation source.
-        /// </summary>
-        public IEdmNavigationSource NavigationSource { get; set; }
+    /// <summary>
+    /// Gets or sets the navigation source.
+    /// </summary>
+    public IEdmNavigationSource NavigationSource { get; set; }
 
-        /// <summary>
-        /// Gets or sets the EDM model associated with the request.
-        /// </summary>
-        public IEdmModel Model { get; set; }
+    /// <summary>
+    /// Gets or sets the EDM model associated with the request.
+    /// </summary>
+    public IEdmModel Model { get; set; }
 
-        /// <summary>
-        /// Gets or sets the <see cref="ODataPath"/> of the request.
-        /// </summary>
-        public ODataPath Path { get; set; }
+    /// <summary>
+    /// Gets or sets the <see cref="ODataPath"/> of the request.
+    /// </summary>
+    public ODataPath Path { get; set; }
 
-        /// <summary>
-        /// Gets or sets the metadata level of the response.
-        /// </summary>
-        public ODataMetadataLevel MetadataLevel { get; set; }
+    /// <summary>
+    /// Gets or sets the metadata level of the response.
+    /// </summary>
+    public ODataMetadataLevel MetadataLevel { get; set; }
 
-        /// <summary>
-        /// Gets or sets the HTTP Request whose response is being serialized.
-        /// </summary>
-        public HttpRequest Request { get;set; }
+    /// <summary>
+    /// Gets or sets the HTTP Request whose response is being serialized.
+    /// </summary>
+    public HttpRequest Request { get;set; }
 
-        /// <summary>
-        /// Get the <see cref="CancellationToken"/> from <see cref="Request"/> if defined or <see cref="System.Threading.CancellationToken.None"/>
-        /// </summary>
-        public CancellationToken CancellationToken => Request?.HttpContext.RequestAborted ?? CancellationToken.None;
+    /// <summary>
+    /// Get the <see cref="CancellationToken"/> from <see cref="Request"/> if defined or <see cref="System.Threading.CancellationToken.None"/>
+    /// </summary>
+    public CancellationToken CancellationToken => Request?.HttpContext.RequestAborted ?? CancellationToken.None;
 
-        /// <summary>
-        /// Gets or sets the root element name which is used when writing primitive and enum types
-        /// </summary>
-        public string RootElementName { get; set; }
+    /// <summary>
+    /// Gets or sets the root element name which is used when writing primitive and enum types
+    /// </summary>
+    public string RootElementName { get; set; }
 
-        /// <summary>
-        /// Gets or sets the boolean value indicating whether it's $ref expanded.
-        /// </summary>
-        public bool ExpandReference { get; set; }
+    /// <summary>
+    /// Gets or sets the boolean value indicating whether it's $ref expanded.
+    /// </summary>
+    public bool ExpandReference { get; set; }
 
-        /// <summary>
-        /// Gets or sets the complex property being nested or navigation property being expanded.
-        /// </summary>
-        public IEdmProperty EdmProperty { get; set; }
+    /// <summary>
+    /// Gets or sets the complex property being nested or navigation property being expanded.
+    /// </summary>
+    public IEdmProperty EdmProperty { get; set; }
 
-        /// <summary>
-        /// Get or sets whether expensive links should be calculated.
-        /// </summary>
-        public bool SkipExpensiveAvailabilityChecks { get; set; }
+    /// <summary>
+    /// Get or sets whether expensive links should be calculated.
+    /// </summary>
+    public bool SkipExpensiveAvailabilityChecks { get; set; }
 
-        /// <summary>
-        /// Gets or sets the <see cref="TimeZoneInfo"/>.
-        /// </summary>
-        public TimeZoneInfo TimeZone { get; set; }
+    /// <summary>
+    /// Gets or sets the <see cref="TimeZoneInfo"/>.
+    /// </summary>
+    public TimeZoneInfo TimeZone { get; set; }
 
-        /// <summary>
-        /// Gets or sets the <see cref="ODataQueryOptions"/>.
-        /// </summary>
-        public ODataQueryOptions QueryOptions { get; internal set; }
+    /// <summary>
+    /// Gets or sets the <see cref="ODataQueryOptions"/>.
+    /// </summary>
+    public ODataQueryOptions QueryOptions { get; internal set; }
 
-        /// <summary>
-        /// Gets the computed properties in serializer context.
-        /// It contains all computed properties at current serializer context.
-        /// </summary>
-        public ISet<string> ComputedProperties { get; } = new HashSet<string>();
+    /// <summary>
+    /// Gets the computed properties in serializer context.
+    /// It contains all computed properties at current serializer context.
+    /// </summary>
+    public ISet<string> ComputedProperties { get; } = new HashSet<string>();
 
-        private IUntypedResourceMapper _valueMapper;
-        internal IUntypedResourceMapper UntypedMapper
+    private IUntypedResourceMapper _valueMapper;
+    internal IUntypedResourceMapper UntypedMapper
+    {
+        get
         {
-            get
+            if (_valueMapper == null)
             {
-                if (_valueMapper == null)
-                {
-                    _valueMapper = Request?.GetRouteServices()?.GetService<IUntypedResourceMapper>();
-                    _valueMapper = _valueMapper ?? DefaultUntypedResourceMapper.Instance;
-                }
-
-                return _valueMapper;
+                _valueMapper = Request?.GetRouteServices()?.GetService<IUntypedResourceMapper>();
+                _valueMapper = _valueMapper ?? DefaultUntypedResourceMapper.Instance;
             }
+
+            return _valueMapper;
         }
+    }
 
-        /// <summary>
-        /// ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
-        /// </summary>
-        internal ODataQueryContext QueryContext
+    /// <summary>
+    /// ODataQueryContext object, retrieved from query options for top-level context and passed down to nested serializer context as is.
+    /// </summary>
+    internal ODataQueryContext QueryContext
+    {
+        get
         {
-            get
+            if (QueryOptions != null)
             {
-                if (QueryOptions != null)
-                {
-                    return QueryOptions.Context;
-                }
-
-                return _queryContext;
+                return QueryOptions.Context;
             }
-            private set { _queryContext = value; }
+
+            return _queryContext;
         }
+        private set { _queryContext = value; }
+    }
 
-        /// <summary>
-        /// Gets or sets the <see cref="SelectItem"/>.
-        /// </summary>
-        internal SelectItem CurrentSelectItem { get; set; }
+    /// <summary>
+    /// Gets or sets the <see cref="SelectItem"/>.
+    /// </summary>
+    internal SelectItem CurrentSelectItem { get; set; }
 
-        /// <summary>
-        /// Gets a property bag associated with this context to store any generic data.
-        /// </summary>
-        public IDictionary<object, object> Items
+    /// <summary>
+    /// Gets a property bag associated with this context to store any generic data.
+    /// </summary>
+    public IDictionary<object, object> Items
+    {
+        get
         {
-            get
-            {
-                _items = _items ?? new Dictionary<object, object>();
-                return _items;
-            }
-            private set
-            {
-                _items = value;
-            }
+            _items = _items ?? new Dictionary<object, object>();
+            return _items;
         }
-
-        /// <summary>
-        /// Gets or sets the resource that is being expanded.
-        /// </summary>
-        public ResourceContext ExpandedResource { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="SelectExpandClause"/>.
-        /// </summary>
-        public SelectExpandClause SelectExpandClause
+        private set
         {
-            get
+            _items = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the resource that is being expanded.
+    /// </summary>
+    public ResourceContext ExpandedResource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="SelectExpandClause"/>.
+    /// </summary>
+    public SelectExpandClause SelectExpandClause
+    {
+        get
+        {
+            // private backing field to be removed once public setter from ODataFeature is removed.
+            if (_isSelectExpandClauseSet)
             {
-                // private backing field to be removed once public setter from ODataFeature is removed.
-                if (_isSelectExpandClauseSet)
-                {
-                    return _selectExpandClause;
-                }
+                return _selectExpandClause;
+            }
 
-                if (QueryOptions != null)
+            if (QueryOptions != null)
+            {
+                if (QueryOptions.SelectExpand != null)
                 {
-                    if (QueryOptions.SelectExpand != null)
-                    {
-                        return QueryOptions.SelectExpand.ProcessedSelectExpandClause;
-                    }
-
-                    return null;
-                }
-
-                ExpandedNavigationSelectItem expandedItem = CurrentSelectItem as ExpandedNavigationSelectItem;
-                if (expandedItem != null)
-                {
-                    return expandedItem.SelectAndExpand;
+                    return QueryOptions.SelectExpand.ProcessedSelectExpandClause;
                 }
 
                 return null;
             }
-            set
+
+            ExpandedNavigationSelectItem expandedItem = CurrentSelectItem as ExpandedNavigationSelectItem;
+            if (expandedItem != null)
             {
-                _isSelectExpandClauseSet = true;
-                _selectExpandClause = value;
+                return expandedItem.SelectAndExpand;
             }
+
+            return null;
         }
-
-        internal bool IsDeltaOfT
+        set
         {
-            get
+            _isSelectExpandClauseSet = true;
+            _selectExpandClause = value;
+        }
+    }
+
+    internal bool IsDeltaOfT
+    {
+        get
+        {
+            if (_isDeltaOfT.HasValue)
             {
-                if (_isDeltaOfT.HasValue)
-                {
-                    return _isDeltaOfT.Value;
-                }
-                
-                if (!(Type is { IsGenericType: true }))
-                {
-                    _isDeltaOfT = false;
-                    return _isDeltaOfT.Value;
-                }
-
-                var genericTypeDefinition = Type.GetGenericTypeDefinition();
-                _isDeltaOfT = genericTypeDefinition == typeof(Delta<>) ||
-                              genericTypeDefinition == typeof(DeltaSet<>) ||
-                              genericTypeDefinition == typeof(DeltaDeletedResource<>);
-
                 return _isDeltaOfT.Value;
             }
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="ExpandedNavigationSelectItem"/>.
-        /// </summary>
-        internal ExpandedReferenceSelectItem CurrentExpandedSelectItem
-        {
-            get
+                
+            if (!(Type is { IsGenericType: true }))
             {
-                return CurrentSelectItem as ExpandedReferenceSelectItem;
+                _isDeltaOfT = false;
+                return _isDeltaOfT.Value;
+            }
+
+            var genericTypeDefinition = Type.GetGenericTypeDefinition();
+            _isDeltaOfT = genericTypeDefinition == typeof(Delta<>) ||
+                          genericTypeDefinition == typeof(DeltaSet<>) ||
+                          genericTypeDefinition == typeof(DeltaDeletedResource<>);
+
+            return _isDeltaOfT.Value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the <see cref="ExpandedNavigationSelectItem"/>.
+    /// </summary>
+    internal ExpandedReferenceSelectItem CurrentExpandedSelectItem
+    {
+        get
+        {
+            return CurrentSelectItem as ExpandedReferenceSelectItem;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the navigation property being expanded.
+    /// </summary>
+    public IEdmNavigationProperty NavigationProperty
+    {
+        get
+        {
+            return EdmProperty as IEdmNavigationProperty;
+        }
+    }
+
+    internal IEdmTypeReference GetEdmType(object instance, Type type, bool isUntyped = false)
+    {
+        IEdmTypeReference edmType = null;
+
+        IEdmObject edmObject = instance as IEdmObject;
+        if (edmObject != null)
+        {
+            edmType = edmObject.GetEdmType();
+            if (edmType == null && !isUntyped)
+            {
+                throw Error.InvalidOperation(SRResources.EdmTypeCannotBeNull, edmObject.GetType().FullName,
+                    typeof(IEdmObject).Name);
             }
         }
-
-        /// <summary>
-        /// Gets or sets the navigation property being expanded.
-        /// </summary>
-        public IEdmNavigationProperty NavigationProperty
+        else
         {
-            get
+            if (typeof(IDeltaSet).IsAssignableFrom(type))
             {
-                return EdmProperty as IEdmNavigationProperty;
+                return Model.GetEdmTypeReference(type);
             }
-        }
 
-        internal IEdmTypeReference GetEdmType(object instance, Type type, bool isUntyped = false)
-        {
-            IEdmTypeReference edmType = null;
-
-            IEdmObject edmObject = instance as IEdmObject;
-            if (edmObject != null)
+            if (Model == null && !isUntyped)
             {
-                edmType = edmObject.GetEdmType();
-                if (edmType == null && !isUntyped)
-                {
-                    throw Error.InvalidOperation(SRResources.EdmTypeCannotBeNull, edmObject.GetType().FullName,
-                        typeof(IEdmObject).Name);
-                }
+                throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
             }
-            else
+
+            if (Model != null)
             {
-                if (typeof(IDeltaSet).IsAssignableFrom(type))
-                {
-                    return Model.GetEdmTypeReference(type);
-                }
+                edmType = Model.GetEdmTypeReference(type);
 
-                if (Model == null && !isUntyped)
+                if (edmType == null)
                 {
-                    throw Error.InvalidOperation(SRResources.RequestMustHaveModel);
-                }
-
-                if (Model != null)
-                {
-                    edmType = Model.GetEdmTypeReference(type);
-
-                    if (edmType == null)
+                    if (instance != null)
                     {
-                        if (instance != null)
+                        if (instance is ITypedDelta delta)
                         {
-                            if (instance is ITypedDelta delta)
-                            {
-                                edmType = Model.GetEdmTypeReference(delta.ExpectedClrType);
-                            }
-                            else
-                            {
-                                edmType = Model.GetEdmTypeReference(instance.GetType());
-                            }
+                            edmType = Model.GetEdmTypeReference(delta.ExpectedClrType);
                         }
-
-                        if (edmType == null && !isUntyped)
+                        else
                         {
-                            throw Error.InvalidOperation(SRResources.ClrTypeNotInModel, type);
+                            edmType = Model.GetEdmTypeReference(instance.GetType());
                         }
                     }
-                    else if (instance != null)
+
+                    if (edmType == null && !isUntyped)
                     {
-                        IEdmTypeReference actualType = Model.GetEdmTypeReference(instance.GetType());
-                        if (actualType != null && actualType != edmType)
-                        {
-                            edmType = actualType;
-                        }
+                        throw Error.InvalidOperation(SRResources.ClrTypeNotInModel, type);
+                    }
+                }
+                else if (instance != null)
+                {
+                    IEdmTypeReference actualType = Model.GetEdmTypeReference(instance.GetType());
+                    if (actualType != null && actualType != edmType)
+                    {
+                        edmType = actualType;
                     }
                 }
             }
-
-            if (edmType == null && isUntyped)
-            {
-                // we can't find the Edm type and it's in untyped. Let's return it as Untyped resource type (or collection)
-                return TypeHelper.GetUntypedEdmType(type ?? instance.GetType());
-            }
-
-            return edmType;
         }
 
-        internal void SetComputedProperties(ComputeClause computeClause)
+        if (edmType == null && isUntyped)
         {
-            if (computeClause == null || !computeClause.ComputedItems.Any())
-            {
-                return;
-            }
+            // we can't find the Edm type and it's in untyped. Let's return it as Untyped resource type (or collection)
+            return TypeHelper.GetUntypedEdmType(type ?? instance.GetType());
+        }
 
-            foreach (var item in computeClause.ComputedItems)
-            {
-                ComputedProperties.Add(item.Alias);
-            }
+        return edmType;
+    }
+
+    internal void SetComputedProperties(ComputeClause computeClause)
+    {
+        if (computeClause == null || !computeClause.ComputedItems.Any())
+        {
+            return;
+        }
+
+        foreach (var item in computeClause.ComputedItems)
+        {
+            ComputedProperties.Add(item.Alias);
         }
     }
 }

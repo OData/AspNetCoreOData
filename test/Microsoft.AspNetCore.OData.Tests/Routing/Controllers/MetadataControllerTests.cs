@@ -14,86 +14,85 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Routing.Controllers
+namespace Microsoft.AspNetCore.OData.Tests.Routing.Controllers;
+
+public class MetadataControllerTests
 {
-    public class MetadataControllerTests
+    [Fact]
+    public void GetMetadataOnMetadataController_ReturnsODataModel()
     {
-        [Fact]
-        public void GetMetadataOnMetadataController_ReturnsODataModel()
-        {
-            // Arrange
-            IEdmModel model = new EdmModel();
-            HttpRequest reqest = RequestFactory.Create(model);
+        // Arrange
+        IEdmModel model = new EdmModel();
+        HttpRequest reqest = RequestFactory.Create(model);
 
-            MetadataController metadataController = new MetadataController();
-            metadataController.ControllerContext.HttpContext = reqest.HttpContext;
+        MetadataController metadataController = new MetadataController();
+        metadataController.ControllerContext.HttpContext = reqest.HttpContext;
 
-            // Act
-            IEdmModel actual = metadataController.GetMetadata();
+        // Act
+        IEdmModel actual = metadataController.GetMetadata();
 
-            // Assert
-            Assert.Same(model, actual);
-        }
+        // Assert
+        Assert.Same(model, actual);
+    }
 
-        [Fact]
-        public void GetMetadataOnMetadataController_ThrowsInvalidOperationException()
-        {
-            // Arrange
-            HttpRequest reqest = RequestFactory.Create(model: null);
+    [Fact]
+    public void GetMetadataOnMetadataController_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        HttpRequest reqest = RequestFactory.Create(model: null);
 
-            MetadataController metadataController = new MetadataController();
-            metadataController.ControllerContext.HttpContext = reqest.HttpContext;
+        MetadataController metadataController = new MetadataController();
+        metadataController.ControllerContext.HttpContext = reqest.HttpContext;
 
-            // Act
-            Action test = () => metadataController.GetMetadata();
+        // Act
+        Action test = () => metadataController.GetMetadata();
 
-            // Assert
-            ExceptionAssert.Throws<InvalidOperationException>(test,
-                "The request must have an associated EDM model. Consider registering Edm model calling AddOData().");
-        }
+        // Assert
+        ExceptionAssert.Throws<InvalidOperationException>(test,
+            "The request must have an associated EDM model. Consider registering Edm model calling AddOData().");
+    }
 
-        [Fact]
-        public void GetODataServiceDocumentOnMetadataController_ReturnsODataODataServiceDocument()
-        {
-            // Arrange
-            EdmModel model = new EdmModel();
-            EdmEntityType entity = new EdmEntityType("NS", "Entity");
-            EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
-            container.AddSingleton("me", entity);
-            model.AddElement(entity);
-            model.AddElement(container);
+    [Fact]
+    public void GetODataServiceDocumentOnMetadataController_ReturnsODataODataServiceDocument()
+    {
+        // Arrange
+        EdmModel model = new EdmModel();
+        EdmEntityType entity = new EdmEntityType("NS", "Entity");
+        EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+        container.AddSingleton("me", entity);
+        model.AddElement(entity);
+        model.AddElement(container);
 
-            HttpRequest reqest = RequestFactory.Create(model);
+        HttpRequest reqest = RequestFactory.Create(model);
 
-            MetadataController metadataController = new MetadataController();
-            metadataController.ControllerContext.HttpContext = reqest.HttpContext;
+        MetadataController metadataController = new MetadataController();
+        metadataController.ControllerContext.HttpContext = reqest.HttpContext;
 
-            // Act
-            ODataServiceDocument actual = metadataController.GetServiceDocument();
+        // Act
+        ODataServiceDocument actual = metadataController.GetServiceDocument();
 
-            // Assert
-            Assert.NotNull(actual);
-            Assert.Empty(actual.EntitySets);
-            Assert.Empty(actual.FunctionImports);
-            ODataSingletonInfo singletonInfo = Assert.Single(actual.Singletons);
-            Assert.Equal("me", singletonInfo.Name);
-        }
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Empty(actual.EntitySets);
+        Assert.Empty(actual.FunctionImports);
+        ODataSingletonInfo singletonInfo = Assert.Single(actual.Singletons);
+        Assert.Equal("me", singletonInfo.Name);
+    }
 
-        [Fact]
-        public void GetODataServiceDocumentOnMetadataController_ThrowsInvalidOperationException_()
-        {
-            // Arrange
-            HttpRequest reqest = RequestFactory.Create(model: null);
+    [Fact]
+    public void GetODataServiceDocumentOnMetadataController_ThrowsInvalidOperationException_()
+    {
+        // Arrange
+        HttpRequest reqest = RequestFactory.Create(model: null);
 
-            MetadataController metadataController = new MetadataController();
-            metadataController.ControllerContext.HttpContext = reqest.HttpContext;
+        MetadataController metadataController = new MetadataController();
+        metadataController.ControllerContext.HttpContext = reqest.HttpContext;
 
-            // Act
-            Action test = () => metadataController.GetServiceDocument();
+        // Act
+        Action test = () => metadataController.GetServiceDocument();
 
-            // Assert
-            ExceptionAssert.Throws<InvalidOperationException>(test,
-                "The request must have an associated EDM model. Consider registering Edm model calling AddOData().");
-        }
+        // Assert
+        ExceptionAssert.Throws<InvalidOperationException>(test,
+            "The request must have an associated EDM model. Consider registering Edm model calling AddOData().");
     }
 }

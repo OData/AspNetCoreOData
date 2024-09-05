@@ -8,22 +8,21 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial;
+
+public static class IsofEdmModel
 {
-    public static class IsofEdmModel
+    private static IEdmModel _model;
+
+    public static IEdmModel GetEdmModel()
     {
-        private static IEdmModel _model;
-
-        public static IEdmModel GetEdmModel()
+        if (_model != null)
         {
-            if (_model != null)
-            {
-                return _model;
-            }
-
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<SpatialCustomer>("SpatialCustomers");
-            return _model = builder.GetEdmModel();
+            return _model;
         }
+
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<SpatialCustomer>("SpatialCustomers");
+        return _model = builder.GetEdmModel();
     }
 }

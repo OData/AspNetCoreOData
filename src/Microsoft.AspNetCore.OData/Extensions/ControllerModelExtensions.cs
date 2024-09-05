@@ -10,60 +10,59 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.OData.Routing.Attributes;
 
-namespace Microsoft.AspNetCore.OData.Extensions
+namespace Microsoft.AspNetCore.OData.Extensions;
+
+/// <summary>
+/// The extension methods for the <see cref="ControllerModel"/>.
+/// </summary>
+public static class ControllerModelExtensions
 {
     /// <summary>
-    /// The extension methods for the <see cref="ControllerModel"/>.
+    /// Test whether the controller is not suitable for OData controller.
     /// </summary>
-    public static class ControllerModelExtensions
+    /// <param name="controller">The given controller model.</param>
+    /// <returns>True/False.</returns>
+    public static bool IsODataIgnored(this ControllerModel controller)
     {
-        /// <summary>
-        /// Test whether the controller is not suitable for OData controller.
-        /// </summary>
-        /// <param name="controller">The given controller model.</param>
-        /// <returns>True/False.</returns>
-        public static bool IsODataIgnored(this ControllerModel controller)
+        if (controller == null)
         {
-            if (controller == null)
-            {
-                throw Error.ArgumentNull(nameof(controller));
-            }
-
-            return controller.Attributes.Any(a => a is ODataIgnoredAttribute);
+            throw Error.ArgumentNull(nameof(controller));
         }
 
-        /// <summary>
-        /// Test whether the controller has the specified attribute defined
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <param name="controller">The given controller model.</param>
-        /// <returns>True/False.</returns>
-        public static bool HasAttribute<T>(this ControllerModel controller)
-            where T : Attribute
-        {
-            if (controller == null)
-            {
-                throw Error.ArgumentNull(nameof(controller));
-            }
+        return controller.Attributes.Any(a => a is ODataIgnoredAttribute);
+    }
 
-            return controller.Attributes.Any(a => a is T);
+    /// <summary>
+    /// Test whether the controller has the specified attribute defined
+    /// </summary>
+    /// <typeparam name="T">The attribute type.</typeparam>
+    /// <param name="controller">The given controller model.</param>
+    /// <returns>True/False.</returns>
+    public static bool HasAttribute<T>(this ControllerModel controller)
+        where T : Attribute
+    {
+        if (controller == null)
+        {
+            throw Error.ArgumentNull(nameof(controller));
         }
 
-        /// <summary>
-        /// Gets the attribute from the controller model.
-        /// </summary>
-        /// <typeparam name="T">The attribute type.</typeparam>
-        /// <param name="controller">The given controller model.</param>
-        /// <returns>The attribute or null.</returns>
-        public static T GetAttribute<T>(this ControllerModel controller)
-            where T : Attribute
-        {
-            if (controller == null)
-            {
-                throw Error.ArgumentNull(nameof(controller));
-            }
+        return controller.Attributes.Any(a => a is T);
+    }
 
-            return controller.Attributes.OfType<T>().FirstOrDefault();
+    /// <summary>
+    /// Gets the attribute from the controller model.
+    /// </summary>
+    /// <typeparam name="T">The attribute type.</typeparam>
+    /// <param name="controller">The given controller model.</param>
+    /// <returns>The attribute or null.</returns>
+    public static T GetAttribute<T>(this ControllerModel controller)
+        where T : Attribute
+    {
+        if (controller == null)
+        {
+            throw Error.ArgumentNull(nameof(controller));
         }
+
+        return controller.Attributes.OfType<T>().FirstOrDefault();
     }
 }

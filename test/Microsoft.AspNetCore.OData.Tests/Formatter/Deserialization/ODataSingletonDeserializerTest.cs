@@ -18,92 +18,91 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
+
+public class ODataSingletonDeserializerTest
 {
-    public class ODataSingletonDeserializerTest
+    private IEdmModel _edmModel;
+    private IEdmSingleton _singleton;
+    private readonly ODataDeserializerContext _readContext;
+    private readonly IODataDeserializerProvider _deserializerProvider;
+
+    private sealed class EmployeeModel
     {
-        private IEdmModel _edmModel;
-        private IEdmSingleton _singleton;
-        private readonly ODataDeserializerContext _readContext;
-        private readonly IODataDeserializerProvider _deserializerProvider;
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+    }
 
-        private sealed class EmployeeModel
+    public ODataSingletonDeserializerTest()
+    {
+        EdmModel model = new EdmModel();
+        var employeeType = new EdmEntityType("NS", "Employee");
+        employeeType.AddStructuralProperty("EmployeeId", EdmPrimitiveTypeKind.Int32);
+        employeeType.AddStructuralProperty("EmployeeName", EdmPrimitiveTypeKind.String);
+        model.AddElement(employeeType);
+
+        EdmEntityContainer defaultContainer = new EdmEntityContainer("NS", "Default");
+        model.AddElement(defaultContainer);
+
+        _singleton = new EdmSingleton(defaultContainer, "CEO", employeeType);
+        defaultContainer.AddElement(_singleton);
+
+        model.SetAnnotationValue<ClrTypeAnnotation>(employeeType, new ClrTypeAnnotation(typeof(EmployeeModel)));
+
+        _edmModel = model;
+
+        _readContext = new ODataDeserializerContext
         {
-            public int EmployeeId { get; set; }
-            public string EmployeeName { get; set; }
-        }
+            Path = new ODataPath(new SingletonSegment(_singleton)),
+            Model = _edmModel,
+            ResourceType = typeof(EmployeeModel)
+        };
 
-        public ODataSingletonDeserializerTest()
-        {
-            EdmModel model = new EdmModel();
-            var employeeType = new EdmEntityType("NS", "Employee");
-            employeeType.AddStructuralProperty("EmployeeId", EdmPrimitiveTypeKind.Int32);
-            employeeType.AddStructuralProperty("EmployeeName", EdmPrimitiveTypeKind.String);
-            model.AddElement(employeeType);
+        _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
+    }
 
-            EdmEntityContainer defaultContainer = new EdmEntityContainer("NS", "Default");
-            model.AddElement(defaultContainer);
+    [Fact]
+    public async Task CanDeserializerSingletonPayloadFromStream()
+    {
+        // Arrange
+        const string payload = "{" +
+            "\"@odata.context\":\"http://localhost/odata/$metadata#CEO\"," +
+            "\"EmployeeId\":789," +
+            "\"EmployeeName\":\"John Hark\"}";
 
-            _singleton = new EdmSingleton(defaultContainer, "CEO", employeeType);
-            defaultContainer.AddElement(_singleton);
+        ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
 
-            model.SetAnnotationValue<ClrTypeAnnotation>(employeeType, new ClrTypeAnnotation(typeof(EmployeeModel)));
+        // Act
+        EmployeeModel employee = await deserializer.ReadAsync(
+            GetODataMessageReader(payload),
+            typeof(EmployeeModel),
+            _readContext) as EmployeeModel;
 
-            _edmModel = model;
+        // Assert
+        Assert.NotNull(employee);
+        Assert.Equal(789, employee.EmployeeId);
+        Assert.Equal("John Hark", employee.EmployeeName);
+    }
 
-            _readContext = new ODataDeserializerContext
-            {
-                Path = new ODataPath(new SingletonSegment(_singleton)),
-                Model = _edmModel,
-                ResourceType = typeof(EmployeeModel)
-            };
+    private ODataMessageReader GetODataMessageReader(string content)
+    {
+        HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddRouteComponents("odata", _edmModel));
 
-            _deserializerProvider = DeserializationServiceProviderHelper.GetServiceProvider().GetRequiredService<IODataDeserializerProvider>();
-        }
+        //request.Content = new StringContent(content);
+        //request.Headers.Add("OData-Version", "4.0");
 
-        [Fact]
-        public async Task CanDeserializerSingletonPayloadFromStream()
-        {
-            // Arrange
-            const string payload = "{" +
-                "\"@odata.context\":\"http://localhost/odata/$metadata#CEO\"," +
-                "\"EmployeeId\":789," +
-                "\"EmployeeName\":\"John Hark\"}";
+        //MediaTypeWithQualityHeaderValue mediaType = new MediaTypeWithQualityHeaderValue("application/json");
+        //mediaType.Parameters.Add(new NameValueHeaderValue("odata.metadata", "full"));
+        //request.Headers.Accept.Add(mediaType);
+        //request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
+        byte[] contentBytes = Encoding.UTF8.GetBytes(content);
+        request.Body = new MemoryStream(contentBytes);
+        request.ContentType = "application/json";
+        request.ContentLength = contentBytes.Length;
+        request.Headers.Append("OData-Version", "4.0");
+        request.Headers.Append("Accept", "application/json;odata.metadata=full");
 
-            // Act
-            EmployeeModel employee = await deserializer.ReadAsync(
-                GetODataMessageReader(payload),
-                typeof(EmployeeModel),
-                _readContext) as EmployeeModel;
-
-            // Assert
-            Assert.NotNull(employee);
-            Assert.Equal(789, employee.EmployeeId);
-            Assert.Equal("John Hark", employee.EmployeeName);
-        }
-
-        private ODataMessageReader GetODataMessageReader(string content)
-        {
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/odata/CEO", opt => opt.AddRouteComponents("odata", _edmModel));
-
-            //request.Content = new StringContent(content);
-            //request.Headers.Add("OData-Version", "4.0");
-
-            //MediaTypeWithQualityHeaderValue mediaType = new MediaTypeWithQualityHeaderValue("application/json");
-            //mediaType.Parameters.Add(new NameValueHeaderValue("odata.metadata", "full"));
-            //request.Headers.Accept.Add(mediaType);
-            //request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            byte[] contentBytes = Encoding.UTF8.GetBytes(content);
-            request.Body = new MemoryStream(contentBytes);
-            request.ContentType = "application/json";
-            request.ContentLength = contentBytes.Length;
-            request.Headers.Add("OData-Version", "4.0");
-            request.Headers.Add("Accept", "application/json;odata.metadata=full");
-
-            return new ODataMessageReader(new HttpRequestODataMessage(request), new ODataMessageReaderSettings(), _edmModel);
-        }
+        return new ODataMessageReader(new HttpRequestODataMessage(request), new ODataMessageReaderSettings(), _edmModel);
     }
 }

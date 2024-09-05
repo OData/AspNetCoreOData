@@ -11,16 +11,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Abstracts
+namespace Microsoft.AspNetCore.OData.Tests.Abstracts;
+
+public class ContainerBuilderExtensionsTests
 {
-    public class ContainerBuilderExtensionsTests
+    [Fact]
+    public void AddDefaultWebApiServices_ThrowsArgumentNull_Builder()
     {
-        [Fact]
-        public void AddDefaultWebApiServices_ThrowsArgumentNull_Builder()
-        {
-            // Arrange & Act & Assert
-            IServiceCollection services = null;
-            ExceptionAssert.ThrowsArgumentNull(() => services.AddDefaultWebApiServices(), "services");
-        }
+        // Arrange & Act & Assert
+        IServiceCollection services = null;
+        ExceptionAssert.ThrowsArgumentNull(() => services.AddDefaultWebApiServices(), "services");
     }
 }

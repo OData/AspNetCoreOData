@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+/// <summary>
+/// Represents an instance of an enum value.
+/// </summary>
+public interface IEdmEnumObject : IEdmObject
 {
-    /// <summary>
-    /// Represents an instance of an enum value.
-    /// </summary>
-    public interface IEdmEnumObject : IEdmObject
-    {
-    }
 }

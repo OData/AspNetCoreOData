@@ -9,15 +9,14 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query
+namespace Microsoft.AspNetCore.OData.Tests.Query;
+
+public class OrderByPropertyNodeTests
 {
-    public class OrderByPropertyNodeTests
+    [Fact]
+    public void CtorOrderByPropertyNode_ThrowsArgumentNull_OrderByClause()
     {
-        [Fact]
-        public void CtorOrderByPropertyNode_ThrowsArgumentNull_OrderByClause()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new OrderByPropertyNode(null), "orderByClause");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new OrderByPropertyNode(null), "orderByClause");
     }
 }

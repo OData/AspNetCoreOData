@@ -10,84 +10,83 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.Edm
+namespace Microsoft.AspNetCore.OData.Edm;
+
+/// <summary>
+/// Extension methods for <see cref="IODataTypeMapper"/>.
+/// </summary>
+public static class IODataTypeMapperExtensions
 {
     /// <summary>
-    /// Extension methods for <see cref="IODataTypeMapper"/>.
+    /// Gets the corresponding <see cref="Type"/> for a given Edm primitive type <see cref="IEdmPrimitiveTypeReference"/>.
     /// </summary>
-    public static class IODataTypeMapperExtensions
+    /// <param name="mapper">The type mapper.</param>
+    /// <param name="primitiveType">The Edm primitive type reference.</param>
+    /// <returns>Null or the CLR type.</returns>
+    public static Type GetPrimitiveType(this IODataTypeMapper mapper, IEdmPrimitiveTypeReference primitiveType)
     {
-        /// <summary>
-        /// Gets the corresponding <see cref="Type"/> for a given Edm primitive type <see cref="IEdmPrimitiveTypeReference"/>.
-        /// </summary>
-        /// <param name="mapper">The type mapper.</param>
-        /// <param name="primitiveType">The Edm primitive type reference.</param>
-        /// <returns>Null or the CLR type.</returns>
-        public static Type GetPrimitiveType(this IODataTypeMapper mapper, IEdmPrimitiveTypeReference primitiveType)
+        if (mapper == null)
         {
-            if (mapper == null)
-            {
-                throw Error.ArgumentNull(nameof(mapper));
-            }
-
-            if (primitiveType == null)
-            {
-                throw Error.ArgumentNull(nameof(primitiveType));
-            }
-
-            return mapper.GetClrPrimitiveType(primitiveType.PrimitiveDefinition(), primitiveType.IsNullable);
+            throw Error.ArgumentNull(nameof(mapper));
         }
 
-        /// <summary>
-        /// Gets the corresponding Edm type <see cref="IEdmType"/> for the given CLR type <see cref="Type"/>.
-        /// </summary>
-        /// <param name="mapper">The type mapper.</param>
-        /// <param name="edmModel">The given Edm model.</param>
-        /// <param name="clrType">The given CLR type.</param>
-        /// <returns>Null or the corresponding Edm type.</returns>
-        public static IEdmType GetEdmType(this IODataTypeMapper mapper, IEdmModel edmModel, Type clrType)
+        if (primitiveType == null)
         {
-            if (mapper == null)
-            {
-                throw Error.ArgumentNull(nameof(mapper));
-            }
-
-            return mapper.GetEdmTypeReference(edmModel, clrType)?.Definition;
+            throw Error.ArgumentNull(nameof(primitiveType));
         }
 
-        /// <summary>
-        /// Gets the corresponding <see cref="Type"/> for a given Edm type <see cref="IEdmTypeReference"/>.
-        /// </summary>
-        /// <param name="mapper">The type mapper.</param>
-        /// <param name="edmModel">The Edm model.</param>
-        /// <param name="edmType">The Edm type reference.</param>
-        /// <returns>Null or the CLR type.</returns>
-        public static Type GetClrType(this IODataTypeMapper mapper, IEdmModel edmModel, IEdmTypeReference edmType)
+        return mapper.GetClrPrimitiveType(primitiveType.PrimitiveDefinition(), primitiveType.IsNullable);
+    }
+
+    /// <summary>
+    /// Gets the corresponding Edm type <see cref="IEdmType"/> for the given CLR type <see cref="Type"/>.
+    /// </summary>
+    /// <param name="mapper">The type mapper.</param>
+    /// <param name="edmModel">The given Edm model.</param>
+    /// <param name="clrType">The given CLR type.</param>
+    /// <returns>Null or the corresponding Edm type.</returns>
+    public static IEdmType GetEdmType(this IODataTypeMapper mapper, IEdmModel edmModel, Type clrType)
+    {
+        if (mapper == null)
         {
-            return mapper.GetClrType(edmModel, edmType, AssemblyResolverHelper.Default);
+            throw Error.ArgumentNull(nameof(mapper));
         }
 
-        /// <summary>
-        /// Gets the corresponding <see cref="Type"/> for a given Edm type <see cref="IEdmTypeReference"/>.
-        /// </summary>
-        /// <param name="mapper">The type mapper.</param>
-        /// <param name="edmModel">The Edm model.</param>
-        /// <param name="edmType">The Edm type.</param>
-        /// <param name="assembliesResolver">The assembly resolver.</param>
-        /// <returns>Null or the CLR type.</returns>
-        public static Type GetClrType(this IODataTypeMapper mapper, IEdmModel edmModel, IEdmTypeReference edmType, IAssemblyResolver assembliesResolver)
+        return mapper.GetEdmTypeReference(edmModel, clrType)?.Definition;
+    }
+
+    /// <summary>
+    /// Gets the corresponding <see cref="Type"/> for a given Edm type <see cref="IEdmTypeReference"/>.
+    /// </summary>
+    /// <param name="mapper">The type mapper.</param>
+    /// <param name="edmModel">The Edm model.</param>
+    /// <param name="edmType">The Edm type reference.</param>
+    /// <returns>Null or the CLR type.</returns>
+    public static Type GetClrType(this IODataTypeMapper mapper, IEdmModel edmModel, IEdmTypeReference edmType)
+    {
+        return mapper.GetClrType(edmModel, edmType, AssemblyResolverHelper.Default);
+    }
+
+    /// <summary>
+    /// Gets the corresponding <see cref="Type"/> for a given Edm type <see cref="IEdmTypeReference"/>.
+    /// </summary>
+    /// <param name="mapper">The type mapper.</param>
+    /// <param name="edmModel">The Edm model.</param>
+    /// <param name="edmType">The Edm type.</param>
+    /// <param name="assembliesResolver">The assembly resolver.</param>
+    /// <returns>Null or the CLR type.</returns>
+    public static Type GetClrType(this IODataTypeMapper mapper, IEdmModel edmModel, IEdmTypeReference edmType, IAssemblyResolver assembliesResolver)
+    {
+        if (mapper == null)
         {
-            if (mapper == null)
-            {
-                throw Error.ArgumentNull(nameof(mapper));
-            }
-
-            if (edmType == null)
-            {
-                throw Error.ArgumentNull(nameof(edmType));
-            }
-
-            return mapper.GetClrType(edmModel, edmType.Definition, edmType.IsNullable, assembliesResolver);
+            throw Error.ArgumentNull(nameof(mapper));
         }
+
+        if (edmType == null)
+        {
+            throw Error.ArgumentNull(nameof(edmType));
+        }
+
+        return mapper.GetClrType(edmModel, edmType.Definition, edmType.IsNullable, assembliesResolver);
     }
 }

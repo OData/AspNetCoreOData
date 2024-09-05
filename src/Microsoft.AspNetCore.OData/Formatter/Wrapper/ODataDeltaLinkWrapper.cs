@@ -7,25 +7,24 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
+namespace Microsoft.AspNetCore.OData.Formatter.Wrapper;
+
+/// <summary>
+/// Encapsulates an <see cref="ODataDeltaLink"/> added link.
+/// </summary>
+public sealed class ODataDeltaLinkWrapper : ODataDeltaLinkBaseWrapper
 {
     /// <summary>
-    /// Encapsulates an <see cref="ODataDeltaLink"/> added link.
+    /// Initializes a new instance of <see cref="ODataDeltaLinkWrapper"/>.
     /// </summary>
-    public sealed class ODataDeltaLinkWrapper : ODataDeltaLinkBaseWrapper
+    /// <param name="deltaLink">The wrapped added link item.</param>
+    public ODataDeltaLinkWrapper(ODataDeltaLink deltaLink)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ODataDeltaLinkWrapper"/>.
-        /// </summary>
-        /// <param name="deltaLink">The wrapped added link item.</param>
-        public ODataDeltaLinkWrapper(ODataDeltaLink deltaLink)
-        {
-            DeltaLink = deltaLink;
-        }
-
-        /// <summary>
-        /// Gets the wrapped <see cref="ODataDeltaLink"/>.
-        /// </summary>
-        public ODataDeltaLink DeltaLink { get; }
+        DeltaLink = deltaLink;
     }
+
+    /// <summary>
+    /// Gets the wrapped <see cref="ODataDeltaLink"/>.
+    /// </summary>
+    public ODataDeltaLink DeltaLink { get; }
 }

@@ -8,27 +8,26 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport;
+
+public class DateTimeOffsetEdmModel
 {
-    public class DateTimeOffsetEdmModel
+    public static IEdmModel GetExplicitModel()
     {
-        public static IEdmModel GetExplicitModel()
-        {
-            ODataModelBuilder builder = new ODataModelBuilder();
-            var fileType = builder.EntityType<File>().HasKey(f => f.FileId);
-            fileType.Property(f => f.Name);
-            fileType.Property(f => f.CreatedDate);
-            fileType.Property(f => f.DeleteDate);
+        ODataModelBuilder builder = new ODataModelBuilder();
+        var fileType = builder.EntityType<File>().HasKey(f => f.FileId);
+        fileType.Property(f => f.Name);
+        fileType.Property(f => f.CreatedDate);
+        fileType.Property(f => f.DeleteDate);
 
-            var files = builder.EntitySet<File>("Files");
-            return builder.GetEdmModel();
-        }
+        var files = builder.EntitySet<File>("Files");
+        return builder.GetEdmModel();
+    }
 
-        public static IEdmModel GetConventionModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<File>("Files");
-            return builder.GetEdmModel();
-        }
+    public static IEdmModel GetConventionModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<File>("Files");
+        return builder.GetEdmModel();
     }
 }

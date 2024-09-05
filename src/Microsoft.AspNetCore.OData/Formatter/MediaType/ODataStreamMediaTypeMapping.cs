@@ -9,30 +9,29 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing;
 
-namespace Microsoft.AspNetCore.OData.Formatter.MediaType
+namespace Microsoft.AspNetCore.OData.Formatter.MediaType;
+
+/// <summary>
+/// Media type mapping that associates requests with stream property.
+/// </summary>
+public class ODataStreamMediaTypeMapping : MediaTypeMapping
 {
     /// <summary>
-    /// Media type mapping that associates requests with stream property.
+    /// Initializes a new instance of the <see cref="ODataStreamMediaTypeMapping"/> class.
     /// </summary>
-    public class ODataStreamMediaTypeMapping : MediaTypeMapping
+    public ODataStreamMediaTypeMapping()
+        : base("application/octet-stream")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataStreamMediaTypeMapping"/> class.
-        /// </summary>
-        public ODataStreamMediaTypeMapping()
-            : base("application/octet-stream")
+    }
+
+    /// <inheritdoc/>
+    public override double TryMatchMediaType(HttpRequest request)
+    {
+        if (request == null)
         {
+            throw Error.ArgumentNull(nameof(request));
         }
 
-        /// <inheritdoc/>
-        public override double TryMatchMediaType(HttpRequest request)
-        {
-            if (request == null)
-            {
-                throw Error.ArgumentNull(nameof(request));
-            }
-
-            return request.ODataFeature().Path.IsStreamPropertyPath() ? 1 : 0;
-        }
+        return request.ODataFeature().Path.IsStreamPropertyPath() ? 1 : 0;
     }
 }
