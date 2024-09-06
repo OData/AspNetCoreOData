@@ -64,14 +64,14 @@ public class ZipCodeInfo
     public string Code { get; set; }
 }
 
-public class People
+public class Person
 {
     public int Id { get; set; }
 
-    [AutoExpand]
-    public Order Order { get; set; }
+[AutoExpand]
+public Order Order { get; set; }
 
-    public People Friend { get; set; }
+    public Person Friend { get; set; }
 }
 
 public class Order
