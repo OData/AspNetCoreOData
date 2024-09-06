@@ -869,7 +869,7 @@ namespace Microsoft.AspNetCore.OData.Query
 
         private IDictionary<string, string> GetODataQueryParameters()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>();
+            Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var query in Request.Query)
             {

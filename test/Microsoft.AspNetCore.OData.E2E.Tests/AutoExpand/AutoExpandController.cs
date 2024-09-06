@@ -69,9 +69,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
     public class PeopleController : ODataController
     {
         [EnableQuery(MaxExpansionDepth = 4)]
-        public IQueryable<People> Get()
+        public IQueryable<Person> Get()
         {
             return AutoExpandDataSource.People.AsQueryable();
+        }
+
+        [EnableQuery]
+        public IActionResult Get(int key)
+        {
+            Person person = AutoExpandDataSource.People.FirstOrDefault(c => c.Id == key);
+            if (person == null)
+            {
+                return NotFound($"Cannot find person with key = {key}");
+            }
+
+            return Ok(person);
         }
     }
 
