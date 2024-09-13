@@ -6,13 +6,18 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Microsoft.FullyQualified.NS;
 using Moq;
 using Xunit;
 
@@ -100,16 +105,144 @@ public class QueryBinderTests
             "Unknown function 'anyUnknown'.");
     }
 
-    [Fact]
-    public void BindSingleValueFunctionCallNode_ThrowsArgumentNull_ForInputs()
-    {
-        // Arrange
-        QueryBinder binder = new MyQueryBinder();
-        Mock<IEdmType> type = new Mock<IEdmType>();
-        type.Setup(t => t.TypeKind).Returns(EdmTypeKind.Primitive);
-        Mock<IEdmTypeReference> typeRef = new Mock<IEdmTypeReference>();
-        typeRef.Setup(t => t.Definition).Returns(type.Object);
-        SingleValueFunctionCallNode node = new SingleValueFunctionCallNode("any", null, typeRef.Object);
+        [Theory]
+        [InlineData(typeof(ConstantNode))]
+        [InlineData(typeof(SingleResourceCastNode))]
+        public void BindSingleResourceFunctionCallNode_CastingEntityType_ReturnsExpression(Type queryNodeType)
+        {
+            // Arrange
+            var binder = new MyQueryBinder();
+
+            var model = EdmModelBuilder.BuildAndGetEdmModel();
+
+            // Create the type reference and navigation source
+            var personType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Person");
+            var personTypeRef = EdmModelBuilder.GetEntityTypeReference(personType);
+            var collectionNode = FakeCollectionResourceNode.CreateFakeNodeForPerson();
+
+            var employeeType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Employee");
+
+            // Create a ResourceRangeVariableReferenceNode for the Person entity
+            var rangeVariable = new ResourceRangeVariable("$it", personTypeRef, collectionNode);
+            var personNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
+
+            // Create the parameters list
+            int capacity = 2;
+            var parameters = new List<QueryNode>(capacity)
+            {
+                personNode // First parameter is the Person entity
+            };
+
+            if (queryNodeType == typeof(SingleResourceCastNode))
+            {
+                // Create a SingleResourceCastNode to cast Person to NS.Employee
+                var singleResourceCastNode = new SingleResourceCastNode(personNode as SingleResourceNode, employeeType);
+                parameters.Add(singleResourceCastNode); // Second parameter is the SingleResourceCastNode
+            }
+            else if (queryNodeType == typeof(ConstantNode))
+            {
+                // Create a ConstantNode to cast Person to NS.Employee
+                var constantNode = new ConstantNode("Microsoft.FullyQualified.NS.Employee");
+                parameters.Add(constantNode); // Second parameter is the ConstantNode
+            }
+
+            // Create the SingleResourceFunctionCallNode
+            var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
+
+            // Create an instance of QueryBinderContext using the real model and settings
+            Type clrType = model.GetClrType(personType);
+            var context = new QueryBinderContext(model, new ODataQuerySettings(), clrType);
+
+            // Act
+            Expression expression = binder.BindSingleResourceFunctionCallNode(node, context);
+
+            // Assert
+            Assert.NotNull(expression);
+            Assert.Equal("($it As Employee)", expression.ToString());
+            Assert.Equal("Microsoft.FullyQualified.NS.Employee", expression.Type.ToString());
+            Assert.Equal(typeof(Employee), expression.Type);
+            Assert.Equal(ExpressionType.TypeAs, expression.NodeType);
+            Assert.Equal(personType.FullName(), (expression as UnaryExpression).Operand.Type.FullName);
+            Assert.Equal(employeeType.FullName(), (expression as UnaryExpression).Type.FullName);
+        }
+
+        [Theory]
+        [InlineData(typeof(ConstantNode))]
+        [InlineData(typeof(SingleResourceCastNode))]
+        public void BindSingleResourceFunctionCallNode_PropertyCasting_ReturnsExpression(Type queryNodeType)
+        {
+            // Arrange
+            var binder = new MyQueryBinder();
+
+            var model = EdmModelBuilder.BuildAndGetEdmModel();
+
+            // Create the type reference and navigation source
+            var personType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Person");
+            var personTypeRef = EdmModelBuilder.GetEntityTypeReference(personType);
+            var collectionNode = FakeCollectionResourceNode.CreateFakeNodeForPerson();
+
+            var myAddressType = EdmModelBuilder.GetEdmComplexType("Microsoft.FullyQualified.NS.MyAddress");
+            var workAddressType = EdmModelBuilder.GetEdmComplexType("Microsoft.FullyQualified.NS.WorkAddress");
+
+            // Create a ResourceRangeVariableReferenceNode for the Person entity
+            var rangeVariable = new ResourceRangeVariable("$it", personTypeRef, collectionNode);
+            var personNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
+
+            // Create a SingleComplexNode for the Location property of the Person entity
+            var locationProperty = EdmModelBuilder.GetPersonLocationProperty();
+            var locationNode = new SingleComplexNode(personNode as SingleResourceNode, locationProperty);
+
+            // Create the parameters list
+            int capacity = 2;
+            var parameters = new List<QueryNode>(capacity)
+            {
+                locationNode // First parameter is the Location property
+            };
+
+            if(queryNodeType == typeof(SingleResourceCastNode))
+            {
+                // Create a SingleResourceCastNode to cast Location to NS.WorkAddress
+                var singleResourceCastNode = new SingleResourceCastNode(locationNode, workAddressType);
+                parameters.Add(singleResourceCastNode); // Second parameter is the SingleResourceCastNode
+            }
+            else if (queryNodeType == typeof(ConstantNode))
+            {
+                // Create a ConstantNode to cast Location to NS.WorkAddress
+                var constantNode = new ConstantNode("Microsoft.FullyQualified.NS.WorkAddress");
+                parameters.Add(constantNode); // Second parameter is the ConstantNode
+            }
+
+            // Create the SingleResourceFunctionCallNode
+            var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
+
+            // Create an instance of QueryBinderContext using the real model and settings
+            Type clrType = model.GetClrType(personType);
+            var context = new QueryBinderContext(model, new ODataQuerySettings(), clrType);
+
+            // Act
+            Expression expression = binder.BindSingleResourceFunctionCallNode(node, context);
+
+            // Assert
+            Assert.NotNull(expression);
+            Assert.Equal("($it.Location As WorkAddress)", expression.ToString());
+            Assert.Equal("Microsoft.FullyQualified.NS.WorkAddress", expression.Type.ToString());
+            Assert.Equal("Location", ((expression as UnaryExpression).Operand as MemberExpression).Member.Name);
+            Assert.Equal(typeof(WorkAddress), expression.Type);
+            Assert.Equal(ExpressionType.TypeAs, expression.NodeType);
+            Assert.Equal(workAddressType.FullName(), (expression as UnaryExpression).Type.FullName);
+            Assert.Equal(myAddressType.FullName(), (expression as UnaryExpression).Operand.Type.FullName);
+        }
+
+        [Fact]
+        public void BindSingleValueFunctionCallNode_ThrowsArgumentNull_ForInputs()
+        {
+            // Arrange
+            QueryBinder binder = new MyQueryBinder();
+            Mock<IEdmType> type = new Mock<IEdmType>();
+            type.Setup(t => t.TypeKind).Returns(EdmTypeKind.Primitive);
+            Mock<IEdmTypeReference> typeRef = new Mock<IEdmTypeReference>();
+            typeRef.Setup(t => t.Definition).Returns(type.Object);
+            SingleValueFunctionCallNode node = new SingleValueFunctionCallNode("any", null, typeRef.Object);
 
         // Act & Assert
         ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleValueFunctionCallNode(null, null), "node");
