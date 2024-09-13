@@ -113,14 +113,14 @@ public class QueryBinderTests
             // Arrange
             var binder = new MyQueryBinder();
 
-            var model = EdmModelBuilder.BuildAndGetEdmModel();
+            var model = HardCodedTestModel.TestModel;
 
             // Create the type reference and navigation source
-            var personType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Person");
-            var personTypeRef = EdmModelBuilder.GetEntityTypeReference(personType);
+            var personType = HardCodedTestModel.GetEntityType("Microsoft.FullyQualified.NS.Person");
+            var personTypeRef = HardCodedTestModel.GetEntityTypeReference(personType);
             var collectionNode = FakeCollectionResourceNode.CreateFakeNodeForPerson();
 
-            var employeeType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Employee");
+            var employeeType = HardCodedTestModel.GetEntityType("Microsoft.FullyQualified.NS.Employee");
 
             // Create a ResourceRangeVariableReferenceNode for the Person entity
             var rangeVariable = new ResourceRangeVariable("$it", personTypeRef, collectionNode);
@@ -174,22 +174,22 @@ public class QueryBinderTests
             // Arrange
             var binder = new MyQueryBinder();
 
-            var model = EdmModelBuilder.BuildAndGetEdmModel();
+            var model = HardCodedTestModel.TestModel;
 
             // Create the type reference and navigation source
-            var personType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Person");
-            var personTypeRef = EdmModelBuilder.GetEntityTypeReference(personType);
+            var personType = HardCodedTestModel.GetEntityType("Microsoft.FullyQualified.NS.Person");
+            var personTypeRef = HardCodedTestModel.GetEntityTypeReference(personType);
             var collectionNode = FakeCollectionResourceNode.CreateFakeNodeForPerson();
 
-            var myAddressType = EdmModelBuilder.GetEdmComplexType("Microsoft.FullyQualified.NS.MyAddress");
-            var workAddressType = EdmModelBuilder.GetEdmComplexType("Microsoft.FullyQualified.NS.WorkAddress");
+            var myAddressType = HardCodedTestModel.GetEdmComplexType("Microsoft.FullyQualified.NS.MyAddress");
+            var workAddressType = HardCodedTestModel.GetEdmComplexType("Microsoft.FullyQualified.NS.WorkAddress");
 
             // Create a ResourceRangeVariableReferenceNode for the Person entity
             var rangeVariable = new ResourceRangeVariable("$it", personTypeRef, collectionNode);
             var personNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
 
             // Create a SingleComplexNode for the Location property of the Person entity
-            var locationProperty = EdmModelBuilder.GetPersonLocationProperty();
+            var locationProperty = HardCodedTestModel.GetPersonLocationProperty();
             var locationNode = new SingleComplexNode(personNode as SingleResourceNode, locationProperty);
 
             // Create the parameters list

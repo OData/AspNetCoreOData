@@ -36,8 +36,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         public static FakeSingleEntityNode CreateFakeNodeForPerson()
         {
-            var personType = EdmModelBuilder.GetEntityType("Microsoft.FullyQualified.NS.Person");
-            return new FakeSingleEntityNode(EdmModelBuilder.GetEntityTypeReference(personType), EdmModelBuilder.GetPeopleSet());
+            var personType = HardCodedTestModel.GetEntityType("Microsoft.FullyQualified.NS.Person");
+            return new FakeSingleEntityNode(HardCodedTestModel.GetEntityTypeReference(personType), HardCodedTestModel.GetPeopleSet());
         }
     }
 

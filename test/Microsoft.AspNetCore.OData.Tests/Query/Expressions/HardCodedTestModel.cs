@@ -4,7 +4,7 @@ using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 {
-    internal static class EdmModelBuilder
+    internal static class HardCodedTestModel
     {
         private static readonly IEdmModel Model = BuildAndGetEdmModel();
 
@@ -48,7 +48,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             return TestModel.EntityContainer.FindEntitySet("People");
         }
 
-        public static IEdmModel BuildAndGetEdmModel()
+        private static IEdmModel BuildAndGetEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
             builder.Namespace = "Microsoft.FullyQualified.NS";
