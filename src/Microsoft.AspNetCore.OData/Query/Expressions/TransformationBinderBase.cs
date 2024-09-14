@@ -10,6 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
