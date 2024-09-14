@@ -17,70 +17,69 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Routing.QueryRequest;
+
+public class CustomQueryOptionsParserTests : WebApiTestBase<CustomQueryOptionsParserTests>
 {
-    public class CustomQueryOptionsParserTests : WebApiTestBase<CustomQueryOptionsParserTests>
+    public CustomQueryOptionsParserTests(WebApiTestFixture<CustomQueryOptionsParserTests> fixture)
+        : base(fixture)
     {
-        public CustomQueryOptionsParserTests(WebApiTestFixture<CustomQueryOptionsParserTests> fixture)
-            : base(fixture)
+    }
+
+    protected static void UpdateConfigureServices(IServiceCollection services)
+    {
+        services.ConfigureControllers(typeof(DollarQueryCustomersController));
+        services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
+        services.TryAddEnumerable(
+            ServiceDescriptor.Singleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>());
+        // NOTE: The following statement also does what is expected
+        // services.AddSingleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>();
+    }
+
+    protected static void UpdateConfigure(IApplicationBuilder app)
+    {
+        // Add OData /$query middleware
+        app.UseODataQueryRequest();
+
+        app.UseRouting();
+        app.UseEndpoints(endpoints =>
         {
-        }
+            endpoints.MapControllers();
+        });
+    }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            services.ConfigureControllers(typeof(DollarQueryCustomersController));
-            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()).Count().Filter().OrderBy().Expand().SetMaxTop(null).Select());
-            services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>());
-            // NOTE: The following statement also does what is expected
-            // services.AddSingleton<IODataQueryRequestParser, CustomODataQueryOptionsParser>();
-        }
+    private static IEdmModel GetEdmModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
 
-        protected static void UpdateConfigure(IApplicationBuilder app)
-        {
-            // Add OData /$query middleware
-            app.UseODataQueryRequest();
+        builder.EntitySet<DollarQueryCustomer>("DollarQueryCustomers");
+        builder.EntitySet<DollarQueryOrder>("DollarQueryOrders");
 
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
+        return builder.GetEdmModel();
+    }
 
-        private static IEdmModel GetEdmModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+    [Fact]
+    public async Task ODataQueryOptionsInRequestBody_ForSupportedMediaType()
+    {
+        // Arrange
+        string requestUri = "odata/DollarQueryCustomers/$query";
+        var contentType = "text/xml";
+        var queryOptionsPayload = "<QueryOptions><QueryOption Option=\"$filter\" Value=\"Id eq 1\"/></QueryOptions>";
 
-            builder.EntitySet<DollarQueryCustomer>("DollarQueryCustomers");
-            builder.EntitySet<DollarQueryOrder>("DollarQueryOrders");
+        var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+        request.Content = new StringContent(queryOptionsPayload);
+        request.Content.Headers.ContentType = new MediaTypeWithQualityHeaderValue(contentType);
+        request.Content.Headers.ContentLength = queryOptionsPayload.Length;
 
-            return builder.GetEdmModel();
-        }
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        HttpClient client = CreateClient();
 
-        [Fact]
-        public async Task ODataQueryOptionsInRequestBody_ForSupportedMediaType()
-        {
-            // Arrange
-            string requestUri = "odata/DollarQueryCustomers/$query";
-            var contentType = "text/xml";
-            var queryOptionsPayload = "<QueryOptions><QueryOption Option=\"$filter\" Value=\"Id eq 1\"/></QueryOptions>";
+        // Act
+        var response = await client.SendAsync(request);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
-            request.Content = new StringContent(queryOptionsPayload);
-            request.Content.Headers.ContentType = new MediaTypeWithQualityHeaderValue(contentType);
-            request.Content.Headers.ContentLength = queryOptionsPayload.Length;
-
-            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
-            HttpClient client = CreateClient();
-
-            // Act
-            var response = await client.SendAsync(request);
-
-            // Arrange
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.Contains("\"value\":[{\"Id\":1,\"Name\":\"Customer Name 1\"}]",
-                await response.Content.ReadAsStringAsync());
-        }
+        // Arrange
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Contains("\"value\":[{\"Id\":1,\"Name\":\"Customer Name 1\"}]",
+            await response.Content.ReadAsStringAsync());
     }
 }

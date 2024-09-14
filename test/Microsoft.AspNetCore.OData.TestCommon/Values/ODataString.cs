@@ -5,18 +5,17 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.TestCommon.Values
-{
-    /// <summary>
-    /// A OData string value.
-    /// </summary>
-    public class ODataString : IODataValue
-    {
-        public ODataString(string value)
-        {
-            Value = value;
-        }
+namespace Microsoft.AspNetCore.OData.TestCommon.Values;
 
-        public string Value { get; }
+/// <summary>
+/// A OData string value.
+/// </summary>
+public class ODataString : IODataValue
+{
+    public ODataString(string value)
+    {
+        Value = value;
     }
+
+    public string Value { get; }
 }

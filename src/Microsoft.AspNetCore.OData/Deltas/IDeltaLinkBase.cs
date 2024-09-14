@@ -7,26 +7,25 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OData.Deltas
+namespace Microsoft.AspNetCore.OData.Deltas;
+
+/// <summary>
+/// <see cref="IDelta" /> allows and tracks changes to delta link.
+/// </summary>
+internal interface IDeltaLinkBase : IDeltaSetItem
 {
     /// <summary>
-    /// <see cref="IDelta" /> allows and tracks changes to delta link.
+    /// The Uri of the entity from which the relationship is defined, which may be absolute or relative.
     /// </summary>
-    internal interface IDeltaLinkBase : IDeltaSetItem
-    {
-        /// <summary>
-        /// The Uri of the entity from which the relationship is defined, which may be absolute or relative.
-        /// </summary>
-        Uri Source { get; set; }
+    Uri Source { get; set; }
 
-        /// <summary>
-        /// The Uri of the related entity, which may be absolute or relative.
-        /// </summary>
-        Uri Target { get; set; }
+    /// <summary>
+    /// The Uri of the related entity, which may be absolute or relative.
+    /// </summary>
+    Uri Target { get; set; }
 
-        /// <summary>
-        /// The name of the relationship property on the parent object.
-        /// </summary>
-        string Relationship { get; set; }
-    }
+    /// <summary>
+    /// The name of the relationship property on the parent object.
+    /// </summary>
+    string Relationship { get; set; }
 }

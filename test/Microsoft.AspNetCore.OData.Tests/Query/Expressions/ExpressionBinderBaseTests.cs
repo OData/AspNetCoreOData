@@ -17,57 +17,56 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
+namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions;
+
+/// <summary>
+/// Tests to ExpressionBinderBase binder.
+/// </summary>
+public class ExpressionBinderBaseTests
 {
-    /// <summary>
-    /// Tests to ExpressionBinderBase binder.
-    /// </summary>
-    public class ExpressionBinderBaseTests
+    [Fact]
+    public void RetrieveClrTypeForConstant_WorksForEnum()
     {
-        [Fact]
-        public void RetrieveClrTypeForConstant_WorksForEnum()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.ComplexType<Address>();
-            var model = builder.GetEdmModel();
-            var enumType = model.SchemaElements.OfType<IEdmEnumType>().First();
-            var enumTypeRef = new EdmEnumTypeReference(enumType, true);
+        var builder = new ODataConventionModelBuilder();
+        builder.ComplexType<Address>();
+        var model = builder.GetEdmModel();
+        var enumType = model.SchemaElements.OfType<IEdmEnumType>().First();
+        var enumTypeRef = new EdmEnumTypeReference(enumType, true);
 
-            MyExpressionBinder binder = new MyExpressionBinder(model, new ODataQuerySettings());
-            object enumValue = new ODataEnumValue("low");
-            Type type = binder.RetrieveClrTypeForConstant(enumTypeRef, ref enumValue);
-            Assert.NotNull(type);
-            Assert.Equal(typeof(Level), type);
-            Assert.Equal(Level.Low, enumValue);
-        }
-
-        public class Address
-        {
-            public Level Level { get; set; }
-        }
-
-        [DataContract(Name = "level")]
-        public enum Level
-        {
-            [EnumMember(Value = "low")]
-            Low,
-
-            [EnumMember(Value = "veryhigh")]
-            High
-        }
+        MyExpressionBinder binder = new MyExpressionBinder(model, new ODataQuerySettings());
+        object enumValue = new ODataEnumValue("low");
+        Type type = binder.RetrieveClrTypeForConstant(enumTypeRef, ref enumValue);
+        Assert.NotNull(type);
+        Assert.Equal(typeof(Level), type);
+        Assert.Equal(Level.Low, enumValue);
     }
 
-    public class MyExpressionBinder : ExpressionBinderBase
+    public class Address
     {
-        public MyExpressionBinder(IEdmModel model, ODataQuerySettings querySettings) : base(model, querySettings)
-        {
-        }
+        public Level Level { get; set; }
+    }
 
-        protected override ParameterExpression Parameter => throw new NotImplementedException();
+    [DataContract(Name = "level")]
+    public enum Level
+    {
+        [EnumMember(Value = "low")]
+        Low,
 
-        public override Expression Bind(QueryNode node)
-        {
-            throw new NotImplementedException();
-        }
+        [EnumMember(Value = "veryhigh")]
+        High
+    }
+}
+
+public class MyExpressionBinder : ExpressionBinderBase
+{
+    public MyExpressionBinder(IEdmModel model, ODataQuerySettings querySettings) : base(model, querySettings)
+    {
+    }
+
+    protected override ParameterExpression Parameter => throw new NotImplementedException();
+
+    public override Expression Bind(QueryNode node)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -8,70 +8,69 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.AspNetCore.OData
+namespace Microsoft.AspNetCore.OData;
+
+/// <summary>
+/// Provides extension methods to add OData services based on <see cref="IMvcCoreBuilder"/>.
+/// </summary>
+public static class ODataMvcCoreBuilderExtensions
 {
     /// <summary>
-    /// Provides extension methods to add OData services based on <see cref="IMvcCoreBuilder"/>.
+    /// Adds essential OData services to the specified <see cref="IMvcCoreBuilder" />.
     /// </summary>
-    public static class ODataMvcCoreBuilderExtensions
+    /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to add services to.</param>
+    /// <returns>A <see cref="IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
+    public static IMvcCoreBuilder AddOData(this IMvcCoreBuilder builder)
     {
-        /// <summary>
-        /// Adds essential OData services to the specified <see cref="IMvcCoreBuilder" />.
-        /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to add services to.</param>
-        /// <returns>A <see cref="IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
-        public static IMvcCoreBuilder AddOData(this IMvcCoreBuilder builder)
+        return builder.AddOData(opt => { });
+    }
+
+    /// <summary>
+    /// Adds essential OData services to the specified <see cref="IMvcCoreBuilder" />.
+    /// </summary>
+    /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to add services to.</param>
+    /// <param name="setupAction">The OData options to configure the services with,
+    /// including access to a service provider which you can resolve services from.</param>
+    /// <returns>A <see cref="IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
+    public static IMvcCoreBuilder AddOData(this IMvcCoreBuilder builder, Action<ODataOptions> setupAction)
+    {
+        if (builder == null)
         {
-            return builder.AddOData(opt => { });
+            throw Error.ArgumentNull(nameof(builder));
         }
 
-        /// <summary>
-        /// Adds essential OData services to the specified <see cref="IMvcCoreBuilder" />.
-        /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to add services to.</param>
-        /// <param name="setupAction">The OData options to configure the services with,
-        /// including access to a service provider which you can resolve services from.</param>
-        /// <returns>A <see cref="IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
-        public static IMvcCoreBuilder AddOData(this IMvcCoreBuilder builder, Action<ODataOptions> setupAction)
+        if (setupAction == null)
         {
-            if (builder == null)
-            {
-                throw Error.ArgumentNull(nameof(builder));
-            }
-
-            if (setupAction == null)
-            {
-                throw Error.ArgumentNull(nameof(setupAction));
-            }
-
-            builder.Services.AddODataCore();
-            builder.Services.Configure(setupAction);
-            return builder;
+            throw Error.ArgumentNull(nameof(setupAction));
         }
 
-        /// <summary>
-        /// Adds essential OData services to the specified <see cref="IMvcCoreBuilder" />.
-        /// </summary>
-        /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to add services to.</param>
-        /// <param name="setupAction">The OData options to configure the services with,
-        /// including access to a service provider which you can resolve services from.</param>
-        /// <returns>A <see cref="IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
-        public static IMvcCoreBuilder AddOData(this IMvcCoreBuilder builder, Action<ODataOptions, IServiceProvider> setupAction)
+        builder.Services.AddODataCore();
+        builder.Services.Configure(setupAction);
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds essential OData services to the specified <see cref="IMvcCoreBuilder" />.
+    /// </summary>
+    /// <param name="builder">The <see cref="IMvcCoreBuilder" /> to add services to.</param>
+    /// <param name="setupAction">The OData options to configure the services with,
+    /// including access to a service provider which you can resolve services from.</param>
+    /// <returns>A <see cref="IMvcCoreBuilder"/> that can be used to further configure the OData services.</returns>
+    public static IMvcCoreBuilder AddOData(this IMvcCoreBuilder builder, Action<ODataOptions, IServiceProvider> setupAction)
+    {
+        if (builder == null)
         {
-            if (builder == null)
-            {
-                throw Error.ArgumentNull(nameof(builder));
-            }
-
-            if (setupAction == null)
-            {
-                throw Error.ArgumentNull(nameof(setupAction));
-            }
-
-            builder.Services.AddODataCore();
-            builder.Services.AddOptions<ODataOptions>().Configure(setupAction);
-
-            return builder;
+            throw Error.ArgumentNull(nameof(builder));
         }
+
+        if (setupAction == null)
+        {
+            throw Error.ArgumentNull(nameof(setupAction));
+        }
+
+        builder.Services.AddODataCore();
+        builder.Services.AddOptions<ODataOptions>().Configure(setupAction);
+
+        return builder;
     }
 }

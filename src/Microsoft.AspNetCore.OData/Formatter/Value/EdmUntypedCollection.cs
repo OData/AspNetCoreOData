@@ -10,15 +10,14 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+/// <summary>
+/// Represents an <see cref="IEdmObject"/> that is a collection of untyped values.
+/// </summary>
+[NonValidatingParameterBinding]
+public sealed class EdmUntypedCollection : List<object>, IEdmObject
 {
-    /// <summary>
-    /// Represents an <see cref="IEdmObject"/> that is a collection of untyped values.
-    /// </summary>
-    [NonValidatingParameterBinding]
-    public sealed class EdmUntypedCollection : List<object>, IEdmObject
-    {
-        /// <inheritdoc/>
-        public IEdmTypeReference GetEdmType() => EdmUntypedHelpers.NullableUntypedCollectionReference;
-    }
+    /// <inheritdoc/>
+    public IEdmTypeReference GetEdmType() => EdmUntypedHelpers.NullableUntypedCollectionReference;
 }

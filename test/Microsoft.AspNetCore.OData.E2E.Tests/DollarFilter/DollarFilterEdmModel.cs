@@ -8,16 +8,15 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter
-{
-    public class DollarFilterEdmModel
-    {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Person>("People");
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
 
-            return builder.GetEdmModel();
-        }
+public class DollarFilterEdmModel
+{
+    public static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Person>("People");
+
+        return builder.GetEdmModel();
     }
 }

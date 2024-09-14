@@ -17,52 +17,51 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Test.Batch
+namespace Microsoft.AspNetCore.OData.Test.Batch;
+
+/// <summary>
+/// Provides extension methods for the <see cref="HttpContent"/> class.
+/// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
+public static class ODataHttpContentExtensions
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="HttpContent"/> class.
+    /// Gets the <see cref="ODataMessageReader"/> for the <see cref="HttpContent"/> stream.
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static class ODataHttpContentExtensions
+    /// <param name="content">The <see cref="HttpContent"/>.</param>
+    /// <param name="settings">The <see cref="ODataMessageReaderSettings"/>.</param>
+    /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
+    public static Task<ODataMessageReader> GetODataMessageReaderAsync(this HttpContent content, ODataMessageReaderSettings settings)
     {
-        /// <summary>
-        /// Gets the <see cref="ODataMessageReader"/> for the <see cref="HttpContent"/> stream.
-        /// </summary>
-        /// <param name="content">The <see cref="HttpContent"/>.</param>
-        /// <param name="settings">The <see cref="ODataMessageReaderSettings"/>.</param>
-        /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
-        public static Task<ODataMessageReader> GetODataMessageReaderAsync(this HttpContent content, ODataMessageReaderSettings settings)
+        return GetODataMessageReaderAsync(content, settings, CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Gets the <see cref="ODataMessageReader"/> for the <see cref="HttpContent"/> stream.
+    /// </summary>
+    /// <param name="content">The <see cref="HttpContent"/>.</param>
+    /// <param name="settings">The <see cref="ODataMessageReaderSettings"/>.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
+    public static async Task<ODataMessageReader> GetODataMessageReaderAsync(this HttpContent content,
+        ODataMessageReaderSettings settings, CancellationToken cancellationToken)
+    {
+        if (content == null)
         {
-            return GetODataMessageReaderAsync(content, settings, CancellationToken.None);
+            throw Error.ArgumentNull("content");
         }
 
-        /// <summary>
-        /// Gets the <see cref="ODataMessageReader"/> for the <see cref="HttpContent"/> stream.
-        /// </summary>
-        /// <param name="content">The <see cref="HttpContent"/>.</param>
-        /// <param name="settings">The <see cref="ODataMessageReaderSettings"/>.</param>
-        /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
-        /// <returns>A task object that produces an <see cref="ODataMessageReader"/> when completed.</returns>
-        public static async Task<ODataMessageReader> GetODataMessageReaderAsync(this HttpContent content,
-            ODataMessageReaderSettings settings, CancellationToken cancellationToken)
+        cancellationToken.ThrowIfCancellationRequested();
+        Stream contentStream = await content.ReadAsStreamAsync();
+
+        HeaderDictionary headerDict = new HeaderDictionary();
+        foreach (var head in content.Headers)
         {
-            if (content == null)
-            {
-                throw Error.ArgumentNull("content");
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            Stream contentStream = await content.ReadAsStreamAsync();
-
-            HeaderDictionary headerDict = new HeaderDictionary();
-            foreach (var head in content.Headers)
-            {
-                headerDict[head.Key] = new StringValues(head.Value.ToArray());
-            }
-
-            IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(contentStream, headerDict/*, new MockServiceProvider()*/);
-            ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, settings);
-            return oDataMessageReader;
+            headerDict[head.Key] = new StringValues(head.Value.ToArray());
         }
+
+        IODataRequestMessage oDataRequestMessage = ODataMessageWrapperHelper.Create(contentStream, headerDict/*, new MockServiceProvider()*/);
+        ODataMessageReader oDataMessageReader = new ODataMessageReader(oDataRequestMessage, settings);
+        return oDataMessageReader;
     }
 }

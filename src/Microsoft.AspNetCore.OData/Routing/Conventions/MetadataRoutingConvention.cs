@@ -13,63 +13,62 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.Routing.Template;
 
-namespace Microsoft.AspNetCore.OData.Routing.Conventions
+namespace Microsoft.AspNetCore.OData.Routing.Conventions;
+
+/// <summary>
+/// The convention for $metadata.
+/// </summary>
+public class MetadataRoutingConvention : IODataControllerActionConvention
 {
+    private static TypeInfo metadataTypeInfo = typeof(MetadataController).GetTypeInfo();
+
     /// <summary>
-    /// The convention for $metadata.
+    /// Gets the order value for determining the order of execution of conventions.
+    /// Metadata routing convention has 0 order.
     /// </summary>
-    public class MetadataRoutingConvention : IODataControllerActionConvention
+    public virtual int Order => 0;
+
+    /// <inheritdoc />
+    public virtual bool AppliesToController(ODataControllerActionContext context)
     {
-        private static TypeInfo metadataTypeInfo = typeof(MetadataController).GetTypeInfo();
-
-        /// <summary>
-        /// Gets the order value for determining the order of execution of conventions.
-        /// Metadata routing convention has 0 order.
-        /// </summary>
-        public virtual int Order => 0;
-
-        /// <inheritdoc />
-        public virtual bool AppliesToController(ODataControllerActionContext context)
+        if (context == null)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            // This convention only applies to "MetadataController".
-            return context.Controller.ControllerType == metadataTypeInfo;
+            throw Error.ArgumentNull(nameof(context));
         }
 
-        /// <inheritdoc />
-        public virtual bool AppliesToAction(ODataControllerActionContext context)
+        // This convention only applies to "MetadataController".
+        return context.Controller.ControllerType == metadataTypeInfo;
+    }
+
+    /// <inheritdoc />
+    public virtual bool AppliesToAction(ODataControllerActionContext context)
+    {
+        if (context == null)
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            Debug.Assert(context.Controller != null);
-            Debug.Assert(context.Action != null);
-            ActionModel action = context.Action;
-            string actionName = action.ActionName;
-
-            // for ~$metadata
-            if (actionName == "GetMetadata")
-            {
-                ODataPathTemplate template = new ODataPathTemplate(MetadataSegmentTemplate.Instance);
-                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
-                return true;
-            }
-
-            // for ~/
-            if (actionName == "GetServiceDocument")
-            {
-                ODataPathTemplate template = new ODataPathTemplate();
-                action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
-                return true;
-            }
-
-            return false;
+            throw Error.ArgumentNull(nameof(context));
         }
+
+        Debug.Assert(context.Controller != null);
+        Debug.Assert(context.Action != null);
+        ActionModel action = context.Action;
+        string actionName = action.ActionName;
+
+        // for ~$metadata
+        if (actionName == "GetMetadata")
+        {
+            ODataPathTemplate template = new ODataPathTemplate(MetadataSegmentTemplate.Instance);
+            action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
+            return true;
+        }
+
+        // for ~/
+        if (actionName == "GetServiceDocument")
+        {
+            ODataPathTemplate template = new ODataPathTemplate();
+            action.AddSelector("Get", context.Prefix, context.Model, template, context.Options?.RouteOptions);
+            return true;
+        }
+
+        return false;
     }
 }

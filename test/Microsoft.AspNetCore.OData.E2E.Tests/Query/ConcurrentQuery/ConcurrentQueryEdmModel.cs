@@ -8,15 +8,14 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ConcurrentQuery;
+
+public class ConcurrentQueryEdmModel
 {
-    public class ConcurrentQueryEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
-            return builder.GetEdmModel();
-        }
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Customer>("Customers");
+        return builder.GetEdmModel();
     }
 }

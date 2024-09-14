@@ -5,10 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class SimpleVipCustomer : SimpleOpenCustomer
 {
-    public class SimpleVipCustomer : SimpleOpenCustomer
-    {
-        public string VipNum { get; set; }
-    }
+    public string VipNum { get; set; }
 }

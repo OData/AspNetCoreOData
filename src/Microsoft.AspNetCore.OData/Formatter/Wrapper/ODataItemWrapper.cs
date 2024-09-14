@@ -7,12 +7,11 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
+namespace Microsoft.AspNetCore.OData.Formatter.Wrapper;
+
+/// <summary>
+/// Base class for all classes that wrap an <see cref="ODataItem"/>.
+/// </summary>
+public abstract class ODataItemWrapper
 {
-    /// <summary>
-    /// Base class for all classes that wrap an <see cref="ODataItem"/>.
-    /// </summary>
-    public abstract class ODataItemWrapper
-    {
-    }
 }

@@ -8,15 +8,14 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.QueryValidationBeforeAction
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.QueryValidationBeforeAction;
+
+public class QueryValidationBeforeActionEdmModel
 {
-    public class QueryValidationBeforeActionEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
-            return builder.GetEdmModel();
-        }
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Customer>("Customers");
+        return builder.GetEdmModel();
     }
 }

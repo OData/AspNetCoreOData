@@ -10,34 +10,33 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter
+namespace Microsoft.AspNetCore.OData.Formatter;
+
+/// <summary>
+/// An equality comparer for <see cref="IEdmTypeReference"/>.
+/// </summary>
+internal class EdmTypeReferenceEqualityComparer : IEqualityComparer<IEdmTypeReference>
 {
-    /// <summary>
-    /// An equality comparer for <see cref="IEdmTypeReference"/>.
-    /// </summary>
-    internal class EdmTypeReferenceEqualityComparer : IEqualityComparer<IEdmTypeReference>
+    public bool Equals(IEdmTypeReference x, IEdmTypeReference y)
     {
-        public bool Equals(IEdmTypeReference x, IEdmTypeReference y)
+        Contract.Assert(x != null);
+        return x.IsEquivalentTo(y);
+    }
+
+    public int GetHashCode(IEdmTypeReference obj)
+    {
+        Contract.Assert(obj != null);
+
+        string fullName = obj.FullName();
+        if (fullName == null)
         {
-            Contract.Assert(x != null);
-            return x.IsEquivalentTo(y);
+            // EdmTypeReferences without an IEdmSchemaElement Definition will all be hashed to 0
+            // This is mostly so unit tests don't cause this method to null-ref
+            return 0;
         }
-
-        public int GetHashCode(IEdmTypeReference obj)
+        else
         {
-            Contract.Assert(obj != null);
-
-            string fullName = obj.FullName();
-            if (fullName == null)
-            {
-                // EdmTypeReferences without an IEdmSchemaElement Definition will all be hashed to 0
-                // This is mostly so unit tests don't cause this method to null-ref
-                return 0;
-            }
-            else
-            {
-                return fullName.GetHashCode(StringComparison.Ordinal);
-            }
+            return fullName.GetHashCode(StringComparison.Ordinal);
         }
     }
 }

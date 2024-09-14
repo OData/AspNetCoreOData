@@ -7,10 +7,9 @@
 
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.Abstracts
+namespace Microsoft.AspNetCore.OData.Abstracts;
+
+internal static class AssemblyResolverHelper
 {
-    internal static class AssemblyResolverHelper
-    {
-        public static IAssemblyResolver Default = new DefaultAssemblyResolver();
-    }
+    public static IAssemblyResolver Default = new DefaultAssemblyResolver();
 }

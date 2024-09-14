@@ -13,64 +13,63 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
+namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser;
+
+public class UnqualifiedCallAndAlternateKeyResolverTests
 {
-    public class UnqualifiedCallAndAlternateKeyResolverTests
+    private static IEdmModel _model = GetEdmModel();
+
+    [Fact]
+    public void Ctor_ThrowsArgumentNull_Model()
     {
-        private static IEdmModel _model = GetEdmModel();
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new UnqualifiedCallAndAlternateKeyResolver(null), "model");
+    }
 
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_Model()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new UnqualifiedCallAndAlternateKeyResolver(null), "model");
-        }
+    [Fact]
+    public void ResolveUnboundOperations_CanUnboundOperations()
+    {
+        // Arrange
+        UnqualifiedCallAndAlternateKeyResolver resolver = new UnqualifiedCallAndAlternateKeyResolver(_model);
 
-        [Fact]
-        public void ResolveUnboundOperations_CanUnboundOperations()
-        {
-            // Arrange
-            UnqualifiedCallAndAlternateKeyResolver resolver = new UnqualifiedCallAndAlternateKeyResolver(_model);
+        // Act
+        IEnumerable<IEdmOperation> operations = resolver.ResolveUnboundOperations(_model, "UnboundFunc");
 
-            // Act
-            IEnumerable<IEdmOperation> operations = resolver.ResolveUnboundOperations(_model, "UnboundFunc");
+        // Assert
+        IEdmOperation operation = Assert.Single(operations);
+        EdmFunction function = Assert.IsType<EdmFunction>(operation);
+        Assert.False(function.IsBound);
+        Assert.Equal("UnboundFunc", function.Name);
+    }
 
-            // Assert
-            IEdmOperation operation = Assert.Single(operations);
-            EdmFunction function = Assert.IsType<EdmFunction>(operation);
-            Assert.False(function.IsBound);
-            Assert.Equal("UnboundFunc", function.Name);
-        }
+    [Fact]
+    public void ResolveBoundOperations_CanBoundOperations()
+    {
+        // Arrange
+        UnqualifiedCallAndAlternateKeyResolver resolver = new UnqualifiedCallAndAlternateKeyResolver(_model);
+        IEdmEntityType type = _model.SchemaElements.OfType<IEdmEntityType>().First();
 
-        [Fact]
-        public void ResolveBoundOperations_CanBoundOperations()
-        {
-            // Arrange
-            UnqualifiedCallAndAlternateKeyResolver resolver = new UnqualifiedCallAndAlternateKeyResolver(_model);
-            IEdmEntityType type = _model.SchemaElements.OfType<IEdmEntityType>().First();
+        // Act
+        IEnumerable<IEdmOperation> operations = resolver.ResolveBoundOperations(_model, "BoundFunc", type);
 
-            // Act
-            IEnumerable<IEdmOperation> operations = resolver.ResolveBoundOperations(_model, "BoundFunc", type);
+        // Assert
+        IEdmOperation operation = Assert.Single(operations);
+        EdmFunction function = Assert.IsType<EdmFunction>(operation);
+        Assert.True(function.IsBound);
+        Assert.Equal("BoundFunc", function.Name);
+    }
 
-            // Assert
-            IEdmOperation operation = Assert.Single(operations);
-            EdmFunction function = Assert.IsType<EdmFunction>(operation);
-            Assert.True(function.IsBound);
-            Assert.Equal("BoundFunc", function.Name);
-        }
+    private static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Customer>("Customers");
+        builder.Function("UnboundFunc").Returns<int>();
+        builder.EntityType<Customer>().Function("BoundFunc").Returns<int>();
+        return builder.GetEdmModel();
+    }
 
-        private static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Customer>("Customers");
-            builder.Function("UnboundFunc").Returns<int>();
-            builder.EntityType<Customer>().Function("BoundFunc").Returns<int>();
-            return builder.GetEdmModel();
-        }
-
-        private class Customer
-        {
-            public int Id { get; set; }
-        }
+    private class Customer
+    {
+        public int Id { get; set; }
     }
 }

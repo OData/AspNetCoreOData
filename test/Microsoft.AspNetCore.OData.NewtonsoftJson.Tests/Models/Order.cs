@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.Models
-{
-    public class Order
-    {
-        public int Id { get; set; }
+namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.Models;
 
-        public string Title { get; set; }
-    }
+public class Order
+{
+    public int Id { get; set; }
+
+    public string Title { get; set; }
 }

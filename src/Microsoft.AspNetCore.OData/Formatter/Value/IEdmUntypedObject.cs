@@ -5,13 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+/// <summary>
+/// Represents an instance of an untyped structured object.
+/// Untyped means this structured Edm type is "Edm.Untyped" or no Edm type.
+/// </summary>
+public interface IEdmUntypedObject : IEdmStructuredObject
 {
-    /// <summary>
-    /// Represents an instance of an untyped structured object.
-    /// Untyped means this structured Edm type is "Edm.Untyped" or no Edm type.
-    /// </summary>
-    public interface IEdmUntypedObject : IEdmStructuredObject
-    {
-    }
 }

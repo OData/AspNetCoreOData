@@ -7,66 +7,65 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OData.Common
+namespace Microsoft.AspNetCore.OData.Common;
+
+internal class TimeZoneInfoHelper
 {
-    internal class TimeZoneInfoHelper
+    public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime)
     {
-        public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime)
+        return ConvertToDateTimeOffset(dateTime, TimeZoneInfo.Local);
+    }
+
+    public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime, TimeZoneInfo timeZone)
+    {
+        if (timeZone == null)
         {
-            return ConvertToDateTimeOffset(dateTime, TimeZoneInfo.Local);
+            timeZone = TimeZoneInfo.Local;
         }
 
-        public static DateTimeOffset ConvertToDateTimeOffset(DateTime dateTime, TimeZoneInfo timeZone)
+        TimeSpan utcOffset = timeZone.GetUtcOffset(dateTime);
+        if (utcOffset >= TimeSpan.Zero)
         {
-            if (timeZone == null)
+            if (dateTime <= DateTime.MinValue + utcOffset)
             {
-                timeZone = TimeZoneInfo.Local;
+                return DateTimeOffset.MinValue;
             }
+        }
+        else
+        {
+            if (dateTime >= DateTime.MaxValue + utcOffset)
+            {
+                return DateTimeOffset.MaxValue;
+            }
+        }
 
-            TimeSpan utcOffset = timeZone.GetUtcOffset(dateTime);
-            if (utcOffset >= TimeSpan.Zero)
+        if (dateTime.Kind == DateTimeKind.Local)
+        {
+            TimeZoneInfo localTimeZoneInfo = TimeZoneInfo.Local;
+            TimeSpan localTimeSpan = localTimeZoneInfo.GetUtcOffset(dateTime);
+            if (localTimeSpan < TimeSpan.Zero)
             {
-                if (dateTime <= DateTime.MinValue + utcOffset)
-                {
-                    return DateTimeOffset.MinValue;
-                }
-            }
-            else
-            {
-                if (dateTime >= DateTime.MaxValue + utcOffset)
+                if (dateTime >= DateTime.MaxValue + localTimeSpan)
                 {
                     return DateTimeOffset.MaxValue;
                 }
             }
-
-            if (dateTime.Kind == DateTimeKind.Local)
+            else
             {
-                TimeZoneInfo localTimeZoneInfo = TimeZoneInfo.Local;
-                TimeSpan localTimeSpan = localTimeZoneInfo.GetUtcOffset(dateTime);
-                if (localTimeSpan < TimeSpan.Zero)
+                if (dateTime <= DateTime.MinValue + localTimeSpan)
                 {
-                    if (dateTime >= DateTime.MaxValue + localTimeSpan)
-                    {
-                        return DateTimeOffset.MaxValue;
-                    }
+                    return DateTimeOffset.MinValue;
                 }
-                else
-                {
-                    if (dateTime <= DateTime.MinValue + localTimeSpan)
-                    {
-                        return DateTimeOffset.MinValue;
-                    }
-                }
-
-                return TimeZoneInfo.ConvertTime(new DateTimeOffset(dateTime), timeZone);
             }
 
-            if (dateTime.Kind == DateTimeKind.Utc)
-            {
-                return TimeZoneInfo.ConvertTime(new DateTimeOffset(dateTime), timeZone);
-            }
-
-            return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime));
+            return TimeZoneInfo.ConvertTime(new DateTimeOffset(dateTime), timeZone);
         }
+
+        if (dateTime.Kind == DateTimeKind.Utc)
+        {
+            return TimeZoneInfo.ConvertTime(new DateTimeOffset(dateTime), timeZone);
+        }
+
+        return new DateTimeOffset(dateTime, timeZone.GetUtcOffset(dateTime));
     }
 }

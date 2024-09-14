@@ -11,41 +11,40 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser
+namespace Microsoft.AspNetCore.OData.Tests.Routing.Parser;
+
+public class DefaultODataPathParserTests
 {
-    public class DefaultODataPathParserTests
+    [Theory]
+    [InlineData(null)]
+    [InlineData("http://any")]
+    public void CanParseEntitySetPathWithOrWithoutServiceRoot(string serviceRoot)
     {
-        [Theory]
-        [InlineData(null)]
-        [InlineData("http://any")]
-        public void CanParseEntitySetPathWithOrWithoutServiceRoot(string serviceRoot)
-        {
-            // Arrange
-            IEdmModel model = GetEdmModel();
-            IODataPathParser parser = new DefaultODataPathParser();
-            Uri serviceRootUri = serviceRoot == null ? null : new Uri(serviceRoot);
+        // Arrange
+        IEdmModel model = GetEdmModel();
+        IODataPathParser parser = new DefaultODataPathParser();
+        Uri serviceRootUri = serviceRoot == null ? null : new Uri(serviceRoot);
 
-            // Act
-            ODataPath path = parser.Parse(model, serviceRootUri, new Uri("Customers", UriKind.RelativeOrAbsolute), null);
+        // Act
+        ODataPath path = parser.Parse(model, serviceRootUri, new Uri("Customers", UriKind.RelativeOrAbsolute), null);
 
-            // Assert
-            Assert.NotNull(path);
-            ODataPathSegment segment = Assert.Single(path);
-            EntitySetSegment setSegment = Assert.IsType<EntitySetSegment>(segment);
-            Assert.Equal("Customers", setSegment.EntitySet.Name);
-        }
+        // Assert
+        Assert.NotNull(path);
+        ODataPathSegment segment = Assert.Single(path);
+        EntitySetSegment setSegment = Assert.IsType<EntitySetSegment>(segment);
+        Assert.Equal("Customers", setSegment.EntitySet.Name);
+    }
 
-        private static EdmModel GetEdmModel()
-        {
-            EdmModel model = new EdmModel();
-            EdmEntityType customer = new EdmEntityType("NS", "Customer");
-            customer.AddKeys(customer.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
-            customer.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+    private static EdmModel GetEdmModel()
+    {
+        EdmModel model = new EdmModel();
+        EdmEntityType customer = new EdmEntityType("NS", "Customer");
+        customer.AddKeys(customer.AddStructuralProperty("Id", EdmPrimitiveTypeKind.Int32));
+        customer.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
 
-            EdmEntityContainer entityContainer = new EdmEntityContainer("NS", "Default");
-            entityContainer.AddEntitySet("Customers", customer);
-            model.AddElement(entityContainer);
-            return model;
-        }
+        EdmEntityContainer entityContainer = new EdmEntityContainer("NS", "Default");
+        entityContainer.AddEntitySet("Customers", customer);
+        model.AddElement(entityContainer);
+        return model;
     }
 }

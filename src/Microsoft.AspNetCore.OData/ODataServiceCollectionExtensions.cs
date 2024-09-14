@@ -19,91 +19,90 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData
+namespace Microsoft.AspNetCore.OData;
+
+/// <summary>
+/// Provides extension methods to add OData services.
+/// </summary>
+public static class ODataServiceCollectionExtensions
 {
     /// <summary>
-    /// Provides extension methods to add OData services.
+    /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
+    /// type. To avoid processing unexpected or malicious queries, use the validation settings on
+    /// <see cref="EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+    /// http://go.microsoft.com/fwlink/?LinkId=279712.
     /// </summary>
-    public static class ODataServiceCollectionExtensions
+    /// <param name="services">The services collection.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection AddODataQueryFilter(this IServiceCollection services)
     {
-        /// <summary>
-        /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
-        /// type. To avoid processing unexpected or malicious queries, use the validation settings on
-        /// <see cref="EnableQueryAttribute"/> to validate incoming queries. For more information, visit
-        /// http://go.microsoft.com/fwlink/?LinkId=279712.
-        /// </summary>
-        /// <param name="services">The services collection.</param>
-        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddODataQueryFilter(this IServiceCollection services)
+        return AddODataQueryFilter(services, new EnableQueryAttribute());
+    }
+
+    /// <summary>
+    /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
+    /// type. To avoid processing unexpected or malicious queries, use the validation settings on
+    /// <see cref="EnableQueryAttribute"/> to validate incoming queries. For more information, visit
+    /// http://go.microsoft.com/fwlink/?LinkId=279712.
+    /// </summary>
+    /// <param name="services">The services collection.</param>
+    /// <param name="queryFilter">The action filter that executes the query.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    public static IServiceCollection AddODataQueryFilter(this IServiceCollection services, IActionFilter queryFilter)
+    {
+        if (services == null)
         {
-            return AddODataQueryFilter(services, new EnableQueryAttribute());
+            throw Error.ArgumentNull(nameof(services));
         }
 
-        /// <summary>
-        /// Enables query support for actions with an <see cref="IQueryable" /> or <see cref="IQueryable{T}" /> return
-        /// type. To avoid processing unexpected or malicious queries, use the validation settings on
-        /// <see cref="EnableQueryAttribute"/> to validate incoming queries. For more information, visit
-        /// http://go.microsoft.com/fwlink/?LinkId=279712.
-        /// </summary>
-        /// <param name="services">The services collection.</param>
-        /// <param name="queryFilter">The action filter that executes the query.</param>
-        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        public static IServiceCollection AddODataQueryFilter(this IServiceCollection services, IActionFilter queryFilter)
-        {
-            if (services == null)
-            {
-                throw Error.ArgumentNull(nameof(services));
-            }
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IFilterProvider>(new QueryFilterProvider(queryFilter)));
+        return services;
+    }
 
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IFilterProvider>(new QueryFilterProvider(queryFilter)));
-            return services;
+    /// <summary>
+    /// Adds the core OData services required for OData requests.
+    /// </summary>
+    /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
+    /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
+    internal static IServiceCollection AddODataCore(this IServiceCollection services)
+    {
+        if (services == null)
+        {
+            throw Error.ArgumentNull(nameof(services));
         }
 
-        /// <summary>
-        /// Adds the core OData services required for OData requests.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
-        /// <returns>The <see cref="IServiceCollection"/> so that additional calls can be chained.</returns>
-        internal static IServiceCollection AddODataCore(this IServiceCollection services)
-        {
-            if (services == null)
-            {
-                throw Error.ArgumentNull(nameof(services));
-            }
+        //
+        // Options
+        //
+        services.TryAddEnumerable(
+            ServiceDescriptor.Transient<IConfigureOptions<ODataOptions>, ODataOptionsSetup>());
 
-            //
-            // Options
-            //
-            services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IConfigureOptions<ODataOptions>, ODataOptionsSetup>());
+        services.TryAddEnumerable(
+            ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, ODataMvcOptionsSetup>());
 
-            services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, ODataMvcOptionsSetup>());
+        services.TryAddEnumerable(
+            ServiceDescriptor.Transient<IConfigureOptions<JsonOptions>, ODataJsonOptionsSetup>());
 
-            services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IConfigureOptions<JsonOptions>, ODataJsonOptionsSetup>());
+        //
+        // Parser & Resolver & Provider
+        //
+        services.TryAddEnumerable(
+            ServiceDescriptor.Singleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>());
 
-            //
-            // Parser & Resolver & Provider
-            //
-            services.TryAddEnumerable(
-                ServiceDescriptor.Singleton<IODataQueryRequestParser, DefaultODataQueryRequestParser>());
+        services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
 
-            services.TryAddSingleton<IAssemblyResolver, DefaultAssemblyResolver>();
+        //
+        // Routing
+        //
+        services.TryAddEnumerable(
+            ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
 
-            //
-            // Routing
-            //
-            services.TryAddEnumerable(
-                ServiceDescriptor.Transient<IApplicationModelProvider, ODataRoutingApplicationModelProvider>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataRoutingMatcherPolicy>());
 
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<MatcherPolicy, ODataRoutingMatcherPolicy>());
+        services.TryAddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
 
-            services.TryAddSingleton<IODataTemplateTranslator, DefaultODataTemplateTranslator>();
+        services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
 
-            services.TryAddSingleton<IODataPathTemplateParser, DefaultODataPathTemplateParser>();
-
-            return services;
-        }
+        return services;
     }
 }

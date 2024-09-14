@@ -11,44 +11,43 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
+
+/// <summary>
+/// Represents an <see cref="ODataSerializer"/> for serializing the raw value of an <see cref="IEdmPrimitiveType"/>.
+/// </summary>
+public class ODataRawValueSerializer : ODataSerializer
 {
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> for serializing the raw value of an <see cref="IEdmPrimitiveType"/>.
+    /// Initializes a new instance of <see cref="ODataRawValueSerializer"/>.
     /// </summary>
-    public class ODataRawValueSerializer : ODataSerializer
+    public ODataRawValueSerializer()
+        : base(ODataPayloadKind.Value)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ODataRawValueSerializer"/>.
-        /// </summary>
-        public ODataRawValueSerializer()
-            : base(ODataPayloadKind.Value)
+    }
+
+    /// <inheritdoc/>
+    public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+    {
+        if (graph == null)
         {
+            throw new ArgumentNullException(nameof(graph));
         }
 
-        /// <inheritdoc/>
-        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        if (messageWriter == null)
         {
-            if (graph == null)
-            {
-                throw new ArgumentNullException(nameof(graph));
-            }
+            throw new ArgumentNullException(nameof(messageWriter));
+        }
 
-            if (messageWriter == null)
-            {
-                throw new ArgumentNullException(nameof(messageWriter));
-            }
-
-            // TODO: Call Async version?
-            // TODO: Make the enum alias working
-            if (TypeHelper.IsEnum(graph.GetType()))
-            {
-                await messageWriter.WriteValueAsync(graph.ToString()).ConfigureAwait(false);
-            }
-            else
-            {
-                await messageWriter.WriteValueAsync(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, writeContext?.TimeZone)).ConfigureAwait(false);
-            }
+        // TODO: Call Async version?
+        // TODO: Make the enum alias working
+        if (TypeHelper.IsEnum(graph.GetType()))
+        {
+            await messageWriter.WriteValueAsync(graph.ToString()).ConfigureAwait(false);
+        }
+        else
+        {
+            await messageWriter.WriteValueAsync(ODataPrimitiveSerializer.ConvertUnsupportedPrimitives(graph, writeContext?.TimeZone)).ConfigureAwait(false);
         }
     }
 }

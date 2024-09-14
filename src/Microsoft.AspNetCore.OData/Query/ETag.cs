@@ -12,146 +12,145 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Query.Container;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query;
+
+/// <summary>
+/// The ETag parsed from request.
+/// </summary>
+public class ETag : DynamicObject
 {
+    private IDictionary<string, object> _concurrencyProperties = new Dictionary<string, object>();
+
     /// <summary>
-    /// The ETag parsed from request.
+    /// Create an instance of <see cref="ETag"/>.
     /// </summary>
-    public class ETag : DynamicObject
+    public ETag()
     {
-        private IDictionary<string, object> _concurrencyProperties = new Dictionary<string, object>();
+        IsWellFormed = true;
+    }
 
-        /// <summary>
-        /// Create an instance of <see cref="ETag"/>.
-        /// </summary>
-        public ETag()
+    /// <summary>
+    /// Gets or sets the value associated with the specified key.
+    /// </summary>
+    /// <param name="key">The key of the value to get or set.</param>
+    public object this[string key]
+    {
+        get
         {
-            IsWellFormed = true;
-        }
-
-        /// <summary>
-        /// Gets or sets the value associated with the specified key.
-        /// </summary>
-        /// <param name="key">The key of the value to get or set.</param>
-        public object this[string key]
-        {
-            get
-            {
-                if (!IsWellFormed)
-                {
-                    throw Error.InvalidOperation(SRResources.ETagNotWellFormed);
-                }
-                return ConcurrencyProperties[key];
-            }
-            set
-            {
-                ConcurrencyProperties[key] = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets whether the ETag is well-formed.
-        /// </summary>
-        public bool IsWellFormed { get; set; }
-
-        /// <summary>
-        /// Gets or sets an entity type of the ETag.
-        /// </summary>
-        public Type EntityType { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether the ETag is corresponding to "*".
-        /// </summary>
-        public bool IsAny { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether If-None-Match set in the request header.
-        /// </summary>
-        public bool IsIfNoneMatch { get; set; }
-
-        internal IDictionary<string, object> ConcurrencyProperties
-        {
-            get
-            {
-                return _concurrencyProperties;
-            }
-            set
-            {
-                _concurrencyProperties = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets a property value from the ETag.
-        /// </summary>
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            if (binder == null)
-            {
-                throw Error.ArgumentNull("binder");
-            }
-
             if (!IsWellFormed)
             {
                 throw Error.InvalidOperation(SRResources.ETagNotWellFormed);
             }
-
-            string name = binder.Name;
-            return ConcurrencyProperties.TryGetValue(name, out result);
+            return ConcurrencyProperties[key];
         }
-
-        /// <summary>
-        /// Sets a property value to ETag.
-        /// </summary>
-        public override bool TrySetMember(SetMemberBinder binder, object value)
+        set
         {
-            if (binder == null)
-            {
-                throw Error.ArgumentNull("binder");
-            }
-
-            ConcurrencyProperties[binder.Name] = value;
-            return true;
+            ConcurrencyProperties[key] = value;
         }
+    }
 
-        /// <summary>
-        /// Apply the ETag to the given IQueryable.
-        /// </summary>
-        /// <param name="query">The original <see cref="IQueryable"/>.</param>
-        /// <returns>The new <see cref="IQueryable"/> after the ETag has been applied to.</returns>
-        public virtual IQueryable ApplyTo(IQueryable query)
+    /// <summary>
+    /// Gets or sets whether the ETag is well-formed.
+    /// </summary>
+    public bool IsWellFormed { get; set; }
+
+    /// <summary>
+    /// Gets or sets an entity type of the ETag.
+    /// </summary>
+    public Type EntityType { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the ETag is corresponding to "*".
+    /// </summary>
+    public bool IsAny { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether If-None-Match set in the request header.
+    /// </summary>
+    public bool IsIfNoneMatch { get; set; }
+
+    internal IDictionary<string, object> ConcurrencyProperties
+    {
+        get
         {
-            if (IsAny)
-            {
-                return query;
-            }
-
-            Type type = EntityType;
-            ParameterExpression param = Expression.Parameter(type);
-            Expression where = null;
-            foreach (KeyValuePair<string, object> item in ConcurrencyProperties)
-            {
-                MemberExpression name = Expression.Property(param, item.Key);
-                object itemValue = item.Value;
-                Expression value = itemValue != null
-                    ? LinqParameterContainer.Parameterize(itemValue.GetType(), itemValue)
-                    : Expression.Constant(value: null);
-                BinaryExpression equal = Expression.Equal(name, value);
-                where = where == null ? equal : Expression.AndAlso(where, equal);
-            }
-
-            if (where == null)
-            {
-                return query;
-            }
-
-            if (IsIfNoneMatch)
-            {
-                where = Expression.Not(where);
-            }
-
-            Expression whereLambda = Expression.Lambda(where, param);
-            return ExpressionHelpers.Where(query, whereLambda, type);
+            return _concurrencyProperties;
         }
+        set
+        {
+            _concurrencyProperties = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets a property value from the ETag.
+    /// </summary>
+    public override bool TryGetMember(GetMemberBinder binder, out object result)
+    {
+        if (binder == null)
+        {
+            throw Error.ArgumentNull("binder");
+        }
+
+        if (!IsWellFormed)
+        {
+            throw Error.InvalidOperation(SRResources.ETagNotWellFormed);
+        }
+
+        string name = binder.Name;
+        return ConcurrencyProperties.TryGetValue(name, out result);
+    }
+
+    /// <summary>
+    /// Sets a property value to ETag.
+    /// </summary>
+    public override bool TrySetMember(SetMemberBinder binder, object value)
+    {
+        if (binder == null)
+        {
+            throw Error.ArgumentNull("binder");
+        }
+
+        ConcurrencyProperties[binder.Name] = value;
+        return true;
+    }
+
+    /// <summary>
+    /// Apply the ETag to the given IQueryable.
+    /// </summary>
+    /// <param name="query">The original <see cref="IQueryable"/>.</param>
+    /// <returns>The new <see cref="IQueryable"/> after the ETag has been applied to.</returns>
+    public virtual IQueryable ApplyTo(IQueryable query)
+    {
+        if (IsAny)
+        {
+            return query;
+        }
+
+        Type type = EntityType;
+        ParameterExpression param = Expression.Parameter(type);
+        Expression where = null;
+        foreach (KeyValuePair<string, object> item in ConcurrencyProperties)
+        {
+            MemberExpression name = Expression.Property(param, item.Key);
+            object itemValue = item.Value;
+            Expression value = itemValue != null
+                ? LinqParameterContainer.Parameterize(itemValue.GetType(), itemValue)
+                : Expression.Constant(value: null);
+            BinaryExpression equal = Expression.Equal(name, value);
+            where = where == null ? equal : Expression.AndAlso(where, equal);
+        }
+
+        if (where == null)
+        {
+            return query;
+        }
+
+        if (IsIfNoneMatch)
+        {
+            where = Expression.Not(where);
+        }
+
+        Expression whereLambda = Expression.Lambda(where, param);
+        return ExpressionHelpers.Where(query, whereLambda, type);
     }
 }

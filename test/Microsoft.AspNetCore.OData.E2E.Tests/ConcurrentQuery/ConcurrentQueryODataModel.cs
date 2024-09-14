@@ -8,17 +8,16 @@
 using System.Collections.Generic;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery
-{
-    public class Customer
-    {
-        public int Id { get; set; }
-        [Contained]
-        public IEnumerable<Order> Orders { get; set; }
-    }
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ConcurrentQuery;
 
-    public class Order
-    {
-        public int Id { get; set; }
-    }
+public class Customer
+{
+    public int Id { get; set; }
+    [Contained]
+    public IEnumerable<Order> Orders { get; set; }
+}
+
+public class Order
+{
+    public int Id { get; set; }
 }

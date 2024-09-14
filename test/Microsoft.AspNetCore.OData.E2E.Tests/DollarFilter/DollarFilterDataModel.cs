@@ -5,11 +5,10 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
+
+public class Person
 {
-    public class Person
-    {
-        public int Id { get; set; }
-        public string SSN { get; set; }
-    }
+    public int Id { get; set; }
+    public string SSN { get; set; }
 }

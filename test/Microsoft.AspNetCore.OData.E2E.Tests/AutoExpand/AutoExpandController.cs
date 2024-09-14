@@ -12,165 +12,164 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand
+namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand;
+
+public class CustomersController : ODataController
 {
-    public class CustomersController : ODataController
+    [EnableQuery]
+    public IActionResult Get()
     {
-        [EnableQuery]
-        public IActionResult Get()
-        {
-            return Ok(AutoExpandDataSource.Customers);
-        }
-
-        [EnableQuery]
-        public IActionResult Get(int key)
-        {
-            Customer c = AutoExpandDataSource.Customers.FirstOrDefault(c => c.Id == key);
-            if (c == null)
-            {
-                return NotFound($"Cannot find customer with key = {key}");
-            }
-
-            return Ok(c);
-        }
-
-        [EnableQuery]
-        public IActionResult GetHomeAddress(int key)
-        {
-            Customer c = AutoExpandDataSource.Customers.FirstOrDefault(c => c.Id == key);
-            if (c == null)
-            {
-                return NotFound($"Cannot find customer with key = {key}");
-            }
-
-            return Ok(c.HomeAddress);
-        }
-
-        [EnableQuery]
-        public IActionResult Post([FromBody] Customer customer)
-        {
-            return Created(customer);
-        }
-
-        [EnableQuery]
-        public IActionResult Put(int key, [FromBody] Customer customer)
-        {
-            var existingCustomer = AutoExpandDataSource.Customers.FirstOrDefault(d => d.Id == key);
-
-            if (existingCustomer == null)
-            {
-                return BadRequest();
-            }
-
-            return Updated(existingCustomer);
-        }
+        return Ok(AutoExpandDataSource.Customers);
     }
 
-    public class PeopleController : ODataController
+    [EnableQuery]
+    public IActionResult Get(int key)
     {
-        [EnableQuery(MaxExpansionDepth = 4)]
-        public IQueryable<People> Get()
+        Customer c = AutoExpandDataSource.Customers.FirstOrDefault(c => c.Id == key);
+        if (c == null)
         {
-            return AutoExpandDataSource.People.AsQueryable();
+            return NotFound($"Cannot find customer with key = {key}");
         }
+
+        return Ok(c);
     }
 
-    public class NormalOrdersController : ODataController
+    [EnableQuery]
+    public IActionResult GetHomeAddress(int key)
     {
-        [EnableQuery]
-        public IQueryable<NormalOrder> Get()
+        Customer c = AutoExpandDataSource.Customers.FirstOrDefault(c => c.Id == key);
+        if (c == null)
         {
-            return AutoExpandDataSource.NormalOrders.AsQueryable();
+            return NotFound($"Cannot find customer with key = {key}");
         }
 
-        [EnableQuery]
-        public IActionResult Get(int key)
-        {
-            NormalOrder n = AutoExpandDataSource.NormalOrders.FirstOrDefault(c => c.Id == key);
-            if (n == null)
-            {
-                return NotFound($"Cannot find NormalOrder with key = {key}");
-            }
-
-            return Ok(n);
-        }
+        return Ok(c.HomeAddress);
     }
 
-    public class EnableQueryMenusController : ODataController
+    [EnableQuery]
+    public IActionResult Post([FromBody] Customer customer)
     {
-        private static readonly List<Menu> menus = new List<Menu>
+        return Created(customer);
+    }
+
+    [EnableQuery]
+    public IActionResult Put(int key, [FromBody] Customer customer)
+    {
+        var existingCustomer = AutoExpandDataSource.Customers.FirstOrDefault(d => d.Id == key);
+
+        if (existingCustomer == null)
         {
-            new Menu
+            return BadRequest();
+        }
+
+        return Updated(existingCustomer);
+    }
+}
+
+public class PeopleController : ODataController
+{
+    [EnableQuery(MaxExpansionDepth = 4)]
+    public IQueryable<People> Get()
+    {
+        return AutoExpandDataSource.People.AsQueryable();
+    }
+}
+
+public class NormalOrdersController : ODataController
+{
+    [EnableQuery]
+    public IQueryable<NormalOrder> Get()
+    {
+        return AutoExpandDataSource.NormalOrders.AsQueryable();
+    }
+
+    [EnableQuery]
+    public IActionResult Get(int key)
+    {
+        NormalOrder n = AutoExpandDataSource.NormalOrders.FirstOrDefault(c => c.Id == key);
+        if (n == null)
+        {
+            return NotFound($"Cannot find NormalOrder with key = {key}");
+        }
+
+        return Ok(n);
+    }
+}
+
+public class EnableQueryMenusController : ODataController
+{
+    private static readonly List<Menu> menus = new List<Menu>
+    {
+        new Menu
+        {
+            Id = 1,
+            Tabs = new List<Tab>
             {
-                Id = 1,
-                Tabs = new List<Tab>
+                new Tab
                 {
-                    new Tab
+                    Id = 1,
+                    Items = new List<Item>
                     {
-                        Id = 1,
-                        Items = new List<Item>
+                        new Item
                         {
-                            new Item
+                            Id = 1,
+                            Notes = new List<Note>
                             {
-                                Id = 1,
-                                Notes = new List<Note>
-                                {
-                                    new Note { Id = 1 }
-                                }
+                                new Note { Id = 1 }
                             }
                         }
                     }
                 }
             }
-        };
-
-        [EnableQuery(MaxExpansionDepth = 4)]
-        public ActionResult Get()
-        {
-            return Ok(menus);
         }
-    }
+    };
 
-    public class QueryOptionsOfTMenusController : ODataController
+    [EnableQuery(MaxExpansionDepth = 4)]
+    public ActionResult Get()
     {
-        private static readonly List<Menu> menus = new List<Menu>
+        return Ok(menus);
+    }
+}
+
+public class QueryOptionsOfTMenusController : ODataController
+{
+    private static readonly List<Menu> menus = new List<Menu>
+    {
+        new Menu
         {
-            new Menu
+            Id = 1,
+            Tabs = new List<Tab>
             {
-                Id = 1,
-                Tabs = new List<Tab>
+                new Tab
                 {
-                    new Tab
+                    Id = 1,
+                    Items = new List<Item>
                     {
-                        Id = 1,
-                        Items = new List<Item>
+                        new Item
                         {
-                            new Item
+                            Id = 1,
+                            Notes = new List<Note>
                             {
-                                Id = 1,
-                                Notes = new List<Note>
-                                {
-                                    new Note { Id = 1 }
-                                }
+                                new Note { Id = 1 }
                             }
                         }
                     }
                 }
             }
+        }
+    };
+
+    public ActionResult Get(ODataQueryOptions<Menu> queryOptions)
+    {
+        var validationSettings = new ODataValidationSettings
+        {
+            MaxExpansionDepth = 4
         };
 
-        public ActionResult Get(ODataQueryOptions<Menu> queryOptions)
-        {
-            var validationSettings = new ODataValidationSettings
-            {
-                MaxExpansionDepth = 4
-            };
+        queryOptions.Validate(validationSettings);
 
-            queryOptions.Validate(validationSettings);
-
-            var result = queryOptions.ApplyTo(menus.AsQueryable());
+        var result = queryOptions.ApplyTo(menus.AsQueryable());
             
-            return Ok(result);
-        }
+        return Ok(result);
     }
 }

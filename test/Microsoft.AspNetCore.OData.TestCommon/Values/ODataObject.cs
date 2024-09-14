@@ -7,13 +7,12 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.TestCommon.Values
+namespace Microsoft.AspNetCore.OData.TestCommon.Values;
+
+/// <summary>
+/// An OData object
+/// </summary>
+public class ODataObject : Dictionary<string, IODataValue>, IODataValue
 {
-    /// <summary>
-    /// An OData object
-    /// </summary>
-    public class ODataObject : Dictionary<string, IODataValue>, IODataValue
-    {
-        public string ContextUri { get; set; }
-    }
+    public string ContextUri { get; set; }
 }

@@ -9,87 +9,86 @@ using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
+namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper;
+
+public class DynamicTypeWrapperTests
 {
-    public class DynamicTypeWrapperTests
+    [Fact]
+    public void CanSetProperty()
     {
-        [Fact]
-        public void CanSetProperty()
+        var expectedValue = "TestValue";
+        var propName = "TestProp";
+        var wrapper = new GroupByWrapper();
+        wrapper.GroupByContainer = new AggregationPropertyContainer()
         {
-            var expectedValue = "TestValue";
-            var propName = "TestProp";
-            var wrapper = new GroupByWrapper();
-            wrapper.GroupByContainer = new AggregationPropertyContainer()
-            {
-                Name = propName,
-                Value = expectedValue
-            };
+            Name = propName,
+            Value = expectedValue
+        };
 
-            var actual = wrapper.Values[propName];
+        var actual = wrapper.Values[propName];
 
-            Assert.Equal(expectedValue, actual);
-        }
+        Assert.Equal(expectedValue, actual);
+    }
 
-        [Fact]
-        public void CanTryGetProperty()
+    [Fact]
+    public void CanTryGetProperty()
+    {
+        var expectedValue = "TestValue";
+        var propName = "TestProp";
+        var wrapper = new GroupByWrapper();
+        wrapper.GroupByContainer = new AggregationPropertyContainer()
         {
-            var expectedValue = "TestValue";
-            var propName = "TestProp";
-            var wrapper = new GroupByWrapper();
-            wrapper.GroupByContainer = new AggregationPropertyContainer()
-            {
-                Name = propName,
-                Value = expectedValue
-            };
+            Name = propName,
+            Value = expectedValue
+        };
 
-            object actual;
-            Assert.True(wrapper.TryGetPropertyValue(propName, out actual));
+        object actual;
+        Assert.True(wrapper.TryGetPropertyValue(propName, out actual));
 
-            Assert.Equal(expectedValue, actual);
-        }
+        Assert.Equal(expectedValue, actual);
+    }
 
-        [Fact]
-        public void CanEqualWrappers()
+    [Fact]
+    public void CanEqualWrappers()
+    {
+        var expectedValue = "TestValue";
+        var propName = "TestProp";
+        var wrapper = new GroupByWrapper();
+        wrapper.GroupByContainer = new AggregationPropertyContainer()
         {
-            var expectedValue = "TestValue";
-            var propName = "TestProp";
-            var wrapper = new GroupByWrapper();
-            wrapper.GroupByContainer = new AggregationPropertyContainer()
-            {
-                Name = propName,
-                Value = expectedValue
-            };
+            Name = propName,
+            Value = expectedValue
+        };
 
-            var wrapper2 = new GroupByWrapper();
-            wrapper2.GroupByContainer = new AggregationPropertyContainer()
-            {
-                Name = propName,
-                Value = expectedValue
-            };
-
-            Assert.Equal(wrapper, wrapper2);
-        }
-
-        [Fact]
-        public void GetHashCodeEqualForEqualWrappers()
+        var wrapper2 = new GroupByWrapper();
+        wrapper2.GroupByContainer = new AggregationPropertyContainer()
         {
-            var expectedValue = "TestValue";
-            var propName = "TestProp";
-            var wrapper = new GroupByWrapper();
-            wrapper.GroupByContainer = new AggregationPropertyContainer()
-            {
-                Name = propName,
-                Value = expectedValue
-            };
+            Name = propName,
+            Value = expectedValue
+        };
 
-            var wrapper2 = new GroupByWrapper();
-            wrapper2.GroupByContainer = new AggregationPropertyContainer()
-            {
-                Name = propName,
-                Value = expectedValue
-            };
+        Assert.Equal(wrapper, wrapper2);
+    }
 
-            Assert.Equal(wrapper.GetHashCode(), wrapper2.GetHashCode());
-        }
+    [Fact]
+    public void GetHashCodeEqualForEqualWrappers()
+    {
+        var expectedValue = "TestValue";
+        var propName = "TestProp";
+        var wrapper = new GroupByWrapper();
+        wrapper.GroupByContainer = new AggregationPropertyContainer()
+        {
+            Name = propName,
+            Value = expectedValue
+        };
+
+        var wrapper2 = new GroupByWrapper();
+        wrapper2.GroupByContainer = new AggregationPropertyContainer()
+        {
+            Name = propName,
+            Value = expectedValue
+        };
+
+        Assert.Equal(wrapper.GetHashCode(), wrapper2.GetHashCode());
     }
 }

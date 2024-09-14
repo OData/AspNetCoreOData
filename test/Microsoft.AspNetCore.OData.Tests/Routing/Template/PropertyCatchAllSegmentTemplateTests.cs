@@ -13,96 +13,95 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Routing.Template
+namespace Microsoft.AspNetCore.OData.Tests.Routing.Template;
+
+public class PropertyCatchAllSegmentTemplateTests
 {
-    public class PropertyCatchAllSegmentTemplateTests
+    private static IEdmEntityType _entityType;
+
+    static PropertyCatchAllSegmentTemplateTests()
     {
-        private static IEdmEntityType _entityType;
+        EdmEntityType entityType = new EdmEntityType("NS", "Customer", null, false, true);
+        entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+        entityType.AddStructuralProperty("Title", EdmPrimitiveTypeKind.String);
+        _entityType = entityType;
+    }
 
-        static PropertyCatchAllSegmentTemplateTests()
+    [Fact]
+    public void CtorPropertyCatchAllSegmentTemplate_ThrowsArgumentNull_DeclaredType()
+    {
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new PropertyCatchAllSegmentTemplate(null), "declaredType");
+    }
+
+    [Fact]
+    public void CtorPropertyCatchAllSegmentTemplate_SetsProperties()
+    {
+        // Arrange & Act
+        PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
+
+        // Assert
+        Assert.Same(_entityType, pathSegment.StructuredType);
+    }
+
+    [Fact]
+    public void GetTemplatesPropertyCatchAllSegmentTemplate_ReturnsTemplates()
+    {
+        // Arrange
+        PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
+
+        // Act & Assert
+        IEnumerable<string> templates = pathSegment.GetTemplates();
+        string template = Assert.Single(templates);
+        Assert.Equal("/{property}", template);
+    }
+
+    [Fact]
+    public void TryTranslatePropertyCatchAllSegmentTemplate_ThrowsArgumentNull_Context()
+    {
+        // Arrange
+        PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => pathSegment.TryTranslate(null), "context");
+    }
+
+    [Fact]
+    public void TryTranslatePropertyCatchAllSegmentTemplate_ReturnsFalse_NoCorrectRouteData()
+    {
+        // Arrange
+        PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
+        ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
         {
-            EdmEntityType entityType = new EdmEntityType("NS", "Customer", null, false, true);
-            entityType.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
-            entityType.AddStructuralProperty("Title", EdmPrimitiveTypeKind.String);
-            _entityType = entityType;
-        }
+            RouteValues = new RouteValueDictionary()
+        };
 
-        [Fact]
-        public void CtorPropertyCatchAllSegmentTemplate_ThrowsArgumentNull_DeclaredType()
+        // Act & Assert
+        Assert.False(pathSegment.TryTranslate(context));
+    }
+
+    [Theory]
+    [InlineData("Title")]
+    [InlineData("title")]
+    [InlineData("tiTLE")]
+    public void TryTranslatePropertyCatchAllSegmentTemplate_ReturnsPropertySegment(string property)
+    {
+        // Arrange
+        RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { property = $"{property}" });
+        ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
         {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new PropertyCatchAllSegmentTemplate(null), "declaredType");
-        }
+            RouteValues = routeValueDictionary
+        };
 
-        [Fact]
-        public void CtorPropertyCatchAllSegmentTemplate_SetsProperties()
-        {
-            // Arrange & Act
-            PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
+        PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
 
-            // Assert
-            Assert.Same(_entityType, pathSegment.StructuredType);
-        }
+        // Act
+        bool ok = pathSegment.TryTranslate(context);
 
-        [Fact]
-        public void GetTemplatesPropertyCatchAllSegmentTemplate_ReturnsTemplates()
-        {
-            // Arrange
-            PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
-
-            // Act & Assert
-            IEnumerable<string> templates = pathSegment.GetTemplates();
-            string template = Assert.Single(templates);
-            Assert.Equal("/{property}", template);
-        }
-
-        [Fact]
-        public void TryTranslatePropertyCatchAllSegmentTemplate_ThrowsArgumentNull_Context()
-        {
-            // Arrange
-            PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => pathSegment.TryTranslate(null), "context");
-        }
-
-        [Fact]
-        public void TryTranslatePropertyCatchAllSegmentTemplate_ReturnsFalse_NoCorrectRouteData()
-        {
-            // Arrange
-            PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
-            {
-                RouteValues = new RouteValueDictionary()
-            };
-
-            // Act & Assert
-            Assert.False(pathSegment.TryTranslate(context));
-        }
-
-        [Theory]
-        [InlineData("Title")]
-        [InlineData("title")]
-        [InlineData("tiTLE")]
-        public void TryTranslatePropertyCatchAllSegmentTemplate_ReturnsPropertySegment(string property)
-        {
-            // Arrange
-            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(new { property = $"{property}" });
-            ODataTemplateTranslateContext context = new ODataTemplateTranslateContext
-            {
-                RouteValues = routeValueDictionary
-            };
-
-            PropertyCatchAllSegmentTemplate pathSegment = new PropertyCatchAllSegmentTemplate(_entityType);
-
-            // Act
-            bool ok = pathSegment.TryTranslate(context);
-
-            // Assert
-            Assert.True(ok);
-            ODataPathSegment segment = Assert.Single(context.Segments);
-            PropertySegment propertySegment = Assert.IsType<PropertySegment>(segment);
-            Assert.Equal("Title", propertySegment.Property.Name);
-        }
+        // Assert
+        Assert.True(ok);
+        ODataPathSegment segment = Assert.Single(context.Segments);
+        PropertySegment propertySegment = Assert.IsType<PropertySegment>(segment);
+        Assert.Equal("Title", propertySegment.Property.Name);
     }
 }

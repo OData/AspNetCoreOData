@@ -5,16 +5,15 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public enum SimpleEnum
 {
-    public enum SimpleEnum
-    {
-        First,
+    First,
 
-        Second,
+    Second,
 
-        Third,
+    Third,
 
-        Fourth
-    }
+    Fourth
 }

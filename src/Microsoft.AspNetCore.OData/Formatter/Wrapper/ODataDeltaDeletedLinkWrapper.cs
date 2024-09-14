@@ -7,25 +7,24 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Wrapper
+namespace Microsoft.AspNetCore.OData.Formatter.Wrapper;
+
+/// <summary>
+/// Encapsulates an <see cref="ODataDeltaDeletedLink"/> deleted link.
+/// </summary>
+public sealed class ODataDeltaDeletedLinkWrapper : ODataDeltaLinkBaseWrapper
 {
     /// <summary>
-    /// Encapsulates an <see cref="ODataDeltaDeletedLink"/> deleted link.
+    /// Initializes a new instance of <see cref="ODataDeltaDeletedLinkWrapper"/>.
     /// </summary>
-    public sealed class ODataDeltaDeletedLinkWrapper : ODataDeltaLinkBaseWrapper
+    /// <param name="deltaDeletedLink">The wrapped deleted link.</param>
+    public ODataDeltaDeletedLinkWrapper(ODataDeltaDeletedLink deltaDeletedLink)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ODataDeltaDeletedLinkWrapper"/>.
-        /// </summary>
-        /// <param name="deltaDeletedLink">The wrapped deleted link.</param>
-        public ODataDeltaDeletedLinkWrapper(ODataDeltaDeletedLink deltaDeletedLink)
-        {
-            DeltaDeletedLink = deltaDeletedLink;
-        }
-
-        /// <summary>
-        /// Gets the wrapped <see cref="ODataDeltaDeletedLink"/>.
-        /// </summary>
-        public ODataDeltaDeletedLink DeltaDeletedLink { get; }
+        DeltaDeletedLink = deltaDeletedLink;
     }
+
+    /// <summary>
+    /// Gets the wrapped <see cref="ODataDeltaDeletedLink"/>.
+    /// </summary>
+    public ODataDeltaDeletedLink DeltaDeletedLink { get; }
 }

@@ -9,53 +9,52 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore;
+
+public class ETagCurrencyTokenEfContext : DbContext
 {
-    public class ETagCurrencyTokenEfContext : DbContext
+    public ETagCurrencyTokenEfContext(DbContextOptions<ETagCurrencyTokenEfContext> options)
+        : base(options)
     {
-        public ETagCurrencyTokenEfContext(DbContextOptions<ETagCurrencyTokenEfContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<Dominio> Dominios { get; set; }
-
-        public DbSet<Server> Servers { get; set; }
     }
 
-    [Table("Domini")]
-    public class Dominio
-    {
-        [Key]
-        [StringLength(50)]
-        public string Id { get; set; }
+    public DbSet<Dominio> Dominios { get; set; }
 
-        [StringLength(200)]
-        public string Descrizione { get; set; }
+    public DbSet<Server> Servers { get; set; }
+}
 
-        public string ServerAutenticazioneId { get; set; }
+[Table("Domini")]
+public class Dominio
+{
+    [Key]
+    [StringLength(50)]
+    public string Id { get; set; }
 
-        [ForeignKey("ServerAutenticazioneId")]
-        public virtual Server ServerAutenticazione { get; set; }
+    [StringLength(200)]
+    public string Descrizione { get; set; }
 
-        [ConcurrencyCheck]
-        public int? RECVER { get; set; }
-    }
+    public string ServerAutenticazioneId { get; set; }
 
-    [Table("Servers")]
-    public class Server
-    {
-        [Key]
-        [StringLength(50)]
-        public string Id { get; set; }
+    [ForeignKey("ServerAutenticazioneId")]
+    public virtual Server ServerAutenticazione { get; set; }
 
-        [StringLength(200)]
-        public string Descrizione { get; set; }
+    [ConcurrencyCheck]
+    public int? RECVER { get; set; }
+}
 
-        [StringLength(2000)]
-        public string Url { get; set; }
+[Table("Servers")]
+public class Server
+{
+    [Key]
+    [StringLength(50)]
+    public string Id { get; set; }
 
-        [ConcurrencyCheck]
-        public int? RECVER { get; set; }
-    }
+    [StringLength(200)]
+    public string Descrizione { get; set; }
+
+    [StringLength(2000)]
+    public string Url { get; set; }
+
+    [ConcurrencyCheck]
+    public int? RECVER { get; set; }
 }

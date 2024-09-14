@@ -7,12 +7,11 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class SimpleOpenAddress
 {
-    public class SimpleOpenAddress
-    {
-        public string Street { get; set; }
-        public string City { get; set; }
-        public IDictionary<string, object> Properties { get; set; }
-    }
+    public string Street { get; set; }
+    public string City { get; set; }
+    public IDictionary<string, object> Properties { get; set; }
 }

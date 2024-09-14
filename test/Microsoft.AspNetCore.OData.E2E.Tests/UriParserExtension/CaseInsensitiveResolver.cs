@@ -7,19 +7,18 @@
 
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension
-{
-    /// <summary>
-    /// Add this class for ODL's issue #695, should remove it and use ODataUriResolver after the issue fix.
-    /// </summary>
-    public class CaseInsensitiveResolver : ODataUriResolver
-    {
-        private bool _enableCaseInsensitive;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.UriParserExtension;
 
-        public override bool EnableCaseInsensitive
-        {
-            get { return true; }
-            set { _enableCaseInsensitive = value; }
-        }
+/// <summary>
+/// Add this class for ODL's issue #695, should remove it and use ODataUriResolver after the issue fix.
+/// </summary>
+public class CaseInsensitiveResolver : ODataUriResolver
+{
+    private bool _enableCaseInsensitive;
+
+    public override bool EnableCaseInsensitive
+    {
+        get { return true; }
+        set { _enableCaseInsensitive = value; }
     }
 }

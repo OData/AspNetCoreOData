@@ -16,55 +16,54 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
+
+public class EntityTypeTests
 {
-    public class EntityTypeTests
+    private IEdmModel _model = GetSampleModel();
+
+    [Fact]
+    public async Task EntityTypeSerializesAsODataEntry()
     {
-        private IEdmModel _model = GetSampleModel();
+        // Arrange
+        const string routeName = "OData";
+        IEdmEntitySet entitySet = _model.EntityContainer.FindEntitySet("employees");
+        ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
 
-        [Fact]
-        public async Task EntityTypeSerializesAsODataEntry()
+        var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, _model));
+        request.ODataFeature().Model = _model;
+        request.ODataFeature().Path = path;
+        request.ODataFeature().RoutePrefix = routeName;
+
+        var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
+        var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);
+        Employee employee = new Employee
         {
-            // Arrange
-            const string routeName = "OData";
-            IEdmEntitySet entitySet = _model.EntityContainer.FindEntitySet("employees");
-            ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
+            EmployeeID = 8,
+            Birthday = new System.DateTimeOffset(2020, 9, 10, 1, 2, 3, System.TimeSpan.Zero),
+            EmployeeName = "Ssa",
+            HomeAddress = null
+        };
+        var content = ODataFormatterHelpers.GetContent(employee, formatter, ODataMediaTypes.ApplicationJsonODataMinimalMetadata);
 
-            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, _model));
-            request.ODataFeature().Model = _model;
-            request.ODataFeature().Path = path;
-            request.ODataFeature().RoutePrefix = routeName;
+        // Act & Assert
+        string actual = await ODataFormatterHelpers.GetContentResult(content, request);
 
-            var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
-            var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);
-            Employee employee = new Employee
-            {
-                EmployeeID = 8,
-                Birthday = new System.DateTimeOffset(2020, 9, 10, 1, 2, 3, System.TimeSpan.Zero),
-                EmployeeName = "Ssa",
-                HomeAddress = null
-            };
-            var content = ODataFormatterHelpers.GetContent(employee, formatter, ODataMediaTypes.ApplicationJsonODataMinimalMetadata);
+        Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#employees/$entity\"," +
+            "\"EmployeeID\":8," +
+            "\"EmployeeName\":\"Ssa\"," +
+            "\"BaseSalary\":0," +
+            "\"Birthday\":\"2020-09-10T01:02:03Z\"," +
+            "\"WorkCompanyId\":0," +
+            "\"HomeAddress\":null" +
+            "}", actual);
+    }
 
-            // Act & Assert
-            string actual = await ODataFormatterHelpers.GetContentResult(content, request);
-
-            Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#employees/$entity\"," +
-                "\"EmployeeID\":8," +
-                "\"EmployeeName\":\"Ssa\"," +
-                "\"BaseSalary\":0," +
-                "\"Birthday\":\"2020-09-10T01:02:03Z\"," +
-                "\"WorkCompanyId\":0," +
-                "\"HomeAddress\":null" +
-                "}", actual);
-        }
-
-        private static IEdmModel GetSampleModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Employee>("employees");
-            builder.EntitySet<WorkItem>("workitems");
-            return builder.GetEdmModel();
-        }
+    private static IEdmModel GetSampleModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Employee>("employees");
+        builder.EntitySet<WorkItem>("workitems");
+        return builder.GetEdmModel();
     }
 }

@@ -17,52 +17,51 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
+
+public class ComplexTypeTest
 {
-    public class ComplexTypeTest
+    [Fact]
+    public async Task ComplexTypeSerializesAsOData()
     {
-        [Fact]
-        public async Task ComplexTypeSerializesAsOData()
+        // Arrange
+        string routeName = "OData";
+        IEdmModel model = GetSampleModel();
+        var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, model));
+        var addressComplexType = model.SchemaElements.OfType<IEdmComplexType>().Single(d => d.Name.Equals("Address"));
+        request.ODataFeature().Path = new ODataPath(new ValueSegment(addressComplexType));
+        request.ODataFeature().Model = model;
+        request.ODataFeature().RoutePrefix = routeName;
+
+        var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
+        var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);
+
+        Address address = new Address
         {
-            // Arrange
-            string routeName = "OData";
-            IEdmModel model = GetSampleModel();
-            var request = RequestFactory.Create("Get", "http://localhost/property", opt => opt.AddRouteComponents(routeName, model));
-            var addressComplexType = model.SchemaElements.OfType<IEdmComplexType>().Single(d => d.Name.Equals("Address"));
-            request.ODataFeature().Path = new ODataPath(new ValueSegment(addressComplexType));
-            request.ODataFeature().Model = model;
-            request.ODataFeature().RoutePrefix = routeName;
+            Street = "abc",
+            City = "efg",
+            State = "opq",
+            ZipCode = "98029",
+            CountryOrRegion = "Mars"
+        };
 
-            var payload = new ODataPayloadKind[] { ODataPayloadKind.Resource };
-            var formatter = ODataFormatterHelpers.GetOutputFormatter(payload);
+        var content = ODataFormatterHelpers.GetContent(address, formatter, ODataMediaTypes.ApplicationJsonODataMinimalMetadata);
 
-            Address address = new Address
-            {
-                Street = "abc",
-                City = "efg",
-                State = "opq",
-                ZipCode = "98029",
-                CountryOrRegion = "Mars"
-            };
+        // Act & Assert
+        string actual = await ODataFormatterHelpers.GetContentResult(content, request);
 
-            var content = ODataFormatterHelpers.GetContent(address, formatter, ODataMediaTypes.ApplicationJsonODataMinimalMetadata);
+        Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#Microsoft.AspNetCore.OData.Tests.Formatter.Models.Address\"," +
+            "\"Street\":\"abc\"," +
+            "\"City\":\"efg\"," +
+            "\"State\":\"opq\"," +
+            "\"ZipCode\":\"98029\"," +
+            "\"CountryOrRegion\":\"Mars\"}", actual);
+    }
 
-            // Act & Assert
-            string actual = await ODataFormatterHelpers.GetContentResult(content, request);
-
-            Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#Microsoft.AspNetCore.OData.Tests.Formatter.Models.Address\"," +
-                "\"Street\":\"abc\"," +
-                "\"City\":\"efg\"," +
-                "\"State\":\"opq\"," +
-                "\"ZipCode\":\"98029\"," +
-                "\"CountryOrRegion\":\"Mars\"}", actual);
-        }
-
-        private static IEdmModel GetSampleModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.ComplexType<Address>();
-            return builder.GetEdmModel();
-        }
+    private static IEdmModel GetSampleModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.ComplexType<Address>();
+        return builder.GetEdmModel();
     }
 }

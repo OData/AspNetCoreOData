@@ -10,130 +10,129 @@ using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query;
+
+/// <summary>
+/// Represents a single order by expression in the $orderby clause.
+/// </summary>
+/// <remarks>
+/// Why do we need this class and its derived type? only fetch the PropertyPath? In the next major release, we can consider to remove all of these.
+/// Track on it at: https://github.com/OData/AspNetCoreOData/issues/1153
+/// </remarks>
+public abstract class OrderByNode
 {
     /// <summary>
-    /// Represents a single order by expression in the $orderby clause.
+    /// Initializes a new instance of the <see cref="OrderByNode"/> class.
     /// </summary>
-    /// <remarks>
-    /// Why do we need this class and its derived type? only fetch the PropertyPath? In the next major release, we can consider to remove all of these.
-    /// Track on it at: https://github.com/OData/AspNetCoreOData/issues/1153
-    /// </remarks>
-    public abstract class OrderByNode
+    /// <param name="direction">The direction of the sort order.</param>
+    protected OrderByNode(OrderByDirection direction)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrderByNode"/> class.
-        /// </summary>
-        /// <param name="direction">The direction of the sort order.</param>
-        protected OrderByNode(OrderByDirection direction)
+        Direction = direction;
+        PropertyPath = String.Empty;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OrderByNode"/> class.
+    /// </summary>
+    /// <param name="orderByClause">The clause of the sort order.</param>
+    protected OrderByNode(OrderByClause orderByClause)
+    {
+        if (orderByClause == null)
         {
-            Direction = direction;
-            PropertyPath = String.Empty;
+            throw Error.ArgumentNull(nameof(orderByClause));
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrderByNode"/> class.
-        /// </summary>
-        /// <param name="orderByClause">The clause of the sort order.</param>
-        protected OrderByNode(OrderByClause orderByClause)
+        Direction = orderByClause.Direction;
+        PropertyPath = RestorePropertyPath(orderByClause.Expression);
+    }
+
+    /// <summary>
+    /// Gets the <see cref="OrderByDirection"/> for the current node.
+    /// </summary>
+    public OrderByDirection Direction { get; internal set; }
+
+    internal string PropertyPath { get; set; }
+
+    /// <summary>
+    /// Creates a list of <see cref="OrderByNode"/> instances from a linked list of <see cref="OrderByClause"/> instances.
+    /// </summary>
+    /// <param name="orderByClause">The head of the <see cref="OrderByClause"/> linked list.</param>
+    /// <returns>The list of new <see cref="OrderByPropertyNode"/> instances.</returns>
+    public static IList<OrderByNode> CreateCollection(OrderByClause orderByClause)
+    {
+        List<OrderByNode> result = new List<OrderByNode>();
+        for (OrderByClause clause = orderByClause; clause != null; clause = clause.ThenBy)
         {
-            if (orderByClause == null)
+            if (clause.Expression is CountNode)
             {
-                throw Error.ArgumentNull(nameof(orderByClause));
+                result.Add(new OrderByCountNode(clause));
             }
-
-            Direction = orderByClause.Direction;
-            PropertyPath = RestorePropertyPath(orderByClause.Expression);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="OrderByDirection"/> for the current node.
-        /// </summary>
-        public OrderByDirection Direction { get; internal set; }
-
-        internal string PropertyPath { get; set; }
-
-        /// <summary>
-        /// Creates a list of <see cref="OrderByNode"/> instances from a linked list of <see cref="OrderByClause"/> instances.
-        /// </summary>
-        /// <param name="orderByClause">The head of the <see cref="OrderByClause"/> linked list.</param>
-        /// <returns>The list of new <see cref="OrderByPropertyNode"/> instances.</returns>
-        public static IList<OrderByNode> CreateCollection(OrderByClause orderByClause)
-        {
-            List<OrderByNode> result = new List<OrderByNode>();
-            for (OrderByClause clause = orderByClause; clause != null; clause = clause.ThenBy)
+            else if (clause.Expression is NonResourceRangeVariableReferenceNode ||
+                clause.Expression is ResourceRangeVariableReferenceNode)
             {
-                if (clause.Expression is CountNode)
-                {
-                    result.Add(new OrderByCountNode(clause));
-                }
-                else if (clause.Expression is NonResourceRangeVariableReferenceNode ||
-                    clause.Expression is ResourceRangeVariableReferenceNode)
-                {
-                    result.Add(new OrderByItNode(clause));
-                }
-                else if (clause.Expression is SingleValueOpenPropertyAccessNode)
-                {
-                    result.Add(new OrderByOpenPropertyNode(clause));
-                }
-                else if(clause.Expression is SingleValuePropertyAccessNode)
-                {
-                    result.Add(new OrderByPropertyNode(clause));
-                }
-                else
-                {
-                    // For other, let's create a wrapper. In next major release, we don't need this wrapper.
-                    result.Add(new OrderByClauseNode(clause));
-                }
+                result.Add(new OrderByItNode(clause));
             }
-
-            return result;
-        }
-
-        internal static string RestorePropertyPath(SingleValueNode expression)
-        {
-            if (expression == null)
+            else if (clause.Expression is SingleValueOpenPropertyAccessNode)
             {
-                return string.Empty;
+                result.Add(new OrderByOpenPropertyNode(clause));
             }
-
-            string propertyName = string.Empty;
-            SingleValueNode source = null;
-
-            var accessNode = expression as SingleValuePropertyAccessNode;
-            if (accessNode != null)
+            else if(clause.Expression is SingleValuePropertyAccessNode)
             {
-                propertyName = accessNode.Property.Name;
-                source = accessNode.Source;
+                result.Add(new OrderByPropertyNode(clause));
             }
             else
             {
-                var complexNode = expression as SingleComplexNode;
-                if (complexNode != null)
-                {
-                    propertyName = complexNode.Property.Name;
-                    source = complexNode.Source;
-                }
-                else
-                {
-                    var navNode = expression as SingleNavigationNode;
-                    if (navNode != null)
-                    {
-                        propertyName = navNode.NavigationProperty.Name;
-                        source = navNode.Source;
-                    }
-                }
+                // For other, let's create a wrapper. In next major release, we don't need this wrapper.
+                result.Add(new OrderByClauseNode(clause));
             }
+        }
 
-            var parentPath = RestorePropertyPath(source);
-            if (string.IsNullOrEmpty(parentPath))
+        return result;
+    }
+
+    internal static string RestorePropertyPath(SingleValueNode expression)
+    {
+        if (expression == null)
+        {
+            return string.Empty;
+        }
+
+        string propertyName = string.Empty;
+        SingleValueNode source = null;
+
+        var accessNode = expression as SingleValuePropertyAccessNode;
+        if (accessNode != null)
+        {
+            propertyName = accessNode.Property.Name;
+            source = accessNode.Source;
+        }
+        else
+        {
+            var complexNode = expression as SingleComplexNode;
+            if (complexNode != null)
             {
-                return propertyName;
+                propertyName = complexNode.Property.Name;
+                source = complexNode.Source;
             }
             else
             {
-                return string.Format(CultureInfo.CurrentCulture, "{0}/{1}", parentPath, propertyName);
+                var navNode = expression as SingleNavigationNode;
+                if (navNode != null)
+                {
+                    propertyName = navNode.NavigationProperty.Name;
+                    source = navNode.Source;
+                }
             }
+        }
+
+        var parentPath = RestorePropertyPath(source);
+        if (string.IsNullOrEmpty(parentPath))
+        {
+            return propertyName;
+        }
+        else
+        {
+            return string.Format(CultureInfo.CurrentCulture, "{0}/{1}", parentPath, propertyName);
         }
     }
 }

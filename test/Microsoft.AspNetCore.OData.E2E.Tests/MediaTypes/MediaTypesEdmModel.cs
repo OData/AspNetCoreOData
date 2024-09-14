@@ -8,16 +8,15 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes
-{
-    public class MediaTypesEdmModel
-    {
-        public static IEdmModel GetEdmModel()
-        {
-            var modelBuilder = new ODataConventionModelBuilder();
-            modelBuilder.EntitySet<Order>("Orders");
+namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes;
 
-            return modelBuilder.GetEdmModel();
-        }
+public class MediaTypesEdmModel
+{
+    public static IEdmModel GetEdmModel()
+    {
+        var modelBuilder = new ODataConventionModelBuilder();
+        modelBuilder.EntitySet<Order>("Orders");
+
+        return modelBuilder.GetEdmModel();
     }
 }

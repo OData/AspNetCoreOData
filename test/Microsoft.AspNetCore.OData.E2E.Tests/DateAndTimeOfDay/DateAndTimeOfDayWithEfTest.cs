@@ -27,32 +27,32 @@ using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+
+public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfTest>
 {
-    public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfTest>
+    public DateAndTimeOfDayWithEfTest(WebApiTestFixture<DateAndTimeOfDayWithEfTest> fixture)
+        :base(fixture)
     {
-        public DateAndTimeOfDayWithEfTest(WebApiTestFixture<DateAndTimeOfDayWithEfTest> fixture)
-            :base(fixture)
-        {
-        }
+    }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=EfDateAndTimeOfDayModelContext8";
-            services.AddDbContext<EfDateAndTimeOfDayModelContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
+    protected static void UpdateConfigureServices(IServiceCollection services)
+    {
+        string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=EfDateAndTimeOfDayModelContext8";
+        services.AddDbContext<EfDateAndTimeOfDayModelContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
-            services.ConfigureControllers(typeof(MetadataController), typeof(DateAndTimeOfDayModelsController));
+        services.ConfigureControllers(typeof(MetadataController), typeof(DateAndTimeOfDayModelsController));
 
-            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddRouteComponents("odata", BuildEdmModel()));
-        }
+        services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
+            .AddRouteComponents("odata", BuildEdmModel()));
+    }
 
-        [Fact]
-        public async Task MetadataDocument_IncludesDateAndTimeOfDayProperties()
-        {
-            // Arrange
-            string Uri = "odata/$metadata";
-            string expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
+    [Fact]
+    public async Task MetadataDocument_IncludesDateAndTimeOfDayProperties()
+    {
+        // Arrange
+        string Uri = "odata/$metadata";
+        string expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
 "<edmx:Edmx Version=\"4.0\" xmlns:edmx=\"http://docs.oasis-open.org/odata/ns/edmx\">\r\n" +
 "  <edmx:DataServices>\r\n" +
 "    <Schema Namespace=\"Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">\r\n" +
@@ -78,52 +78,52 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
 "  </edmx:DataServices>\r\n" +
 "</edmx:Edmx>";
 
-            // Remove indentation
-            expected = Regex.Replace(expected, @"\r\n\s*<", @"<");
-            HttpClient client = CreateClient();
+        // Remove indentation
+        expected = Regex.Replace(expected, @"\r\n\s*<", @"<");
+        HttpClient client = CreateClient();
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
 
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
 
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.Equal(expected, await response.Content.ReadAsStringAsync());
-        }
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(expected, await response.Content.ReadAsStringAsync());
+    }
 
-        [Fact]
-        public async Task CanQueryEntitySet_WithDateAndTimeOfDayProperties()
-        {
-            // Arrange
-            string Uri = "odata/DateAndTimeOfDayModels";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
-            HttpClient client = CreateClient();
+    [Fact]
+    public async Task CanQueryEntitySet_WithDateAndTimeOfDayProperties()
+    {
+        // Arrange
+        string Uri = "odata/DateAndTimeOfDayModels";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
 
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
 
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-            var result = JObject.Parse(await response.Content.ReadAsStringAsync());
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        var result = JObject.Parse(await response.Content.ReadAsStringAsync());
 
-            Assert.Equal(5, result["value"].Count());
+        Assert.Equal(5, result["value"].Count());
 
-            // test one for each entity
-            Assert.Equal("2015-12-23", result["value"][0]["EndDay"]);
-            Assert.Equal(JValue.CreateNull(), result["value"][1]["DeliverDay"]);
-            Assert.Equal("08:06:04.0030000", result["value"][2]["ResumeTime"]);
-            Assert.Equal(JValue.CreateNull(), result["value"][3]["EndTime"]);
-            Assert.Equal("05:03:05.0790000", result["value"][4]["CreatedTime"]);
-        }
+        // test one for each entity
+        Assert.Equal("2015-12-23", result["value"][0]["EndDay"]);
+        Assert.Equal(JValue.CreateNull(), result["value"][1]["DeliverDay"]);
+        Assert.Equal("08:06:04.0030000", result["value"][2]["ResumeTime"]);
+        Assert.Equal(JValue.CreateNull(), result["value"][3]["EndTime"]);
+        Assert.Equal("05:03:05.0790000", result["value"][4]["CreatedTime"]);
+    }
 
-        [Fact]
-        public async Task CanQuerySingleEntity_WithDateAndTimeOfDayProperties()
-        {
-            // Arrange
-            string Uri = "odata/DateAndTimeOfDayModels(2)";
+    [Fact]
+    public async Task CanQuerySingleEntity_WithDateAndTimeOfDayProperties()
+    {
+        // Arrange
+        string Uri = "odata/DateAndTimeOfDayModels(2)";
 
-            string expect = @"{
+        string expect = @"{
   ""@odata.context"": ""{XXXX}/odata/$metadata#DateAndTimeOfDayModels/$entity"",
   ""@odata.type"": ""#Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay.DateAndTimeOfDayModel"",
   ""@odata.id"": ""{XXXX}/odata/DateAndTimeOfDayModels(2)"",
@@ -142,288 +142,287 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay
   ""CreatedTime"": ""02:03:05.0790000"",
   ""EndTime"": null
 }";
-            expect = expect.Replace("{XXXX}", "http://localhost");
+        expect = expect.Replace("{XXXX}", "http://localhost");
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
-            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=full"));
-            HttpClient client = CreateClient();
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=full"));
+        HttpClient client = CreateClient();
 
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
 
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-            var result = JObject.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal(JObject.Parse(expect), result);
-        }
-
-        [Fact]
-        public async Task CanSelect_OnDateAndTimeOfDayProperties()
-        {
-            // Arrange
-            string Uri = "odata/DateAndTimeOfDayModels(3)?$select=Birthday,PublishDay,DeliverDay,CreatedTime,ResumeTime";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
-            HttpClient client = CreateClient();
-
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-
-            var result = JObject.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal("2018-12-22", result["Birthday"]);
-            Assert.Equal(JValue.CreateNull(), result["PublishDay"]);
-            Assert.Equal("2017-12-22", result["DeliverDay"]);
-            Assert.Equal("03:03:05.0790000", result["CreatedTime"]);
-            Assert.Equal("08:06:04.0030000", result["ResumeTime"]);
-        }
-
-        [Theory]
-        [InlineData("?$filter=year(Birthday) eq 2017", "2")]
-        [InlineData("?$filter=month(PublishDay) eq 01", "4")]
-        [InlineData("?$filter=day(EndDay) ne 27", "1,2,3,4")]
-        [InlineData("?$filter=Birthday gt 2017-12-22", "3,4,5")]
-        [InlineData("?$filter=PublishDay eq null", "1,3,5")] // the following four cases are for nullable
-        [InlineData("?$filter=PublishDay eq 2016-03-22", "2")]
-        [InlineData("?$filter=PublishDay ne 2016-03-22", "1,3,4,5")]
-        [InlineData("?$filter=PublishDay lt 2016-03-22", "4")]
-        [InlineData("?$filter=EndTime ne null", "1,3,5")]
-        // [InlineData("?$filter=CreatedTime eq 04:03:05.0790000", "4")] // EFCore could not be translated.
-        // [InlineData("?$filter=hour(EndTime) eq 11", "1")] // EFCore could not be translated.
-        // [InlineData("?$filter=minute(EndTime) eq 06", "3")] // EFCore could not be translated.
-        // [InlineData("?$filter=second(EndTime) eq 10", "5")] // EFCore could not be translated.
-        [InlineData("?$filter=EndTime eq null", "2,4")]
-        // [InlineData("?$filter=EndTime ge 02:03:05.0790000", "1,3,5")] // EFCore could not be translated.
-        public async Task CanFilter_OnDateAndTimeOfDayProperties(string filter, string expect)
-        {
-            // Arrange
-            string Uri = "odata/DateAndTimeOfDayModels" + filter;
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
-            HttpClient client = CreateClient();
-
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-
-            JObject result = await response.Content.ReadAsObject<JObject>();
-            Assert.Equal(expect, string.Join(",", result["value"].Select(e => e["Id"].ToString())));
-        }
-
-        [Theory]
-        [InlineData("?$orderby=Birthday", "1,2,3,4,5")]
-        [InlineData("?$orderby=Birthday desc", "5,4,3,2,1")]
-        [InlineData("?$orderby=PublishDay", "1,3,5,4,2")]
-        [InlineData("?$orderby=PublishDay desc", "2,4,5,3,1")]
-        [InlineData("?$orderby=CreatedTime", "1,2,3,4,5")]
-        [InlineData("?$orderby=CreatedTime desc", "5,4,3,2,1")]
-        public async Task CanOrderBy_OnDateAndTimeOfDayProperties(string orderby, string expect)
-        {
-            // Arrange
-            string Uri = "odata/DateAndTimeOfDayModels" + orderby;
-            var request = new HttpRequestMessage(HttpMethod.Get, Uri);
-            HttpClient client = CreateClient();
-
-            // Act
-            var response = await client.SendAsync(request);
-
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-
-            var result = JObject.Parse(await response.Content.ReadAsStringAsync());
-            Assert.Equal(5, result["value"].Count());
-
-            Assert.Equal(expect, string.Join(",", result["value"].Select(e => e["Id"].ToString())));
-        }
-
-        [Fact]
-        public async Task PostEntity_WithDateAndTimeOfDayTimeProperties()
-        {
-            // Arrange
-            const string Payload = "{" +
-                "\"Id\":99," +
-                "\"Birthday\":\"2099-01-01\"," +
-                "\"CreatedTime\":\"14:13:15.1790000\"," +
-                "\"EndDay\":\"1990-12-22\"}";
-
-            string Uri = "odata/DateAndTimeOfDayModels";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Uri);
-
-            request.Content = new StringContent(Payload);
-            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = Payload.Length;
-            HttpClient client = CreateClient();
-
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task PutEntity_WithDateAndTimeOfDayProperties()
-        {
-            // Arrange
-            const string Payload = "{" +
-                "\"Birthday\":\"2199-01-02\"," +
-                "\"CreatedTime\":\"14:13:15.1790000\"}";
-
-            string Uri = "odata/DateAndTimeOfDayModels(3)";
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Uri);
-
-            request.Content = new StringContent(Payload);
-            request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
-            request.Content.Headers.ContentLength = Payload.Length;
-            HttpClient client = CreateClient();
-
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            // Assert
-            Assert.True(response.IsSuccessStatusCode);
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        }
-
-        private static IEdmModel BuildEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<DateAndTimeOfDayModel>("DateAndTimeOfDayModels");
-
-            var type = builder.EntityType<DateAndTimeOfDayModel>();
-            type.Property(c => c.EndDay).AsDate();
-            type.Property(c => c.DeliverDay).AsDate();
-            type.Property(c => c.ResumeTime).AsTimeOfDay();
-
-            return builder.GetEdmModel();
-        }
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        var result = JObject.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(JObject.Parse(expect), result);
     }
 
-    public class DateAndTimeOfDayModelsController : ODataController
+    [Fact]
+    public async Task CanSelect_OnDateAndTimeOfDayProperties()
     {
-        private EfDateAndTimeOfDayModelContext _db;
+        // Arrange
+        string Uri = "odata/DateAndTimeOfDayModels(3)?$select=Birthday,PublishDay,DeliverDay,CreatedTime,ResumeTime";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
 
-        public DateAndTimeOfDayModelsController(EfDateAndTimeOfDayModelContext context)
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var result = JObject.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal("2018-12-22", result["Birthday"]);
+        Assert.Equal(JValue.CreateNull(), result["PublishDay"]);
+        Assert.Equal("2017-12-22", result["DeliverDay"]);
+        Assert.Equal("03:03:05.0790000", result["CreatedTime"]);
+        Assert.Equal("08:06:04.0030000", result["ResumeTime"]);
+    }
+
+    [Theory]
+    [InlineData("?$filter=year(Birthday) eq 2017", "2")]
+    [InlineData("?$filter=month(PublishDay) eq 01", "4")]
+    [InlineData("?$filter=day(EndDay) ne 27", "1,2,3,4")]
+    [InlineData("?$filter=Birthday gt 2017-12-22", "3,4,5")]
+    [InlineData("?$filter=PublishDay eq null", "1,3,5")] // the following four cases are for nullable
+    [InlineData("?$filter=PublishDay eq 2016-03-22", "2")]
+    [InlineData("?$filter=PublishDay ne 2016-03-22", "1,3,4,5")]
+    [InlineData("?$filter=PublishDay lt 2016-03-22", "4")]
+    [InlineData("?$filter=EndTime ne null", "1,3,5")]
+    // [InlineData("?$filter=CreatedTime eq 04:03:05.0790000", "4")] // EFCore could not be translated.
+    // [InlineData("?$filter=hour(EndTime) eq 11", "1")] // EFCore could not be translated.
+    // [InlineData("?$filter=minute(EndTime) eq 06", "3")] // EFCore could not be translated.
+    // [InlineData("?$filter=second(EndTime) eq 10", "5")] // EFCore could not be translated.
+    [InlineData("?$filter=EndTime eq null", "2,4")]
+    // [InlineData("?$filter=EndTime ge 02:03:05.0790000", "1,3,5")] // EFCore could not be translated.
+    public async Task CanFilter_OnDateAndTimeOfDayProperties(string filter, string expect)
+    {
+        // Arrange
+        string Uri = "odata/DateAndTimeOfDayModels" + filter;
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        JObject result = await response.Content.ReadAsObject<JObject>();
+        Assert.Equal(expect, string.Join(",", result["value"].Select(e => e["Id"].ToString())));
+    }
+
+    [Theory]
+    [InlineData("?$orderby=Birthday", "1,2,3,4,5")]
+    [InlineData("?$orderby=Birthday desc", "5,4,3,2,1")]
+    [InlineData("?$orderby=PublishDay", "1,3,5,4,2")]
+    [InlineData("?$orderby=PublishDay desc", "2,4,5,3,1")]
+    [InlineData("?$orderby=CreatedTime", "1,2,3,4,5")]
+    [InlineData("?$orderby=CreatedTime desc", "5,4,3,2,1")]
+    public async Task CanOrderBy_OnDateAndTimeOfDayProperties(string orderby, string expect)
+    {
+        // Arrange
+        string Uri = "odata/DateAndTimeOfDayModels" + orderby;
+        var request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var result = JObject.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(5, result["value"].Count());
+
+        Assert.Equal(expect, string.Join(",", result["value"].Select(e => e["Id"].ToString())));
+    }
+
+    [Fact]
+    public async Task PostEntity_WithDateAndTimeOfDayTimeProperties()
+    {
+        // Arrange
+        const string Payload = "{" +
+            "\"Id\":99," +
+            "\"Birthday\":\"2099-01-01\"," +
+            "\"CreatedTime\":\"14:13:15.1790000\"," +
+            "\"EndDay\":\"1990-12-22\"}";
+
+        string Uri = "odata/DateAndTimeOfDayModels";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Uri);
+
+        request.Content = new StringContent(Payload);
+        request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+        request.Content.Headers.ContentLength = Payload.Length;
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task PutEntity_WithDateAndTimeOfDayProperties()
+    {
+        // Arrange
+        const string Payload = "{" +
+            "\"Birthday\":\"2199-01-02\"," +
+            "\"CreatedTime\":\"14:13:15.1790000\"}";
+
+        string Uri = "odata/DateAndTimeOfDayModels(3)";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Uri);
+
+        request.Content = new StringContent(Payload);
+        request.Content.Headers.ContentType = MediaTypeWithQualityHeaderValue.Parse("application/json");
+        request.Content.Headers.ContentLength = Payload.Length;
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    private static IEdmModel BuildEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<DateAndTimeOfDayModel>("DateAndTimeOfDayModels");
+
+        var type = builder.EntityType<DateAndTimeOfDayModel>();
+        type.Property(c => c.EndDay).AsDate();
+        type.Property(c => c.DeliverDay).AsDate();
+        type.Property(c => c.ResumeTime).AsTimeOfDay();
+
+        return builder.GetEdmModel();
+    }
+}
+
+public class DateAndTimeOfDayModelsController : ODataController
+{
+    private EfDateAndTimeOfDayModelContext _db;
+
+    public DateAndTimeOfDayModelsController(EfDateAndTimeOfDayModelContext context)
+    {
+        context.Database.EnsureCreated();
+        if (!context.DateTimes.Any())
         {
-            context.Database.EnsureCreated();
-            if (!context.DateTimes.Any())
-            {
-                DateTime dt = new DateTime(2015, 12, 22);
+            DateTime dt = new DateTime(2015, 12, 22);
 
-                IList<DateAndTimeOfDayModel> dateTimes = Enumerable.Range(1, 5).Select(i =>
-                    new DateAndTimeOfDayModel
-                    {
-                       // Id = i,
-                        Birthday = dt.AddYears(i),
-                        EndDay = dt.AddDays(i),
-                        DeliverDay = i % 2 == 0 ? (DateTime?)null : dt.AddYears(5 - i),
-                        PublishDay = i % 2 != 0 ? (DateTime?)null : dt.AddMonths(5 - i),
-                        CreatedTime = new TimeSpan(0, i, 3, 5, 79),
-                        EndTime = i % 2 == 0 ? (TimeSpan?)null : new TimeSpan(0, 10 + i, 3 + i, 5 + i, 79 + i),
-                        ResumeTime = new TimeSpan(0, 8, 6, 4, 3)
-                    }).ToList();
-
-                foreach (var efDateTime in dateTimes)
+            IList<DateAndTimeOfDayModel> dateTimes = Enumerable.Range(1, 5).Select(i =>
+                new DateAndTimeOfDayModel
                 {
-                    context.DateTimes.Add(efDateTime);
-                }
+                   // Id = i,
+                    Birthday = dt.AddYears(i),
+                    EndDay = dt.AddDays(i),
+                    DeliverDay = i % 2 == 0 ? (DateTime?)null : dt.AddYears(5 - i),
+                    PublishDay = i % 2 != 0 ? (DateTime?)null : dt.AddMonths(5 - i),
+                    CreatedTime = new TimeSpan(0, i, 3, 5, 79),
+                    EndTime = i % 2 == 0 ? (TimeSpan?)null : new TimeSpan(0, 10 + i, 3 + i, 5 + i, 79 + i),
+                    ResumeTime = new TimeSpan(0, 8, 6, 4, 3)
+                }).ToList();
 
-                context.SaveChanges();
-            }
-
-            _db = context;
-        }
-
-        [EnableQuery]
-        public IActionResult Get()
-        {
-            return Ok(_db.DateTimes);
-        }
-
-        [EnableQuery]
-        public IActionResult Get(int key)
-        {
-            DateAndTimeOfDayModel dtm = _db.DateTimes.FirstOrDefault(e => e.Id == key);
-            if (dtm == null)
+            foreach (var efDateTime in dateTimes)
             {
-                return NotFound();
+                context.DateTimes.Add(efDateTime);
             }
 
-            return Ok(dtm);
+            context.SaveChanges();
         }
 
-        public IActionResult Post([FromBody]DateAndTimeOfDayModel dt)
-        {
-            Assert.NotNull(dt);
-
-            Assert.Equal(99, dt.Id);
-            Assert.Equal(new DateTime(2099, 1, 1), dt.Birthday);
-            Assert.Equal(new TimeSpan(0, 14, 13, 15, 179), dt.CreatedTime);
-            Assert.Equal(new DateTime(1990, 12, 22), dt.EndDay);
-
-            return Created(dt);
-        }
-
-        public IActionResult Put(int key, [FromBody]Delta<DateAndTimeOfDayModel> dt)
-        {
-            Assert.Equal(new[] { "Birthday", "CreatedTime" }, dt.GetChangedPropertyNames());
-
-            // Birthday
-            object value;
-            bool success = dt.TryGetPropertyValue("Birthday", out value);
-            Assert.True(success);
-            DateTime dateTime = Assert.IsType<DateTime>(value);
-            Assert.Equal(DateTimeKind.Unspecified, dateTime.Kind);
-            Assert.Equal(new DateTime(2199, 1, 2), dateTime);
-
-            // CreatedTime
-            success = dt.TryGetPropertyValue("CreatedTime", out value);
-            Assert.True(success);
-            TimeSpan timeSpan = Assert.IsType<TimeSpan>(value);
-            Assert.Equal(new TimeSpan(0, 14, 13, 15, 179), timeSpan);
-            return Updated(dt);
-        }
+        _db = context;
     }
 
-    public class EfDateAndTimeOfDayModelContext : DbContext
+    [EnableQuery]
+    public IActionResult Get()
     {
-        public EfDateAndTimeOfDayModelContext(DbContextOptions<EfDateAndTimeOfDayModelContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<DateAndTimeOfDayModel> DateTimes { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.EndDay).HasColumnType("date");
-            modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.DeliverDay).HasColumnType("date");
-        }
+        return Ok(_db.DateTimes);
     }
 
-    public class DateAndTimeOfDayModel
+    [EnableQuery]
+    public IActionResult Get(int key)
     {
-        public int Id { get; set; }
+        DateAndTimeOfDayModel dtm = _db.DateTimes.FirstOrDefault(e => e.Id == key);
+        if (dtm == null)
+        {
+            return NotFound();
+        }
 
-        [Column(TypeName = "date")]
-        public DateTime Birthday { get; set; }
-
-        [Column(TypeName = "DaTe")]
-        public DateTime? PublishDay { get; set; }
-
-        public DateTime EndDay { get; set; } // will use the Fluent API
-
-        public DateTime? DeliverDay { get; set; } // will use the Fluent API
-
-        [Column(TypeName = "time")]
-        public TimeSpan CreatedTime { get; set; }
-
-        [Column(TypeName = "tIme")]
-        public TimeSpan? EndTime { get; set; }
-
-        public TimeSpan ResumeTime { get; set; } // will use the Fluent API
+        return Ok(dtm);
     }
+
+    public IActionResult Post([FromBody]DateAndTimeOfDayModel dt)
+    {
+        Assert.NotNull(dt);
+
+        Assert.Equal(99, dt.Id);
+        Assert.Equal(new DateTime(2099, 1, 1), dt.Birthday);
+        Assert.Equal(new TimeSpan(0, 14, 13, 15, 179), dt.CreatedTime);
+        Assert.Equal(new DateTime(1990, 12, 22), dt.EndDay);
+
+        return Created(dt);
+    }
+
+    public IActionResult Put(int key, [FromBody]Delta<DateAndTimeOfDayModel> dt)
+    {
+        Assert.Equal(new[] { "Birthday", "CreatedTime" }, dt.GetChangedPropertyNames());
+
+        // Birthday
+        object value;
+        bool success = dt.TryGetPropertyValue("Birthday", out value);
+        Assert.True(success);
+        DateTime dateTime = Assert.IsType<DateTime>(value);
+        Assert.Equal(DateTimeKind.Unspecified, dateTime.Kind);
+        Assert.Equal(new DateTime(2199, 1, 2), dateTime);
+
+        // CreatedTime
+        success = dt.TryGetPropertyValue("CreatedTime", out value);
+        Assert.True(success);
+        TimeSpan timeSpan = Assert.IsType<TimeSpan>(value);
+        Assert.Equal(new TimeSpan(0, 14, 13, 15, 179), timeSpan);
+        return Updated(dt);
+    }
+}
+
+public class EfDateAndTimeOfDayModelContext : DbContext
+{
+    public EfDateAndTimeOfDayModelContext(DbContextOptions<EfDateAndTimeOfDayModelContext> options)
+        : base(options)
+    {
+    }
+
+    public DbSet<DateAndTimeOfDayModel> DateTimes { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.EndDay).HasColumnType("date");
+        modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.DeliverDay).HasColumnType("date");
+    }
+}
+
+public class DateAndTimeOfDayModel
+{
+    public int Id { get; set; }
+
+    [Column(TypeName = "date")]
+    public DateTime Birthday { get; set; }
+
+    [Column(TypeName = "DaTe")]
+    public DateTime? PublishDay { get; set; }
+
+    public DateTime EndDay { get; set; } // will use the Fluent API
+
+    public DateTime? DeliverDay { get; set; } // will use the Fluent API
+
+    [Column(TypeName = "time")]
+    public TimeSpan CreatedTime { get; set; }
+
+    [Column(TypeName = "tIme")]
+    public TimeSpan? EndTime { get; set; }
+
+    public TimeSpan ResumeTime { get; set; } // will use the Fluent API
 }

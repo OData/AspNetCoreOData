@@ -15,139 +15,138 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateTimeOffsetSupport;
+
+public class FilesController : ODataController
 {
-    public class FilesController : ODataController
-    {
-        private readonly FilesContext _db;
+    private readonly FilesContext _db;
 
         
 
-         public FilesController(FilesContext context)
+     public FilesController(FilesContext context)
+    {
+        context.Database.EnsureCreated();
+        if (!context.Files.Any())
         {
-            context.Database.EnsureCreated();
-            if (!context.Files.Any())
+            foreach (var file in CreateFiles())
             {
-                foreach (var file in CreateFiles())
-                {
-                    context.Files.Add(file);
-                }
-
-                context.SaveChanges();
+                context.Files.Add(file);
             }
 
-            _db = context;
+            context.SaveChanges();
         }
 
-        [EnableQuery]
-        public IQueryable<File> Get()
+        _db = context;
+    }
+
+    [EnableQuery]
+    public IQueryable<File> Get()
+    {
+        return _db.Files;
+    }
+
+    [EnableQuery]
+    public IActionResult Get(int key)
+    {
+        File file = _db.Files.FirstOrDefault(c => c.FileId == key);
+        if (file == null)
         {
-            return _db.Files;
+            return NotFound();
         }
 
-        [EnableQuery]
-        public IActionResult Get(int key)
+        return Ok(file);
+    }
+
+    [HttpPost]
+    public IActionResult Post([FromBody]File file)
+    {
+        if (file.FileId == 99)
         {
-            File file = _db.Files.FirstOrDefault(c => c.FileId == key);
-            if (file == null)
+            // Special test case for property name case-insensitive
+            Assert.Equal("abc", file.Name);
+            Assert.Equal(new DateTimeOffset(2021, 10, 28, 21, 33, 26, TimeSpan.FromHours(8)), file.CreatedDate);
+            Assert.Equal(new DateTimeOffset(2021, 11, 01, 10, 48, 12, TimeSpan.FromHours(8)), file.DeleteDate);
+
+            // special string used to verify at test case.
+            return Ok("PropertyCaseInsensitive");
+        }
+
+        _db.Files.Add(file);
+        _db.SaveChanges();
+
+        return Created(file);
+    }
+
+    public IActionResult Patch(int key, Delta<File> patch)
+    {
+        var file = _db.Files.SingleOrDefault(c => c.FileId == key);
+        if (file == null)
+        {
+            return NotFound();
+        }
+
+        patch.Patch(file);
+        _db.SaveChanges();
+
+        return Updated(file);
+    }
+
+    public IActionResult Delete(int key)
+    {
+        File original = _db.Files.FirstOrDefault(c => c.FileId == key);
+        if (original == null)
+        {
+            return NotFound();
+        }
+
+        _db.Files.Remove(original);
+        _db.SaveChanges();
+
+        return StatusCode(StatusCodes.Status204NoContent);
+    }
+
+    public IActionResult GetCreatedDate(int key)
+    {
+        File file = _db.Files.FirstOrDefault(c => c.FileId == key);
+        if (file == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(file.CreatedDate);
+    }
+
+    [HttpPost("/ResetDataSource")]
+    public IActionResult ResetDataSource()
+    {
+        _db.Files.RemoveRange(_db.Files);
+        _db.SaveChanges();
+
+        _db.Database.EnsureDeleted();
+        _db.Database.EnsureCreated();
+
+        var files = CreateFiles();
+        _db.Files.AddRange(files);
+        _db.SaveChanges();
+
+        return StatusCode(StatusCodes.Status204NoContent);
+    }
+
+    public static IEnumerable<File> CreateFiles()
+    {
+        DateTimeOffset dateTime = new DateTimeOffset(2021, 4, 15, 16, 24, 8, TimeSpan.FromHours(-8));
+
+        // #2 is used for update/get round trip, its value will be changed every test running.
+        // #3 is used for get, will never change its value.
+        // #4 is used  to select date time property, will never change its value.
+        // #6 is used for create/get round trip, it will create, get, delete
+        return Enumerable.Range(1, 5).Select(e =>
+            new File
             {
-                return NotFound();
-            }
-
-            return Ok(file);
-        }
-
-        [HttpPost]
-        public IActionResult Post([FromBody]File file)
-        {
-            if (file.FileId == 99)
-            {
-                // Special test case for property name case-insensitive
-                Assert.Equal("abc", file.Name);
-                Assert.Equal(new DateTimeOffset(2021, 10, 28, 21, 33, 26, TimeSpan.FromHours(8)), file.CreatedDate);
-                Assert.Equal(new DateTimeOffset(2021, 11, 01, 10, 48, 12, TimeSpan.FromHours(8)), file.DeleteDate);
-
-                // special string used to verify at test case.
-                return Ok("PropertyCaseInsensitive");
-            }
-
-            _db.Files.Add(file);
-            _db.SaveChanges();
-
-            return Created(file);
-        }
-
-        public IActionResult Patch(int key, Delta<File> patch)
-        {
-            var file = _db.Files.SingleOrDefault(c => c.FileId == key);
-            if (file == null)
-            {
-                return NotFound();
-            }
-
-            patch.Patch(file);
-            _db.SaveChanges();
-
-            return Updated(file);
-        }
-
-        public IActionResult Delete(int key)
-        {
-            File original = _db.Files.FirstOrDefault(c => c.FileId == key);
-            if (original == null)
-            {
-                return NotFound();
-            }
-
-            _db.Files.Remove(original);
-            _db.SaveChanges();
-
-            return StatusCode(StatusCodes.Status204NoContent);
-        }
-
-        public IActionResult GetCreatedDate(int key)
-        {
-            File file = _db.Files.FirstOrDefault(c => c.FileId == key);
-            if (file == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(file.CreatedDate);
-        }
-
-        [HttpPost("/ResetDataSource")]
-        public IActionResult ResetDataSource()
-        {
-            _db.Files.RemoveRange(_db.Files);
-            _db.SaveChanges();
-
-            _db.Database.EnsureDeleted();
-            _db.Database.EnsureCreated();
-
-            var files = CreateFiles();
-            _db.Files.AddRange(files);
-            _db.SaveChanges();
-
-            return StatusCode(StatusCodes.Status204NoContent);
-        }
-
-        public static IEnumerable<File> CreateFiles()
-        {
-            DateTimeOffset dateTime = new DateTimeOffset(2021, 4, 15, 16, 24, 8, TimeSpan.FromHours(-8));
-
-            // #2 is used for update/get round trip, its value will be changed every test running.
-            // #3 is used for get, will never change its value.
-            // #4 is used  to select date time property, will never change its value.
-            // #6 is used for create/get round trip, it will create, get, delete
-            return Enumerable.Range(1, 5).Select(e =>
-                new File
-                {
-                    // FileId = e,
-                    Name = "File #" + e,
-                    CreatedDate = dateTime.AddMonths(3 - e).AddYears(e % 2 == 0 ? e : -e),
-                    DeleteDate = dateTime.AddMonths(e % 2 == 0 ? e : -e),
-                });
-        }
+                // FileId = e,
+                Name = "File #" + e,
+                CreatedDate = dateTime.AddMonths(3 - e).AddYears(e % 2 == 0 ? e : -e),
+                DeleteDate = dateTime.AddMonths(e % 2 == 0 ? e : -e),
+            });
     }
 }

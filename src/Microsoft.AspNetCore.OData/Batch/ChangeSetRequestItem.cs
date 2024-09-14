@@ -11,61 +11,60 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 
-namespace Microsoft.AspNetCore.OData.Batch
+namespace Microsoft.AspNetCore.OData.Batch;
+
+/// <summary>
+/// Represents a ChangeSet request.
+/// </summary>
+public class ChangeSetRequestItem : ODataBatchRequestItem
 {
     /// <summary>
-    /// Represents a ChangeSet request.
+    /// Initializes a new instance of the <see cref="ChangeSetRequestItem"/> class.
     /// </summary>
-    public class ChangeSetRequestItem : ODataBatchRequestItem
+    /// <param name="contexts">The request contexts in the ChangeSet.</param>
+    public ChangeSetRequestItem(IEnumerable<HttpContext> contexts)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ChangeSetRequestItem"/> class.
-        /// </summary>
-        /// <param name="contexts">The request contexts in the ChangeSet.</param>
-        public ChangeSetRequestItem(IEnumerable<HttpContext> contexts)
+        Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts));
+    }
+
+    /// <summary>
+    /// Gets the request contexts in the ChangeSet.
+    /// </summary>
+    public IEnumerable<HttpContext> Contexts { get; }
+
+    /// <summary>
+    /// Sends the ChangeSet request to the request delegate.
+    /// </summary>
+    /// <param name="handler">The handler for processing a message.</param>
+    /// <returns>A <see cref="ChangeSetResponseItem"/>.</returns>
+    public override async Task<ODataBatchResponseItem> SendRequestAsync(RequestDelegate handler)
+    {
+        if (handler == null)
         {
-            Contexts = contexts ?? throw new ArgumentNullException(nameof(contexts));
+            throw new ArgumentNullException(nameof(handler));
         }
 
-        /// <summary>
-        /// Gets the request contexts in the ChangeSet.
-        /// </summary>
-        public IEnumerable<HttpContext> Contexts { get; }
+        List<HttpContext> responseContexts = new List<HttpContext>();
 
-        /// <summary>
-        /// Sends the ChangeSet request to the request delegate.
-        /// </summary>
-        /// <param name="handler">The handler for processing a message.</param>
-        /// <returns>A <see cref="ChangeSetResponseItem"/>.</returns>
-        public override async Task<ODataBatchResponseItem> SendRequestAsync(RequestDelegate handler)
+        IDictionary<string, string> contentIdToLocationMapping = this.ContentIdToLocationMapping ?? new Dictionary<string, string>();
+
+        foreach (HttpContext context in Contexts)
         {
-            if (handler == null)
+            await SendRequestAsync(handler, context, contentIdToLocationMapping).ConfigureAwait(false);
+
+            HttpResponse response = context.Response;
+            if (response.IsSuccessStatusCode())
             {
-                throw new ArgumentNullException(nameof(handler));
+                responseContexts.Add(context);
             }
-
-            List<HttpContext> responseContexts = new List<HttpContext>();
-
-            IDictionary<string, string> contentIdToLocationMapping = this.ContentIdToLocationMapping ?? new Dictionary<string, string>();
-
-            foreach (HttpContext context in Contexts)
+            else
             {
-                await SendRequestAsync(handler, context, contentIdToLocationMapping).ConfigureAwait(false);
-
-                HttpResponse response = context.Response;
-                if (response.IsSuccessStatusCode())
-                {
-                    responseContexts.Add(context);
-                }
-                else
-                {
-                    responseContexts.Clear();
-                    responseContexts.Add(context);
-                    return new ChangeSetResponseItem(responseContexts);
-                }
+                responseContexts.Clear();
+                responseContexts.Add(context);
+                return new ChangeSetResponseItem(responseContexts);
             }
-
-            return new ChangeSetResponseItem(responseContexts);
         }
+
+        return new ChangeSetResponseItem(responseContexts);
     }
 }

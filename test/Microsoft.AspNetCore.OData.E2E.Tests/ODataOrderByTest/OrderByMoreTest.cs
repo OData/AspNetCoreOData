@@ -18,76 +18,75 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ODataOrderByTest;
+
+public class ODataOrderByMoreTest : WebApiTestBase<ODataOrderByMoreTest>
 {
-    public class ODataOrderByMoreTest : WebApiTestBase<ODataOrderByMoreTest>
+    public ODataOrderByMoreTest(WebApiTestFixture<ODataOrderByMoreTest> fixture)
+        :base(fixture)
     {
-        public ODataOrderByMoreTest(WebApiTestFixture<ODataOrderByMoreTest> fixture)
-            :base(fixture)
-        {
-        }
-
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            services.ConfigureControllers(typeof(BooksController));
-            services.AddControllers()
-                .AddOData(); // without any configuration
-        }
-
-        [Theory]
-        [InlineData("/books?orderby=ISBN&top=1")]
-        [InlineData("/books?orderby=isbn&top=1")]
-        [InlineData("/books?$orderby=ISBN&top=1")]
-        [InlineData("/books?$orderby=isbn&top=1")]
-        public async Task TestOrderBy_WithDifferentPropertyCase(string requestUri)
-        {
-            // Arrange
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
-            HttpClient client = CreateClient();
-
-            // Act
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var resultArray = await response.Content.ReadAsObject<JArray>();
-
-            JObject objectItem = Assert.IsType<JObject>(Assert.Single(resultArray));
-            Assert.Equal(2, objectItem.Properties().Count());
-            Assert.Equal("063-6-920-02371-5", objectItem["isbn"]);
-            Assert.Equal(2, objectItem["id"]);
-        }
     }
 
-    [ApiController]
-    [Route("[controller]")]
-    public class BooksController : ControllerBase
+    protected static void UpdateConfigureServices(IServiceCollection services)
     {
-        private static IList<Book> _books = new List<Book>
-        {
-            new Book
-            {
-                Id = 1,
-                ISBN = "978-0-321-87758-1"
-            },
-            new Book
-            {
-                Id = 2,
-                ISBN = "063-6-920-02371-5",
-            }
-        };
+        services.ConfigureControllers(typeof(BooksController));
+        services.AddControllers()
+            .AddOData(); // without any configuration
+    }
 
-        [HttpGet]
-        public IEnumerable<Book> Get(ODataQueryOptions<Book> queryOptions)
+    [Theory]
+    [InlineData("/books?orderby=ISBN&top=1")]
+    [InlineData("/books?orderby=isbn&top=1")]
+    [InlineData("/books?$orderby=ISBN&top=1")]
+    [InlineData("/books?$orderby=isbn&top=1")]
+    public async Task TestOrderBy_WithDifferentPropertyCase(string requestUri)
+    {
+        // Arrange
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var resultArray = await response.Content.ReadAsObject<JArray>();
+
+        JObject objectItem = Assert.IsType<JObject>(Assert.Single(resultArray));
+        Assert.Equal(2, objectItem.Properties().Count());
+        Assert.Equal("063-6-920-02371-5", objectItem["isbn"]);
+        Assert.Equal(2, objectItem["id"]);
+    }
+}
+
+[ApiController]
+[Route("[controller]")]
+public class BooksController : ControllerBase
+{
+    private static IList<Book> _books = new List<Book>
+    {
+        new Book
         {
-            var queryable = (IQueryable<Book>)queryOptions.ApplyTo(_books.AsQueryable());
-            return queryable.ToList();
+            Id = 1,
+            ISBN = "978-0-321-87758-1"
+        },
+        new Book
+        {
+            Id = 2,
+            ISBN = "063-6-920-02371-5",
         }
-    }
+    };
 
-    public class Book
+    [HttpGet]
+    public IEnumerable<Book> Get(ODataQueryOptions<Book> queryOptions)
     {
-        public int Id { get; set; }
-        public string ISBN { get; set; }
+        var queryable = (IQueryable<Book>)queryOptions.ApplyTo(_books.AsQueryable());
+        return queryable.ToList();
     }
+}
+
+public class Book
+{
+    public int Id { get; set; }
+    public string ISBN { get; set; }
 }

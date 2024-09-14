@@ -9,20 +9,19 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
-{
-    /// <summary>
-    /// Represents an <see cref="IEdmUntypedObject"/> with no backing Edm type, or its Edm.Untyped.
-    /// </summary>
-    [NonValidatingParameterBinding]
-    public sealed class EdmUntypedObject : Dictionary<string, object>, IEdmUntypedObject
-    {
-        /// <inheritdoc/>
-        public IEdmTypeReference GetEdmType()
-            => EdmUntypedStructuredTypeReference.NullableTypeReference;
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
 
-        /// <inheritdoc/>
-        public bool TryGetPropertyValue(string propertyName, out object value)
-            => TryGetValue(propertyName, out value);
-    }
+/// <summary>
+/// Represents an <see cref="IEdmUntypedObject"/> with no backing Edm type, or its Edm.Untyped.
+/// </summary>
+[NonValidatingParameterBinding]
+public sealed class EdmUntypedObject : Dictionary<string, object>, IEdmUntypedObject
+{
+    /// <inheritdoc/>
+    public IEdmTypeReference GetEdmType()
+        => EdmUntypedStructuredTypeReference.NullableTypeReference;
+
+    /// <inheritdoc/>
+    public bool TryGetPropertyValue(string propertyName, out object value)
+        => TryGetValue(propertyName, out value);
 }

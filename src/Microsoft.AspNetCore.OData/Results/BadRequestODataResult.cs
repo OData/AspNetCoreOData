@@ -11,62 +11,61 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OData;
 using ErrorUtils = Microsoft.AspNetCore.OData.Error;
 
-namespace Microsoft.AspNetCore.OData.Results
+namespace Microsoft.AspNetCore.OData.Results;
+
+/// <summary>
+/// Represents a result that when executed will produce a Bad Request (400) response.
+/// </summary>
+/// <remarks>This result creates an <see cref="ODataError"/> with status code: 400.</remarks>
+public class BadRequestODataResult : BadRequestResult, IODataErrorResult
 {
+    private const string errorCode = "400";
+
     /// <summary>
-    /// Represents a result that when executed will produce a Bad Request (400) response.
+    /// OData error.
     /// </summary>
-    /// <remarks>This result creates an <see cref="ODataError"/> with status code: 400.</remarks>
-    public class BadRequestODataResult : BadRequestResult, IODataErrorResult
+    public ODataError Error { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the class.
+    /// </summary>
+    /// <param name="message">Error message.</param>
+    public BadRequestODataResult(string message)
     {
-        private const string errorCode = "400";
-
-        /// <summary>
-        /// OData error.
-        /// </summary>
-        public ODataError Error { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="message">Error message.</param>
-        public BadRequestODataResult(string message)
+        if (string.IsNullOrEmpty(message))
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
-            }
-
-            Error = new ODataError
-            {
-                Message = message,
-                ErrorCode = errorCode
-            };
+            throw ErrorUtils.ArgumentNullOrEmpty(nameof(message));
         }
 
-        /// <summary>
-        /// Initializes a new instance of the class.
-        /// </summary>
-        /// <param name="odataError">An <see cref="ODataError"/> object.</param>
-        public BadRequestODataResult(ODataError odataError)
+        Error = new ODataError
         {
-            if (odataError == null)
-            {
-                throw ErrorUtils.ArgumentNull(nameof(odataError));
-            }
+            Message = message,
+            Code = errorCode
+        };
+    }
 
-            Error = odataError;
+    /// <summary>
+    /// Initializes a new instance of the class.
+    /// </summary>
+    /// <param name="odataError">An <see cref="ODataError"/> object.</param>
+    public BadRequestODataResult(ODataError odataError)
+    {
+        if (odataError == null)
+        {
+            throw ErrorUtils.ArgumentNull(nameof(odataError));
         }
 
-        /// <inheritdoc/>
-        public async override Task ExecuteResultAsync(ActionContext context)
-        {
-            ObjectResult objectResult = new ObjectResult(Error)
-            {
-                StatusCode = StatusCodes.Status400BadRequest
-            };
+        Error = odataError;
+    }
 
-            await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);
-        }
+    /// <inheritdoc/>
+    public async override Task ExecuteResultAsync(ActionContext context)
+    {
+        ObjectResult objectResult = new ObjectResult(Error)
+        {
+            StatusCode = StatusCodes.Status400BadRequest
+        };
+
+        await objectResult.ExecuteResultAsync(context).ConfigureAwait(false);
     }
 }

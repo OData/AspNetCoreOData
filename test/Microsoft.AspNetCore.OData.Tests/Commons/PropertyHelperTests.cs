@@ -8,42 +8,41 @@
 using Microsoft.AspNetCore.OData.Common;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Commons
+namespace Microsoft.AspNetCore.OData.Tests.Commons;
+
+public class PropertyHelperTests
 {
-    public class PropertyHelperTests
+    [Fact]
+    public void GetProperties_Returns_PropertyHelpers()
     {
-        [Fact]
-        public void GetProperties_Returns_PropertyHelpers()
+        // Arrange
+        MyProps props = new MyProps
         {
-            // Arrange
-            MyProps props = new MyProps
+            IntProp = 42,
+            StringProp = "abc"
+        };
+
+        // Act
+        PropertyHelper[] properties = PropertyHelper.GetProperties(props);
+
+        // Assert
+        Assert.Equal(2, properties.Length);
+        Assert.Collection(properties,
+            e =>
             {
-                IntProp = 42,
-                StringProp = "abc"
-            };
+                Assert.Equal("IntProp", e.Name);
+                Assert.Equal(42, e.GetValue(props));
+            },
+            e =>
+            {
+                Assert.Equal("StringProp", e.Name);
+                Assert.Equal("abc", e.GetValue(props));
+            });
+    }
 
-            // Act
-            PropertyHelper[] properties = PropertyHelper.GetProperties(props);
-
-            // Assert
-            Assert.Equal(2, properties.Length);
-            Assert.Collection(properties,
-                e =>
-                {
-                    Assert.Equal("IntProp", e.Name);
-                    Assert.Equal(42, e.GetValue(props));
-                },
-                e =>
-                {
-                    Assert.Equal("StringProp", e.Name);
-                    Assert.Equal("abc", e.GetValue(props));
-                });
-        }
-
-        private class MyProps
-        {
-            public int IntProp { get; set; }
-            public string StringProp { get; set; }
-        }
+    private class MyProps
+    {
+        public int IntProp { get; set; }
+        public string StringProp { get; set; }
     }
 }

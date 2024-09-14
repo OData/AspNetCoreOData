@@ -10,24 +10,23 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
-{
-    public class EdmObjectExtensionsTests
-    {
-        [Fact]
-        public void IsDeltaResourceSet_ThrowsArgumentNull_Type()
-        {
-            // Arrange & Act & Assert
-            IEdmType edmType = null;
-            ExceptionAssert.ThrowsArgumentNull(() => edmType.IsDeltaResourceSet(), "type");
-        }
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
 
-        [Fact]
-        public void IsDeltaResource_ThrowsArgumentNull_Resource()
-        {
-            // Arrange & Act & Assert
-            IEdmObject resource = null;
-            ExceptionAssert.ThrowsArgumentNull(() => resource.IsDeltaResource(), "resource");
-        }
+public class EdmObjectExtensionsTests
+{
+    [Fact]
+    public void IsDeltaResourceSet_ThrowsArgumentNull_Type()
+    {
+        // Arrange & Act & Assert
+        IEdmType edmType = null;
+        ExceptionAssert.ThrowsArgumentNull(() => edmType.IsDeltaResourceSet(), "type");
+    }
+
+    [Fact]
+    public void IsDeltaResource_ThrowsArgumentNull_Resource()
+    {
+        // Arrange & Act & Assert
+        IEdmObject resource = null;
+        ExceptionAssert.ThrowsArgumentNull(() => resource.IsDeltaResource(), "resource");
     }
 }

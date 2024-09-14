@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // <copyright file="ODataNullValueExtensions.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
@@ -7,10 +7,9 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Edm
+namespace Microsoft.AspNetCore.OData.Edm;
+
+internal class ODataNullValueExtensions
 {
-    internal class ODataNullValueExtensions
-    {
-        public static readonly ODataNullValue NullValue = new ODataNullValue();
-    }
+    public static readonly ODataNullValue NullValue = new ODataNullValue();
 }

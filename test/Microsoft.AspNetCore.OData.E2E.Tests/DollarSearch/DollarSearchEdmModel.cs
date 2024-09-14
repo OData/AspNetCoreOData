@@ -8,17 +8,16 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch;
+
+public class DollarSearchEdmModel
 {
-    public class DollarSearchEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<SearchProduct>("Products");
-            builder.EntitySet<SearchCategory>("Categories");
-            IEdmModel model = builder.GetEdmModel();
-            return model;
-        }
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<SearchProduct>("Products");
+        builder.EntitySet<SearchCategory>("Categories");
+        IEdmModel model = builder.GetEdmModel();
+        return model;
     }
 }

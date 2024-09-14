@@ -9,10 +9,9 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Abstracts
+namespace Microsoft.AspNetCore.OData.Tests.Abstracts;
+
+public class ODataFeatureTests
 {
-    public class ODataFeatureTests
-    {
         
-    }
 }

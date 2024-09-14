@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &gt;= '17.0'">$(TargetFrameworks);net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Microsoft.AspNetCore.OData</RootNamespace>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
@@ -31,6 +30,10 @@
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
     <PackageReference Include="Microsoft.OData.Core" Version="7.21.2" />
     <PackageReference Include="Microsoft.OData.Edm" Version="7.21.2" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="2.0.0" />
+    <PackageReference Include="Microsoft.OData.Core" Version="8.0.1" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Spatial" Version="8.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -64,6 +67,11 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>PropertyContainer.generated.cs</LastGenOutput>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
   </ItemGroup>
 
   <ItemGroup>

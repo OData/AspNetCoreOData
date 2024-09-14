@@ -9,35 +9,34 @@ using System.Reflection;
 using Microsoft.OData.ModelBuilder;
 using Moq;
 
-namespace Microsoft.AspNetCore.OData.TestCommon
+namespace Microsoft.AspNetCore.OData.TestCommon;
+
+/// <summary>
+/// A mock to represent an assembly resolver
+/// </summary>
+public class MockAssembliesResolverFactory
 {
     /// <summary>
-    /// A mock to represent an assembly resolver
+    /// Initializes a new instance of the routing configuration class.
     /// </summary>
-    public class MockAssembliesResolverFactory
+    /// <returns>A new instance of the routing configuration class.</returns>
+    public static IAssemblyResolver Create(MockAssembly assembly = null)
     {
-        /// <summary>
-        /// Initializes a new instance of the routing configuration class.
-        /// </summary>
-        /// <returns>A new instance of the routing configuration class.</returns>
-        public static IAssemblyResolver Create(MockAssembly assembly = null)
+        IAssemblyResolver resolver = null;
+        if (assembly != null)
         {
-            IAssemblyResolver resolver = null;
-            if (assembly != null)
-            {
-                resolver = new TestAssemblyResolver(assembly);
-            }
-            else
-            {
-                Mock<IAssemblyResolver> mockAssembliesResolver = new Mock<IAssemblyResolver>();
-                mockAssembliesResolver
-                    .Setup(r => r.Assemblies)
-                    .Returns(new Assembly[0]);
-
-                resolver = mockAssembliesResolver.Object;
-            }
-
-            return resolver;
+            resolver = new TestAssemblyResolver(assembly);
         }
+        else
+        {
+            Mock<IAssemblyResolver> mockAssembliesResolver = new Mock<IAssemblyResolver>();
+            mockAssembliesResolver
+                .Setup(r => r.Assemblies)
+                .Returns(new Assembly[0]);
+
+            resolver = mockAssembliesResolver.Object;
+        }
+
+        return resolver;
     }
 }

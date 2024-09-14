@@ -9,34 +9,33 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Formatter.Deserialization;
+
+/// <summary>
+/// An <see cref="ODataDeserializer"/> is used to read an ODataMessage into a CLR object.
+/// </summary>
+/// <remarks>
+/// Each supported CLR type has a corresponding <see cref="ODataDeserializer" />. A CLR type is supported if it is one of
+/// the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
+/// Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
+/// </remarks>
+public abstract class ODataDeserializer : IODataDeserializer
 {
     /// <summary>
-    /// An <see cref="ODataDeserializer"/> is used to read an ODataMessage into a CLR object.
+    /// Initializes a new instance of the <see cref="ODataDeserializer"/> class.
     /// </summary>
-    /// <remarks>
-    /// Each supported CLR type has a corresponding <see cref="ODataDeserializer" />. A CLR type is supported if it is one of
-    /// the special types or if it has a backing EDM type. Some of the special types are Uri which maps to ODataReferenceLink payload, 
-    /// Uri[] which maps to ODataReferenceLinks payload, ODataWorkspace which maps to ODataServiceDocument payload.
-    /// </remarks>
-    public abstract class ODataDeserializer : IODataDeserializer
+    /// <param name="payloadKind">The kind of payload this deserializer handles.</param>
+    protected ODataDeserializer(ODataPayloadKind payloadKind)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataDeserializer"/> class.
-        /// </summary>
-        /// <param name="payloadKind">The kind of payload this deserializer handles.</param>
-        protected ODataDeserializer(ODataPayloadKind payloadKind)
-        {
-            ODataPayloadKind = payloadKind;
-        }
+        ODataPayloadKind = payloadKind;
+    }
 
-        /// <inheritdoc />
-        public ODataPayloadKind ODataPayloadKind { get; private set; }
+    /// <inheritdoc />
+    public ODataPayloadKind ODataPayloadKind { get; private set; }
 
-        /// <inheritdoc/>
-        public virtual Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
-        {
-            throw Error.NotSupported(SRResources.DeserializerDoesNotSupportRead, GetType().Name);
-        }
+    /// <inheritdoc/>
+    public virtual Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+    {
+        throw Error.NotSupported(SRResources.DeserializerDoesNotSupportRead, GetType().Name);
     }
 }

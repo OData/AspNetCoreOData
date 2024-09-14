@@ -12,28 +12,27 @@ using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query
+namespace Microsoft.AspNetCore.OData.Tests.Query;
+
+public class OrderByOpenPropertyNodeTests
 {
-    public class OrderByOpenPropertyNodeTests
+    [Fact]
+    public void CtorOrderByOpenPropertyNodeTests_ThrowsArgumentNull_OrderByClause()
     {
-        [Fact]
-        public void CtorOrderByOpenPropertyNodeTests_ThrowsArgumentNull_OrderByClause()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new OrderByOpenPropertyNode(null), "orderByClause");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new OrderByOpenPropertyNode(null), "orderByClause");
+    }
 
-        [Fact]
-        public void CtorOrderByOpenPropertyNodeTests_ThrowsODataException_NotOpenPropertyAccess()
-        {
-            // Arrange
-            SingleValueNode singleValue = new Mock<SingleValueNode>().Object;
-            RangeVariable rangeVariable = new Mock<RangeVariable>().Object;
-            OrderByClause orderBy = new OrderByClause(null, singleValue, OrderByDirection.Descending, rangeVariable);
+    [Fact]
+    public void CtorOrderByOpenPropertyNodeTests_ThrowsODataException_NotOpenPropertyAccess()
+    {
+        // Arrange
+        SingleValueNode singleValue = new Mock<SingleValueNode>().Object;
+        RangeVariable rangeVariable = new Mock<RangeVariable>().Object;
+        OrderByClause orderBy = new OrderByClause(null, singleValue, OrderByDirection.Descending, rangeVariable);
 
-            // Act & Assert
-            ExceptionAssert.Throws<ODataException>(() => new OrderByOpenPropertyNode(orderBy),
-                "OrderBy clause kind 'None' is not valid. Only kind 'SingleValueOpenPropertyAccess' is accepted.");
-        }
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(() => new OrderByOpenPropertyNode(orderBy),
+            "OrderBy clause kind 'None' is not valid. Only kind 'SingleValueOpenPropertyAccess' is accepted.");
     }
 }

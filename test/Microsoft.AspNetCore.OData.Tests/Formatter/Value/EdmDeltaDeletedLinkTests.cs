@@ -12,48 +12,47 @@ using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
+
+public class EdmDeltaDeletedLinkTests
 {
-    public class EdmDeltaDeletedLinkTests
+    [Fact]
+    public void CtorEdmDeltaDeletedLink_ThrowsArgumentNull_TypeReference()
     {
-        [Fact]
-        public void CtorEdmDeltaDeletedLink_ThrowsArgumentNull_TypeReference()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaDeletedLink(entityTypeReference: null), "typeReference");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaDeletedLink(entityTypeReference: null), "typeReference");
+    }
 
-        [Fact]
-        public void CtorEdmDeltaDeletedLink_ThrowsArgumentNull_EntityType()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaDeletedLink(entityType: null), "entityType");
+    [Fact]
+    public void CtorEdmDeltaDeletedLink_ThrowsArgumentNull_EntityType()
+    {
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaDeletedLink(entityType: null), "entityType");
 
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaDeletedLink(entityType: null, false), "entityType");
-        }
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaDeletedLink(entityType: null, false), "entityType");
+    }
 
-        [Fact]
-        public void KindProperty_Returns_DeltaItemKind()
-        {
-            // Arrange & Act
-            Mock<IEdmEntityTypeReference> mock = new Mock<IEdmEntityTypeReference>();
-            EdmDeltaDeletedLink edmDeletedLink = new EdmDeltaDeletedLink(mock.Object);
+    [Fact]
+    public void KindProperty_Returns_DeltaItemKind()
+    {
+        // Arrange & Act
+        Mock<IEdmEntityTypeReference> mock = new Mock<IEdmEntityTypeReference>();
+        EdmDeltaDeletedLink edmDeletedLink = new EdmDeltaDeletedLink(mock.Object);
 
-            // Assert
-            Assert.Equal(DeltaItemKind.DeltaDeletedLink, edmDeletedLink.Kind);
-        }
+        // Assert
+        Assert.Equal(DeltaItemKind.DeltaDeletedLink, edmDeletedLink.Kind);
+    }
 
-        [Fact]
-        public void CtorEdmDeltaDeletedLink_Sets_PropertyValue()
-        {
-            // Arrange & Act
-            Mock<IEdmEntityType> mock = new Mock<IEdmEntityType>();
-            EdmDeltaDeletedLink edmDeletedLink = new EdmDeltaDeletedLink(mock.Object, true);
+    [Fact]
+    public void CtorEdmDeltaDeletedLink_Sets_PropertyValue()
+    {
+        // Arrange & Act
+        Mock<IEdmEntityType> mock = new Mock<IEdmEntityType>();
+        EdmDeltaDeletedLink edmDeletedLink = new EdmDeltaDeletedLink(mock.Object, true);
 
-            // Assert
-            Assert.Same(mock.Object, edmDeletedLink.EntityType);
-            Assert.Same(mock.Object, edmDeletedLink.GetEdmType().Definition);
-            Assert.True(edmDeletedLink.IsNullable);
-        }
+        // Assert
+        Assert.Same(mock.Object, edmDeletedLink.EntityType);
+        Assert.Same(mock.Object, edmDeletedLink.GetEdmType().Definition);
+        Assert.True(edmDeletedLink.IsNullable);
     }
 }

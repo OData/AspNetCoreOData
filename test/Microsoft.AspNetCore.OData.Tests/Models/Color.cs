@@ -7,15 +7,14 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+[Flags]
+public enum Color
 {
-    [Flags]
-    public enum Color
-    {
-        Red = 1,
+    Red = 1,
 
-        Green = 2,
+    Green = 2,
 
-        Blue = 4
-    }
+    Blue = 4
 }

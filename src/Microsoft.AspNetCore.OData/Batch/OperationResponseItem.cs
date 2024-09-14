@@ -11,47 +11,46 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Batch
+namespace Microsoft.AspNetCore.OData.Batch;
+
+/// <summary>
+/// Represents an Operation response.
+/// </summary>
+public class OperationResponseItem : ODataBatchResponseItem
 {
     /// <summary>
-    /// Represents an Operation response.
+    /// Initializes a new instance of the <see cref="OperationResponseItem"/> class.
     /// </summary>
-    public class OperationResponseItem : ODataBatchResponseItem
+    /// <param name="context">The response context for the Operation request.</param>
+    public OperationResponseItem(HttpContext context)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OperationResponseItem"/> class.
-        /// </summary>
-        /// <param name="context">The response context for the Operation request.</param>
-        public OperationResponseItem(HttpContext context)
+        Context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    /// <summary>
+    /// Gets the response messages for the Operation.
+    /// </summary>
+    public HttpContext Context { get; private set; }
+
+    /// <summary>
+    /// Writes the response as an Operation.
+    /// </summary>
+    /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
+    public override Task WriteResponseAsync(ODataBatchWriter writer)
+    {
+        if (writer == null)
         {
-            Context = context ?? throw new ArgumentNullException(nameof(context));
+            throw new ArgumentNullException(nameof(writer));
         }
 
-        /// <summary>
-        /// Gets the response messages for the Operation.
-        /// </summary>
-        public HttpContext Context { get; private set; }
+        return WriteMessageAsync(writer, Context);
+    }
 
-        /// <summary>
-        /// Writes the response as an Operation.
-        /// </summary>
-        /// <param name="writer">The <see cref="ODataBatchWriter"/>.</param>
-        public override Task WriteResponseAsync(ODataBatchWriter writer)
-        {
-            if (writer == null)
-            {
-                throw new ArgumentNullException(nameof(writer));
-            }
-
-            return WriteMessageAsync(writer, Context);
-        }
-
-        /// <summary>
-        /// Gets a value that indicates if the responses in this item are successful.
-        /// </summary>
-        internal override bool IsResponseSuccessful()
-        {
-            return Context.Response.IsSuccessStatusCode();
-        }
+    /// <summary>
+    /// Gets a value that indicates if the responses in this item are successful.
+    /// </summary>
+    internal override bool IsResponseSuccessful()
+    {
+        return Context.Response.IsSuccessStatusCode();
     }
 }
