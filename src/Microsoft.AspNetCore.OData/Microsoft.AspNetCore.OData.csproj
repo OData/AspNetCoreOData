@@ -27,9 +27,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
-    <PackageReference Include="Microsoft.OData.Core" Version="7.21.2" />
-    <PackageReference Include="Microsoft.OData.Edm" Version="7.21.2" />
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="2.0.0" />
     <PackageReference Include="Microsoft.OData.Core" Version="8.0.1" />
     <PackageReference Include="Microsoft.OData.Edm" Version="8.0.1" />
@@ -38,7 +35,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Spatial" Version="7.21.2" />
   </ItemGroup>
 
   <ItemGroup>
