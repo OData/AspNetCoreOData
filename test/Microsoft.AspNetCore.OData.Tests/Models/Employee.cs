@@ -9,47 +9,46 @@ using System;
 using System.Collections.Generic;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class Employee
 {
-    public class Employee
-    {
-        public int EmployeeID { get; set; }
+    public int EmployeeID { get; set; }
 
-        public string EmployeeName { get; set; }
+    public string EmployeeName { get; set; }
 
-        public Decimal BaseSalary { get; set; }
+    public Decimal BaseSalary { get; set; }
 
-        public DateTimeOffset Birthday { get; set; }
+    public DateTimeOffset Birthday { get; set; }
 
-        public IList<Company> IsCeoOf { get; set; }
+    public IList<Company> IsCeoOf { get; set; }
 
-        public int WorkCompanyId { get; set; }
+    public int WorkCompanyId { get; set; }
 
-        public Company WorkCompany { get; set; }
+    public Company WorkCompany { get; set; }
 
-        [Singleton]
-        public Employee Boss { get; set; }
+    [Singleton]
+    public Employee Boss { get; set; }
 
-        public Address HomeAddress { get; set; }
+    public Address HomeAddress { get; set; }
 
-        public IList<Employee> DirectReports { get; set; }
-    }
+    public IList<Employee> DirectReports { get; set; }
+}
 
-    public class Manager : Employee
-    {
-        public Decimal ExtraDraw;
-        public Address ExtraOffice { get; set; }
-    }
+public class Manager : Employee
+{
+    public Decimal ExtraDraw;
+    public Address ExtraOffice { get; set; }
+}
 
-    public class Engineer : Employee
-    {
-        public int Level { get; set; }
-        public Decimal YearEndBonus { get; set; }
-    }
+public class Engineer : Employee
+{
+    public int Level { get; set; }
+    public Decimal YearEndBonus { get; set; }
+}
 
-    public class SalesPerson : Employee
-    {
-        public Decimal Bonus { get; set; }
-        public IList<Customer> Customers { get; set; }
-    }
+public class SalesPerson : Employee
+{
+    public Decimal Bonus { get; set; }
+    public IList<Customer> Customers { get; set; }
 }

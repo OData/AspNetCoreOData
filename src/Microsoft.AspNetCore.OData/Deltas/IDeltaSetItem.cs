@@ -5,16 +5,15 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Deltas
+namespace Microsoft.AspNetCore.OData.Deltas;
+
+/// <summary>
+/// The delta set item base.
+/// </summary>
+public interface IDeltaSetItem
 {
     /// <summary>
-    /// The delta set item base.
+    /// Gets the delta item kind.
     /// </summary>
-    public interface IDeltaSetItem
-    {
-        /// <summary>
-        /// Gets the delta item kind.
-        /// </summary>
-        DeltaItemKind Kind { get; }
-    }
+    DeltaItemKind Kind { get; }
 }

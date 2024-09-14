@@ -2746,7 +2746,14 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize)
 	public TruncatedCollection`1 (IEnumerable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount)
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, bool parameterize)
+	[
+	ObsoleteAttribute(),
+	]
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount)
+
+	[
+	ObsoleteAttribute(),
+	]
 	public TruncatedCollection`1 (IQueryable`1 source, int pageSize, System.Nullable`1[[System.Int64]] totalCount, bool parameterize)
 
 	bool IsTruncated  { public virtual get; }
@@ -2929,6 +2936,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 	Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder OrderByBinder  { public get; }
 
 	public virtual void BindComputedProperty (System.Linq.Expressions.Expression source, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, string computedProperty, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)
+	protected virtual void BindOrderByProperties (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties, bool isSelectedAll)
 	public virtual System.Linq.Expressions.Expression BindSelectExpand (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual void BuildDynamicProperty (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)
 	public virtual System.Linq.Expressions.Expression CreatePropertyNameExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source)

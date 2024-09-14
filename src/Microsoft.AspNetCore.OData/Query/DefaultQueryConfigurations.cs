@@ -7,14 +7,13 @@
 
 using Microsoft.OData.ModelBuilder.Config;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query;
+
+/// <summary>
+/// This class describes the default configurations to use during query composition.
+/// </summary>
+public class DefaultQueryConfigurations : DefaultQuerySettings
 {
-    /// <summary>
-    /// This class describes the default configurations to use during query composition.
-    /// </summary>
-    public class DefaultQueryConfigurations : DefaultQuerySettings
-    {
-        // We will add other query settings, for example, $compute, $search here
-        // In the next major release, we should remove the inheritance from 'DefaultQuerySettings'.
-    }
+    // We will add other query settings, for example, $compute, $search here
+    // In the next major release, we should remove the inheritance from 'DefaultQuerySettings'.
 }

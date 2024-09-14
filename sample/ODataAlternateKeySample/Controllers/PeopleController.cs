@@ -1,4 +1,4 @@
-﻿//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // <copyright file="PeopleController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
@@ -10,48 +10,47 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using ODataAlternateKeySample.Models;
 
-namespace ODataAlternateKeySample.Controllers
+namespace ODataAlternateKeySample.Controllers;
+
+public class PeopleController : ODataController
 {
-    public class PeopleController : ODataController
+    private readonly IAlternateKeyRepository _repository;
+
+    public PeopleController(IAlternateKeyRepository repository)
     {
-        private readonly IAlternateKeyRepository _repository;
+        _repository = repository;
+    }
 
-        public PeopleController(IAlternateKeyRepository repository)
+    [HttpGet]
+    [EnableQuery]
+    public IActionResult Get()
+    {
+        return Ok(_repository.GetPeople());
+    }
+
+    [HttpGet]
+    [EnableQuery]
+    public IActionResult Get(int key)
+    {
+        var c = _repository.GetPeople().FirstOrDefault(c => c.Id == key);
+        if (c == null)
         {
-            _repository = repository;
+            return NotFound();
         }
 
-        [HttpGet]
-        [EnableQuery]
-        public IActionResult Get()
+        return Ok(c);
+    }
+
+    [HttpGet("odata/People(c_or_r={cr},passport={passport})")] // use community alternate key
+    [HttpGet("odata/People(core_c_r={cr},core_passport={passport})")] // use core alternate key
+    public IActionResult FindPeopleByCountryAndPassport(string cr, string passport)
+    {
+        var c = _repository.GetPeople().FirstOrDefault(c => c.CountryOrRegion == cr && c.Passport == passport);
+        if (c == null)
         {
-            return Ok(_repository.GetPeople());
+            return NotFound();
         }
 
-        [HttpGet]
-        [EnableQuery]
-        public IActionResult Get(int key)
-        {
-            var c = _repository.GetPeople().FirstOrDefault(c => c.Id == key);
-            if (c == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(c);
-        }
-
-        [HttpGet("odata/People(c_or_r={cr},passport={passport})")] // use community alternate key
-        [HttpGet("odata/People(core_c_r={cr},core_passport={passport})")] // use core alternate key
-        public IActionResult FindPeopleByCountryAndPassport(string cr, string passport)
-        {
-            var c = _repository.GetPeople().FirstOrDefault(c => c.CountryOrRegion == cr && c.Passport == passport);
-            if (c == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(c);
-        }
+        return Ok(c);
     }
 }

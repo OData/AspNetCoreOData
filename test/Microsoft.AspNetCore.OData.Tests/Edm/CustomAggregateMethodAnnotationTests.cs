@@ -12,30 +12,29 @@ using Microsoft.AspNetCore.OData.Edm;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
+
+public class CustomAggregateMethodAnnotationTests
 {
-    public class CustomAggregateMethodAnnotationTests
+    [Fact]
+    public void CustomAggregateMethodAnnotation_Works_RoundTrip()
     {
-        [Fact]
-        public void CustomAggregateMethodAnnotation_Works_RoundTrip()
+        // Arrange
+        MethodInfo methodInfo = new Mock<MethodInfo>().Object;
+
+        IDictionary<Type, MethodInfo> methods = new Dictionary<Type, MethodInfo>
         {
-            // Arrange
-            MethodInfo methodInfo = new Mock<MethodInfo>().Object;
+            { typeof(int), methodInfo }
+        };
 
-            IDictionary<Type, MethodInfo> methods = new Dictionary<Type, MethodInfo>
-            {
-                { typeof(int), methodInfo }
-            };
+        CustomAggregateMethodAnnotation annotation = new CustomAggregateMethodAnnotation();
 
-            CustomAggregateMethodAnnotation annotation = new CustomAggregateMethodAnnotation();
+        // Act & Assert
+        annotation.AddMethod("token", methods);
 
-            // Act & Assert
-            annotation.AddMethod("token", methods);
+        Assert.True(annotation.GetMethodInfo("token", typeof(int), out MethodInfo actual));
+        Assert.Same(methodInfo, actual);
 
-            Assert.True(annotation.GetMethodInfo("token", typeof(int), out MethodInfo actual));
-            Assert.Same(methodInfo, actual);
-
-            Assert.False(annotation.GetMethodInfo("unknown", typeof(int), out _));
-        }
+        Assert.False(annotation.GetMethodInfo("unknown", typeof(int), out _));
     }
 }

@@ -13,30 +13,29 @@ using Microsoft.OData;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
+
+public class ODataSerializerTest
 {
-    public class ODataSerializerTest
+    [Fact]
+    public void Ctor_SetsProperty_ODataPayloadKind()
     {
-        [Fact]
-        public void Ctor_SetsProperty_ODataPayloadKind()
-        {
-            // Arrange
-            ODataSerializer serializer = new Mock<ODataSerializer>(ODataPayloadKind.Unsupported).Object;
+        // Arrange
+        ODataSerializer serializer = new Mock<ODataSerializer>(ODataPayloadKind.Unsupported).Object;
 
-            // Act & Assert
-            Assert.Equal(ODataPayloadKind.Unsupported, serializer.ODataPayloadKind);
-        }
+        // Act & Assert
+        Assert.Equal(ODataPayloadKind.Unsupported, serializer.ODataPayloadKind);
+    }
 
-        [Fact]
-        public async Task WriteObjectAsync_Throws_NotSupported()
-        {
-            // Arrange
-            ODataSerializer serializer = new Mock<ODataSerializer>(ODataPayloadKind.Unsupported) { CallBase = true }.Object;
+    [Fact]
+    public async Task WriteObjectAsync_Throws_NotSupported()
+    {
+        // Arrange
+        ODataSerializer serializer = new Mock<ODataSerializer>(ODataPayloadKind.Unsupported) { CallBase = true }.Object;
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsAsync<NotSupportedException>(
-                () => serializer.WriteObjectAsync(graph: null, type: typeof(int), messageWriter: null, writeContext: null),
-                "ODataSerializerProxy does not support WriteObject.");
-        }
+        // Act & Assert
+        await ExceptionAssert.ThrowsAsync<NotSupportedException>(
+            () => serializer.WriteObjectAsync(graph: null, type: typeof(int), messageWriter: null, writeContext: null),
+            "ODataSerializerProxy does not support WriteObject.");
     }
 }

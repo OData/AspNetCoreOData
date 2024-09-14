@@ -11,79 +11,79 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Results;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests
+namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests;
+
+public class JPageResultValueConverterTests
 {
-    public class JPageResultValueConverterTests
+    private static IList<PageCustomer> _customers = new List<PageCustomer>
     {
-        private static IList<PageCustomer> _customers = new List<PageCustomer>
+        new PageCustomer
         {
-            new PageCustomer
-            {
-                Id = 1,
-                Name = "XU"
-            },
-            new PageCustomer
-            {
-                Id = 2,
-                Name = "WU"
-            },
-        };
-
-        [Theory]
-        [InlineData(typeof(PageResult), true)]
-        [InlineData(typeof(PageResult<object>), true)]
-        [InlineData(typeof(SelectExpandWrapper), false)]
-        [InlineData(typeof(object), false)]
-        public void CanConvertWorksForPageResult(Type type, bool expected)
+            Id = 1,
+            Name = "XU"
+        },
+        new PageCustomer
         {
-            // Arrange
-            JPageResultValueConverter converter = new JPageResultValueConverter();
+            Id = 2,
+            Name = "WU"
+        },
+    };
 
-            // Act & Assert
-            Assert.Equal(expected, converter.CanConvert(type));
-        }
+    [Theory]
+    [InlineData(typeof(PageResult), true)]
+    [InlineData(typeof(PageResult<object>), true)]
+    [InlineData(typeof(SelectExpandWrapper), false)]
+    [InlineData(typeof(object), false)]
+    public void CanConvertWorksForPageResult(Type type, bool expected)
+    {
+        // Arrange
+        JPageResultValueConverter converter = new JPageResultValueConverter();
 
-        [Fact]
-        public void ReadJsonForPageResultThrowsNotImplementedException()
-        {
-            // Arrange
-            JPageResultValueConverter converter = new JPageResultValueConverter();
+        // Act & Assert
+        Assert.Equal(expected, converter.CanConvert(type));
+    }
 
-            // Act
-            Action test = () => converter.ReadJson(null, typeof(object), null, null);
+    [Fact]
+    public void ReadJsonForPageResultThrowsNotImplementedException()
+    {
+        // Arrange
+        JPageResultValueConverter converter = new JPageResultValueConverter();
 
-            // Assert
-            NotImplementedException exception = Assert.Throws<NotImplementedException>(test);
-            Assert.Equal(SRResources.ReadPageResultNotImplemented, exception.Message);
-        }
+        // Act
+        Action test = () => converter.ReadJson(null, typeof(object), null, null);
 
-        [Fact]
-        public void CanWritePageResultOnlyWithEnumerableToJsonUsingNewtonsoftJsonConverter()
-        {
-            // Arrange
-            PageResult<PageCustomer> pageResult = new PageResult<PageCustomer>(_customers, null, null);
-            JPageResultValueConverter converter = new JPageResultValueConverter();
+        // Assert
+        NotImplementedException exception = Assert.Throws<NotImplementedException>(test);
+        Assert.Equal(SRResources.ReadPageResultNotImplemented, exception.Message);
+    }
 
-            // Act
-            string json = SerializeUtils.WriteJson(converter, pageResult);
+    [Fact]
+    public void CanWritePageResultOnlyWithEnumerableToJsonUsingNewtonsoftJsonConverter()
+    {
+        // Arrange
+        PageResult<PageCustomer> pageResult = new PageResult<PageCustomer>(_customers, null, null);
+        JPageResultValueConverter converter = new JPageResultValueConverter();
 
-            // Assert
-            Assert.Equal("{\"items\":[{\"Id\":1,\"Name\":\"XU\"},{\"Id\":2,\"Name\":\"WU\"}]}", json);
-        }
+        // Act
+        string json = SerializeUtils.WriteJson(converter, pageResult);
 
-        [Fact]
-        public void CanWritePageResultAllToJsonUsingNewtonsoftJsonConverter()
-        {
-            // Arrange
-            Uri uri = new Uri("http://any");
-            PageResult<PageCustomer> pageResult = new PageResult<PageCustomer>(_customers, uri, 4);
-            JPageResultValueConverter converter = new JPageResultValueConverter();
+        // Assert
+        Assert.Equal("{\"items\":[{\"Id\":1,\"Name\":\"XU\"},{\"Id\":2,\"Name\":\"WU\"}]}", json);
+    }
 
-            // Act
-            string json = SerializeUtils.WriteJson(converter, pageResult, true);
+    [Fact]
+    public void CanWritePageResultAllToJsonUsingNewtonsoftJsonConverter()
+    {
+        // Arrange
+        Uri uri = new Uri("http://any");
+        PageResult<PageCustomer> pageResult = new PageResult<PageCustomer>(_customers, uri, 4);
+        JPageResultValueConverter converter = new JPageResultValueConverter();
 
-            // Assert
-            Assert.Equal(@"{
+        // Act
+        string json = SerializeUtils.WriteJson(converter, pageResult, true);
+
+        // Assert
+        Assert.Equal(@"{
   ""items"": [
     {
       ""Id"": 1,
@@ -97,13 +97,12 @@ namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests
   ""nextpagelink"": ""http://any"",
   ""count"": 4
 }", json);
-        }
     }
+}
 
-    public class PageCustomer
-    {
-        public int Id { get; set; }
+public class PageCustomer
+{
+    public int Id { get; set; }
 
-        public string Name { get; set; }
-    }
+    public string Name { get; set; }
 }

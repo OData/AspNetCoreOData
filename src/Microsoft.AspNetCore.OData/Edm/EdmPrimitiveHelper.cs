@@ -13,175 +13,172 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Edm
+namespace Microsoft.AspNetCore.OData.Edm;
+
+internal static class EdmPrimitiveHelper
 {
-    internal static class EdmPrimitiveHelper
+    public static object ConvertPrimitiveValue(object value, Type type)
     {
-        public static object ConvertPrimitiveValue(object value, Type type)
+        return ConvertPrimitiveValue(value, type, timeZoneInfo: null);
+    }
+
+    public static object ConvertPrimitiveValue(object value, Type type, TimeZoneInfo timeZoneInfo)
+    {
+        Contract.Assert(value != null);
+        Contract.Assert(type != null);
+
+        // if value is of the same type nothing to do here.
+        if (value.GetType() == type || value.GetType() == Nullable.GetUnderlyingType(type))
         {
-            return ConvertPrimitiveValue(value, type, timeZoneInfo: null);
+            return value;
         }
 
-        public static object ConvertPrimitiveValue(object value, Type type, TimeZoneInfo timeZoneInfo)
+        if (type.IsInstanceOfType(value))
         {
-            Contract.Assert(value != null);
-            Contract.Assert(type != null);
+            return value;
+        }
 
-            // if value is of the same type nothing to do here.
-            if (value.GetType() == type || value.GetType() == Nullable.GetUnderlyingType(type))
+        string str = value as string;
+
+        if (type == typeof(char))
+        {
+            if (str == null || str.Length != 1)
             {
-                return value;
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeStringLengthOne));
             }
 
-            if (type.IsInstanceOfType(value))
+            return str[0];
+        }
+        else if (type == typeof(char?))
+        {
+            if (str == null || str.Length > 1)
             {
-                return value;
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeStringMaxLengthOne));
             }
 
-            string str = value as string;
-
-            if (type == typeof(char))
+            return str.Length > 0 ? str[0] : (char?)null;
+        }
+        else if (type == typeof(char[]))
+        {
+            if (str == null)
             {
-                if (str == null || str.Length != 1)
-                {
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeStringLengthOne));
-                }
-
-                return str[0];
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
             }
-            else if (type == typeof(char?))
+
+            return str.ToCharArray();
+        }
+        else if (type == typeof(XElement))
+        {
+            if (str == null)
             {
-                if (str == null || str.Length > 1)
-                {
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeStringMaxLengthOne));
-                }
-
-                return str.Length > 0 ? str[0] : (char?)null;
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
             }
-            else if (type == typeof(char[]))
+
+            return XElement.Parse(str);
+        }
+        else
+        {
+            type = Nullable.GetUnderlyingType(type) ?? type;
+
+            // Convert.ChangeType invalid cast from 'System.String' to 'System.Guid'
+            if (type == typeof(Guid))
             {
                 if (str == null)
                 {
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
                 }
 
-                return str.ToCharArray();
+                return Guid.Parse(str);
             }
-            else if (type == typeof(XElement))
+            else if (TypeHelper.IsEnum(type))
             {
                 if (str == null)
                 {
                     throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
                 }
 
-                return XElement.Parse(str);
+                return Enum.Parse(type, str);
+            }
+            else if (type == typeof(DateTime))
+            {
+                if (value is DateTimeOffset)
+                {
+                    DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
+                    TimeZoneInfo timeZone = timeZoneInfo ?? TimeZoneInfo.Local;
+                    dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
+                    return dateTimeOffsetValue.DateTime;
+                }
+
+                if (value is Date)
+                {
+                    Date dt = (Date)value;
+                    return (DateTime)dt;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+            }
+            else if (type == typeof(TimeSpan))
+            {
+                if (value is TimeOfDay)
+                {
+                    TimeOfDay tod = (TimeOfDay)value;
+                    return (TimeSpan)tod;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+            }
+            else if (type == typeof(bool))
+            {
+                bool result;
+                if (str != null && Boolean.TryParse(str, out result))
+                {
+                    return result;
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeBoolean));
+            }
+            else if (type == typeof(DateOnly))
+            {
+                if (value is Date dt)
+                {
+                    return new DateOnly(dt.Year, dt.Month, dt.Day);
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+            }
+            else if (type == typeof(TimeOnly))
+            {
+                if (value is TimeOfDay tod)
+                {
+                    return new TimeOnly(tod.Hours, tod.Minutes, tod.Seconds, (int)tod.Milliseconds);
+                }
+
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
             }
             else
             {
-                type = Nullable.GetUnderlyingType(type) ?? type;
-
-                // Convert.ChangeType invalid cast from 'System.String' to 'System.Guid'
-                if (type == typeof(Guid))
+                if (TypeHelper.TryGetInstance(type, value, out var result))
                 {
-                    if (str == null)
-                    {
-                        throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
-                    }
-
-                    return Guid.Parse(str);
+                    return result;
                 }
-                else if (TypeHelper.IsEnum(type))
-                {
-                    if (str == null)
-                    {
-                        throw new ValidationException(Error.Format(SRResources.PropertyMustBeString));
-                    }
 
-                    return Enum.Parse(type, str);
+                try
+                {
+                    // Note that we are not casting the return value to nullable<T> as even if we do it
+                    // CLR would un-box it back to T.
+                    return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
                 }
-                else if (type == typeof(DateTime))
+                catch (InvalidCastException)
                 {
-                    if (value is DateTimeOffset)
-                    {
-                        DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
-                        TimeZoneInfo timeZone = timeZoneInfo ?? TimeZoneInfo.Local;
-                        dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
-                        return dateTimeOffsetValue.DateTime;
-                    }
-
-                    if (value is Date)
-                    {
-                        Date dt = (Date)value;
-                        return (DateTime)dt;
-                    }
-
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+                    throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, type));
                 }
-                else if (type == typeof(TimeSpan))
+                catch (FormatException)
                 {
-                    if (value is TimeOfDay)
-                    {
-                        TimeOfDay tod = (TimeOfDay)value;
-                        return (TimeSpan)tod;
-                    }
-
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                    throw new ValidationException(Error.Format(SRResources.PropertyUnrecognizedFormat, type));
                 }
-                else if (type == typeof(bool))
+                catch (OverflowException)
                 {
-                    bool result;
-                    if (str != null && Boolean.TryParse(str, out result))
-                    {
-                        return result;
-                    }
-
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeBoolean));
-                }
-#if NET6_0
-                else if (type == typeof(DateOnly))
-                {
-                    if (value is Date dt)
-                    {
-                        return new DateOnly(dt.Year, dt.Month, dt.Day);
-                    }
-
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
-                }
-                else if (type == typeof(TimeOnly))
-                {
-                    if (value is TimeOfDay tod)
-                    {
-                        return new TimeOnly(tod.Hours, tod.Minutes, tod.Seconds, (int)tod.Milliseconds);
-                    }
-
-                    throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
-                }
-#endif
-                else
-                {
-                    if (TypeHelper.TryGetInstance(type, value, out var result))
-                    {
-                        return result;
-                    }
-
-                    try
-                    {
-                        // Note that we are not casting the return value to nullable<T> as even if we do it
-                        // CLR would un-box it back to T.
-                        return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
-                    }
-                    catch (InvalidCastException)
-                    {
-                        throw new ValidationException(Error.Format(SRResources.PropertyCannotBeConverted, type));
-                    }
-                    catch (FormatException)
-                    {
-                        throw new ValidationException(Error.Format(SRResources.PropertyUnrecognizedFormat, type));
-                    }
-                    catch (OverflowException)
-                    {
-                        throw new ValidationException(Error.Format(SRResources.PropertyTypeOverflow, type));
-                    }
+                    throw new ValidationException(Error.Format(SRResources.PropertyTypeOverflow, type));
                 }
             }
         }

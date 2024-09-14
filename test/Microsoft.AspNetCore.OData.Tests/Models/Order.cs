@@ -7,20 +7,19 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class Order
 {
-    public class Order
-    {
-        public int OrderId { get; set; }
+    public int OrderId { get; set; }
 
-        public Customer Customer { get; set; }
+    public Customer Customer { get; set; }
 
-        public decimal Cost { get; set; }
+    public decimal Cost { get; set; }
 
-        public decimal Price { get; set; }
+    public decimal Price { get; set; }
 
-        public DateTimeOffset OrderDate { get; set; }
+    public DateTimeOffset OrderDate { get; set; }
 
-        public DateTimeOffset? DeliveryDate { get; set; }
-    }
+    public DateTimeOffset? DeliveryDate { get; set; }
 }

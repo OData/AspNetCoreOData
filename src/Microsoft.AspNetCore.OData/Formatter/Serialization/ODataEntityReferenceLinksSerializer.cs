@@ -13,58 +13,57 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
+
+/// <summary>
+/// Represents an <see cref="ODataSerializer"/> for serializing $ref response for a collection navigation property.
+/// </summary>
+public class ODataEntityReferenceLinksSerializer : ODataSerializer
 {
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> for serializing $ref response for a collection navigation property.
+    /// Initializes a new instance of the <see cref="ODataEntityReferenceLinksSerializer"/> class.
     /// </summary>
-    public class ODataEntityReferenceLinksSerializer : ODataSerializer
+    public ODataEntityReferenceLinksSerializer()
+        : base(ODataPayloadKind.EntityReferenceLinks)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataEntityReferenceLinksSerializer"/> class.
-        /// </summary>
-        public ODataEntityReferenceLinksSerializer()
-            : base(ODataPayloadKind.EntityReferenceLinks)
+    }
+
+    /// <inheridoc />
+    public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+    {
+        if (messageWriter == null)
         {
+            throw Error.ArgumentNull(nameof(messageWriter));
         }
 
-        /// <inheridoc />
-        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        if (writeContext == null)
         {
-            if (messageWriter == null)
-            {
-                throw Error.ArgumentNull(nameof(messageWriter));
-            }
+            throw Error.ArgumentNull(nameof(writeContext));
+        }
 
-            if (writeContext == null)
+        if (graph != null)
+        {
+            ODataEntityReferenceLinks entityReferenceLinks = graph as ODataEntityReferenceLinks;
+            if (entityReferenceLinks == null)
             {
-                throw Error.ArgumentNull(nameof(writeContext));
-            }
-
-            if (graph != null)
-            {
-                ODataEntityReferenceLinks entityReferenceLinks = graph as ODataEntityReferenceLinks;
-                if (entityReferenceLinks == null)
+                IEnumerable<Uri> uris = graph as IEnumerable<Uri>;
+                if (uris == null)
                 {
-                    IEnumerable<Uri> uris = graph as IEnumerable<Uri>;
-                    if (uris == null)
-                    {
-                        throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
-                    }
-
-                    entityReferenceLinks = new ODataEntityReferenceLinks
-                    {
-                        Links = uris.Select(uri => new ODataEntityReferenceLink { Url = uri })
-                    };
-
-                    if (writeContext.Request != null)
-                    {
-                        entityReferenceLinks.Count = writeContext.Request.ODataFeature().TotalCount;
-                    }
+                    throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
                 }
 
-                await messageWriter.WriteEntityReferenceLinksAsync(entityReferenceLinks).ConfigureAwait(false);
+                entityReferenceLinks = new ODataEntityReferenceLinks
+                {
+                    Links = uris.Select(uri => new ODataEntityReferenceLink { Url = uri })
+                };
+
+                if (writeContext.Request != null)
+                {
+                    entityReferenceLinks.Count = writeContext.Request.ODataFeature().TotalCount;
+                }
             }
+
+            await messageWriter.WriteEntityReferenceLinksAsync(entityReferenceLinks).ConfigureAwait(false);
         }
     }
 }

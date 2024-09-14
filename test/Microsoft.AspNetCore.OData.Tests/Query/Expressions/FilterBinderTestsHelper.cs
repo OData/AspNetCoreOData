@@ -13,46 +13,45 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
+namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions;
+
+public static class FilterBinderTestsHelper
 {
-    public static class FilterBinderTestsHelper
+    public static Expression TestBind(FilterClause filterClause, Type filterType, IEdmModel model,
+        IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
     {
-        public static Expression TestBind(FilterClause filterClause, Type filterType, IEdmModel model,
-            IAssemblyResolver assembliesResolver, ODataQuerySettings querySettings)
+        if (filterClause == null)
         {
-            if (filterClause == null)
-            {
-                throw Error.ArgumentNull(nameof(filterClause));
-            }
-
-            if (filterType == null)
-            {
-                throw Error.ArgumentNull(nameof(filterType));
-            }
-
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
-            if (assembliesResolver == null)
-            {
-                throw Error.ArgumentNull(nameof(assembliesResolver));
-            }
-
-            IFilterBinder binder = new FilterBinder();
-
-            QueryBinderContext context = new QueryBinderContext(model, querySettings, filterType)
-            {
-                AssembliesResolver = assembliesResolver,
-            };
-
-            return binder.BindFilter(filterClause, context);
+            throw Error.ArgumentNull(nameof(filterClause));
         }
-    }
 
-    public class MyNoneQueryNode : QueryNode
-    {
-        public override QueryNodeKind Kind => QueryNodeKind.None;
+        if (filterType == null)
+        {
+            throw Error.ArgumentNull(nameof(filterType));
+        }
+
+        if (model == null)
+        {
+            throw Error.ArgumentNull(nameof(model));
+        }
+
+        if (assembliesResolver == null)
+        {
+            throw Error.ArgumentNull(nameof(assembliesResolver));
+        }
+
+        IFilterBinder binder = new FilterBinder();
+
+        QueryBinderContext context = new QueryBinderContext(model, querySettings, filterType)
+        {
+            AssembliesResolver = assembliesResolver,
+        };
+
+        return binder.BindFilter(filterClause, context);
     }
+}
+
+public class MyNoneQueryNode : QueryNode
+{
+    public override QueryNodeKind Kind => QueryNodeKind.None;
 }

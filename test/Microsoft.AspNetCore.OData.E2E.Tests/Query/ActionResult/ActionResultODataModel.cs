@@ -7,17 +7,16 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Query.ActionResult;
+
+public class Customer
 {
-    public class Customer
-    {
-        public string Id { get; set; }
+    public string Id { get; set; }
 
-        public IEnumerable<Book> Books { get; set; }
-    }
+    public IEnumerable<Book> Books { get; set; }
+}
 
-    public class Book
-    {
-        public string Id { get; set; }
-    }
+public class Book
+{
+    public string Id { get; set; }
 }

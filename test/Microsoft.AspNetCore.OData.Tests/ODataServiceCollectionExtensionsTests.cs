@@ -9,18 +9,17 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests
-{
-    public class ODataServiceCollectionExtensionsTests
-    {
-        [Fact]
-        public void AddODataCore_ThrowsArgumentNull_Services()
-        {
-            // Arrange
-            IServiceCollection services = null;
+namespace Microsoft.AspNetCore.OData.Tests;
 
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => services.AddODataCore(), "services");
-        }
+public class ODataServiceCollectionExtensionsTests
+{
+    [Fact]
+    public void AddODataCore_ThrowsArgumentNull_Services()
+    {
+        // Arrange
+        IServiceCollection services = null;
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => services.AddODataCore(), "services");
     }
 }

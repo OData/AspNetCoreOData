@@ -14,122 +14,121 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Routing.Template
+namespace Microsoft.AspNetCore.OData.Routing.Template;
+
+/// <summary>
+/// Represents a template that could match a $ref on a generic navigation segment.
+/// </summary>
+public class NavigationLinkTemplateSegmentTemplate : ODataSegmentTemplate
 {
+    private readonly string ParameterName = "navigationProperty";
+
     /// <summary>
-    /// Represents a template that could match a $ref on a generic navigation segment.
+    /// Initializes a new instance of the <see cref="NavigationLinkTemplateSegmentTemplate" /> class.
     /// </summary>
-    public class NavigationLinkTemplateSegmentTemplate : ODataSegmentTemplate
+    /// <param name="declaringType">The declaring type.</param>
+    /// <param name="navigationSource">The Edm navigation source.</param>
+    public NavigationLinkTemplateSegmentTemplate(IEdmStructuredType declaringType, IEdmNavigationSource navigationSource)
     {
-        private readonly string ParameterName = "navigationProperty";
+        DeclaringType = declaringType ?? throw Error.ArgumentNull(nameof(declaringType));
+        NavigationSource = navigationSource ?? throw Error.ArgumentNull(nameof(navigationSource));
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NavigationLinkTemplateSegmentTemplate" /> class.
-        /// </summary>
-        /// <param name="declaringType">The declaring type.</param>
-        /// <param name="navigationSource">The Edm navigation source.</param>
-        public NavigationLinkTemplateSegmentTemplate(IEdmStructuredType declaringType, IEdmNavigationSource navigationSource)
+    /// <summary>
+    /// Gets the related key mapping.
+    /// </summary>
+    public string RelatedKey { get; set; }
+
+    /// <summary>
+    /// Gets the declaring type for this property template.
+    /// </summary>
+    public IEdmStructuredType DeclaringType { get; }
+
+    /// <summary>
+    /// Gets the navigation source.
+    /// </summary>
+    public IEdmNavigationSource NavigationSource { get; }
+
+    /// <inheritdoc />
+    public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+    {
+        if (RelatedKey != null)
         {
-            DeclaringType = declaringType ?? throw Error.ArgumentNull(nameof(declaringType));
-            NavigationSource = navigationSource ?? throw Error.ArgumentNull(nameof(navigationSource));
-        }
+            options = options ?? ODataRouteOptions.Default;
+            Contract.Assert(options.EnableKeyInParenthesis || options.EnableKeyAsSegment);
 
-        /// <summary>
-        /// Gets the related key mapping.
-        /// </summary>
-        public string RelatedKey { get; set; }
-
-        /// <summary>
-        /// Gets the declaring type for this property template.
-        /// </summary>
-        public IEdmStructuredType DeclaringType { get; }
-
-        /// <summary>
-        /// Gets the navigation source.
-        /// </summary>
-        public IEdmNavigationSource NavigationSource { get; }
-
-        /// <inheritdoc />
-        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
-        {
-            if (RelatedKey != null)
+            if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
             {
-                options = options ?? ODataRouteOptions.Default;
-                Contract.Assert(options.EnableKeyInParenthesis || options.EnableKeyAsSegment);
-
-                if (options.EnableKeyInParenthesis && options.EnableKeyAsSegment)
-                {
-                    yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
-                    yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
-                }
-                else if (options.EnableKeyInParenthesis)
-                {
-                    yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
-                }
-                else
-                {
-                    yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
-                }
+                yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
+                yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
+            }
+            else if (options.EnableKeyInParenthesis)
+            {
+                yield return $"/{{{ParameterName}}}({{{RelatedKey}}})/$ref";
             }
             else
             {
-                yield return $"/{{{ParameterName}}}/$ref";
+                yield return $"/{{{ParameterName}}}/{{{RelatedKey}}}/$ref";
             }
         }
-
-        /// <inheritdoc />
-        public override bool TryTranslate(ODataTemplateTranslateContext context)
+        else
         {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            RouteValueDictionary routeValues = context.RouteValues;
-
-            // the request should have the navigation property
-            if (!routeValues.TryGetValue(ParameterName, out object rawValue))
-            {
-                return false;
-            }
-
-            string navigationProperty = rawValue as string;
-            if (navigationProperty == null)
-            {
-                return false;
-            }
-
-            // Find the navigation property
-            IEdmNavigationProperty edmNavProperty = DeclaringType.ResolveProperty(navigationProperty) as IEdmNavigationProperty;
-            if (edmNavProperty == null)
-            {
-                return false;
-            }
-
-            IEdmNavigationSource targetNavigationSource = NavigationSource.FindNavigationTarget(edmNavProperty);
-
-            // ODL implementation is complex, here i just use the NavigationPropertyLinkSegment
-            context.Segments.Add(new NavigationPropertyLinkSegment(edmNavProperty, targetNavigationSource));
-
-            if (RelatedKey != null)
-            {
-                IEdmEntityType entityType = edmNavProperty.ToEntityType();
-
-                // only handle the single key
-                Contract.Assert(entityType.Key().Count() == 1);
-                IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
-                Contract.Assert(keyProperty != null);
-
-                IDictionary<string, string> keyValuePairs = new Dictionary<string, string>
-                {
-                    { keyProperty.Name, $"{{{RelatedKey}}}" }
-                };
-
-                KeySegmentTemplate keySegment = new KeySegmentTemplate(keyValuePairs, entityType, targetNavigationSource);
-                return keySegment.TryTranslate(context);
-            }
-
-            return true;
+            yield return $"/{{{ParameterName}}}/$ref";
         }
+    }
+
+    /// <inheritdoc />
+    public override bool TryTranslate(ODataTemplateTranslateContext context)
+    {
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        RouteValueDictionary routeValues = context.RouteValues;
+
+        // the request should have the navigation property
+        if (!routeValues.TryGetValue(ParameterName, out object rawValue))
+        {
+            return false;
+        }
+
+        string navigationProperty = rawValue as string;
+        if (navigationProperty == null)
+        {
+            return false;
+        }
+
+        // Find the navigation property
+        IEdmNavigationProperty edmNavProperty = DeclaringType.ResolveProperty(navigationProperty) as IEdmNavigationProperty;
+        if (edmNavProperty == null)
+        {
+            return false;
+        }
+
+        IEdmNavigationSource targetNavigationSource = NavigationSource.FindNavigationTarget(edmNavProperty);
+
+        // ODL implementation is complex, here i just use the NavigationPropertyLinkSegment
+        context.Segments.Add(new NavigationPropertyLinkSegment(edmNavProperty, targetNavigationSource));
+
+        if (RelatedKey != null)
+        {
+            IEdmEntityType entityType = edmNavProperty.ToEntityType();
+
+            // only handle the single key
+            Contract.Assert(entityType.Key().Count() == 1);
+            IEdmStructuralProperty keyProperty = entityType.Key().SingleOrDefault();
+            Contract.Assert(keyProperty != null);
+
+            IDictionary<string, string> keyValuePairs = new Dictionary<string, string>
+            {
+                { keyProperty.Name, $"{{{RelatedKey}}}" }
+            };
+
+            KeySegmentTemplate keySegment = new KeySegmentTemplate(keyValuePairs, entityType, targetNavigationSource);
+            return keySegment.TryTranslate(context);
+        }
+
+        return true;
     }
 }

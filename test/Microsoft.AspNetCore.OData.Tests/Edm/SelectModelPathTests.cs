@@ -13,81 +13,80 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
+
+public class SelectModelPathTests
 {
-    public class SelectModelPathTests
+    private IEdmStructuralProperty _homeAddress;
+    private IEdmStructuralProperty _city;
+    private IEdmNavigationProperty _relatedNavProperty;
+
+    public SelectModelPathTests()
     {
-        private IEdmStructuralProperty _homeAddress;
-        private IEdmStructuralProperty _city;
-        private IEdmNavigationProperty _relatedNavProperty;
+        // Address is an open complex type
+        var addressType = new EdmComplexType("NS", "Address");
+        addressType.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
+        _city = addressType.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
 
-        public SelectModelPathTests()
+        EdmEntityType customerType = new EdmEntityType("NS", "Customer");
+        customerType.AddKeys(customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
+        _homeAddress = customerType.AddStructuralProperty("HomeAddress", new EdmComplexTypeReference(addressType, false));
+
+        _relatedNavProperty = addressType.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
         {
-            // Address is an open complex type
-            var addressType = new EdmComplexType("NS", "Address");
-            addressType.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
-            _city = addressType.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
+            Name = "RelatedCustomers",
+            Target = customerType,
+            TargetMultiplicity = EdmMultiplicity.Many
+        });
+    }
 
-            EdmEntityType customerType = new EdmEntityType("NS", "Customer");
-            customerType.AddKeys(customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
-            _homeAddress = customerType.AddStructuralProperty("HomeAddress", new EdmComplexTypeReference(addressType, false));
-
-            _relatedNavProperty = addressType.AddUnidirectionalNavigation(new EdmNavigationPropertyInfo
-            {
-                Name = "RelatedCustomers",
-                Target = customerType,
-                TargetMultiplicity = EdmMultiplicity.Many
-            });
-        }
-
-        [Fact]
-        public void Ctor_SelectModelPath_WithBasicElements_SetsProperties()
+    [Fact]
+    public void Ctor_SelectModelPath_WithBasicElements_SetsProperties()
+    {
+        // Arrange
+        IList<IEdmElement> elements = new List<IEdmElement>
         {
-            // Arrange
-            IList<IEdmElement> elements = new List<IEdmElement>
-            {
-                _homeAddress
-            };
+            _homeAddress
+        };
 
-            // Act
-            SelectModelPath selectPath = new SelectModelPath(elements);
+        // Act
+        SelectModelPath selectPath = new SelectModelPath(elements);
 
-            // Assert
-            Assert.Equal("HomeAddress", selectPath.SelectPath);
-        }
+        // Assert
+        Assert.Equal("HomeAddress", selectPath.SelectPath);
+    }
 
-        [Fact]
-        public void Ctor_SelectModelPath_WithOtherElements_SetsProperties()
+    [Fact]
+    public void Ctor_SelectModelPath_WithOtherElements_SetsProperties()
+    {
+        // Arrange
+        IList<IEdmElement> elements = new List<IEdmElement>
         {
-            // Arrange
-            IList<IEdmElement> elements = new List<IEdmElement>
-            {
-                _homeAddress,
-                _city
-            };
+            _homeAddress,
+            _city
+        };
 
-            // Act
-            SelectModelPath selectPath = new SelectModelPath(elements);
+        // Act
+        SelectModelPath selectPath = new SelectModelPath(elements);
 
-            // Assert
-            Assert.Equal("HomeAddress/City", selectPath.SelectPath);
-        }
+        // Assert
+        Assert.Equal("HomeAddress/City", selectPath.SelectPath);
+    }
 
-        [Fact]
-        public void Ctor_SelectModelPath_Throws_EmtpyElement()
+    [Fact]
+    public void Ctor_SelectModelPath_Throws_EmtpyElement()
+    {
+        // Arrange
+        IList<IEdmElement> elements = new List<IEdmElement>
         {
-            // Arrange
-            IList<IEdmElement> elements = new List<IEdmElement>
-            {
-                _relatedNavProperty
-            };
+            _relatedNavProperty
+        };
 
-            // Act
-            Action test = () => new SelectModelPath(elements);
+        // Act
+        Action test = () => new SelectModelPath(elements);
 
-            // Assert
-            ExceptionAssert.Throws<ODataException>(test,
-                "A segment 'EdmNavigationProperty' within the select or expand query option is not supported.");
-        }
+        // Assert
+        ExceptionAssert.Throws<ODataException>(test,
+            "A segment 'EdmNavigationProperty' within the select or expand query option is not supported.");
     }
 }

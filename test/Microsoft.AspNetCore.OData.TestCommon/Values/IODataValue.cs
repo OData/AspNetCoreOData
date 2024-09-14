@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.TestCommon.Values
+namespace Microsoft.AspNetCore.OData.TestCommon.Values;
+
+/// <summary>
+/// Interface of OData value.
+/// </summary>
+public interface IODataValue
 {
-    /// <summary>
-    /// Interface of OData value.
-    /// </summary>
-    public interface IODataValue
-    {
-    }
 }

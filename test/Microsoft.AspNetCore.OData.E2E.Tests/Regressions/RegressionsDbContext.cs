@@ -7,17 +7,16 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Regressions
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Regressions;
+
+public class RegressionsDbContext : DbContext
 {
-    public class RegressionsDbContext : DbContext
+    public RegressionsDbContext(DbContextOptions<RegressionsDbContext> options)
+        : base(options)
     {
-        public RegressionsDbContext(DbContextOptions<RegressionsDbContext> options)
-            : base(options)
-        {
-        }
-
-        public DbSet<User> Users { get; set; }
-
-        public DbSet<DataFile> DataFiles { get; set; }
     }
+
+    public DbSet<User> Users { get; set; }
+
+    public DbSet<DataFile> DataFiles { get; set; }
 }

@@ -8,19 +8,18 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Spatial;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Spatial;
+
+public class SpatialCustomer
 {
-    public class SpatialCustomer
-    {
-        [Key]
-        public int CustomerId { get; set; }
+    [Key]
+    public int CustomerId { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public GeographyPoint Location { get; set; }
+    public GeographyPoint Location { get; set; }
 
-        public GeographyLineString Region { get; set; }
+    public GeographyLineString Region { get; set; }
 
-        public GeometryPoint HomePoint { get; set; }
-    }
+    public GeometryPoint HomePoint { get; set; }
 }

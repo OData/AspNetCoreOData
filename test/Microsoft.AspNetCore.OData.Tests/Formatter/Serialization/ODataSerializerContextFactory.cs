@@ -10,29 +10,28 @@ using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
+
+/// <summary>
+/// A class to create ODataSerializerContext.
+/// </summary>
+public class ODataSerializerContextFactory
 {
     /// <summary>
-    /// A class to create ODataSerializerContext.
+    /// Initializes a new instance of the routing configuration class.
     /// </summary>
-    public class ODataSerializerContextFactory
+    /// <returns>A new instance of the routing configuration class.</returns>
+    public static ODataSerializerContext Create(IEdmModel model, IEdmNavigationSource navigationSource, HttpRequest request)
     {
-        /// <summary>
-        /// Initializes a new instance of the routing configuration class.
-        /// </summary>
-        /// <returns>A new instance of the routing configuration class.</returns>
-        public static ODataSerializerContext Create(IEdmModel model, IEdmNavigationSource navigationSource, HttpRequest request)
-        {
-            return new ODataSerializerContext { Model = model, NavigationSource = navigationSource, Request = request };
-        }
+        return new ODataSerializerContext { Model = model, NavigationSource = navigationSource, Request = request };
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the routing configuration class.
-        /// </summary>
-        /// <returns>A new instance of the routing configuration class.</returns>
-        public static ODataSerializerContext Create(IEdmModel model, IEdmNavigationSource navigationSource, ODataPath path, HttpRequest request)
-        {
-            return new ODataSerializerContext { Model = model, NavigationSource = navigationSource, Path = path, Request = request };
-        }
+    /// <summary>
+    /// Initializes a new instance of the routing configuration class.
+    /// </summary>
+    /// <returns>A new instance of the routing configuration class.</returns>
+    public static ODataSerializerContext Create(IEdmModel model, IEdmNavigationSource navigationSource, ODataPath path, HttpRequest request)
+    {
+        return new ODataSerializerContext { Model = model, NavigationSource = navigationSource, Path = path, Request = request };
     }
 }

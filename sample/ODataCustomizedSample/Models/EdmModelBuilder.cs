@@ -10,47 +10,46 @@ using System.Linq;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace ODataCustomizedSample.Models
+namespace ODataCustomizedSample.Models;
+
+public class EdmModelBuilder
 {
-    public class EdmModelBuilder
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Player>("Players");
+
+        var function = builder.EntityType<Player>().Function("PlayPiano").Returns<string>();
+        function.Parameter<int>("kind");
+        function.Parameter<string>("name");
+
+        return builder.GetEdmModel();
+    }
+
+    public static IEdmModel BuildEdmModel()
+    {
+        var models = new Dictionary<string, string>()
         {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Player>("Players");
+            {"Customer", "CustomerId" },
+            {"Car", "CarId" },
+            {"School", "SchoolId" }
+        };
 
-            var function = builder.EntityType<Player>().Function("PlayPiano").Returns<string>();
-            function.Parameter<int>("kind");
-            function.Parameter<string>("name");
+        var model = new EdmModel();
 
-            return builder.GetEdmModel();
+        EdmEntityContainer container = new EdmEntityContainer("Default", "Container");
+
+        for (int i = 0; i < models.Count; i++)
+        {
+            var name = models.ElementAt(i);
+            EdmEntityType element = new EdmEntityType("Default", name.Key, null, false, true);
+            element.AddKeys(element.AddStructuralProperty(name.Value, EdmPrimitiveTypeKind.Int32));
+
+            model.AddElement(element);
+            container.AddEntitySet(name.Key, element);
         }
 
-        public static IEdmModel BuildEdmModel()
-        {
-            var models = new Dictionary<string, string>()
-            {
-                {"Customer", "CustomerId" },
-                {"Car", "CarId" },
-                {"School", "SchoolId" }
-            };
-
-            var model = new EdmModel();
-
-            EdmEntityContainer container = new EdmEntityContainer("Default", "Container");
-
-            for (int i = 0; i < models.Count; i++)
-            {
-                var name = models.ElementAt(i);
-                EdmEntityType element = new EdmEntityType("Default", name.Key, null, false, true);
-                element.AddKeys(element.AddStructuralProperty(name.Value, EdmPrimitiveTypeKind.Int32));
-
-                model.AddElement(element);
-                container.AddEntitySet(name.Key, element);
-            }
-
-            model.AddElement(container);
-            return model;
-        }
+        model.AddElement(container);
+        return model;
     }
 }

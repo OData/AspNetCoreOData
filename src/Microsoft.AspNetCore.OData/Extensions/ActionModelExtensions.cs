@@ -19,317 +19,316 @@ using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Extensions
+namespace Microsoft.AspNetCore.OData.Extensions;
+
+/// <summary>
+/// The extension methods for <see cref="ActionModel"/>.
+/// </summary>
+public static class ActionModelExtensions
 {
     /// <summary>
-    /// The extension methods for <see cref="ActionModel"/>.
+    /// Tests whether the action is not suitable for OData action.
     /// </summary>
-    public static class ActionModelExtensions
+    /// <param name="action">The given action model.</param>
+    /// <returns>True/False.</returns>
+    public static bool IsODataIgnored(this ActionModel action)
     {
-        /// <summary>
-        /// Tests whether the action is not suitable for OData action.
-        /// </summary>
-        /// <param name="action">The given action model.</param>
-        /// <returns>True/False.</returns>
-        public static bool IsODataIgnored(this ActionModel action)
+        if (action == null)
         {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            return action.Attributes.Any(a => a is ODataIgnoredAttribute);
+            throw Error.ArgumentNull(nameof(action));
         }
 
-        /// <summary>
-        /// Tests whether the action has the given parameter with the given type.
-        /// </summary>
-        /// <typeparam name="T">The parameter type.</typeparam>
-        /// <param name="action">The given action model.</param>
-        /// <param name="parameterName">The given parameter name.</param>
-        /// <returns>True/False.</returns>
-        public static bool HasParameter<T>(this ActionModel action, string parameterName)
+        return action.Attributes.Any(a => a is ODataIgnoredAttribute);
+    }
+
+    /// <summary>
+    /// Tests whether the action has the given parameter with the given type.
+    /// </summary>
+    /// <typeparam name="T">The parameter type.</typeparam>
+    /// <param name="action">The given action model.</param>
+    /// <param name="parameterName">The given parameter name.</param>
+    /// <returns>True/False.</returns>
+    public static bool HasParameter<T>(this ActionModel action, string parameterName)
+    {
+        if (action == null)
         {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            // parameter name is unique?
-            ParameterModel parameter = action.Parameters.FirstOrDefault(p => p.Name == parameterName);
-            if (parameter == null)
-            {
-                return false;
-            }
-
-            return parameter.ParameterType == typeof(T);
+            throw Error.ArgumentNull(nameof(action));
         }
 
-        /// <summary>
-        /// Gets the attribute on an action model.
-        /// </summary>
-        /// <typeparam name="T">The required attribute type.</typeparam>
-        /// <param name="action">The given action model.</param>
-        /// <returns>Null or the corresponding attribute.</returns>
-        public static T GetAttribute<T>(this ActionModel action)
+        // parameter name is unique?
+        ParameterModel parameter = action.Parameters.FirstOrDefault(p => p.Name == parameterName);
+        if (parameter == null)
         {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            return action.Attributes.OfType<T>().FirstOrDefault();
+            return false;
         }
 
-        /// <summary>
-        /// Test whether the action has the key parameters defined.
-        /// </summary>
-        /// <param name="action">The action model.</param>
-        /// <param name="entityType">The Edm entity type.</param>
-        /// <param name="enablePropertyNameCaseInsensitive">Enable property name case insensitive.</param>
-        /// <param name="keyPrefix">The key prefix for the action parameter.</param>
-        /// <returns>True/false.</returns>
-        public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, bool enablePropertyNameCaseInsensitive = false, string keyPrefix = "key")
+        return parameter.ParameterType == typeof(T);
+    }
+
+    /// <summary>
+    /// Gets the attribute on an action model.
+    /// </summary>
+    /// <typeparam name="T">The required attribute type.</typeparam>
+    /// <param name="action">The given action model.</param>
+    /// <returns>Null or the corresponding attribute.</returns>
+    public static T GetAttribute<T>(this ActionModel action)
+    {
+        if (action == null)
         {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
+            throw Error.ArgumentNull(nameof(action));
+        }
 
-            if (entityType == null)
-            {
-                throw Error.ArgumentNull(nameof(entityType));
-            }
+        return action.Attributes.OfType<T>().FirstOrDefault();
+    }
 
-            // TODO: shall we make sure the type is matching?
-            var keys = entityType.Key().ToArray();
-            if (keys.Length == 1)
+    /// <summary>
+    /// Test whether the action has the key parameters defined.
+    /// </summary>
+    /// <param name="action">The action model.</param>
+    /// <param name="entityType">The Edm entity type.</param>
+    /// <param name="enablePropertyNameCaseInsensitive">Enable property name case insensitive.</param>
+    /// <param name="keyPrefix">The key prefix for the action parameter.</param>
+    /// <returns>True/false.</returns>
+    public static bool HasODataKeyParameter(this ActionModel action, IEdmEntityType entityType, bool enablePropertyNameCaseInsensitive = false, string keyPrefix = "key")
+    {
+        if (action == null)
+        {
+            throw Error.ArgumentNull(nameof(action));
+        }
+
+        if (entityType == null)
+        {
+            throw Error.ArgumentNull(nameof(entityType));
+        }
+
+        // TODO: shall we make sure the type is matching?
+        var keys = entityType.Key().ToArray();
+        if (keys.Length == 1)
+        {
+            // one key
+            return action.Parameters.Any(p => p.ParameterInfo.Name == keyPrefix);
+        }
+        else
+        {
+            // multiple keys
+            foreach (var key in keys)
             {
-                // one key
-                return action.Parameters.Any(p => p.ParameterInfo.Name == keyPrefix);
-            }
-            else
-            {
-                // multiple keys
-                foreach (var key in keys)
+                string keyName = $"{keyPrefix}{key.Name}";
+
+                if (enablePropertyNameCaseInsensitive)
                 {
-                    string keyName = $"{keyPrefix}{key.Name}";
-
-                    if (enablePropertyNameCaseInsensitive)
+                    keyName = keyName.ToUpperInvariant();
+                    if (!action.Parameters.Any(p => p.ParameterInfo.Name.ToUpperInvariant() == keyName))
                     {
-                        keyName = keyName.ToUpperInvariant();
-                        if (!action.Parameters.Any(p => p.ParameterInfo.Name.ToUpperInvariant() == keyName))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                    else
-                    {
-                        if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
-                        {
-                            return false;
-                        }
-                    }
-                }
-
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// Adds the OData selector model to the action.
-        /// </summary>
-        /// <param name="action">The given action model.</param>
-        /// <param name="httpMethods">The supported http methods, if multiple, using ',' to separate.</param>
-        /// <param name="prefix">The prefix.</param>
-        /// <param name="model">The Edm model.</param>
-        /// <param name="path">The OData path template.</param>
-        /// <param name="options">The route build options.</param>
-        public static void AddSelector(this ActionModel action, string httpMethods, string prefix, IEdmModel model, ODataPathTemplate path, ODataRouteOptions options = null)
-        {
-            if (action == null)
-            {
-                throw Error.ArgumentNull(nameof(action));
-            }
-
-            if (string.IsNullOrEmpty(httpMethods))
-            {
-                throw Error.ArgumentNullOrEmpty(nameof(httpMethods));
-            }
-
-            if (model == null)
-            {
-                throw Error.ArgumentNull(nameof(model));
-            }
-
-            if (path == null)
-            {
-                throw Error.ArgumentNull(nameof(path));
-            }
-
-            // if the controller has attribute route decorated, for example:
-            // [Route("api/[controller]")]
-            // public class CustomersController : Controller
-            // {}
-            // let's always create new selector model for action.
-            // Since the new created selector model is absolute attribute route, the controller attribute route doesn't apply to this selector model.
-            bool hasAttributeRouteOnController = action.Controller.Selectors.Any(s => s.AttributeRouteModel != null);
-            
-            // Check if CORS attribute is specified on action. New selectors need to be registered with CORS support.
-            bool acceptPreflight = action.Controller.Attributes.OfType<IDisableCorsAttribute>().Any() ||
-                                   action.Controller.Attributes.OfType<IEnableCorsAttribute>().Any() ||
-                                   action.Attributes.OfType<IDisableCorsAttribute>().Any() ||
-                                   action.Attributes.OfType<IEnableCorsAttribute>().Any();
-            
-            // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,
-            // It will throw "An item with the same key has already been added. Key: GET", in
-            // HttpMethodMatcherPolicy.BuildJumpTable(Int32 exitDestination, IReadOnlyList`1 edges)
-            // Another root cause is that in attribute routing, we reuse the HttpMethodMetadata, the method name is always "upper" case.
-            // Therefore, we upper the http method name always.
-            string[] methods = httpMethods.ToUpperInvariant().Split(',');
-            foreach (string template in path.GetTemplates(options))
-            {
-                // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
-                // No matter whether the action selector model is absolute route template, the controller's attribute will apply automatically
-                // So, let's only create/update the action selector model
-                SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
-                if (hasAttributeRouteOnController || selectorModel == null)
-                {
-                    // Create a new selector model.
-                    selectorModel = CreateSelectorModel(action, methods, acceptPreflight);
-                    action.Selectors.Add(selectorModel);
                 }
                 else
                 {
-                    // Update the existing non attribute routing selector model.
-                    selectorModel = UpdateSelectorModel(selectorModel, methods, acceptPreflight);
+                    if (!action.Parameters.Any(p => p.ParameterInfo.Name == keyName))
+                    {
+                        return false;
+                    }
                 }
-
-                ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
-                selectorModel.EndpointMetadata.Add(odataMetadata);
-
-                string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
-
-                selectorModel.AttributeRouteModel = new AttributeRouteModel
-                {
-                    // OData convention route template doesn't get combined with the route template applied to the controller.
-                    // Route templates applied to an action that begin with / or ~/ don't get combined with route templates applied to the controller.
-                    Template = $"/{templateStr}",
-                    Order = options?.Order,
-                    Name = templateStr // do we need this?
-                };
-
-                // Check with .NET Team whether the "Endpoint name metadata" needed?
-                selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString())); // Do we need this?
             }
+
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Adds the OData selector model to the action.
+    /// </summary>
+    /// <param name="action">The given action model.</param>
+    /// <param name="httpMethods">The supported http methods, if multiple, using ',' to separate.</param>
+    /// <param name="prefix">The prefix.</param>
+    /// <param name="model">The Edm model.</param>
+    /// <param name="path">The OData path template.</param>
+    /// <param name="options">The route build options.</param>
+    public static void AddSelector(this ActionModel action, string httpMethods, string prefix, IEdmModel model, ODataPathTemplate path, ODataRouteOptions options = null)
+    {
+        if (action == null)
+        {
+            throw Error.ArgumentNull(nameof(action));
         }
 
-        internal static SelectorModel UpdateSelectorModel(SelectorModel selectorModel, string[] httpMethods, bool acceptPreflight)
+        if (string.IsNullOrEmpty(httpMethods))
         {
-            Contract.Assert(selectorModel != null);
+            throw Error.ArgumentNullOrEmpty(nameof(httpMethods));
+        }
 
-            // remove the unused constraints (just for safe)
-            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
-                {
-                    selectorModel.ActionConstraints.RemoveAt(i);
-                }
-            }
+        if (model == null)
+        {
+            throw Error.ArgumentNull(nameof(model));
+        }
 
-            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
-                {
-                    selectorModel.ActionConstraints.RemoveAt(i);
-                }
-            }
+        if (path == null)
+        {
+            throw Error.ArgumentNull(nameof(path));
+        }
 
-            // remove the unused metadata
-            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
-                {
-                    selectorModel.EndpointMetadata.RemoveAt(i);
-                }
-            }
-
-            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
-                {
-                    selectorModel.EndpointMetadata.RemoveAt(i);
-                }
-            }
-
-            // append the http method metadata.
-            Contract.Assert(httpMethods.Length >= 1);
-            selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
-            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods, acceptPreflight));
-
-            // append controller attributes to action selector model? -- NO
+        // if the controller has attribute route decorated, for example:
+        // [Route("api/[controller]")]
+        // public class CustomersController : Controller
+        // {}
+        // let's always create new selector model for action.
+        // Since the new created selector model is absolute attribute route, the controller attribute route doesn't apply to this selector model.
+        bool hasAttributeRouteOnController = action.Controller.Selectors.Any(s => s.AttributeRouteModel != null);
+            
+        // Check if CORS attribute is specified on action. New selectors need to be registered with CORS support.
+        bool acceptPreflight = action.Controller.Attributes.OfType<IDisableCorsAttribute>().Any() ||
+                               action.Controller.Attributes.OfType<IEnableCorsAttribute>().Any() ||
+                               action.Attributes.OfType<IDisableCorsAttribute>().Any() ||
+                               action.Attributes.OfType<IEnableCorsAttribute>().Any();
+            
+        // If the methods have different case sensitive, for example, "get", "Get", in the ASP.NET Core 3.1,
+        // It will throw "An item with the same key has already been added. Key: GET", in
+        // HttpMethodMatcherPolicy.BuildJumpTable(Int32 exitDestination, IReadOnlyList`1 edges)
+        // Another root cause is that in attribute routing, we reuse the HttpMethodMetadata, the method name is always "upper" case.
+        // Therefore, we upper the http method name always.
+        string[] methods = httpMethods.ToUpperInvariant().Split(',');
+        foreach (string template in path.GetTemplates(options))
+        {
             // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
+            // No matter whether the action selector model is absolute route template, the controller's attribute will apply automatically
+            // So, let's only create/update the action selector model
+            SelectorModel selectorModel = action.Selectors.FirstOrDefault(s => s.AttributeRouteModel == null);
+            if (hasAttributeRouteOnController || selectorModel == null)
+            {
+                // Create a new selector model.
+                selectorModel = CreateSelectorModel(action, methods, acceptPreflight);
+                action.Selectors.Add(selectorModel);
+            }
+            else
+            {
+                // Update the existing non attribute routing selector model.
+                selectorModel = UpdateSelectorModel(selectorModel, methods, acceptPreflight);
+            }
 
-            return selectorModel;
+            ODataRoutingMetadata odataMetadata = new ODataRoutingMetadata(prefix, model, path);
+            selectorModel.EndpointMetadata.Add(odataMetadata);
+
+            string templateStr = string.IsNullOrEmpty(prefix) ? template : $"{prefix}/{template}";
+
+            selectorModel.AttributeRouteModel = new AttributeRouteModel
+            {
+                // OData convention route template doesn't get combined with the route template applied to the controller.
+                // Route templates applied to an action that begin with / or ~/ don't get combined with route templates applied to the controller.
+                Template = $"/{templateStr}",
+                Order = options?.Order,
+                Name = templateStr // do we need this?
+            };
+
+            // Check with .NET Team whether the "Endpoint name metadata" needed?
+            selectorModel.EndpointMetadata.Add(new EndpointNameMetadata(Guid.NewGuid().ToString())); // Do we need this?
+        }
+    }
+
+    internal static SelectorModel UpdateSelectorModel(SelectorModel selectorModel, string[] httpMethods, bool acceptPreflight)
+    {
+        Contract.Assert(selectorModel != null);
+
+        // remove the unused constraints (just for safe)
+        for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+        {
+            if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
+            {
+                selectorModel.ActionConstraints.RemoveAt(i);
+            }
         }
 
-        internal static SelectorModel CreateSelectorModel(ActionModel actionModel, string[] httpMethods, bool acceptPreflight)
+        for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
         {
-            Contract.Assert(actionModel != null);
-
-            SelectorModel selectorModel = new SelectorModel();
-            IReadOnlyList<object> attributes = actionModel.Attributes;
-
-            AddRange(selectorModel.ActionConstraints, attributes.OfType<IActionConstraintMetadata>());
-
-            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+            if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
             {
-                if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
-                {
-                    selectorModel.ActionConstraints.RemoveAt(i);
-                }
+                selectorModel.ActionConstraints.RemoveAt(i);
             }
-
-            for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
-                {
-                    selectorModel.ActionConstraints.RemoveAt(i);
-                }
-            }
-
-            AddRange(selectorModel.EndpointMetadata, attributes);
-            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
-                {
-                    selectorModel.EndpointMetadata.RemoveAt(i);
-                }
-            }
-
-            for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
-            {
-                if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
-                {
-                    selectorModel.EndpointMetadata.RemoveAt(i);
-                }
-            }
-
-            Contract.Assert(httpMethods.Length >= 1);
-            selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
-            selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods, acceptPreflight));
-
-            // append controller attributes to action selector model? -- NO
-            // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
-            return selectorModel;
         }
 
-        private static void AddRange<T>(IList<T> list, IEnumerable<T> items)
+        // remove the unused metadata
+        for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
         {
-            foreach (var item in items)
+            if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
             {
-                list.Add(item);
+                selectorModel.EndpointMetadata.RemoveAt(i);
             }
+        }
+
+        for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+        {
+            if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
+            {
+                selectorModel.EndpointMetadata.RemoveAt(i);
+            }
+        }
+
+        // append the http method metadata.
+        Contract.Assert(httpMethods.Length >= 1);
+        selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+        selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods, acceptPreflight));
+
+        // append controller attributes to action selector model? -- NO
+        // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
+
+        return selectorModel;
+    }
+
+    internal static SelectorModel CreateSelectorModel(ActionModel actionModel, string[] httpMethods, bool acceptPreflight)
+    {
+        Contract.Assert(actionModel != null);
+
+        SelectorModel selectorModel = new SelectorModel();
+        IReadOnlyList<object> attributes = actionModel.Attributes;
+
+        AddRange(selectorModel.ActionConstraints, attributes.OfType<IActionConstraintMetadata>());
+
+        for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+        {
+            if (selectorModel.ActionConstraints[i] is IRouteTemplateProvider)
+            {
+                selectorModel.ActionConstraints.RemoveAt(i);
+            }
+        }
+
+        for (var i = selectorModel.ActionConstraints.Count - 1; i >= 0; i--)
+        {
+            if (selectorModel.ActionConstraints[i] is HttpMethodActionConstraint)
+            {
+                selectorModel.ActionConstraints.RemoveAt(i);
+            }
+        }
+
+        AddRange(selectorModel.EndpointMetadata, attributes);
+        for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+        {
+            if (selectorModel.EndpointMetadata[i] is IRouteTemplateProvider)
+            {
+                selectorModel.EndpointMetadata.RemoveAt(i);
+            }
+        }
+
+        for (var i = selectorModel.EndpointMetadata.Count - 1; i >= 0; i--)
+        {
+            if (selectorModel.EndpointMetadata[i] is IHttpMethodMetadata)
+            {
+                selectorModel.EndpointMetadata.RemoveAt(i);
+            }
+        }
+
+        Contract.Assert(httpMethods.Length >= 1);
+        selectorModel.ActionConstraints.Add(new HttpMethodActionConstraint(httpMethods));
+        selectorModel.EndpointMetadata.Add(new HttpMethodMetadata(httpMethods, acceptPreflight));
+
+        // append controller attributes to action selector model? -- NO
+        // Be noted: https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ApplicationModels/ActionAttributeRouteModel.cs#L74-L75
+        return selectorModel;
+    }
+
+    private static void AddRange<T>(IList<T> list, IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            list.Add(item);
         }
     }
 }

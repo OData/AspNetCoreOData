@@ -7,23 +7,22 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
+
+public class DollarFilterDataSource
 {
-    public class DollarFilterDataSource
+    private static IList<Person> people;
+
+    static DollarFilterDataSource()
     {
-        private static IList<Person> people;
-
-        static DollarFilterDataSource()
+        people = new List<Person>
         {
-            people = new List<Person>
-            {
-                new Person { Id = 1, SSN = "a'bc" },
-                new Person { Id = 2, SSN = "'def" },
-                new Person { Id = 3, SSN = "xyz'" },
-                new Person { Id = 4, SSN = "'pqr'" }
-            };
-        }
-
-        public static IList<Person> People => people;
+            new Person { Id = 1, SSN = "a'bc" },
+            new Person { Id = 2, SSN = "'def" },
+            new Person { Id = 3, SSN = "xyz'" },
+            new Person { Id = 4, SSN = "'pqr'" }
+        };
     }
+
+    public static IList<Person> People => people;
 }

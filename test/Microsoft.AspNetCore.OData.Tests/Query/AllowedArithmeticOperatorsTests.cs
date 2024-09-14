@@ -9,29 +9,28 @@ using System;
 using Microsoft.AspNetCore.OData.Query;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query
+namespace Microsoft.AspNetCore.OData.Tests.Query;
+
+public class AllowedArithmeticOperatorsTests
 {
-    public class AllowedArithmeticOperatorsTests
+    [Fact]
+    public void None_MatchesNone()
     {
-        [Fact]
-        public void None_MatchesNone()
-        {
-            Assert.Equal(AllowedArithmeticOperators.None, AllowedArithmeticOperators.All & AllowedArithmeticOperators.None);
-        }
+        Assert.Equal(AllowedArithmeticOperators.None, AllowedArithmeticOperators.All & AllowedArithmeticOperators.None);
+    }
 
-        [Fact]
-        public void All_Contains_AllArithmeticOperators()
+    [Fact]
+    public void All_Contains_AllArithmeticOperators()
+    {
+        AllowedArithmeticOperators allArithmeticOperators = 0;
+        foreach (AllowedArithmeticOperators allowedArithmeticOperator in Enum.GetValues(typeof(AllowedArithmeticOperators)))
         {
-            AllowedArithmeticOperators allArithmeticOperators = 0;
-            foreach (AllowedArithmeticOperators allowedArithmeticOperator in Enum.GetValues(typeof(AllowedArithmeticOperators)))
+            if (allowedArithmeticOperator != AllowedArithmeticOperators.All)
             {
-                if (allowedArithmeticOperator != AllowedArithmeticOperators.All)
-                {
-                    allArithmeticOperators |= allowedArithmeticOperator;
-                }
+                allArithmeticOperators |= allowedArithmeticOperator;
             }
-
-            Assert.Equal(AllowedArithmeticOperators.All, allArithmeticOperators);
         }
+
+        Assert.Equal(AllowedArithmeticOperators.All, allArithmeticOperators);
     }
 }

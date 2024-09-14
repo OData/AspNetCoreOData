@@ -14,107 +14,106 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.Routing;
 
-namespace Microsoft.AspNetCore.OData.TestCommon
+namespace Microsoft.AspNetCore.OData.TestCommon;
+
+/// <summary>
+/// If want to see the templates, add this controller into controller feature:
+/// services.ConfigureControllers(typeof(ODataEndpointController));
+/// </summary>
+public class ODataEndpointController : ControllerBase
 {
-    /// <summary>
-    /// If want to see the templates, add this controller into controller feature:
-    /// services.ConfigureControllers(typeof(ODataEndpointController));
-    /// </summary>
-    public class ODataEndpointController : ControllerBase
+    /*
+    [Fact]
+    public async Task TestRoutes()
     {
-        /*
-        [Fact]
-        public async Task TestRoutes()
+        // Arrange
+        string requestUri = "$odata";
+        HttpClient client = CreateClient();
+
+        // Act
+        var response = await client.GetAsync(requestUri);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        string payload = await response.Content.ReadAsStringAsync();
+    }
+    */
+    private EndpointDataSource _dataSource;
+
+    public ODataEndpointController(EndpointDataSource dataSource)
+    {
+        _dataSource = dataSource;
+    }
+
+    [HttpGet("$odata")]
+    public IEnumerable<EndpointRouteInfo> GetAllRoutes()
+    {
+        if (_dataSource == null)
         {
-            // Arrange
-            string requestUri = "$odata";
-            HttpClient client = CreateClient();
-
-            // Act
-            var response = await client.GetAsync(requestUri);
-
-            // Assert
-            response.EnsureSuccessStatusCode();
-            string payload = await response.Content.ReadAsStringAsync();
+            return Enumerable.Empty<EndpointRouteInfo>();
         }
-        */
-        private EndpointDataSource _dataSource;
 
-        public ODataEndpointController(EndpointDataSource dataSource)
+        IList<EndpointRouteInfo> routeInfos = new List<EndpointRouteInfo>();
+        foreach (var endpoint in _dataSource.Endpoints)
         {
-            _dataSource = dataSource;
-        }
-
-        [HttpGet("$odata")]
-        public IEnumerable<EndpointRouteInfo> GetAllRoutes()
-        {
-            if (_dataSource == null)
+            RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
+            if (routeEndpoint == null)
             {
-                return Enumerable.Empty<EndpointRouteInfo>();
+                continue;
             }
 
-            IList<EndpointRouteInfo> routeInfos = new List<EndpointRouteInfo>();
-            foreach (var endpoint in _dataSource.Endpoints)
+            ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
+            if (controllerActionDescriptor == null)
             {
-                RouteEndpoint routeEndpoint = endpoint as RouteEndpoint;
-                if (routeEndpoint == null)
-                {
-                    continue;
-                }
-
-                ControllerActionDescriptor controllerActionDescriptor = endpoint.Metadata.GetMetadata<ControllerActionDescriptor>();
-                if (controllerActionDescriptor == null)
-                {
-                    continue;
-                }
-
-                EndpointRouteInfo routeInfo = new EndpointRouteInfo();
-
-                StringBuilder action = new StringBuilder();
-                if (controllerActionDescriptor.MethodInfo.ReturnType != null)
-                {
-                    action.Append(controllerActionDescriptor.MethodInfo.ReturnType.Name + " ");
-                }
-                else
-                {
-                    action.Append("void ");
-                }
-                action.Append(controllerActionDescriptor.MethodInfo.Name + "(");
-                action.Append(string.Join(",", controllerActionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
-                action.Append(")");
-
-                routeInfo.ControllerFullName = controllerActionDescriptor.ControllerTypeInfo.FullName;
-                routeInfo.ActionFullName = action.ToString();
-                routeInfo.Template = routeEndpoint.RoutePattern.RawText;
-
-                var httpMethods = GetHttpMethods(endpoint);
-                routeInfo.HttpMethods = string.Join(",", httpMethods);
-
-                IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
-                if (metadata == null)
-                {
-                    routeInfo.IsODataRoute = false;
-                }
-                else
-                {
-                    routeInfo.IsODataRoute = true;
-                }
-
-                routeInfos.Add(routeInfo);
+                continue;
             }
 
-            return routeInfos;
+            EndpointRouteInfo routeInfo = new EndpointRouteInfo();
+
+            StringBuilder action = new StringBuilder();
+            if (controllerActionDescriptor.MethodInfo.ReturnType != null)
+            {
+                action.Append(controllerActionDescriptor.MethodInfo.ReturnType.Name + " ");
+            }
+            else
+            {
+                action.Append("void ");
+            }
+            action.Append(controllerActionDescriptor.MethodInfo.Name + "(");
+            action.Append(string.Join(",", controllerActionDescriptor.MethodInfo.GetParameters().Select(p => p.ParameterType.Name)));
+            action.Append(")");
+
+            routeInfo.ControllerFullName = controllerActionDescriptor.ControllerTypeInfo.FullName;
+            routeInfo.ActionFullName = action.ToString();
+            routeInfo.Template = routeEndpoint.RoutePattern.RawText;
+
+            var httpMethods = GetHttpMethods(endpoint);
+            routeInfo.HttpMethods = string.Join(",", httpMethods);
+
+            IODataRoutingMetadata metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
+            if (metadata == null)
+            {
+                routeInfo.IsODataRoute = false;
+            }
+            else
+            {
+                routeInfo.IsODataRoute = true;
+            }
+
+            routeInfos.Add(routeInfo);
         }
 
-        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        return routeInfos;
+    }
+
+    private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+    {
+        HttpMethodMetadata metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
+        if (metadata != null)
         {
-            HttpMethodMetadata metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
-            if (metadata != null)
-            {
-                return metadata.HttpMethods;
-            }
-
-            return new[] { "No HttpMethod" };
+            return metadata.HttpMethods;
         }
+
+        return new[] { "No HttpMethod" };
     }
 }

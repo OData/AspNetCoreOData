@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.Models
-{
-    public class Address
-    {
-        public string Street { get; set; }
+namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests.Models;
 
-        public string City { get; set; }
-    }
+public class Address
+{
+    public string Street { get; set; }
+
+    public string City { get; set; }
 }

@@ -7,18 +7,17 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Results
+namespace Microsoft.AspNetCore.OData.Results;
+
+/// <summary>
+/// Provide the interface for the details of a given OData error result.
+/// </summary>
+public interface IODataErrorResult
 {
     /// <summary>
-    /// Provide the interface for the details of a given OData error result.
+    /// OData error.
     /// </summary>
-    public interface IODataErrorResult
-    {
-        /// <summary>
-        /// OData error.
-        /// </summary>
 #pragma warning disable CA1716 // Identifiers should not match keywords
-        ODataError Error { get; }
+    ODataError Error { get; }
 #pragma warning restore CA1716 // Identifiers should not match keywords
-    }
 }

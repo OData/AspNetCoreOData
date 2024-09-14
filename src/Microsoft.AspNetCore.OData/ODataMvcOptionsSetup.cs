@@ -10,35 +10,34 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.AspNetCore.OData
+namespace Microsoft.AspNetCore.OData;
+
+/// <summary>
+/// Sets up default OData options for <see cref="MvcOptions"/>.
+/// </summary>
+public class ODataMvcOptionsSetup : IConfigureOptions<MvcOptions>
 {
     /// <summary>
-    /// Sets up default OData options for <see cref="MvcOptions"/>.
+    /// Configure the default <see cref="MvcOptions"/>
     /// </summary>
-    public class ODataMvcOptionsSetup : IConfigureOptions<MvcOptions>
+    /// <param name="options">The <see cref="MvcOptions"/> to configure.</param>
+    public void Configure(MvcOptions options)
     {
-        /// <summary>
-        /// Configure the default <see cref="MvcOptions"/>
-        /// </summary>
-        /// <param name="options">The <see cref="MvcOptions"/> to configure.</param>
-        public void Configure(MvcOptions options)
+        if (options == null)
         {
-            if (options == null)
-            {
-                throw Error.ArgumentNull(nameof(options));
-            }
+            throw Error.ArgumentNull(nameof(options));
+        }
 
-            // Read formatters
-            foreach (ODataInputFormatter inputFormatter in ODataInputFormatterFactory.Create().Reverse())
-            {
-                options.InputFormatters.Insert(0, inputFormatter);
-            }
+        // Read formatters
+        foreach (ODataInputFormatter inputFormatter in ODataInputFormatterFactory.Create().Reverse())
+        {
+            options.InputFormatters.Insert(0, inputFormatter);
+        }
 
-            // Write formatters
-            foreach (ODataOutputFormatter outputFormatter in ODataOutputFormatterFactory.Create().Reverse())
-            {
-                options.OutputFormatters.Insert(0, outputFormatter);
-            }
+        // Write formatters
+        foreach (ODataOutputFormatter outputFormatter in ODataOutputFormatterFactory.Create().Reverse())
+        {
+            options.OutputFormatters.Insert(0, outputFormatter);
         }
     }
 }

@@ -7,20 +7,19 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes
+namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes;
+
+internal static class MediaTypesDataSource
 {
-    internal static class MediaTypesDataSource
+    private readonly static List<Order> orders;
+
+    static MediaTypesDataSource()
     {
-        private readonly static List<Order> orders;
-
-        static MediaTypesDataSource()
+        orders = new List<Order>
         {
-            orders = new List<Order>
-            {
-                new Order { Id = 1, Amount = 130, TrackingNumber = 9223372036854775807L }
-            };
-        }
-
-        public static List<Order> Orders => orders;
+            new Order { Id = 1, Amount = 130, TrackingNumber = 9223372036854775807L }
+        };
     }
+
+    public static List<Order> Orders => orders;
 }

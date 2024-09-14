@@ -7,22 +7,21 @@
 
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+/// <summary>
+/// Represents an <see cref="IEdmComplexObject"/> backed by a CLR object with a one-to-one mapping.
+/// </summary>
+internal class TypedEdmComplexObject : TypedEdmStructuredObject, IEdmComplexObject
 {
     /// <summary>
-    /// Represents an <see cref="IEdmComplexObject"/> backed by a CLR object with a one-to-one mapping.
+    /// Initializes a new instance of the <see cref="TypedEdmComplexObject"/> class.
     /// </summary>
-    internal class TypedEdmComplexObject : TypedEdmStructuredObject, IEdmComplexObject
+    /// <param name="instance">The backing CLR instance.</param>
+    /// <param name="edmType">The <see cref="IEdmComplexTypeReference"/> of this object.</param>
+    /// <param name="edmModel">The <see cref="IEdmModel"/>.</param>
+    public TypedEdmComplexObject(object instance, IEdmComplexTypeReference edmType, IEdmModel edmModel)
+        : base(instance, edmType, edmModel)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TypedEdmComplexObject"/> class.
-        /// </summary>
-        /// <param name="instance">The backing CLR instance.</param>
-        /// <param name="edmType">The <see cref="IEdmComplexTypeReference"/> of this object.</param>
-        /// <param name="edmModel">The <see cref="IEdmModel"/>.</param>
-        public TypedEdmComplexObject(object instance, IEdmComplexTypeReference edmType, IEdmModel edmModel)
-            : base(instance, edmType, edmModel)
-        {
-        }
     }
 }

@@ -8,18 +8,17 @@
 using System.Collections.Generic;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ModelBoundQuerySettings
-{
-    [Filter("Books")]
-    public class Author
-    {
-        public long AuthorId { get; set; }
-        public List<Book> Books { get; set; }
-    }
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ModelBoundQuerySettings;
 
-    [Filter("BookId")]
-    public class Book
-    {
-        public long BookId { get; set; }
-    }
+[Filter("Books")]
+public class Author
+{
+    public long AuthorId { get; set; }
+    public List<Book> Books { get; set; }
+}
+
+[Filter("BookId")]
+public class Book
+{
+    public long BookId { get; set; }
 }

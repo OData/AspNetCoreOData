@@ -9,29 +9,28 @@ using Microsoft.AspNetCore.OData.Query;
 using System;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Query
+namespace Microsoft.AspNetCore.OData.Tests.Query;
+
+public class AllowedLogicalOperatorsTests
 {
-    public class AllowedLogicalOperatorsTests
+    [Fact]
+    public void None_MatchesNone()
     {
-        [Fact]
-        public void None_MatchesNone()
-        {
-            Assert.Equal(AllowedLogicalOperators.None, AllowedLogicalOperators.All & AllowedLogicalOperators.None);
-        }
+        Assert.Equal(AllowedLogicalOperators.None, AllowedLogicalOperators.All & AllowedLogicalOperators.None);
+    }
 
-        [Fact]
-        public void All_Contains_AllLogicalOperators()
+    [Fact]
+    public void All_Contains_AllLogicalOperators()
+    {
+        AllowedLogicalOperators allLogicalOperators = 0;
+        foreach (AllowedLogicalOperators allowedLogicalOperator in Enum.GetValues(typeof(AllowedLogicalOperators)))
         {
-            AllowedLogicalOperators allLogicalOperators = 0;
-            foreach (AllowedLogicalOperators allowedLogicalOperator in Enum.GetValues(typeof(AllowedLogicalOperators)))
+            if (allowedLogicalOperator != AllowedLogicalOperators.All)
             {
-                if (allowedLogicalOperator != AllowedLogicalOperators.All)
-                {
-                    allLogicalOperators = allLogicalOperators | allowedLogicalOperator;
-                }
+                allLogicalOperators = allLogicalOperators | allowedLogicalOperator;
             }
-
-            Assert.Equal(AllowedLogicalOperators.All, allLogicalOperators);
         }
+
+        Assert.Equal(AllowedLogicalOperators.All, allLogicalOperators);
     }
 }

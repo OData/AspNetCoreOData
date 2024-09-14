@@ -12,60 +12,59 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast;
+
+public class ProductsController : ODataController
 {
-    public class ProductsController : ODataController
+    private ProductsContext _context;
+
+    public ProductsController(ProductsContext context)
     {
-        private ProductsContext _context;
+        context.Database.EnsureCreated();
+        _context = context;
 
-        public ProductsController(ProductsContext context)
+        if (!_context.Products.Any())
         {
-            context.Database.EnsureCreated();
-            _context = context;
-
-            if (!_context.Products.Any())
+            foreach (Product product in DataSource.InMemoryProducts)
             {
-                foreach (Product product in DataSource.InMemoryProducts)
-                {
-                    _context.Products.Add(product);
-                }
-
-                _context.SaveChanges();
+                _context.Products.Add(product);
             }
-        }
 
-        [EnableQuery]
-        public IActionResult Get()
+            _context.SaveChanges();
+        }
+    }
+
+    [EnableQuery]
+    public IActionResult Get()
+    {
+        if (GetRoutePrefix() == "EF")
         {
-            if (GetRoutePrefix() == "EF")
-            {
-                return Ok(_context.Products);
-            }
-            else
-            {
-                return Ok(DataSource.InMemoryProducts);
-            }
+            return Ok(_context.Products);
         }
-
-        [EnableQuery]
-        public IActionResult GetDimensionInCentimeter(int key)
+        else
         {
-            if (GetRoutePrefix() == "EF")
-            {
-                Product product = _context.Products.Single(p => p.ID == key);
-                return Ok(product.DimensionInCentimeter);
-            }
-            else
-            {
-                Product product = DataSource.InMemoryProducts.Single(p => p.ID == key);
-                return Ok(product.DimensionInCentimeter);
-            }
+            return Ok(DataSource.InMemoryProducts);
         }
+    }
 
-        protected string GetRoutePrefix()
+    [EnableQuery]
+    public IActionResult GetDimensionInCentimeter(int key)
+    {
+        if (GetRoutePrefix() == "EF")
         {
-            IODataFeature feature = Request.ODataFeature();
-            return feature.RoutePrefix;
+            Product product = _context.Products.Single(p => p.ID == key);
+            return Ok(product.DimensionInCentimeter);
         }
+        else
+        {
+            Product product = DataSource.InMemoryProducts.Single(p => p.ID == key);
+            return Ok(product.DimensionInCentimeter);
+        }
+    }
+
+    protected string GetRoutePrefix()
+    {
+        IODataFeature feature = Request.ODataFeature();
+        return feature.RoutePrefix;
     }
 }

@@ -5,12 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes
+namespace Microsoft.AspNetCore.OData.E2E.Tests.MediaTypes;
+
+public class Order
 {
-    public class Order
-    {
-        public int Id { get; set; }
-        public decimal Amount { get; set; }
-        public long TrackingNumber { get; set; }
-    }
+    public int Id { get; set; }
+    public decimal Amount { get; set; }
+    public long TrackingNumber { get; set; }
 }

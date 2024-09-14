@@ -10,161 +10,160 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Query.Validator
+namespace Microsoft.AspNetCore.OData.Query.Validator;
+
+internal class OrderByModelLimitationsValidator : QueryNodeVisitor<SingleValueNode>
 {
-    internal class OrderByModelLimitationsValidator : QueryNodeVisitor<SingleValueNode>
+    private readonly IEdmModel _model;
+    private readonly bool _enableOrderBy;
+    private IEdmProperty _property;
+    private IEdmStructuredType _structuredType;
+
+    public OrderByModelLimitationsValidator(ODataQueryContext context, bool enableOrderBy)
     {
-        private readonly IEdmModel _model;
-        private readonly bool _enableOrderBy;
-        private IEdmProperty _property;
-        private IEdmStructuredType _structuredType;
+        _model = context.Model;
+        _enableOrderBy = enableOrderBy;
 
-        public OrderByModelLimitationsValidator(ODataQueryContext context, bool enableOrderBy)
+        if (context.Path != null)
         {
-            _model = context.Model;
-            _enableOrderBy = enableOrderBy;
-
-            if (context.Path != null)
-            {
-                _property = context.TargetProperty;
-                _structuredType = context.TargetStructuredType;
-            }
+            _property = context.TargetProperty;
+            _structuredType = context.TargetStructuredType;
         }
+    }
 
-        public bool TryValidate(IEdmProperty property, IEdmStructuredType structuredType, OrderByClause orderByClause,
-            bool explicitPropertiesDefined)
+    public bool TryValidate(IEdmProperty property, IEdmStructuredType structuredType, OrderByClause orderByClause,
+        bool explicitPropertiesDefined)
+    {
+        _property = property;
+        _structuredType = structuredType;
+        return TryValidate(orderByClause, explicitPropertiesDefined);
+    }
+
+    // Visits the expression to find the first node if any, that is not sortable and throws
+    // an exception only if no explicit properties have been defined in AllowedOrderByProperties
+    // on the ODataValidationSettings instance associated with this OrderByValidator.
+    public bool TryValidate(OrderByClause orderByClause, bool explicitPropertiesDefined)
+    {
+        SingleValueNode invalidNode = orderByClause.Expression.Accept(this);
+        if (invalidNode != null && !explicitPropertiesDefined)
         {
-            _property = property;
-            _structuredType = structuredType;
-            return TryValidate(orderByClause, explicitPropertiesDefined);
+            throw new ODataException(Error.Format(SRResources.NotSortablePropertyUsedInOrderBy,
+                GetPropertyName(invalidNode)));
         }
+        return invalidNode == null;
+    }
 
-        // Visits the expression to find the first node if any, that is not sortable and throws
-        // an exception only if no explicit properties have been defined in AllowedOrderByProperties
-        // on the ODataValidationSettings instance associated with this OrderByValidator.
-        public bool TryValidate(OrderByClause orderByClause, bool explicitPropertiesDefined)
+    public override SingleValueNode Visit(SingleValuePropertyAccessNode nodeIn)
+    {
+        if (nodeIn.Source != null)
         {
-            SingleValueNode invalidNode = orderByClause.Expression.Accept(this);
-            if (invalidNode != null && !explicitPropertiesDefined)
+            if (nodeIn.Source.Kind == QueryNodeKind.SingleNavigationNode)
             {
-                throw new ODataException(Error.Format(SRResources.NotSortablePropertyUsedInOrderBy,
-                    GetPropertyName(invalidNode)));
-            }
-            return invalidNode == null;
-        }
-
-        public override SingleValueNode Visit(SingleValuePropertyAccessNode nodeIn)
-        {
-            if (nodeIn.Source != null)
-            {
-                if (nodeIn.Source.Kind == QueryNodeKind.SingleNavigationNode)
-                {
-                    SingleNavigationNode singleNavigationNode = nodeIn.Source as SingleNavigationNode;
-                    if (EdmHelpers.IsNotSortable(nodeIn.Property, singleNavigationNode.NavigationProperty,
-                        singleNavigationNode.NavigationProperty.ToEntityType(), _model, _enableOrderBy))
-                    {
-                        return nodeIn;
-                    }
-                }
-                else if (nodeIn.Source.Kind == QueryNodeKind.SingleComplexNode)
-                {
-                    SingleComplexNode singleComplexNode = nodeIn.Source as SingleComplexNode;
-                    if (EdmHelpers.IsNotSortable(nodeIn.Property, singleComplexNode.Property,
-                        nodeIn.Property.DeclaringType, _model, _enableOrderBy))
-                    {
-                        return nodeIn;
-                    }
-                }
-                else if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
+                SingleNavigationNode singleNavigationNode = nodeIn.Source as SingleNavigationNode;
+                if (EdmHelpers.IsNotSortable(nodeIn.Property, singleNavigationNode.NavigationProperty,
+                    singleNavigationNode.NavigationProperty.ToEntityType(), _model, _enableOrderBy))
                 {
                     return nodeIn;
                 }
             }
-
-            if (nodeIn.Source != null)
+            else if (nodeIn.Source.Kind == QueryNodeKind.SingleComplexNode)
             {
-                return nodeIn.Source.Accept(this);
+                SingleComplexNode singleComplexNode = nodeIn.Source as SingleComplexNode;
+                if (EdmHelpers.IsNotSortable(nodeIn.Property, singleComplexNode.Property,
+                    nodeIn.Property.DeclaringType, _model, _enableOrderBy))
+                {
+                    return nodeIn;
+                }
             }
-
-            return null;
-        }
-
-        public override SingleValueNode Visit(SingleValueOpenPropertyAccessNode nodeIn)
-        {
-            return null;
-        }
-
-        public override SingleValueNode Visit(SingleComplexNode nodeIn)
-        {
-            if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
+            else if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
             {
                 return nodeIn;
             }
-
-            if (nodeIn.Source != null)
-            {
-                return nodeIn.Source.Accept(this);
-            }
-
-            return null;
         }
 
-        public override SingleValueNode Visit(SingleNavigationNode nodeIn)
+        if (nodeIn.Source != null)
         {
-            if (EdmHelpers.IsNotSortable(nodeIn.NavigationProperty, _property, _structuredType, _model,
-                _enableOrderBy))
-            {
-                return nodeIn;
-            }
-
-            if (nodeIn.Source != null)
-            {
-                return nodeIn.Source.Accept(this);
-            }
-
-            return null;
+            return nodeIn.Source.Accept(this);
         }
 
-        public override SingleValueNode Visit(ResourceRangeVariableReferenceNode nodeIn)
+        return null;
+    }
+
+    public override SingleValueNode Visit(SingleValueOpenPropertyAccessNode nodeIn)
+    {
+        return null;
+    }
+
+    public override SingleValueNode Visit(SingleComplexNode nodeIn)
+    {
+        if (EdmHelpers.IsNotSortable(nodeIn.Property, _property, _structuredType, _model, _enableOrderBy))
         {
-            return null;
+            return nodeIn;
         }
 
-        public override SingleValueNode Visit(NonResourceRangeVariableReferenceNode nodeIn)
+        if (nodeIn.Source != null)
         {
-            return null;
+            return nodeIn.Source.Accept(this);
         }
 
-        public override SingleValueNode Visit(SingleValueFunctionCallNode nodeIn)
+        return null;
+    }
+
+    public override SingleValueNode Visit(SingleNavigationNode nodeIn)
+    {
+        if (EdmHelpers.IsNotSortable(nodeIn.NavigationProperty, _property, _structuredType, _model,
+            _enableOrderBy))
         {
-            foreach (var parameter in nodeIn.Parameters)
-            {
-                parameter.Accept(this);
-            }
-
-            if (nodeIn.Source != null)
-            {
-                return nodeIn.Source.Accept(this);
-            }
-
-            return null;
+            return nodeIn;
         }
 
-        private static string GetPropertyName(SingleValueNode node)
+        if (nodeIn.Source != null)
         {
-            if (node.Kind == QueryNodeKind.SingleNavigationNode)
-            {
-                return ((SingleNavigationNode)node).NavigationProperty.Name;
-            }
-            else if (node.Kind == QueryNodeKind.SingleValuePropertyAccess)
-            {
-                return ((SingleValuePropertyAccessNode)node).Property.Name;
-            }
-            else if (node.Kind == QueryNodeKind.SingleComplexNode)
-            {
-                return ((SingleComplexNode)node).Property.Name;
-            }
-            return null;
+            return nodeIn.Source.Accept(this);
         }
+
+        return null;
+    }
+
+    public override SingleValueNode Visit(ResourceRangeVariableReferenceNode nodeIn)
+    {
+        return null;
+    }
+
+    public override SingleValueNode Visit(NonResourceRangeVariableReferenceNode nodeIn)
+    {
+        return null;
+    }
+
+    public override SingleValueNode Visit(SingleValueFunctionCallNode nodeIn)
+    {
+        foreach (var parameter in nodeIn.Parameters)
+        {
+            parameter.Accept(this);
+        }
+
+        if (nodeIn.Source != null)
+        {
+            return nodeIn.Source.Accept(this);
+        }
+
+        return null;
+    }
+
+    private static string GetPropertyName(SingleValueNode node)
+    {
+        if (node.Kind == QueryNodeKind.SingleNavigationNode)
+        {
+            return ((SingleNavigationNode)node).NavigationProperty.Name;
+        }
+        else if (node.Kind == QueryNodeKind.SingleValuePropertyAccess)
+        {
+            return ((SingleValuePropertyAccessNode)node).Property.Name;
+        }
+        else if (node.Kind == QueryNodeKind.SingleComplexNode)
+        {
+            return ((SingleComplexNode)node).Property.Name;
+        }
+        return null;
     }
 }

@@ -7,10 +7,9 @@
 
 using System.Collections.Generic;
 
-namespace ODataDynamicModel.Extensions
+namespace ODataDynamicModel.Extensions;
+
+public interface IDataSourceProvider
 {
-    public interface IDataSourceProvider
-    {
-        IDictionary<string, IDataSource> DataSources { get; }
-    }
+    IDictionary<string, IDataSource> DataSources { get; }
 }

@@ -7,18 +7,17 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.TestCommon
+namespace Microsoft.AspNetCore.OData.TestCommon;
+
+public class EndpointRouteInfo
 {
-    public class EndpointRouteInfo
-    {
-        public string ControllerFullName { get; set; }
+    public string ControllerFullName { get; set; }
 
-        public string ActionFullName { get; set; }
+    public string ActionFullName { get; set; }
 
-        public string HttpMethods { get; set; }
+    public string HttpMethods { get; set; }
 
-        public string Template { get; set; }
+    public string Template { get; set; }
 
-        public bool IsODataRoute { get; set; }
-    }
+    public bool IsODataRoute { get; set; }
 }

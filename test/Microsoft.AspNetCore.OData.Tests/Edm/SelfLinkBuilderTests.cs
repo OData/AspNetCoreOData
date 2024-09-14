@@ -11,16 +11,15 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Edm
+namespace Microsoft.AspNetCore.OData.Tests.Edm;
+
+public class SelfLinkBuilderTests
 {
-    public class SelfLinkBuilderTests
+    [Fact]
+    public void Ctor_ThrowsArgumentNull_LinkFactory()
     {
-        [Fact]
-        public void Ctor_ThrowsArgumentNull_LinkFactory()
-        {
-            // Arrange & Act & Assert
-            Func<ResourceContext, Uri> linkFactory = null;
-            ExceptionAssert.ThrowsArgumentNull(() => new SelfLinkBuilder<Uri>(linkFactory, false), "linkFactory");
-        }
+        // Arrange & Act & Assert
+        Func<ResourceContext, Uri> linkFactory = null;
+        ExceptionAssert.ThrowsArgumentNull(() => new SelfLinkBuilder<Uri>(linkFactory, false), "linkFactory");
     }
 }

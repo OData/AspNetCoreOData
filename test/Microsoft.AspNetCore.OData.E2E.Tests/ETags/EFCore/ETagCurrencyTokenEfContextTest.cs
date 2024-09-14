@@ -15,37 +15,37 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore;
+
+public class ETagCurrencyTokenEfContextTest : WebApiTestBase<ETagCurrencyTokenEfContextTest>
 {
-    public class ETagCurrencyTokenEfContextTest : WebApiTestBase<ETagCurrencyTokenEfContextTest>
+    public ETagCurrencyTokenEfContextTest(WebApiTestFixture<ETagCurrencyTokenEfContextTest> fixture)
+        :base(fixture)
     {
-        public ETagCurrencyTokenEfContextTest(WebApiTestFixture<ETagCurrencyTokenEfContextTest> fixture)
-            :base(fixture)
-        {
-        }
+    }
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=ETagCurrencyTokenEfContext8";
-            services.AddDbContext<ETagCurrencyTokenEfContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
+    protected static void UpdateConfigureServices(IServiceCollection services)
+    {
+        string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=ETagCurrencyTokenEfContext8";
+        services.AddDbContext<ETagCurrencyTokenEfContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
-            IEdmModel edmModel = GetEdmModel();
-            services.ConfigureControllers(typeof(DominiosController));
-            services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel).Expand().Select());
-        }
+        IEdmModel edmModel = GetEdmModel();
+        services.ConfigureControllers(typeof(DominiosController));
+        services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel).Expand().Select());
+    }
 
-        private static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Dominio>("Dominios");
-            builder.EntitySet<Server>("Servers");
-            return builder.GetEdmModel();
-        }
+    private static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Dominio>("Dominios");
+        builder.EntitySet<Server>("Servers");
+        return builder.GetEdmModel();
+    }
 
-        [Fact]
-        public async Task NestedDollarSelectWorksOnCurrencyTokenProperty()
-        {
-            string expect = "{\r\n" +
+    [Fact]
+    public async Task NestedDollarSelectWorksOnCurrencyTokenProperty()
+    {
+        string expect = "{\r\n" +
 "  \"@odata.context\":\"http://localhost/odata/$metadata#Dominios(ServerAutenticazione(Id,RECVER))\",\"value\":[\r\n" +
 "    {\r\n" +
 "      \"@odata.etag\":\"W/\\\"bnVsbA==\\\"\",\"Id\":\"1\",\"Descrizione\":\"Test1\",\"ServerAutenticazioneId\":\"1\",\"RECVER\":null,\"ServerAutenticazione\":{\r\n" +
@@ -58,21 +58,20 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags.EFCore
 "    }\r\n" +
 "  ]\r\n" +
 "}";
-            // Remove indentation
-            expect = Regex.Replace(expect, @"\r\n\s*([""{}\]])", "$1");
+        // Remove indentation
+        expect = Regex.Replace(expect, @"\r\n\s*([""{}\]])", "$1");
 
-            var getUri = "odata/Dominios?$expand=ServerAutenticazione($select=Id,RECVER)";
-            HttpClient client = CreateClient();
+        var getUri = "odata/Dominios?$expand=ServerAutenticazione($select=Id,RECVER)";
+        HttpClient client = CreateClient();
 
-            var response = await client.GetAsync(getUri);
+        var response = await client.GetAsync(getUri);
 
-            response.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
-            Assert.NotNull(response.Content);
+        Assert.NotNull(response.Content);
 
-            var payload = await response.Content.ReadAsStringAsync();
+        var payload = await response.Content.ReadAsStringAsync();
 
-            Assert.Equal(expect, payload);
-        }
+        Assert.Equal(expect, payload);
     }
 }

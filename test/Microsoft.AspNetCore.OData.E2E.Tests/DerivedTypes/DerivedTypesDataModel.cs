@@ -7,34 +7,33 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DerivedTypes;
+
+public class Customer
 {
-    public class Customer
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public List<Order> Orders { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public List<Order> Orders { get; set; }
+}
 
-    public class VipCustomer : Customer
-    {
-        public string LoyaltyCardNo { get; set; }
-    }
+public class VipCustomer : Customer
+{
+    public string LoyaltyCardNo { get; set; }
+}
 
-    public class Order
-    {
-        public int Id { get; set; }
-        public decimal Amount { get; set; }
-    }
+public class Order
+{
+    public int Id { get; set; }
+    public decimal Amount { get; set; }
+}
 
-    public class EnterpriseCustomer : Customer
-    {
-        public Employee RelationshipManager { get; set; }
-    }
+public class EnterpriseCustomer : Customer
+{
+    public Employee RelationshipManager { get; set; }
+}
 
-    public class Employee
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+public class Employee
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
 }

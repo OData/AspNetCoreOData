@@ -18,163 +18,162 @@ using Microsoft.OData.ModelBuilder;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
+
+public class ODataEnumDeserializerTests
 {
-    public class ODataEnumDeserializerTests
+    private static IEdmModel _edmModel = GetEdmModel();
+
+    [Fact]
+    public async Task ReadAsync_ThrowsArgumentNull_ForInputs()
     {
-        private static IEdmModel _edmModel = GetEdmModel();
+        // Arrange & Act & Assert
+        var deserializer = new ODataEnumDeserializer();
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => deserializer.ReadAsync(messageReader: null, type: null, readContext: null), "messageReader");
 
-        [Fact]
-        public async Task ReadAsync_ThrowsArgumentNull_ForInputs()
+        // Arrange & Act & Assert
+        ODataMessageReader messageReader = ODataFormatterHelpers.GetMockODataMessageReader();
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => deserializer.ReadAsync(messageReader, type: null, readContext: null), "type");
+
+        // Arrange & Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => deserializer.ReadAsync(messageReader, typeof(Color), readContext: null), "readContext");
+    }
+
+    [Fact]
+    public async Task ReadAsync_Works_ForEnumValue()
+    {
+        // Arrange
+        string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
+
+        ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+        ODataDeserializerContext readContext = new ODataDeserializerContext
         {
-            // Arrange & Act & Assert
-            var deserializer = new ODataEnumDeserializer();
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => deserializer.ReadAsync(messageReader: null, type: null, readContext: null), "messageReader");
+            Model = _edmModel,
+            ResourceType = typeof(Color)
+        };
 
-            // Arrange & Act & Assert
-            ODataMessageReader messageReader = ODataFormatterHelpers.GetMockODataMessageReader();
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => deserializer.ReadAsync(messageReader, type: null, readContext: null), "type");
+        HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddRouteComponents("odata", _edmModel));
 
-            // Arrange & Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => deserializer.ReadAsync(messageReader, typeof(Color), readContext: null), "readContext");
-        }
+        // Act
+        object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
+            typeof(Color), readContext);
 
-        [Fact]
-        public async Task ReadAsync_Works_ForEnumValue()
+        // Assert
+        Color color = Assert.IsType<Color>(value);
+        Assert.Equal(Color.Blue, color);
+    }
+
+    [Fact]
+    public async Task ReadAsync_Works_ForRawValue()
+    {
+        // Arrange
+        string content = "{\"value\":\"Blue\"}";
+
+        ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+        ODataDeserializerContext readContext = new ODataDeserializerContext
         {
-            // Arrange
-            string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
+            Model = _edmModel,
+            ResourceType = typeof(Color)
+        };
+        HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
 
-            ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
-            ODataDeserializerContext readContext = new ODataDeserializerContext
-            {
-                Model = _edmModel,
-                ResourceType = typeof(Color)
-            };
+        // Act
+        object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
+            typeof(Color), readContext);
 
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/TestUri", opt => opt.AddRouteComponents("odata", _edmModel));
+        // Assert
+        Color color = Assert.IsType<Color>(value);
+        Assert.Equal(Color.Blue, color);
+    }
 
-            // Act
-            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
-                typeof(Color), readContext);
+    [Fact]
+    public async Task ReadAsync_Works_ForUnType()
+    {
+        // Arrange
+        string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
 
-            // Assert
-            Color color = Assert.IsType<Color>(value);
-            Assert.Equal(Color.Blue, color);
-        }
-
-        [Fact]
-        public async Task ReadAsync_Works_ForRawValue()
+        ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+        ODataDeserializerContext readContext = new ODataDeserializerContext
         {
-            // Arrange
-            string content = "{\"value\":\"Blue\"}";
+            Model = _edmModel,
+            ResourceType = typeof(IEdmEnumObject)
+        };
+        HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
 
-            ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
-            ODataDeserializerContext readContext = new ODataDeserializerContext
-            {
-                Model = _edmModel,
-                ResourceType = typeof(Color)
-            };
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
+        // Act
+        object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
+            typeof(Color), readContext);
 
-            // Act
-            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
-                typeof(Color), readContext);
+        // Assert
+        EdmEnumObject color = Assert.IsType<EdmEnumObject>(value);
+        Assert.NotNull(color);
 
-            // Assert
-            Color color = Assert.IsType<Color>(value);
-            Assert.Equal(Color.Blue, color);
-        }
+        Assert.Equal("Blue", color.Value);
+    }
 
-        [Fact]
-        public async Task ReadAsync_Works_ForUnType()
+    [Fact]
+    public async Task ReadAsync_Works_ForModelAlias()
+    {
+        // Arrange
+        string content = "{\"@odata.type\":\"#NS.level\",\"value\":\"veryhigh\"}";
+
+        var builder = new ODataConventionModelBuilder();
+        builder.EnumType<Level>().Namespace = "NS";
+        IEdmModel model = builder.GetEdmModel();
+
+        ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+        ODataDeserializerContext readContext = new ODataDeserializerContext
         {
-            // Arrange
-            string content = "{\"@odata.type\":\"#NS.Color\",\"value\":\"Blue\"}";
+            Model = model,
+            ResourceType = typeof(Level)
+        };
 
-            ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
-            ODataDeserializerContext readContext = new ODataDeserializerContext
-            {
-                Model = _edmModel,
-                ResourceType = typeof(IEdmEnumObject)
-            };
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
+        HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
 
-            // Act
-            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), _edmModel),
-                typeof(Color), readContext);
+        // Act
+        object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model),
+            typeof(Level), readContext);
 
-            // Assert
-            EdmEnumObject color = Assert.IsType<EdmEnumObject>(value);
-            Assert.NotNull(color);
+        // Assert
+        Level level = Assert.IsType<Level>(value);
+        Assert.Equal(Level.High, level);
+    }
 
-            Assert.Equal("Blue", color.Value);
-        }
+    [Fact]
+    public void ReadInline_ThrowsArgumentNull_ForInputs()
+    {
+        // Arrange
+        ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+        Mock<IEdmTypeReference> edmType = new Mock<IEdmTypeReference>();
 
-        [Fact]
-        public async Task ReadAsync_Works_ForModelAlias()
-        {
-            // Arrange
-            string content = "{\"@odata.type\":\"#NS.level\",\"value\":\"veryhigh\"}";
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(new object(), edmType.Object, readContext: null), "readContext");
+    }
 
-            var builder = new ODataConventionModelBuilder();
-            builder.EnumType<Level>().Namespace = "NS";
-            IEdmModel model = builder.GetEdmModel();
+    private static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EnumType<Color>().Namespace = "NS";
+        return builder.GetEdmModel();
+    }
 
-            ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
-            ODataDeserializerContext readContext = new ODataDeserializerContext
-            {
-                Model = model,
-                ResourceType = typeof(Level)
-            };
+    public enum Color
+    {
+        Red,
+        Blue,
+        Green
+    }
 
-            HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
+    [DataContract(Name = "level")]
+    public enum Level
+    {
+        [EnumMember(Value = "low")]
+        Low,
 
-            // Act
-            object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model),
-                typeof(Level), readContext);
-
-            // Assert
-            Level level = Assert.IsType<Level>(value);
-            Assert.Equal(Level.High, level);
-        }
-
-        [Fact]
-        public void ReadInline_ThrowsArgumentNull_ForInputs()
-        {
-            // Arrange
-            ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
-            Mock<IEdmTypeReference> edmType = new Mock<IEdmTypeReference>();
-
-            // Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => deserializer.ReadInline(new object(), edmType.Object, readContext: null), "readContext");
-        }
-
-        private static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EnumType<Color>().Namespace = "NS";
-            return builder.GetEdmModel();
-        }
-
-        public enum Color
-        {
-            Red,
-            Blue,
-            Green
-        }
-
-        [DataContract(Name = "level")]
-        public enum Level
-        {
-            [EnumMember(Value = "low")]
-            Low,
-
-            [EnumMember(Value = "veryhigh")]
-            High
-        }
+        [EnumMember(Value = "veryhigh")]
+        High
     }
 }

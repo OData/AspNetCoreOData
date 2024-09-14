@@ -7,37 +7,36 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Query.Validator
+namespace Microsoft.AspNetCore.OData.Query.Validator;
+
+/// <summary>
+/// The metadata context for $orderby validator.
+/// </summary>
+public class OrderByValidatorContext : QueryValidatorContext
 {
+    private int _orderByNodeCount = 0;
+
     /// <summary>
-    /// The metadata context for $orderby validator.
+    /// The top level $orderby query option.
     /// </summary>
-    public class OrderByValidatorContext : QueryValidatorContext
+    public OrderByQueryOption OrderBy { get; set; }
+
+    /// <summary>
+    /// Gets current orderby node count.
+    /// </summary>
+    public int OrderByNodeCount => _orderByNodeCount;
+
+    /// <summary>
+    /// Increment orderby node count.
+    /// </summary>
+    /// <exception cref="ODataException">Throw OData exception.</exception>
+    public void IncrementNodeCount()
     {
-        private int _orderByNodeCount = 0;
+        ++_orderByNodeCount;
 
-        /// <summary>
-        /// The top level $orderby query option.
-        /// </summary>
-        public OrderByQueryOption OrderBy { get; set; }
-
-        /// <summary>
-        /// Gets current orderby node count.
-        /// </summary>
-        public int OrderByNodeCount => _orderByNodeCount;
-
-        /// <summary>
-        /// Increment orderby node count.
-        /// </summary>
-        /// <exception cref="ODataException">Throw OData exception.</exception>
-        public void IncrementNodeCount()
+        if (_orderByNodeCount > ValidationSettings.MaxOrderByNodeCount)
         {
-            ++_orderByNodeCount;
-
-            if (_orderByNodeCount > ValidationSettings.MaxOrderByNodeCount)
-            {
-                throw new ODataException(Error.Format(SRResources.OrderByNodeCountExceeded, ValidationSettings.MaxOrderByNodeCount));
-            }
+            throw new ODataException(Error.Format(SRResources.OrderByNodeCountExceeded, ValidationSettings.MaxOrderByNodeCount));
         }
     }
 }

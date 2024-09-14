@@ -13,27 +13,26 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Test.Batch
+namespace Microsoft.AspNetCore.OData.Test.Batch;
+
+public class ODataHttpContentExtensionsTest
 {
-    public class ODataHttpContentExtensionsTest
+    [Fact]
+    public async Task GetODataMessageReaderAsync_NullContent_Throws()
     {
-        [Fact]
-        public async Task GetODataMessageReaderAsync_NullContent_Throws()
-        {
-            // Arrange & Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => ODataHttpContentExtensions.GetODataMessageReaderAsync(null, new ODataMessageReaderSettings(), CancellationToken.None),
-                "content");
-        }
+        // Arrange & Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => ODataHttpContentExtensions.GetODataMessageReaderAsync(null, new ODataMessageReaderSettings(), CancellationToken.None),
+            "content");
+    }
 
-        [Fact]
-        public async Task GetODataMessageReaderAsync_ReturnsMessageReader()
-        {
-            // Arrange
-            StringContent content = new StringContent("foo", Encoding.UTF8, "multipart/mixed");
+    [Fact]
+    public async Task GetODataMessageReaderAsync_ReturnsMessageReader()
+    {
+        // Arrange
+        StringContent content = new StringContent("foo", Encoding.UTF8, "multipart/mixed");
 
-            // Act & Assert
-            Assert.NotNull(await content.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None));
-        }
+        // Act & Assert
+        Assert.NotNull(await content.GetODataMessageReaderAsync(new ODataMessageReaderSettings(), CancellationToken.None));
     }
 }

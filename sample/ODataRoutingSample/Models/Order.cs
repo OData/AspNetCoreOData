@@ -5,19 +5,18 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace ODataRoutingSample.Models
+namespace ODataRoutingSample.Models;
+
+public class Order
 {
-    public class Order
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Title { get; set; }
+    public string Title { get; set; }
 
-        public virtual Category Category { get; set; }
-    }
+    public virtual Category Category { get; set; }
+}
 
-    public class VipOrder : Order
-    {
-        public virtual Category VipCategory { get; set; }
-    }
+public class VipOrder : Order
+{
+    public virtual Category VipCategory { get; set; }
 }

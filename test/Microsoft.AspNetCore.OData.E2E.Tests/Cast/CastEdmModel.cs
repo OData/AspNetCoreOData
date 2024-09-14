@@ -8,21 +8,20 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
+namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast;
+
+internal class CastEdmModel
 {
-    internal class CastEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Product>("Products");
-            var airPlaneType=builder.EntityType<AirPlane>();
-            airPlaneType.DerivesFrom<Product>();
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Product>("Products");
+        var airPlaneType=builder.EntityType<AirPlane>();
+        airPlaneType.DerivesFrom<Product>();
 
-            builder.Namespace = typeof(Product).Namespace;
+        builder.Namespace = typeof(Product).Namespace;
 
-            var edmModel = builder.GetEdmModel();
-            return edmModel;
-        }
+        var edmModel = builder.GetEdmModel();
+        return edmModel;
     }
 }

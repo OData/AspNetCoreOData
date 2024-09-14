@@ -10,14 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ModelBoundQuerySettings
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ModelBoundQuerySettings;
+
+public class AuthorsController : ODataController
 {
-    public class AuthorsController : ODataController
+    [EnableQuery]
+    public ActionResult<IEnumerable<Author>> Get()
     {
-        [EnableQuery]
-        public ActionResult<IEnumerable<Author>> Get()
-        {
-            return ModelBoundQuerySettingsDataSource.Authors;
-        }
+        return ModelBoundQuerySettingsDataSource.Authors;
     }
 }

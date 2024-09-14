@@ -9,39 +9,38 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace Microsoft.AspNetCore.OData.Query.Container
+namespace Microsoft.AspNetCore.OData.Query.Container;
+
+internal class NamedProperty<T> : PropertyContainer
 {
-    internal class NamedProperty<T> : PropertyContainer
+    public string Name { get; set; }
+
+    public T Value { get; set; }
+
+    public bool AutoSelected { get; set; }
+
+    public override void ToDictionaryCore(Dictionary<string, object> dictionary, IPropertyMapper propertyMapper,
+        bool includeAutoSelected)
     {
-        public string Name { get; set; }
+        Contract.Assert(dictionary != null);
 
-        public T Value { get; set; }
-
-        public bool AutoSelected { get; set; }
-
-        public override void ToDictionaryCore(Dictionary<string, object> dictionary, IPropertyMapper propertyMapper,
-            bool includeAutoSelected)
+        if (Name != null && (includeAutoSelected || !AutoSelected))
         {
-            Contract.Assert(dictionary != null);
-
-            if (Name != null && (includeAutoSelected || !AutoSelected))
+            string mappedName = propertyMapper.MapProperty(Name);
+            if (mappedName != null)
             {
-                string mappedName = propertyMapper.MapProperty(Name);
-                if (mappedName != null)
+                if (String.IsNullOrEmpty(mappedName))
                 {
-                    if (String.IsNullOrEmpty(mappedName))
-                    {
-                        throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, Name);
-                    }
-
-                    dictionary.Add(mappedName, GetValue());
+                    throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, Name);
                 }
+
+                dictionary.Add(mappedName, GetValue());
             }
         }
+    }
 
-        public virtual object GetValue()
-        {
-            return Value;
-        }
+    public virtual object GetValue()
+    {
+        return Value;
     }
 }

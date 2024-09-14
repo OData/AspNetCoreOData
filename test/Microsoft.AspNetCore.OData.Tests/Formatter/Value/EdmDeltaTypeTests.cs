@@ -12,28 +12,27 @@ using Microsoft.OData.Edm;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
+
+public class EdmDeltaTypeTests
 {
-    public class EdmDeltaTypeTests
+    [Fact]
+    public void CtorEdmDeltaType_ThrowsArgumentNull_EntityType()
     {
-        [Fact]
-        public void CtorEdmDeltaType_ThrowsArgumentNull_EntityType()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaType(null, DeltaItemKind.Resource), "entityType");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmDeltaType(null, DeltaItemKind.Resource), "entityType");
+    }
 
-        [Fact]
-        public void CtorEdmDeltaType_SetsProperties()
-        {
-            // Arrange & Act
-            IEdmEntityType typeRef = new Mock<IEdmEntityType>().Object;
-            EdmDeltaType deltaType = new EdmDeltaType(typeRef, DeltaItemKind.Resource);
+    [Fact]
+    public void CtorEdmDeltaType_SetsProperties()
+    {
+        // Arrange & Act
+        IEdmEntityType typeRef = new Mock<IEdmEntityType>().Object;
+        EdmDeltaType deltaType = new EdmDeltaType(typeRef, DeltaItemKind.Resource);
 
-            // Assert
-            Assert.Equal(EdmTypeKind.Entity, deltaType.TypeKind);
-            Assert.Same(typeRef, deltaType.EntityType);
-            Assert.Equal(DeltaItemKind.Resource, deltaType.DeltaKind);
-        }
+        // Assert
+        Assert.Equal(EdmTypeKind.Entity, deltaType.TypeKind);
+        Assert.Same(typeRef, deltaType.EntityType);
+        Assert.Equal(DeltaItemKind.Resource, deltaType.DeltaKind);
     }
 }

@@ -10,23 +10,22 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.TestCommon
+namespace Microsoft.AspNetCore.OData.TestCommon;
+
+internal class TestAssemblyResolver : IAssemblyResolver
 {
-    internal class TestAssemblyResolver : IAssemblyResolver
+    List<Assembly> _assemblies;
+
+    public TestAssemblyResolver(MockAssembly assembly)
     {
-        List<Assembly> _assemblies;
-
-        public TestAssemblyResolver(MockAssembly assembly)
-        {
-            _assemblies = new List<Assembly>();
-            _assemblies.Add(assembly);
-        }
-
-        public TestAssemblyResolver(params Type[] types)
-            : this(new MockAssembly(types))
-        {
-        }
-
-        public IEnumerable<Assembly> Assemblies => _assemblies;
+        _assemblies = new List<Assembly>();
+        _assemblies.Add(assembly);
     }
+
+    public TestAssemblyResolver(params Type[] types)
+        : this(new MockAssembly(types))
+    {
+    }
+
+    public IEnumerable<Assembly> Assemblies => _assemblies;
 }

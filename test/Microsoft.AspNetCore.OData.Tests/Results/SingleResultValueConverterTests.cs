@@ -14,70 +14,69 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Results
+namespace Microsoft.AspNetCore.OData.Tests.Results;
+
+public class SingleResultValueConverterTests
 {
-    public class SingleResultValueConverterTests
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData(typeof(object), false)]
+    [InlineData(typeof(SingleResult<object>), true)]
+    public void CanConvert_WorksForSingleResultValueConverter(Type type, bool expected)
     {
-        [Theory]
-        [InlineData(null, false)]
-        [InlineData(typeof(object), false)]
-        [InlineData(typeof(SingleResult<object>), true)]
-        public void CanConvert_WorksForSingleResultValueConverter(Type type, bool expected)
+        // Arrange
+        SingleResultValueConverter converter = new SingleResultValueConverter();
+
+        // Act & Assert
+        Assert.Equal(expected, converter.CanConvert(type));
+    }
+
+    [Fact]
+    public void CreateConverter_WorksForSingleResultValueConverter()
+    {
+        // Arrange
+        JsonSerializerOptions options = new JsonSerializerOptions();
+        SingleResultValueConverter converter = new SingleResultValueConverter();
+
+        // Act & Assert
+        Type type = typeof(SingleResult<object>);
+        JsonConverter typeConverter = converter.CreateConverter(type, options);
+        Assert.Equal(typeof(SingleResultConverter<object>), typeConverter.GetType());
+
+        // Act & Assert
+        type = typeof(IEnumerable<object>);
+        typeConverter = converter.CreateConverter(type, options);
+        Assert.Null(typeConverter);
+    }
+
+    [Fact]
+    public void SingleResultValueConverter_CanSerializeSingleResultOfT()
+    {
+        // Arrange & Act & Assert
+        IEnumerable<Customer> customers = new Customer[]
         {
-            // Arrange
-            SingleResultValueConverter converter = new SingleResultValueConverter();
+            new Customer { Id = 1, Name = "abc" },
+            new Customer { Id = 2, Name = "efg" }
+        };
 
-            // Act & Assert
-            Assert.Equal(expected, converter.CanConvert(type));
-        }
+        SingleResult<Customer> result = new SingleResult<Customer>(customers.AsQueryable());
 
-        [Fact]
-        public void CreateConverter_WorksForSingleResultValueConverter()
-        {
-            // Arrange
-            JsonSerializerOptions options = new JsonSerializerOptions();
-            SingleResultValueConverter converter = new SingleResultValueConverter();
+        JsonSerializerOptions options = new JsonSerializerOptions();
+        SingleResultValueConverter converterFactory = new SingleResultValueConverter();
+        Type type = typeof(SingleResult<Customer>);
+        SingleResultConverter<Customer> typeConverter = converterFactory.CreateConverter(type, options) as SingleResultConverter<Customer>;
 
-            // Act & Assert
-            Type type = typeof(SingleResult<object>);
-            JsonConverter typeConverter = converter.CreateConverter(type, options);
-            Assert.Equal(typeof(SingleResultConverter<object>), typeConverter.GetType());
+        // Act
+        string json = SerializeUtils.SerializeAsJson(jsonWriter => typeConverter.Write(jsonWriter, result, options));
 
-            // Act & Assert
-            type = typeof(IEnumerable<object>);
-            typeConverter = converter.CreateConverter(type, options);
-            Assert.Null(typeConverter);
-        }
+        // Assert
+        Assert.Equal("{\"Id\":1,\"Name\":\"abc\"}", json);
+    }
 
-        [Fact]
-        public void SingleResultValueConverter_CanSerializeSingleResultOfT()
-        {
-            // Arrange & Act & Assert
-            IEnumerable<Customer> customers = new Customer[]
-            {
-                new Customer { Id = 1, Name = "abc" },
-                new Customer { Id = 2, Name = "efg" }
-            };
+    private class Customer
+    {
+        public int Id { get; set; }
 
-            SingleResult<Customer> result = new SingleResult<Customer>(customers.AsQueryable());
-
-            JsonSerializerOptions options = new JsonSerializerOptions();
-            SingleResultValueConverter converterFactory = new SingleResultValueConverter();
-            Type type = typeof(SingleResult<Customer>);
-            SingleResultConverter<Customer> typeConverter = converterFactory.CreateConverter(type, options) as SingleResultConverter<Customer>;
-
-            // Act
-            string json = SerializeUtils.SerializeAsJson(jsonWriter => typeConverter.Write(jsonWriter, result, options));
-
-            // Assert
-            Assert.Equal("{\"Id\":1,\"Name\":\"abc\"}", json);
-        }
-
-        private class Customer
-        {
-            public int Id { get; set; }
-
-            public string Name { get; set; }
-        }
+        public string Name { get; set; }
     }
 }

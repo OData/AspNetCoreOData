@@ -7,21 +7,20 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.OData.Deltas
+namespace Microsoft.AspNetCore.OData.Deltas;
+
+/// <summary>
+/// The typed delta.
+/// </summary>
+public interface ITypedDelta
 {
     /// <summary>
-    /// The typed delta.
+    /// Gets the actual type of the structural object for which the changes are tracked.
     /// </summary>
-    public interface ITypedDelta
-    {
-        /// <summary>
-        /// Gets the actual type of the structural object for which the changes are tracked.
-        /// </summary>
-        Type StructuredType { get; }
+    Type StructuredType { get; }
 
-        /// <summary>
-        /// Gets the expected type of the entity for which the changes are tracked.
-        /// </summary>
-        Type ExpectedClrType { get; }
-    }
+    /// <summary>
+    /// Gets the expected type of the entity for which the changes are tracked.
+    /// </summary>
+    Type ExpectedClrType { get; }
 }

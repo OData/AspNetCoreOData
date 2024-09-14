@@ -14,95 +14,94 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Formatter.Deserialization;
+
+/// <summary>
+/// Represents an <see cref="ODataDeserializer"/> that can read OData enum types.
+/// </summary>
+public class ODataEnumDeserializer : ODataEdmTypeDeserializer
 {
     /// <summary>
-    /// Represents an <see cref="ODataDeserializer"/> that can read OData enum types.
+    /// Initializes a new instance of the <see cref="ODataEnumDeserializer"/> class.
     /// </summary>
-    public class ODataEnumDeserializer : ODataEdmTypeDeserializer
+    public ODataEnumDeserializer()
+        : base(ODataPayloadKind.Property)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataEnumDeserializer"/> class.
-        /// </summary>
-        public ODataEnumDeserializer()
-            : base(ODataPayloadKind.Property)
+    }
+
+    /// <inheritdoc />
+    public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+    {
+        if (messageReader == null)
         {
+            throw Error.ArgumentNull(nameof(messageReader));
         }
 
-        /// <inheritdoc />
-        public override async Task<object> ReadAsync(ODataMessageReader messageReader, Type type, ODataDeserializerContext readContext)
+        if (type == null)
         {
-            if (messageReader == null)
-            {
-                throw Error.ArgumentNull(nameof(messageReader));
-            }
-
-            if (type == null)
-            {
-                throw Error.ArgumentNull(nameof(type));
-            }
-
-            if (readContext == null)
-            {
-                throw Error.ArgumentNull(nameof(readContext));
-            }
-
-            IEdmTypeReference edmType = readContext.GetEdmType(type);
-            Contract.Assert(edmType != null);
-
-            ODataProperty property = await messageReader.ReadPropertyAsync(edmType).ConfigureAwait(false);
-            return ReadInline(property, edmType, readContext);
+            throw Error.ArgumentNull(nameof(type));
         }
 
-        /// <inheritdoc />
-        public override object ReadInline(object item, IEdmTypeReference edmType, ODataDeserializerContext readContext)
+        if (readContext == null)
         {
-            if (item == null)
-            {
-                return null;
-            }
+            throw Error.ArgumentNull(nameof(readContext));
+        }
 
-            if (readContext == null)
-            {
-                throw Error.ArgumentNull(nameof(readContext));
-            }
+        IEdmTypeReference edmType = readContext.GetEdmType(type);
+        Contract.Assert(edmType != null);
 
-            ODataProperty property = item as ODataProperty;
-            if (property != null)
-            {
-                item = property.Value;
-            }
+        ODataProperty property = await messageReader.ReadPropertyAsync(edmType).ConfigureAwait(false);
+        return ReadInline(property, edmType, readContext);
+    }
 
-            IEdmEnumTypeReference enumTypeReference = edmType.AsEnum();
-            ODataEnumValue enumValue = item as ODataEnumValue;
-            if (readContext.IsNoClrType)
-            {
-                Contract.Assert(edmType.TypeKind() == EdmTypeKind.Enum);
-                return new EdmEnumObject(enumTypeReference, enumValue.Value);
-            }
+    /// <inheritdoc />
+    public override object ReadInline(object item, IEdmTypeReference edmType, ODataDeserializerContext readContext)
+    {
+        if (item == null)
+        {
+            return null;
+        }
 
-            IEdmEnumType enumType = enumTypeReference.EnumDefinition();
+        if (readContext == null)
+        {
+            throw Error.ArgumentNull(nameof(readContext));
+        }
 
-            // Enum member supports model alias case. So, try to use the Edm member name to retrieve the Enum value.
-            var memberMapAnnotation = readContext.Model.GetClrEnumMemberAnnotation(enumType);
-            if (memberMapAnnotation != null)
+        ODataProperty property = item as ODataProperty;
+        if (property != null)
+        {
+            item = property.Value;
+        }
+
+        IEdmEnumTypeReference enumTypeReference = edmType.AsEnum();
+        ODataEnumValue enumValue = item as ODataEnumValue;
+        if (readContext.IsNoClrType)
+        {
+            Contract.Assert(edmType.TypeKind() == EdmTypeKind.Enum);
+            return new EdmEnumObject(enumTypeReference, enumValue.Value);
+        }
+
+        IEdmEnumType enumType = enumTypeReference.EnumDefinition();
+
+        // Enum member supports model alias case. So, try to use the Edm member name to retrieve the Enum value.
+        var memberMapAnnotation = readContext.Model.GetClrEnumMemberAnnotation(enumType);
+        if (memberMapAnnotation != null)
+        {
+            if (enumValue != null)
             {
-                if (enumValue != null)
+                IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name == enumValue.Value);
+                if (enumMember != null)
                 {
-                    IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name == enumValue.Value);
-                    if (enumMember != null)
+                    var clrMember = memberMapAnnotation.GetClrEnumMember(enumMember);
+                    if (clrMember != null)
                     {
-                        var clrMember = memberMapAnnotation.GetClrEnumMember(enumMember);
-                        if (clrMember != null)
-                        {
-                            return clrMember;
-                        }
+                        return clrMember;
                     }
                 }
             }
-
-            Type clrType = readContext.Model.GetClrType(edmType);
-            return EnumDeserializationHelpers.ConvertEnumValue(item, clrType);
         }
+
+        Type clrType = readContext.Model.GetClrType(edmType);
+        return EnumDeserializationHelpers.ConvertEnumValue(item, clrType);
     }
 }

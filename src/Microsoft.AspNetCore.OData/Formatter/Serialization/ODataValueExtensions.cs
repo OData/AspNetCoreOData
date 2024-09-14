@@ -7,24 +7,23 @@
 
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
+
+internal static class ODataValueExtensions
 {
-    internal static class ODataValueExtensions
+    public static object GetInnerValue(this ODataValue odataValue)
     {
-        public static object GetInnerValue(this ODataValue odataValue)
+        if (odataValue is ODataNullValue)
         {
-            if (odataValue is ODataNullValue)
-            {
-                return null;
-            }
-
-            ODataPrimitiveValue oDataPrimitiveValue = odataValue as ODataPrimitiveValue;
-            if (oDataPrimitiveValue != null)
-            {
-                return oDataPrimitiveValue.Value;
-            }
-
-            return odataValue;
+            return null;
         }
+
+        ODataPrimitiveValue oDataPrimitiveValue = odataValue as ODataPrimitiveValue;
+        if (oDataPrimitiveValue != null)
+        {
+            return oDataPrimitiveValue.Value;
+        }
+
+        return odataValue;
     }
 }

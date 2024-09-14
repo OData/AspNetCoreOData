@@ -12,71 +12,70 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Results;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests
+namespace Microsoft.AspNetCore.OData.NewtonsoftJson.Tests;
+
+public class JSingleResultValueConverterTests
 {
-    public class JSingleResultValueConverterTests
+    private static IQueryable<SingleCustomer> _customers = new List<SingleCustomer>
     {
-        private static IQueryable<SingleCustomer> _customers = new List<SingleCustomer>
+        new SingleCustomer
         {
-            new SingleCustomer
-            {
-                Id = 1,
-                Name = "XU"
-            },
-            new SingleCustomer
-            {
-                Id = 2,
-                Name = "WU"
-            },
-        }.AsQueryable();
-
-        [Theory]
-        [InlineData(typeof(SingleResult), true)]
-        [InlineData(typeof(SingleResult<object>), true)]
-        [InlineData(typeof(SelectExpandWrapper), false)]
-        [InlineData(typeof(object), false)]
-        public void CanConvertWorksForSingleResult(Type type, bool expected)
+            Id = 1,
+            Name = "XU"
+        },
+        new SingleCustomer
         {
-            // Arrange
-            JSingleResultValueConverter converter = new JSingleResultValueConverter();
+            Id = 2,
+            Name = "WU"
+        },
+    }.AsQueryable();
 
-            // Act & Assert
-            Assert.Equal(expected, converter.CanConvert(type));
-        }
+    [Theory]
+    [InlineData(typeof(SingleResult), true)]
+    [InlineData(typeof(SingleResult<object>), true)]
+    [InlineData(typeof(SelectExpandWrapper), false)]
+    [InlineData(typeof(object), false)]
+    public void CanConvertWorksForSingleResult(Type type, bool expected)
+    {
+        // Arrange
+        JSingleResultValueConverter converter = new JSingleResultValueConverter();
 
-        [Fact]
-        public void ReadJsonForSingleResultThrowsNotImplementedException()
-        {
-            // Arrange
-            JSingleResultValueConverter converter = new JSingleResultValueConverter();
-
-            // Act
-            Action test = () => converter.ReadJson(null, typeof(object), null, null);
-
-            // Assert
-            NotImplementedException exception = Assert.Throws<NotImplementedException>(test);
-            Assert.Equal(SRResources.ReadSingleResultNotImplemented, exception.Message);
-        }
-
-        [Fact]
-        public void CanWriteSingleResultToJsonUsingNewtonsoftJsonConverter()
-        {
-            // Arrange
-            SingleResult<SingleCustomer> pageResult = new SingleResult<SingleCustomer>(_customers);
-            JSingleResultValueConverter converter = new JSingleResultValueConverter();
-
-            // Act
-            string json = SerializeUtils.WriteJson(converter, pageResult);
-
-            // Assert
-            Assert.Equal("{\"Id\":1,\"Name\":\"XU\"}", json);
-        }
+        // Act & Assert
+        Assert.Equal(expected, converter.CanConvert(type));
     }
 
-    public class SingleCustomer
+    [Fact]
+    public void ReadJsonForSingleResultThrowsNotImplementedException()
     {
-        public int Id { get; set; }
+        // Arrange
+        JSingleResultValueConverter converter = new JSingleResultValueConverter();
 
-        public string Name { get; set; }
+        // Act
+        Action test = () => converter.ReadJson(null, typeof(object), null, null);
+
+        // Assert
+        NotImplementedException exception = Assert.Throws<NotImplementedException>(test);
+        Assert.Equal(SRResources.ReadSingleResultNotImplemented, exception.Message);
     }
+
+    [Fact]
+    public void CanWriteSingleResultToJsonUsingNewtonsoftJsonConverter()
+    {
+        // Arrange
+        SingleResult<SingleCustomer> pageResult = new SingleResult<SingleCustomer>(_customers);
+        JSingleResultValueConverter converter = new JSingleResultValueConverter();
+
+        // Act
+        string json = SerializeUtils.WriteJson(converter, pageResult);
+
+        // Assert
+        Assert.Equal("{\"Id\":1,\"Name\":\"XU\"}", json);
+    }
+}
+
+public class SingleCustomer
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; }
 }

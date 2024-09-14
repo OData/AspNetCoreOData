@@ -8,41 +8,40 @@
 using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 
-namespace Microsoft.AspNetCore.OData.Routing.Template
+namespace Microsoft.AspNetCore.OData.Routing.Template;
+
+/// <summary>
+/// Represents a template that could match "$metadata".
+/// </summary>
+public class MetadataSegmentTemplate : ODataSegmentTemplate
 {
     /// <summary>
-    /// Represents a template that could match "$metadata".
+    /// Gets the static instance of $metadata
     /// </summary>
-    public class MetadataSegmentTemplate : ODataSegmentTemplate
+    public static MetadataSegmentTemplate Instance { get; } = new MetadataSegmentTemplate();
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MetadataSegmentTemplate" /> class.
+    /// </summary>
+    private MetadataSegmentTemplate()
     {
-        /// <summary>
-        /// Gets the static instance of $metadata
-        /// </summary>
-        public static MetadataSegmentTemplate Instance { get; } = new MetadataSegmentTemplate();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MetadataSegmentTemplate" /> class.
-        /// </summary>
-        private MetadataSegmentTemplate()
+    /// <inheritdoc />
+    public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
+    {
+        yield return "/$metadata";
+    }
+
+    /// <inheritdoc />
+    public override bool TryTranslate(ODataTemplateTranslateContext context)
+    {
+        if (context == null)
         {
+            throw Error.ArgumentNull(nameof(context));
         }
 
-        /// <inheritdoc />
-        public override IEnumerable<string> GetTemplates(ODataRouteOptions options)
-        {
-            yield return "/$metadata";
-        }
-
-        /// <inheritdoc />
-        public override bool TryTranslate(ODataTemplateTranslateContext context)
-        {
-            if (context == null)
-            {
-                throw Error.ArgumentNull(nameof(context));
-            }
-
-            context.Segments.Add(MetadataSegment.Instance);
-            return true;
-        }
+        context.Segments.Add(MetadataSegment.Instance);
+        return true;
     }
 }

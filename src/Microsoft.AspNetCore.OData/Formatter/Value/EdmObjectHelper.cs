@@ -9,60 +9,59 @@ using System.Collections;
 using System.Diagnostics.Contracts;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Formatter.Value;
+
+internal static class EdmObjectHelper
 {
-    internal static class EdmObjectHelper
+    public static IEdmObject ConvertToEdmObject(this IEnumerable enumerable, IEdmCollectionTypeReference collectionType)
     {
-        public static IEdmObject ConvertToEdmObject(this IEnumerable enumerable, IEdmCollectionTypeReference collectionType)
+        Contract.Assert(enumerable != null);
+        Contract.Assert(collectionType != null);
+
+        if (enumerable is IEdmObject edmObject)
         {
-            Contract.Assert(enumerable != null);
-            Contract.Assert(collectionType != null);
-
-            if (enumerable is IEdmObject edmObject)
-            {
-                return edmObject;
-            }
-
-            IEdmTypeReference elementType = collectionType.ElementType();
-
-            if (elementType.IsEntity())
-            {
-                EdmEntityObjectCollection entityCollection =
-                                        new EdmEntityObjectCollection(collectionType);
-
-                foreach (EdmEntityObject entityObject in enumerable)
-                {
-                    entityCollection.Add(entityObject);
-                }
-
-                return entityCollection;
-            }
-            else if (elementType.IsComplex())
-            {
-                EdmComplexObjectCollection complexCollection =
-                                        new EdmComplexObjectCollection(collectionType);
-
-                foreach (EdmComplexObject complexObject in enumerable)
-                {
-                    complexCollection.Add(complexObject);
-                }
-
-                return complexCollection;
-            }
-            else if (elementType.IsEnum())
-            {
-                EdmEnumObjectCollection enumCollection =
-                                        new EdmEnumObjectCollection(collectionType);
-
-                foreach (EdmEnumObject enumObject in enumerable)
-                {
-                    enumCollection.Add(enumObject);
-                }
-
-                return enumCollection;
-            }
-
-            return null;
+            return edmObject;
         }
+
+        IEdmTypeReference elementType = collectionType.ElementType();
+
+        if (elementType.IsEntity())
+        {
+            EdmEntityObjectCollection entityCollection =
+                                    new EdmEntityObjectCollection(collectionType);
+
+            foreach (EdmEntityObject entityObject in enumerable)
+            {
+                entityCollection.Add(entityObject);
+            }
+
+            return entityCollection;
+        }
+        else if (elementType.IsComplex())
+        {
+            EdmComplexObjectCollection complexCollection =
+                                    new EdmComplexObjectCollection(collectionType);
+
+            foreach (EdmComplexObject complexObject in enumerable)
+            {
+                complexCollection.Add(complexObject);
+            }
+
+            return complexCollection;
+        }
+        else if (elementType.IsEnum())
+        {
+            EdmEnumObjectCollection enumCollection =
+                                    new EdmEnumObjectCollection(collectionType);
+
+            foreach (EdmEnumObject enumObject in enumerable)
+            {
+                enumCollection.Add(enumObject);
+            }
+
+            return enumCollection;
+        }
+
+        return null;
     }
 }

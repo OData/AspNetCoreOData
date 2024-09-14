@@ -10,47 +10,46 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;
+
+public class EdmEntityObjectTests
 {
-    public class EdmEntityObjectTests
+    [Fact]
+    public void CtorEdmEntityObject_ThrowsArgumentNull_IEdmEntityType()
     {
-        [Fact]
-        public void CtorEdmEntityObject_ThrowsArgumentNull_IEdmEntityType()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmEntityObject((IEdmEntityType)null), "edmType");
-        }
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmEntityObject((IEdmEntityType)null), "edmType");
+    }
 
-        [Fact]
-        public void CtorEdmEntityObject_ThrowsArgumentNull_IEdmEntityTypeAndNullable()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmEntityObject(null, true), "edmType");
-        }
+    [Fact]
+    public void CtorEdmEntityObject_ThrowsArgumentNull_IEdmEntityTypeAndNullable()
+    {
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmEntityObject(null, true), "edmType");
+    }
 
-        [Fact]
-        public void CtorEdmEntityObject_ThrowsArgumentNull_IEdmEntityTypeReference()
-        {
-            // Arrange & Act & Assert
-            ExceptionAssert.ThrowsArgumentNull(() => new EdmEntityObject((IEdmEntityTypeReference)null), "type");
-        }
+    [Fact]
+    public void CtorEdmEntityObject_ThrowsArgumentNull_IEdmEntityTypeReference()
+    {
+        // Arrange & Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => new EdmEntityObject((IEdmEntityTypeReference)null), "type");
+    }
 
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void CtorEdmEntityObject_SetProperties(bool isNullable)
-        {
-            // Arrange
-            IEdmEntityType entityType = new EdmEntityType("NS", "Entity");
-            IEdmEntityTypeReference entity = new EdmEntityTypeReference(entityType, isNullable);
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CtorEdmEntityObject_SetProperties(bool isNullable)
+    {
+        // Arrange
+        IEdmEntityType entityType = new EdmEntityType("NS", "Entity");
+        IEdmEntityTypeReference entity = new EdmEntityTypeReference(entityType, isNullable);
 
-            // Act
-            EdmEntityObject edmObject = new EdmEntityObject(entity);
+        // Act
+        EdmEntityObject edmObject = new EdmEntityObject(entity);
 
-            // Assert
-            Assert.Same(entityType, edmObject.ExpectedEdmType);
-            Assert.Same(entityType, edmObject.ActualEdmType);
-            Assert.Equal(isNullable, edmObject.IsNullable);
-        }
+        // Assert
+        Assert.Same(entityType, edmObject.ExpectedEdmType);
+        Assert.Same(entityType, edmObject.ActualEdmType);
+        Assert.Equal(isNullable, edmObject.IsNullable);
     }
 }

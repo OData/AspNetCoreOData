@@ -8,26 +8,25 @@
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.ModelBoundQuerySettings
+namespace Microsoft.AspNetCore.OData.E2E.Tests.ModelBoundQuerySettings;
+
+public class ModelBoundQuerySettingsEdmModel
 {
-    public class ModelBoundQuerySettingsEdmModel
+    public static IEdmModel GetEdmModel()
     {
-        public static IEdmModel GetEdmModel()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Author>("Authors");
-            builder.EntitySet<Book>("Books");
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Author>("Authors");
+        builder.EntitySet<Book>("Books");
 
-            return builder.GetEdmModel();
-        }
+        return builder.GetEdmModel();
+    }
 
-        public static IEdmModel GetEdmModelByModelBoundAPI()
-        {
-            var builder = new ODataConventionModelBuilder();
-            builder.EntitySet<Author>("Authors").EntityType.Filter("Books");
-            builder.EntitySet<Book>("Books").EntityType.Filter("BookId");
+    public static IEdmModel GetEdmModelByModelBoundAPI()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Author>("Authors").EntityType.Filter("Books");
+        builder.EntitySet<Book>("Books").EntityType.Filter("BookId");
 
-            return builder.GetEdmModel();
-        }
+        return builder.GetEdmModel();
     }
 }

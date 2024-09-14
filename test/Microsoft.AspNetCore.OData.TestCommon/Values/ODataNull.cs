@@ -5,13 +5,12 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.TestCommon.Values
+namespace Microsoft.AspNetCore.OData.TestCommon.Values;
+
+/// <summary>
+/// A OData null value.
+/// </summary>
+public class ODataNull : IODataValue
 {
-    /// <summary>
-    /// A OData null value.
-    /// </summary>
-    public class ODataNull : IODataValue
-    {
-        public static ODataNull Null = new ODataNull();
-    }
+    public static ODataNull Null = new ODataNull();
 }

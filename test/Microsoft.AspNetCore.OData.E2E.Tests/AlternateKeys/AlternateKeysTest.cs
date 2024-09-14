@@ -18,36 +18,36 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.AlternateKeys
+namespace Microsoft.AspNetCore.OData.E2E.Tests.AlternateKeys;
+
+public class AlternateKeysTest : WebApiTestBase<AlternateKeysTest>
 {
-    public class AlternateKeysTest : WebApiTestBase<AlternateKeysTest>
+    public AlternateKeysTest(WebApiTestFixture<AlternateKeysTest> fixture)
+        :base(fixture)
     {
-        public AlternateKeysTest(WebApiTestFixture<AlternateKeysTest> fixture)
-            :base(fixture)
+    }
+
+    protected static void UpdateConfigureServices(IServiceCollection services)
+    {
+        var controllers = new[]
         {
-        }
+            typeof (CustomersController), typeof (OrdersController), typeof (PeopleController),
+            typeof (CompaniesController), typeof (MetadataController)
+        };
 
-        protected static void UpdateConfigureServices(IServiceCollection services)
-        {
-            var controllers = new[]
-            {
-                typeof (CustomersController), typeof (OrdersController), typeof (PeopleController),
-                typeof (CompaniesController), typeof (MetadataController)
-            };
+        services.ConfigureControllers(controllers);
 
-            services.ConfigureControllers(controllers);
+        IEdmModel model = AlternateKeysEdmModel.GetEdmModel();
 
-            IEdmModel model = AlternateKeysEdmModel.GetEdmModel();
+        services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
+            .AddRouteComponents("odata", model,
+            services => services.AddSingleton<ODataUriResolver>(sp => new AlternateKeysODataUriResolver(model))));
+    }
 
-            services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddRouteComponents("odata", model,
-                services => services.AddSingleton<ODataUriResolver>(sp => new AlternateKeysODataUriResolver(model))));
-        }
-
-        [Fact]
-        public async Task AlteranteKeysMetadata()
-        {
-            string expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
+    [Fact]
+    public async Task AlteranteKeysMetadata()
+    {
+        string expect = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
 "<edmx:Edmx Version=\"4.0\" xmlns:edmx=\"http://docs.oasis-open.org/odata/ns/edmx\">\r\n" +
 "  <edmx:DataServices>\r\n" +
 "    <Schema Namespace=\"NS\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">\r\n" +
@@ -182,186 +182,185 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AlternateKeys
 "  </edmx:DataServices>\r\n" +
 "</edmx:Edmx>";
 
-            // Remove indentation
-            expect = Regex.Replace(expect, @"\r\n\s*<", @"<");
+        // Remove indentation
+        expect = Regex.Replace(expect, @"\r\n\s*<", @"<");
 
-            var requestUri = "odata/$metadata";
-            HttpClient client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(requestUri);
+        var requestUri = "odata/$metadata";
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.GetAsync(requestUri);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            string responseContent = await response.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        string responseContent = await response.Content.ReadAsStringAsync();
 
-            Assert.Equal(expect, responseContent);
-        }
+        Assert.Equal(expect, responseContent);
+    }
 
-        [Fact]
-        public async Task QueryEntityWithSingleAlternateKeysWorks()
+    [Fact]
+    public async Task QueryEntityWithSingleAlternateKeysWorks()
+    {
+        // query with alternate keys
+        string expect = "{" +
+                        "\"@odata.context\":\"http://localhost/odata/$metadata#Edm.String\",\"value\":\"special-SSN\"" +
+                        "}";
+
+        var requestUri = "odata/Customers(SSN='special-SSN')";
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+
+        response.EnsureSuccessStatusCode();
+        string responseContent = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(expect, responseContent);
+    }
+
+    public static TheoryDataSet<string, string> SingleAlternateKeysCases
+    {
+        get
         {
-            // query with alternate keys
-            string expect = "{" +
-                            "\"@odata.context\":\"http://localhost/odata/$metadata#Edm.String\",\"value\":\"special-SSN\"" +
-                            "}";
-
-            var requestUri = "odata/Customers(SSN='special-SSN')";
-            HttpClient client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(requestUri);
-
-            response.EnsureSuccessStatusCode();
-            string responseContent = await response.Content.ReadAsStringAsync();
-
-            Assert.Equal(expect, responseContent);
-        }
-
-        public static TheoryDataSet<string, string> SingleAlternateKeysCases
-        {
-            get
+            var data = new TheoryDataSet<string, string>();
+            for (int i = 1; i <= 5; i++)
             {
-                var data = new TheoryDataSet<string, string>();
-                for (int i = 1; i <= 5; i++)
-                {
-                    data.Add("Customers(" + i + ")", "Customers(SSN='SSN-" + i + "-" + (100 + i) + "')");
-                }
-
-                return data;
+                data.Add("Customers(" + i + ")", "Customers(SSN='SSN-" + i + "-" + (100 + i) + "')");
             }
-        }
 
-        [Theory]
-        [MemberData(nameof(SingleAlternateKeysCases))]
-        public async Task EntityWithSingleAlternateKeys_ReturnsSame_WithPrimitiveKey(string declaredKeys, string alternatekeys)
+            return data;
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(SingleAlternateKeysCases))]
+    public async Task EntityWithSingleAlternateKeys_ReturnsSame_WithPrimitiveKey(string declaredKeys, string alternatekeys)
+    {
+        // query with declared key
+        var requestUri = $"odata/{declaredKeys}";
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+
+        response.EnsureSuccessStatusCode();
+        string primitiveResponse = await response.Content.ReadAsStringAsync();
+
+        // query with alternate key
+        requestUri = $"odata/{alternatekeys}";
+        response = await client.GetAsync(requestUri);
+
+        response.EnsureSuccessStatusCode();
+        string alternatekeyResponse = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(primitiveResponse, alternatekeyResponse);
+    }
+
+    [Fact]
+    public async Task QueryEntityWithMultipleAlternateKeys_Returns_SameEntityWithPrimitiveKey()
+    {
+        // query with declared key
+        var requestUri = "odata/Orders(2)";
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+
+        response.EnsureSuccessStatusCode();
+        string primitiveResponse = await response.Content.ReadAsStringAsync();
+
+        // query with one alternate key
+        requestUri = "odata/Orders(Name='Order-2')";
+        response = await client.GetAsync(requestUri);
+        response.EnsureSuccessStatusCode();
+        string nameResponse = await response.Content.ReadAsStringAsync();
+
+        // query with another alternate key
+        requestUri = "odata/Orders(Token=75036B94-C836-4946-8CC8-054CF54060EC)";
+        response = await client.GetAsync(requestUri);
+        response.EnsureSuccessStatusCode();
+        string tokenResponse = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(primitiveResponse, nameResponse);
+        Assert.Equal(primitiveResponse, tokenResponse);
+    }
+
+    [Fact]
+    public async Task QueryEntityWithComposedAlternateKeys_Returns_SameEntityWithPrimitiveKey()
+    {
+        // query with declared key
+        var requestUri = "odata/People(2)";
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+
+        response.EnsureSuccessStatusCode();
+        string primitiveResponse = await response.Content.ReadAsStringAsync();
+
+        // query with composed alternate keys
+        requestUri = "odata/People(Country_Region='United States',Passport='9999')";
+        response = await client.GetAsync(requestUri);
+        response.EnsureSuccessStatusCode();
+        string composedResponse = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(primitiveResponse, composedResponse);
+    }
+
+    [Fact]
+    public async Task QueryFailedIfMissingAnyOfComposedAlternateKeys()
+    {
+        // Since this request matched "odata/People({key})", and key value is not valid.
+        // It throws exception
+        var requestUri = "odata/People(Country_Region='United States')";
+        HttpClient client = CreateClient();
+
+        try
         {
-            // query with declared key
-            var requestUri = $"odata/{declaredKeys}";
-            HttpClient client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(requestUri);
-
-            response.EnsureSuccessStatusCode();
-            string primitiveResponse = await response.Content.ReadAsStringAsync();
-
-            // query with alternate key
-            requestUri = $"odata/{alternatekeys}";
-            response = await client.GetAsync(requestUri);
-
-            response.EnsureSuccessStatusCode();
-            string alternatekeyResponse = await response.Content.ReadAsStringAsync();
-
-            Assert.Equal(primitiveResponse, alternatekeyResponse);
+            var response = await client.GetAsync(requestUri);
         }
-
-        [Fact]
-        public async Task QueryEntityWithMultipleAlternateKeys_Returns_SameEntityWithPrimitiveKey()
+        catch (ODataException ex)
         {
-            // query with declared key
-            var requestUri = "odata/Orders(2)";
-            HttpClient client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(requestUri);
-
-            response.EnsureSuccessStatusCode();
-            string primitiveResponse = await response.Content.ReadAsStringAsync();
-
-            // query with one alternate key
-            requestUri = "odata/Orders(Name='Order-2')";
-            response = await client.GetAsync(requestUri);
-            response.EnsureSuccessStatusCode();
-            string nameResponse = await response.Content.ReadAsStringAsync();
-
-            // query with another alternate key
-            requestUri = "odata/Orders(Token=75036B94-C836-4946-8CC8-054CF54060EC)";
-            response = await client.GetAsync(requestUri);
-            response.EnsureSuccessStatusCode();
-            string tokenResponse = await response.Content.ReadAsStringAsync();
-
-            Assert.Equal(primitiveResponse, nameResponse);
-            Assert.Equal(primitiveResponse, tokenResponse);
+            Assert.Equal("The key value (Country_Region='United States') from request is not valid. The key value should be format of type 'Edm.Int32'.", ex.Message);
         }
+    }
 
-        [Fact]
-        public async Task QueryEntityWithComposedAlternateKeys_Returns_SameEntityWithPrimitiveKey()
-        {
-            // query with declared key
-            var requestUri = "odata/People(2)";
-            HttpClient client = CreateClient();
-            HttpResponseMessage response = await client.GetAsync(requestUri);
+    /* ODL has the bug to parse the route template with complex property path expression.
+    [Fact]
+    public async Task QueryEntityWithComplexPropertyAlternateKeys_Returns_SameEntityWithPrimitiveKey()
+    {
+        HttpClient client = CreateClient();
 
-            response.EnsureSuccessStatusCode();
-            string primitiveResponse = await response.Content.ReadAsStringAsync();
+        // query with declared key
+        var requestUri = "odata/Companies(2)";
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+        response.EnsureSuccessStatusCode();
+        string responseContent1 = await response.Content.ReadAsStringAsync();
 
-            // query with composed alternate keys
-            requestUri = "odata/People(Country_Region='United States',Passport='9999')";
-            response = await client.GetAsync(requestUri);
-            response.EnsureSuccessStatusCode();
-            string composedResponse = await response.Content.ReadAsStringAsync();
+        // query with complex alternate key
+        requestUri = "odata/Companies(Code=30)";
+        response = await client.GetAsync(requestUri);
+        response.EnsureSuccessStatusCode();
+        string responseContent2 = await response.Content.ReadAsStringAsync();
+        Assert.Equal(responseContent1, responseContent2);
 
-            Assert.Equal(primitiveResponse, composedResponse);
-        }
+        // query with complex alternate key
+        requestUri = "odata/Companies(City='Guangzhou',Street='Xiaoxiang Rd')";
+        response = await client.GetAsync(requestUri);
+        string responseContent3 = await response.Content.ReadAsStringAsync();
+        Assert.Equal(responseContent2, responseContent3);
+    }
+    */
 
-        [Fact]
-        public async Task QueryFailedIfMissingAnyOfComposedAlternateKeys()
-        {
-            // Since this request matched "odata/People({key})", and key value is not valid.
-            // It throws exception
-            var requestUri = "odata/People(Country_Region='United States')";
-            HttpClient client = CreateClient();
+    [Fact]
+    public async Task CanUpdateEntityWithSingleAlternateKeys()
+    {
+        string expect = "{" +
+                        "\"@odata.context\":\"http://localhost/odata/$metadata#Customers/$entity\",\"ID\":6,\"Name\":\"Updated Customer Name\",\"SSN\":\"SSN-6-T-006\"" +
+                        "}";
 
-            try
-            {
-                var response = await client.GetAsync(requestUri);
-            }
-            catch (ODataException ex)
-            {
-                Assert.Equal("The key value (Country_Region='United States') from request is not valid. The key value should be format of type 'Edm.Int32'.", ex.Message);
-            }
-        }
+        var requestUri = "odata/Customers(SSN='SSN-6-T-006')";
 
-        /* ODL has the bug to parse the route template with complex property path expression.
-        [Fact]
-        public async Task QueryEntityWithComplexPropertyAlternateKeys_Returns_SameEntityWithPrimitiveKey()
-        {
-            HttpClient client = CreateClient();
+        HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
+        const string content = @"{'Name':'Updated Customer Name'}";
+        request.Content = new StringContent(content);
+        request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        HttpClient client = CreateClient();
 
-            // query with declared key
-            var requestUri = "odata/Companies(2)";
-            HttpResponseMessage response = await client.GetAsync(requestUri);
-            response.EnsureSuccessStatusCode();
-            string responseContent1 = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await client.SendAsync(request);
 
-            // query with complex alternate key
-            requestUri = "odata/Companies(Code=30)";
-            response = await client.GetAsync(requestUri);
-            response.EnsureSuccessStatusCode();
-            string responseContent2 = await response.Content.ReadAsStringAsync();
-            Assert.Equal(responseContent1, responseContent2);
+        response.EnsureSuccessStatusCode();
+        string responseContent = await response.Content.ReadAsStringAsync();
 
-            // query with complex alternate key
-            requestUri = "odata/Companies(City='Guangzhou',Street='Xiaoxiang Rd')";
-            response = await client.GetAsync(requestUri);
-            string responseContent3 = await response.Content.ReadAsStringAsync();
-            Assert.Equal(responseContent2, responseContent3);
-        }
-        */
-
-        [Fact]
-        public async Task CanUpdateEntityWithSingleAlternateKeys()
-        {
-            string expect = "{" +
-                            "\"@odata.context\":\"http://localhost/odata/$metadata#Customers/$entity\",\"ID\":6,\"Name\":\"Updated Customer Name\",\"SSN\":\"SSN-6-T-006\"" +
-                            "}";
-
-            var requestUri = "odata/Customers(SSN='SSN-6-T-006')";
-
-            HttpRequestMessage request = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
-            const string content = @"{'Name':'Updated Customer Name'}";
-            request.Content = new StringContent(content);
-            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-            HttpClient client = CreateClient();
-
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            response.EnsureSuccessStatusCode();
-            string responseContent = await response.Content.ReadAsStringAsync();
-
-            Assert.Equal(expect, responseContent);
-        }
+        Assert.Equal(expect, responseContent);
     }
 }

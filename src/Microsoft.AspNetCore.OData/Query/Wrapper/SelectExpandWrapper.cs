@@ -12,154 +12,153 @@ using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Query.Wrapper
+namespace Microsoft.AspNetCore.OData.Query.Wrapper;
+
+internal abstract class SelectExpandWrapper : IEdmEntityObject, ISelectExpandWrapper
 {
-    internal abstract class SelectExpandWrapper : IEdmEntityObject, ISelectExpandWrapper
+    private static readonly IPropertyMapper DefaultPropertyMapper = new IdentityPropertyMapper();
+    private static readonly Func<IEdmModel, IEdmStructuredType, IPropertyMapper> _mapperProvider =
+        (IEdmModel m, IEdmStructuredType t) => DefaultPropertyMapper;
+
+    private Dictionary<string, object> _containerDict;
+    private TypedEdmStructuredObject _typedEdmStructuredObject;
+
+    /// <summary>
+    /// Gets or sets the property container that contains the properties being expanded. 
+    /// </summary>
+    public PropertyContainer Container { get; set; }
+
+    /// <summary>
+    /// The Edm Model associated with the wrapper.
+    /// EntityFramework does not let us inject non primitive constant values (like IEdmModel).
+    /// However, we can always 'parameterize" this non-constant value.
+    /// </summary>
+    public IEdmModel Model { get; set; }
+
+    /// <inheritdoc />
+    public object UntypedInstance { get; set; }
+
+    /// <summary>
+    /// Gets or sets the instance type name
+    /// </summary>
+    public string InstanceType { get; set; }
+
+    /// <summary>
+    /// Indicates whether the underlying instance can be used to obtain property values.
+    /// </summary>
+    public bool UseInstanceForProperties { get; set; }
+
+    /// <inheritdoc />
+    public IEdmTypeReference GetEdmType()
     {
-        private static readonly IPropertyMapper DefaultPropertyMapper = new IdentityPropertyMapper();
-        private static readonly Func<IEdmModel, IEdmStructuredType, IPropertyMapper> _mapperProvider =
-            (IEdmModel m, IEdmStructuredType t) => DefaultPropertyMapper;
+        IEdmModel model = Model;
 
-        private Dictionary<string, object> _containerDict;
-        private TypedEdmStructuredObject _typedEdmStructuredObject;
-
-        /// <summary>
-        /// Gets or sets the property container that contains the properties being expanded. 
-        /// </summary>
-        public PropertyContainer Container { get; set; }
-
-        /// <summary>
-        /// The Edm Model associated with the wrapper.
-        /// EntityFramework does not let us inject non primitive constant values (like IEdmModel).
-        /// However, we can always 'parameterize" this non-constant value.
-        /// </summary>
-        public IEdmModel Model { get; set; }
-
-        /// <inheritdoc />
-        public object UntypedInstance { get; set; }
-
-        /// <summary>
-        /// Gets or sets the instance type name
-        /// </summary>
-        public string InstanceType { get; set; }
-
-        /// <summary>
-        /// Indicates whether the underlying instance can be used to obtain property values.
-        /// </summary>
-        public bool UseInstanceForProperties { get; set; }
-
-        /// <inheritdoc />
-        public IEdmTypeReference GetEdmType()
+        if (InstanceType != null)
         {
+            IEdmStructuredType structuredType = model.FindType(InstanceType) as IEdmStructuredType;
+            IEdmEntityType entityType = structuredType as IEdmEntityType;
+
+            if (entityType != null)
+            {
+                return entityType.ToEdmTypeReference(true);
+            }
+
+            return structuredType.ToEdmTypeReference(true);
+        }
+
+        Type elementType = GetElementType();
+
+        return model.GetEdmTypeReference(elementType);
+    }
+
+    /// <inheritdoc />
+    public bool TryGetPropertyValue(string propertyName, out object value)
+    {
+        // look into the container first to see if it has that property. container would have it 
+        // if the property was expanded.
+        if (Container != null)
+        {
+            _containerDict = _containerDict ?? Container.ToDictionary(DefaultPropertyMapper, includeAutoSelected: true);
+            if (_containerDict.TryGetValue(propertyName, out value))
+            {
+                return true;
+            }
+        }
+
+        // fall back to the instance.
+        if (UseInstanceForProperties && UntypedInstance != null)
+        {
+            IEdmTypeReference edmTypeReference = GetEdmType();
             IEdmModel model = Model;
-
-            if (InstanceType != null)
+            if (edmTypeReference is IEdmComplexTypeReference)
             {
-                IEdmStructuredType structuredType = model.FindType(InstanceType) as IEdmStructuredType;
-                IEdmEntityType entityType = structuredType as IEdmEntityType;
-
-                if (entityType != null)
-                {
-                    return entityType.ToEdmTypeReference(true);
-                }
-
-                return structuredType.ToEdmTypeReference(true);
+                _typedEdmStructuredObject = _typedEdmStructuredObject ??
+                    new TypedEdmComplexObject(UntypedInstance, edmTypeReference as IEdmComplexTypeReference, model);
+            }
+            else
+            {
+                _typedEdmStructuredObject = _typedEdmStructuredObject ??
+                    new TypedEdmEntityObject(UntypedInstance, edmTypeReference as IEdmEntityTypeReference, model);
             }
 
-            Type elementType = GetElementType();
-
-            return model.GetEdmTypeReference(elementType);
+            return _typedEdmStructuredObject.TryGetPropertyValue(propertyName, out value);
         }
 
-        /// <inheritdoc />
-        public bool TryGetPropertyValue(string propertyName, out object value)
+        value = null;
+        return false;
+    }
+
+    public IDictionary<string, object> ToDictionary()
+    {
+        return ToDictionary(_mapperProvider);
+    }
+
+    public IDictionary<string, object> ToDictionary(Func<IEdmModel, IEdmStructuredType, IPropertyMapper> mapperProvider)
+    {
+        if (mapperProvider == null)
         {
-            // look into the container first to see if it has that property. container would have it 
-            // if the property was expanded.
-            if (Container != null)
-            {
-                _containerDict = _containerDict ?? Container.ToDictionary(DefaultPropertyMapper, includeAutoSelected: true);
-                if (_containerDict.TryGetValue(propertyName, out value))
-                {
-                    return true;
-                }
-            }
-
-            // fall back to the instance.
-            if (UseInstanceForProperties && UntypedInstance != null)
-            {
-                IEdmTypeReference edmTypeReference = GetEdmType();
-                IEdmModel model = Model;
-                if (edmTypeReference is IEdmComplexTypeReference)
-                {
-                    _typedEdmStructuredObject = _typedEdmStructuredObject ??
-                        new TypedEdmComplexObject(UntypedInstance, edmTypeReference as IEdmComplexTypeReference, model);
-                }
-                else
-                {
-                    _typedEdmStructuredObject = _typedEdmStructuredObject ??
-                        new TypedEdmEntityObject(UntypedInstance, edmTypeReference as IEdmEntityTypeReference, model);
-                }
-
-                return _typedEdmStructuredObject.TryGetPropertyValue(propertyName, out value);
-            }
-
-            value = null;
-            return false;
+            throw Error.ArgumentNull("mapperProvider");
         }
 
-        public IDictionary<string, object> ToDictionary()
+        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+        IEdmStructuredType type = GetEdmType().AsStructured().StructuredDefinition();
+
+        IPropertyMapper mapper = mapperProvider(Model, type);
+        if (mapper == null)
         {
-            return ToDictionary(_mapperProvider);
+            throw Error.InvalidOperation(SRResources.InvalidPropertyMapper, typeof(IPropertyMapper).FullName,
+                type.FullTypeName());
         }
 
-        public IDictionary<string, object> ToDictionary(Func<IEdmModel, IEdmStructuredType, IPropertyMapper> mapperProvider)
+        if (Container != null)
         {
-            if (mapperProvider == null)
-            {
-                throw Error.ArgumentNull("mapperProvider");
-            }
+            dictionary = Container.ToDictionary(mapper, includeAutoSelected: false);
+        }
 
-            Dictionary<string, object> dictionary = new Dictionary<string, object>();
-            IEdmStructuredType type = GetEdmType().AsStructured().StructuredDefinition();
-
-            IPropertyMapper mapper = mapperProvider(Model, type);
-            if (mapper == null)
+        // The user asked for all the structural properties on this instance.
+        if (UseInstanceForProperties && UntypedInstance != null)
+        {
+            foreach (IEdmStructuralProperty property in type.StructuralProperties())
             {
-                throw Error.InvalidOperation(SRResources.InvalidPropertyMapper, typeof(IPropertyMapper).FullName,
-                    type.FullTypeName());
-            }
-
-            if (Container != null)
-            {
-                dictionary = Container.ToDictionary(mapper, includeAutoSelected: false);
-            }
-
-            // The user asked for all the structural properties on this instance.
-            if (UseInstanceForProperties && UntypedInstance != null)
-            {
-                foreach (IEdmStructuralProperty property in type.StructuralProperties())
+                object propertyValue;
+                if (TryGetPropertyValue(property.Name, out propertyValue))
                 {
-                    object propertyValue;
-                    if (TryGetPropertyValue(property.Name, out propertyValue))
+                    string mappingName = mapper.MapProperty(property.Name);
+                    if (mappingName != null)
                     {
-                        string mappingName = mapper.MapProperty(property.Name);
-                        if (mappingName != null)
+                        if (String.IsNullOrWhiteSpace(mappingName))
                         {
-                            if (String.IsNullOrWhiteSpace(mappingName))
-                            {
-                                throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, property.Name);
-                            }
-
-                            dictionary[mappingName] = propertyValue;
+                            throw Error.InvalidOperation(SRResources.InvalidPropertyMapping, property.Name);
                         }
+
+                        dictionary[mappingName] = propertyValue;
                     }
                 }
             }
-
-            return dictionary;
         }
 
-        protected abstract Type GetElementType();
+        return dictionary;
     }
+
+    protected abstract Type GetElementType();
 }

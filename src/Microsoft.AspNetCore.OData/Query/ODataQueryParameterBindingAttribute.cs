@@ -19,159 +19,158 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.Query
+namespace Microsoft.AspNetCore.OData.Query;
+
+/// <summary>
+/// A <see cref="ModelBinderAttribute"/> to bind parameters of type <see cref="ODataQueryOptions"/> to the OData query from the incoming request.
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = true, AllowMultiple = false)]
+public sealed class ODataQueryParameterBindingAttribute : ModelBinderAttribute
 {
     /// <summary>
-    /// A <see cref="ModelBinderAttribute"/> to bind parameters of type <see cref="ODataQueryOptions"/> to the OData query from the incoming request.
+    /// Instantiates a new instance of the <see cref="ODataQueryParameterBindingAttribute"/> class.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Parameter, Inherited = true, AllowMultiple = false)]
-    public sealed class ODataQueryParameterBindingAttribute : ModelBinderAttribute
+    public ODataQueryParameterBindingAttribute()
+        : base(typeof(ODataQueryParameterBinding))
     {
-        /// <summary>
-        /// Instantiates a new instance of the <see cref="ODataQueryParameterBindingAttribute"/> class.
-        /// </summary>
-        public ODataQueryParameterBindingAttribute()
-            : base(typeof(ODataQueryParameterBinding))
+    }
+
+    internal static Type GetEntityClrTypeFromParameterType(Type parameterType)
+    {
+        Contract.Assert(parameterType != null);
+
+        if (parameterType.IsGenericType &&
+            parameterType.GetGenericTypeDefinition() == typeof(ODataQueryOptions<>))
         {
+            return parameterType.GetGenericArguments().Single();
         }
 
-        internal static Type GetEntityClrTypeFromParameterType(Type parameterType)
+        return null;
+    }
+
+    internal class ODataQueryParameterBinding : IModelBinder
+    {
+        private static MethodInfo _createODataQueryOptions = typeof(ODataQueryParameterBinding).GetMethod("CreateODataQueryOptions");
+        private const string CreateODataQueryOptionsCtorKey = "MS_CreateODataQueryOptionsOfT";
+
+        public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            Contract.Assert(parameterType != null);
-
-            if (parameterType.IsGenericType &&
-                parameterType.GetGenericTypeDefinition() == typeof(ODataQueryOptions<>))
+            if (bindingContext == null)
             {
-                return parameterType.GetGenericArguments().Single();
+                throw Error.ArgumentNull(nameof(bindingContext));
             }
 
-            return null;
-        }
-
-        internal class ODataQueryParameterBinding : IModelBinder
-        {
-            private static MethodInfo _createODataQueryOptions = typeof(ODataQueryParameterBinding).GetMethod("CreateODataQueryOptions");
-            private const string CreateODataQueryOptionsCtorKey = "MS_CreateODataQueryOptionsOfT";
-
-            public Task BindModelAsync(ModelBindingContext bindingContext)
+            HttpRequest request = bindingContext.HttpContext.Request;
+            if (request == null)
             {
-                if (bindingContext == null)
-                {
-                    throw Error.ArgumentNull(nameof(bindingContext));
-                }
-
-                HttpRequest request = bindingContext.HttpContext.Request;
-                if (request == null)
-                {
-                    throw Error.Argument("bindingContext", SRResources.ModelBindingContextMustHaveRequest);
-                }
-
-                ActionDescriptor actionDescriptor = bindingContext.ActionContext.ActionDescriptor;
-                if (actionDescriptor == null)
-                {
-                    throw Error.Argument("actionContext", SRResources.ActionContextMustHaveDescriptor);
-                }
-
-                // Get the parameter description of the parameter to bind.
-                ParameterDescriptor paramDescriptor = bindingContext.ActionContext.ActionDescriptor.Parameters
-                    .Where(p => p.Name == bindingContext.FieldName)
-                    .FirstOrDefault();
-
-                // Now make sure parameter type is ODataQueryOptions or ODataQueryOptions<T>.
-                Type parameterType = paramDescriptor?.ParameterType;
-                if (IsODataQueryOptions(parameterType))
-                {
-                    // Get the entity type from the parameter type if it is ODataQueryOptions<T>.
-                    // Fall back to the return type if not. Also, note that the entity type from the return type and ODataQueryOptions<T>
-                    // can be different (example implementing $select or $expand).
-                    Type entityClrType = null;
-                    if (paramDescriptor != null)
-                    {
-                        entityClrType = GetEntityClrTypeFromParameterType(parameterType);
-                    }
-
-                    if (entityClrType == null)
-                    {
-                        entityClrType = GetEntityClrTypeFromActionReturnType(actionDescriptor);
-                    }
-
-                    // In 7.x, GetModel() from request will return "EdmCoreModel.Instance" for non-model scenario
-                    // In 8.x, GetModel() return null.
-                    IEdmModel userModel = request.GetModel();
-                    IEdmModel model = userModel ?? actionDescriptor.GetEdmModel(request, entityClrType);
-                    ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, request.ODataFeature().Path);
-
-                    Func<ODataQueryContext, HttpRequest, ODataQueryOptions> createODataQueryOptions;
-                    object constructorAsObject = null;
-                    if (actionDescriptor.Properties.TryGetValue(CreateODataQueryOptionsCtorKey, out constructorAsObject))
-                    {
-                        createODataQueryOptions = (Func<ODataQueryContext, HttpRequest, ODataQueryOptions>)constructorAsObject;
-                    }
-                    else
-                    {
-                        createODataQueryOptions = (Func<ODataQueryContext, HttpRequest, ODataQueryOptions>)
-                            Delegate.CreateDelegate(typeof(Func<ODataQueryContext, HttpRequest, ODataQueryOptions>),
-                                _createODataQueryOptions.MakeGenericMethod(entityClrType));
-                    };
-
-                    ODataQueryOptions parameterValue = createODataQueryOptions(entitySetContext, request);
-                    bindingContext.Result = ModelBindingResult.Success(parameterValue);
-                }
-
-                return Task.CompletedTask;
+                throw Error.Argument("bindingContext", SRResources.ModelBindingContextMustHaveRequest);
             }
 
-            public static bool IsODataQueryOptions(Type parameterType)
+            ActionDescriptor actionDescriptor = bindingContext.ActionContext.ActionDescriptor;
+            if (actionDescriptor == null)
             {
-                if (parameterType == null)
-                {
-                    return false;
-                }
-
-                return ((parameterType == typeof(ODataQueryOptions)) ||
-                        (parameterType.IsGenericType &&
-                         parameterType.GetGenericTypeDefinition() == typeof(ODataQueryOptions<>)));
+                throw Error.Argument("actionContext", SRResources.ActionContextMustHaveDescriptor);
             }
 
-            public static ODataQueryOptions<T> CreateODataQueryOptions<T>(ODataQueryContext context, HttpRequest request)
+            // Get the parameter description of the parameter to bind.
+            ParameterDescriptor paramDescriptor = bindingContext.ActionContext.ActionDescriptor.Parameters
+                .Where(p => p.Name == bindingContext.FieldName)
+                .FirstOrDefault();
+
+            // Now make sure parameter type is ODataQueryOptions or ODataQueryOptions<T>.
+            Type parameterType = paramDescriptor?.ParameterType;
+            if (IsODataQueryOptions(parameterType))
             {
-                return new ODataQueryOptions<T>(context, request);
-            }
-
-            internal static Type GetEntityClrTypeFromActionReturnType(ActionDescriptor actionDescriptor)
-            {
-                // It is a developer programming error to use this binding attribute
-                // on actions that return void.
-                ControllerActionDescriptor controllerActionDescriptor = actionDescriptor as ControllerActionDescriptor;
-                if (controllerActionDescriptor == null)
+                // Get the entity type from the parameter type if it is ODataQueryOptions<T>.
+                // Fall back to the return type if not. Also, note that the entity type from the return type and ODataQueryOptions<T>
+                // can be different (example implementing $select or $expand).
+                Type entityClrType = null;
+                if (paramDescriptor != null)
                 {
-                    throw Error.InvalidOperation(SRResources.ActionDescriptorNotControllerActionDescriptor);
+                    entityClrType = GetEntityClrTypeFromParameterType(parameterType);
                 }
-
-                if (controllerActionDescriptor.MethodInfo.ReturnType == null)
-                {
-                    throw Error.InvalidOperation(
-                                    SRResources.FailedToBuildEdmModelBecauseReturnTypeIsNull,
-                                    controllerActionDescriptor.ActionName,
-                                    controllerActionDescriptor.ControllerName);
-                }
-
-                Type entityClrType = TypeHelper.GetImplementedIEnumerableType(controllerActionDescriptor.MethodInfo.ReturnType);
 
                 if (entityClrType == null)
                 {
-                    // It is a developer programming error to use this binding attribute
-                    // on actions that return a collection whose element type cannot be
-                    // determined, such as a non-generic IQueryable or IEnumerable.
-                    throw Error.InvalidOperation(
-                                    SRResources.FailedToRetrieveTypeToBuildEdmModel,
-                                    controllerActionDescriptor.ActionName,
-                                    controllerActionDescriptor.ControllerName,
-                                    controllerActionDescriptor.MethodInfo.ReturnType.FullName);
+                    entityClrType = GetEntityClrTypeFromActionReturnType(actionDescriptor);
                 }
 
-                return entityClrType;
+                // In 7.x, GetModel() from request will return "EdmCoreModel.Instance" for non-model scenario
+                // In 8.x, GetModel() return null.
+                IEdmModel userModel = request.GetModel();
+                IEdmModel model = userModel ?? actionDescriptor.GetEdmModel(request, entityClrType);
+                ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, request.ODataFeature().Path);
+
+                Func<ODataQueryContext, HttpRequest, ODataQueryOptions> createODataQueryOptions;
+                object constructorAsObject = null;
+                if (actionDescriptor.Properties.TryGetValue(CreateODataQueryOptionsCtorKey, out constructorAsObject))
+                {
+                    createODataQueryOptions = (Func<ODataQueryContext, HttpRequest, ODataQueryOptions>)constructorAsObject;
+                }
+                else
+                {
+                    createODataQueryOptions = (Func<ODataQueryContext, HttpRequest, ODataQueryOptions>)
+                        Delegate.CreateDelegate(typeof(Func<ODataQueryContext, HttpRequest, ODataQueryOptions>),
+                            _createODataQueryOptions.MakeGenericMethod(entityClrType));
+                };
+
+                ODataQueryOptions parameterValue = createODataQueryOptions(entitySetContext, request);
+                bindingContext.Result = ModelBindingResult.Success(parameterValue);
             }
+
+            return Task.CompletedTask;
+        }
+
+        public static bool IsODataQueryOptions(Type parameterType)
+        {
+            if (parameterType == null)
+            {
+                return false;
+            }
+
+            return ((parameterType == typeof(ODataQueryOptions)) ||
+                    (parameterType.IsGenericType &&
+                     parameterType.GetGenericTypeDefinition() == typeof(ODataQueryOptions<>)));
+        }
+
+        public static ODataQueryOptions<T> CreateODataQueryOptions<T>(ODataQueryContext context, HttpRequest request)
+        {
+            return new ODataQueryOptions<T>(context, request);
+        }
+
+        internal static Type GetEntityClrTypeFromActionReturnType(ActionDescriptor actionDescriptor)
+        {
+            // It is a developer programming error to use this binding attribute
+            // on actions that return void.
+            ControllerActionDescriptor controllerActionDescriptor = actionDescriptor as ControllerActionDescriptor;
+            if (controllerActionDescriptor == null)
+            {
+                throw Error.InvalidOperation(SRResources.ActionDescriptorNotControllerActionDescriptor);
+            }
+
+            if (controllerActionDescriptor.MethodInfo.ReturnType == null)
+            {
+                throw Error.InvalidOperation(
+                                SRResources.FailedToBuildEdmModelBecauseReturnTypeIsNull,
+                                controllerActionDescriptor.ActionName,
+                                controllerActionDescriptor.ControllerName);
+            }
+
+            Type entityClrType = TypeHelper.GetImplementedIEnumerableType(controllerActionDescriptor.MethodInfo.ReturnType);
+
+            if (entityClrType == null)
+            {
+                // It is a developer programming error to use this binding attribute
+                // on actions that return a collection whose element type cannot be
+                // determined, such as a non-generic IQueryable or IEnumerable.
+                throw Error.InvalidOperation(
+                                SRResources.FailedToRetrieveTypeToBuildEdmModel,
+                                controllerActionDescriptor.ActionName,
+                                controllerActionDescriptor.ControllerName,
+                                controllerActionDescriptor.MethodInfo.ReturnType.FullName);
+            }
+
+            return entityClrType;
         }
     }
 }

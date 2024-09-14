@@ -19,140 +19,139 @@ using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
+namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
+
+public class ODataEntityReferenceLinkDeserializerTests
 {
-    public class ODataEntityReferenceLinkDeserializerTests
+    [Fact]
+    public void Ctor_DoesnotThrow()
     {
-        [Fact]
-        public void Ctor_DoesnotThrow()
+        // Arrange
+        var deserializer = new ODataEntityReferenceLinkDeserializer();
+
+        // Act & Assert
+        Assert.Equal(ODataPayloadKind.EntityReferenceLink, deserializer.ODataPayloadKind);
+    }
+
+    [Fact]
+    public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
+    {
+        // Arrange
+        var deserializer = new ODataEntityReferenceLinkDeserializer();
+
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => deserializer.ReadAsync(messageReader: null, type: null, readContext: new ODataDeserializerContext()),
+            "messageReader");
+    }
+
+    [Fact]
+    public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
+    {
+        // Arrange
+        var deserializer = new ODataEntityReferenceLinkDeserializer();
+        ODataMessageReader messageReader = ODataTestUtil.GetMockODataMessageReader();
+
+        // Act & Assert
+        await ExceptionAssert.ThrowsArgumentNullAsync(
+            () => deserializer.ReadAsync(messageReader, type: null, readContext: null),
+            "readContext");
+    }
+
+    [Fact]
+    public async Task ReadAsync_RoundTrips()
+    {
+        // Arrange
+        IEdmModel model = CreateModel();
+        var deserializer = new ODataEntityReferenceLinkDeserializer();
+        MockODataRequestMessage requestMessage = new MockODataRequestMessage();
+        ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
         {
-            // Arrange
-            var deserializer = new ODataEntityReferenceLinkDeserializer();
+            ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/") }
+        };
+        settings.SetContentType(ODataFormat.Json);
 
-            // Act & Assert
-            Assert.Equal(ODataPayloadKind.EntityReferenceLink, deserializer.ODataPayloadKind);
-        }
+        ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, settings);
+        await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
 
-        [Fact]
-        public async Task ReadAsync_ThrowsArgumentNull_MessageReader()
+        var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
+        request.ODataFeature().RoutePrefix = "odata";
+        ODataMessageReaderSettings readSettings = new ODataMessageReaderSettings();
+        ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage), readSettings, model);
+        ODataDeserializerContext context = new ODataDeserializerContext
         {
-            // Arrange
-            var deserializer = new ODataEntityReferenceLinkDeserializer();
+            Request = request,
+            Path = new ODataPath(new NavigationPropertySegment(GetNavigationProperty(model), navigationSource: null))
+        };
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => deserializer.ReadAsync(messageReader: null, type: null, readContext: new ODataDeserializerContext()),
-                "messageReader");
-        }
+        // Act
+        Uri uri = await deserializer.ReadAsync(messageReader, typeof(Uri), context) as Uri;
 
-        [Fact]
-        public async Task ReadAsync_ThrowsArgumentNull_ReadContext()
+        // Assert
+        Assert.NotNull(uri);
+        Assert.Equal("http://localhost/samplelink", uri.AbsoluteUri);
+    }
+
+    [Fact]
+    public async Task ReadJsonLightAsync()
+    {
+        // Arrange
+        var deserializer = new ODataEntityReferenceLinkDeserializer();
+        MockODataRequestMessage requestMessage = new MockODataRequestMessage();
+        ODataMessageWriterSettings writerSettings = new ODataMessageWriterSettings();
+        writerSettings.SetContentType(ODataFormat.Json);
+        IEdmModel model = CreateModel();
+        ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, writerSettings, model);
+        await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
+        ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage),
+            new ODataMessageReaderSettings(), model);
+
+        IEdmNavigationProperty navigationProperty = GetNavigationProperty(model);
+
+        var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
+        request.ODataFeature().RoutePrefix = "odata";
+        ODataDeserializerContext context = new ODataDeserializerContext
         {
-            // Arrange
-            var deserializer = new ODataEntityReferenceLinkDeserializer();
-            ODataMessageReader messageReader = ODataTestUtil.GetMockODataMessageReader();
+            Request = request,
+            Path = new ODataPath(new NavigationPropertySegment(navigationProperty, navigationSource: null))
+        };
 
-            // Act & Assert
-            await ExceptionAssert.ThrowsArgumentNullAsync(
-                () => deserializer.ReadAsync(messageReader, type: null, readContext: null),
-                "readContext");
-        }
+        // Act
+        Uri uri = await deserializer.ReadAsync(messageReader, typeof(Uri), context) as Uri;
 
-        [Fact]
-        public async Task ReadAsync_RoundTrips()
-        {
-            // Arrange
-            IEdmModel model = CreateModel();
-            var deserializer = new ODataEntityReferenceLinkDeserializer();
-            MockODataRequestMessage requestMessage = new MockODataRequestMessage();
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
-            {
-                ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/") }
-            };
-            settings.SetContentType(ODataFormat.Json);
+        // Assert
+        Assert.NotNull(uri);
+        Assert.Equal("http://localhost/samplelink", uri.AbsoluteUri);
+    }
 
-            ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, settings);
-            await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
+    private static IEdmModel CreateModel()
+    {
+        Mock<ODataModelBuilder> mock = new Mock<ODataModelBuilder>();
+        mock.Setup(b => b.ValidateModel(It.IsAny<IEdmModel>())).Callback(() => { });
+        mock.CallBase = true;
+        ODataModelBuilder builder = mock.Object;
+        EntitySetConfiguration<Entity> entities = builder.EntitySet<Entity>("entities");
+        builder.EntitySet<RelatedEntity>("related");
+        NavigationPropertyConfiguration entityToRelated =
+            entities.EntityType.HasOptional<RelatedEntity>((e) => e.Related);
+        // entities.HasNavigationPropertyLink(entityToRelated, (a, b) => new Uri("aa:b"), false);
+        entities.HasOptionalBinding((e) => e.Related, "related");
 
-            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
-            request.ODataFeature().RoutePrefix = "odata";
-            ODataMessageReaderSettings readSettings = new ODataMessageReaderSettings();
-            ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage), readSettings, model);
-            ODataDeserializerContext context = new ODataDeserializerContext
-            {
-                Request = request,
-                Path = new ODataPath(new NavigationPropertySegment(GetNavigationProperty(model), navigationSource: null))
-            };
+        return builder.GetEdmModel();
+    }
 
-            // Act
-            Uri uri = await deserializer.ReadAsync(messageReader, typeof(Uri), context) as Uri;
+    private static IEdmNavigationProperty GetNavigationProperty(IEdmModel model)
+    {
+        return
+            model.EntityContainer.EntitySets().First().NavigationPropertyBindings.Single().NavigationProperty;
+    }
 
-            // Assert
-            Assert.NotNull(uri);
-            Assert.Equal("http://localhost/samplelink", uri.AbsoluteUri);
-        }
+    private class Entity
+    {
+        public RelatedEntity Related { get; set; }
+    }
 
-        [Fact]
-        public async Task ReadJsonLightAsync()
-        {
-            // Arrange
-            var deserializer = new ODataEntityReferenceLinkDeserializer();
-            MockODataRequestMessage requestMessage = new MockODataRequestMessage();
-            ODataMessageWriterSettings writerSettings = new ODataMessageWriterSettings();
-            writerSettings.SetContentType(ODataFormat.Json);
-            IEdmModel model = CreateModel();
-            ODataMessageWriter messageWriter = new ODataMessageWriter(requestMessage, writerSettings, model);
-            await messageWriter.WriteEntityReferenceLinkAsync(new ODataEntityReferenceLink { Url = new Uri("http://localhost/samplelink") });
-            ODataMessageReader messageReader = new ODataMessageReader(new MockODataRequestMessage(requestMessage),
-                new ODataMessageReaderSettings(), model);
-
-            IEdmNavigationProperty navigationProperty = GetNavigationProperty(model);
-
-            var request = RequestFactory.Create("Get", "http://localhost", opt => opt.AddRouteComponents("odata", model));
-            request.ODataFeature().RoutePrefix = "odata";
-            ODataDeserializerContext context = new ODataDeserializerContext
-            {
-                Request = request,
-                Path = new ODataPath(new NavigationPropertySegment(navigationProperty, navigationSource: null))
-            };
-
-            // Act
-            Uri uri = await deserializer.ReadAsync(messageReader, typeof(Uri), context) as Uri;
-
-            // Assert
-            Assert.NotNull(uri);
-            Assert.Equal("http://localhost/samplelink", uri.AbsoluteUri);
-        }
-
-        private static IEdmModel CreateModel()
-        {
-            Mock<ODataModelBuilder> mock = new Mock<ODataModelBuilder>();
-            mock.Setup(b => b.ValidateModel(It.IsAny<IEdmModel>())).Callback(() => { });
-            mock.CallBase = true;
-            ODataModelBuilder builder = mock.Object;
-            EntitySetConfiguration<Entity> entities = builder.EntitySet<Entity>("entities");
-            builder.EntitySet<RelatedEntity>("related");
-            NavigationPropertyConfiguration entityToRelated =
-                entities.EntityType.HasOptional<RelatedEntity>((e) => e.Related);
-            // entities.HasNavigationPropertyLink(entityToRelated, (a, b) => new Uri("aa:b"), false);
-            entities.HasOptionalBinding((e) => e.Related, "related");
-
-            return builder.GetEdmModel();
-        }
-
-        private static IEdmNavigationProperty GetNavigationProperty(IEdmModel model)
-        {
-            return
-                model.EntityContainer.EntitySets().First().NavigationPropertyBindings.Single().NavigationProperty;
-        }
-
-        private class Entity
-        {
-            public RelatedEntity Related { get; set; }
-        }
-
-        private class RelatedEntity
-        {
-        }
+    private class RelatedEntity
+    {
     }
 }

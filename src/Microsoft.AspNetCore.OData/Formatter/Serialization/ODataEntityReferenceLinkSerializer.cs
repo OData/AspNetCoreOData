@@ -10,51 +10,50 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
-namespace Microsoft.AspNetCore.OData.Formatter.Serialization
+namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
+
+/// <summary>
+/// Represents an <see cref="ODataSerializer"/> for serializing $ref response.
+/// </summary>
+// For example, the response to the url http://localhost/Products(10)/Category/$ref gets serialized using this.</remarks>
+public class ODataEntityReferenceLinkSerializer : ODataSerializer
 {
     /// <summary>
-    /// Represents an <see cref="ODataSerializer"/> for serializing $ref response.
+    /// Initializes a new instance of <see cref="ODataEntityReferenceLinkSerializer"/>.
     /// </summary>
-    // For example, the response to the url http://localhost/Products(10)/Category/$ref gets serialized using this.</remarks>
-    public class ODataEntityReferenceLinkSerializer : ODataSerializer
+    public ODataEntityReferenceLinkSerializer()
+        : base(ODataPayloadKind.EntityReferenceLink)
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="ODataEntityReferenceLinkSerializer"/>.
-        /// </summary>
-        public ODataEntityReferenceLinkSerializer()
-            : base(ODataPayloadKind.EntityReferenceLink)
+    }
+
+    /// <inheritdoc/>
+    public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+    {
+        if (messageWriter == null)
         {
+            throw Error.ArgumentNull(nameof(messageWriter));
         }
 
-        /// <inheritdoc/>
-        public override async Task WriteObjectAsync(object graph, Type type, ODataMessageWriter messageWriter, ODataSerializerContext writeContext)
+        if (writeContext == null)
         {
-            if (messageWriter == null)
-            {
-                throw Error.ArgumentNull(nameof(messageWriter));
-            }
+            throw Error.ArgumentNull(nameof(writeContext));
+        }
 
-            if (writeContext == null)
+        if (graph != null)
+        {
+            ODataEntityReferenceLink entityReferenceLink = graph as ODataEntityReferenceLink;
+            if (entityReferenceLink == null)
             {
-                throw Error.ArgumentNull(nameof(writeContext));
-            }
-
-            if (graph != null)
-            {
-                ODataEntityReferenceLink entityReferenceLink = graph as ODataEntityReferenceLink;
-                if (entityReferenceLink == null)
+                Uri uri = graph as Uri;
+                if (uri == null)
                 {
-                    Uri uri = graph as Uri;
-                    if (uri == null)
-                    {
-                        throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
-                    }
-
-                    entityReferenceLink = new ODataEntityReferenceLink { Url = uri };
+                    throw new SerializationException(Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
                 }
 
-                await messageWriter.WriteEntityReferenceLinkAsync(entityReferenceLink).ConfigureAwait(false);
+                entityReferenceLink = new ODataEntityReferenceLink { Url = uri };
             }
+
+            await messageWriter.WriteEntityReferenceLinkAsync(entityReferenceLink).ConfigureAwait(false);
         }
     }
 }
