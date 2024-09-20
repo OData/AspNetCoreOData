@@ -29,7 +29,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(SelectSome<object>), true)]
         [InlineData(typeof(SelectExpandWrapper), false)]
         [InlineData(typeof(FlatteningWrapper<object>), false)]
-        [InlineData(typeof(NoGroupByWrapper), false)]
+        [InlineData(typeof(NoGroupByWrapper<object>), false)]
         [InlineData(typeof(object), false)]
         [InlineData(null, false)]
         public void CanConvertWorksForSelectExpandWrapper(Type type, bool expected)
@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         [InlineData(typeof(SelectExpandWrapper<object>), typeof(SelectExpandWrapperConverter<object>))]
         [InlineData(typeof(SelectExpandWrapper), null)]
         [InlineData(typeof(FlatteningWrapper<object>), null)]
-        [InlineData(typeof(NoGroupByWrapper), null)]
+        [InlineData(typeof(NoGroupByWrapper<object>), null)]
         [InlineData(typeof(object), null)]
         [InlineData(null, null)]
         public void CreateConverterWorksForSelectExpandWrapper(Type type, Type expected)

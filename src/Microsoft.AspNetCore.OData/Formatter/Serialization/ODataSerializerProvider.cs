@@ -121,6 +121,14 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
             {
                 return _serviceProvider.GetRequiredService<ODataDeltaResourceSetSerializer>();
             }
+            else if (type.IsDynamicTypeWrapper())
+            {
+                return _serviceProvider.GetRequiredService<ODataResourceSerializer>();
+            }
+            else if (type.IsCollectionDynamicTypeWrapper())
+            {
+                return _serviceProvider.GetRequiredService<ODataResourceSetSerializer>();
+            }
 
             IEdmModel model = request.GetModel();
 
