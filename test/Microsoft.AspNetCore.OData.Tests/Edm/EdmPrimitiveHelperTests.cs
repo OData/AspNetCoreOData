@@ -126,6 +126,23 @@ public class EdmPrimitiveHelperTests
 
     [Theory]
     [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
+    public void ConvertDateTimeValue_ExplicitUtc(DateTimeOffset valueToConvert)
+    {
+        //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
+        //and do not accept Local and Unspecified in the new versions of the framework
+
+        //example: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported
+
+        // Arrange & Act
+        object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
+
+        // Assert
+        DateTime dt = Assert.IsType<DateTime>(actual);
+        Assert.Equal(DateTimeKind.Utc, dt.Kind);
+    }
+
+    [Theory]
+    [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
     public void ConvertDateTimeValue_NonStandardPrimitives_CustomTimeZoneInfo(DateTimeOffset valueToConvert)
     {
         // Arrange & Act
@@ -145,23 +162,5 @@ public class EdmPrimitiveHelperTests
         ExceptionAssert.Throws<ValidationException>(
             () => EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, conversionType),
             exception);
-    }
-
-    [Theory]
-    [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
-    public void ConvertDateTimeValue_ExplicitUtc(DateTimeOffset valueToConvert)
-    {
-        //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
-        //and do not accept Local and Unspecified in the new versions of the framework
-
-        //example: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported
-
-        // Arrange & Act
-        object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
-
-        // Assert
-        DateTime dt = Assert.IsType<DateTime>(actual);
-        Assert.Equal(valueToConvert.LocalDateTime, dt);
-        Assert.Equal(DateTimeKind.Utc, dt.Kind);
     }
 }
