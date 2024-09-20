@@ -6,15 +6,19 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 {
@@ -161,6 +165,48 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             Assert.NotNull(expression);
             Assert.Equal(expected, expression.ToString());
         }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(null)]
+        public void MakeCustomFunctionCall_StaticMethod_ShouldCreateCorrectExpression(int? value)
+        {
+            // Arrange
+            MethodInfo methodInfo = typeof(TestCustomFunctionCall).GetMethod(nameof(TestCustomFunctionCall.StaticCustomMethod));
+            Expression[] arguments = { Expression.Constant(value, typeof(int?)) };
+
+            // Act
+            Expression result = ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<MethodCallExpression>(result);
+            var methodCall = (MethodCallExpression)result;
+            Assert.Equal(methodInfo, methodCall.Method);
+            Assert.Equal(arguments, methodCall.Arguments);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(null)]
+        public void MakeCustomFunctionCall_InstanceMethod_ShouldCreateCorrectExpression(int? value)
+        {
+            // Arrange
+            MethodInfo methodInfo = typeof(TestCustomFunctionCall).GetMethod(nameof(TestCustomFunctionCall.InstanceCustomMethod));
+            Expression instance = Expression.Constant(new TestCustomFunctionCall());
+            Expression[] arguments = { instance, Expression.Constant(value, typeof(int?)) };
+
+            // Act
+            Expression result = ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<MethodCallExpression>(result);
+            var methodCall = (MethodCallExpression)result;
+            Assert.Equal(methodInfo, methodCall.Method);
+            Assert.Equal(arguments.Skip(1), methodCall.Arguments);
+            Assert.Equal(instance, methodCall.Object);
+        }
     }
 
     public class MyQueryBinder : QueryBinder
@@ -169,5 +215,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         {
             return GetDynamicPropertyContainer(openNode, context);
         }
+    }
+    internal class TestCustomFunctionCall
+    {
+        public static void StaticCustomMethod(int? x) { }
+        public void InstanceCustomMethod(int? x) { }
     }
 }
