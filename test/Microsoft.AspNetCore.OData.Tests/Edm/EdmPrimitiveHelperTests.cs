@@ -154,6 +154,8 @@ public class EdmPrimitiveHelperTests
         //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
         //and do not accept Local and Unspecified in the new versions of the framework
 
+        //example: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported
+
         // Arrange & Act
         object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
 
