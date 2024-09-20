@@ -101,12 +101,11 @@ internal static class EdmPrimitiveHelper
             }
             else if (type == typeof(DateTime))
             {
-                if (value is DateTimeOffset)
+                if (value is DateTimeOffset dateTimeOffsetValue)
                 {
-                    DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
                     TimeZoneInfo timeZone = timeZoneInfo ?? TimeZoneInfo.Local;
                     dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
-                    return dateTimeOffsetValue.DateTime;
+                    return DateTime.SpecifyKind(dateTimeOffsetValue.DateTime, DateTimeKind.Utc);
                 }
 
                 if (value is Date)

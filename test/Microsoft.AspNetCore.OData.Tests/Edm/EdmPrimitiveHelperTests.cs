@@ -94,7 +94,7 @@ public class EdmPrimitiveHelperTests
 
     [Theory]
     [MemberData(nameof(ConvertPrimitiveValue_NonStandardPrimitives_Data))]
-    [MemberData(nameof(ConvertPrimitiveValue_NonStandardPrimitives_ExtraData))] 
+    [MemberData(nameof(ConvertPrimitiveValue_NonStandardPrimitives_ExtraData))]
     public void ConvertPrimitiveValue_NonStandardPrimitives(object valueToConvert, object result, Type conversionType)
     {
         // Arrange & Act
@@ -145,5 +145,21 @@ public class EdmPrimitiveHelperTests
         ExceptionAssert.Throws<ValidationException>(
             () => EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, conversionType),
             exception);
+    }
+
+    [Theory]
+    [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
+    public void ConvertDateTimeValue_ExplicitUtc(DateTimeOffset valueToConvert)
+    {
+        //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
+        //and do not accept Local and Unspecified in the new versions of the framework
+
+        // Arrange & Act
+        object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
+
+        // Assert
+        DateTime dt = Assert.IsType<DateTime>(actual);
+        Assert.Equal(valueToConvert.LocalDateTime, dt);
+        Assert.Equal(DateTimeKind.Utc, dt.Kind);
     }
 }
