@@ -68,5 +68,8 @@ namespace Microsoft.AspNetCore.OData.Deltas
         /// The name of the relationship property on the parent object.
         /// </summary>
         public string Relationship { get; set; }
+
+        /// <inheritdoc/>
+        public IODataInstanceAnnotationContainer TransientInstanceAnnotationContainer { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 }
