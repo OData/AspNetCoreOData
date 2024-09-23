@@ -128,11 +128,6 @@ public class EdmPrimitiveHelperTests
     [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
     public void ConvertDateTimeValue_ImplicitKind(DateTimeOffset valueToConvert)
     {
-        //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
-        //and do not accept Local and Unspecified in the new versions of the framework
-
-        //example: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported
-
         // Arrange & Act
         object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
 
@@ -145,11 +140,6 @@ public class EdmPrimitiveHelperTests
     [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
     public void ConvertDateTimeValue_ExplicitLocalKind(DateTimeOffset valueToConvert)
     {
-        //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
-        //and do not accept Local and Unspecified in the new versions of the framework
-
-        //example: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported
-
         // Arrange & Act
         object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime), TimeZoneInfo.Local);
 
@@ -162,11 +152,6 @@ public class EdmPrimitiveHelperTests
     [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
     public void ConvertDateTimeValue_ExplicitUtcKind(DateTimeOffset valueToConvert)
     {
-        //Some databases (for example, Npgsql) require an explicit indication of Kind = Utc
-        //and do not accept Local and Unspecified in the new versions of the framework
-
-        //example: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported
-
         // Arrange & Act
         object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime), TimeZoneInfo.Utc);
 
