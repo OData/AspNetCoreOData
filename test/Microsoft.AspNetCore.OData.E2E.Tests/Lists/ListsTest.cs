@@ -19,6 +19,7 @@ using Newtonsoft.Json.Linq;
 using Xunit;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
 {
