@@ -68,8 +68,8 @@ public class Person
 {
     public int Id { get; set; }
 
-[AutoExpand]
-public Order Order { get; set; }
+    [AutoExpand]
+    public Order Order { get; set; }
 
     public Person Friend { get; set; }
 }
