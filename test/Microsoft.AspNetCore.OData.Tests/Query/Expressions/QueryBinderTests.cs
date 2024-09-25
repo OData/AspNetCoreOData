@@ -245,9 +245,9 @@ public class QueryBinderTests
         typeRef.Setup(t => t.Definition).Returns(type.Object);
         SingleValueFunctionCallNode node = new SingleValueFunctionCallNode("any", null, typeRef.Object);
 
-    // Act & Assert
-    ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleValueFunctionCallNode(null, null), "node");
-    ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleValueFunctionCallNode(node, null), "context");
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleValueFunctionCallNode(null, null), "node");
+        ExceptionAssert.ThrowsArgumentNull(() => binder.BindSingleValueFunctionCallNode(node, null), "context");
     }
 
     [Fact]
