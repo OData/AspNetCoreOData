@@ -5093,6 +5093,11 @@
             Gets or sets the HTTP Request whose response is being serialized.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CancellationToken">
+            <summary>
+            Get the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CancellationToken"/> from <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Request"/> if defined or <see cref="P:System.Threading.CancellationToken.None"/>
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.RootElementName">
             <summary>
             Gets or sets the root element name which is used when writing primitive and enum types
