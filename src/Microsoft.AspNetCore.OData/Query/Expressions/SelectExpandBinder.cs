@@ -97,13 +97,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             int? modelBoundPageSize = null)
         {
             Type elementType;
-            bool isCollection, isPrimitiveCollection = false;
+            bool isCollection;
             isCollection = TypeHelper.IsCollection(source.Type, out elementType);
 
-            if (isCollection)
-            {
-                isPrimitiveCollection = TypeHelper.IsPrimitiveOrKnownType(elementType);
-            }
             QueryBinderContext subContext = new QueryBinderContext(context, context.QuerySettings, elementType);
             if (computeClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Compute))
             {
@@ -115,9 +111,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 subContext.OrderByClauses = orderByClause.ToList();
             }
 
-            if (isCollection
-                && !isPrimitiveCollection
-                )
+            if (isCollection)
             {
 
                 // new CollectionWrapper<ElementType> { Instance = source.Select(s => new Wrapper { ... }) };
@@ -1366,7 +1360,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // expression
             //      source.Select((ElementType element) => new Wrapper { })
             var selectMethod = GetSelectMethod(elementType, projection.Type);
-            Expression selectedExpresion = Expression.Call(selectMethod, source, selector);
+            bool isPrimitiveCollection = TypeHelper.IsPrimitiveOrKnownType(elementType);
+            Expression selectedExpresion =
+                isPrimitiveCollection ? source : Expression.Call(selectMethod, source, selector);
 
             // Append ToList() to collection as a hint to LINQ provider to buffer correlated sub-queries in memory and avoid executing N+1 queries
             if (settings.EnableCorrelatedSubqueryBuffering)
