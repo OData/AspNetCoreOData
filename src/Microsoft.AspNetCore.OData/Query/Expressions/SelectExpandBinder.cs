@@ -232,6 +232,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             // Expression:  source.Property
             string propertyName = model.GetClrPropertyName(edmProperty);
+            
             PropertyInfo propertyInfo = source.Type.GetProperty(propertyName, BindingFlags.DeclaredOnly);
             if (propertyInfo == null)
             {
@@ -252,6 +253,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                  */
                 propertyInfo = source.Type.GetProperties().Where(m => m.Name.Equals(propertyName, StringComparison.Ordinal)).FirstOrDefault();
             }
+            
             Expression propertyValue = Expression.Property(source, propertyInfo);
             Type nullablePropertyType = TypeHelper.ToNullable(propertyValue.Type);
             Expression nullablePropertyValue = ExpressionHelpers.ToNullable(propertyValue);
