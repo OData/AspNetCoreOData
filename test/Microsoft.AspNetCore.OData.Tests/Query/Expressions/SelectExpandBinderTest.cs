@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -36,6 +37,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         private readonly SelectExpandBinder _binder;
         private readonly SelectExpandBinder _binder_lowerCamelCased;
         private readonly IQueryable<QueryCustomer> _queryable;
+        private readonly IQueryable<QueryCustomer> _queryable1;
         private readonly IQueryable<QueryCustomer> _queryable_lowerCamelCased;
         private readonly ODataQueryContext _context;
         private readonly ODataQueryContext _context_lowerCamelCased;
@@ -82,7 +84,19 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             QueryOrder order = new QueryOrder { Id = 42, Title = "The order", Customer = customer };
             customer.Orders.Add(order);
 
+            QueryCustomer customer1 = new QueryCustomer
+            {
+                Orders = new List<QueryOrder>()
+            };
+
+            QueryOrder order1 = new QueryOrder { Id = 42, Title = "The order", Customer = customer1 };
+            QueryOrder order2 = null;
+
+            customer1.Orders.Add(order1);
+            customer1.Orders.Add(order2);
+
             _queryable = new[] { customer }.AsQueryable();
+            _queryable1 = new[] { customer1 }.AsQueryable();
 
             SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption("Orders", expand: null, context: _context);
 
@@ -255,6 +269,139 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             object customer = partialOrder.Container.ToDictionary(PropertyMapper)["Customer"];
             SelectExpandWrapper<QueryCustomer> innerInnerCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(customer);
             Assert.Same(_queryable.First(), innerInnerCustomer.Instance);
+        }
+
+        [Theory]
+        [InlineData(HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6)]
+        public void Bind_UsingEFQueryProvider_GeneratedExpression__DoesNot_ContainExpandedObject(string queryProvider)
+        {
+            // Arrange
+            SelectExpandQueryOption selectExpand = new SelectExpandQueryOption("Orders", "Orders,Orders($expand=Customer)", _context);
+
+            // Act
+            SelectExpandBinder binder = new SelectExpandBinder();
+            _queryBinderContext.QueryProvider = queryProvider;
+            IQueryable queryable = binder.ApplyBind(_queryable1, selectExpand.SelectExpandClause, _queryBinderContext);
+
+            // Assert
+            IEnumerator enumerator = queryable.GetEnumerator();
+            Assert.True(enumerator.MoveNext());
+            var partialCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.Null(partialCustomer.Instance);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCustomer", partialCustomer.InstanceType);
+            IEnumerable<SelectExpandWrapper<QueryOrder>> innerOrders = partialCustomer.Container
+                .ToDictionary(PropertyMapper)["Orders"] as IEnumerable<SelectExpandWrapper<QueryOrder>>;
+            Assert.NotNull(innerOrders);
+            SelectExpandWrapper<QueryOrder> partialOrder = innerOrders.FirstOrDefault();
+            
+            // We only write structural properties to the instance.
+            // This means that navigation properties on the instance property will be null
+            // when using any instance of EF query provider, and all structural properties
+            // will be assigned. 
+            Assert.Null(partialOrder.Instance.Customer);
+            Assert.NotEqual(0, partialOrder.Instance.Id);
+            Assert.NotNull(partialOrder.Instance.Title);
+
+            object customer = partialOrder.Container.ToDictionary(PropertyMapper)["Customer"];
+            SelectExpandWrapper<QueryCustomer> innerInnerCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(customer);
+
+            Assert.Null(innerInnerCustomer.Instance.Orders);
+            Assert.Equal(2, innerInnerCustomer.Instance.TestReadonlyProperty.Count);
+            Assert.Equal("Test1", innerInnerCustomer.Instance.TestReadonlyProperty[0]);
+            Assert.Equal("Test2", innerInnerCustomer.Instance.TestReadonlyProperty[1]);
+            Assert.Equal(2, innerInnerCustomer.Instance.TestReadOnlyWithAttribute);
+        }
+
+        [Theory]
+        [InlineData(HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5)]
+        [InlineData(HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6)]
+        public void Bind_UsingEFQueryProvider_LowerCamelCasedModel_GeneratedExpression__DoesNot_ContainExpandedObject(string queryProvider)
+        {
+            // Arrange
+            SelectExpandQueryOption selectExpand = new SelectExpandQueryOption("Orders", "Orders,Orders($expand=Customer)", _context_lowerCamelCased);
+
+            // Act
+            SelectExpandBinder binder = new SelectExpandBinder();
+            _queryBinderContext_lowerCamelCased.QueryProvider = queryProvider;
+            IQueryable queryable = binder.ApplyBind(_queryable_lowerCamelCased, selectExpand.SelectExpandClause, _queryBinderContext_lowerCamelCased);
+
+            // Assert
+            IEnumerator enumerator = queryable.GetEnumerator();
+            Assert.True(enumerator.MoveNext());
+            var partialCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.Null(partialCustomer.Instance);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.QueryCustomer", partialCustomer.InstanceType);
+            IEnumerable<SelectExpandWrapper<QueryOrder>> innerOrders = partialCustomer.Container
+                .ToDictionary(PropertyMapper)["orders"] as IEnumerable<SelectExpandWrapper<QueryOrder>>;
+            Assert.NotNull(innerOrders);
+            SelectExpandWrapper<QueryOrder> partialOrder = innerOrders.FirstOrDefault();
+            
+            // We only write structural properties to the instance.
+            // This means that navigation properties on the instance property will be null
+            // when using any instance of EF query provider, and all structural properties
+            // will be assigned. 
+            Assert.Null(partialOrder.Instance.Customer);
+            Assert.NotEqual(0, partialOrder.Instance.Id);
+            Assert.NotNull(partialOrder.Instance.Title);
+
+            object customer = partialOrder.Container.ToDictionary(PropertyMapper)["customer"];
+            SelectExpandWrapper<QueryCustomer> innerInnerCustomer = Assert.IsAssignableFrom<SelectExpandWrapper<QueryCustomer>>(customer);
+
+            Assert.Null(innerInnerCustomer.Instance.Orders);
+        }
+
+        [Fact]
+        public void Bind_SelectAndExpand_WithNullProperties_DoesNotThrowException()
+        {
+            // Arrange
+            IQueryable<User> users;
+            string expand = "FileRefNavigation";
+
+            User user = new User
+            {
+                UserId = 1,
+                Name = "Alex",
+                Age = 35,
+                DataFileRef = null,
+                FileRefNavigation = null
+            };
+
+            users = new[] { user }.AsQueryable();
+            ODataQueryContext context = new ODataQueryContext(_model, typeof(User)) { RequestContainer = new MockServiceProvider() };
+
+            SelectExpandQueryOption selectExpand = new SelectExpandQueryOption(select: null, expand: expand, context: context);
+
+            QueryBinderContext queryBinderContext = new QueryBinderContext(_model, _settings, selectExpand.Context.ElementClrType)
+            {
+                NavigationSource = context.NavigationSource
+            };
+
+            queryBinderContext.QueryProvider = HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace;
+
+            // Act
+            SelectExpandBinder binder = new SelectExpandBinder();
+            IQueryable queryable = binder.ApplyBind(users, selectExpand.SelectExpandClause, queryBinderContext);
+
+            // Assert
+            Assert.NotNull(queryable);
+
+            IEnumerator enumerator = queryable.GetEnumerator();
+            Assert.True(enumerator.MoveNext());
+            var usr = Assert.IsAssignableFrom<SelectExpandWrapper<User>>(enumerator.Current);
+            Assert.False(enumerator.MoveNext());
+            Assert.NotNull(usr.Instance);
+            Assert.Equal("Microsoft.AspNetCore.OData.Tests.Query.Expressions.User", usr.Instance.GetType().ToString());
+            IEnumerable<SelectExpandWrapper<DataFile>> fileRefsNavigations = usr.Container
+                .ToDictionary(PropertyMapper)["FileRefNavigation"] as IEnumerable<SelectExpandWrapper<DataFile>>;
+            
+            Assert.Null(fileRefsNavigations);
         }
 
         [Fact]
@@ -1996,6 +2143,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             builder.EntitySet<QueryOrder>("Orders");
             builder.EntitySet<QueryCity>("Cities");
             builder.EntitySet<QueryProduct>("Products");
+            builder.EntitySet<User>("Users");
 
             customer.Collection.Function("IsUpgraded").Returns<bool>().Namespace="NS";
             customer.Collection.Action("UpgradeAll").Namespace = "NS";
@@ -2143,9 +2291,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         public IList<QueryAddress> Addresses { get; set; }
 
-        public QueryOrder PrivateOrder { get; set; }
+        public QueryOrder? PrivateOrder { get; set; }
 
-        public IList<QueryOrder> Orders { get; set; }
+        public IList<QueryOrder>? Orders { get; set; }
 
         public List<string> TestReadonlyProperty
         {
@@ -2205,5 +2353,28 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         Green,
 
         Blue
+    }
+
+    public class User
+    {
+        [Key]
+        public int UserId { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public int Age { get; set; }
+
+        //Navigations
+        [ForeignKey("FileRefNavigation")]
+        public int? DataFileRef { get; set; }
+        public DataFile? FileRefNavigation { get; set; }
+    }
+
+    public class DataFile
+    {
+        [Key]
+        public int FileId { get; set; }
+        [Required]
+        public string FileName { get; set; }
     }
 }
