@@ -1452,6 +1452,7 @@ public abstract partial class QueryBinder
         return body;
     }
 
+    [DebuggerStepThrough]
     private static void CheckArgumentNull<T>(T node, QueryBinderContext context) where T : QueryNode
     {
         if (node == null)

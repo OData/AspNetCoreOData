@@ -763,6 +763,7 @@ public abstract partial class QueryBinder
         return null;
     }
 
+    [DebuggerStepThrough]
     private static void CheckArgumentNull(SingleValueFunctionCallNode node, QueryBinderContext context, string nodeName)
     {
         if (node == null || node.Name != nodeName)
