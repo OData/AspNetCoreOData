@@ -652,6 +652,10 @@ public abstract partial class QueryBinder
         {
             targetEdmTypeName = singleResourceCastNode.TypeReference.FullName();
         }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, "BindSingleResourceCastFunctionCall");
+        }
 
         IEdmType targetEdmType = model.FindType(targetEdmTypeName);
         Type targetClrType = null;
