@@ -102,7 +102,7 @@ internal static class ExpressionBinderHelper
             left = CreateDateBinaryExpression(left, querySettings);
             right = CreateDateBinaryExpression(right, querySettings);
         }
-        else if((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
+        else if ((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
             (IsTimeOfDay(leftUnderlyingType) && IsType<TimeOnly>(rightUnderlyingType)))
         {
             left = CreateTimeBinaryExpression(left, querySettings);
@@ -649,11 +649,11 @@ internal static class ExpressionBinderHelper
         {
             if (settings.EnableConstantParameterization)
             {
-	            return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
+                return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
             }
             else
             {
-	            return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
+                return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
             }
         }
         return expression;

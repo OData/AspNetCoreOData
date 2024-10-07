@@ -38,3 +38,48 @@ public class BadVendorsController : ODataController
         return DollarFilterDataSource.BadVendors;
     }
 }
+
+public class CustomersController : ODataController
+{
+    [EnableQuery(MaxAnyAllExpressionDepth = 2)]
+    public ActionResult<IEnumerable<Customer>> Get()
+    {
+        return DollarFilterDataSource.Customers;
+    }
+}
+
+public class BadCustomersController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<Customer>> Get()
+    {
+        return DollarFilterDataSource.BadCustomers;
+    }
+}
+
+public class ProductsController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<Product>> Get()
+    {
+        return DollarFilterDataSource.Products;
+    }
+}
+
+public class BasketsController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<Basket>> Get()
+    {
+        return DollarFilterDataSource.Baskets;
+    }
+}
+
+public class BasicTypesController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<BasicType>> Get()
+    {
+        return DollarFilterDataSource.BasicTypes;
+    }
+}

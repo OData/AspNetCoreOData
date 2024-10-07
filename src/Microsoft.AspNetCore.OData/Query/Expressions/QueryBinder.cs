@@ -97,6 +97,9 @@ public abstract partial class QueryBinder
             case QueryNodeKind.CollectionPropertyAccess:
                 return BindCollectionPropertyAccessNode(node as CollectionPropertyAccessNode, context);
 
+            case QueryNodeKind.CollectionOpenPropertyAccess:
+                return BindCollectionOpenPropertyAccessNode(node as CollectionOpenPropertyAccessNode, context);
+
             case QueryNodeKind.CollectionComplexNode:
                 return BindCollectionComplexNode(node as CollectionComplexNode, context);
 
@@ -108,7 +111,6 @@ public abstract partial class QueryBinder
 
             case QueryNodeKind.CollectionFunctionCall:
             case QueryNodeKind.CollectionResourceFunctionCall:
-            case QueryNodeKind.CollectionOpenPropertyAccess:
             default:
                 throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, node.Kind, typeof(QueryBinder).Name);
         }
@@ -277,6 +279,41 @@ public abstract partial class QueryBinder
     }
 
     /// <summary>
+    /// Binds a <see cref="CollectionPropertyAccessNode"/> to create a LINQ <see cref="Expression"/> that
+    /// represents the semantics of the <see cref="CollectionPropertyAccessNode"/>.
+    /// </summary>
+    /// <param name="openCollectionNode">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    public virtual Expression BindCollectionOpenPropertyAccessNode(CollectionOpenPropertyAccessNode openCollectionNode, QueryBinderContext context)
+    {
+        CheckArgumentNull(openCollectionNode, context);
+
+        if (context.ElementClrType.IsDynamicTypeWrapper())
+        {
+            return GetFlattenedPropertyExpression(openCollectionNode.Name, context) ?? Expression.Property(
+                Bind(openCollectionNode.Source, context), openCollectionNode.Name);
+        }
+
+        if (context.ComputedProperties.TryGetValue(openCollectionNode.Name, out ComputeExpression computedProperty))
+        {
+            return Bind(computedProperty.Expression, context);
+        }
+
+        if (openCollectionNode.Source is SingleValueOpenPropertyAccessNode
+            || openCollectionNode.Source is NonResourceRangeVariableReferenceNode)
+        {
+            return BindNestedCollectionOpenPropertyAccessExpression(
+                openCollectionNode,
+                context);
+        }
+        else
+        {
+            return BindCollectionOpenPropertyAccessExpression(openCollectionNode, context);
+        }
+    }
+
+    /// <summary>
     /// Binds a <see cref="SingleValueOpenPropertyAccessNode"/> to create a LINQ <see cref="Expression"/> that
     /// represents the semantics of the <see cref="SingleValueOpenPropertyAccessNode"/>.
     /// </summary>
@@ -297,7 +334,8 @@ public abstract partial class QueryBinder
             return Bind(computedProperty.Expression, context);
         }
 
-        if (openNode.Source is SingleValueOpenPropertyAccessNode)
+        if (openNode.Source is SingleValueOpenPropertyAccessNode
+            || openNode.Source is NonResourceRangeVariableReferenceNode)
         {
             return BindNestedDynamicPropertyAccessExpression(openNode, context);
         }
@@ -697,7 +735,7 @@ public abstract partial class QueryBinder
     {
         CheckArgumentNull(allNode, context);
 
-       // context.EnterLambdaScope();
+        // context.EnterLambdaScope();
 
         (string name, ParameterExpression allIt) = context.HandleLambdaParameters(allNode.RangeVariables);
 
@@ -977,6 +1015,27 @@ public abstract partial class QueryBinder
         }
 
         return GetDynamicPropertyContainer(openNode.Source.TypeReference, openNode.Kind, context.Model);
+    }
+
+    /// <summary>
+    /// Gets property for dynamic properties dictionary.
+    /// </summary>
+    /// <param name="openCollectionNode">The collection-valued open property access node.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>Returns CLR property for dynamic properties container.</returns>
+    protected static PropertyInfo GetDynamicPropertyContainer(CollectionOpenPropertyAccessNode openCollectionNode, QueryBinderContext context)
+    {
+        if (openCollectionNode == null)
+        {
+            throw Error.ArgumentNull(nameof(openCollectionNode));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        return GetDynamicPropertyContainer(openCollectionNode.Source.TypeReference, openCollectionNode.Kind, context.Model);
     }
 
     /// <summary>
@@ -1487,42 +1546,42 @@ public abstract partial class QueryBinder
     /// <summary>
     /// Creates an expression for retrieving a dynamic property from the dynamic properties container property.
     /// </summary>
-    /// <param name="dynamicPropertiesContainerExpr">The dynamic properties container property access expression.</param>
+    /// <param name="containerPropertyAccessExpr">The dynamic properties container property access expression.</param>
     /// <param name="propertyName">The dynamic property name.</param>
     /// <param name="context">The query binder context.</param>
     /// <returns>The LINQ <see cref="Expression"/> created.</returns>
     private static Expression CreateDynamicPropertyAccessExpression(
-        Expression dynamicPropertiesContainerExpr,
+        Expression containerPropertyAccessExpr,
         string propertyName,
         QueryBinderContext context)
     {
         // Get dynamic property value
         IndexExpression dictionaryIndexExpr = Expression.Property(
-            dynamicPropertiesContainerExpr, DictionaryStringObjectIndexerName,
+            containerPropertyAccessExpr, DictionaryStringObjectIndexerName,
             Expression.Constant(propertyName));
 
         // ContainsKey method
         MethodCallExpression containsKeyExpression = Expression.Call(
-            dynamicPropertiesContainerExpr,
-            dynamicPropertiesContainerExpr.Type.GetMethod("ContainsKey"),
+            containerPropertyAccessExpr,
+            containerPropertyAccessExpr.Type.GetMethod("ContainsKey"),
             Expression.Constant(propertyName));
 
         // Handle null propagation
         if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
         {
-            BinaryExpression dictIonaryIsNotNullExpr = Expression.NotEqual(dynamicPropertiesContainerExpr, Expression.Constant(null));
+            BinaryExpression dictIonaryIsNotNullExpr = Expression.NotEqual(containerPropertyAccessExpr, NullConstant);
             BinaryExpression dictIonaryIsNotNullAndContainsKeyExpr = Expression.AndAlso(dictIonaryIsNotNullExpr, containsKeyExpression);
             return Expression.Condition(
                 dictIonaryIsNotNullAndContainsKeyExpr,
                 dictionaryIndexExpr,
-                Expression.Constant(null));
+                NullConstant);
         }
         else
         {
             return Expression.Condition(
                 containsKeyExpression,
                 dictionaryIndexExpr,
-                Expression.Constant(null));
+                NullConstant);
         }
     }
 
@@ -1551,6 +1610,13 @@ public abstract partial class QueryBinder
         {
             sourceExpr = BindNestedDynamicPropertyAccessExpression(openNodeParent, context);
         }
+        else if (openNode.Source is NonResourceRangeVariableReferenceNode nonResourceRangeVariableReferenceNode)
+        {
+            return CreateNestedDynamicPropertyAccessExpression(
+                BindRangeVariable(nonResourceRangeVariableReferenceNode.RangeVariable, context),
+                openNode,
+                context);
+        }
         else
         {
             return BindDynamicPropertyAccessExpression(openNode, context);
@@ -1573,12 +1639,13 @@ public abstract partial class QueryBinder
     {
         // Scenario 1: Declared property => DynamicProperty/DeclaredProperty
         // Yields the equivalent of:
-        // dynamicPropertyValue.GetType().GetProperty(openNode.Name).GetValue(dynamicPropertyValue)
-        Expression getTypeExpr = Expression.Call(sourceExpr, "GetType", Type.EmptyTypes);
+        // dynamicPropertyValue.GetType().GetProperty(propertyName).GetValue(dynamicPropertyValue)
+
+        Expression getInstanceTypeExpr = Expression.Call(sourceExpr, "GetType", Type.EmptyTypes);
 
         // Get declared property
         Expression getPropertyExpr = Expression.Call(
-            getTypeExpr,
+            getInstanceTypeExpr,
             typeof(Type).GetMethod("GetProperty", new[] { typeof(string) }),
             Expression.Constant(openNode.Name));
 
@@ -1591,7 +1658,245 @@ public abstract partial class QueryBinder
 
         // SCENARIO 2: Dynamic property =>  DynamicProperty/DynamicProperty
         // Yields the equivalent of:
-        // dynamicPropertyValue.GetType().GetProperty({DynamicContainerPropertyName}).GetValue(dynamicPropertyValue).Item[openNode.Name]
+        // dynamicPropertyValue.GetType().GetProperty({DynamicContainerPropertyName}).GetValue(dynamicPropertyValue).Item[propertyName]
+
+        // Get dynamic property from container property
+        Expression getDynamicPropertyValueExpr = CreateNestedDynamicPropertyAccessExpression(
+            sourceExpr,
+            openNode.Name,
+            openNode.Kind,
+            context);
+
+        // We only consider scenario 2 if scenario 1 doesn't apply
+        Expression getValueExpr = Expression.Condition(
+            Expression.NotEqual(getPropertyExpr, NullConstant),
+            getDeclaredPropertyValueExpr,
+            getDynamicPropertyValueExpr);
+
+        // Handle null propagation
+        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
+        {
+            return Expression.Condition(
+                Expression.Equal(sourceExpr, NullConstant),
+                NullConstant,
+                getValueExpr);
+        }
+
+        return getValueExpr;
+    }
+
+    /// <summary>
+    /// Binds dynamic collection property to the source node.
+    /// </summary>
+    /// <param name="openCollectionNode">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private Expression BindCollectionOpenPropertyAccessExpression(CollectionOpenPropertyAccessNode openCollectionNode, QueryBinderContext context)
+    {
+        PropertyInfo containerProperty = GetDynamicPropertyContainer(openCollectionNode, context);
+
+        Expression containerPropertyAccessExpr = BindPropertyAccessExpression(openCollectionNode.Source, containerProperty, context);
+
+        IndexExpression dynamicPropertyValueExpr = Expression.Property(containerPropertyAccessExpr,
+            DictionaryStringObjectIndexerName, Expression.Constant(openCollectionNode.Name));
+
+        // Method call expression for ((IEnumerable)value).Cast<object>()
+        MethodCallExpression dynamicPropertyValueToEnumerableCastExpr = Expression.Call(
+            ExpressionHelperMethods.EnumerableCastGeneric.MakeGenericMethod(typeof(object)),
+            Expression.Convert(dynamicPropertyValueExpr, typeof(IEnumerable)));
+
+        // Throw exception if value is not IEnumerable
+        Expression dynamicPropertyIsNotCollectionExceptionExpr = Expression.Throw(
+            CreatePropertyIsNotCollectionExceptionExpression(
+                Expression.Constant(context.Model.GetClrType(openCollectionNode.Source.TypeReference), typeof(Type)),
+                Expression.Call(dynamicPropertyValueExpr, "GetType", Type.EmptyTypes),
+                openCollectionNode.Name),
+            typeof(IEnumerable<object>));
+
+        // Conditional expression to throw exception if value is not IEnumerable, else perform Cast<object>()
+        Expression dynamicPropertyConditionalCastExpr = Expression.Condition(
+            Expression.TypeIs(dynamicPropertyValueExpr, typeof(IEnumerable)),
+            dynamicPropertyValueToEnumerableCastExpr,
+            dynamicPropertyIsNotCollectionExceptionExpr);
+
+        Expression containsKeyExpr = Expression.Call(containerPropertyAccessExpr,
+            containerPropertyAccessExpr.Type.GetMethod("ContainsKey"), Expression.Constant(openCollectionNode.Name));
+
+        // Return null if not IEnumerable
+        Expression defaultNullExpr = Expression.Convert(NullConstant, typeof(IEnumerable<object>));
+
+        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
+        {
+            Expression dynamicDictIsNotNullExpr = Expression.NotEqual(containerPropertyAccessExpr, NullConstant);
+            Expression dynamicDictIsNotNullAndContainsKeyExpr = Expression.AndAlso(dynamicDictIsNotNullExpr, containsKeyExpr);
+            return Expression.Condition(
+                dynamicDictIsNotNullAndContainsKeyExpr,
+                dynamicPropertyConditionalCastExpr,
+                defaultNullExpr);
+        }
+        else
+        {
+            return Expression.Condition(
+                containsKeyExpr,
+                dynamicPropertyConditionalCastExpr,
+                defaultNullExpr);
+        }
+    }
+
+    /// <summary>
+    /// Binds nested dynamic collection property to the source node.
+    /// </summary>
+    /// <param name="openCollectionNode">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private Expression BindNestedCollectionOpenPropertyAccessExpression(CollectionOpenPropertyAccessNode openCollectionNode, QueryBinderContext context)
+    {
+        // NOTE: Every segment after a dynamic property segment will be represented
+        // as a dynamic segment though it may resolve a declared property.
+        // The URI parser is unable to determine that so we handle that here.
+
+        // For the expression $filter=DynamicSingleValuedProperty/CollectionValuedProperty/any(...),
+        // the CollectionValuedProperty segment will be a CollectionOpenPropertyAccessNode but
+        // can resolve into either a declared or dynamic property. The parser is unable to determine this
+
+        Contract.Assert(openCollectionNode.Source is SingleValueOpenPropertyAccessNode
+            || openCollectionNode.Source is NonResourceRangeVariableReferenceNode);
+
+        Expression sourceExpr = null;
+
+        if (openCollectionNode.Source is SingleValueOpenPropertyAccessNode openNodeParent)
+        {
+            sourceExpr = BindNestedDynamicPropertyAccessExpression(openNodeParent, context);
+        }
+        else if (openCollectionNode.Source is NonResourceRangeVariableReferenceNode nonResourceRangeVariableReferenceNode)
+        {
+            sourceExpr = BindRangeVariable(nonResourceRangeVariableReferenceNode.RangeVariable, context);
+        }
+        else
+        {
+            Contract.Assert(sourceExpr == null);
+        }
+
+        return CreateNestedCollectionOpenPropertyAccessExpression(sourceExpr, openCollectionNode, context);
+    }
+
+    /// <summary>
+    /// Creates an expression for retrieving a nested dynamic collection property.
+    /// </summary>
+    /// <param name="sourceExpr">The source expression.</param>
+    /// <param name="openCollectionNode">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private static Expression CreateNestedCollectionOpenPropertyAccessExpression(
+        Expression sourceExpr,
+        CollectionOpenPropertyAccessNode openCollectionNode,
+        QueryBinderContext context)
+    {
+        // Scenario 1: Nested declared collection property => DynamicProperty/DeclaredCollectionValuedProperty
+        // Yields the equivalent of:
+        // (IEnumerable<object>)dynamicPropertyValue.GetType().GetProperty(propertyName).GetValue(dynamicPropertyValue)
+
+        Expression getInstanceTypeExpr = Expression.Call(sourceExpr, "GetType", Type.EmptyTypes);
+
+        // Get declared property
+        Expression getPropertyExpr = Expression.Call(
+            getInstanceTypeExpr,
+            typeof(Type).GetMethod("GetProperty", new[] { typeof(string) }),
+            Expression.Constant(openCollectionNode.Name));
+
+        // Get declared property value
+        Expression getDeclaredPropertyValueExpr = Expression.Call(
+            getPropertyExpr,
+            "GetValue",
+            Type.EmptyTypes,
+            sourceExpr);
+
+        // Method call expression for ((IEnumerable)value).Cast<object>()
+        MethodCallExpression declaredPropertyValueToEnumerableCastExpr = Expression.Call(
+            ExpressionHelperMethods.EnumerableCastGeneric.MakeGenericMethod(typeof(object)),
+            Expression.Convert(getDeclaredPropertyValueExpr, typeof(IEnumerable)));
+
+        // Throw exception if value is not IEnumerable
+        Expression declaredPropertyIsNotCollectionExceptionExpr = Expression.Throw(
+            CreatePropertyIsNotCollectionExceptionExpression(
+                getInstanceTypeExpr,
+                Expression.Call(getDeclaredPropertyValueExpr, "GetType", Type.EmptyTypes),
+                openCollectionNode.Name),
+            typeof(IEnumerable<object>));
+
+        // Conditional expression to throw exception if value is not IEnumerable, else perform Cast<object>()
+        Expression declaredPropertyConditionalCastExpr = Expression.Condition(
+            Expression.TypeIs(getDeclaredPropertyValueExpr, typeof(IEnumerable)),
+            declaredPropertyValueToEnumerableCastExpr,
+            declaredPropertyIsNotCollectionExceptionExpr);
+
+        // SCENARIO 2: Nested dynamic collection property =>  DynamicProperty/DynamicCollectionProperty
+        // Yields the equivalent of:
+        // (IEnumerable<object>)dynamicPropertyValue.GetType().GetProperty({DynamicContainerPropertyName}).GetValue(dynamicPropertyValue).Item[propertyName]
+
+        // Get dynamic property from container property
+        Expression getDynamicPropertyValueExpr = CreateNestedDynamicPropertyAccessExpression(
+            sourceExpr,
+            openCollectionNode.Name,
+            openCollectionNode.Kind,
+            context);
+
+        // Method call expression for ((IEnumerable)value).Cast<object>()
+        MethodCallExpression dynamicPropertyValueToEnumerableCastExpr = Expression.Call(
+            ExpressionHelperMethods.EnumerableCastGeneric.MakeGenericMethod(typeof(object)),
+            Expression.Convert(getDynamicPropertyValueExpr, typeof(IEnumerable)));
+
+        // Throw exception if value is not IEnumerable
+        Expression dynamicPropertyIsNotCollectionExceptionExpr = Expression.Throw(
+            CreatePropertyIsNotCollectionExceptionExpression(
+                getInstanceTypeExpr,
+                Expression.Call(getDynamicPropertyValueExpr, "GetType", Type.EmptyTypes),
+                openCollectionNode.Name),
+            typeof(IEnumerable<object>));
+
+        // Conditional expression to throw exception if value is not IEnumerable, else perform Cast<object>()
+        Expression dynamicPropertyConditionCastExpr = Expression.Condition(
+            Expression.NotEqual(getDynamicPropertyValueExpr, NullConstant),
+            Expression.Condition(
+                Expression.TypeIs(getDynamicPropertyValueExpr, typeof(IEnumerable)),
+                dynamicPropertyValueToEnumerableCastExpr,
+                dynamicPropertyIsNotCollectionExceptionExpr),
+           Expression.Convert(NullConstant, typeof(IEnumerable<object>)));
+
+        // We only consider scenario 2 if scenario 1 doesn't apply
+        Expression getPropertyValueExpr = Expression.Condition(
+            Expression.NotEqual(getPropertyExpr, NullConstant),
+            declaredPropertyConditionalCastExpr,
+            dynamicPropertyConditionCastExpr);
+
+        // Handle null propagation
+        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
+        {
+            return Expression.Condition(
+                Expression.Equal(sourceExpr, NullConstant),
+                Expression.Constant(null, typeof(IEnumerable<object>)),
+                getPropertyValueExpr);
+        }
+
+        return getPropertyValueExpr;
+    }
+
+    /// <summary>
+    /// Creates an expression for retrieving a dynamic property from the dynamic properties container property.
+    /// </summary>
+    /// <param name="sourceExpr">The source expression.</param>
+    /// <param name="propertyName">The property name.</param>
+    /// <param name="queryNodeKind">The query node kind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private static Expression CreateNestedDynamicPropertyAccessExpression(
+        Expression sourceExpr,
+        string propertyName,
+        QueryNodeKind queryNodeKind,
+        QueryBinderContext context)
+    {
+        Expression getInstanceTypeExpr = Expression.Call(sourceExpr, "GetType", Type.EmptyTypes);
+
         // GetEdmTypeReference method
         MethodInfo getEdmTypeReferenceMethod = typeof(EdmClrTypeMapExtensions).GetMethod(
             nameof(EdmClrTypeMapExtensions.GetEdmTypeReference),
@@ -1604,19 +1909,17 @@ public abstract partial class QueryBinder
             getEdmTypeReferenceMethod,
             new Expression[]
             {
-                    Expression.Constant(context.Model, typeof(IEdmModel)),
-                    getTypeExpr
+                Expression.Constant(context.Model, typeof(IEdmModel)),
+                getInstanceTypeExpr
             });
 
         // Throw exception if GetEdmTypeReference returns null - Resource type not in model
-        Expression formatExceptionExpr = Expression.Call(
-            typeof(string).GetMethod("Format", new[] { typeof(string), typeof(object) }),
-            Expression.Constant(SRResources.ResourceTypeNotInModel),
-            Expression.Property(getTypeExpr, nameof(Type.FullName)));
-        Expression newExceptionExpr = Expression.New(
-            typeof(InvalidOperationException).GetConstructor(new[] { typeof(string) }),
-            formatExceptionExpr);
-        Expression throwExpresionExpr = Expression.Throw(newExceptionExpr, typeof(object));
+        Expression edmTypeReferenceConditionalExpr = Expression.Condition(
+            Expression.Equal(getEdmTypeReferenceExpr, NullConstant),
+            Expression.Throw(
+                CreateResourceTypeNotInModelExceptionExpression(getInstanceTypeExpr),
+                typeof(IEdmTypeReference)),
+            getEdmTypeReferenceExpr);
 
         // GetDynamicPropertyContainer method
         MethodInfo getDynamicPropertyContainerMethod = typeof(QueryBinder).GetMethod(
@@ -1628,8 +1931,8 @@ public abstract partial class QueryBinder
         Expression getDynamicPropertyContainerExpr = Expression.Call(
             null,
             getDynamicPropertyContainerMethod,
-        getEdmTypeReferenceExpr,
-            Expression.Constant(openNode.Kind, typeof(QueryNodeKind)),
+            edmTypeReferenceConditionalExpr,
+            Expression.Constant(queryNodeKind, typeof(QueryNodeKind)),
             Expression.Constant(context.Model, typeof(IEdmModel)));
 
         // Get dynamic properties container property value - value is a dictionary
@@ -1638,30 +1941,48 @@ public abstract partial class QueryBinder
             typeof(IDictionary<string, object>));
 
         // Get dynamic property from container property
-        Expression getDynamicPropertyValueExpr = CreateDynamicPropertyAccessExpression(
+        return CreateDynamicPropertyAccessExpression(
             dynamicPropertiesContainerExpr,
-            openNode.Name,
+            propertyName,
             context);
+    }
 
-        // We only consider scenario 2 if scenario 1 doesn't apply
-        Expression getValueExpr = Expression.Condition(
-            Expression.NotEqual(getPropertyExpr, Expression.Constant(null, typeof(PropertyInfo))),
-            getDeclaredPropertyValueExpr,
-            Expression.Condition( // Throw exception if resource type not in model
-                Expression.Equal(getEdmTypeReferenceExpr, Expression.Constant(null, typeof(object))),
-                throwExpresionExpr,
-                getDynamicPropertyValueExpr));
+    /// <summary>
+    /// Creates an <see cref="ODataException"/> for the scenario where resource type is not in the Edm model.
+    /// </summary>
+    /// <param name="instanceTypeExpr">The resource instance type expression.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private static Expression CreateResourceTypeNotInModelExceptionExpression(Expression instanceTypeExpr)
+    {
+        return Expression.New(
+            typeof(ODataException).GetConstructor(new[] { typeof(string) }),
+            Expression.Call(
+                typeof(string).GetMethod("Format", new[] { typeof(string), typeof(object) }),
+                Expression.Constant(SRResources.ResourceTypeNotInModel),
+                Expression.Property(instanceTypeExpr, nameof(Type.FullName))));
+    }
 
-        // Handle null propagation
-        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
-        {
-            return Expression.Condition(
-                Expression.Equal(sourceExpr, Expression.Constant(null, typeof(object))),
-                Expression.Constant(null, typeof(object)),
-                getValueExpr);
-        }
-
-        return getValueExpr;
+    /// <summary>
+    /// Creates an <see cref="ODataException"/> for the scenario where
+    /// any/any operators are applied to a property that is not a collection.
+    /// </summary>
+    /// <param name="instanceTypeExpr">The resource instance type expression.</param>
+    /// <param name="propertyTypeExpr">The property type expression.</param>
+    /// <param name="propertyName">The property name.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private static Expression CreatePropertyIsNotCollectionExceptionExpression(
+        Expression instanceTypeExpr,
+        Expression propertyTypeExpr,
+        string propertyName)
+    {
+        return Expression.New(
+            typeof(ODataException).GetConstructor(new[] { typeof(string) }),
+            Expression.Call(
+                typeof(string).GetMethod("Format", new[] { typeof(string), typeof(object), typeof(object), typeof(object) }),
+                Expression.Constant(SRResources.PropertyIsNotCollection, typeof(string)),
+                Expression.Property(propertyTypeExpr, nameof(Type.FullName)),
+                Expression.Constant(propertyName),
+                Expression.Property(instanceTypeExpr, nameof(Type.FullName))));
     }
 
     [DebuggerStepThrough]
