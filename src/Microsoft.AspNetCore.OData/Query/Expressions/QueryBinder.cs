@@ -1055,6 +1055,16 @@ public abstract partial class QueryBinder
     /// <returns>Returns CLR property for dynamic properties container.</returns>
     protected static PropertyInfo GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
+        if (openNode == null)
+        {
+            throw Error.ArgumentNull(nameof(openNode));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
         return GetDynamicPropertyContainer(openNode.Source, openNode.Kind, context);
     }
 
@@ -1066,6 +1076,16 @@ public abstract partial class QueryBinder
     /// <returns>Returns CLR property for dynamic properties container.</returns>
     protected static PropertyInfo GetDynamicPropertyContainer(CollectionOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
+        if (openNode == null)
+        {
+            throw Error.ArgumentNull(nameof(openNode));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
         return GetDynamicPropertyContainer(openNode.Source, openNode.Kind, context);
     }
 
@@ -1507,15 +1527,7 @@ public abstract partial class QueryBinder
     /// <returns>Returns CLR property for dynamic properties container.</returns>
     private static PropertyInfo GetDynamicPropertyContainer(SingleValueNode sourceNode, QueryNodeKind queryNodeKind, QueryBinderContext context)
     {
-        if (sourceNode == null)
-        {
-            throw Error.ArgumentNull(nameof(sourceNode));
-        }
-
-        if (context == null)
-        {
-            throw Error.ArgumentNull(nameof(context));
-        }
+        Debug.Assert(sourceNode != null, $"{nameof(sourceNode) != null}");
 
         IEdmStructuredType edmStructuredType;
         IEdmTypeReference edmTypeReference = sourceNode.TypeReference;
