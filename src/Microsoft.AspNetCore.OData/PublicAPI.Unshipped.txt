@@ -1,1 +1,2 @@
-﻿
+﻿static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueNode source, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Reflection.PropertyInfo
+virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindCollectionOpenPropertyAccessNode(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode openPropertyAccessNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression

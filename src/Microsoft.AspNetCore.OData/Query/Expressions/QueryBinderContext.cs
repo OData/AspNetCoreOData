@@ -235,7 +235,18 @@ public class QueryBinderContext
                 }
             }
 
-            ParameterExpression parameter = Expression.Parameter(Model.GetClrType(edmTypeReference, AssembliesResolver), rangeVariable.Name);
+            Type clrType = null;
+            if (edmTypeReference != null)
+            {
+                clrType = Model.GetClrType(edmTypeReference, AssembliesResolver);
+            }
+            else
+            {
+                // Edm type reference will be null in a dynamic property scenario
+                clrType = typeof(object);
+            }
+
+            ParameterExpression parameter = Expression.Parameter(clrType, rangeVariable.Name);
             Contract.Assert(lambdaIt == null, "There can be only one parameter in an Any/All lambda");
             lambdaIt = parameter;
 
