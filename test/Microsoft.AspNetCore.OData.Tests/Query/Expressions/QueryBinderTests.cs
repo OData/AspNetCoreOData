@@ -110,31 +110,25 @@ public class QueryBinderTests
     {
         get
         {
-            // Create the type reference and navigation source
-            var employeeType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-            var employeeTypeRef = HardCodedTestModel.GetEntityTypeReference(employeeType);
-            var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
-
             // Get the entity type for the Manager entity -> Manager is derived from Employee
-            var managerType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Manager");
+            var managerType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
             // Create a ResourceRangeVariableReferenceNode for the Employee entity
-            var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
-            var employeeNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
+            var employeeNode = CreateEmployeeRangeVariableReferenceNode();
 
             int capacity = 2;
             // Create a ConstantNode to cast Employee to Microsoft.AspNetCore.OData.Tests.Models.Manager
             var parametersWithConstantNode = new List<QueryNode>(capacity)
             {
-                employeeNode, // First parameter is the Person entity
-                new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.Manager") // Second parameter is the ConstantNode
+                employeeNode, 
+                new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.Manager") 
             };
 
             // Create a SingleResourceCastNode to cast Employee to Microsoft.AspNetCore.OData.Tests.Models.Manager
             var parametersWithSingleResourceCastNode = new List<QueryNode>(capacity)
             {
-                employeeNode, // First parameter is the Person entity
-                new SingleResourceCastNode(employeeNode as SingleResourceNode, managerType) // Second parameter is the SingleResourceCastNode
+                employeeNode, 
+                new SingleResourceCastNode(employeeNode as SingleResourceNode, managerType)
             };
 
             var data = new TheoryDataSet<List<QueryNode>>()
@@ -157,11 +151,11 @@ public class QueryBinderTests
         var model = HardCodedTestModel.TestModel;
 
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
         // Get the entity type for the Manager entity -> Manager is derived from Employee
-        var managerType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Manager");
+        var managerType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
         // Create the SingleResourceFunctionCallNode
         var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
@@ -175,7 +169,8 @@ public class QueryBinderTests
 
         // Assert
         Assert.NotNull(expression);
-        Assert.Equal("($it As Manager)", expression.ToString()); // cast($it, 'Microsoft.AspNetCore.OData.Tests.Models.Manager') where $it is the Employee entity
+        // cast($it, 'Microsoft.AspNetCore.OData.Tests.Models.Manager') where $it is the Employee entity
+        Assert.Equal("($it As Manager)", expression.ToString());
         Assert.Equal("Microsoft.AspNetCore.OData.Tests.Models.Manager", expression.Type.ToString());
         Assert.Equal(typeof(Manager), expression.Type);
         Assert.Equal(ExpressionType.TypeAs, expression.NodeType);
@@ -187,35 +182,31 @@ public class QueryBinderTests
     {
         get
         {
-            // Create the type reference and navigation source
-            var employeeType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-            var employeeTypeRef = HardCodedTestModel.GetEntityTypeReference(employeeType);
-            var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
-
-            var addressType = HardCodedTestModel.GetEdmComplexType("Microsoft.AspNetCore.OData.Tests.Models.Address");
-            var workAddressType = HardCodedTestModel.GetEdmComplexType("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
+            var addressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
+            var workAddressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
 
             // Create a ResourceRangeVariableReferenceNode for the Employee entity
-            var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
-            var employeeNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
+            var employeeNode = CreateEmployeeRangeVariableReferenceNode();
 
             // Create a SingleComplexNode for the Location property of the Person entity
-            var locationProperty = HardCodedTestModel.GetEmployeeLocationProperty();
+            var locationProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
             var locationNode = new SingleComplexNode(employeeNode as SingleResourceNode, locationProperty);
 
             int capacity = 2;
             // Create a ConstantNode to cast Location to NS.WorkAddress
             var parametersWithConstantNode = new List<QueryNode>(capacity)
             {
-                locationNode, // First parameter is the Location property
-                new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress") // Second parameter is the ConstantNode
+                // First parameter is the Location property
+                locationNode, 
+                // Second parameter is the ConstantNode
+                new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress") 
             };
 
             // Create a SingleResourceCastNode to cast Location to Microsoft.AspNetCore.OData.Tests.Models.WorkAddress
             var parametersWithSingleResourceCastNode = new List<QueryNode>(capacity)
             {
-                locationNode, // First parameter is the Location property
-                new SingleResourceCastNode(locationNode, workAddressType) // Second parameter is the SingleResourceCastNode
+                locationNode,
+                new SingleResourceCastNode(locationNode, workAddressType) 
             };
 
             var data = new TheoryDataSet<List<QueryNode>>()
@@ -238,19 +229,19 @@ public class QueryBinderTests
         var model = HardCodedTestModel.TestModel;
 
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReference(employeeType);
+        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReferenceFor(employeeType);
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
-        var addressType = HardCodedTestModel.GetEdmComplexType("Microsoft.AspNetCore.OData.Tests.Models.Address");
-        var workAddressType = HardCodedTestModel.GetEdmComplexType("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
+        var addressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
+        var workAddressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
 
         // Create a ResourceRangeVariableReferenceNode for the Employee entity
         var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
         var employeeNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
 
         // Create a SingleComplexNode for the Location property of the Person entity
-        var locationProperty = HardCodedTestModel.GetEmployeeLocationProperty();
+        var locationProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
         var locationNode = new SingleComplexNode(employeeNode as SingleResourceNode, locationProperty);
 
         // Create the SingleResourceFunctionCallNode
@@ -265,7 +256,8 @@ public class QueryBinderTests
 
         // Assert
         Assert.NotNull(expression);
-        Assert.Equal("($it.Location As WorkAddress)", expression.ToString()); // cast($it.Location, 'Microsoft.AspNetCore.OData.Tests.Models.WorkAddress') where $it is the Employee entity
+        // cast($it.Location, 'Microsoft.AspNetCore.OData.Tests.Models.WorkAddress') where $it is the Employee entity
+        Assert.Equal("($it.Location As WorkAddress)", expression.ToString());
         Assert.Equal("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress", expression.Type.ToString());
         Assert.Equal("Location", ((expression as UnaryExpression).Operand as MemberExpression).Member.Name);
         Assert.Equal(typeof(WorkAddress), expression.Type);
@@ -283,19 +275,19 @@ public class QueryBinderTests
         var model = HardCodedTestModel.TestModel;
 
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReference(employeeType);
+        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReferenceFor(employeeType);
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
         // Get the entity type for the Manager entity -> Manager is derived from Employee
-        var managerType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Manager");
+        var managerType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
         // Create a ResourceRangeVariableReferenceNode for the Employee entity
         var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
         var employeeNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
 
         // Create a SingleValuePropertyAccessNode for the EmployeeID property of the Person entity
-        var employeeIDProperty = HardCodedTestModel.GetEmployeeIDProperty();
+        var employeeIDProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "EmployeeID");
         var employeeIDNode = new SingleValuePropertyAccessNode(employeeNode, employeeIDProperty);
 
         // Create ConvertNode that is not SingleResourceNode or ConstantNode
@@ -383,6 +375,18 @@ public class QueryBinderTests
         Assert.NotNull(expression);
         Assert.Equal(expected, expression.ToString());
     }
+
+    private static SingleValueNode CreateEmployeeRangeVariableReferenceNode()
+    {
+        // Create the type reference and navigation source
+        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReferenceFor(employeeType);
+        var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
+
+        // Create a ResourceRangeVariableReferenceNode for the Employee entity
+        var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
+        return new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable);
+    }
 }
 
 public class MyQueryBinder : QueryBinder
@@ -403,40 +407,29 @@ public static class HardCodedTestModel
         get { return Model; }
     }
 
-    public static IEdmEntityType GetEntityType(string entityQualifiedName)
+    public static IEdmEntityType GetEntityTypeFor(string entityQualifiedName)
     {
         return TestModel.FindDeclaredType(entityQualifiedName) as IEdmEntityType;
     }
 
-    public static IEdmComplexType GetEdmComplexType(string complexTypeQualifiedName)
+    public static IEdmComplexType GetEdmComplexTypeFor(string complexTypeQualifiedName)
     {
         return TestModel.FindDeclaredType(complexTypeQualifiedName) as IEdmComplexType;
     }
 
-    public static IEdmEntityTypeReference GetEntityTypeReference(IEdmEntityType entityType)
+    public static IEdmEntityTypeReference GetEntityTypeReferenceFor(IEdmEntityType entityType)
     {
         return new EdmEntityTypeReference(entityType, false);
     }
 
-    public static IEdmComplexTypeReference GetComplexTypeReference(IEdmComplexType complexType)
+    public static IEdmProperty GetEdmPropertyFor(string entityQualifiedName, string propertyName)
     {
-        // Create a complex type reference using the EdmCoreModel
-        return new EdmComplexTypeReference(complexType, isNullable: false);
+        return GetEntityTypeFor(entityQualifiedName).FindProperty(propertyName);
     }
 
-    public static IEdmProperty GetEmployeeLocationProperty()
+    public static IEdmEntitySet GetEntitySetFor(string entityName)
     {
-        return GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee").FindProperty("Location");
-    }
-
-    public static IEdmProperty GetEmployeeIDProperty()
-    {
-        return GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee").FindProperty("EmployeeID");
-    }
-
-    public static IEdmEntitySet GetEmployeeSet()
-    {
-        return TestModel.EntityContainer.FindEntitySet("Employee");
+        return TestModel.EntityContainer.FindEntitySet(entityName);
     }
 
     private static IEdmModel BuildAndGetEdmModel()

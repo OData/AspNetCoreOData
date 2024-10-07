@@ -43,8 +43,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
         public static MockSingleEntityNode CreateFakeNodeForEmployee()
         {
-            var employeeType = HardCodedTestModel.GetEntityType("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-            return new MockSingleEntityNode(HardCodedTestModel.GetEntityTypeReference(employeeType), HardCodedTestModel.GetEmployeeSet());
+            var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+            return new MockSingleEntityNode(HardCodedTestModel.GetEntityTypeReferenceFor(employeeType), HardCodedTestModel.GetEntitySetFor("Employees"));
         }
     }
 
