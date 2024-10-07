@@ -9411,11 +9411,19 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Gets property for dynamic properties dictionary.
             </summary>
-            <param name="sourceNode">The source node.</param>
+            <param name="openNode">The single-valued open property access node.</param>
+            <param name="context">The query binder context.</param>
+            <returns>Returns CLR property for dynamic properties container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets property for dynamic properties dictionary.
+            </summary>
+            <param name="openNode">The collection-valued open property access node.</param>
             <param name="context">The query binder context.</param>
             <returns>Returns CLR property for dynamic properties container.</returns>
         </member>
@@ -9435,6 +9443,15 @@
             <param name="prop">The property.</param>
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueNode,Microsoft.OData.UriParser.QueryNodeKind,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets property for dynamic properties dictionary.
+            </summary>
+            <param name="sourceNode">The source node.</param>
+            <param name="queryNodeKind">Query node kind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>Returns CLR property for dynamic properties container.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.ApplyNullPropagationForFilterBody(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>

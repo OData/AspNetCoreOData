@@ -300,7 +300,7 @@ public abstract partial class QueryBinder
             return Bind(computedProperty.Expression, context);
         }
 
-        PropertyInfo containerProperty = GetDynamicPropertyContainer(openPropertyAccessNode.Source, context);
+        PropertyInfo containerProperty = GetDynamicPropertyContainer(openPropertyAccessNode, context);
 
         Expression containerPropertyAccessExpression = BindPropertyAccessExpression(openPropertyAccessNode.Source, containerProperty, context);
 
@@ -369,7 +369,7 @@ public abstract partial class QueryBinder
             return Bind(computedProperty.Expression, context);
         }
 
-        PropertyInfo prop = GetDynamicPropertyContainer(openNode.Source, context);
+        PropertyInfo prop = GetDynamicPropertyContainer(openNode, context);
 
         var propertyAccessExpression = BindPropertyAccessExpression(openNode.Source, prop, context);
         var readDictionaryIndexerExpression = Expression.Property(propertyAccessExpression,
@@ -1050,42 +1050,23 @@ public abstract partial class QueryBinder
     /// <summary>
     /// Gets property for dynamic properties dictionary.
     /// </summary>
-    /// <param name="sourceNode">The source node.</param>
+    /// <param name="openNode">The single-valued open property access node.</param>
     /// <param name="context">The query binder context.</param>
     /// <returns>Returns CLR property for dynamic properties container.</returns>
-    protected static PropertyInfo GetDynamicPropertyContainer(SingleValueNode sourceNode, QueryBinderContext context)
+    protected static PropertyInfo GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
-        if (sourceNode == null)
-        {
-            throw Error.ArgumentNull(nameof(sourceNode));
-        }
+        return GetDynamicPropertyContainer(openNode.Source, openNode.Kind, context);
+    }
 
-        if (context == null)
-        {
-            throw Error.ArgumentNull(nameof(context));
-        }
-
-        IEdmStructuredType edmStructuredType;
-        IEdmTypeReference edmTypeReference = sourceNode.TypeReference;
-        if (edmTypeReference.IsEntity())
-        {
-            edmStructuredType = edmTypeReference.AsEntity().EntityDefinition();
-        }
-        else if (edmTypeReference.IsComplex())
-        {
-            edmStructuredType = edmTypeReference.AsComplex().ComplexDefinition();
-        }
-        else
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, sourceNode.Kind, typeof(QueryBinder).Name);
-        }
-
-        if (!edmStructuredType.IsOpen)
-        {
-            throw Error.NotSupported(SRResources.TypeMustBeOpenType, edmStructuredType.FullTypeName());
-        }
-
-        return context.Model.GetDynamicPropertyDictionary(edmStructuredType);
+    /// <summary>
+    /// Gets property for dynamic properties dictionary.
+    /// </summary>
+    /// <param name="openNode">The collection-valued open property access node.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>Returns CLR property for dynamic properties container.</returns>
+    protected static PropertyInfo GetDynamicPropertyContainer(CollectionOpenPropertyAccessNode openNode, QueryBinderContext context)
+    {
+        return GetDynamicPropertyContainer(openNode.Source, openNode.Kind, context);
     }
 
     /// <summary>
@@ -1515,6 +1496,48 @@ public abstract partial class QueryBinder
         }
 
         return propertyAccessExpression;
+    }
+
+    /// <summary>
+    /// Gets property for dynamic properties dictionary.
+    /// </summary>
+    /// <param name="sourceNode">The source node.</param>
+    /// <param name="queryNodeKind">Query node kind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>Returns CLR property for dynamic properties container.</returns>
+    private static PropertyInfo GetDynamicPropertyContainer(SingleValueNode sourceNode, QueryNodeKind queryNodeKind, QueryBinderContext context)
+    {
+        if (sourceNode == null)
+        {
+            throw Error.ArgumentNull(nameof(sourceNode));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        IEdmStructuredType edmStructuredType;
+        IEdmTypeReference edmTypeReference = sourceNode.TypeReference;
+        if (edmTypeReference.IsEntity())
+        {
+            edmStructuredType = edmTypeReference.AsEntity().EntityDefinition();
+        }
+        else if (edmTypeReference.IsComplex())
+        {
+            edmStructuredType = edmTypeReference.AsComplex().ComplexDefinition();
+        }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNodeKind, typeof(QueryBinder).Name);
+        }
+
+        if (!edmStructuredType.IsOpen)
+        {
+            throw Error.NotSupported(SRResources.TypeMustBeOpenType, edmStructuredType.FullTypeName());
+        }
+
+        return context.Model.GetDynamicPropertyDictionary(edmStructuredType);
     }
 
     /// <summary>
