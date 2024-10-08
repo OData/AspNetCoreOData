@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
@@ -763,6 +764,7 @@ public abstract partial class QueryBinder
         return null;
     }
 
+    [DebuggerStepThrough]
     private static void CheckArgumentNull(SingleValueFunctionCallNode node, QueryBinderContext context, string nodeName)
     {
         if (node == null || node.Name != nodeName)

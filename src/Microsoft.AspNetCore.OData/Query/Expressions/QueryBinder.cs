@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1457,6 +1458,7 @@ public abstract partial class QueryBinder
         return body;
     }
 
+    [DebuggerStepThrough]
     private static void CheckArgumentNull<T>(T node, QueryBinderContext context) where T : QueryNode
     {
         if (node == null)
