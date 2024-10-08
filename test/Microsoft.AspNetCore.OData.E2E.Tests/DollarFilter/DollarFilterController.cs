@@ -20,3 +20,12 @@ public class PeopleController : ODataController
         return Ok(DollarFilterDataSource.People);
     }
 }
+
+public class ProductsController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<Product>> Get()
+    {
+        return Ok(DollarFilterDataSource.Products);
+    }
+}

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
+using Moq.Protected;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
@@ -27,7 +28,7 @@ public class DollarFilterTests : WebApiTestBase<DollarFilterTests>
     {
         IEdmModel model = DollarFilterEdmModel.GetEdmModel();
 
-        services.ConfigureControllers(typeof(PeopleController));
+        services.ConfigureControllers(typeof(PeopleController), typeof(ProductsController));
 
         services.AddControllers().AddOData(opt =>
             opt.Filter().Select().AddRouteComponents("odata", model));
@@ -93,5 +94,137 @@ public class DollarFilterTests : WebApiTestBase<DollarFilterTests>
         var result = await response.Content.ReadAsStringAsync();
 
         Assert.EndsWith($"$metadata#People\",\"value\":{partialResult}}}", result);
+    }
+
+    [Fact]
+    public async Task TestInOperatorOnDynamicSingleValuedProperty()
+    {
+        // Arrange
+        var queryUrl = $"odata/Products?$filter=DynamicSingleValuedProperty in ('b','c')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.EndsWith(
+            "/$metadata#Products\"," +
+            "\"value\":[" +
+            "{\"Id\":\"abc8fh64-3d16-473e-9251-378c68de859f\"," +
+            "\"DeclaredSingleValuedProperty\":\"b\"," +
+            "\"DeclaredCollectionValuedProperty\":[2,3,4]," +
+            "\"DynamicSingleValuedProperty\":\"b\"," +
+            "\"DynamicCollectionValuedProperty@odata.type\":\"#Collection(Int32)\",\"DynamicCollectionValuedProperty\":[2,3,4]}," +
+            "{\"Id\":\"abc8fh64-3d16-473e-9251-378c68de859g\"," +
+            "\"DeclaredSingleValuedProperty\":\"c\"," +
+            "\"DeclaredCollectionValuedProperty\":[3,4,5]," +
+            "\"DynamicSingleValuedProperty\":\"c\"," +
+            "\"DynamicCollectionValuedProperty@odata.type\":\"#Collection(Int32)\",\"DynamicCollectionValuedProperty\":[3,4,5]}]}",
+            result);
+    }
+
+    [Fact]
+    public async Task TestAnyOperatorOnDynamicCollectionValuedProperty()
+    {
+        // Arrange
+        var queryUrl = $"odata/Products?$filter=DynamicCollectionValuedProperty/any(d:d eq 4)";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.EndsWith(
+            "/$metadata#Products\"," +
+            "\"value\":[" +
+            "{\"Id\":\"abc8fh64-3d16-473e-9251-378c68de859f\"," +
+            "\"DeclaredSingleValuedProperty\":\"b\"," +
+            "\"DeclaredCollectionValuedProperty\":[2,3,4]," +
+            "\"DynamicSingleValuedProperty\":\"b\"," +
+            "\"DynamicCollectionValuedProperty@odata.type\":\"#Collection(Int32)\",\"DynamicCollectionValuedProperty\":[2,3,4]}," +
+            "{\"Id\":\"abc8fh64-3d16-473e-9251-378c68de859g\"," +
+            "\"DeclaredSingleValuedProperty\":\"c\"," +
+            "\"DeclaredCollectionValuedProperty\":[3,4,5]," +
+            "\"DynamicSingleValuedProperty\":\"c\"," +
+            "\"DynamicCollectionValuedProperty@odata.type\":\"#Collection(Int32)\",\"DynamicCollectionValuedProperty\":[3,4,5]}]}",
+            result);
+    }
+
+    [Fact]
+    public async Task TestAllOperatorOnDynamicCollectionValuedProperty()
+    {
+        // Arrange
+        var queryUrl = $"odata/Products?$filter=DynamicCollectionValuedProperty/all(d: d gt 2)";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.EndsWith(
+            "/$metadata#Products\"," +
+            "\"value\":[" +
+            "{\"Id\":\"abc8fh64-3d16-473e-9251-378c68de859g\"," +
+            "\"DeclaredSingleValuedProperty\":\"c\"," +
+            "\"DeclaredCollectionValuedProperty\":[3,4,5]," +
+            "\"DynamicSingleValuedProperty\":\"c\"," +
+            "\"DynamicCollectionValuedProperty@odata.type\":\"#Collection(Int32)\",\"DynamicCollectionValuedProperty\":[3,4,5]}]}",
+            result);
+    }
+
+    [Theory]
+    [InlineData("DeclaredSingleValuedProperty in ('b','c')", "DynamicSingleValuedProperty in ('b','c')")]
+    [InlineData("DeclaredCollectionValuedProperty/any(d:d eq 4)", "DynamicCollectionValuedProperty/any(d:d eq 4)")]
+    [InlineData("DeclaredCollectionValuedProperty/all(d: d gt 2)", "DynamicCollectionValuedProperty/all(d: d gt 2)")]
+    public async Task TestOperatorsOnDeclaredVsDynamicProperties(string declaredPropertyFilter, string dynamicPropertyFilter)
+    {
+        // Arrange
+        var declaredQueryUrl = $"odata/Products?$filter={declaredPropertyFilter}";
+        var declaredRequest = new HttpRequestMessage(HttpMethod.Get, declaredQueryUrl);
+        declaredRequest.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var declaredClient = CreateClient();
+
+        var dynamicQueryUrl = $"odata/Products?$filter={dynamicPropertyFilter}";
+        var dynamicRequest = new HttpRequestMessage(HttpMethod.Get, dynamicQueryUrl);
+        dynamicRequest.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var dynamicClient = CreateClient();
+
+        // Act
+        var declaredResponse = await declaredClient.SendAsync(declaredRequest);
+        var dynamicResponse = await dynamicClient.SendAsync(dynamicRequest);
+
+        // Assert
+        Assert.NotNull(declaredResponse);
+        Assert.NotNull(dynamicResponse);
+        Assert.Equal(HttpStatusCode.OK, declaredResponse.StatusCode);
+        Assert.Equal(declaredResponse.StatusCode, dynamicResponse.StatusCode);
+        Assert.NotNull(declaredResponse.Content);
+        Assert.NotNull(dynamicResponse.Content);
+
+        var declaredResult = await declaredResponse.Content.ReadAsStringAsync();
+        var dynamicResult = await dynamicResponse.Content.ReadAsStringAsync();
+
+        Assert.Equal(declaredResult, dynamicResult);
     }
 }

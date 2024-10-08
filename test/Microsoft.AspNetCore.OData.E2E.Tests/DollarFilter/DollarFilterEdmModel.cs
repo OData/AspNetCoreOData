@@ -16,6 +16,7 @@ public class DollarFilterEdmModel
     {
         var builder = new ODataConventionModelBuilder();
         builder.EntitySet<Person>("People");
+        builder.EntitySet<Product>("Products");
 
         return builder.GetEdmModel();
     }
