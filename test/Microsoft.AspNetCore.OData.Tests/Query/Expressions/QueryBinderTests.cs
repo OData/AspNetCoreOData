@@ -116,28 +116,27 @@ public class QueryBinderTests
             // Create a ResourceRangeVariableReferenceNode for the Employee entity
             var employeeNode = CreateEmployeeRangeVariableReferenceNode();
 
-            int capacity = 2;
-            // Create a ConstantNode to cast Employee to Microsoft.AspNetCore.OData.Tests.Models.Manager
-            var parametersWithConstantNode = new List<QueryNode>(capacity)
+            return new TheoryDataSet<List<QueryNode>>()
             {
-                employeeNode, 
-                new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.Manager") 
+                {
+                    // Create a ConstantNode to cast Employee to Microsoft.AspNetCore.OData.Tests.Models.Manager
+                    // This represents the quoted type parameter for cast function. For example: cast('Microsoft.AspNetCore.OData.Tests.Models.Manager')
+                    new List<QueryNode>()
+                    {
+                        employeeNode,
+                        new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.Manager")
+                    }
+                },
+                {
+                    // Create a SingleResourceCastNode to cast Employee to Microsoft.AspNetCore.OData.Tests.Models.Manager
+                    // This represents the unquoted type parameter for cast function. For example: cast(Microsoft.AspNetCore.OData.Tests.Models.Manager)
+                    new List<QueryNode>()
+                    {
+                        employeeNode,
+                        new SingleResourceCastNode(employeeNode as SingleResourceNode, managerType)
+                    }
+                }
             };
-
-            // Create a SingleResourceCastNode to cast Employee to Microsoft.AspNetCore.OData.Tests.Models.Manager
-            var parametersWithSingleResourceCastNode = new List<QueryNode>(capacity)
-            {
-                employeeNode, 
-                new SingleResourceCastNode(employeeNode as SingleResourceNode, managerType)
-            };
-
-            var data = new TheoryDataSet<List<QueryNode>>()
-            {
-                { parametersWithConstantNode },
-                { parametersWithSingleResourceCastNode }
-            };
-
-            return data;
         }
     }
 
@@ -192,30 +191,29 @@ public class QueryBinderTests
             var locationProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
             var locationNode = new SingleComplexNode(employeeNode as SingleResourceNode, locationProperty);
 
-            int capacity = 2;
-            // Create a ConstantNode to cast Location to NS.WorkAddress
-            var parametersWithConstantNode = new List<QueryNode>(capacity)
+            return new TheoryDataSet<List<QueryNode>>()
             {
-                // First parameter is the Location property
-                locationNode, 
-                // Second parameter is the ConstantNode
-                new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress") 
+                {
+                    // Create a ConstantNode to cast Location to NS.WorkAddress
+                    // This represents the quoted type parameter for cast function. For example: cast($it.Location, 'Microsoft.AspNetCore.OData.Tests.Models.WorkAddress')
+                    new List<QueryNode>()
+                    {
+                        // First parameter is the Location property
+                        locationNode, 
+                        // Second parameter is the ConstantNode
+                        new ConstantNode("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress")
+                    }
+                },
+                {
+                    // Create a SingleResourceCastNode to cast Location to Microsoft.AspNetCore.OData.Tests.Models.WorkAddress
+                    // This represents the unquoted type parameter for cast function. For example: cast($it.Location, Microsoft.AspNetCore.OData.Tests.Models.WorkAddress)
+                    new List<QueryNode>()
+                    {
+                        locationNode,
+                        new SingleResourceCastNode(locationNode, workAddressType)
+                    }
+                }
             };
-
-            // Create a SingleResourceCastNode to cast Location to Microsoft.AspNetCore.OData.Tests.Models.WorkAddress
-            var parametersWithSingleResourceCastNode = new List<QueryNode>(capacity)
-            {
-                locationNode,
-                new SingleResourceCastNode(locationNode, workAddressType) 
-            };
-
-            var data = new TheoryDataSet<List<QueryNode>>()
-            {
-                { parametersWithConstantNode },
-                { parametersWithSingleResourceCastNode }
-            };
-
-            return data;
         }
     }
 
