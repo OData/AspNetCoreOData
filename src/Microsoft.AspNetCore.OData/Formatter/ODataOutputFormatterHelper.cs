@@ -141,7 +141,7 @@ internal static class ODataOutputFormatterHelper
             metadataLevel = ODataMediaTypes.GetMetadataLevel(contentType.MediaType.ToString(), parameters);
         }
 
-        using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
+        await using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
         {
             ODataSerializerContext writeContext = BuildSerializerContext(request);
             writeContext.NavigationSource = targetNavigationSource;
