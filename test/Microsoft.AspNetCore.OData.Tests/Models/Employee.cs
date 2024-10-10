@@ -32,6 +32,8 @@ public class Employee
 
     public Address HomeAddress { get; set; }
 
+    public Address Location { get; set; }
+
     public IList<Employee> DirectReports { get; set; }
 }
 
