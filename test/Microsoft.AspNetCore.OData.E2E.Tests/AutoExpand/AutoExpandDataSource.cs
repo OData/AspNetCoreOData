@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.AutoExpand;
 public class AutoExpandDataSource
 {
     private static IList<Customer> _customers;
-    private static IList<People> _people;
+    private static IList<Person> _people;
     private static IList<NormalOrder> _normalOrders;
 
     static AutoExpandDataSource()
@@ -26,7 +26,7 @@ public class AutoExpandDataSource
 
     public static IList<Customer> Customers => _customers;
 
-    public static IList<People> People => _people;
+    public static IList<Person> People => _people;
 
     public static IList<NormalOrder> NormalOrders => _normalOrders;
 
@@ -129,12 +129,12 @@ public class AutoExpandDataSource
 
     public static void GeneratePeople()
     {
-        _people = new List<People>();
+        _people = new List<Person>();
 
-        People previousPeople = null;
+        Person previousPerson = null;
         for (int i = 1; i < 10; i++)
         {
-            var people = new People
+            var person = new Person
             {
                 Id = i,
                 Order = new Order
@@ -150,11 +150,11 @@ public class AutoExpandDataSource
 
             if (i > 1)
             {
-                people.Friend = previousPeople;
+                person.Friend = previousPerson;
             }
 
-            _people.Add(people);
-            previousPeople = people;
+            _people.Add(person);
+            previousPerson = person;
         }
     }
 
