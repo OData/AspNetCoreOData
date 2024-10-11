@@ -12,7 +12,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
 public class DollarFilterDataSource
 {
     private static IList<Person> people;
-    private static IList<Product> products;
+    private static List<Product> products;
+    private static List<Customer> customers;
 
     static DollarFilterDataSource()
     {
@@ -34,7 +35,8 @@ public class DollarFilterDataSource
                 Properties = new Dictionary<string, object>
                 {
                     { "DynamicSingleValuedProperty", "a" },
-                    { "DynamicCollectionValuedProperty", new int[] { 1, 2, 3 } }
+                    { "DynamicCollectionValuedProperty", new int[] { 1, 2, 3 } },
+                    { "DynamicMixedCollectionValuedProperty", new object[] { "a", 2, 3 } }
                 }
             },
             new Product
@@ -45,7 +47,8 @@ public class DollarFilterDataSource
                 Properties = new Dictionary<string, object>
                 {
                     { "DynamicSingleValuedProperty", "b" },
-                    { "DynamicCollectionValuedProperty", new int[] { 2, 3, 4 } }
+                    { "DynamicCollectionValuedProperty", new int[] { 2, 3, 4 } },
+                    { "DynamicMixedCollectionValuedProperty", new object[] { 2, "b", 4 } }
                 }
             },
             new Product
@@ -56,7 +59,58 @@ public class DollarFilterDataSource
                 Properties = new Dictionary<string, object>
                 {
                     { "DynamicSingleValuedProperty", "c" },
-                    { "DynamicCollectionValuedProperty", new int[] { 3, 4, 5 } }
+                    { "DynamicCollectionValuedProperty", new int[] { 3, 4, 5 } },
+                    { "DynamicMixedCollectionValuedProperty", new object[] { 3, 4, "c" } }
+                }
+            }
+        };
+
+        customers = new List<Customer>
+        {
+            new Customer
+            {
+                Id = 1,
+                Properties = new Dictionary<string, object>
+                {
+                    {
+                        "UntypedCollectionProperty",
+                        new object[]
+                        {
+                            Color.Black,
+                            2,
+                            new Address { Street = "Broadway Street" },
+                            "Sue",
+                            new object[] { "x", "y", "z" },
+                            null
+                        }
+                    }
+                }
+            },
+            new Customer
+            {
+                Id = 2,
+                Addresses = new List<Address>
+                {
+                    new Address
+                    {
+                        Street = "One Microsoft Way",
+                        Properties = new Dictionary<string, object>
+                        {
+                            { "Floors", new [] { 7, 8, 9, 10, 11 } }
+                        }
+                    },
+                    new Address
+                    {
+                        Street = "Park Avenue",
+                        Properties = new Dictionary<string, object>
+                        {
+                            { "Floors", new [] { 5 } }
+                        }
+                    }
+                },
+                Properties = new Dictionary<string, object>
+                {
+                    { "UntypedCollectionProperty", new [] { 3, 4 } }
                 }
             }
         };
@@ -64,5 +118,7 @@ public class DollarFilterDataSource
 
     public static IList<Person> People => people;
 
-    public static IList<Product> Products => products;
+    public static List<Product> Products => products;
+
+    public static List<Customer> Customers => customers;
 }

@@ -29,6 +29,7 @@ internal static class ExpressionBinderHelper
 {
     private static readonly MethodInfo StringCompareMethodInfo = typeof(string).GetMethod("Compare", new[] { typeof(string), typeof(string) });
     private static readonly MethodInfo GuidCompareMethodInfo = typeof(Guid).GetMethod("CompareTo", new[] { typeof(Guid) });
+    private static readonly MethodInfo ObjectEqualsMethodInfo = typeof(object).GetMethod("Equals", new[] { typeof(object), typeof(object) });
 
     private static readonly Expression NullConstant = Expression.Constant(null);
     private static readonly Expression FalseConstant = Expression.Constant(false);
@@ -109,7 +110,35 @@ internal static class ExpressionBinderHelper
             right = CreateTimeBinaryExpression(right, querySettings);
         }
 
-        if (left.Type != right.Type)
+        if (left.Type == typeof(object))
+        {
+            // left.Type will be of type object in untyped/dynamic properties scenarios.
+            // Use object equality (Object.Equals) to check if the operands are equal.
+            // Object.Equals will do a value comparison if the operands are boxed value types
+            // of the same type, e.g., Object.Equals((object)1, (object)2)
+            // Comparisons of values of different types will also be handled gracefully,
+            // e.g., Object.Equals("b", (object)2), or Object.Equals(["a","c"], (object)2),
+            // or even Object.Equals(null, (object)2)
+            // For a dynamic non-homogeneous collection like { "a", 2, "c" } and an
+            // expression $filter=any(d: d eq 2), the expected result will be returned
+            switch (binaryOperator)
+            {
+                case BinaryOperatorKind.Equal:
+                case BinaryOperatorKind.NotEqual:
+                    left = Expression.Call(null, ObjectEqualsMethodInfo, left, Expression.Convert(right, typeof(object)));
+                    right = TrueConstant;
+                    break;
+                default:
+                    // Be noted: gt (>), ge (>=), lt (<), le (<=) operators against non-homogeneous dynamic collection properties will
+                    // result into undefined/buggy behaviours.
+                    // However, they will work alright against homogenenous dynamic collection properties
+
+                    // Apply Convert expression to the left operand for gt (>), ge (>=), lt (<), le (<=) operators to work
+                    left = Expression.Convert(left, right.Type);
+                    break;
+            }
+        }
+        else if (left.Type != right.Type)
         {
             // one of them must be nullable and the other is not.
             left = ToNullable(left);

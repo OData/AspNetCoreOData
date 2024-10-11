@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -26,6 +27,28 @@ public class ProductsController : ODataController
     [EnableQuery]
     public ActionResult<IEnumerable<Product>> Get()
     {
-        return Ok(DollarFilterDataSource.Products);
+        return DollarFilterDataSource.Products;
+    }
+}
+
+public class CustomersController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<Customer>> Get()
+    {
+        return DollarFilterDataSource.Customers;
+    }
+
+    [EnableQuery]
+    public ActionResult<IEnumerable<Address>> GetAddresses(int key)
+    {
+        var customer = DollarFilterDataSource.Customers.FirstOrDefault(d => d.Id == key);
+
+        if (customer == null)
+        {
+            return NotFound();
+        }
+
+        return customer.Addresses;
     }
 }

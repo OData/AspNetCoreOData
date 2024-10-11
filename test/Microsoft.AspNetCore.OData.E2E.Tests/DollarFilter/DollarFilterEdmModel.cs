@@ -17,6 +17,8 @@ public class DollarFilterEdmModel
         var builder = new ODataConventionModelBuilder();
         builder.EntitySet<Person>("People");
         builder.EntitySet<Product>("Products");
+        builder.EntitySet<Customer>("Customers");
+        builder.EnumType<Color>();
 
         return builder.GetEdmModel();
     }

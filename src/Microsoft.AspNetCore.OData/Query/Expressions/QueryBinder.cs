@@ -1327,6 +1327,16 @@ public abstract partial class QueryBinder
                 // we handle enum conversions ourselves
                 return source;
             }
+            else if (source.Type.Equals(typeof(object)))
+            {
+                // source.Type will be of type object in untyped/dynamic properties scenarios.
+                // For an expression like any(d: d eq 2), inferring that type of "d" is integer
+                // based on the right operand and returning Convert(d, typeof(int))
+                // will cause problems if the dynamic property is a non-homogenous collection, e.g., { 1, "b", 2 }
+                // Convert(d, typeof(int)) will throw an exception for d = "b"
+                // For that reason, we don't apply a Convert expression
+                return source;
+            }
             else
             {
                 // if a cast is from Nullable<T> to Non-Nullable<T> we need to check if source is null

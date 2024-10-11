@@ -22,3 +22,22 @@ public class Product
     public List<int> DeclaredCollectionValuedProperty { get; set; }
     public Dictionary<string, object> Properties { get; set; }
 }
+
+public class Customer
+{
+    public int Id { get; set; }
+    public List<Address> Addresses { get; set; }
+    public Dictionary<string, object> Properties { get; set; }
+}
+
+public class Address
+{
+    public string Street { get; set; }
+    public Dictionary<string, object> Properties { get; set; }
+}
+
+public enum Color
+{
+    Black,
+    White
+}
