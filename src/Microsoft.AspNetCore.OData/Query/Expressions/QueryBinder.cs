@@ -97,6 +97,9 @@ public abstract partial class QueryBinder
             case QueryNodeKind.CollectionPropertyAccess:
                 return BindCollectionPropertyAccessNode(node as CollectionPropertyAccessNode, context);
 
+            case QueryNodeKind.CollectionOpenPropertyAccess:
+                return BindCollectionOpenPropertyAccessNode(node as CollectionOpenPropertyAccessNode, context);
+
             case QueryNodeKind.CollectionComplexNode:
                 return BindCollectionComplexNode(node as CollectionComplexNode, context);
 
@@ -108,7 +111,6 @@ public abstract partial class QueryBinder
 
             case QueryNodeKind.CollectionFunctionCall:
             case QueryNodeKind.CollectionResourceFunctionCall:
-            case QueryNodeKind.CollectionOpenPropertyAccess:
             default:
                 throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, node.Kind, typeof(QueryBinder).Name);
         }
@@ -277,6 +279,76 @@ public abstract partial class QueryBinder
     }
 
     /// <summary>
+    /// Binds a <see cref="CollectionPropertyAccessNode"/> to create a LINQ <see cref="Expression"/> that
+    /// represents the semantics of the <see cref="CollectionPropertyAccessNode"/>.
+    /// </summary>
+    /// <param name="openPropertyAccessNode">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    public virtual Expression BindCollectionOpenPropertyAccessNode(CollectionOpenPropertyAccessNode openPropertyAccessNode, QueryBinderContext context)
+    {
+        CheckArgumentNull(openPropertyAccessNode, context);
+
+        if (context.ElementClrType.IsDynamicTypeWrapper())
+        {
+            return GetFlattenedPropertyExpression(openPropertyAccessNode.Name, context) ?? Expression.Property(
+                Bind(openPropertyAccessNode.Source, context), openPropertyAccessNode.Name);
+        }
+
+        if (context.ComputedProperties.TryGetValue(openPropertyAccessNode.Name, out ComputeExpression computedProperty))
+        {
+            return Bind(computedProperty.Expression, context);
+        }
+
+        PropertyInfo containerProperty = GetDynamicPropertyContainer(openPropertyAccessNode, context);
+
+        Expression containerPropertyAccessExpression = BindPropertyAccessExpression(openPropertyAccessNode.Source, containerProperty, context);
+
+        IndexExpression readDictionaryIndexerExpression = Expression.Property(containerPropertyAccessExpression,
+            DictionaryStringObjectIndexerName, Expression.Constant(openPropertyAccessNode.Name));
+
+        // Check if value from dictionary is IEnumerable
+        Expression enumerableCheckExpression = Expression.TypeIs(readDictionaryIndexerExpression, typeof(IEnumerable));
+
+        // Cast to IEnumerable - if check passes
+        Expression castToEnumerableExpression = Expression.Convert(readDictionaryIndexerExpression, typeof(IEnumerable));
+
+        // Method call expression for ((IEnumerable)value).Cast<object>()
+        MethodCallExpression castMethodCallExpression = Expression.Call(
+            ExpressionHelperMethods.EnumerableCastGeneric.MakeGenericMethod(typeof(object)),
+            castToEnumerableExpression);
+
+        // Return null if not IEnumerable
+        Expression defaultNullExpression = Expression.Convert(Expression.Constant(null), typeof(IEnumerable<object>));
+
+        // Conditional expression to return 'null' if value is not IEnumerable, else perform Cast<object>()
+        Expression conditionalCastExpression = Expression.Condition(
+            enumerableCheckExpression,
+            castMethodCallExpression,
+            defaultNullExpression);
+
+        Expression containsKeyExpression = Expression.Call(containerPropertyAccessExpression,
+            containerPropertyAccessExpression.Type.GetMethod("ContainsKey"), Expression.Constant(openPropertyAccessNode.Name));
+
+        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
+        {
+            var dynamicDictIsNotNull = Expression.NotEqual(containerPropertyAccessExpression, Expression.Constant(null));
+            var dynamicDictIsNotNullAndContainsKey = Expression.AndAlso(dynamicDictIsNotNull, containsKeyExpression);
+            return Expression.Condition(
+                dynamicDictIsNotNullAndContainsKey,
+                conditionalCastExpression,
+                defaultNullExpression);
+        }
+        else
+        {
+            return Expression.Condition(
+                containsKeyExpression,
+                conditionalCastExpression,
+                defaultNullExpression);
+        }
+    }
+
+    /// <summary>
     /// Binds a <see cref="SingleValueOpenPropertyAccessNode"/> to create a LINQ <see cref="Expression"/> that
     /// represents the semantics of the <see cref="SingleValueOpenPropertyAccessNode"/>.
     /// </summary>
@@ -299,7 +371,7 @@ public abstract partial class QueryBinder
 
         PropertyInfo prop = GetDynamicPropertyContainer(openNode, context);
 
-        var propertyAccessExpression = BindPropertyAccessExpression(openNode, prop, context);
+        var propertyAccessExpression = BindPropertyAccessExpression(openNode.Source, prop, context);
         var readDictionaryIndexerExpression = Expression.Property(propertyAccessExpression,
             DictionaryStringObjectIndexerName, Expression.Constant(openNode.Name));
         var containsKeyExpression = Expression.Call(propertyAccessExpression,
@@ -978,7 +1050,7 @@ public abstract partial class QueryBinder
     /// <summary>
     /// Gets property for dynamic properties dictionary.
     /// </summary>
-    /// <param name="openNode"></param>
+    /// <param name="openNode">The single-valued open property access node.</param>
     /// <param name="context">The query binder context.</param>
     /// <returns>Returns CLR property for dynamic properties container.</returns>
     protected static PropertyInfo GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
@@ -993,22 +1065,28 @@ public abstract partial class QueryBinder
             throw Error.ArgumentNull(nameof(context));
         }
 
-        IEdmStructuredType edmStructuredType;
-        IEdmTypeReference edmTypeReference = openNode.Source.TypeReference;
-        if (edmTypeReference.IsEntity())
+        return GetDynamicPropertyContainer(openNode.Source, openNode.Kind, context);
+    }
+
+    /// <summary>
+    /// Gets property for dynamic properties dictionary.
+    /// </summary>
+    /// <param name="openNode">The collection-valued open property access node.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>Returns CLR property for dynamic properties container.</returns>
+    protected static PropertyInfo GetDynamicPropertyContainer(CollectionOpenPropertyAccessNode openNode, QueryBinderContext context)
+    {
+        if (openNode == null)
         {
-            edmStructuredType = edmTypeReference.AsEntity().EntityDefinition();
-        }
-        else if (edmTypeReference.IsComplex())
-        {
-            edmStructuredType = edmTypeReference.AsComplex().ComplexDefinition();
-        }
-        else
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, openNode.Kind, typeof(QueryBinder).Name);
+            throw Error.ArgumentNull(nameof(openNode));
         }
 
-        return context.Model.GetDynamicPropertyDictionary(edmStructuredType);
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        return GetDynamicPropertyContainer(openNode.Source, openNode.Kind, context);
     }
 
     /// <summary>
@@ -1249,6 +1327,16 @@ public abstract partial class QueryBinder
                 // we handle enum conversions ourselves
                 return source;
             }
+            else if (source.Type.Equals(typeof(object)))
+            {
+                // source.Type will be of type object in untyped/dynamic properties scenarios.
+                // For an expression like any(d: d eq 2), inferring that type of "d" is integer
+                // based on the right operand and returning Convert(d, typeof(int))
+                // will cause problems if the dynamic property is a non-homogenous collection, e.g., { 1, "b", 2 }
+                // Convert(d, typeof(int)) will throw an exception for d = "b"
+                // For that reason, we don't apply a Convert expression
+                return source;
+            }
             else
             {
                 // if a cast is from Nullable<T> to Non-Nullable<T> we need to check if source is null
@@ -1320,6 +1408,11 @@ public abstract partial class QueryBinder
             (edmTypeReference.IsDate() || edmTypeReference.IsTimeOfDay()))
         {
             constantType = Nullable.GetUnderlyingType(constantType) ?? constantType;
+        }
+
+        if (edmTypeReference != null && edmTypeReference.IsUntyped())
+        {
+            constantType = typeof(object);
         }
 
         return constantType;
@@ -1409,10 +1502,19 @@ public abstract partial class QueryBinder
         }
     }
 
-    private Expression BindPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, PropertyInfo prop, QueryBinderContext context)
+    /// <summary>
+    /// Binds property to the source node.
+    /// </summary>
+    /// <param name="sourceNode">The source node.</param>
+    /// <param name="prop">The property.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    private Expression BindPropertyAccessExpression(SingleValueNode sourceNode, PropertyInfo prop, QueryBinderContext context)
     {
-        var source = Bind(openNode.Source, context);
+        Expression source = Bind(sourceNode, context);
+
         Expression propertyAccessExpression;
+
         if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True &&
             ExpressionBinderHelper.IsNullable(source.Type) && source != context.CurrentParameter)
         {
@@ -1422,7 +1524,42 @@ public abstract partial class QueryBinder
         {
             propertyAccessExpression = Expression.Property(source, prop.Name);
         }
+
         return propertyAccessExpression;
+    }
+
+    /// <summary>
+    /// Gets property for dynamic properties dictionary.
+    /// </summary>
+    /// <param name="sourceNode">The source node.</param>
+    /// <param name="queryNodeKind">Query node kind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>Returns CLR property for dynamic properties container.</returns>
+    private static PropertyInfo GetDynamicPropertyContainer(SingleValueNode sourceNode, QueryNodeKind queryNodeKind, QueryBinderContext context)
+    {
+        Debug.Assert(sourceNode != null, $"{nameof(sourceNode) != null}");
+
+        IEdmStructuredType edmStructuredType;
+        IEdmTypeReference edmTypeReference = sourceNode.TypeReference;
+        if (edmTypeReference.IsEntity())
+        {
+            edmStructuredType = edmTypeReference.AsEntity().EntityDefinition();
+        }
+        else if (edmTypeReference.IsComplex())
+        {
+            edmStructuredType = edmTypeReference.AsComplex().ComplexDefinition();
+        }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNodeKind, typeof(QueryBinder).Name);
+        }
+
+        if (!edmStructuredType.IsOpen)
+        {
+            throw Error.NotSupported(SRResources.TypeMustBeOpenType, edmStructuredType.FullTypeName());
+        }
+
+        return context.Model.GetDynamicPropertyDictionary(edmStructuredType);
     }
 
     /// <summary>

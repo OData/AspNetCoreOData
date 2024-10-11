@@ -186,6 +186,9 @@
   <data name="TypeMustBeEnumOrNullableEnum" xml:space="preserve">
     <value>The type '{0}' must be an enum or Nullable&lt;T&gt; where T is an enum type.</value>
   </data>
+  <data name="TypeMustBeOpenType" xml:space="preserve">
+    <value>The type '{0}' must be an open type. The dynamic properties container property is only expected on open types.</value>
+  </data>
   <data name="EdmTypeNotSupported" xml:space="preserve">
     <value>{0} is not a supported EDM type.</value>
   </data>

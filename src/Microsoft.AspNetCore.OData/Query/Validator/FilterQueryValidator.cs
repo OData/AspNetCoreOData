@@ -617,6 +617,10 @@ public class FilterQueryValidator : IFilterQueryValidator
                 ValidateCollectionPropertyAccessNode(propertyAccessNode, validatorContext);
                 break;
 
+            case QueryNodeKind.CollectionOpenPropertyAccess:
+                // No identified validations for collection-valued open property yet
+                break;
+
             case QueryNodeKind.CollectionComplexNode:
                 CollectionComplexNode collectionComplexNode = node as CollectionComplexNode;
                 ValidateCollectionComplexNode(collectionComplexNode, validatorContext);
@@ -633,7 +637,6 @@ public class FilterQueryValidator : IFilterQueryValidator
 
             case QueryNodeKind.CollectionFunctionCall:
             case QueryNodeKind.CollectionResourceFunctionCall:
-            case QueryNodeKind.CollectionOpenPropertyAccess:
             // Unused or have unknown uses.
             default:
                 throw Error.NotSupported(SRResources.QueryNodeValidationNotSupported, node.Kind, typeof(FilterQueryValidator).Name);
