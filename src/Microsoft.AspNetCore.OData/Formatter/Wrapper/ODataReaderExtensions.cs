@@ -200,6 +200,10 @@ public static class ODataReaderExtensions
                 resourceSetParentWrapper.Items.Add(new ODataPrimitiveWrapper((ODataPrimitiveValue)reader.Item));
                 break;
 
+            case ODataReaderState.NestedProperty:
+                // Property without value - do nothing
+                break;
+
             default:
                 Contract.Assert(false, "We should never get here, it means the ODataReader reported a wrong state.");
                 break;

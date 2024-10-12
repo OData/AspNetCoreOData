@@ -489,8 +489,14 @@ public class ODataResourceDeserializer : ODataEdmTypeDeserializer
             throw new ArgumentNullException(nameof(resourceWrapper));
         }
 
-        foreach (ODataProperty property in resourceWrapper.Resource.Properties)
+        foreach (ODataPropertyInfo propertyInfo in resourceWrapper.Resource.Properties)
         {
+            if (!(propertyInfo is ODataProperty property))
+            {
+                // Cannot deserialize property without value
+                continue;
+            }
+
             ApplyStructuralProperty(resource, property, structuredType, readContext);
         }
     }

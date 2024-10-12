@@ -1553,6 +1553,40 @@ public class ODataResourceDeserializerTests
             typeof(Product), _readContext).Wait(), "The property 'Concurrency' does not exist on type 'ODataDemo.Product'. Make sure to only use property names that are defined by the type or mark the type as open type.");
     }
 
+    [Fact]
+    public async Task ReadAsync_ForPropertyWithoutValue()
+    {
+        // Arrange
+        string content = "{" +
+            "\"ID\":0," +
+            "\"Name\":\"Bread\"," +
+            "\"Description\":\"Whole grain bread\"," +
+            "\"PublishDate\":\"1997-07-01\"," +
+            "\"ReleaseDate@odata.type\":\"#Edm.DateTimeOffset\"," + // OData annotation - Property without value
+            "\"DiscontinuedDate@Is.DateTimeOffset\":true," + // Custom annotation - Property without value
+            "\"Rating\":4," +
+            "\"Price\":2.5" +
+        "}";
+
+        ODataResourceDeserializer deserializer = new ODataResourceDeserializer(_deserializerProvider);
+
+        // Act
+        Product product = await deserializer.ReadAsync(
+            GetODataMessageReader(content, _edmModel),
+            typeof(Product),
+            _readContext) as Product;
+
+        // Assert
+        Assert.Equal(0, product.ID);
+        Assert.Equal(4, product.Rating);
+        Assert.Equal(2.5m, product.Price);
+        Assert.Equal(product.PublishDate, new Date(1997, 7, 1));
+        Assert.Equal("Bread", product.Name);
+        Assert.Equal("Whole grain bread", product.Description);
+        Assert.Null(product.ReleaseDate);
+        Assert.Null(product.DiscontinuedDate);
+    }
+
     private static ODataMessageReader GetODataMessageReader(IODataRequestMessage oDataRequestMessage, IEdmModel edmModel)
     {
         return new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings(), edmModel);
