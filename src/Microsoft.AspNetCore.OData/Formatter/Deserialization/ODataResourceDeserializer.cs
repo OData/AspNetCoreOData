@@ -27,6 +27,8 @@ using Microsoft.AspNetCore.OData.Routing.Parser;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.Edm.Vocabularies;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
@@ -118,6 +120,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.Argument("edmType", SRResources.ArgumentMustBeOfType, "Entity, Complex or Untyped");
             }
 
+            if (item is ODataResourceValue resourceValue)
+            {
+                item = new ODataResourceWrapper(resourceValue);
+            }
+
             ODataResourceWrapper resourceWrapper = item as ODataResourceWrapper;
             if (resourceWrapper == null)
             {
@@ -152,9 +159,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(readContext));
             }
 
-            if (!String.IsNullOrEmpty(resourceWrapper.Resource.TypeName) &&
-                structuredType.FullName() != resourceWrapper.Resource.TypeName &&
-                resourceWrapper.Resource.TypeName != "Edm.Untyped")
+            string typeName = resourceWrapper.IsResourceValue ?
+                resourceWrapper.ResourceValue.TypeName :
+                resourceWrapper.Resource.TypeName;
+
+            if (!String.IsNullOrEmpty(typeName) && structuredType.FullName() != typeName && typeName != "Edm.Untyped")
             {
                 // received a derived type in a base type deserializer. delegate it to the appropriate derived type deserializer.
                 IEdmModel model = readContext.Model;
@@ -164,15 +173,15 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                     throw Error.Argument("readContext", SRResources.ModelMissingFromReadContext);
                 }
 
-                IEdmStructuredType actualType = model.FindType(resourceWrapper.Resource.TypeName) as IEdmStructuredType;
+                IEdmStructuredType actualType = model.FindType(typeName) as IEdmStructuredType;
                 if (actualType == null)
                 {
-                    throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, resourceWrapper.Resource.TypeName));
+                    throw new ODataException(Error.Format(SRResources.ResourceTypeNotInModel, typeName));
                 }
 
                 if (actualType.IsAbstract)
                 {
-                    string message = Error.Format(SRResources.CannotInstantiateAbstractResourceType, resourceWrapper.Resource.TypeName);
+                    string message = Error.Format(SRResources.CannotInstantiateAbstractResourceType, typeName);
                     throw new ODataException(message);
                 }
 
@@ -208,6 +217,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 object resource = CreateResourceInstance(structuredType, readContext);
                 ApplyResourceProperties(resource, resourceWrapper, structuredType, readContext);
+                ApplyResourceInstanceAnnotations(resource, resourceWrapper, structuredType, readContext);
                 ApplyDeletedResource(resource, resourceWrapper, readContext);
                 return resource;
             }
@@ -269,19 +279,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
 
                 if (readContext.IsDeltaOfT || readContext.IsDeltaDeleted)
                 {
-                    IEnumerable<string> updatablePoperties = model.GetAllProperties(structuredType.StructuredDefinition());
+                    IEnumerable<string> updatableProperties = model.GetAllProperties(structuredType.StructuredDefinition());
 
                     if (structuredType.IsOpen())
                     {
                         PropertyInfo dynamicDictionaryPropertyInfo = model.GetDynamicPropertyDictionary(
                             structuredType.StructuredDefinition());
 
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties,
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatableProperties,
                             dynamicDictionaryPropertyInfo, structuredType.IsComplex());
                     }
                     else
                     {
-                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatablePoperties, null, structuredType.IsComplex());
+                        return Activator.CreateInstance(readContext.ResourceType, clrType, updatableProperties, null, structuredType.IsComplex());
                     }
                 }
                 else
@@ -475,6 +485,67 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
         }
 
         /// <summary>
+        /// Deserializes the instance annotations from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+        /// </summary>
+        /// <param name="resource">The object into which the annotations should be read.</param>
+        /// <param name="resourceWrapper">The resource object containing the annotations.</param>
+        /// <param name="structuredType">The type of the resource.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        public virtual void ApplyResourceInstanceAnnotations(object resource, ODataResourceWrapper resourceWrapper,
+            IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
+        {
+            if (resourceWrapper == null)
+            {
+                throw new ArgumentNullException(nameof(resourceWrapper));
+            }
+
+            ICollection<ODataInstanceAnnotation> annotations = resourceWrapper.IsResourceValue ?
+                resourceWrapper.ResourceValue.InstanceAnnotations :
+                resourceWrapper.Resource.InstanceAnnotations;
+
+            if (annotations == null || annotations.Count == 0)
+            {
+                return;
+            }
+
+            IODataInstanceAnnotationContainer container = readContext.GetContainer(resource, structuredType.StructuredDefinition());
+            if (container == null)
+            {
+                return;
+            }
+
+            foreach (ODataInstanceAnnotation annotation in annotations)
+            {
+                IEdmTypeReference valueType = null;
+
+                object annotationValue = DeserializationHelpers.ConvertValue(annotation.Value, ref valueType, DeserializerProvider, readContext, out _);
+                container.AddResourceAnnotation(annotation.Name, annotationValue);
+            }
+        }
+
+        /// <summary>
+        /// Deserializes the nested property info from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
+        /// Nested property info contains annotations for the property but without the property value.
+        /// </summary>
+        /// <param name="resource">The object into which the structural properties should be read.</param>
+        /// <param name="resourceWrapper">The resource object containing the structural properties.</param>
+        /// <param name="structuredType">The type of the resource.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        public virtual void ApplyNestedPropertyInfos(object resource, ODataResourceWrapper resourceWrapper,
+            IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
+        {
+            if (resourceWrapper == null)
+            {
+                throw new ArgumentNullException(nameof(resourceWrapper));
+            }
+
+            foreach (ODataPropertyInfo property in resourceWrapper.NestedPropertyInfos)
+            {
+                ApplyPropertyInstanceAnnotations(resource, property, structuredType, readContext);
+            }
+        }
+
+        /// <summary>
         /// Deserializes the structural properties from <paramref name="resourceWrapper"/> into <paramref name="resource"/>.
         /// </summary>
         /// <param name="resource">The object into which the structural properties should be read.</param>
@@ -489,7 +560,11 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw new ArgumentNullException(nameof(resourceWrapper));
             }
 
-            foreach (ODataProperty property in resourceWrapper.Resource.Properties)
+            IEnumerable<ODataProperty> properties = resourceWrapper.IsResourceValue ?
+                resourceWrapper.ResourceValue.Properties :
+                resourceWrapper.Resource.Properties;
+
+            foreach (ODataProperty property in properties)
             {
                 ApplyStructuralProperty(resource, property, structuredType, readContext);
             }
@@ -526,12 +601,56 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             }
 
             DeserializationHelpers.ApplyProperty(structuralProperty, structuredType, resource, DeserializerProvider, readContext);
+
+            ApplyPropertyInstanceAnnotations(resource, structuralProperty, structuredType, readContext);
+        }
+
+        /// <summary>
+        /// Deserializes the instance annotations <paramref name="structuralProperty"/> into <paramref name="resource"/>.
+        /// </summary>
+        /// <param name="resource">The object into which the structural property should be read.</param>
+        /// <param name="structuralProperty">The structural property info.</param>
+        /// <param name="structuredType">The type of the resource.</param>
+        /// <param name="readContext">The deserializer context.</param>
+        public virtual void ApplyPropertyInstanceAnnotations(object resource, ODataPropertyInfo structuralProperty,
+            IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
+        {
+            if (structuralProperty == null)
+            {
+                throw new ArgumentNullException(nameof(structuralProperty));
+            }
+
+            if (structuralProperty.InstanceAnnotations.Count == 0)
+            {
+                return;
+            }
+
+            IODataInstanceAnnotationContainer container = readContext.GetContainer(resource, structuredType.StructuredDefinition());
+            if (container == null)
+            {
+                return;
+            }
+
+            foreach (ODataInstanceAnnotation annotation in structuralProperty.InstanceAnnotations)
+            {
+                IEdmTypeReference valueType = null;
+
+                IEdmTerm term = readContext.Model.ResolveTerm(annotation.Name);
+                if (term != null)
+                {
+                    valueType = term.Type;
+                }
+
+                object annotationValue = DeserializationHelpers.ConvertValue(annotation.Value, ref valueType, DeserializerProvider, readContext, out _);
+                container.AddPropertyAnnotation(structuralProperty.Name, annotation.Name, annotationValue);
+            }
         }
 
         private void ApplyResourceProperties(object resource, ODataResourceWrapper resourceWrapper,
             IEdmStructuredTypeReference structuredType, ODataDeserializerContext readContext)
         {
             ApplyStructuralProperties(resource, resourceWrapper, structuredType, readContext);
+            ApplyNestedPropertyInfos(resource, resourceWrapper, structuredType, readContext);
             ApplyNestedProperties(resource, resourceWrapper, structuredType, readContext);
         }
 
@@ -566,15 +685,19 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             object value = null;
             if (resourceWrapper != null)
             {
+                string typeName = resourceWrapper.IsResourceValue ?
+                    resourceWrapper.ResourceValue.TypeName :
+                    resourceWrapper.Resource.TypeName;
+
                 IEdmTypeReference edmTypeReference;
-                if (resourceWrapper.Resource.TypeName == null ||
-                    string.Equals(resourceWrapper.Resource.TypeName, "Edm.Untyped", StringComparison.OrdinalIgnoreCase))
+                if (typeName == null ||
+                    string.Equals(typeName, "Edm.Untyped", StringComparison.OrdinalIgnoreCase))
                 {
                     edmTypeReference = EdmUntypedStructuredTypeReference.NullableTypeReference;
                 }
                 else
                 {
-                    IEdmSchemaType elementType = readContext.Model.FindDeclaredType(resourceWrapper.Resource.TypeName);
+                    IEdmSchemaType elementType = readContext.Model.FindDeclaredType(typeName);
                     edmTypeReference = elementType.ToEdmTypeReference(true);
                 }
 
@@ -613,7 +736,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             {
                 // We should use the given type name to replace the EdmType.
                 // If it's real untyped, use untyped object to read.
-                edmType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
+                edmType = readContext.Model.ResolveResourceType(resourceWrapper);
                 if (edmType.IsUntyped())
                 {
                     nestedReadContext.ResourceType = typeof(EdmUntypedObject);

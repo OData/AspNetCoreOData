@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
             if (elementType == null || elementType.IsUntyped())
             {
                 // We should use the given type name to read
-                elementType = readContext.Model.ResolveResourceType(resourceWrapper.Resource);
+                elementType = readContext.Model.ResolveResourceType(resourceWrapper);
                 if (elementType.IsUntyped())
                 {
                     nestedReadContext.ResourceType = typeof(EdmUntypedObject);

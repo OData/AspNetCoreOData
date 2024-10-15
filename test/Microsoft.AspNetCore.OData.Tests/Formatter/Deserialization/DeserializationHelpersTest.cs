@@ -13,12 +13,15 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
+using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Moq;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 {
@@ -346,6 +349,71 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             // Assert
             Assert.Equal(EdmTypeKind.Primitive, typeKind);
             Assert.Equal((double)-1643000, value);
+        }
+
+        [Fact]
+        public void ConvertValue_Works_WithODataResourceValue()
+        {
+            // Arrange
+            object expect = new object();
+            object oDataValue = new ODataResourceValue
+            {
+                TypeName = "NS.ResourceValue",
+                Properties = Enumerable.Empty<ODataProperty>()
+            };
+
+            EdmModel model = new EdmModel();
+            EdmComplexType complexType = new EdmComplexType("NS", "ResourceValue");
+            var streetProp = complexType.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
+            model.AddElement(complexType);
+
+            Mock<IODataEdmTypeDeserializer> deserializer = new Mock<IODataEdmTypeDeserializer>();
+            deserializer.Setup(e => e.ReadInline(oDataValue, It.IsAny<IEdmTypeReference>(), It.IsAny<ODataDeserializerContext>())).Returns(expect);
+
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
+            deserializerProvider.Setup(e => e.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>(), It.IsAny<bool>())).Returns(deserializer.Object);
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext
+            {
+                Model = model,
+                ResourceType = typeof(IEdmObject)
+            };
+
+            // Act
+            IEdmTypeReference typeRef = null;
+            object value = DeserializationHelpers.ConvertValue(oDataValue, ref typeRef, deserializerProvider.Object, readContext, out EdmTypeKind typeKind);
+
+            // Assert
+            Assert.Equal(EdmTypeKind.Complex, typeKind);
+            Assert.Same(expect, value);
+        }
+
+        [Fact]
+        public void ConvertValue_Works_WithODataCollectionValueWithoutTypeName()
+        {
+            // Arrange
+            object expect = new object();
+            object oDataValue = new ODataCollectionValue
+            {
+                TypeName = null,
+                Items = Enumerable.Empty<object>()
+            };
+
+            Mock<IODataEdmTypeDeserializer> deserializer = new Mock<IODataEdmTypeDeserializer>();
+            deserializer.Setup(e => e.ReadInline(oDataValue, It.IsAny<IEdmTypeReference>(), It.IsAny<ODataDeserializerContext>())).Returns(expect);
+
+            Mock<IODataDeserializerProvider> deserializerProvider = new Mock<IODataDeserializerProvider>();
+            deserializerProvider.Setup(e => e.GetEdmTypeDeserializer(It.IsAny<IEdmTypeReference>(), It.IsAny<bool>())).Returns(deserializer.Object);
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext();
+
+            // Act
+            IEdmTypeReference typeRef = null;
+            object value = DeserializationHelpers.ConvertValue(oDataValue, ref typeRef, deserializerProvider.Object, readContext, out EdmTypeKind typeKind);
+
+            // Assert
+            Assert.Equal(EdmTypeKind.Collection, typeKind);
+            Assert.Same(expect, value);
         }
 
         [Theory]

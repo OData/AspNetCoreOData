@@ -592,6 +592,11 @@ public sealed class Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static System.Reflection.PropertyInfo GetInstanceAnnotationsContainer (Microsoft.OData.Edm.IEdmModel edmModel, Microsoft.OData.Edm.IEdmStructuredType edmType)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static string GetModelName (Microsoft.OData.Edm.IEdmModel model)
 
 	[
@@ -852,6 +857,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	[
 	ExtensionAttribute(),
 	]
+	public static System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] GetInstanceAnnotations (Microsoft.AspNetCore.Http.HttpRequest request)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static Microsoft.OData.Edm.IEdmModel GetModel (Microsoft.AspNetCore.Http.HttpRequest request)
 
 	[
@@ -908,6 +918,11 @@ public sealed class Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions 
 	ExtensionAttribute(),
 	]
 	public static Microsoft.AspNetCore.OData.ODataOptions ODataOptions (Microsoft.AspNetCore.Http.HttpRequest request)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Http.HttpRequest SetInstanceAnnotations (Microsoft.AspNetCore.Http.HttpRequest request, System.Collections.Generic.IDictionary`2[[System.String],[System.Object]] instanceAnnotations)
 }
 
 [
@@ -2018,6 +2033,9 @@ public class Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataResourceD
 	public virtual void ApplyDeletedResource (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyNestedProperties (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyNestedProperty (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper resourceInfoWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual void ApplyNestedPropertyInfos (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual void ApplyPropertyInstanceAnnotations (object resource, Microsoft.OData.ODataPropertyInfo structuralProperty, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
+	public virtual void ApplyResourceInstanceAnnotations (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyStructuralProperties (object resource, Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper resourceWrapper, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual void ApplyStructuralProperty (object resource, Microsoft.OData.ODataProperty structuralProperty, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
 	public virtual object CreateResourceInstance (Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext readContext)
@@ -2245,6 +2263,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataMetadataSer
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataPrimitiveSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer, IODataEdmTypeSerializer, IODataSerializer {
 	public ODataPrimitiveSerializer ()
+	public ODataPrimitiveSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
 	public virtual Microsoft.OData.ODataPrimitiveValue CreateODataPrimitiveValue (object graph, Microsoft.OData.Edm.IEdmPrimitiveTypeReference primitiveType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 	public virtual Microsoft.OData.ODataValue CreateODataValue (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
@@ -2267,6 +2286,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public ODataResourceSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
 	public virtual void AppendDynamicProperties (Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual void AppendResourceInstanceAnnotations (Microsoft.OData.ODataResourceBase resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateComplexNestedResourceInfo (Microsoft.OData.Edm.IEdmStructuralProperty complexProperty, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataProperty CreateComputedProperty (string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateDynamicComplexNestedResourceInfo (string propertyName, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
@@ -2274,6 +2294,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateNavigationLink (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataAction CreateODataAction (Microsoft.OData.Edm.IEdmAction action, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataFunction CreateODataFunction (Microsoft.OData.Edm.IEdmFunction function, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataResourceValue CreateODataResourceValue (object value, Microsoft.OData.Edm.IEdmStructuredTypeReference structuredType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
+	public virtual Microsoft.OData.ODataValue CreateODataValue (object value, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 	public virtual Microsoft.OData.ODataResource CreateResource (Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode CreateSelectExpandNode (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataStreamPropertyInfo CreateStreamProperty (Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
@@ -2714,10 +2736,14 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceSe
 
 public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWrapper : Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataItemWrapper {
 	public ODataResourceWrapper (Microsoft.OData.ODataResourceBase resource)
+	public ODataResourceWrapper (Microsoft.OData.ODataResourceValue resourceValue)
 
 	bool IsDeletedResource  { public get; }
+	bool IsResourceValue  { public get; }
+	System.Collections.Generic.IList`1[[Microsoft.OData.ODataPropertyInfo]] NestedPropertyInfos  { public get; }
 	System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataNestedResourceInfoWrapper]] NestedResourceInfos  { public get; }
 	Microsoft.OData.ODataResourceBase Resource  { public get; }
+	Microsoft.OData.ODataResourceValue ResourceValue  { public get; }
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper {

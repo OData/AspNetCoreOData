@@ -741,6 +741,9 @@
   <data name="SkipTokenNotSupportedOrderByExpression" xml:space="preserve">
     <value>SkipToken doesn't support $orderby expression kind '{0}'. Only support property or simple property path with $orderby when SkipToken enabled.</value>
   </data>
+  <data name="CannotCreateInstanceForProperty" xml:space="preserve">
+    <value>Cannot Create an instance for the property '{0}'.</value>
+  </data>
   <data name="UnableToIdentifyUniqueProperty" xml:space="preserve">
     <value>Unable to identify a unique property named '{0}'.</value>
     <comment>{0} = Property Name</comment>

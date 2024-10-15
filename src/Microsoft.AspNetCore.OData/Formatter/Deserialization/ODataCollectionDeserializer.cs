@@ -108,7 +108,9 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 }
                 else
                 {
-                    Type elementClrType = readContext.Model.GetClrType(elementType);
+                    Type elementClrType = elementType.IsUntyped() ?
+                        typeof(object) :
+                        readContext.Model.GetClrType(elementType);
                     IEnumerable castedResult = _castMethodInfo.MakeGenericMethod(elementClrType).Invoke(null, new object[] { result }) as IEnumerable;
                     return castedResult;
                 }
@@ -136,22 +138,33 @@ namespace Microsoft.AspNetCore.OData.Formatter.Deserialization
                 throw Error.ArgumentNull("elementType");
             }
 
-            IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
-            if (deserializer == null)
+            if (elementType.IsUntyped())
             {
-                throw new SerializationException(
-                    Error.Format(SRResources.TypeCannotBeDeserialized, elementType.FullName()));
-            }
-
-            foreach (object item in collectionValue.Items)
-            {
-                if (elementType.IsPrimitive())
+                foreach (object item in collectionValue.Items)
                 {
-                    yield return item;
+                    IEdmTypeReference valueType = null;
+                    yield return DeserializationHelpers.ConvertValue(item, ref valueType, DeserializerProvider, readContext, out _);
                 }
-                else
+            }
+            else
+            {
+                IODataEdmTypeDeserializer deserializer = DeserializerProvider.GetEdmTypeDeserializer(elementType);
+                if (deserializer == null)
                 {
-                    yield return deserializer.ReadInline(item, elementType, readContext);
+                    throw new SerializationException(
+                        Error.Format(SRResources.TypeCannotBeDeserialized, elementType.FullName()));
+                }
+
+                foreach (object item in collectionValue.Items)
+                {
+                    if (elementType.IsPrimitive())
+                    {
+                        yield return item;
+                    }
+                    else
+                    {
+                        yield return deserializer.ReadInline(item, elementType, readContext);
+                    }
                 }
             }
         }

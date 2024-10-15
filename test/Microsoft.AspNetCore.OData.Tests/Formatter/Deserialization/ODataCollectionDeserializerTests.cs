@@ -271,6 +271,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
         {
             ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
             builder.EnumType<Color>().Namespace = "NS";
+            builder.ComplexType<CollComplex>().Namespace = "NS";
             return builder.GetEdmModel();
         }
 
@@ -279,6 +280,113 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
             Red,
             Blue,
             Green
+        }
+
+        public class CollComplex
+        {
+            public string City { get; set; }
+            public string Street { get; set; }
+        }
+
+        [Fact]
+        public void ReadInline_CanRead_CollectionOfResourceValue()
+        {
+            // Arrange
+            ODataCollectionValue collectionValue = new ODataCollectionValue
+            {
+                TypeName = "Collection(NS.CollComplex)"
+            };
+            collectionValue.Items = new ODataResourceValue[]
+            {
+                new ODataResourceValue
+                {
+                    TypeName = "NS.CollComplex",
+                    Properties = new ODataProperty[]
+                    {
+                        new ODataProperty { Name = "City", Value = "Shang" },
+                        new ODataProperty { Name = "Street", Value = "Xia" },
+                    }
+                },
+                new ODataResourceValue
+                {
+                    TypeName = "NS.CollComplex",
+                    Properties = new ODataProperty[]
+                    {
+                        new ODataProperty { Name = "City", Value = "Zuo" },
+                        new ODataProperty { Name = "Street", Value = "You" },
+                    }
+                }
+            };
+
+            ODataCollectionDeserializer deserializer = new ODataCollectionDeserializer(DeserializerProvider);
+            IEdmComplexType complexType = Model.SchemaElements.OfType<IEdmComplexType>().First(c => c.Name == "CollComplex");
+            IEdmTypeReference edmType = new EdmCollectionTypeReference(new EdmCollectionType(new EdmComplexTypeReference(complexType, true)));
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext() { Model = Model };
+
+            // Act
+            IEnumerable results = deserializer.ReadInline(collectionValue, edmType, readContext) as IEnumerable;
+
+            // Assert
+            Assert.NotNull(results);
+            var complexInstances = results.Cast<CollComplex>();
+            Assert.Equal(2, complexInstances.Count());
+            Assert.Collection(complexInstances,
+                e =>
+                {
+                    Assert.Equal("Shang", e.City);
+                    Assert.Equal("Xia", e.Street);
+                },
+                e =>
+                {
+                    Assert.Equal("Zuo", e.City);
+                    Assert.Equal("You", e.Street);
+                });
+        }
+
+        [Fact]
+        public void ReadInline_CanRead_CollectionOfAnyTypeOfValues()
+        {
+            // Arrange
+            ODataCollectionValue collectionValue = new ODataCollectionValue();
+            collectionValue.Items = new ODataValue[]
+            {
+                new ODataResourceValue
+                {
+                    TypeName = "NS.CollComplex",
+                    Properties = new ODataProperty[]
+                    {
+                        new ODataProperty { Name = "City", Value = "Xu" },
+                        new ODataProperty { Name = "Street", Value = "Wu" },
+                    }
+                },
+                null,
+                new ODataPrimitiveValue(42),
+                new ODataEnumValue("Blue", "NS.Color")
+            };
+
+            ODataCollectionDeserializer deserializer = new ODataCollectionDeserializer(DeserializerProvider);
+            IEdmTypeReference edmType = EdmUntypedHelpers.NullablePrimitiveUntypedCollectionReference;
+
+            ODataDeserializerContext readContext = new ODataDeserializerContext() { Model = Model };
+
+            // Act
+            IEnumerable results = deserializer.ReadInline(collectionValue, edmType, readContext) as IEnumerable;
+
+            // Assert
+            Assert.NotNull(results);
+            var complexInstances = results.Cast<object>();
+            Assert.Equal(4, complexInstances.Count());
+            Assert.Collection(complexInstances,
+                e =>
+                {
+                    CollComplex c = Assert.IsType<CollComplex>(e);
+                    Assert.Equal("Xu", c.City);
+                    Assert.Equal("Wu", c.Street);
+                },
+                e => Assert.Null(e),
+                e => Assert.Equal(42, e),
+                e => Assert.Equal(Color.Blue, e));
         }
     }
 }

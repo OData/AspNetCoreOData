@@ -164,18 +164,21 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
     "]}", result);
         }
 
-        [Fact]
-        public async Task WriteObjectAsync_CanWrite_TopLevelResourceSet_ContainsEmptyCollectionOfDynamicComplexElement()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task WriteObjectAsync_CanWrite_TopLevelResourceSet_ContainsEmptyCollectionOfDynamicComplexElement(bool containsAnnotation)
         {
             // Arrange
             IODataSerializerProvider serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
             ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
             MemoryStream stream = new MemoryStream();
             IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+            message.PreferenceAppliedHeader().AnnotationFilter = "*";
 
             ODataMessageWriterSettings settings = new ODataMessageWriterSettings
             {
-                ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/"), }
+                ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/"), },
             };
             settings.SetContentType(ODataFormat.Json);
 
@@ -198,6 +201,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             builder.ComplexType<SimpleOpenAddress>();
             IEdmModel model = builder.GetEdmModel();
             ODataSerializerContext writeContext = new ODataSerializerContext { Model = model };
+            if (containsAnnotation)
+            {
+                writeContext.InstanceAnnotations = new Dictionary<string, object>
+                {
+                    { "NS.TestAnnotation", "Xiao" }
+                };
+            }
 
             // Act
             await serializer.WriteObjectAsync(addresses, typeof(IList<SimpleOpenAddress>), writer, writeContext);
@@ -205,18 +215,38 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             JObject result = JObject.Parse(await new StreamReader(stream).ReadToEndAsync());//.ToString();
 
             // Assert
-            Assert.Equal(JObject.Parse(@"{
-                ""@odata.context"": ""http://any/$metadata#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
-                ""value"": [
-                {
-                    ""Street"": ""Microsoft Rd"",
-                    ""City"": ""Redmond"",
-                    ""StringProp"": ""abc"",
-                    ""Locations@odata.type"": ""#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
-                    ""Locations"": []
-                }
-                ]
-            }"), result);
+            if (containsAnnotation)
+            {
+                Assert.Equal(JObject.Parse(@"{
+                    ""@odata.context"": ""http://any/$metadata#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
+                    ""@NS.TestAnnotation"": ""Xiao"",
+                    ""value"": [
+                      {
+                          ""Street"": ""Microsoft Rd"",
+                          ""City"": ""Redmond"",
+                          ""StringProp"": ""abc"",
+                          ""Locations@odata.type"": ""#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
+                          ""Locations"": []
+                      }
+                    ]
+                }"), result);
+            }
+            else
+            {
+
+                Assert.Equal(JObject.Parse(@"{
+                    ""@odata.context"": ""http://any/$metadata#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
+                    ""value"": [
+                      {
+                          ""Street"": ""Microsoft Rd"",
+                          ""City"": ""Redmond"",
+                          ""StringProp"": ""abc"",
+                          ""Locations@odata.type"": ""#Collection(Microsoft.AspNetCore.OData.Tests.Formatter.Models.SimpleOpenAddress)"",
+                          ""Locations"": []
+                      }
+                    ]
+                }"), result);
+            }
         }
 
         [Fact]
