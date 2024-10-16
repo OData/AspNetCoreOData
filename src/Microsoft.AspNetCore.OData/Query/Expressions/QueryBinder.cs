@@ -289,7 +289,7 @@ public abstract partial class QueryBinder
 
         if (context.ElementClrType.IsDynamicTypeWrapper())
         {
-            return GetFlattenedPropertyExpression(openNode.Name, context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
+            return GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
         }
 
         if (context.ComputedProperties.TryGetValue(openNode.Name, out var computedProperty))
@@ -714,7 +714,7 @@ public abstract partial class QueryBinder
     {
         CheckArgumentNull(allNode, context);
 
-       // context.EnterLambdaScope();
+        // context.EnterLambdaScope();
 
         (string name, ParameterExpression allIt) = context.HandleLambdaParameters(allNode.RangeVariables);
 
@@ -1035,7 +1035,7 @@ public abstract partial class QueryBinder
     }
     #endregion
 
-    internal string GetFullPropertyPath(SingleValueNode node)
+    internal static string GetFullPropertyPath(SingleValueNode node)
     {
         string path = null;
         SingleValueNode parent = null;
@@ -1047,14 +1047,19 @@ public abstract partial class QueryBinder
                 parent = complexNode.Source;
                 break;
             case QueryNodeKind.SingleValuePropertyAccess:
-                var propertyNode = ((SingleValuePropertyAccessNode)node);
+                var propertyNode = (SingleValuePropertyAccessNode)node;
                 path = propertyNode.Property.Name;
                 parent = propertyNode.Source;
                 break;
             case QueryNodeKind.SingleNavigationNode:
-                var navNode = ((SingleNavigationNode)node);
+                var navNode = (SingleNavigationNode)node;
                 path = navNode.NavigationProperty.Name;
                 parent = navNode.Source;
+                break;
+            case QueryNodeKind.SingleValueOpenPropertyAccess:
+                var openPropertyNode = (SingleValueOpenPropertyAccessNode)node;
+                path = openPropertyNode.Name;
+                parent = openPropertyNode.Source;
                 break;
         }
 
