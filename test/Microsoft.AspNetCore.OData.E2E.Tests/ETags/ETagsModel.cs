@@ -41,5 +41,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
         public ETagsCustomer RelatedCustomer { get; set; }
         [Contained]
         public ETagsCustomer ContainedCustomer { get; set; }
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }
