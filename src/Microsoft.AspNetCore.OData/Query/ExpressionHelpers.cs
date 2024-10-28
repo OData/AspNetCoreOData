@@ -284,4 +284,13 @@ internal static class ExpressionHelpers
         MemberExpression propertyAccess = Expression.Property(odataItParameter, propertyName);
         return Expression.Lambda(propertyAccess, odataItParameter);
     }
+    
+    public static Expression SequenceEquals(Expression left, Expression right)
+    {
+        MethodInfo sequenceEqualMethod = typeof(Enumerable)
+            .GetMethods(BindingFlags.Static | BindingFlags.Public)
+            .First(m => m.Name == "SequenceEqual" && m.GetParameters().Length == 2)
+            .MakeGenericMethod(right.Type.GetElementType());
+        return Expression.Call(sequenceEqualMethod, left, right);
+    }
 }

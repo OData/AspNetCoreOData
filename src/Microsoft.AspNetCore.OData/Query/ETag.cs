@@ -136,7 +136,13 @@ public class ETag : DynamicObject
             Expression value = itemValue != null
                 ? LinqParameterContainer.Parameterize(itemValue.GetType(), itemValue)
                 : Expression.Constant(value: null);
-            BinaryExpression equal = Expression.Equal(name, value);
+            
+            Expression equal;
+            if (itemValue != null && itemValue.GetType().IsArray)
+                equal = ExpressionHelpers.SequenceEquals(name, value);
+            else
+                equal = Expression.Equal(name, value);
+
             where = where == null ? equal : Expression.AndAlso(where, equal);
         }
 
