@@ -5,10 +5,10 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.AspNetCore.OData.Tests.Models
+namespace Microsoft.AspNetCore.OData.Tests.Models;
+
+public class WorkAddress : Address
 {
-    internal class WorkAddress : Address
-    {
-        public string OfficeNumber { get; set; }
-    }
+    public string OfficeNumber { get; set; }
 }
+
