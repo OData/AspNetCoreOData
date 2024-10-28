@@ -41,4 +41,6 @@ public class ETagsCustomer
     public ETagsCustomer RelatedCustomer { get; set; }
     [Contained]
     public ETagsCustomer ContainedCustomer { get; set; }
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
 }
