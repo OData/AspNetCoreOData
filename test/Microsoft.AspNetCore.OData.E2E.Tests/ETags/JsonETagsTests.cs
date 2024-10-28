@@ -62,6 +62,7 @@ public class JsonETagsTests : WebApiTestBase<JsonETagsTests>
         eTagsCustomers.Property(c => c.UlongProperty).IsConcurrencyToken();
         eTagsCustomers.Property(c => c.GuidProperty).IsConcurrencyToken();
         eTagsCustomers.Property(c => c.DateTimeOffsetProperty).IsConcurrencyToken();
+        eTagsCustomers.Ignore(d=>d.RowVersion);
         return builder.GetEdmModel();
     }
 

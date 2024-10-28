@@ -48,6 +48,7 @@ public class DerivedETagTests : WebApiTestBase<DerivedETagTests>
         SingletonConfiguration<ETagsCustomer> eTagsCustomerSingleton = builder.Singleton<ETagsCustomer>("ETagsDerivedCustomersSingleton");
         eTagsCustomerSingleton.HasRequiredBinding(c => c.RelatedCustomer, eTagsCustomersSet);
         eTagsCustomerSingleton.HasRequiredBinding(c => c.ContainedCustomer, eTagsCustomersSet);
+        eTagsCustomersSet.EntityType.Ignore(d=>d.RowVersion);
         return builder.GetEdmModel();
     }
 
@@ -60,6 +61,7 @@ public class DerivedETagTests : WebApiTestBase<DerivedETagTests>
         EntitySetConfiguration<ETagsDerivedCustomer> eTagsDerivedCustomersSet = builder.EntitySet<ETagsDerivedCustomer>("ETagsDerivedCustomers");
         eTagsDerivedCustomersSet.HasRequiredBinding(c => c.RelatedCustomer, eTagsCustomersSet);
         eTagsDerivedCustomersSet.HasRequiredBinding(c => c.ContainedCustomer, eTagsCustomersSet);
+        eTagsDerivedCustomersSet.EntityType.Ignore(d=>d.RowVersion);
         return builder.GetEdmModel();
     }
 
