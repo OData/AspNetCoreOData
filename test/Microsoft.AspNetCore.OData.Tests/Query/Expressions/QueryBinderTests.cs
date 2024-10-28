@@ -29,6 +29,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions;
 /// </summary>
 public class QueryBinderTests
 {
+    #region Create the model
+    private static readonly IEdmModel TestModel = BuildAndGetEdmModel();
+    #endregion
+
     [Fact]
     public void Bind_ThrowsArgumentNull_ForInputs()
     {
@@ -111,7 +115,7 @@ public class QueryBinderTests
         get
         {
             // Get the entity type for the Manager entity -> Manager is derived from Employee
-            var managerType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
+            var managerType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
             // Create a ResourceRangeVariableReferenceNode for the Employee entity
             var employeeNode = CreateEmployeeRangeVariableReferenceNode();
@@ -147,21 +151,19 @@ public class QueryBinderTests
         // Arrange
         var binder = new MyQueryBinder();
 
-        var model = HardCodedTestModel.TestModel;
-
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
         // Get the entity type for the Manager entity -> Manager is derived from Employee
-        var managerType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
+        var managerType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
         // Create the SingleResourceFunctionCallNode
         var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
 
         // Create an instance of QueryBinderContext using the real model and settings
-        Type clrType = model.GetClrType(employeeType);
-        var context = new QueryBinderContext(model, new ODataQuerySettings(), clrType);
+        Type clrType = TestModel.GetClrType(employeeType);
+        var context = new QueryBinderContext(TestModel, new ODataQuerySettings(), clrType);
 
         // Act
         Expression expression = binder.BindSingleResourceFunctionCallNode(node, context);
@@ -181,14 +183,14 @@ public class QueryBinderTests
     {
         get
         {
-            var addressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
-            var workAddressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
+            var addressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
+            var workAddressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
 
             // Create a ResourceRangeVariableReferenceNode for the Employee entity
             var employeeNode = CreateEmployeeRangeVariableReferenceNode();
 
             // Create a SingleComplexNode for the Location property of the Person entity
-            var locationProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
+            var locationProperty = GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
             var locationNode = new SingleComplexNode(employeeNode as SingleResourceNode, locationProperty);
 
             return new TheoryDataSet<List<QueryNode>>()
@@ -224,30 +226,28 @@ public class QueryBinderTests
         // Arrange
         var binder = new MyQueryBinder();
 
-        var model = HardCodedTestModel.TestModel;
-
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReferenceFor(employeeType);
+        var employeeType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeTypeRef = GetEntityTypeReferenceFor(employeeType);
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
-        var addressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
-        var workAddressType = HardCodedTestModel.GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
+        var addressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
+        var workAddressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
 
         // Create a ResourceRangeVariableReferenceNode for the Employee entity
         var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
         var employeeNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
 
         // Create a SingleComplexNode for the Location property of the Person entity
-        var locationProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
+        var locationProperty = GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "Location");
         var locationNode = new SingleComplexNode(employeeNode as SingleResourceNode, locationProperty);
 
         // Create the SingleResourceFunctionCallNode
         var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
 
         // Create an instance of QueryBinderContext using the real model and settings
-        Type clrType = model.GetClrType(employeeType);
-        var context = new QueryBinderContext(model, new ODataQuerySettings(), clrType);
+        Type clrType = TestModel.GetClrType(employeeType);
+        var context = new QueryBinderContext(TestModel, new ODataQuerySettings(), clrType);
 
         // Act
         Expression expression = binder.BindSingleResourceFunctionCallNode(node, context);
@@ -270,22 +270,20 @@ public class QueryBinderTests
         // Arrange
         var binder = new MyQueryBinder();
 
-        var model = HardCodedTestModel.TestModel;
-
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReferenceFor(employeeType);
+        var employeeType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeTypeRef = GetEntityTypeReferenceFor(employeeType);
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
         // Get the entity type for the Manager entity -> Manager is derived from Employee
-        var managerType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
+        var managerType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
         // Create a ResourceRangeVariableReferenceNode for the Employee entity
         var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
         var employeeNode = new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable) as SingleValueNode;
 
         // Create a SingleValuePropertyAccessNode for the EmployeeID property of the Person entity
-        var employeeIDProperty = HardCodedTestModel.GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "EmployeeID");
+        var employeeIDProperty = GetEdmPropertyFor("Microsoft.AspNetCore.OData.Tests.Models.Employee", "EmployeeID");
         var employeeIDNode = new SingleValuePropertyAccessNode(employeeNode, employeeIDProperty);
 
         // Create ConvertNode that is not SingleResourceNode or ConstantNode
@@ -304,8 +302,8 @@ public class QueryBinderTests
         var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
 
         // Create an instance of QueryBinderContext using the real model and settings
-        Type clrType = model.GetClrType(employeeType);
-        var context = new QueryBinderContext(model, new ODataQuerySettings(), clrType);
+        Type clrType = TestModel.GetClrType(employeeType);
+        var context = new QueryBinderContext(TestModel, new ODataQuerySettings(), clrType);
 
         // Act & Assert
         ExceptionAssert.Throws<NotSupportedException>(() => binder.BindSingleResourceFunctionCallNode(node, context),
@@ -377,34 +375,16 @@ public class QueryBinderTests
     private static SingleValueNode CreateEmployeeRangeVariableReferenceNode()
     {
         // Create the type reference and navigation source
-        var employeeType = HardCodedTestModel.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
-        var employeeTypeRef = HardCodedTestModel.GetEntityTypeReferenceFor(employeeType);
+        var employeeType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        var employeeTypeRef = GetEntityTypeReferenceFor(employeeType);
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
 
         // Create a ResourceRangeVariableReferenceNode for the Employee entity
         var rangeVariable = new ResourceRangeVariable("$it", employeeTypeRef, collectionNode);
         return new ResourceRangeVariableReferenceNode(rangeVariable.Name, rangeVariable);
     }
-}
 
-public class MyQueryBinder : QueryBinder
-{
-    public static PropertyInfo Call_GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
-    {
-        return GetDynamicPropertyContainer(openNode, context);
-    }
-}
-
-public static class HardCodedTestModel
-{
-    #region Create the model
-    private static readonly IEdmModel Model = BuildAndGetEdmModel();
-
-    public static IEdmModel TestModel
-    {
-        get { return Model; }
-    }
-
+    #region Helper methods
     public static IEdmEntityType GetEntityTypeFor(string entityQualifiedName)
     {
         return TestModel.FindDeclaredType(entityQualifiedName) as IEdmEntityType;
@@ -443,3 +423,84 @@ public static class HardCodedTestModel
     }
     #endregion
 }
+
+public class MyQueryBinder : QueryBinder
+{
+    public static PropertyInfo Call_GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
+    {
+        return GetDynamicPropertyContainer(openNode, context);
+    }
+}
+
+#region Mock Single Entity Node
+public class MockSingleEntityNode : SingleEntityNode
+{
+    private readonly IEdmEntityTypeReference typeReference;
+    private readonly IEdmEntitySetBase set;
+
+    public MockSingleEntityNode(IEdmEntityTypeReference type, IEdmEntitySetBase set)
+    {
+        this.typeReference = type;
+        this.set = set;
+    }
+
+    public override IEdmTypeReference TypeReference
+    {
+        get { return this.typeReference; }
+    }
+
+    public override IEdmNavigationSource NavigationSource
+    {
+        get { return this.set; }
+    }
+
+    public override IEdmStructuredTypeReference StructuredTypeReference
+    {
+        get { return this.typeReference; }
+    }
+
+    public override IEdmEntityTypeReference EntityTypeReference
+    {
+        get { return this.typeReference; }
+    }
+
+    public static MockSingleEntityNode CreateFakeNodeForEmployee()
+    {
+        var employeeType = QueryBinderTests.GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+        return new MockSingleEntityNode(QueryBinderTests.GetEntityTypeReferenceFor(employeeType), QueryBinderTests.GetEntitySetFor("Employees"));
+    }
+}
+#endregion
+
+#region Mock Collection Resource Node
+public class MockCollectionResourceNode : CollectionResourceNode
+{
+    private readonly IEdmStructuredTypeReference _typeReference;
+    private readonly IEdmNavigationSource _source;
+    private readonly IEdmTypeReference _itemType;
+    private readonly IEdmCollectionTypeReference _collectionType;
+
+    public MockCollectionResourceNode(IEdmStructuredTypeReference type, IEdmNavigationSource source, IEdmTypeReference itemType, IEdmCollectionTypeReference collectionType)
+    {
+        _typeReference = type;
+        _source = source;
+        _itemType = itemType;
+        _collectionType = collectionType;
+    }
+
+    public override IEdmStructuredTypeReference ItemStructuredType => _typeReference;
+
+    public override IEdmNavigationSource NavigationSource => _source;
+
+    public override IEdmTypeReference ItemType => _itemType;
+
+    public override IEdmCollectionTypeReference CollectionType => _collectionType;
+
+    public static MockCollectionResourceNode CreateFakeNodeForEmployee()
+    {
+        var singleEntityNode = MockSingleEntityNode.CreateFakeNodeForEmployee();
+        return new MockCollectionResourceNode(
+            singleEntityNode.EntityTypeReference, singleEntityNode.NavigationSource, singleEntityNode.EntityTypeReference, singleEntityNode.EntityTypeReference.AsCollection());
+    }
+}
+#endregion
