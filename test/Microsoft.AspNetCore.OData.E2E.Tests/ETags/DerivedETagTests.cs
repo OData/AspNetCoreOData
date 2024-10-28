@@ -62,6 +62,7 @@ public class DerivedETagTests : WebApiTestBase<DerivedETagTests>
         eTagsDerivedCustomersSet.HasRequiredBinding(c => c.RelatedCustomer, eTagsCustomersSet);
         eTagsDerivedCustomersSet.HasRequiredBinding(c => c.ContainedCustomer, eTagsCustomersSet);
         eTagsDerivedCustomersSet.EntityType.Ignore(d=>d.RowVersion);
+        eTagsCustomersSet.EntityType.Ignore(d=>d.RowVersion);
         return builder.GetEdmModel();
     }
 
