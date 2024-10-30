@@ -745,4 +745,7 @@
     <value>Unable to identify a unique property named '{0}'.</value>
     <comment>{0} = Property Name</comment>
   </data>
+  <data name="TypeMustBeOpenType" xml:space="preserve">
+    <value>The type '{0}' must be an open type. The dynamic properties container property is only expected on open types.</value>
+  </data>
 </root>
