@@ -110,7 +110,7 @@ public class QueryBinderTests
             "Unknown function 'anyUnknown'.");
     }
 
-    public static TheoryDataSet<List<QueryNode>> BindSingleResourceFunctionCallNodeForEntityTypCasting_Data
+    public static TheoryDataSet<List<QueryNode>> BindSingleResourceFunctionCallNodeForEntityTypeCasting_Data
     {
         get
         {
@@ -145,25 +145,26 @@ public class QueryBinderTests
     }
 
     [Theory]
-    [MemberData(nameof(BindSingleResourceFunctionCallNodeForEntityTypCasting_Data))]
+    [MemberData(nameof(BindSingleResourceFunctionCallNodeForEntityTypeCasting_Data))]
     public void BindSingleResourceFunctionCallNode_CastingEntityType_ReturnsExpression(List<QueryNode> parameters)
     {
         // Arrange
         var binder = new MyQueryBinder();
 
         // Create the type reference and navigation source
-        var employeeType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
         var collectionNode = MockCollectionResourceNode.CreateFakeNodeForEmployee();
-
-        // Get the entity type for the Manager entity -> Manager is derived from Employee
-        var managerType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
         // Create the SingleResourceFunctionCallNode
         var node = new SingleResourceFunctionCallNode("cast", parameters, collectionNode.ItemStructuredType, collectionNode.NavigationSource);
 
+        var employeeType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Employee");
+
         // Create an instance of QueryBinderContext using the real model and settings
         Type clrType = TestModel.GetClrType(employeeType);
         var context = new QueryBinderContext(TestModel, new ODataQuerySettings(), clrType);
+
+        // Get the entity type for the Manager entity -> Manager is derived from Employee
+        var managerType = GetEntityTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Manager");
 
         // Act
         Expression expression = binder.BindSingleResourceFunctionCallNode(node, context);
@@ -183,7 +184,6 @@ public class QueryBinderTests
     {
         get
         {
-            var addressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
             var workAddressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.WorkAddress");
 
             // Create a ResourceRangeVariableReferenceNode for the Employee entity
@@ -435,33 +435,33 @@ public class MyQueryBinder : QueryBinder
 #region Mock Single Entity Node
 public class MockSingleEntityNode : SingleEntityNode
 {
-    private readonly IEdmEntityTypeReference typeReference;
-    private readonly IEdmEntitySetBase set;
+    private readonly IEdmEntityTypeReference entityTypeReference;
+    private readonly IEdmEntitySetBase entitySet;
 
-    public MockSingleEntityNode(IEdmEntityTypeReference type, IEdmEntitySetBase set)
+    public MockSingleEntityNode(IEdmEntityTypeReference entityTypeReference, IEdmEntitySetBase entitySet)
     {
-        this.typeReference = type;
-        this.set = set;
+        this.entityTypeReference = entityTypeReference;
+        this.entitySet = entitySet;
     }
 
     public override IEdmTypeReference TypeReference
     {
-        get { return this.typeReference; }
+        get { return this.entityTypeReference; }
     }
 
     public override IEdmNavigationSource NavigationSource
     {
-        get { return this.set; }
+        get { return this.entitySet; }
     }
 
     public override IEdmStructuredTypeReference StructuredTypeReference
     {
-        get { return this.typeReference; }
+        get { return this.entityTypeReference; }
     }
 
     public override IEdmEntityTypeReference EntityTypeReference
     {
-        get { return this.typeReference; }
+        get { return this.entityTypeReference; }
     }
 
     public static MockSingleEntityNode CreateFakeNodeForEmployee()
@@ -475,32 +475,32 @@ public class MockSingleEntityNode : SingleEntityNode
 #region Mock Collection Resource Node
 public class MockCollectionResourceNode : CollectionResourceNode
 {
-    private readonly IEdmStructuredTypeReference _typeReference;
-    private readonly IEdmNavigationSource _source;
-    private readonly IEdmTypeReference _itemType;
-    private readonly IEdmCollectionTypeReference _collectionType;
+    private readonly IEdmStructuredTypeReference structuredTypeReference;
+    private readonly IEdmNavigationSource navigationSource;
+    private readonly IEdmTypeReference typeReference;
+    private readonly IEdmCollectionTypeReference collectionTypeReference;
 
-    public MockCollectionResourceNode(IEdmStructuredTypeReference type, IEdmNavigationSource source, IEdmTypeReference itemType, IEdmCollectionTypeReference collectionType)
+    public MockCollectionResourceNode(IEdmStructuredTypeReference structuredTypeReference, IEdmNavigationSource navigationSource, IEdmTypeReference typeReference)
     {
-        _typeReference = type;
-        _source = source;
-        _itemType = itemType;
-        _collectionType = collectionType;
+        this.structuredTypeReference = structuredTypeReference;
+        this.navigationSource = navigationSource;
+        this.typeReference = typeReference;
+        this.collectionTypeReference = typeReference.AsCollection();
     }
 
-    public override IEdmStructuredTypeReference ItemStructuredType => _typeReference;
+    public override IEdmStructuredTypeReference ItemStructuredType => structuredTypeReference;
 
-    public override IEdmNavigationSource NavigationSource => _source;
+    public override IEdmNavigationSource NavigationSource => navigationSource;
 
-    public override IEdmTypeReference ItemType => _itemType;
+    public override IEdmTypeReference ItemType => typeReference;
 
-    public override IEdmCollectionTypeReference CollectionType => _collectionType;
+    public override IEdmCollectionTypeReference CollectionType => collectionTypeReference;
 
     public static MockCollectionResourceNode CreateFakeNodeForEmployee()
     {
         var singleEntityNode = MockSingleEntityNode.CreateFakeNodeForEmployee();
         return new MockCollectionResourceNode(
-            singleEntityNode.EntityTypeReference, singleEntityNode.NavigationSource, singleEntityNode.EntityTypeReference, singleEntityNode.EntityTypeReference.AsCollection());
+            singleEntityNode.EntityTypeReference, singleEntityNode.NavigationSource, singleEntityNode.EntityTypeReference);
     }
 }
 #endregion
