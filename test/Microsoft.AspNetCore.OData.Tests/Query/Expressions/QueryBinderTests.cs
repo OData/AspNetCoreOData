@@ -291,8 +291,7 @@ public class QueryBinderTests
         var convertNode = new ConvertNode(employeeIDNode, edmTypeReference);
 
         // Create the parameters list
-        int capacity = 2;
-        var parameters = new List<QueryNode>(capacity)
+        var parameters = new List<QueryNode>()
         {
             employeeNode, // First parameter is the Person entity,
             convertNode // Second parameter is the ConvertNode
