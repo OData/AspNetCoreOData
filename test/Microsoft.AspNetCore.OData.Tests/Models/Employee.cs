@@ -32,8 +32,10 @@ namespace Microsoft.AspNetCore.OData.Tests.Models
 
         public Address HomeAddress { get; set; }
 
-        public IList<Employee> DirectReports { get; set; }
-    }
+    public Address Location { get; set; }
+
+    public IList<Employee> DirectReports { get; set; }
+}
 
     public class Manager : Employee
     {

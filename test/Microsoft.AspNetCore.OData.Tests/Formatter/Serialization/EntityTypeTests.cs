@@ -49,15 +49,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization
             // Act & Assert
             string actual = await ODataFormatterHelpers.GetContentResult(content, request);
 
-            Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#employees/$entity\"," +
-                "\"EmployeeID\":8," +
-                "\"EmployeeName\":\"Ssa\"," +
-                "\"BaseSalary\":0," +
-                "\"Birthday\":\"2020-09-10T01:02:03Z\"," +
-                "\"WorkCompanyId\":0," +
-                "\"HomeAddress\":null" +
-                "}", actual);
-        }
+        Assert.Equal("{\"@odata.context\":\"http://localhost/OData/$metadata#employees/$entity\"," +
+            "\"EmployeeID\":8," +
+            "\"EmployeeName\":\"Ssa\"," +
+            "\"BaseSalary\":0," +
+            "\"Birthday\":\"2020-09-10T01:02:03Z\"," +
+            "\"WorkCompanyId\":0," +
+            "\"HomeAddress\":null," +
+            "\"Location\":null" +
+            "}", actual);
+    }
 
         private static IEdmModel GetSampleModel()
         {

@@ -642,9 +642,23 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             IEdmModel model = context.Model;
 
-            string targetEdmTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
-            IEdmType targetEdmType = model.FindType(targetEdmTypeName);
-            Type targetClrType = null;
+        string targetEdmTypeName = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
+        {
+            targetEdmTypeName = constantNode.Value as string;
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            targetEdmTypeName = singleResourceCastNode.TypeReference.FullName();
+        }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, "BindSingleResourceCastFunctionCall");
+        }
+
+        IEdmType targetEdmType = model.FindType(targetEdmTypeName);
+        Type targetClrType = null;
 
             if (targetEdmType != null)
             {
