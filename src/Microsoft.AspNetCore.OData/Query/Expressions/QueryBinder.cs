@@ -24,7 +24,6 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
-using Microsoft.VisualBasic;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions;
 
