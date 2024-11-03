@@ -37,9 +37,11 @@ internal static class TypeHelper
         return (type != null && typeof(DynamicTypeWrapper).IsAssignableFrom(type));
     }
 
-    public static bool IsDeltaSetWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(DeltaSet<>), type, out entityType);
+    public static bool IsDeltaSetWrapper(this Type type, out Type entityType) =>
+        IsTypeWrapper(typeof(DeltaSet<>), type, out entityType);
 
-    public static bool IsSelectExpandWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
+    public static bool IsSelectExpandWrapper(this Type type, out Type entityType) =>
+        IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
 
     /// <summary>
     /// Determines whether the specified type is a <see cref="ComputeWrapper{T}"/> or a custom implementation
@@ -81,8 +83,8 @@ internal static class TypeHelper
             // Must inherit from DynamicTypeWrapper
             // Must implement IComputeWrapper<T> and IGroupByWrapper<TContainer, TWrapper>
             else if (typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
-                && genericTypeDefinition.ImplementsInterface(typeof(IComputeWrapper<>))
-                && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>)))
+                     && genericTypeDefinition.ImplementsInterface(typeof(IComputeWrapper<>))
+                     && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>)))
             {
                 isComputeWrapper = true;
             }
@@ -117,7 +119,8 @@ internal static class TypeHelper
         {
             Type genericTypeDefinition = typeToCheck.GetGenericTypeDefinition();
 
-            Func<bool> isFlatteningWrapperFunc = () => typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
+            Func<bool> isFlatteningWrapperFunc = () =>
+                typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
                 && genericTypeDefinition.ImplementsInterface(typeof(IFlatteningWrapper<>))
                 && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>));
             // Default implementation
@@ -136,8 +139,8 @@ internal static class TypeHelper
             // Must inherit from DynamicTypeWrapper
             // Must implement IFlatteningWrapper<T> and IGroupByWrapper<TContainer, TWrapper>
             return typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
-                && genericTypeDefinition.ImplementsInterface(typeof(IFlatteningWrapper<>))
-                && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>));
+                   && genericTypeDefinition.ImplementsInterface(typeof(IFlatteningWrapper<>))
+                   && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>));
         }
 
         return false;
@@ -174,7 +177,7 @@ internal static class TypeHelper
         // Must inherit from DynamicTypeWrapper
         // Must implement IGroupByWrapper<TContainer, TWrapper>
         return typeof(DynamicTypeWrapper).IsAssignableFrom(typeToCheck) &&
-            typeToCheck.ImplementsInterface(typeof(IGroupByWrapper<,>));
+               typeToCheck.ImplementsInterface(typeof(IGroupByWrapper<,>));
     }
 
     private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
@@ -371,10 +374,9 @@ internal static class TypeHelper
         Type collectionInterface
             = clrType.GetInterfaces()
                 .Union(new[] { clrType })
-                .FirstOrDefault(
-                    t => t.IsGenericType
-                         && (t.GetGenericTypeDefinition() == typeof(IEnumerable<>)
-                         || t.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
+                .FirstOrDefault(t => t.IsGenericType
+                                     && (t.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                                         || t.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
 
         if (collectionInterface != null)
         {
@@ -392,14 +394,12 @@ internal static class TypeHelper
     /// <returns>True if type is primitive or known type, otherwise False.</returns>
     public static bool IsPrimitiveOrKnownType(Type type)
     {
-        return type.IsPrimitive 
+        return type.IsPrimitive
                || type == typeof(string)
                || type == typeof(Uri)
                || type == typeof(DateTime)
-#if NET6_0_OR_GREATER
-    || type == typeof(DateOnly)
-    || type == typeof(TimeOnly)
-#endif
+               || type == typeof(DateOnly)
+               || type == typeof(TimeOnly)
                || type == typeof(DateTimeOffset)
                || type == typeof(Guid)
                || type == typeof(Decimal);
@@ -417,9 +417,10 @@ internal static class TypeHelper
             throw Error.ArgumentNull(nameof(clrType));
         }
 
-        return 
+        return
             (clrType.IsGenericType && clrType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)) ||
-            (clrType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
+            (clrType.GetInterfaces()
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
     }
 
     internal static bool IsDictionary(Type clrType)
@@ -457,11 +458,11 @@ internal static class TypeHelper
             throw Error.ArgumentNull(nameof(clrType));
         }
 
-        return IsDictionary(clrType) ?
-                (IEdmTypeReference)EdmUntypedStructuredTypeReference.NullableTypeReference :
-                (TypeHelper.IsCollection(clrType) ?
-                    (IEdmTypeReference)EdmUntypedHelpers.NullableUntypedCollectionReference :
-                    (IEdmTypeReference)EdmUntypedStructuredTypeReference.NullableTypeReference);
+        return IsDictionary(clrType)
+            ? (IEdmTypeReference)EdmUntypedStructuredTypeReference.NullableTypeReference
+            : (TypeHelper.IsCollection(clrType)
+                ? (IEdmTypeReference)EdmUntypedHelpers.NullableUntypedCollectionReference
+                : (IEdmTypeReference)EdmUntypedStructuredTypeReference.NullableTypeReference);
     }
 
     /// <summary>
@@ -503,7 +504,8 @@ internal static class TypeHelper
         return null;
     }
 
-    [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
+    [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+        Justification = "Catching all exceptions in this case is the right to do.")]
     // This code is copied from DefaultHttpControllerTypeResolver.GetControllerTypes.
     internal static IEnumerable<Type> GetLoadedTypes(IAssemblyResolver assembliesResolver)
     {
@@ -562,13 +564,15 @@ internal static class TypeHelper
         return type;
     }
 
-    [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Catching all exceptions in this case is the right to do.")]
+    [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes",
+        Justification = "Catching all exceptions in this case is the right to do.")]
     internal static bool TryGetInstance(Type type, object value, out object instance)
     {
         instance = null;
 
         // Trial to create an instance, using parsing
-        var methodInfo = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { value.GetType(), type.MakeByRefType() }, null);
+        var methodInfo = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null,
+            new[] { value.GetType(), type.MakeByRefType() }, null);
         if (methodInfo != null)
         {
             object[] parameters = new object[] { value, null };
@@ -593,6 +597,7 @@ internal static class TypeHelper
         {
             // Proceed further
         }
+
         return false;
     }
 
