@@ -1357,7 +1357,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // expression
             //      source.Select((ElementType element) => new Wrapper { })
             var selectMethod = GetSelectMethod(elementType, projection.Type);
-            Expression selectedExpresion = Expression.Call(selectMethod, source, selector);
+            bool isPrimitiveCollection = TypeHelper.IsPrimitiveOrKnownType(elementType);
+            Expression selectedExpresion =
+                isPrimitiveCollection ? source : Expression.Call(selectMethod, source, selector);
 
             // Append ToList() to collection as a hint to LINQ provider to buffer correlated sub-queries in memory and avoid executing N+1 queries
             if (settings.EnableCorrelatedSubqueryBuffering)

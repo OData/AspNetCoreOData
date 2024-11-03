@@ -252,6 +252,26 @@ namespace Microsoft.AspNetCore.OData.Common
             return false;
         }
 
+        /// <summary>
+        /// Check whether the given type is a primitive type or known type.
+        /// </summary>
+        /// <param name="type">The type to validate.</param>
+        /// <returns>True if type is primitive or known type, otherwise False.</returns>
+        public static bool IsPrimitiveOrKnownType(Type type)
+        {
+            return type.IsPrimitive 
+                   || type == typeof(string)
+                   || type == typeof(Uri)
+                   || type == typeof(DateTime)
+#if NET6_0_OR_GREATER
+        || type == typeof(DateOnly)
+        || type == typeof(TimeOnly)
+#endif
+                   || type == typeof(DateTimeOffset)
+                   || type == typeof(Guid)
+                   || type == typeof(Decimal);
+        }
+
         internal static bool IsDictionary(Type clrType)
         {
             if (clrType == null)
