@@ -1544,9 +1544,9 @@ public abstract partial class QueryBinder
     }
 
     /// <summary>
-    /// Creates an expression for retrieving a dynamic property from the dynamic properties container property.
+    /// Creates an expression for retrieving a dynamic property from the container property.
     /// </summary>
-    /// <param name="containerPropertyAccessExpr">The dynamic properties container property access expression.</param>
+    /// <param name="containerPropertyAccessExpr">The container property access expression.</param>
     /// <param name="propertyName">The dynamic property name.</param>
     /// <param name="context">The query binder context.</param>
     /// <returns>The LINQ <see cref="Expression"/> created.</returns>
@@ -1882,7 +1882,7 @@ public abstract partial class QueryBinder
     }
 
     /// <summary>
-    /// Creates an expression for retrieving a dynamic property from the dynamic properties container property.
+    /// Creates an expression for retrieving a dynamic property from the container property.
     /// </summary>
     /// <param name="sourceExpr">The source expression.</param>
     /// <param name="propertyName">The property name.</param>
@@ -1927,7 +1927,7 @@ public abstract partial class QueryBinder
             BindingFlags.NonPublic | BindingFlags.Static,
             new[] { typeof(IEdmTypeReference), typeof(QueryNodeKind), typeof(IEdmModel) });
 
-        // Get dynamic properties container property
+        // Get container property
         Expression getDynamicPropertyContainerExpr = Expression.Call(
             null,
             getDynamicPropertyContainerMethod,
@@ -1935,7 +1935,7 @@ public abstract partial class QueryBinder
             Expression.Constant(queryNodeKind, typeof(QueryNodeKind)),
             Expression.Constant(context.Model, typeof(IEdmModel)));
 
-        // Get dynamic properties container property value - value is a dictionary
+        // Get container property value - value is a dictionary
         Expression dynamicPropertiesContainerExpr = Expression.Convert(
             Expression.Call(getDynamicPropertyContainerExpr, "GetValue", Type.EmptyTypes, sourceExpr),
             typeof(IDictionary<string, object>));
