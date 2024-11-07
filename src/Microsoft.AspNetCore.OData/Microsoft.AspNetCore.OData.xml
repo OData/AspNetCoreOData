@@ -9241,6 +9241,15 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindCollectionOpenPropertyAccessNode(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.CollectionPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.CollectionPropertyAccessNode"/>.
+            </summary>
+            <param name="openCollectionNode">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindDynamicPropertyAccessQueryNode(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Binds a <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
@@ -9410,6 +9419,14 @@
             <param name="context">The query binder context.</param>
             <returns>Returns CLR property for dynamic properties container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets property for dynamic properties dictionary.
+            </summary>
+            <param name="openCollectionNode">The collection-valued open property access node.</param>
+            <param name="context">The query binder context.</param>
+            <returns>Returns CLR property for dynamic properties container.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetFlattenedPropertyExpression(System.String,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Gets expression for property from previously aggregated query
@@ -9456,7 +9473,7 @@
             <summary>
             Creates an expression for retrieving a dynamic property from the dynamic properties container property.
             </summary>
-            <param name="dynamicPropertiesContainerExpr">The dynamic properties container property access expression.</param>
+            <param name="containerPropertyAccessExpr">The dynamic properties container property access expression.</param>
             <param name="propertyName">The dynamic property name.</param>
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
@@ -9476,6 +9493,58 @@
             <param name="sourceExpr">The source expression.</param>
             <param name="openNode">The query node to bind.</param>
             <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindCollectionOpenPropertyAccessExpression(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds dynamic collection property to the source node.
+            </summary>
+            <param name="openCollectionNode">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindNestedCollectionOpenPropertyAccessExpression(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds nested dynamic collection property to the source node.
+            </summary>
+            <param name="openCollectionNode">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateNestedCollectionOpenPropertyAccessExpression(System.Linq.Expressions.Expression,Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for retrieving a nested dynamic collection property.
+            </summary>
+            <param name="sourceExpr">The source expression.</param>
+            <param name="openCollectionNode">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateNestedDynamicPropertyAccessExpression(System.Linq.Expressions.Expression,System.String,Microsoft.OData.UriParser.QueryNodeKind,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for retrieving a dynamic property from the dynamic properties container property.
+            </summary>
+            <param name="sourceExpr">The source expression.</param>
+            <param name="propertyName">The property name.</param>
+            <param name="queryNodeKind">The query node kind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateResourceTypeNotInModelExceptionExpression(System.Linq.Expressions.Expression)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataException"/> for the scenario where resource type is not in the Edm model.
+            </summary>
+            <param name="instanceTypeExpr">The resource instance type expression.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreatePropertyIsNotCollectionExceptionExpression(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.String)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataException"/> for the scenario where
+            any/any operators are applied to a property that is not a collection.
+            </summary>
+            <param name="instanceTypeExpr">The resource instance type expression.</param>
+            <param name="propertyTypeExpr">The property type expression.</param>
+            <param name="propertyName">The property name.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">

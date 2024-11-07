@@ -326,19 +326,19 @@ public class QueryBinderTests
     }
 
     [Fact]
-    public void GetDynamicPropertyContainer_ThrowsArgumentNull_ForInputs()
+    public void GetDynamicSingleValuedPropertyContainer_ThrowsArgumentNull_ForNullArguments()
     {
         // Arrange
         Mock<SingleValueNode> singleValueNode = new Mock<SingleValueNode>();
         SingleValueOpenPropertyAccessNode node = new SingleValueOpenPropertyAccessNode(singleValueNode.Object, "dynamic");
 
         // Act & Assert
-        ExceptionAssert.ThrowsArgumentNull(() => MyQueryBinder.Call_GetDynamicPropertyContainer(null, null), "openNode");
-        ExceptionAssert.ThrowsArgumentNull(() => MyQueryBinder.Call_GetDynamicPropertyContainer(node, null), "context");
+        ExceptionAssert.ThrowsArgumentNull(() => MyQueryBinder.GetDynamicPropertyContainerInternal((SingleValueOpenPropertyAccessNode)null, null), "openNode");
+        ExceptionAssert.ThrowsArgumentNull(() => MyQueryBinder.GetDynamicPropertyContainerInternal(node, null), "context");
     }
 
     [Fact]
-    public void GetDynamicPropertyContainer_ThrowsNotSupported_ForNotAcceptNode()
+    public void GetDynamicSingleValuedPropertyContainer_ThrowsNotSupported_ForEdmTypeNotEntityTypeOrComplexType()
     {
         // Arrange
         Mock<IEdmType> type = new Mock<IEdmType>();
@@ -351,8 +351,80 @@ public class QueryBinderTests
         SingleValueOpenPropertyAccessNode node = new SingleValueOpenPropertyAccessNode(singleValueNode.Object, "dynamic");
 
         // Act & Assert
-        ExceptionAssert.Throws<NotSupportedException>(() => MyQueryBinder.Call_GetDynamicPropertyContainer(node, new QueryBinderContext()),
+        ExceptionAssert.Throws<NotSupportedException>(() => MyQueryBinder.GetDynamicPropertyContainerInternal(node, new QueryBinderContext()),
             "Binding OData QueryNode of kind 'SingleValueOpenPropertyAccess' is not supported by 'QueryBinder'.");
+    }
+
+    [Fact]
+    public void GetDynamicSingleValuedPropertyContainer_ThrowsNotSupported_ForNonOpenEdmType()
+    {
+        // Arrange
+        Mock<IEdmEntityType> edmType = new Mock<IEdmEntityType>();
+        edmType.Setup(t => t.TypeKind).Returns(EdmTypeKind.Entity);
+        edmType.Setup(t => t.IsOpen).Returns(false);
+        edmType.Setup(t => t.Namespace).Returns("Ns");
+        edmType.Setup(t => t.Name).Returns("NonOpenEdmType");
+        Mock<IEdmTypeReference> typeRef = new Mock<IEdmTypeReference>();
+        typeRef.Setup(t => t.Definition).Returns(edmType.Object);
+
+        Mock<SingleValueNode> singleValueNode = new Mock<SingleValueNode>();
+        singleValueNode.Setup(s => s.TypeReference).Returns(typeRef.Object);
+        SingleValueOpenPropertyAccessNode node = new SingleValueOpenPropertyAccessNode(singleValueNode.Object, "dynamic");
+
+        // Act & Assert
+        ExceptionAssert.Throws<NotSupportedException>(() => MyQueryBinder.GetDynamicPropertyContainerInternal(node, new QueryBinderContext()),
+            "The type 'Ns.NonOpenEdmType' must be an open type. The dynamic properties container property is only expected on open types.");
+    }
+
+    [Fact]
+    public void GetDynamicCollectionValuedPropertyContainer_ThrowsException_ForNullArguments()
+    {
+        // Arrange
+        Mock<SingleValueNode> singleValueNode = new Mock<SingleValueNode>();
+        CollectionOpenPropertyAccessNode node = new CollectionOpenPropertyAccessNode(singleValueNode.Object, "dynamic");
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => MyQueryBinder.GetDynamicPropertyContainerInternal((CollectionOpenPropertyAccessNode)null, null), "openCollectionNode");
+        ExceptionAssert.ThrowsArgumentNull(() => MyQueryBinder.GetDynamicPropertyContainerInternal(node, null), "context");
+    }
+
+    [Fact]
+    public void GetDynamicCollectionValuedPropertyContainer_ThrowsNotSupported_ForEdmTypeNotEntityTypeOrComplexType()
+    {
+        // Arrange
+        Mock<IEdmType> type = new Mock<IEdmType>();
+        type.Setup(t => t.TypeKind).Returns(EdmTypeKind.Primitive);
+        Mock<IEdmTypeReference> typeRef = new Mock<IEdmTypeReference>();
+        typeRef.Setup(t => t.Definition).Returns(type.Object);
+
+        Mock<SingleValueNode> singleValueNode = new Mock<SingleValueNode>();
+        singleValueNode.Setup(s => s.TypeReference).Returns(typeRef.Object);
+        CollectionOpenPropertyAccessNode node = new CollectionOpenPropertyAccessNode(singleValueNode.Object, "dynamic");
+
+        // Act & Assert
+        ExceptionAssert.Throws<NotSupportedException>(() => MyQueryBinder.GetDynamicPropertyContainerInternal(node, new QueryBinderContext()),
+            "Binding OData QueryNode of kind 'CollectionOpenPropertyAccess' is not supported by 'QueryBinder'.");
+    }
+
+    [Fact]
+    public void GetDynamicCollectionValuedPropertyContainer_ThrowsNotSupported_ForNonOpenEdmType()
+    {
+        // Arrange
+        Mock<IEdmEntityType> edmType = new Mock<IEdmEntityType>();
+        edmType.Setup(t => t.TypeKind).Returns(EdmTypeKind.Entity);
+        edmType.Setup(t => t.IsOpen).Returns(false);
+        edmType.Setup(t => t.Namespace).Returns("Ns");
+        edmType.Setup(t => t.Name).Returns("NonOpenEdmType");
+        Mock<IEdmTypeReference> typeRef = new Mock<IEdmTypeReference>();
+        typeRef.Setup(t => t.Definition).Returns(edmType.Object);
+
+        Mock<SingleValueNode> singleValueNode = new Mock<SingleValueNode>();
+        singleValueNode.Setup(s => s.TypeReference).Returns(typeRef.Object);
+        CollectionOpenPropertyAccessNode node = new CollectionOpenPropertyAccessNode(singleValueNode.Object, "dynamic");
+
+        // Act & Assert
+        ExceptionAssert.Throws<NotSupportedException>(() => MyQueryBinder.GetDynamicPropertyContainerInternal(node, new QueryBinderContext()),
+            "The type 'Ns.NonOpenEdmType' must be an open type. The dynamic properties container property is only expected on open types.");
     }
 
     [Theory]
@@ -425,9 +497,14 @@ public class QueryBinderTests
 
 public class MyQueryBinder : QueryBinder
 {
-    public static PropertyInfo Call_GetDynamicPropertyContainer(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
+    internal static PropertyInfo GetDynamicPropertyContainerInternal(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
         return GetDynamicPropertyContainer(openNode, context);
+    }
+
+    internal static PropertyInfo GetDynamicPropertyContainerInternal(CollectionOpenPropertyAccessNode openCollectionNode, QueryBinderContext context)
+    {
+        return GetDynamicPropertyContainer(openCollectionNode, context);
     }
 }
 
