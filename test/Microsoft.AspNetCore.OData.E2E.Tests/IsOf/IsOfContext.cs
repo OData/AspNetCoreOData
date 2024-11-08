@@ -1,20 +1,18 @@
-//-----------------------------------------------------------------------------
-// <copyright file="CastContext.cs" company=".NET Foundation">
+﻿//-----------------------------------------------------------------------------
+// <copyright file="IsOfContext.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection.Metadata;
-using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Linq;
+using System;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.IsOf;
 
 public class DataSource
 {
@@ -99,7 +97,7 @@ public class DataSource
                         ManufacturingDate=new DateTimeOffset(2013,1,1,0,0,0,TimeSpan.FromHours(8)),
                         Speed=500,
                         Company="AirBus",
-                        Location =  addresses.First(a => a.ID == 400)
+                        Location =  addresses.First(a => a.ID == 100)
                     },
 
                }.AsQueryable<Product>();
@@ -107,29 +105,6 @@ public class DataSource
             return _products;
         }
     }
-
-    //public static IQueryable<Product> EfProducts
-    //{
-    //    get
-    //    {
-    //        if (_context == null)
-    //        {
-    //            Database.SetInitializer(new DropCreateDatabaseAlways<ProductsContext>());
-    //            string databaseName = "CastTest_" + DateTime.Now.Ticks.ToString();
-    //            string connectionString = string.Format(@"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog={0}", databaseName);
-
-    //            _context = new ProductsContext();
-    //            foreach (Product product in DataSource.InMemoryProducts)
-    //            {
-    //                _context.Products.Add(product);
-    //            }
-
-    //            _context.SaveChanges();
-    //        }
-
-    //        return _context.Products;
-    //    }
-    //}
 }
 
 public class ProductsContext : DbContext
@@ -172,12 +147,5 @@ public class ProductsContext : DbContext
     {
         return x => f(x);
     }
-
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //{
-    //    string databaseName = "CastTest_" + DateTime.Now.Ticks.ToString();
-    //    string connectionString = string.Format(@"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog={0}", databaseName);
-
-    //    optionsBuilder.UseInMemoryDatabase("Data Source=blogging.db");
-    //}
 }
+

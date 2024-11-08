@@ -820,7 +820,7 @@ public class FilterQueryValidatorTests
         {
             AllowedFunctions = AllowedFunctions.None,
         };
-        var expectedMessage = "Cast or IsOf Function must have a type in its arguments.";
+        var expectedMessage = $"Function '{unusedName}' is not allowed. To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.";
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
