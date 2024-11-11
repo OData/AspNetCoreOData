@@ -82,10 +82,10 @@ public class IsOfTest : WebODataTestBase<IsOfTest.IsOfTestStartup>
 
     [Theory]
     [MemberData(nameof(Combinations))]
-    public async Task Cast_Query_WorksAsExpected(string dataSourceMode, string dollarFormat, int expectedEntityCount)
+    public async Task Cast_Query_WorksAsExpected(string dataSourceMode, string dollarFilter, int expectedEntityCount)
     {
         // Arrange
-        var requestUri = string.Format("{0}/Products{1}", dataSourceMode, dollarFormat);
+        var requestUri = string.Format("{0}/Products{1}", dataSourceMode, dollarFilter);
 
         // Act
         HttpResponseMessage response = await Client.GetAsync(requestUri);
