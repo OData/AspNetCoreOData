@@ -8,7 +8,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
