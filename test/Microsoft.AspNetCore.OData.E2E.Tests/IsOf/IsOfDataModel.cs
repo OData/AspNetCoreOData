@@ -33,9 +33,7 @@ public class Product
 public enum Domain
 {
     Military = 1,
-
     Civil = 2,
-
     Both = 3,
 }
 

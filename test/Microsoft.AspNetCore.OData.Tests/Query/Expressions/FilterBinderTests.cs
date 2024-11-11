@@ -2418,7 +2418,7 @@ public class FilterBinderTests
 
     [Theory]
     [InlineData("cast(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null")]
-    public void CastToUnquotedComplexType_DoNotThrowsODataException(string filter)
+    public void CastToUnquotedComplexType_DoNotThrowODataException(string filter)
     {
         // Arrange & Act
         var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
