@@ -2684,7 +2684,7 @@ public class FilterBinderTests
     [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)")]
     [InlineData("isof(Category,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
     [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
-    public void IsOfUnquotedEntityType_DoNotThrowsODataException(string filter)
+    public void IsOfUnquotedEntityType_DoNotThrowODataException(string filter)
     {
         // Arrange & Act
         var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
