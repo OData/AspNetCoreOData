@@ -2646,7 +2646,7 @@ public class FilterBinderTests
     [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.Address)", "Microsoft.AspNetCore.OData.Tests.Models.Product")]
     [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)", "<null>")]
     [InlineData("isof(null, Microsoft.AspNetCore.OData.Tests.Models.Address)", "<null>")]
-    public void IsOfUnquotedComplexType_ThrowsODataException(string filter, string assignableFrom)
+    public void IsOfUnquotedComplexType_ThrowsNotAssignableFromException(string filter, string assignableFrom)
     {
         // Arrange
         var expectedMessage =
@@ -2660,7 +2660,7 @@ public class FilterBinderTests
     [Theory]
     [InlineData("isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
     [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
-    public void IsOfUnquotedComplexType_DoNotThrowsODataException(string filter)
+    public void IsOfUnquotedComplexType_DoNotThrowODataException(string filter)
     {
         // Arrange & Act
         var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));

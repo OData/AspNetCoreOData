@@ -118,8 +118,6 @@ public class ProductsContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        var splitStringConverter1 = new ValueConverter<IEnumerable<string>, string>(v => string.Join(";", v), v => v.Split(new[] { ';' }));
-
         Func<string, IList<int>> convertFrom = a =>
         {
             var items = a.Split(new[] { ';' });
