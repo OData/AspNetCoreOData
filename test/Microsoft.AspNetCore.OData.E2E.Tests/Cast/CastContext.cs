@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -24,14 +25,6 @@ public class DataSource
         {
             if (_products == null)
             {
-                var addresses = new List<MyAddress>
-                {
-                    new MyAddress { ID = 100, City = "City1" },
-                    new MyOtherAddress { ID = 200, City = "City2", Street = "Street2" },
-                    new MyAddress { ID = 300, City = "City3" },
-                    new MyOtherAddress { ID = 400, City = "City4", Street = "Street4" },
-                };
-
                 _products = new List<Product>()
                 {
                     new Product()
@@ -42,7 +35,6 @@ public class DataSource
                         Weight=1.1,
                         DimensionInCentimeter=new List<int>{1,2,3},
                         ManufacturingDate=new DateTimeOffset(2011,1,1,0,0,0,TimeSpan.FromHours(8)),
-                        Location = addresses.First(a => a.ID == 100)
                     },
                     new Product()
                     {
@@ -52,7 +44,6 @@ public class DataSource
                         Weight=2.2,
                         DimensionInCentimeter=new List<int>{2,3,4},
                         ManufacturingDate=new DateTimeOffset(2012,1,1,0,0,0,TimeSpan.FromHours(8)),
-                        Location = addresses.First(a => a.ID == 200)
                     },
                     new Product()
                     {
@@ -62,7 +53,6 @@ public class DataSource
                         Weight=3.3,
                         DimensionInCentimeter=new List<int>{3,4,5},
                         ManufacturingDate=new DateTimeOffset(2013,1,1,0,0,0,TimeSpan.FromHours(8)),
-                        Location = addresses.First(a => a.ID == 300)
                     },
                     new AirPlane()
                     {
@@ -72,8 +62,7 @@ public class DataSource
                         Weight=4.4,
                         DimensionInCentimeter=new List<int>{4,5,6},
                         ManufacturingDate=new DateTimeOffset(2013,1,1,0,0,0,TimeSpan.FromHours(8)),
-                        Speed=100,
-                        Location =  addresses.First(a => a.ID == 200)
+                        Speed=100
                     },
                     new JetPlane()
                     {
@@ -84,8 +73,7 @@ public class DataSource
                         DimensionInCentimeter=new List<int>{6,7,8},
                         ManufacturingDate=new DateTimeOffset(2013,1,1,0,0,0,TimeSpan.FromHours(8)),
                         Speed=100,
-                        Company="Boeing",
-                        Location = addresses.First(a => a.ID == 400)
+                        Company="Boeing"
                     },
                     new JetPlane()
                     {
@@ -96,8 +84,7 @@ public class DataSource
                         DimensionInCentimeter=new List<int>{7,8,9},
                         ManufacturingDate=new DateTimeOffset(2013,1,1,0,0,0,TimeSpan.FromHours(8)),
                         Speed=500,
-                        Company="AirBus",
-                        Location =  addresses.First(a => a.ID == 400)
+                        Company="AirBus"
                     },
 
                }.AsQueryable<Product>();
@@ -157,10 +144,6 @@ public class ProductsContext : DbContext
 
         var splitStringConverter = new ValueConverter<IList<int>, string>(v => string.Join(";", v), FuncToExpression(convertFrom));
         modelBuilder.Entity<Product>().Property(nameof(Product.DimensionInCentimeter)).HasConversion(splitStringConverter);
-        modelBuilder.Entity<MyAddress>()
-            .HasDiscriminator<string>("address_type")
-            .HasValue<MyAddress>("MyAddress")
-            .HasValue<MyOtherAddress>("MyOtherAddress");
 
         modelBuilder.Entity<AirPlane>().HasBaseType<Product>();
         modelBuilder.Entity<JetPlane>().HasBaseType<AirPlane>();

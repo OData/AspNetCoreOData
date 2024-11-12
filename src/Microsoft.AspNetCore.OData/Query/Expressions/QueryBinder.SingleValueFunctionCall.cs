@@ -650,20 +650,7 @@ public abstract partial class QueryBinder
             return FalseConstant;
         }
 
-        string typeName;
-        QueryNode queryNode = node.Parameters.Last();
-        if (queryNode is ConstantNode constantNode)
-        {
-            typeName = constantNode.Value as string;
-        }
-        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
-        {
-            typeName = singleResourceCastNode.TypeReference.FullName();
-        }
-        else
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, "BindSingleResourceCastFunctionCall");
-        }
+        string typeName = (string)((ConstantNode)node.Parameters.Last()).Value;
 
         IEdmType edmType = context.Model.FindType(typeName);
         Type clrType = null;

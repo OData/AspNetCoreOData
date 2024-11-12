@@ -1854,7 +1854,7 @@ public class FilterBinderTests
         var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
         Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, SimpleEnum.Second}, values);
     }
-        
+
     [Fact]
     public void EnumInExpression_NullableEnum_WithNullValue()
     {
@@ -2240,9 +2240,10 @@ public class FilterBinderTests
     // in FilterQueryValidatorTest.  ODL's ODataQueryOptionParser and FunctionCallBinder call the code throwing these exceptions.
     [Theory]
     [InlineData("cast(null,Microsoft.AspNetCore.OData.Tests.Models.Address) ne null",
-        "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from '<null>'.")]
+        "Encountered invalid type cast. " +
+        "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.DataTypes'.")]
     [InlineData("cast(null,Microsoft.AspNetCore.OData.Tests.Models.DataTypes) ne null",
-        "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DataTypes' is not assignable from '<null>'.")]
+        "Cast or IsOf Function must have a type in its arguments.")]
     public void Cast_NonPrimitiveTarget_ThrowsODataException(string filter, string expectErrorMessage)
     {
         // Arrange & Act & Assert
@@ -2390,40 +2391,31 @@ public class FilterBinderTests
         InvokeFiltersAndVerify(filters, model, (true,true));
     }
 
-    public static TheoryDataSet<string, string> CastToUnquotedComplexType
+    public static TheoryDataSet<string> CastToUnquotedComplexType
     {
         get
         {
-            return new TheoryDataSet<string, string>
+            return new TheoryDataSet<string>
             {
-                { "cast(Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'." },
-                { "cast(null, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from '<null>'." },
-                { "cast(Category, Microsoft.AspNetCore.OData.Tests.Models.Product) eq null" , "'Microsoft.AspNetCore.OData.Tests.Models.Product' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Category'."},
-                { "cast(Category, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" , "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Category'."},
+                { "cast(Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" },
+                { "cast(null, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" },
+                { "cast('', Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" },
+                { "cast(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" },
             };
         }
     }
 
     [Theory]
     [MemberData(nameof(CastToUnquotedComplexType))]
-    public void CastToUnquotedComplexType_ThrowsODataException(string filter, string assignableFromErrorMessage)
+    public void CastToUnquotedComplexType_ThrowsODataException(string filter)
     {
         // Arrange
-        var expectedMessage = $"Encountered invalid type cast. {assignableFromErrorMessage}";
+        var expectedMessage =
+            "Encountered invalid type cast. " +
+            "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.";
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
-    }
-
-    [Theory]
-    [InlineData("cast(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null")]
-    public void CastToUnquotedComplexType_DoesNotThrowODataException(string filter)
-    {
-        // Arrange & Act
-        var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
-
-        // Assert
-        Assert.Null(exception);
     }
 
     public static TheoryDataSet<string> CastToQuotedComplexType
@@ -2456,17 +2448,25 @@ public class FilterBinderTests
         InvokeFiltersAndVerify(filters, model, (true, true));
     }
 
-    public static TheoryDataSet<string> CastToUnquotedEntityType
+    public static TheoryDataSet<string, string> CastToUnquotedEntityType
     {
         get
         {
-            return new TheoryDataSet<string>
+            return new TheoryDataSet<string, string>
             {
                 {
-                    "cast(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)/DerivedProductName eq null"
+                    "cast(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)/DerivedProductName eq null",
+                    "Cast or IsOf Function must have a type in its arguments."
                 },
                 {
-                    "cast(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)/DerivedCategoryName eq null"
+                    "cast(null, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)/DerivedCategoryName eq null",
+                    "Encountered invalid type cast. " +
+                    "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'."
+                },
+                {
+                    "cast(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)/DerivedCategoryName eq null",
+                    "Encountered invalid type cast. " +
+                    "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'."
                 },
             };
         }
@@ -2474,17 +2474,14 @@ public class FilterBinderTests
 
     [Theory]
     [MemberData(nameof(CastToUnquotedEntityType))]
-    public void CastToUnquotedEntityType_DoesNotThrowODataException(string filter)
+    public void CastToUnquotedEntityType_ThrowsODataException(string filter, string expectedMessage)
     {
-        // Arrange & Act
-        var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
-
-        // Assert
-        Assert.Null(exception);
+        // Arrange & Act & Assert
+        ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
     }
 
     [Theory]
-    [InlineData("cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq null", "$it => (($it As DerivedProduct).DerivedProductName == null)","$it => (IIF((($it As DerivedProduct) == null), null, ($it As DerivedProduct).DerivedProductName) == null)")]
+    [InlineData("cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq null", "$it => (($it As DerivedProduct).DerivedProductName == null)", "$it => (IIF((($it As DerivedProduct) == null), null, ($it As DerivedProduct).DerivedProductName) == null)")]
     [InlineData("cast(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')/DerivedCategoryName eq null", "$it => (($it.Category As DerivedCategory).DerivedCategoryName == null)", "$it => (IIF((($it.Category As DerivedCategory) == null), null, ($it.Category As DerivedCategory).DerivedCategoryName) == null)")]
     public void CastToQuotedEntityOrComplexType_DerivedProductName(string filter, string expectedExpression, string expectedExpressionWithNullCheck)
     {
@@ -2642,57 +2639,36 @@ public class FilterBinderTests
     }
 
     [Theory]
-    [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.Address)", "Microsoft.AspNetCore.OData.Tests.Models.Product")]
-    [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)", "<null>")]
-    [InlineData("isof(null, Microsoft.AspNetCore.OData.Tests.Models.Address)", "<null>")]
-    public void IsOfUnquotedComplexType_ThrowsNotAssignableFromException(string filter, string assignableFrom)
+    [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+    [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+    [InlineData("isof(null, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+    [InlineData("isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+    [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
+    public void IsOfUnquotedComplexType_ThrowsODataException(string filter)
     {
         // Arrange
         var expectedMessage =
             "Encountered invalid type cast. " +
-            $"'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from '{assignableFrom}'.";
+            "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.";
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
     }
 
     [Theory]
-    [InlineData("isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
-    [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
-    public void IsOfUnquotedComplexType_DoesNotThrowODataException(string filter)
+    [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)", "Cast or IsOf Function must have a type in its arguments.")]
+    [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+        "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+    [InlineData("isof(null, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+        "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+    [InlineData("isof(Category,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+        "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+    [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)",
+        "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
+    public void IsOfUnquotedEntityType_ThrowsODataException(string filter, string expectedMessage)
     {
-        // Arrange & Act
-        var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
-
-        // Assert
-        Assert.Null(exception);
-    }
-
-    [Theory]
-    [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)", "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.")]
-    [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)", "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from '<null>'.")]
-    [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)", "'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Address'.")]
-    [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.Address)", "'Microsoft.AspNetCore.OData.Tests.Models.Address' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Category'.")]
-    public void IsOfUnquotedEntityType_ThrowsODataException(string filter, string assignableFromErrorMessage)
-    {
-        // Arrange 
-        string expectedMessage = $"Encountered invalid type cast. {assignableFromErrorMessage}";
-
-        // Act & Assert
+        // Arrange & Act & Assert
         ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>(filter), expectedMessage);
-    }
-
-    [Theory]
-    [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)")]
-    [InlineData("isof(Category,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
-    [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
-    public void IsOfUnquotedEntityType_DoesNotThrowODataException(string filter)
-    {
-        // Arrange & Act
-        var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
-
-        // Assert
-        Assert.Null(exception);
     }
 
     [Theory]
@@ -2702,26 +2678,6 @@ public class FilterBinderTests
     [InlineData("isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
     [InlineData("isof(Category, 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
     public void IsOfQuotedNonPrimitiveType_Succeeds(string filter)
-    {
-        // Arrange
-        var model = new DerivedProduct
-        {
-            SupplierAddress = new Address { City = "Redmond", },
-            Category = new DerivedCategory { DerivedCategoryName = "DerivedCategory" }
-        };
-
-        // Act & Assert
-        var filters = BindFilterAndVerify<Product>(filter);
-        InvokeFiltersAndVerify<Product>(filters, model, (true, true));
-    }
-
-    [Theory]
-    [InlineData("isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)")]
-    [InlineData("isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
-    [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
-    [InlineData("isof(Category,Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
-    [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
-    public void IsOfUnQuotedNonPrimitiveType_Succeeds(string filter)
     {
         // Arrange
         var model = new DerivedProduct
@@ -2828,7 +2784,7 @@ public class FilterBinderTests
     }
 #endif
 
-#region parameter alias for filter query option
+    #region parameter alias for filter query option
 
     [Theory]
     // Parameter alias value is not null.
@@ -2974,7 +2930,7 @@ public class FilterBinderTests
             () => parser.ParseFilter(),
             "Syntax error: character '#' is not valid at position 11 in 'IntProp eq #p'.");
     }
-#endregion
+    #endregion
 
     [Theory]
     [InlineData("ByteArrayProp eq binary'I6v/'", "$it => ($it.ByteArrayProp == System.Byte[])", true, true)]
@@ -3055,9 +3011,9 @@ public class FilterBinderTests
     {
         // Arrange & Act & Assert
         var filters = BindFilterAndVerify<Product>("ProductName eq '1'", settingsCustomizer: (settings) =>
-            {
-                settings.EnableConstantParameterization = false;
-            });
+        {
+            settings.EnableConstantParameterization = false;
+        });
 
         Assert.Equal("$it => ($it.ProductName == \"1\")", (filters.Item1 as Expression).ToString());
     }
@@ -3145,7 +3101,7 @@ public class FilterBinderTests
             expectedExpressionWithNullPropagation);
     }
 
-#region Negative Tests
+    #region Negative Tests
 
     [Fact]
     public void TypeMismatchInComparison()
@@ -3153,9 +3109,9 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>("length(123) eq 12"));
     }
-#endregion
+    #endregion
 
-#region Helpers
+    #region Helpers
     internal static void InvokeFiltersAndThrows<T>((Expression, Expression) filters, T instance, (Type, bool) expectedValue)
     {
         ExceptionAssert.Throws(expectedValue.Item1, () => InvokeFilter(instance, filters.Item1));

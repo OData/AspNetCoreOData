@@ -87,18 +87,10 @@ public class CastTest : WebODataTestBase<CastTest.CastTestStartup>
                 combinations.Add(dataSourceType, "?$filter=cast(null,Microsoft.AspNetCore.OData.E2E.Tests.Cast.Domain) eq Domain", 0);
 
                 // To Derived Structured Types with Unquoted type parameter
-                combinations.Add(dataSourceType, "?$filter=cast(Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane)/Speed eq 100", 2);
-                combinations.Add(dataSourceType, "?$filter=cast(Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane)/Speed eq 500", 1);
-                combinations.Add(dataSourceType, "?$filter=cast(Microsoft.AspNetCore.OData.E2E.Tests.Cast.JetPlane)/Company eq 'Boeing'", 1);
-                combinations.Add(dataSourceType, "?$filter=cast(Location,Microsoft.AspNetCore.OData.E2E.Tests.Cast.MyAddress)/City eq 'City2'", 2);
-                combinations.Add(dataSourceType, "?$filter=cast(Location,Microsoft.AspNetCore.OData.E2E.Tests.Cast.MyOtherAddress)/Street eq 'Street2'", 2);
-
-                // With Quoted type parameter
-                combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane')/Speed eq 100", 2);
-                combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane')/Speed eq 500", 1);
-                combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.JetPlane')/Company eq 'Boeing'", 1);
-                combinations.Add(dataSourceType, "?$filter=cast(Location,'Microsoft.AspNetCore.OData.E2E.Tests.Cast.MyAddress')/City eq 'City2'", 2);
-                combinations.Add(dataSourceType, "?$filter=cast(Location,'Microsoft.AspNetCore.OData.E2E.Tests.Cast.MyOtherAddress')/Street eq 'Street2'", 2);
+                //To Derived Structured Types
+                // combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane')/Speed eq 100", 2);
+                // combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.AirPlane')/Speed eq 500", 1);
+                // combinations.Add(dataSourceType, "?$filter=cast('Microsoft.AspNetCore.OData.E2E.Tests.Cast.JetPlane')/Company eq 'Boeing'", 1);
             }
 
             return combinations;
@@ -107,10 +99,10 @@ public class CastTest : WebODataTestBase<CastTest.CastTestStartup>
 
     [Theory]
     [MemberData(nameof(Combinations))]
-    public async Task Cast_Query_WorksAsExpected(string dataSourceMode, string dollarFilter, int expectedEntityCount)
+    public async Task Cast_Query_WorksAsExpected(string dataSourceMode, string dollarFormat, int expectedEntityCount)
     {
         // Arrange
-        var requestUri = string.Format("{0}/Products{1}", dataSourceMode, dollarFilter);
+        var requestUri = string.Format("{0}/Products{1}", dataSourceMode, dollarFormat);
 
         // Act
         HttpResponseMessage response = await Client.GetAsync(requestUri);

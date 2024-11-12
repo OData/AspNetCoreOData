@@ -25,8 +25,6 @@ public class Product
     public IList<int> DimensionInCentimeter { get; set; }
 
     public DateTimeOffset ManufacturingDate { get; set; }
-
-    public MyAddress Location { get; set; }
 }
 
 [Flags]
@@ -47,16 +45,4 @@ public class AirPlane : Product
 public class JetPlane : AirPlane
 {
     public string Company { get; set; }
-}
-
-public class MyAddress
-{
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int ID { get; set; }
-    public string City { get; set; }
-}
-
-public class MyOtherAddress : MyAddress
-{
-    public string Street { get; set; }
 }
