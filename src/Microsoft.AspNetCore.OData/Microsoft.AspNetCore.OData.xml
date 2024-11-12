@@ -9471,9 +9471,9 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateDynamicPropertyAccessExpression(System.Linq.Expressions.Expression,System.String,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
-            Creates an expression for retrieving a dynamic property from the dynamic properties container property.
+            Creates an expression for retrieving a dynamic property from the container property.
             </summary>
-            <param name="containerPropertyAccessExpr">The dynamic properties container property access expression.</param>
+            <param name="containerPropertyAccessExpr">The container property access expression.</param>
             <param name="propertyName">The dynamic property name.</param>
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
@@ -9522,7 +9522,7 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateNestedDynamicPropertyAccessExpression(System.Linq.Expressions.Expression,System.String,Microsoft.OData.UriParser.QueryNodeKind,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
-            Creates an expression for retrieving a dynamic property from the dynamic properties container property.
+            Creates an expression for retrieving a dynamic property from the container property.
             </summary>
             <param name="sourceExpr">The source expression.</param>
             <param name="propertyName">The property name.</param>
