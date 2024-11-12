@@ -1854,7 +1854,7 @@ public class FilterBinderTests
         var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
         Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, SimpleEnum.Second}, values);
     }
-
+        
     [Fact]
     public void EnumInExpression_NullableEnum_WithNullValue()
     {
@@ -2482,7 +2482,7 @@ public class FilterBinderTests
 
     [Theory]
     [InlineData("cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq null", "$it => (($it As DerivedProduct).DerivedProductName == null)", "$it => (IIF((($it As DerivedProduct) == null), null, ($it As DerivedProduct).DerivedProductName) == null)")]
-    [InlineData("cast(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')/DerivedCategoryName eq null", "$it => (($it.Category As DerivedCategory).DerivedCategoryName == null)", "$it => (IIF((($it.Category As DerivedCategory) == null), null, ($it.Category As DerivedCategory).DerivedCategoryName) == null)")]
+    [InlineData("cast(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')/DerivedCategoryName eq null", "$it => (($it.Category As DerivedCategory).DerivedCategoryName == null)","$it => (IIF((($it.Category As DerivedCategory) == null), null, ($it.Category As DerivedCategory).DerivedCategoryName) == null)")]
     public void CastToQuotedEntityOrComplexType_DerivedProductName(string filter, string expectedExpression, string expectedExpressionWithNullCheck)
     {
         // Arrange, Act & Assert
@@ -2784,7 +2784,7 @@ public class FilterBinderTests
     }
 #endif
 
-    #region parameter alias for filter query option
+#region parameter alias for filter query option
 
     [Theory]
     // Parameter alias value is not null.
@@ -2930,7 +2930,7 @@ public class FilterBinderTests
             () => parser.ParseFilter(),
             "Syntax error: character '#' is not valid at position 11 in 'IntProp eq #p'.");
     }
-    #endregion
+#endregion
 
     [Theory]
     [InlineData("ByteArrayProp eq binary'I6v/'", "$it => ($it.ByteArrayProp == System.Byte[])", true, true)]
@@ -3011,9 +3011,9 @@ public class FilterBinderTests
     {
         // Arrange & Act & Assert
         var filters = BindFilterAndVerify<Product>("ProductName eq '1'", settingsCustomizer: (settings) =>
-        {
-            settings.EnableConstantParameterization = false;
-        });
+            {
+                settings.EnableConstantParameterization = false;
+            });
 
         Assert.Equal("$it => ($it.ProductName == \"1\")", (filters.Item1 as Expression).ToString());
     }
@@ -3101,7 +3101,7 @@ public class FilterBinderTests
             expectedExpressionWithNullPropagation);
     }
 
-    #region Negative Tests
+#region Negative Tests
 
     [Fact]
     public void TypeMismatchInComparison()
@@ -3109,7 +3109,7 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>("length(123) eq 12"));
     }
-    #endregion
+#endregion
 
     #region Helpers
     internal static void InvokeFiltersAndThrows<T>((Expression, Expression) filters, T instance, (Type, bool) expectedValue)
