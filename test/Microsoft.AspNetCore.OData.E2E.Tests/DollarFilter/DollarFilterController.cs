@@ -20,4 +20,22 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter
             return Ok(DollarFilterDataSource.People);
         }
     }
+
+    public class VendorsController : ODataController
+    {
+        [EnableQuery]
+        public ActionResult<IEnumerable<Vendor>> Get()
+        {
+            return DollarFilterDataSource.Vendors;
+        }
+    }
+
+    public class BadVendorsController : ODataController
+    {
+        [EnableQuery]
+        public ActionResult<IEnumerable<Vendor>> Get()
+        {
+            return DollarFilterDataSource.BadVendors;
+        }
+    }
 }

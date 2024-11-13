@@ -1796,7 +1796,18 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeEnumOrNullableEnum", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; must be an open type. The dynamic properties container property is only expected on open types..
+        /// </summary>
+        internal static string TypeMustBeOpenType
+        {
+            get
+            {
+                return ResourceManager.GetString("TypeMustBeOpenType", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from and is not a base type of &apos;{1}&apos;..
         /// </summary>

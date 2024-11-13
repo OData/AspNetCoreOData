@@ -16,6 +16,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Person>("People");
+            builder.ComplexType<VendorAddress>();
+            builder.ComplexType<VendorCity>();
+            builder.ComplexType<NonOpenVendorAddress>();
+            builder.EntitySet<Vendor>("Vendors");
+            builder.EntitySet<Vendor>("BadVendors");
 
             return builder.GetEdmModel();
         }
