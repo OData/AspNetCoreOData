@@ -103,7 +103,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 left = CreateDateBinaryExpression(left, querySettings);
                 right = CreateDateBinaryExpression(right, querySettings);
             }
-            else if((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
+            else if ((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
                 (IsTimeOfDay(leftUnderlyingType) && IsType<TimeOnly>(rightUnderlyingType)))
             {
                 left = CreateTimeBinaryExpression(left, querySettings);
@@ -665,14 +665,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             var dto = parameterizedConstantValue as DateTimeOffset?;
             if (dto != null)
             {
-	            if (settings.EnableConstantParameterization)
-	            {
-		            return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
-	            }
-	            else
-	            {
-		            return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
-	            }
+                if (settings.EnableConstantParameterization)
+                {
+                    return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
+                }
+                else
+                {
+                    return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
+                }
             }
             return expression;
         }
