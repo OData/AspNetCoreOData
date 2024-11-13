@@ -232,6 +232,26 @@ public class DateOnlyAndTimeOnlyWithEfTest : WebApiTestBase<DateOnlyAndTimeOnlyW
         Assert.Equal(expect, string.Join(",", result["value"].Select(e => e["Id"].ToString())));
     }
 
+    [Theory]
+    [InlineData("?$apply=groupby((Birthday))", 5)]
+    [InlineData("?$apply=groupby((PublishDay))", 4)]
+    [InlineData("?$apply=groupby((CreatedTime))", 5)]
+    public async Task CanGroupBy_OnDateOnlyAndTimeOnlyProperties(string applyGroupBy, int expectCount)
+    {
+        // Arrange
+        string Uri = "odata/DateOnlyTimeOnlyModels" + applyGroupBy;
+        var request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+        var result = await response.Content.ReadAsObject<JArray>();
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(expectCount, result.Count());
+    }
+
     [Fact]
     public async Task PostEntity_WithDateOnlyAndTimeOnlyProperties()
     {

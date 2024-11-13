@@ -1099,20 +1099,7 @@ public abstract class ExpressionBinderBase
                         break;
 
                     case TypeCode.Object:
-                        if (sourceType == typeof(char[]))
-                        {
-                            convertedExpression = Expression.New(typeof(string).GetConstructor(new[] { typeof(char[]) }), source);
-                        }
-                        else if (sourceType == typeof(XElement))
-                        {
-                            convertedExpression = Expression.Call(source, "ToString", typeArguments: null, arguments: null);
-                        }
-#if NETFX // System.Data.Linq.Binary is only supported in the AspNet version.
-                        else if (sourceType == typeof(Binary))
-                        {
-                            convertedExpression = Expression.Call(source, "ToArray", typeArguments: null, arguments: null);
-                        }
-#endif
+                        convertedExpression = HandleObjectType(sourceType, source);
                         break;
 
                     default:
@@ -1330,6 +1317,32 @@ public abstract class ExpressionBinderBase
             {
                 return NullConstant;
             }
+        }
+    }
+
+    private static Expression HandleObjectType(Type sourceType, Expression source)
+    {
+        switch (sourceType)
+        {
+            case Type t when t == typeof(char[]):
+                return Expression.New(typeof(string).GetConstructor(new[] { typeof(char[]) }), source);
+
+            case Type t when t == typeof(XElement):
+                return Expression.Call(source, "ToString", null, null);
+
+            case Type t when t == typeof(DateOnly):
+                return source;
+
+            case Type t when t == typeof(TimeOnly):
+                return source;
+
+#if NETFX
+        case Type t when t == typeof(Binary):
+            return Expression.Call(source, "ToArray", null, null);
+#endif
+
+            default:
+                throw new NotSupportedException($"Unsupported object type: {sourceType.Name}");
         }
     }
     #endregion
