@@ -236,6 +236,8 @@ public class DateOnlyAndTimeOnlyWithEfTest : WebApiTestBase<DateOnlyAndTimeOnlyW
     [InlineData("?$apply=groupby((Birthday))", 5)]
     [InlineData("?$apply=groupby((PublishDay))", 4)]
     [InlineData("?$apply=groupby((CreatedTime))", 5)]
+    [InlineData("?$apply=groupby((EndTime))", 4)]
+    [InlineData("?$apply=groupby((EndDay))", 5)]
     public async Task CanGroupBy_OnDateOnlyAndTimeOnlyProperties(string applyGroupBy, int expectCount)
     {
         // Arrange
@@ -250,6 +252,43 @@ public class DateOnlyAndTimeOnlyWithEfTest : WebApiTestBase<DateOnlyAndTimeOnlyW
         // Assert
         Assert.True(response.IsSuccessStatusCode);
         Assert.Equal(expectCount, result.Count());
+    }
+
+    public static TheoryDataSet<string, string> CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties_Input
+    {
+        get
+        {
+            return new TheoryDataSet<string, string>
+            {
+                {
+                    "?$apply=groupby((PublishDay),aggregate(Id with max as MaxId))&$orderby=PublishDay",
+                    "[{\"PublishDay\":null,\"MaxId\":4},{\"PublishDay\":\"2016-11-16\",\"MaxId\":1},{\"PublishDay\":\"2018-09-18\",\"MaxId\":3},{\"PublishDay\":\"2020-07-20\",\"MaxId\":5}]"
+                },
+                {
+                    "?$apply=groupby((EndTime),aggregate(Birthday with min as MinBirthday))",
+                    "[{\"EndTime\":\"01:11:04.0060000\",\"MinBirthday\":\"2011-02-06\"},{\"EndTime\":null,\"MinBirthday\":\"2012-03-07\"},{\"EndTime\":\"03:13:06.0080000\",\"MinBirthday\":\"2013-04-08\"},{\"EndTime\":\"05:15:08.0100000\",\"MinBirthday\":\"2015-06-10\"}]"
+                }
+            };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties_Input))]
+    public async Task CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties(string applyGroupBy, string expectedResult)
+    {
+        // Arrange
+        string Uri = "odata/DateOnlyTimeOnlyModels" + applyGroupBy;
+        var request = new HttpRequestMessage(HttpMethod.Get, Uri);
+
+        HttpClient client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+        var result = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(expectedResult, result.ToString());
     }
 
     [Fact]
