@@ -1229,7 +1229,7 @@ public abstract partial class QueryBinder
                         break;
 
                     default:
-                        Contract.Assert(false, Error.Format("missing non-standard type support for {0}", sourceType.Name));
+                        Contract.Assert(false, Error.Format(SRResources.MissingNonStandardTypeSupportFor, sourceType.Name));
                         break;
                 }
             }
