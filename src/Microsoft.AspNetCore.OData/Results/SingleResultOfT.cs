@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Results
 {
@@ -14,6 +15,7 @@ namespace Microsoft.AspNetCore.OData.Results
     /// <c>[EnableQuery]</c>.
     /// </summary>
     /// <typeparam name="T">The type of the data in the data source.</typeparam>
+    [JsonConverter(typeof(SingleResultValueConverter))]
     public sealed class SingleResult<T> : SingleResult
     {
         /// <summary>
