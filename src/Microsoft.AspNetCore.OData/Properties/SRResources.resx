@@ -682,7 +682,7 @@
     <value>Missing the required parameter '{0}' is in the operation '{1}' parameter mapping.</value>
   </data>
   <data name="MissingNonStandardTypeSupportFor" xml:space="preserve">
-    <value>Missing Non-Standard type support for {0}.</value>
+    <value>Missing non-standard type support for '{0}'.</value>
   </data>
   <data name="CannotFindParameterInOperation" xml:space="preserve">
     <value>Cannot find parameter '{0}' is in the operation '{1}'.</value>

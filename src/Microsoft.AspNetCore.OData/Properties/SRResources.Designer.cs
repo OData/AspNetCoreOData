@@ -979,7 +979,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing Non-Standard type support for {0}..
+        ///   Looks up a localized string similar to Missing non-standard type support for &apos;{0}&apos;..
         /// </summary>
         internal static string MissingNonStandardTypeSupportFor {
             get {
