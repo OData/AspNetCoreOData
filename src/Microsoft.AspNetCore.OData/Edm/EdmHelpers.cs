@@ -200,6 +200,16 @@ namespace Microsoft.AspNetCore.OData.Edm
                 case EdmTypeKind.TypeDefinition:
                     return new EdmTypeDefinitionReference((IEdmTypeDefinition)edmType, isNullable);
 
+                case EdmTypeKind.Untyped:
+                    if (isNullable)
+                    {
+                        return EdmUntypedStructuredTypeReference.NullableTypeReference;
+                    }
+                    else
+                    {
+                        return EdmUntypedStructuredTypeReference.NonNullableTypeReference;
+                    }
+
                 default:
                     throw Error.NotSupported(SRResources.EdmTypeNotSupported, edmType.ToTraceString());
             }
