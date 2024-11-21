@@ -59,32 +59,32 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
                 {
                     return (JsonConverter)Activator.CreateInstance(typeof(FlatteningWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
-            }
-            else
-            {
-                if (type == typeof(AggregationWrapper))
+            //}
+            //else
+            //{
+                if (type == typeof(AggregationWrapper<>))
                 {
-                    return (JsonConverter)Activator.CreateInstance(typeof(AggregationWrapperConverter));
+                    return (JsonConverter)Activator.CreateInstance(typeof(AggregationWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
 
-                if (type == typeof(EntitySetAggregationWrapper))
+                if (type == typeof(EntitySetAggregationWrapper<>))
                 {
-                    return (JsonConverter)Activator.CreateInstance(typeof(EntitySetAggregationWrapperConverter));
+                    return (JsonConverter)Activator.CreateInstance(typeof(EntitySetAggregationWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
 
-                if (type == typeof(GroupByWrapper))
+                if (type == typeof(GroupByWrapper<>))
                 {
-                    return (JsonConverter)Activator.CreateInstance(typeof(GroupByWrapperConverter));
+                    return (JsonConverter)Activator.CreateInstance(typeof(GroupByWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
 
-                if (type == typeof(NoGroupByAggregationWrapper))
+                if (type == typeof(NoGroupByAggregationWrapper<>))
                 {
-                    return (JsonConverter)Activator.CreateInstance(typeof(NoGroupByAggregationWrapperConverter));
+                    return (JsonConverter)Activator.CreateInstance(typeof(NoGroupByAggregationWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
 
-                if (type == typeof(NoGroupByWrapper))
+                if (type == typeof(NoGroupByWrapper<>))
                 {
-                    return (JsonConverter)Activator.CreateInstance(typeof(NoGroupByWrapperConverter));
+                    return (JsonConverter)Activator.CreateInstance(typeof(NoGroupByWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
             }
 

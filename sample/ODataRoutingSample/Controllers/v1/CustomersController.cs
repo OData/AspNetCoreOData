@@ -39,7 +39,29 @@ namespace ODataRoutingSample.Controllers.v1
             }
         }
 
-        // For example: http://localhost:5000/v1/customers?$apply=groupby((Name), aggregate($count as count))&$orderby=name desc
+        // For example: http://localhost:5000/v1/customers?$apply=groupby((Name), aggregate($count as count))&$orderby=Name desc
+        /* You could get:
+{
+    "@odata.context": "http://localhost:5000/v1/$metadata#Customers(Name,count)",
+    "value": [
+        {
+            "@odata.id": null,
+            "Name": "Sam",
+            "count": 2
+        },
+        {
+            "@odata.id": null,
+            "Name": "Peter",
+            "count": 1
+        },
+        {
+            "@odata.id": null,
+            "Name": "Jonier",
+            "count": 1
+        }
+    ]
+}
+         */
         [HttpGet]
         [EnableQuery]
         public IActionResult Get()
