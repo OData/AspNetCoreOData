@@ -254,6 +254,67 @@ public class DateOnlyAndTimeOnlyWithEfTest : WebApiTestBase<DateOnlyAndTimeOnlyW
         Assert.Equal(expectCount, result.Count());
     }
 
+    [Fact]
+    public async Task CanSearch_OnDateOnlyAndTimeOnlyProperties()
+    {
+        // Arrange
+        string Uri = "odata/DateOnlyTimeOnlyModels(3)?$search=(2013-04-08 AND 00:03:03.0050000)";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var stringResponse = await response.Content.ReadAsStringAsync();
+        var result = JObject.Parse(stringResponse);
+
+        Assert.Equal("2013-04-08", result["Birthday"]);
+        Assert.Equal("2018-09-18", result["PublishDay"]);
+        Assert.Equal("00:03:03.0050000", result["CreatedTime"]);
+        Assert.Equal("03:13:06.0080000", result["ResumeTime"]);
+    }
+
+    public static TheoryDataSet<string, string> CanCompute_OnDateOnlyAndTimeOnlyProperties_Input
+    {
+        get
+        {
+            return new TheoryDataSet<string, string>
+            {
+                {
+                    "$compute=year(Birthday) as BirthYear&$select=BirthYear",
+                    "{\"@odata.context\":\"http://localhost/odata/$metadata#DateOnlyTimeOnlyModels(BirthYear)/$entity\",\"BirthYear\":2013}"
+                },
+                {
+                    "$compute=hour(ResumeTime) as ResumeHour&$select=ResumeHour",
+                    "{\"@odata.context\":\"http://localhost/odata/$metadata#DateOnlyTimeOnlyModels(ResumeHour)/$entity\",\"ResumeHour\":3}"
+                }
+            };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CanCompute_OnDateOnlyAndTimeOnlyProperties_Input))]
+    public async Task CanCompute_OnDateOnlyAndTimeOnlyProperties(string query,string expectedResponse)
+    {
+        // Arrange
+        string Uri = $"odata/DateOnlyTimeOnlyModels(3)?{query}";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var stringResponse = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(expectedResponse, stringResponse);
+    }
+
     public static TheoryDataSet<string, string> CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties_Input
     {
         get
