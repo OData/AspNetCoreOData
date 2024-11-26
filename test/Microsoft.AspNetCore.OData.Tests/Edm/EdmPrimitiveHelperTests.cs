@@ -138,7 +138,7 @@ public class EdmPrimitiveHelperTests
 
         // Assert
         DateTime dt = Assert.IsType<DateTime>(actual);
-        Assert.Equal(DateTimeKind.Local, dt.Kind);
+        Assert.Equal(expectedTimeKind, dt.Kind);
     }
 
     [Theory]
