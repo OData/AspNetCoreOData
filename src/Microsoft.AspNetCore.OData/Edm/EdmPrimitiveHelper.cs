@@ -190,11 +190,11 @@ internal static class EdmPrimitiveHelper
 
     private static DateTimeKind GetTargetDateTimeKind(TimeZoneInfo timeZone)
     {
-        if (timeZone.Equals(TimeZoneInfo.Local))
-            return DateTimeKind.Local;
-
         if (timeZone.Equals(TimeZoneInfo.Utc))
             return DateTimeKind.Utc;
+
+        if (timeZone.Equals(TimeZoneInfo.Local))
+            return DateTimeKind.Local;
 
         return DateTimeKind.Unspecified;
     }
