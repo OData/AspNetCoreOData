@@ -108,7 +108,7 @@ internal static class EdmPrimitiveHelper
 
                     dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
 
-                    var dateTimeKind = GetTargetDateTimeKind(timeZone);
+                    DateTimeKind dateTimeKind = GetTargetDateTimeKind(timeZone);
 
                     return DateTime.SpecifyKind(dateTimeOffsetValue.DateTime, dateTimeKind);
                 }
