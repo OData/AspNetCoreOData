@@ -131,6 +131,11 @@ public class EdmPrimitiveHelperTests
         // Arrange & Act
         object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
 
+        //if server local time is UTC, then expect Utc Kind
+        DateTimeKind expectedTimeKind = TimeZoneInfo.Local.Equals(TimeZoneInfo.Utc)
+            ? DateTimeKind.Utc
+            : DateTimeKind.Local;
+
         // Assert
         DateTime dt = Assert.IsType<DateTime>(actual);
         Assert.Equal(DateTimeKind.Local, dt.Kind);
