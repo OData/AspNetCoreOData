@@ -189,6 +189,7 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     [InlineData("?$filter=PublishDay ne 2016-03-22", "1,3,4,5")]
     [InlineData("?$filter=PublishDay lt 2016-03-22", "4")]
     [InlineData("?$filter=EndTime ne null", "1,3,5")]
+    [InlineData($"?$filter=LastAction eq {DateAndTimeOfDayWithEfTestConstants.DefaultLastActionValue}", "1,2,3,4,5")]
     // [InlineData("?$filter=CreatedTime eq 04:03:05.0790000", "4")] // EFCore could not be translated.
     // [InlineData("?$filter=hour(EndTime) eq 11", "1")] // EFCore could not be translated.
     // [InlineData("?$filter=minute(EndTime) eq 06", "3")] // EFCore could not be translated.
@@ -308,7 +309,9 @@ public class DateAndTimeOfDayModelsController : ODataController
 
     public DateAndTimeOfDayModelsController(EfDateAndTimeOfDayModelContext context)
     {
+        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
+
         if (!context.DateTimes.Any())
         {
             DateTime dt = new DateTime(2015, 12, 22);
@@ -318,6 +321,7 @@ public class DateAndTimeOfDayModelsController : ODataController
                 {
                    // Id = i,
                     Birthday = dt.AddYears(i),
+                    LastAction = DateTime.Parse(DateAndTimeOfDayWithEfTestConstants.DefaultLastActionValue),
                     EndDay = dt.AddDays(i),
                     DeliverDay = i % 2 == 0 ? (DateTime?)null : dt.AddYears(5 - i),
                     PublishDay = i % 2 != 0 ? (DateTime?)null : dt.AddMonths(5 - i),
@@ -355,7 +359,7 @@ public class DateAndTimeOfDayModelsController : ODataController
         return Ok(dtm);
     }
 
-    public IActionResult Post([FromBody]DateAndTimeOfDayModel dt)
+    public IActionResult Post([FromBody] DateAndTimeOfDayModel dt)
     {
         Assert.NotNull(dt);
 
@@ -367,7 +371,7 @@ public class DateAndTimeOfDayModelsController : ODataController
         return Created(dt);
     }
 
-    public IActionResult Put(int key, [FromBody]Delta<DateAndTimeOfDayModel> dt)
+    public IActionResult Put(int key, [FromBody] Delta<DateAndTimeOfDayModel> dt)
     {
         Assert.Equal(new[] { "Birthday", "CreatedTime" }, dt.GetChangedPropertyNames());
 
@@ -411,6 +415,9 @@ public class DateAndTimeOfDayModel
     [Column(TypeName = "date")]
     public DateTime Birthday { get; set; }
 
+    [Column(TypeName = "datetime")]
+    public DateTime LastAction { get; set; }
+
     [Column(TypeName = "DaTe")]
     public DateTime? PublishDay { get; set; }
 
@@ -425,4 +432,9 @@ public class DateAndTimeOfDayModel
     public TimeSpan? EndTime { get; set; }
 
     public TimeSpan ResumeTime { get; set; } // will use the Fluent API
+}
+
+internal static class DateAndTimeOfDayWithEfTestConstants
+{
+    internal const string DefaultLastActionValue = "2024-11-27T15:06:35Z";
 }
