@@ -182,6 +182,8 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
             }
 
             Type returnType = controllerActionDescriptor.MethodInfo.ReturnType;
+            if (actionExecutingContext.Controller is IDiscoverEndpointType) 
+                returnType = ((IDiscoverEndpointType)actionExecutingContext.Controller).GetEndpointType();            
             Type elementType;
 
             // For Task<> get the base object.
