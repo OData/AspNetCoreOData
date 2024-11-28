@@ -2065,3 +2065,4 @@ virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConventio
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.Order.get -> int
 virtual Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider) -> Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
 virtual Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options = null) -> System.Collections.Generic.IEnumerable<string>
+T:Microsoft.AspNetCore.OData.IDiscoverEndpointType
