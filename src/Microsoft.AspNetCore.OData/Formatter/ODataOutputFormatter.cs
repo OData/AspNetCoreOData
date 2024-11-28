@@ -212,7 +212,7 @@ public class ODataOutputFormatter : TextOutputFormatter, IMediaTypeMappingCollec
     }
 
     /// <inheritdoc/>
-    public override Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
+    public override async Task WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
     {
         if (context == null)
         {
@@ -239,7 +239,9 @@ public class ODataOutputFormatter : TextOutputFormatter, IMediaTypeMappingCollec
             // However, OData lib doesn't provide the method to overwrite/copyto stream
             // So, Here's the workaround
             Stream objStream = context.Object as Stream;
-            return CopyStreamAsync(objStream, response);
+            await CopyStreamAsync(objStream, response).ConfigureAwait(false);
+
+            return;
         }
 
         Uri baseAddress = GetBaseAddressInternal(request);
@@ -247,7 +249,7 @@ public class ODataOutputFormatter : TextOutputFormatter, IMediaTypeMappingCollec
 
         IODataSerializerProvider serializerProvider = request.GetRouteServices().GetRequiredService<IODataSerializerProvider>();
 
-        return ODataOutputFormatterHelper.WriteToStreamAsync(
+        await ODataOutputFormatterHelper.WriteToStreamAsync(
             type,
             context.Object,
             request.GetModel(),
@@ -256,7 +258,7 @@ public class ODataOutputFormatter : TextOutputFormatter, IMediaTypeMappingCollec
             contentType,
             request,
             request.Headers,
-            serializerProvider);
+            serializerProvider).ConfigureAwait(false);
     }
 
     /// <summary>
