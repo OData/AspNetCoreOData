@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Common;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
 
@@ -102,10 +104,17 @@ public class ODataEnumSerializer : ODataEdmTypeSerializer
         var memberMapAnnotation = writeContext?.Model.GetClrEnumMemberAnnotation(enumType.EnumDefinition());
         if (memberMapAnnotation != null)
         {
-            var edmEnumMember = memberMapAnnotation.GetEdmEnumMember((Enum)graph);
+            Enum graphEnum = (Enum)graph;
+
+            var edmEnumMember = memberMapAnnotation.GetEdmEnumMember(graphEnum);
             if (edmEnumMember != null)
             {
                 value = edmEnumMember.Name;
+            }
+            // If the enum is a flags enum, we need to handle the case where multiple flags are set
+            else if (enumType.EnumDefinition().IsFlags)
+            {
+                value = GetFlagsEnumValue(graphEnum, memberMapAnnotation);
             }
         }
 
@@ -170,5 +179,38 @@ public class ODataEnumSerializer : ODataEdmTypeSerializer
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Gets the combined names of the flags set in a Flags enum value.
+    /// </summary>
+    /// <param name="graphEnum">The enum value.</param>
+    /// <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
+    /// <returns>A comma-separated string of the names of the flags that are set.</returns>
+    private string GetFlagsEnumValue(Enum graphEnum, ClrEnumMemberAnnotation memberMapAnnotation)
+    {
+        List<string> flagsList = new List<string>();
+
+        // Convert the enum value to a long for bitwise operations
+        long graphValue = Convert.ToInt64(graphEnum);
+
+        // Iterate through all enum values
+        foreach (Enum flag in Enum.GetValues(graphEnum.GetType()))
+        {
+            // Convert the current flag to a long
+            long flagValue = Convert.ToInt64(flag);
+
+            // Using bitwise operations to check if a flag is set, which is more efficient than Enum.HasFlag
+            if ((graphValue & flagValue) != 0 && flagValue != 0)
+            {
+                IEdmEnumMember flagMember = memberMapAnnotation.GetEdmEnumMember(flag);
+                if (flagMember != null)
+                {
+                    flagsList.Add(flagMember.Name);
+                }
+            }
+        }
+
+        return string.Join(", ", flagsList);
     }
 }
