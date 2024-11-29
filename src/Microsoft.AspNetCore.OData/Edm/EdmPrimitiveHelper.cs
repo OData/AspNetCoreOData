@@ -105,8 +105,12 @@ internal static class EdmPrimitiveHelper
                 {
                     DateTimeOffset dateTimeOffsetValue = (DateTimeOffset)value;
                     TimeZoneInfo timeZone = timeZoneInfo ?? TimeZoneInfo.Local;
+
                     dateTimeOffsetValue = TimeZoneInfo.ConvertTime(dateTimeOffsetValue, timeZone);
-                    return dateTimeOffsetValue.DateTime;
+
+                    DateTimeKind dateTimeKind = GetTargetDateTimeKind(timeZone);
+
+                    return DateTime.SpecifyKind(dateTimeOffsetValue.DateTime, dateTimeKind);
                 }
 
                 if (value is Date)
@@ -182,5 +186,16 @@ internal static class EdmPrimitiveHelper
                 }
             }
         }
+    }
+
+    private static DateTimeKind GetTargetDateTimeKind(TimeZoneInfo timeZone)
+    {
+        if (timeZone.Equals(TimeZoneInfo.Utc))
+            return DateTimeKind.Utc;
+
+        if (timeZone.Equals(TimeZoneInfo.Local))
+            return DateTimeKind.Local;
+
+        return DateTimeKind.Unspecified;
     }
 }
