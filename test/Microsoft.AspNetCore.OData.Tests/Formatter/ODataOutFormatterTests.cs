@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Extensions;
@@ -174,18 +175,18 @@ public class ODataOutputFormatterTests
 
     #region WriteResponseBodyAsync
     [Fact]
-    public void WriteResponseBodyAsyncODataOutputFormatter_ThrowsArgumentNull_Context()
+    public async Task WriteResponseBodyAsyncODataOutputFormatter_ThrowsArgumentNull_Context()
     {
         // Arrange & Act
         ODataOutputFormatter formatter = new ODataOutputFormatter(new[] { ODataPayloadKind.Resource });
         Encoding encoding = Encoding.UTF8;
 
         // Assert
-        ExceptionAssert.ThrowsArgumentNull(() => formatter.WriteResponseBodyAsync(context: null, encoding), "context");
+        await ExceptionAssert.ThrowsArgumentNullAsync(() => formatter.WriteResponseBodyAsync(context: null, encoding), "context");
     }
 
     [Fact]
-    public void WriteResponseBodyAsyncODataOutputFormatter_ThrowsArgumentNull_ObjectType()
+    public async Task WriteResponseBodyAsyncODataOutputFormatter_ThrowsArgumentNull_ObjectType()
     {
         // Arrange & Act
         ODataOutputFormatter formatter = new ODataOutputFormatter(new[] { ODataPayloadKind.Resource });
@@ -196,11 +197,11 @@ public class ODataOutputFormatterTests
             null);
 
         // Assert
-        ExceptionAssert.ThrowsArgumentNull(() => formatter.WriteResponseBodyAsync(context, Encoding.UTF8), "type");
+        await ExceptionAssert.ThrowsArgumentNullAsync(() => formatter.WriteResponseBodyAsync(context, Encoding.UTF8), "type");
     }
 
     [Fact]
-    public void WriteResponseBodyAsyncODataOutputFormatter_Throws_IfRequestIsNull()
+    public async Task WriteResponseBodyAsyncODataOutputFormatter_Throws_IfRequestIsNull()
     {
         // Arrange & Act
         ODataOutputFormatter formatter = new ODataOutputFormatter(new[] { ODataPayloadKind.Resource });
@@ -212,7 +213,7 @@ public class ODataOutputFormatterTests
             6);
 
         // Assert
-        ExceptionAssert.Throws<InvalidOperationException>(
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
             () => formatter.WriteResponseBodyAsync(context, Encoding.UTF8),
             "The OData formatter requires an attached request in order to serialize.");
     }
