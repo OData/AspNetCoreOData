@@ -117,35 +117,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         }
         else
         {
-            await WriteDeltaResourceAsync(graph, writer, writeContext).ConfigureAwait(false);
-        }
-    }
-
-    private async Task WriteDeltaResourceAsync(object graph, ODataWriter writer, ODataSerializerContext writeContext)
-    {
-        Contract.Assert(writeContext != null);
-
-        IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
-        ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
-        EdmDeltaResourceObject deltaResource = graph as EdmDeltaResourceObject;
-        if (deltaResource != null && deltaResource.NavigationSource != null)
-        {
-            resourceContext.NavigationSource = deltaResource.NavigationSource;
-        }
-
-        SelectExpandNode selectExpandNode = CreateSelectExpandNode(resourceContext);
-        if (selectExpandNode != null)
-        {
-            ODataResource resource = CreateResource(selectExpandNode, resourceContext);
-
-            if (resource != null)
-            {
-                await writer.WriteStartAsync(resource).ConfigureAwait(false);
-                await WriteDeltaComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
-                await WriteDeltaNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                await writer.WriteEndAsync().ConfigureAwait(false);
-            }
+            await WriteResourceAsync(graph, writer, writeContext, expectedType).ConfigureAwait(false);
         }
     }
 
@@ -159,11 +131,22 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         {
             return;
         }
+
         IEnumerable<IEdmStructuralProperty> complexProperties = selectExpandNode.SelectedComplexProperties.Keys;
 
         if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
         {
-            if (resourceContext.EdmObject is TypedEdmEntityObject obj && obj.Instance is IDelta deltaObject)
+            IDelta deltaObject = null;
+            if (resourceContext.EdmObject is TypedEdmEntityObject obj)
+            {
+                deltaObject = obj.Instance as IDelta;
+            }
+            else
+            {
+                deltaObject = resourceContext.EdmObject as IDelta;
+            }
+
+            if (deltaObject != null)
             {
                 IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
                 complexProperties = complexProperties.Where(p => changedProperties.Contains(p.Name));
@@ -235,8 +218,21 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             // }
             if (edmProperty.Type.IsCollection())
             {
-                ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
-                await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext).ConfigureAwait(false);
+                if (IsDeltaCollection(propertyValue))
+                {
+                    ODataEdmTypeSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
+                    EdmCollectionTypeReference edmType = new EdmCollectionTypeReference(new EdmDeltaCollectionType(new EdmEntityTypeReference(edmProperty.Type.GetElementType() as IEdmEntityType, false)));
+                    await serializer.WriteObjectInlineAsync(
+                        propertyValue,
+                        edmType,
+                        writer,
+                        nestedWriteContext).ConfigureAwait(false);
+                }
+                else
+                {
+                    ODataEdmTypeSerializer serializer = new ODataResourceSetSerializer(SerializerProvider);
+                    await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext).ConfigureAwait(false);
+                }
             }
             else
             {
@@ -276,11 +272,11 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
     private IEnumerable<KeyValuePair<IEdmNavigationProperty, Type>> GetNavigationPropertiesToWrite(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
     {
-        ISet<IEdmNavigationProperty> navigationProperties = selectExpandNode.SelectedNavigationProperties;
+        IEnumerable<IEdmNavigationProperty> navigationProperties = selectExpandNode.ExpandedProperties?.Keys;
 
         if (navigationProperties == null)
         {
-            yield break;
+            navigationProperties = resourceContext.StructuredType.DeclaredNavigationProperties();
         }
 
         if (resourceContext.EdmObject is IDelta changedObject)
@@ -442,6 +438,12 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         IEdmStructuredTypeReference structuredType = GetResourceType(graph, writeContext);
         ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
 
+        IEdmNavigationSource originalNavigationSource = writeContext.NavigationSource;
+        if (graph is EdmDeltaResourceObject deltaResource && deltaResource?.NavigationSource != null)
+        {
+            resourceContext.NavigationSource = deltaResource.NavigationSource;
+        }
+
         SelectExpandNode selectExpandNode = CreateSelectExpandNode(resourceContext);
         if (selectExpandNode != null)
         {
@@ -457,17 +459,39 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 }
                 else
                 {
+                    bool isDelta = graph is IDelta || graph is IEdmChangedObject;
                     await writer.WriteStartAsync(resource).ConfigureAwait(false);
-                    await WriteUntypedPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
-                    await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    await WriteExpandedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
-                    await WriteReferencedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+                    await WriteResourceContent(writer, selectExpandNode, resourceContext, isDelta);
                     await writer.WriteEndAsync().ConfigureAwait(false);
                 }
             }
+        }
+
+        writeContext.NavigationSource = originalNavigationSource;
+    }
+
+    internal async Task WriteResourceContent(ODataWriter writer, SelectExpandNode selectExpandNode, ResourceContext resourceContext, bool isDelta)
+    {
+        // TODO: These should be aligned; do we need different methods for delta versus non-delta complex/navigation properties?
+        if (isDelta)
+        {
+            await WriteUntypedPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteDeltaComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            //await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
+            await WriteDeltaNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            //await WriteExpandedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+        }
+        else
+        {
+            await WriteUntypedPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteComplexPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteDynamicComplexPropertiesAsync(resourceContext, writer).ConfigureAwait(false);
+            await WriteNavigationLinksAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteExpandedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
+            await WriteReferencedNavigationPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
         }
     }
 
@@ -535,17 +559,12 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
         };
 
-        if (resourceContext.EdmObject is EdmDeltaResourceObject && resourceContext.NavigationSource != null)
+        InitializeODataResource(selectExpandNode, resource, resourceContext);
+
+        string etag = CreateETag(resourceContext);
+        if (etag != null)
         {
-            ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo();
-            serializationInfo.NavigationSourceName = resourceContext.NavigationSource.Name;
-            serializationInfo.NavigationSourceKind = resourceContext.NavigationSource.NavigationSourceKind();
-            IEdmEntityType sourceType = resourceContext.NavigationSource.EntityType;
-            if (sourceType != null)
-            {
-                serializationInfo.NavigationSourceEntityTypeName = sourceType.Name;
-            }
-            resource.SetSerializationInfo(serializationInfo);
+            resource.ETag = etag;
         }
 
         // Try to add the dynamic properties if the structural type is open.
@@ -567,6 +586,24 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             {
                 resource.AddFunction(function);
             }
+        }
+
+        return resource;
+    }
+
+    internal static void InitializeODataResource(SelectExpandNode selectExpandNode, ODataResourceBase resource, ResourceContext resourceContext)
+    { 
+        if ((resourceContext.EdmObject is EdmDeltaResourceObject || resourceContext.EdmObject is IEdmDeltaDeletedResourceObject) && resourceContext.NavigationSource != null)
+        {
+            ODataResourceSerializationInfo serializationInfo = new ODataResourceSerializationInfo();
+            serializationInfo.NavigationSourceName = resourceContext.NavigationSource.Name;
+            serializationInfo.NavigationSourceKind = resourceContext.NavigationSource.NavigationSourceKind();
+            IEdmEntityType sourceType = resourceContext.NavigationSource.EntityType;
+            if (sourceType != null)
+            {
+                serializationInfo.NavigationSourceEntityTypeName = sourceType.Name;
+            }
+            resource.SetSerializationInfo(serializationInfo);
         }
 
         IEdmStructuredType pathType = GetODataPathType(resourceContext.SerializerContext);
@@ -598,31 +635,23 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 NavigationSourceLinkBuilderAnnotation linkBuilder = EdmModelLinkBuilderExtensions.GetNavigationSourceLinkBuilder(model, resourceContext.NavigationSource);
                 EntitySelfLinks selfLinks = linkBuilder.BuildEntitySelfLinks(resourceContext, resourceContext.SerializerContext.MetadataLevel);
 
-                if (selfLinks.IdLink != null)
+                if (resource.Id == null && selfLinks.IdLink != null)
                 {
                     resource.Id = selfLinks.IdLink;
                 }
 
-                if (selfLinks.ReadLink != null)
+                if (resource.ReadLink == null && selfLinks.ReadLink != null)
                 {
                     resource.ReadLink = selfLinks.ReadLink;
                 }
 
-                if (selfLinks.EditLink != null)
+                if (resource.EditLink == null && selfLinks.EditLink != null)
                 {
                     resource.EditLink = selfLinks.EditLink;
                 }
             }
-
-            string etag = CreateETag(resourceContext);
-            if (etag != null)
-            {
-                resource.ETag = etag;
-            }
         }
-
-        return resource;
-    }
+   }
 
     /// <summary>
     /// Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="ODataResource"/>.
@@ -641,8 +670,14 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         Contract.Assert(selectExpandNode != null);
         Contract.Assert(resourceContext != null);
 
+        AppendDynamicPropertiesInternal(resource,selectExpandNode, resourceContext, SerializerProvider);
+    }
+
+    internal static void AppendDynamicPropertiesInternal(ODataResourceBase resource, SelectExpandNode selectExpandNode,
+        ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
+    {
         if (!resourceContext.StructuredType.IsOpen || // non-open type
-            (!selectExpandNode.SelectAllDynamicProperties && selectExpandNode.SelectedDynamicProperties == null))
+    (!selectExpandNode.SelectAllDynamicProperties && selectExpandNode.SelectedDynamicProperties == null))
         {
             return;
         }
@@ -735,7 +770,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             }
             else
             {
-                IODataEdmTypeSerializer propertySerializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+                IODataEdmTypeSerializer propertySerializer = serializerProvider.GetEdmTypeSerializer(edmTypeReference);
                 if (propertySerializer == null)
                 {
                     throw Error.NotSupported(SRResources.DynamicPropertyCannotBeSerialized, dynamicProperty.Key,
@@ -1252,7 +1287,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         return navigationLink;
     }
 
-    private IEnumerable<ODataProperty> CreateStructuralPropertyBag(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
+    internal IEnumerable<ODataProperty> CreateStructuralPropertyBag(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
     {
         Contract.Assert(selectExpandNode != null);
         Contract.Assert(resourceContext != null);
@@ -1266,10 +1301,20 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
             if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
             {
-                if (resourceContext.EdmObject is TypedEdmEntityObject obj && obj.Instance is IDelta deltaObject)
+                IDelta deltaObject = null;
+                if (resourceContext.EdmObject is TypedEdmEntityObject obj)
                 {
+                    deltaObject = obj.Instance as IDelta;
+                }
+                else
+                {
+                    deltaObject = resourceContext.EdmObject as IDelta;
+                }
+
+                if(deltaObject != null)
+                { 
                     IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
-                    structuralProperties = structuralProperties.Where(p => changedProperties.Contains(p.Name));
+                    structuralProperties = structuralProperties.Where(p => changedProperties.Contains(p.Name) || p.IsKey());
                 }
             }
 
@@ -1734,7 +1779,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         }
     }
 
-    internal static void AddTypeNameAnnotationAsNeeded(ODataResource resource, IEdmStructuredType odataPathType,
+    internal static void AddTypeNameAnnotationAsNeeded(ODataResourceBase resource, IEdmStructuredType odataPathType,
         ODataMetadataLevel metadataLevel)
     {
         // ODataLib normally has the caller decide whether or not to serialize properties by leaving properties
@@ -1759,7 +1804,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         resource.TypeAnnotation = new ODataTypeAnnotation(typeName);
     }
 
-    internal static void AddTypeNameAnnotationAsNeededForComplex(ODataResource resource, ODataMetadataLevel metadataLevel)
+    internal static void AddTypeNameAnnotationAsNeededForComplex(ODataResourceBase resource, ODataMetadataLevel metadataLevel)
     {
         // ODataLib normally has the caller decide whether or not to serialize properties by leaving properties
         // null when values should not be serialized. The TypeName property is different and should always be
@@ -1833,7 +1878,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         }
     }
 
-    internal static bool ShouldSuppressTypeNameSerialization(ODataResource resource, IEdmStructuredType edmType,
+    internal static bool ShouldSuppressTypeNameSerialization(ODataResourceBase resource, IEdmStructuredType edmType,
         ODataMetadataLevel metadataLevel)
     {
         Contract.Assert(resource != null);
@@ -1856,7 +1901,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         }
     }
 
-    private IEdmStructuredTypeReference GetResourceType(object graph, ODataSerializerContext writeContext)
+    internal static IEdmStructuredTypeReference GetResourceType(object graph, ODataSerializerContext writeContext)
     {
         Contract.Assert(graph != null);
 
@@ -1871,9 +1916,14 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         if (!edmType.IsStructured())
         {
             throw new SerializationException(
-                Error.Format(SRResources.CannotWriteType, GetType().Name, edmType.FullName()));
+                Error.Format(SRResources.CannotWriteType, typeof(ODataResourceSerializer).Name, edmType.FullName()));
         }
 
         return edmType.AsStructured();
+    }
+
+    private bool IsDeltaCollection(object collection)
+    {
+        return (collection is IDeltaSet || collection is EdmChangedObjectCollection);
     }
 }

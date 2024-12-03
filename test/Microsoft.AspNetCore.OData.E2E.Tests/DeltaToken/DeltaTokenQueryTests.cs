@@ -53,7 +53,7 @@ public class DeltaTokenQueryTests : WebApiTestBase<DeltaTokenQueryTests>
         Assert.True(results.value.Count == 7, "There should be 7 entries in the response");
 
         var changeEntity = results.value[0];
-        Assert.True(((JToken)changeEntity).Count() == 9, "The changed customer should have 6 properties plus type written. But now it contains non-changed properties, it's regression bug?");
+        Assert.True(((JToken)changeEntity).Count() == 7, "The changed customer should have 6 properties plus type written. But now it contains non-changed properties, it's regression bug?");
         string changeEntityType = changeEntity["@type"].Value as string;
         Assert.True(changeEntityType != null, "The changed customer should have type written");
         Assert.True(changeEntityType.Contains("#Microsoft.AspNetCore.OData.E2E.Tests.DeltaToken.TestCustomerWithAddress"), "The changed order should be a TestCustomerWithAddress");
@@ -61,7 +61,7 @@ public class DeltaTokenQueryTests : WebApiTestBase<DeltaTokenQueryTests>
         Assert.True(changeEntity.OpenProperty.Value == 10, "The OpenProperty property of changed customer should be 10.");
         Assert.True(changeEntity.NullOpenProperty.Value == null, "The NullOpenProperty property of changed customer should be null.");
         Assert.True(changeEntity.Name.Value == "Name", "The Name of changed customer should be 'Name'");
-        Assert.True(((JToken)changeEntity.Address).Count() == 3, "The changed entity's Address should have 2 properties written. But now it contains non-changed properties, it's regression bug?");
+        Assert.True(((JToken)changeEntity.Address).Count() == 2, "The changed entity's Address should have 2 properties written. But now it contains non-changed properties, it's regression bug?");
         Assert.True(changeEntity.Address.State.Value == "State", "The changed customer's Address.State should be 'State'.");
         Assert.True(changeEntity.Address.ZipCode.Value == (int?)null, "The changed customer's Address.ZipCode should be null.");
 
@@ -71,7 +71,7 @@ public class DeltaTokenQueryTests : WebApiTestBase<DeltaTokenQueryTests>
         Assert.True(phoneNumbers[1].Value == "765-4321", "The second phone number should be '765-4321'");
 
         var newCustomer = results.value[1];
-        Assert.True(((JToken)newCustomer).Count() == 5, "The new customer should have 3 properties written, But now it contains 2 non-changed properties, it's regression bug?");
+        Assert.True(((JToken)newCustomer).Count() == 3, "The new customer should have 3 properties written, But now it contains 2 non-changed properties, it's regression bug?");
         Assert.True(newCustomer.Id.Value == 10, "The ID of the new customer should be 10");
         Assert.True(newCustomer.Name.Value == "NewCustomer", "The name of the new customer should be 'NewCustomer'");
 
@@ -79,7 +79,7 @@ public class DeltaTokenQueryTests : WebApiTestBase<DeltaTokenQueryTests>
         Assert.True(((JToken)places).Count() == 2, "The new customer should have 2 favorite places");
 
         var place1 = places[0];
-        Assert.True(((JToken)place1).Count() == 3, "The first favorite place should have 2 properties written.But now it contains non-changed properties, it's regression bug?");
+        Assert.True(((JToken)place1).Count() == 2, "The first favorite place should have 2 properties written.But now it contains non-changed properties, it's regression bug?");
         Assert.True(place1.State.Value == "State", "The first favorite place's state should be 'State'.");
         Assert.True(place1.ZipCode.Value == (int?)null, "The first favorite place's Address.ZipCode should be null.");
 
@@ -92,7 +92,7 @@ public class DeltaTokenQueryTests : WebApiTestBase<DeltaTokenQueryTests>
         Assert.True(place2.NullOpenProperty.Value == null, "The second favorite place's Address.NullOpenProperty should be null.");
 
         var newOrder = results.value[2];
-        Assert.True(((JToken)newOrder).Count() == 4, "The new order should have 2 properties plus context written, , But now it contains one non-changed properties, it's regression bug?");
+        Assert.True(((JToken)newOrder).Count() == 3, "The new order should have 2 properties plus context written, , But now it contains one non-changed properties, it's regression bug?");
         string newOrderContext = newOrder["@context"].Value as string;
         Assert.True(newOrderContext != null, "The new order should have a context written");
         Assert.True(newOrderContext.Contains("$metadata#TestOrders"), "The new order should come from the TestOrders entity set");
@@ -139,13 +139,11 @@ public class DeltaTokenQueryTests : WebApiTestBase<DeltaTokenQueryTests>
             "\"Amount\":42," +
             "\"Location\":{" +
               "\"State\":\"State\"," +
-              "\"City\":null," +
               "\"ZipCode\":null," +
               "\"OpenProperty\":10," +
               "\"key-samplelist\":{" +
                 "\"@type\":\"#Microsoft.AspNetCore.OData.E2E.Tests.DeltaToken.TestAddress\"," +
                 "\"State\":\"sample state\"," +
-                "\"City\":null," +
                 "\"ZipCode\":9," +
                 "\"title\":\"sample title\"" +
               "}" +
