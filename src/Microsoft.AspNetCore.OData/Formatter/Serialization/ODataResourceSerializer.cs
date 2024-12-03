@@ -221,7 +221,14 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 if (IsDeltaCollection(propertyValue))
                 {
                     ODataEdmTypeSerializer serializer = new ODataDeltaResourceSetSerializer(SerializerProvider);
-                    EdmCollectionTypeReference edmType = new EdmCollectionTypeReference(new EdmDeltaCollectionType(new EdmEntityTypeReference(edmProperty.Type.GetElementType() as IEdmEntityType, false)));
+                    IEdmEntityType itemType = edmProperty.Type.GetElementType() as IEdmEntityType;
+                    if(itemType == null)
+                    {
+                        throw new SerializationException(
+                            Error.Format(SRResources.TypeCannotBeSerialized, edmProperty.Type.ToTraceString()));
+                    }
+
+                    EdmCollectionTypeReference edmType = new EdmCollectionTypeReference(new EdmDeltaCollectionType(new EdmEntityTypeReference(itemType, false)));
                     await serializer.WriteObjectInlineAsync(
                         propertyValue,
                         edmType,
@@ -504,6 +511,11 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// </returns>
     public virtual SelectExpandNode CreateSelectExpandNode(ResourceContext resourceContext)
     {
+        return CreateSelectExpandNodeInternal(resourceContext);
+    }
+
+    internal static SelectExpandNode CreateSelectExpandNodeInternal(ResourceContext resourceContext)
+    {
         if (resourceContext == null)
         {
             throw Error.ArgumentNull(nameof(resourceContext));
@@ -556,7 +568,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         ODataResource resource = new ODataResource
         {
             TypeName = typeName ?? "Edm.Untyped",
-            Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
+            Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext, this.CreateStructuralProperty, this.CreateComputedProperty),
         };
 
         InitializeODataResource(selectExpandNode, resource, resourceContext);
@@ -666,16 +678,16 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     public virtual void AppendDynamicProperties(ODataResource resource, SelectExpandNode selectExpandNode,
         ResourceContext resourceContext)
     {
-        Contract.Assert(resource != null);
-        Contract.Assert(selectExpandNode != null);
-        Contract.Assert(resourceContext != null);
-
         AppendDynamicPropertiesInternal(resource,selectExpandNode, resourceContext, SerializerProvider);
     }
 
     internal static void AppendDynamicPropertiesInternal(ODataResourceBase resource, SelectExpandNode selectExpandNode,
         ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
     {
+        Contract.Assert(resource != null);
+        Contract.Assert(selectExpandNode != null);
+        Contract.Assert(resourceContext != null);
+
         if (!resourceContext.StructuredType.IsOpen || // non-open type
     (!selectExpandNode.SelectAllDynamicProperties && selectExpandNode.SelectedDynamicProperties == null))
         {
@@ -795,6 +807,11 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <returns>The created ETag.</returns>
     public virtual string CreateETag(ResourceContext resourceContext)
     {
+        return CreateETagInternal(resourceContext);
+    }
+
+    internal static string CreateETagInternal(ResourceContext resourceContext)
+    {
         if (resourceContext == null)
         {
             throw Error.ArgumentNull(nameof(resourceContext));
@@ -819,7 +836,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             foreach (IEdmStructuralProperty etagProperty in concurrencyProperties)
             {
                 properties ??= new SortedDictionary<string, object>();
-                    
+
                 properties.Add(etagProperty.Name, resourceContext.GetPropertyValue(etagProperty.Name));
             }
 
@@ -831,7 +848,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
         return null;
     }
-
 
     /// <summary>
     /// Write the navigation link for the select navigation properties.
@@ -1287,7 +1303,8 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         return navigationLink;
     }
 
-    internal IEnumerable<ODataProperty> CreateStructuralPropertyBag(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
+    internal static IEnumerable<ODataProperty> CreateStructuralPropertyBag(SelectExpandNode selectExpandNode, ResourceContext resourceContext,
+        Func<IEdmStructuralProperty,ResourceContext,ODataProperty> createStructuralProperty, Func<string,ResourceContext,ODataProperty> createComputedProperty)
     {
         Contract.Assert(selectExpandNode != null);
         Contract.Assert(resourceContext != null);
@@ -1333,7 +1350,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                     continue;
                 }
 
-                ODataProperty property = CreateStructuralProperty(structuralProperty, resourceContext);
+                ODataProperty property = createStructuralProperty(structuralProperty, resourceContext);
                 if (property != null)
                 {
                     properties.Add(property);
@@ -1346,7 +1363,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         {
             foreach (string propertyName in selectExpandNode.SelectedComputedProperties)
             {
-                ODataProperty property = CreateComputedProperty(propertyName, resourceContext);
+                ODataProperty property = createComputedProperty(propertyName, resourceContext);
                 if (property != null)
                 {
                     properties.Add(property);
@@ -1364,6 +1381,11 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <param name="resourceContext">The context for the resource instance being written.</param>
     /// <returns>The <see cref="ODataProperty"/> to write.</returns>
     public virtual ODataProperty CreateComputedProperty(string propertyName, ResourceContext resourceContext)
+    {
+        return CreateComputedPropertyInternal(propertyName, resourceContext, SerializerProvider);
+    }
+
+    internal static ODataProperty CreateComputedPropertyInternal(string propertyName, ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
     {
         if (string.IsNullOrWhiteSpace(propertyName))
         {
@@ -1390,7 +1412,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             throw Error.NotSupported(SRResources.TypeOfDynamicPropertyNotSupported, propertyValue.GetType().FullName, propertyName);
         }
 
-        IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
+        IODataEdmTypeSerializer serializer = serializerProvider.GetEdmTypeSerializer(edmTypeReference);
         if (serializer == null)
         {
             throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmTypeReference.FullName()));
@@ -1523,6 +1545,11 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <returns>The <see cref="ODataProperty"/> to write.</returns>
     public virtual ODataProperty CreateStructuralProperty(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext)
     {
+        return CreateStructuralPropertyInternal(structuralProperty, resourceContext, SerializerProvider);
+    }
+
+    internal static ODataProperty CreateStructuralPropertyInternal(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
+    {
         if (structuralProperty == null)
         {
             throw Error.ArgumentNull(nameof(structuralProperty));
@@ -1534,7 +1561,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
         ODataSerializerContext writeContext = resourceContext.SerializerContext;
 
-        IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+        IODataEdmTypeSerializer serializer = serializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
         if (serializer == null)
         {
             throw new SerializationException(

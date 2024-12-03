@@ -326,7 +326,7 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
             throw Error.ArgumentNull(nameof(writer));
         }
 
-        //todo:use serializer provider
+        //TODO:in future, use SerializerProvider -- requires differentiating between resource serializer and deleted resource serializer for same EdmType
         ODataDeletedResourceSerializer deletedResourceSerializer = new ODataDeletedResourceSerializer(SerializerProvider);
 
         await deletedResourceSerializer.WriteObjectInlineAsync(value, expectedType, writer, writeContext);
