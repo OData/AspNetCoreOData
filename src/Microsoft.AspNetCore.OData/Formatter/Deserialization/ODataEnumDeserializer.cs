@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization;
 
@@ -89,7 +90,7 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
         {
             if (enumValue != null)
             {
-                IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name == enumValue.Value);
+                IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name.Equals(enumValue.Value, StringComparison.InvariantCultureIgnoreCase));
                 if (enumMember != null)
                 {
                     var clrMember = memberMapAnnotation.GetClrEnumMember(enumMember);
@@ -98,10 +99,54 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
                         return clrMember;
                     }
                 }
+                else if (enumType.IsFlags)
+                {
+                    var result = ReadFlagsEnumValue(enumValue, enumType, memberMapAnnotation);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
             }
         }
 
         Type clrType = readContext.Model.GetClrType(edmType);
         return EnumDeserializationHelpers.ConvertEnumValue(item, clrType);
+    }
+
+    /// <summary>
+    /// Reads the value of a flags enum.
+    /// </summary>
+    /// <param name="enumValue">The OData enum value.</param>
+    /// <param name="enumType">The EDM enum type.</param>
+    /// <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
+    /// <returns>The deserialized flags enum value.</returns>
+    private object ReadFlagsEnumValue(ODataEnumValue enumValue, IEdmEnumType enumType, ClrEnumMemberAnnotation memberMapAnnotation)
+    {
+        long result = 0;
+        Type clrEnumType = null;
+
+        // For flags enum, we need to split the value and convert it to the enum value.
+        string[] values = enumValue.Value.Split(',');
+        foreach (string value in values)
+        {
+            IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name.Equals(value.Trim(), StringComparison.InvariantCultureIgnoreCase));
+            if (enumMember == null)
+            {
+                return null;
+            }
+
+            var clrEnumMember = memberMapAnnotation.GetClrEnumMember(enumMember);
+            if (clrEnumMember != null)
+            {
+                result |= Convert.ToInt64(clrEnumMember);
+                if (clrEnumType == null)
+                {
+                    clrEnumType = clrEnumMember.GetType();
+                }
+            }
+        }
+
+        return result == 0 ? null : Enum.ToObject(clrEnumType, result);
     }
 }
