@@ -12,10 +12,10 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -35,7 +35,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
             IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
         services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
-            .AddRouteComponents("convention", model1)
+                .AddRouteComponents("convention", model1)
             .AddRouteComponents("explicit", model2));
     }
 
@@ -82,7 +82,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         var employee = edmModel.SchemaElements.SingleOrDefault(e => e.Name == "Employee") as IEdmEntityType;
         Assert.Single(employee.Key());
         Assert.Equal("ID", employee.Key().First().Name);
-        Assert.Equal(6, employee.Properties().Count());
+        Assert.Equal(7, employee.Properties().Count());
 
         //Entity Enum Collection Property
         var skillSet = employee.Properties().SingleOrDefault(p => p.Name == "SkillSet");
@@ -97,6 +97,11 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         var accessLevel = employee.Properties().SingleOrDefault(p => p.Name == "AccessLevel") as IEdmStructuralProperty;
         edmEnumType = accessLevel.Type.Definition as IEdmEnumType;
         Assert.Equal(3, edmEnumType.Members.Count());
+        Assert.True(edmEnumType.IsFlags);
+
+        var employeeType = employee.Properties().SingleOrDefault(p => p.Name == "EmployeeType") as IEdmStructuralProperty;
+        edmEnumType = employeeType.Type.Definition as IEdmEnumType;
+        Assert.Equal(4, edmEnumType.Members.Count());
         Assert.True(edmEnumType.IsFlags);
 
         //Action AddSkill
@@ -256,6 +261,69 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         {
             var context = json["@odata.context"].ToString();
             Assert.True(context.IndexOf("/$metadata#Collection(Microsoft.AspNetCore.OData.E2E.Tests.Enums.Skill)") >= 0);
+        }
+
+        requestUri = "/convention/Employees(1)/EmployeeType?$format=" + format;
+        response = await client.GetAsync(requestUri);
+        json = await response.Content.ReadAsObject<JObject>();
+        var employeeTypeValue = json.GetValue("value").ToString();
+        Assert.Equal("fulltime, parttime", employeeTypeValue);
+        if (format != "application/json;odata.metadata=none")
+        {
+            var context = json.GetValue("@odata.context").ToString();
+            Assert.True(context.IndexOf("/$metadata#Employees(1)/EmployeeType") > 0);
+        }
+    }
+
+    public static TheoryDataSet<string, int, string, string> QueryEnumPropertyWithFlagsInEntityTypeData
+    {
+        get
+        {
+            return new TheoryDataSet<string, int, string, string>
+            {
+                { "application/json;odata.metadata=full", 1, "Execute", "fulltime, parttime" },
+                { "application/json;odata.metadata=minimal", 1, "Execute", "fulltime, parttime"  },
+                { "application/json;odata.metadata=none", 1, "Execute", "fulltime, parttime" },
+
+                { "application/json;odata.metadata=full", 2, "Read", "contract" },
+                { "application/json;odata.metadata=minimal", 2, "Read", "contract" },
+                { "application/json;odata.metadata=none", 2, "Read", "contract" },
+
+                { "application/json;odata.metadata=full", 3, "Read, Write", "intern, fulltime, parttime" },
+                { "application/json;odata.metadata=minimal", 3, "Read, Write", "intern, fulltime, parttime" },
+                { "application/json;odata.metadata=none", 3, "Read, Write", "intern, fulltime, parttime" },
+            };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(QueryEnumPropertyWithFlagsInEntityTypeData))]
+    public async Task QueryEnumPropertyWithFlagsInEntityType(string format, int id, string expectedAccessLevelValue,string expectedEmployeeTypeValue)
+    {
+        // Arrange
+        await ResetDatasource();
+        HttpClient client = CreateClient();
+
+        string requestUri = $"/convention/Employees({id})?$format={format}";
+
+        // Act
+        var response = await client.GetAsync(requestUri);
+
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsObject<JObject>();
+
+        var accessLevel = json.GetValue("AccessLevel").ToString();
+        var employeeType = json.GetValue("EmployeeType").ToString();
+
+        // Assert
+        Assert.Equal(expectedAccessLevelValue, accessLevel);
+        Assert.Equal(expectedAccessLevelValue, accessLevel);
+
+        if (format != "application/json;odata.metadata=none")
+        {
+            var context = json.GetValue("@odata.context").ToString();
+            Assert.True(context.IndexOf("/$metadata#Employees/$entity") > 0);
         }
     }
 
@@ -417,48 +485,104 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         Assert.Equal(3, secondEmployee["ID"]);
     }
 
-#region Update
+    #region Add
 
-    //[Fact]
-    //public async Task AddEntity()
-    //{
-    //    await ResetDatasource();
-    //    string requestUri = "/convention/Employees?$format=application/json;odata.metadata=none";
+    [Fact]
+    public async Task AddEntity()
+    {
+        await ResetDatasource();
+        HttpClient client = CreateClient();
+        string requestUri = "/convention/Employees?$format=application/json;odata.metadata=none";
 
-    //    using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
-    //    {
-    //        response.EnsureSuccessStatusCode();
+        using (HttpResponseMessage response = await client.GetAsync(requestUri))
+        {
+            response.EnsureSuccessStatusCode();
 
-    //        var json = await response.Content.ReadAsObject<JObject>();
-    //        var result = json.GetValue("value") as JArray;
-    //        Assert.Equal<int>(3, result.Count);
-    //    }
+            var json = await response.Content.ReadAsObject<JObject>();
+            var result = json.GetValue("value") as JArray;
+            Assert.Equal<int>(3, result.Count);
+        }
 
-    //    var postUri = "/convention/Employees";
+        var postUri = "/convention/Employees";
 
-    //    var postContent = JObject.Parse(@"{""ID"":1,
-    //            ""Name"":""Name2"",
-    //            ""SkillSet"":[""Sql""],
-    //            ""Gender"":""Female"",
-    //            ""AccessLevel"":""Read,Write"",
-    //            ""FavoriteSports"":{
-    //                    ""LikeMost"":""Pingpong"",
-    //                    ""Like"":[""Pingpong"",""Basketball""]
-    //            }}");
-    //    using (HttpResponseMessage response = await this.Client.PostAsJsonAsync(postUri, postContent))
-    //    {
-    //        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-    //    }
+        var postContent = JObject.Parse(@"{""ID"":6,
+                ""Name"":""New Name 20"",
+                ""SkillSet"":[""Sql""],
+                ""Gender"":""Female"",
+                ""AccessLevel"":""read,write"",
+                ""EmployeeType"":""intern, contract"",
+                ""FavoriteSports"":{
+                        ""LikeMost"":""Pingpong"",
+                        ""Like"":[""Pingpong"",""Basketball""]
+                }}");
+        using (HttpResponseMessage response = await client.PostAsJsonAsync(postUri, postContent))
+        {
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
 
-    //    using (HttpResponseMessage response = await this.Client.GetAsync(requestUri))
-    //    {
-    //        response.EnsureSuccessStatusCode();
+        using (HttpResponseMessage response = await client.GetAsync(requestUri))
+        {
+            response.EnsureSuccessStatusCode();
 
-    //        var json = await response.Content.ReadAsObject<JObject>();
-    //        var result = json.GetValue("value") as JArray;
-    //        Assert.Equal<int>(4, result.Count);
-    //    }
-    //}
+            var json = await response.Content.ReadAsObject<JObject>();
+            var result = json.GetValue("value") as JArray;
+            Assert.Equal<int>(4, result.Count);
+        }
+    }
+
+    [Theory]
+    [InlineData("read", "intern")]
+    [InlineData("Read", "Intern")]
+    [InlineData("read, Execute", "fullTime, Contract")]
+    [InlineData("Read, Execute", "Intern, FullTime")]
+    [InlineData("read,write", "intern, contract")]
+    public async Task AddEntityWithLowerAndUpperCamelCaseFlagEnums(string accessLevelValue, string employeeTypeValue)
+    {
+        await ResetDatasource();
+        HttpClient client = CreateClient();
+        string requestUri = "/convention/Employees?$format=application/json;odata.metadata=none";
+
+        using (HttpResponseMessage response = await client.GetAsync(requestUri))
+        {
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsObject<JObject>();
+            var result = json.GetValue("value") as JArray;
+            Assert.Equal<int>(3, result.Count);
+        }
+
+        var postUri = "/convention/Employees";
+
+        var postContent = JObject.Parse($@"{{
+                ""ID"":6,
+                ""Name"":""New Name 23"",
+                ""SkillSet"":[""Sql""],
+                ""Gender"":""Female"",
+                ""AccessLevel"":""{accessLevelValue}"",
+                ""EmployeeType"":""{employeeTypeValue}"",
+                ""FavoriteSports"":{{
+                        ""LikeMost"":""Pingpong"",
+                        ""Like"":[""Pingpong"",""Basketball""]
+                }}}}");
+
+        using (HttpResponseMessage response = await client.PostAsJsonAsync(postUri, postContent))
+        {
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        using (HttpResponseMessage response = await client.GetAsync(requestUri))
+        {
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsObject<JObject>();
+            var result = json.GetValue("value") as JArray;
+            Assert.Equal<int>(4, result.Count);
+        }
+    }
+
+    #endregion
+
+    #region Update
 
     [Fact]
     public async Task PostToEnumCollection()
@@ -536,6 +660,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
                 ""SkillSet"":[""Sql""],
                 ""Gender"":""Female"",
                 ""AccessLevel"":""Execute,Write"",
+                ""EmployeeType"":""intern, contract"",
                 ""FavoriteSports"":{
                         ""LikeMost"":""Basketball"",
                         ""Like"":[""Pingpong"",""Basketball""]
@@ -553,6 +678,9 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
 
             var accessLevel = json.GetValue("AccessLevel");
             Assert.Equal("Write, Execute", accessLevel);
+
+            var employeeType = json.GetValue("EmployeeType");
+            Assert.Equal("contract, intern", employeeType);
 
             var skillSet = json.GetValue("SkillSet").ToString();
             Assert.Equal(@"[""Sql""]", skillSet.Replace("\r\n", "").Replace(" ", ""));
@@ -579,6 +707,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
                 ""SkillSet"":[""Sql""],
                 ""Gender"":""Female"",
                 ""AccessLevel"":""Execute,Write"",
+                ""EmployeeType"":""parttime, Fulltime"",
                 ""FavoriteSports"":{
                         ""LikeMost"":""Basketball"",
                         ""Like"":[""Pingpong"",""Basketball""]
@@ -598,9 +727,52 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         }
     }
 
-#endregion
+    public static TheoryDataSet<string, string> UpsertEntityWithLowerAndUpperCamelCaseFlagEnumsData
+    {
+        get
+        {
+            return new TheoryDataSet<string, string>
+        {
+            { "PUT", @"{""ID"":20,""AccessLevel"":""Execute,Write"",""EmployeeType"":""intern, FullTime""}" },
+            { "PATCH", @"{""ID"":20,""AccessLevel"":""Execute,Write"",""EmployeeType"":""intern, FullTime""}" },
+            { "PUT", @"{""ID"":20,""AccessLevel"":""Execute, write"",""EmployeeType"":""Intern, contract""}" },
+            { "PATCH", @"{""ID"":20,""AccessLevel"":""Execute, write"",""EmployeeType"":""Intern, contract""}" },
+            { "PUT", @"{""ID"":20,""AccessLevel"":""execute"",""EmployeeType"":""contract""}" },
+            { "PATCH", @"{""ID"":20,""AccessLevel"":""execute"",""EmployeeType"":""contract""}" },
+            { "PUT", @"{""ID"":20,""AccessLevel"":""Execute"",""EmployeeType"":""FullTime""}" },
+            { "PATCH", @"{""ID"":20,""AccessLevel"":""Execute"",""EmployeeType"":""FullTime""}" },
+        };
+        }
+    }
 
-#region Delete
+
+    [Theory]
+    [MemberData(nameof(UpsertEntityWithLowerAndUpperCamelCaseFlagEnumsData))]
+    public async Task UpsertEntityWithLowerAndUpperCamelCaseFlagEnums(string method, string requestContent)
+    {
+        await ResetDatasource();
+        HttpClient client = CreateClient();
+
+        var requestUri = "/convention/Employees(20)";
+
+        HttpRequestMessage request = new HttpRequestMessage(new HttpMethod(method), requestUri);
+        request.Content = new StringContent(requestContent);
+        request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        request.Content.Headers.ContentLength = requestContent.Length;
+        request.Headers.Add("Prefer", "return=minimal");
+        using (HttpResponseMessage response = await client.SendAsync(request))
+        {
+            Assert.True(HttpStatusCode.NoContent == response.StatusCode,
+                string.Format("Response code is not right, expected: {0}, actual: {1}", HttpStatusCode.NoContent, response.StatusCode));
+            Assert.True(response.Headers.Contains("OData-EntityId"), "The response should contain Header 'OData-EntityId'");
+            Assert.True(response.Headers.Contains("Location"), "The response should contain Header 'Location'");
+            Assert.True(response.Headers.Contains("OData-Version"), "The response should contain Header 'OData-Version'");
+        }
+    }
+
+    #endregion
+
+    #region Delete
 
     [Fact]
     public async Task DeleteEntity()
