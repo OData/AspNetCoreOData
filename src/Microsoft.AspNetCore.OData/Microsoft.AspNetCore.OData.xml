@@ -4521,15 +4521,6 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
-            <summary>
-            Creates the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
-            </summary>
-            <param name="resourceContext">Contains the entity instance being written and the context.</param>
-            <returns>
-            The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
-            </returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.CreateDeletedResource(System.Uri,Microsoft.OData.DeltaDeletedEntryReason,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataResource"/> to be written while writing this resource.
@@ -4539,39 +4530,6 @@
             <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
             <param name="resourceContext">The context for the resource instance being written.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataResource"/>.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.AppendDynamicProperties(Microsoft.OData.ODataDeletedResource,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
-            <summary>
-            Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="T:Microsoft.OData.ODataResource"/>.
-            If the dynamic property is a property of the complex or collection of complex, it will be saved into
-            the dynamic complex properties dictionary of <paramref name="resourceContext"/> and be written later.
-            </summary>
-            <param name="resource">The <see cref="T:Microsoft.OData.ODataDeletedResource"/> describing the resource.</param>
-            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
-            <param name="resourceContext">The context for the resource instance being written.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.CreateETag(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
-            <summary>
-            Creates the ETag for the given entity.
-            </summary>
-            <param name="resourceContext">The context for the resource instance being written.</param>
-            <returns>The created ETag.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.CreateComputedProperty(System.String,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
-            <summary>
-            Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given resource.
-            </summary>
-            <param name="propertyName">The computed property being written.</param>
-            <param name="resourceContext">The context for the resource instance being written.</param>
-            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> to write.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.CreateStructuralProperty(Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
-            <summary>
-            Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given entity and the structural property.
-            </summary>
-            <param name="structuralProperty">The EDM structural property being written.</param>
-            <param name="resourceContext">The context for the entity instance being written.</param>
-            <returns>The <see cref="T:Microsoft.OData.ODataProperty"/> to write.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer">
             <summary>
@@ -4840,6 +4798,7 @@
             <param name="writer">The ODataWriter.</param>
             <returns>A task that represents the asynchronous write operation</returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Boolean)" -->
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
@@ -4857,7 +4816,25 @@
             <param name="resourceContext">The context for the resource instance being written.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataResource"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.InitializeODataResource(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.OData.ODataResourceBase,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Initializes an ODataResource to be written
+            </summary>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
+            <param name="resource">The resource that will be initialized</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.AppendDynamicProperties(Microsoft.OData.ODataResource,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="T:Microsoft.OData.ODataResource"/>.
+            If the dynamic property is a property of the complex or collection of complex, it will be saved into
+            the dynamic complex properties dictionary of <paramref name="resourceContext"/> and be written later.
+            </summary>
+            <param name="resource">The <see cref="T:Microsoft.OData.ODataResource"/> describing the resource.</param>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.AppendDynamicPropertiesInternal(Microsoft.OData.ODataResourceBase,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="T:Microsoft.OData.ODataResource"/>.
             If the dynamic property is a property of the complex or collection of complex, it will be saved into
@@ -4933,6 +4910,7 @@
             <param name="resourceContext">The context for the entity instance being written.</param>
             <returns>The navigation link to be written.</returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralPropertyBag(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)" -->
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComputedProperty(System.String,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given resource.

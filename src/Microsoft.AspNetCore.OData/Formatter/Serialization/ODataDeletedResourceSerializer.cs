@@ -22,13 +22,13 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
 /// ODataSerializer for serializing instances of <see cref="IEdmDeltaDeletedResourceObject"/>/>
 /// </summary>
 [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many ODataLib classes.")]
-public class ODataDeletedResourceSerializer : ODataEdmTypeSerializer
+public class ODataDeletedResourceSerializer : ODataResourceSerializer
 {
     private const string Resource = "DeletedResource";
 
     /// <inheritdoc />
     public ODataDeletedResourceSerializer(IODataSerializerProvider serializerProvider)
-        : base(ODataPayloadKind.Resource, serializerProvider)
+        : base(serializerProvider)
     {
     }
 
@@ -85,13 +85,6 @@ public class ODataDeletedResourceSerializer : ODataEdmTypeSerializer
     {
         Contract.Assert(writeContext != null);
 
-        //TODO: do we need this?
-        //if (graph.GetType().IsDynamicTypeWrapper())
-        //{
-        //    await new ODataResourceSerializer(SerializerProvider).WriteDynamicTypeResourceAsync(graph, writer, expectedType, writeContext).ConfigureAwait(false);
-        //    return;
-        //}
-
         IEdmStructuredTypeReference structuredType = ODataResourceSerializer.GetResourceType(graph, writeContext);
         ResourceContext resourceContext = new ResourceContext(writeContext, structuredType, graph);
 
@@ -135,18 +128,6 @@ public class ODataDeletedResourceSerializer : ODataEdmTypeSerializer
     }
 
     /// <summary>
-    /// Creates the <see cref="SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
-    /// </summary>
-    /// <param name="resourceContext">Contains the entity instance being written and the context.</param>
-    /// <returns>
-    /// The <see cref="SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
-    /// </returns>
-    public virtual SelectExpandNode CreateSelectExpandNode(ResourceContext resourceContext)
-    {
-        return ODataResourceSerializer.CreateSelectExpandNodeInternal(resourceContext);
-    }
-
-    /// <summary>
     /// Creates the <see cref="ODataResource"/> to be written while writing this resource.
     /// </summary>
     /// <param name="id">The id of the Deleted Resource to be written (may be null if properties contains all key properties)</param>
@@ -172,11 +153,11 @@ public class ODataDeletedResourceSerializer : ODataEdmTypeSerializer
         {
             Id = id ?? (resourceContext.NavigationSource == null ? null : resourceContext.GenerateSelfLink(false)),
             TypeName = typeName ?? "Edm.Untyped",
-            Properties = ODataResourceSerializer.CreateStructuralPropertyBag(selectExpandNode, resourceContext, this.CreateStructuralProperty, this.CreateComputedProperty),
+            Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
             Reason = reason
         };
 
-        ODataResourceSerializer.InitializeODataResource(selectExpandNode, resource, resourceContext);
+        InitializeODataResource(selectExpandNode, resource, resourceContext);
 
         string etag = CreateETag(resourceContext);
         if (etag != null)
@@ -185,56 +166,8 @@ public class ODataDeletedResourceSerializer : ODataEdmTypeSerializer
         }
 
         // Try to add the dynamic properties if the structural type is open.
-        AppendDynamicProperties(resource, selectExpandNode, resourceContext);
+        AppendDynamicPropertiesInternal(resource, selectExpandNode, resourceContext);
 
         return resource;
-    }
-
-    /// <summary>
-    /// Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="ODataResource"/>.
-    /// If the dynamic property is a property of the complex or collection of complex, it will be saved into
-    /// the dynamic complex properties dictionary of <paramref name="resourceContext"/> and be written later.
-    /// </summary>
-    /// <param name="resource">The <see cref="ODataDeletedResource"/> describing the resource.</param>
-    /// <param name="selectExpandNode">The <see cref="SelectExpandNode"/> describing the response graph.</param>
-    /// <param name="resourceContext">The context for the resource instance being written.</param>
-    [SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Justification = "Relies on many classes.")]
-    [SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity", Justification = "These are simple conversion function and cannot be split up.")]
-    public virtual void AppendDynamicProperties(ODataDeletedResource resource, SelectExpandNode selectExpandNode,
-        ResourceContext resourceContext)
-    {
-        ODataResourceSerializer.AppendDynamicPropertiesInternal(resource, selectExpandNode, resourceContext, SerializerProvider);
-    }
-
-    /// <summary>
-    /// Creates the ETag for the given entity.
-    /// </summary>
-    /// <param name="resourceContext">The context for the resource instance being written.</param>
-    /// <returns>The created ETag.</returns>
-    public virtual string CreateETag(ResourceContext resourceContext)
-    {
-        return ODataResourceSerializer.CreateETagInternal(resourceContext);
-    }
-
-    /// <summary>
-    /// Creates the <see cref="ODataProperty"/> to be written for the given resource.
-    /// </summary>
-    /// <param name="propertyName">The computed property being written.</param>
-    /// <param name="resourceContext">The context for the resource instance being written.</param>
-    /// <returns>The <see cref="ODataProperty"/> to write.</returns>
-    public virtual ODataProperty CreateComputedProperty(string propertyName, ResourceContext resourceContext)
-    {
-        return ODataResourceSerializer.CreateComputedPropertyInternal(propertyName, resourceContext, SerializerProvider);
-    }
-
-    /// <summary>
-    /// Creates the <see cref="ODataProperty"/> to be written for the given entity and the structural property.
-    /// </summary>
-    /// <param name="structuralProperty">The EDM structural property being written.</param>
-    /// <param name="resourceContext">The context for the entity instance being written.</param>
-    /// <returns>The <see cref="ODataProperty"/> to write.</returns>
-    public virtual ODataProperty CreateStructuralProperty(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext)
-    {
-        return ODataResourceSerializer.CreateStructuralPropertyInternal(structuralProperty, resourceContext, SerializerProvider);
     }
 }

@@ -237,7 +237,13 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 }
                 else
                 {
-                    ODataEdmTypeSerializer serializer = new ODataResourceSetSerializer(SerializerProvider);
+                    IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmProperty.Type);
+                    if (serializer == null)
+                    {
+                        throw new SerializationException(
+                            Error.Format(SRResources.TypeCannotBeSerialized, edmProperty.Type.ToTraceString()));
+                    }
+
                     await serializer.WriteObjectInlineAsync(propertyValue, edmProperty.Type, writer, nestedWriteContext).ConfigureAwait(false);
                 }
             }
@@ -256,7 +262,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <param name="resourceContext">The resource context for the resource being written.</param>
     /// <param name="writer">The ODataWriter.</param>
     /// <returns>A task that represents the asynchronous write operation</returns>
-    internal async Task WriteDeltaNavigationPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
+    private async Task WriteDeltaNavigationPropertiesAsync(SelectExpandNode selectExpandNode, ResourceContext resourceContext, ODataWriter writer)
     {
         Contract.Assert(resourceContext != null, "The ResourceContext cannot be null");
         Contract.Assert(writer != null, "The ODataWriter cannot be null");
@@ -477,7 +483,14 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         writeContext.NavigationSource = originalNavigationSource;
     }
 
-    internal async Task WriteResourceContent(ODataWriter writer, SelectExpandNode selectExpandNode, ResourceContext resourceContext, bool isDelta)
+    /// <summary>
+    /// Writes the context of a Resource
+    /// </summary>
+    /// <param name="writer">The <see cref="ODataWriter"> to use to write the resource contents</param>
+    /// <param name="selectExpandNode">The <see cref="SelectExpandNode"/> describing the response graph.</param>
+    /// <param name="resourceContext">The context for the resource instance being written.</param>
+    /// <param name="isDelta">Whether to only write changed properties of the resource</param>
+    protected internal async Task WriteResourceContent(ODataWriter writer, SelectExpandNode selectExpandNode, ResourceContext resourceContext, bool isDelta)
     {
         // TODO: These should be aligned; do we need different methods for delta versus non-delta complex/navigation properties?
         if (isDelta)
@@ -510,11 +523,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// The <see cref="SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
     /// </returns>
     public virtual SelectExpandNode CreateSelectExpandNode(ResourceContext resourceContext)
-    {
-        return CreateSelectExpandNodeInternal(resourceContext);
-    }
-
-    internal static SelectExpandNode CreateSelectExpandNodeInternal(ResourceContext resourceContext)
     {
         if (resourceContext == null)
         {
@@ -568,7 +576,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         ODataResource resource = new ODataResource
         {
             TypeName = typeName ?? "Edm.Untyped",
-            Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext, this.CreateStructuralProperty, this.CreateComputedProperty),
+            Properties = CreateStructuralPropertyBag(selectExpandNode, resourceContext),
         };
 
         InitializeODataResource(selectExpandNode, resource, resourceContext);
@@ -603,7 +611,13 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         return resource;
     }
 
-    internal static void InitializeODataResource(SelectExpandNode selectExpandNode, ODataResourceBase resource, ResourceContext resourceContext)
+    /// <summary>
+    /// Initializes an ODataResource to be written
+    /// </summary>
+    /// <param name="selectExpandNode">The <see cref="SelectExpandNode"/> describing the response graph.</param>
+    /// <param name="resource">The resource that will be initialized</param>
+    /// <param name="resourceContext">The context for the resource instance being written.</param>
+    protected internal void InitializeODataResource(SelectExpandNode selectExpandNode, ODataResourceBase resource, ResourceContext resourceContext)
     { 
         if ((resourceContext.EdmObject is EdmDeltaResourceObject || resourceContext.EdmObject is IEdmDeltaDeletedResourceObject) && resourceContext.NavigationSource != null)
         {
@@ -678,11 +692,19 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     public virtual void AppendDynamicProperties(ODataResource resource, SelectExpandNode selectExpandNode,
         ResourceContext resourceContext)
     {
-        AppendDynamicPropertiesInternal(resource,selectExpandNode, resourceContext, SerializerProvider);
+        AppendDynamicPropertiesInternal(resource, selectExpandNode, resourceContext);
     }
 
-    internal static void AppendDynamicPropertiesInternal(ODataResourceBase resource, SelectExpandNode selectExpandNode,
-        ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
+    /// <summary>
+    /// Appends the dynamic properties of primitive, enum or the collection of them into the given <see cref="ODataResource"/>.
+    /// If the dynamic property is a property of the complex or collection of complex, it will be saved into
+    /// the dynamic complex properties dictionary of <paramref name="resourceContext"/> and be written later.
+    /// </summary>
+    /// <param name="resource">The <see cref="ODataResource"/> describing the resource.</param>
+    /// <param name="selectExpandNode">The <see cref="SelectExpandNode"/> describing the response graph.</param>
+    /// <param name="resourceContext">The context for the resource instance being written.</param>
+    protected internal void AppendDynamicPropertiesInternal(ODataResourceBase resource, SelectExpandNode selectExpandNode,
+        ResourceContext resourceContext)
     {
         Contract.Assert(resource != null);
         Contract.Assert(selectExpandNode != null);
@@ -782,7 +804,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             }
             else
             {
-                IODataEdmTypeSerializer propertySerializer = serializerProvider.GetEdmTypeSerializer(edmTypeReference);
+                IODataEdmTypeSerializer propertySerializer =SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
                 if (propertySerializer == null)
                 {
                     throw Error.NotSupported(SRResources.DynamicPropertyCannotBeSerialized, dynamicProperty.Key,
@@ -806,11 +828,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <param name="resourceContext">The context for the resource instance being written.</param>
     /// <returns>The created ETag.</returns>
     public virtual string CreateETag(ResourceContext resourceContext)
-    {
-        return CreateETagInternal(resourceContext);
-    }
-
-    internal static string CreateETagInternal(ResourceContext resourceContext)
     {
         if (resourceContext == null)
         {
@@ -1303,8 +1320,14 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         return navigationLink;
     }
 
-    internal static IEnumerable<ODataProperty> CreateStructuralPropertyBag(SelectExpandNode selectExpandNode, ResourceContext resourceContext,
-        Func<IEdmStructuralProperty,ResourceContext,ODataProperty> createStructuralProperty, Func<string,ResourceContext,ODataProperty> createComputedProperty)
+    /// <summary>
+    /// Creates the <see cref="ODataProperty"/>s to be written while writing this entity.
+    /// </summary>
+    /// <param name="selectExpandNode">The <see cref="SelectExpandNode"> to determine the properties to be written</param>
+    /// <param name="resourceContext">The context for the entity instance being written.</param>
+    /// <returns>The navigation link to be written.</returns>
+    /// <returns>ODataProperties to be written</returns>
+    protected internal IEnumerable<ODataProperty> CreateStructuralPropertyBag(SelectExpandNode selectExpandNode, ResourceContext resourceContext)
     {
         Contract.Assert(selectExpandNode != null);
         Contract.Assert(resourceContext != null);
@@ -1350,7 +1373,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                     continue;
                 }
 
-                ODataProperty property = createStructuralProperty(structuralProperty, resourceContext);
+                ODataProperty property = CreateStructuralProperty(structuralProperty, resourceContext);
                 if (property != null)
                 {
                     properties.Add(property);
@@ -1363,7 +1386,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         {
             foreach (string propertyName in selectExpandNode.SelectedComputedProperties)
             {
-                ODataProperty property = createComputedProperty(propertyName, resourceContext);
+                ODataProperty property = CreateComputedProperty(propertyName, resourceContext);
                 if (property != null)
                 {
                     properties.Add(property);
@@ -1381,11 +1404,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <param name="resourceContext">The context for the resource instance being written.</param>
     /// <returns>The <see cref="ODataProperty"/> to write.</returns>
     public virtual ODataProperty CreateComputedProperty(string propertyName, ResourceContext resourceContext)
-    {
-        return CreateComputedPropertyInternal(propertyName, resourceContext, SerializerProvider);
-    }
-
-    internal static ODataProperty CreateComputedPropertyInternal(string propertyName, ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
     {
         if (string.IsNullOrWhiteSpace(propertyName))
         {
@@ -1412,7 +1430,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             throw Error.NotSupported(SRResources.TypeOfDynamicPropertyNotSupported, propertyValue.GetType().FullName, propertyName);
         }
 
-        IODataEdmTypeSerializer serializer = serializerProvider.GetEdmTypeSerializer(edmTypeReference);
+        IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(edmTypeReference);
         if (serializer == null)
         {
             throw new SerializationException(Error.Format(SRResources.TypeCannotBeSerialized, edmTypeReference.FullName()));
@@ -1545,11 +1563,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <returns>The <see cref="ODataProperty"/> to write.</returns>
     public virtual ODataProperty CreateStructuralProperty(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext)
     {
-        return CreateStructuralPropertyInternal(structuralProperty, resourceContext, SerializerProvider);
-    }
-
-    internal static ODataProperty CreateStructuralPropertyInternal(IEdmStructuralProperty structuralProperty, ResourceContext resourceContext, IODataSerializerProvider serializerProvider)
-    {
         if (structuralProperty == null)
         {
             throw Error.ArgumentNull(nameof(structuralProperty));
@@ -1561,7 +1574,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
         ODataSerializerContext writeContext = resourceContext.SerializerContext;
 
-        IODataEdmTypeSerializer serializer = serializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
+        IODataEdmTypeSerializer serializer = SerializerProvider.GetEdmTypeSerializer(structuralProperty.Type);
         if (serializer == null)
         {
             throw new SerializationException(
