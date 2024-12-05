@@ -59,6 +59,7 @@ public class TypelessDeltaSerializationTests : WebApiTestBase<TypelessDeltaSeria
         HttpClient client = CreateClient();
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(acceptHeader));
+        request.Headers.Add("OData-Version", "4.01");
 
         // Act
         HttpResponseMessage response = await client.SendAsync(request);
