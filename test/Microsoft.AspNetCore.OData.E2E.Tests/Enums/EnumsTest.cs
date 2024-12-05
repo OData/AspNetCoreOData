@@ -289,9 +289,9 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
                 { "application/json;odata.metadata=minimal", 2, "Read", "contract" },
                 { "application/json;odata.metadata=none", 2, "Read", "contract" },
 
-                { "application/json;odata.metadata=full", 3, "Read, Write", "intern, fulltime, parttime" },
-                { "application/json;odata.metadata=minimal", 3, "Read, Write", "intern, fulltime, parttime" },
-                { "application/json;odata.metadata=none", 3, "Read, Write", "intern, fulltime, parttime" },
+                { "application/json;odata.metadata=full", 3, "Read, Write", "fulltime, parttime, intern" },
+                { "application/json;odata.metadata=minimal", 3, "Read, Write", "fulltime, parttime, intern" },
+                { "application/json;odata.metadata=none", 3, "Read, Write", "fulltime, parttime, intern" },
             };
         }
     }
@@ -318,7 +318,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
 
         // Assert
         Assert.Equal(expectedAccessLevelValue, accessLevel);
-        Assert.Equal(expectedAccessLevelValue, accessLevel);
+        Assert.Equal(expectedEmployeeTypeValue, employeeType);
 
         if (format != "application/json;odata.metadata=none")
         {
