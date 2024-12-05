@@ -11,7 +11,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -84,12 +83,6 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
             return new EdmEnumObject(enumTypeReference, enumValue.Value);
         }
 
-        bool enablePropertyNameCaseInsensitive = 
-            readContext.Request != null &&
-            readContext.Request.ODataOptions() != null &&
-            readContext.Request.ODataOptions().RouteOptions != null &&
-            readContext.Request.ODataOptions().RouteOptions.EnablePropertyNameCaseInsensitive;
-
         IEdmEnumType enumType = enumTypeReference.EnumDefinition();
 
         Type clrType = readContext.Model.GetClrType(edmType);
@@ -100,8 +93,7 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
         {
             if (enumValue != null)
             {
-                IEdmEnumMember enumMember = GetEnumMember(enumType, enumValue.Value, enablePropertyNameCaseInsensitive);
-
+                IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name.Equals(enumValue.Value, StringComparison.InvariantCultureIgnoreCase));
                 if (enumMember != null)
                 {
                     var clrMember = memberMapAnnotation.GetClrEnumMember(enumMember);
@@ -112,7 +104,7 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
                 }
                 else if (enumType.IsFlags)
                 {
-                    var result = ReadFlagsEnumValue(enumValue, enumType, clrType, enablePropertyNameCaseInsensitive, memberMapAnnotation);
+                    var result = ReadFlagsEnumValue(enumValue, enumType, clrType, memberMapAnnotation);
                     if (result != null)
                     {
                         return result;
@@ -130,46 +122,48 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
     /// <param name="enumValue">The OData enum value.</param>
     /// <param name="enumType">The EDM enum type.</param>
     /// <param name="clrType">The EDM enum CLR type.</param>
-    /// <param name="enablePropertyNameCaseInsensitive">The value indicating whether to enable case insensitive for the property name in conventional routing.</param>
     /// <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
     /// <returns>The deserialized flags enum value.</returns>
-    private object ReadFlagsEnumValue(ODataEnumValue enumValue, IEdmEnumType enumType, Type clrType, bool enablePropertyNameCaseInsensitive, ClrEnumMemberAnnotation memberMapAnnotation)
+    private static object ReadFlagsEnumValue(ODataEnumValue enumValue, IEdmEnumType enumType, Type clrType, ClrEnumMemberAnnotation memberMapAnnotation)
     {
         long result = 0;
         Type clrEnumType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
 
+        // use `stackalloc` to allocate a Span<Range> on the stack, which avoids heap allocations.
+        Span<Range> ranges = stackalloc Range[enumValue.Value.Count(c => c == ',') + 1];
+        ReadOnlySpan<char> source = enumValue.Value.AsSpan();
+
         // For flags enum, we need to split the value and convert it to the enum value.
-        string[] values = enumValue.Value.Split(',');
-        foreach (string value in values)
+        int count = source.Split(ranges, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        for(int i = 0; i < count; i++)
         {
-            Enum clrEnumMember = null;
-            IEdmEnumMember enumMember = GetEnumMember(enumType, value.Trim(), enablePropertyNameCaseInsensitive);
+            ReadOnlySpan<char> value = source[ranges[i]];
+            IEdmEnumMember enumMember = null;
+            foreach (IEdmEnumMember member in enumType.Members)
+            {
+                if (value.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    enumMember = member;
+                    break;
+                }
+            }
 
             if (enumMember != null)
             {
-                clrEnumMember = memberMapAnnotation.GetClrEnumMember(enumMember);
+                Enum clrEnumMember = memberMapAnnotation.GetClrEnumMember(enumMember);
+                result |= Convert.ToInt64(clrEnumMember);
             }
             else if (Enum.TryParse(clrEnumType, value, true, out var enumMemberParsed))
             {
-                clrEnumMember = (Enum)enumMemberParsed;
+                result |= Convert.ToInt64((Enum)enumMemberParsed);
             }
             else
             {
                 return null;
-            }
-
-            if (clrEnumMember != null)
-            {
-                result |= Convert.ToInt64(clrEnumMember);
             }
         }
 
         return result == 0 ? null : Enum.ToObject(clrEnumType, result);
     }
 
-    private IEdmEnumMember GetEnumMember(IEdmEnumType enumType, string value, bool enablePropertyNameCaseInsensitive)
-    {
-        StringComparison comparison = enablePropertyNameCaseInsensitive ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
-        return enumType.Members.FirstOrDefault(m => m.Name.Equals(value, comparison));
-    }
 }

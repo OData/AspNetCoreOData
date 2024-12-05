@@ -3522,14 +3522,13 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadFlagsEnumValue(Microsoft.OData.ODataEnumValue,Microsoft.OData.Edm.IEdmEnumType,System.Type,System.Boolean,Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadFlagsEnumValue(Microsoft.OData.ODataEnumValue,Microsoft.OData.Edm.IEdmEnumType,System.Type,Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation)">
             <summary>
             Reads the value of a flags enum.
             </summary>
             <param name="enumValue">The OData enum value.</param>
             <param name="enumType">The EDM enum type.</param>
             <param name="clrType">The EDM enum CLR type.</param>
-            <param name="enablePropertyNameCaseInsensitive">The value indicating whether to enable case insensitive for the property name in conventional routing.</param>
             <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
             <returns>The deserialized flags enum value.</returns>
         </member>
