@@ -46,6 +46,7 @@ public class EmployeesController : ODataController
                 SkillSet=new List<Skill> { Skill.CSharp, Skill.Sql },
                 Gender=Gender.Female,
                 AccessLevel=AccessLevel.Execute,
+                EmployeeType = EmployeeType.FullTime | EmployeeType.PartTime,
                 FavoriteSports=new FavoriteSports()
                 {
                     LikeMost=Sport.Pingpong,
@@ -58,6 +59,7 @@ public class EmployeesController : ODataController
                 SkillSet=new List<Skill>(),
                 Gender=Gender.Female,
                 AccessLevel=AccessLevel.Read,
+                EmployeeType = EmployeeType.Contract,
                 FavoriteSports=new FavoriteSports()
                 {
                     LikeMost=Sport.Pingpong,
@@ -70,6 +72,7 @@ public class EmployeesController : ODataController
                 SkillSet=new List<Skill> { Skill.Web, Skill.Sql },
                 Gender=Gender.Female,
                 AccessLevel=AccessLevel.Read|AccessLevel.Write,
+                EmployeeType = EmployeeType.Intern | EmployeeType.FullTime | EmployeeType.PartTime,
                 FavoriteSports=new FavoriteSports()
                 {
                     LikeMost=Sport.Pingpong|Sport.Basketball,
@@ -119,6 +122,13 @@ public class EmployeesController : ODataController
     {
         var employee = Employees.SingleOrDefault(e => e.ID == key);
         return Ok(employee.FavoriteSports);
+    }
+
+    [EnableQuery]
+    public IActionResult GetEmployeeTypeFromEmployee(int key)
+    {
+        var employee = Employees.SingleOrDefault(e => e.ID == key);
+        return Ok(employee.EmployeeType);
     }
 
     [HttpGet("Employees({key})/FavoriteSports/LikeMost")]
