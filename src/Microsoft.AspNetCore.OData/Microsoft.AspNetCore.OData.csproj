@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>Microsoft.AspNetCore.OData</RootNamespace>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <!-- Let's generate our own assembly info -->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -68,6 +69,10 @@
   <ItemGroup>
     <AdditionalFiles Include="PublicAPI.Shipped.txt" />
     <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

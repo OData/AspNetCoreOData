@@ -28,6 +28,17 @@ This is the official ASP.NET Core OData repository.
 
 * [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
 
+
+#### **Documentation**:
+
+For comprehensive documentation, please refer to the following links:
+- [ASP.NET Core OData Overview](https://learn.microsoft.com/odata/webapi-8/overview)
+- [Getting Started](https://learn.microsoft.com/odata/webapi-8/getting-started)
+- [Fundamentals Overview](https://learn.microsoft.com/odata/webapi-8/fundamentals/overview)
+- [Tutorials](https://learn.microsoft.com/odata/webapi-8/tutorials/basic-crud)
+- [OData Dev Blogs](https://devblogs.microsoft.com/odata/)
+- [OData.org](https://www.odata.org/blog/)
+
 **Example**:
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/main/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
   
@@ -47,8 +58,19 @@ This is the official ASP.NET Core OData repository.
  * [AspNetCoreOData.NewtonsoftJson.sln](AspNetCoreOData.NewtonsoftJson.sln)
  
    - Includes **Microsoft.AspNetCore.OData.NewtonsoftJson** project, Unit Test, E2E Test & Samples
-	
+
 ## 2. Basic Usage
+
+### Microsoft.AspNetCore.OData Package Installation
+Using .NET CLI:
+```bash
+dotnet add package Microsoft.AspNetCore.OData
+```
+
+Using Package Manager:
+```bash
+Install-Package Microsoft.AspNetCore.OData
+```
 
 In the ASP.NET Core Web Application project, update your `Startup.cs` as below:
 
@@ -77,6 +99,35 @@ public class Startup
     {
         // …
     }
+}
+```
+
+If you work with `Program.cs`, update as below. Refer to the [Getting Started Guide](https://learn.microsoft.com/odata/webapi-8/getting-started).
+```c#
+// using statements
+
+var builder = WebApplication.CreateBuilder(args);
+
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntityType<Order>();
+modelBuilder.EntitySet<Customer>("Customers");
+
+builder.Services.AddControllers().AddOData(
+    options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
+        "odata",
+        GetEdmModel()));
+
+var app = builder.Build();
+
+app.UseRouting();
+
+app.MapControllers();
+
+app.Run();
+
+static IEdmModel GetEdmModel()
+{
+    // …
 }
 ```
 
