@@ -118,7 +118,7 @@ modelBuilder.EntitySet<Customer>("Customers");
 builder.Services.AddControllers().AddOData(
     options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
         "odata",
-        modelBuilder.GetEdmModel()));
+        GetEdmModel()));
 
 var app = builder.Build();
 
