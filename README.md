@@ -104,10 +104,7 @@ public class Startup
 
 If you work with `Program.cs`, update as below. Refer to the [Getting Started Guide](https://learn.microsoft.com/odata/webapi-8/getting-started).
 ```c#
-// Program.cs
-using Lab01.Models;
-using Microsoft.AspNetCore.OData;
-using Microsoft.OData.ModelBuilder;
+// using statements
 
 var builder = WebApplication.CreateBuilder(args);
 
