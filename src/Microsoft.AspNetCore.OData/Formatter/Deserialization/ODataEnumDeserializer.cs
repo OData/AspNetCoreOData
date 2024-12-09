@@ -138,6 +138,8 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
         for(int i = 0; i < count; i++)
         {
             ReadOnlySpan<char> value = source[ranges[i]];
+
+            // Try to find the enum member in the EDM model.
             IEdmEnumMember enumMember = null;
             foreach (IEdmEnumMember member in enumType.Members)
             {
@@ -165,5 +167,4 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
 
         return result == 0 ? null : Enum.ToObject(clrEnumType, result);
     }
-
 }

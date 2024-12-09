@@ -187,7 +187,7 @@ public class ODataEnumSerializer : ODataEdmTypeSerializer
     /// <param name="graphEnum">The enum value.</param>
     /// <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
     /// <returns>A comma-separated string of the names of the flags that are set.</returns>
-    private string GetFlagsEnumValue(Enum graphEnum, ClrEnumMemberAnnotation memberMapAnnotation)
+    private static string GetFlagsEnumValue(Enum graphEnum, ClrEnumMemberAnnotation memberMapAnnotation)
     {
         List<string> flagsList = new List<string>();
 
