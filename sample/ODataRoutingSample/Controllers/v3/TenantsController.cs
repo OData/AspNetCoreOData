@@ -268,10 +268,6 @@ public class Auth : AuthorizationHandler<RolesPolicy>
         var parentType = GetTypeByClassFullName(parentTypeName);
         var request = httpContextAccessor.HttpContext.Request;
 
-        var builder = new ODataConventionModelBuilder(
-            request.HttpContext.RequestServices.GetRequiredService<IAssemblyResolver>(),
-            isQueryCompositionMode: true);
-
         // This code was the source of the memory leak since each model
         // instance is cached by OData to map CLR types to EDM types.
         // Creating a new model instance each time this method is called
@@ -283,6 +279,10 @@ public class Auth : AuthorizationHandler<RolesPolicy>
         // Fix the issue by caching the model instance based on the parent type.
         var model = TypeToModelCache.GetOrAdd(parentType, _ =>
         {
+            var builder = new ODataConventionModelBuilder(
+                request.HttpContext.RequestServices.GetRequiredService<IAssemblyResolver>(),
+                isQueryCompositionMode: true);
+
             var entityTypeConfiguration = builder.AddEntityType(parentType);
             builder.AddEntitySet(parentType.Name, entityTypeConfiguration);
             return builder.GetEdmModel();
