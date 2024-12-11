@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -226,6 +227,8 @@ public class Auth : AuthorizationHandler<RolesPolicy>
     private readonly IHttpContextAccessor httpContextAccessor;
     private List<string> _unauthorizedEntities;
 
+    private static readonly ConcurrentDictionary<Type, IEdmModel> TypeToModelCache = new();
+
     public Auth(IHttpContextAccessor httpContextAccessor)
     {
         this.httpContextAccessor = httpContextAccessor;
@@ -269,9 +272,22 @@ public class Auth : AuthorizationHandler<RolesPolicy>
             request.HttpContext.RequestServices.GetRequiredService<IAssemblyResolver>(),
             isQueryCompositionMode: true);
 
-        var entityTypeConfiguration = builder.AddEntityType(parentType);
-        builder.AddEntitySet(parentType.Name, entityTypeConfiguration);
-        var model = builder.GetEdmModel();
+        // This code was the source of the memory leak since each model
+        // instance is cached by OData to map CLR types to EDM types.
+        // Creating a new model instance each time this method is called
+        // causes the cache to grow indefinitely.
+        //var entityTypeConfiguration = builder.AddEntityType(parentType);
+        //builder.AddEntitySet(parentType.Name, entityTypeConfiguration);
+        //var model = builder.GetEdmModel();
+
+        // Fix the issue by caching the model instance based on the parent type.
+        var model = TypeToModelCache.GetOrAdd(parentType, _ =>
+        {
+            var entityTypeConfiguration = builder.AddEntityType(parentType);
+            builder.AddEntitySet(parentType.Name, entityTypeConfiguration);
+            return builder.GetEdmModel();
+        });
+
 
         var path = request.ODataFeature().Path;
         var queryOptions = new ODataQueryOptions(new ODataQueryContext(model, parentType, path), request);
