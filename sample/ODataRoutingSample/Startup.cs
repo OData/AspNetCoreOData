@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OData.Edm;
+using ODataRoutingSample.Controllers.v3;
 using ODataRoutingSample.Models;
 using ODataRoutingSample.OpenApi;
 
@@ -82,6 +84,13 @@ public class Startup
             );
 
         services.AddSwaggerGen();
+
+        services.AddHttpContextAccessor();
+        services.AddSingleton<IAuthorizationHandler, Auth>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddAuthorization(options => options.AddPolicy("xyzzy", policy => policy.Requirements.Add(new RolesPolicy())));
+        services.AddAuthorization(options => options.DefaultPolicy = options.GetPolicy("xyzzy"));
+        services.AddAuthorization(options => options.FallbackPolicy = options.DefaultPolicy);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,6 +100,7 @@ public class Startup
         {
             app.UseDeveloperExceptionPage();
         }
+
 
         // Use odata route debug, /$odata
         app.UseODataRouteDebug();
@@ -112,6 +122,8 @@ public class Startup
         });
 
         app.UseRouting();
+
+        app.UseAuthorization();
 
         // Test middleware
         app.Use(next => context =>

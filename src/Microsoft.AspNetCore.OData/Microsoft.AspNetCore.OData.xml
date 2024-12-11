@@ -7248,6 +7248,11 @@
               Looks up a localized string similar to Cannot find the services container for the non-OData route. This can occur when using OData components on the non-OData route and is usually a configuration issue. Call EnableDependencyInjection() to enable OData components on non-OData routes. This may also occur when a request was mistakenly handled by the ASP.NET Core routing layer instead of the OData routing layer, for instance the URL does not include the OData route prefix configured via a call to MapODataServiceRoute()..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingNonStandardTypeSupportFor">
+            <summary>
+              Looks up a localized string similar to Missing non-standard type support for &apos;{0}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingODataContainer">
             <summary>
               Looks up a localized string similar to Cannot find the services container for route &apos;{0}&apos;. This should not happen and represents a bug..
