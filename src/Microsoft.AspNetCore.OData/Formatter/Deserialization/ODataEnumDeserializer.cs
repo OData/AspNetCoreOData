@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -128,41 +129,49 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
     {
         long result = 0;
         Type clrEnumType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
+        ReadOnlySpan<char> source = enumValue.Value.AsSpan().Trim();
 
-        // use `stackalloc` to allocate a Span<Range> on the stack, which avoids heap allocations.
-        Span<Range> ranges = stackalloc Range[enumValue.Value.Count(c => c == ',') + 1];
-        ReadOnlySpan<char> source = enumValue.Value.AsSpan();
-
-        // For flags enum, we need to split the value and convert it to the enum value.
-        int count = source.Split(ranges, ',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        for(int i = 0; i < count; i++)
+        int start = 0;
+        while (start < source.Length)
         {
-            ReadOnlySpan<char> value = source[ranges[i]];
-
-            // Try to find the enum member in the EDM model.
-            IEdmEnumMember enumMember = null;
-            foreach (IEdmEnumMember member in enumType.Members)
+            // Find the end of the current value.
+            int end = start;
+            while (end < source.Length && source[end] != ',')
             {
-                if (value.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    enumMember = member;
-                    break;
-                }
+                end++;
             }
 
-            if (enumMember != null)
-            {
-                Enum clrEnumMember = memberMapAnnotation.GetClrEnumMember(enumMember);
-                result |= Convert.ToInt64(clrEnumMember);
-            }
-            else if (Enum.TryParse(clrEnumType, value, true, out var enumMemberParsed))
+            // Extract the current value.
+            ReadOnlySpan<char> currentValue = source[start..end].Trim();
+
+            bool parsed = Enum.TryParse(clrEnumType, currentValue, true, out var enumMemberParsed);
+            if (parsed)
             {
                 result |= Convert.ToInt64((Enum)enumMemberParsed);
             }
             else
             {
+                foreach (IEdmEnumMember enumMember in enumType.Members)
+                {
+                    // Check if the current value matches the enum member name.
+                    parsed = currentValue.Equals(enumMember.Name.AsSpan(), StringComparison.InvariantCultureIgnoreCase);
+                    if (parsed)
+                    {
+                        Enum clrEnumMember = memberMapAnnotation.GetClrEnumMember(enumMember);
+                        result |= Convert.ToInt64(clrEnumMember);
+                        break;
+                    }
+                }
+            }
+
+            // If still not valid, return null.
+            if (!parsed)
+            {
                 return null;
             }
+
+            // Move to the next value.
+            start = end + 1;
         }
 
         return result == 0 ? null : Enum.ToObject(clrEnumType, result);
