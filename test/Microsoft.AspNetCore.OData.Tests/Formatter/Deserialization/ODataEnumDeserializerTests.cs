@@ -146,10 +146,13 @@ public class ODataEnumDeserializerTests
     }
 
     [Theory]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"mon\"}", Day.Monday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday\"}", Day.Monday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday\"}", Day.Monday)]
-    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday, tuesday\"}", Day.Monday | Day.Tuesday)]
-    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, tuesday\"}", Day.Monday | Day.Tuesday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\" monday, friday  \"}", Day.Monday | Day.Friday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"mon, fri\"}", Day.Monday | Day.Friday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday,  tuesday \"}", Day.Monday | Day.Tuesday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\" Monday, tuesday  \"}", Day.Monday | Day.Tuesday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Tuesday\"}", Day.Monday | Day.Tuesday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday, tuesday, thursday\"}", Day.Monday | Day.Tuesday | Day.Thursday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Tuesday, thursday\"}", Day.Monday | Day.Tuesday | Day.Thursday)]
@@ -158,8 +161,6 @@ public class ODataEnumDeserializerTests
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Friday\"}", Day.Monday | Day.Friday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, tuesday,  fri\"}", Day.Monday | Day.Tuesday | Day.Friday)]
     [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, fri, Wednesday\"}", Day.Monday | Day.Friday | Day.Wednesday)]
-    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, fri\"}", Day.Monday | Day.Friday)]
-    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday, fri\"}", Day.Monday | Day.Friday)]
     public async Task ReadAsync_Works_ForModelAliasWithFlags(string content, Day expectedDay)
     {
         // Arrange
@@ -224,7 +225,7 @@ public class ODataEnumDeserializerTests
     [DataContract(Name = "day")]
     public enum Day
     {
-        [EnumMember(Value = "monday")]
+        [EnumMember(Value = "mon")]
         Monday = 1,
 
         [EnumMember(Value = "tuesday")]

@@ -144,13 +144,20 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
             // Extract the current value.
             ReadOnlySpan<char> currentValue = source[start..end].Trim();
 
-            bool parsed = Enum.TryParse(clrEnumType, currentValue, true, out var enumMemberParsed);
+            bool parsed = Enum.TryParse(clrEnumType, currentValue, true, out object enumMemberParsed);
             if (parsed)
             {
                 result |= Convert.ToInt64((Enum)enumMemberParsed);
             }
             else
             {
+                // If the value is not a valid enum member, try to match it with the EDM enum member name.
+                // This is needed for model alias case.
+                // For example,
+                // - if the enum member is defined as "Friday" and the value is "fri", we need to match them.
+                // - if the enum member is defined as "FullTime" and the value is "Full Time", we need to match them.
+                // - if the enum member is defined as "PartTime" and the value is "part time", we need to match them.
+                parsed = false;
                 foreach (IEdmEnumMember enumMember in enumType.Members)
                 {
                     // Check if the current value matches the enum member name.

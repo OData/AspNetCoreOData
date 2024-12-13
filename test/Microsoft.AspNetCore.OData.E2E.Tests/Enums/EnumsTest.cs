@@ -267,7 +267,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         response = await client.GetAsync(requestUri);
         json = await response.Content.ReadAsObject<JObject>();
         var employeeTypeValue = json.GetValue("value").ToString();
-        Assert.Equal("fulltime, parttime", employeeTypeValue);
+        Assert.Equal("full time, Part Time", employeeTypeValue);
         if (format != "application/json;odata.metadata=none")
         {
             var context = json.GetValue("@odata.context").ToString();
@@ -281,17 +281,17 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         {
             return new TheoryDataSet<string, int, string, string>
             {
-                { "application/json;odata.metadata=full", 1, "Execute", "fulltime, parttime" },
-                { "application/json;odata.metadata=minimal", 1, "Execute", "fulltime, parttime"  },
-                { "application/json;odata.metadata=none", 1, "Execute", "fulltime, parttime" },
+                { "application/json;odata.metadata=full", 1, "Execute", "full time, Part Time" },
+                { "application/json;odata.metadata=minimal", 1, "Execute", "full time, Part Time"  },
+                { "application/json;odata.metadata=none", 1, "Execute", "full time, Part Time" },
 
                 { "application/json;odata.metadata=full", 2, "Read", "contract" },
                 { "application/json;odata.metadata=minimal", 2, "Read", "contract" },
                 { "application/json;odata.metadata=none", 2, "Read", "contract" },
 
-                { "application/json;odata.metadata=full", 3, "Read, Write", "fulltime, parttime, intern" },
-                { "application/json;odata.metadata=minimal", 3, "Read, Write", "fulltime, parttime, intern" },
-                { "application/json;odata.metadata=none", 3, "Read, Write", "fulltime, parttime, intern" },
+                { "application/json;odata.metadata=full", 3, "Read, Write", "full time, Part Time, intern" },
+                { "application/json;odata.metadata=minimal", 3, "Read, Write", "full time, Part Time, intern" },
+                { "application/json;odata.metadata=none", 3, "Read, Write", "full time, Part Time, intern" },
             };
         }
     }

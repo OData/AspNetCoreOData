@@ -42,10 +42,10 @@ public enum AccessLevel
 [DataContract(Name = "employeeType")]
 public enum EmployeeType
 {
-    [EnumMember(Value = "fulltime")]
+    [EnumMember(Value = "full time")]
     FullTime = 1,
 
-    [EnumMember(Value = "parttime")]
+    [EnumMember(Value = "Part Time")]
     PartTime = 2,
 
     [EnumMember(Value = "contract")]
