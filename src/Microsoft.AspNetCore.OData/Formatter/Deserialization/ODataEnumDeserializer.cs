@@ -94,7 +94,7 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
         {
             if (enumValue != null)
             {
-                IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name.Equals(enumValue.Value, StringComparison.InvariantCultureIgnoreCase));
+                IEdmEnumMember enumMember = enumType.Members.FirstOrDefault(m => m.Name == enumValue.Value);
                 if (enumMember != null)
                 {
                     var clrMember = memberMapAnnotation.GetClrEnumMember(enumMember);
@@ -128,9 +128,9 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
     private static object ReadFlagsEnumValue(ODataEnumValue enumValue, IEdmEnumType enumType, Type clrType, ClrEnumMemberAnnotation memberMapAnnotation)
     {
         long result = 0;
-        Type clrEnumType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
-        ReadOnlySpan<char> source = enumValue.Value.AsSpan().Trim();
+        clrType = TypeHelper.GetUnderlyingTypeOrSelf(clrType);
 
+        ReadOnlySpan<char> source = enumValue.Value.AsSpan().Trim();
         int start = 0;
         while (start < source.Length)
         {
@@ -144,7 +144,7 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
             // Extract the current value.
             ReadOnlySpan<char> currentValue = source[start..end].Trim();
 
-            bool parsed = Enum.TryParse(clrEnumType, currentValue, true, out object enumMemberParsed);
+            bool parsed = Enum.TryParse(clrType, currentValue, true, out object enumMemberParsed);
             if (parsed)
             {
                 result |= Convert.ToInt64((Enum)enumMemberParsed);
@@ -181,6 +181,6 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
             start = end + 1;
         }
 
-        return result == 0 ? null : Enum.ToObject(clrEnumType, result);
+        return result == 0 ? null : Enum.ToObject(clrType, result);
     }
 }
