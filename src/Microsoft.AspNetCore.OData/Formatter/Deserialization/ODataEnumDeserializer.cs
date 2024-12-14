@@ -156,7 +156,6 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
                 // - if the enum member is defined as "Friday" and the value is "fri", we need to match them.
                 // - if the enum member is defined as "FullTime" and the value is "Full Time", we need to match them.
                 // - if the enum member is defined as "PartTime" and the value is "part time", we need to match them.
-                parsed = false;
                 foreach (IEdmEnumMember enumMember in enumType.Members)
                 {
                     // Check if the current value matches the enum member name.
@@ -164,8 +163,14 @@ public class ODataEnumDeserializer : ODataEdmTypeDeserializer
                     if (parsed)
                     {
                         Enum clrEnumMember = memberMapAnnotation.GetClrEnumMember(enumMember);
-                        result |= Convert.ToInt64(clrEnumMember);
-                        break;
+                        if(clrEnumMember != null)
+                        {
+                            result |= Convert.ToInt64(clrEnumMember);
+                            break;
+                        }
+
+                        // If the enum member is not found, the value is not valid.
+                        parsed = false;
                     }
                 }
             }
