@@ -23,6 +23,8 @@ public class Employee
 
     public AccessLevel AccessLevel { get; set; }
 
+    public EmployeeType EmployeeType { get; set; }
+
     public FavoriteSports FavoriteSports { get; set; }
 }
 
@@ -34,6 +36,23 @@ public enum AccessLevel
     Write = 2,
 
     Execute = 4
+}
+
+[Flags]
+[DataContract(Name = "employeeType")]
+public enum EmployeeType
+{
+    [EnumMember(Value = "full time")]
+    FullTime = 1,
+
+    [EnumMember(Value = "Part Time")]
+    PartTime = 2,
+
+    [EnumMember(Value = "contract")]
+    Contract = 4,
+
+    [EnumMember(Value = "intern")]
+    Intern = 8
 }
 
 public enum Gender
