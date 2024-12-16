@@ -754,12 +754,12 @@ public abstract partial class QueryBinder
         Expression[] arguments = BindArguments(node.Parameters, context);
         IEnumerable<Type> methodArgumentsType = arguments.Select(argument => argument.Type);
 
-        // Search for custom method info that are binded to the node name
-        MethodInfo methodInfo;
-        if (UriFunctionsBinder.TryGetMethodInfo(node.Name, methodArgumentsType, out methodInfo))
-        {
-            return ExpressionBinderHelper.MakeFunctionCall(methodInfo, context.QuerySettings, arguments);
-        }
+            // Search for custom method info that are binded to the node name
+            MethodInfo methodInfo;
+            if (UriFunctionsBinder.TryGetMethodInfo(node.Name, methodArgumentsType, out methodInfo))
+            {
+                return ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
+            }
 
         return null;
     }
