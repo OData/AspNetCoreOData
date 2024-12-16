@@ -5,27 +5,23 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
-using Moq;
-using Xunit;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
-using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.AspNetCore.OData.TestCommon;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using Xunit;
-using Xunit.Sdk;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions;
 
