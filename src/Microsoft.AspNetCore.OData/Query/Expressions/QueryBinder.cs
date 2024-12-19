@@ -956,6 +956,145 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             return Expression.Constant(castedList, listType);
         }
+
+        /// <summary>
+        /// Creates an <see cref="Expression"/> from the <see cref="QueryNode"/>.
+        /// </summary>
+        /// <param name="node">The <see cref="QueryNode"/> to be bound.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
+        /// <param name="baseElement">The <see cref="Expression"/> for the base element.</param>
+        /// <returns>The created <see cref="Expression"/>.</returns>
+        public virtual Expression BindAccessExpression(QueryNode node, QueryBinderContext context, Expression baseElement = null)
+        {
+            if (node == null)
+            {
+                throw Error.ArgumentNull(nameof(node));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            switch (node.Kind)
+            {
+                case QueryNodeKind.ResourceRangeVariableReference:
+                    // TODO: How do we handle 
+                    return context.CurrentParameter.Type.IsFlatteningWrapper()
+                        ? (Expression)Expression.Property(context.CurrentParameter, "Source")
+                        : context.CurrentParameter;
+
+                case QueryNodeKind.SingleValuePropertyAccess:
+                    SingleValuePropertyAccessNode singleValueNode = node as SingleValuePropertyAccessNode;
+                    return CreatePropertyAccessExpression(
+                        BindAccessExpression(singleValueNode.Source, context, baseElement),
+                        context,
+                        singleValueNode.Property,
+                        GetFullPropertyPath(singleValueNode));
+
+                case QueryNodeKind.AggregatedCollectionPropertyNode:
+                    AggregatedCollectionPropertyNode aggregatedCollectionNode = node as AggregatedCollectionPropertyNode;
+                    return CreatePropertyAccessExpression(
+                        BindAccessExpression(aggregatedCollectionNode.Source, context, baseElement),
+                        context,
+                        aggregatedCollectionNode.Property);
+
+                case QueryNodeKind.SingleComplexNode:
+                    SingleComplexNode singleComplexNode = node as SingleComplexNode;
+                    return CreatePropertyAccessExpression(
+                        BindAccessExpression(singleComplexNode.Source, context, baseElement),
+                        context,
+                        singleComplexNode.Property,
+                        GetFullPropertyPath(singleComplexNode));
+
+                case QueryNodeKind.SingleValueOpenPropertyAccess:
+                    SingleValueOpenPropertyAccessNode openNode = node as SingleValueOpenPropertyAccessNode;
+                    return GetFlattenedPropertyExpression(openNode.Name, context) ?? CreateOpenPropertyAccessExpression(openNode, context);
+
+                case QueryNodeKind.None:
+                case QueryNodeKind.SingleNavigationNode:
+                    SingleNavigationNode navigationNode = node as SingleNavigationNode;
+                    return CreatePropertyAccessExpression(
+                        BindAccessExpression(navigationNode.Source, context),
+                        context,
+                        navigationNode.NavigationProperty,
+                        GetFullPropertyPath(navigationNode));
+
+                case QueryNodeKind.BinaryOperator:
+                    BinaryOperatorNode binaryNode = node as BinaryOperatorNode;
+                    Expression leftExpression = BindAccessExpression(binaryNode.Left, context, baseElement);
+                    Expression rightExpression = BindAccessExpression(binaryNode.Right, context, baseElement);
+                    return ExpressionBinderHelper.CreateBinaryExpression(
+                        binaryNode.OperatorKind,
+                        leftExpression,
+                        rightExpression,
+                        liftToNull: true,
+                        context.QuerySettings);
+
+                case QueryNodeKind.Convert:
+                    ConvertNode convertNode = node as ConvertNode;
+                    return CreateConvertExpression(convertNode, BindAccessExpression(convertNode.Source, context, baseElement), context);
+
+                case QueryNodeKind.CollectionNavigationNode:
+                    return baseElement ?? context.CurrentParameter;
+
+                case QueryNodeKind.SingleValueFunctionCall:
+                    return BindSingleValueFunctionCallNode(node as SingleValueFunctionCallNode, context);
+
+                case QueryNodeKind.Constant:
+                    return BindConstantNode(node as ConstantNode, context);
+
+                default:
+                    throw Error.NotSupported(
+                        SRResources.QueryNodeBindingNotSupported,
+                        node.Kind,
+                        typeof(AggregationBinder).Name);
+            }
+        }
+
+        /// <summary>
+        /// Creates a LINQ <see cref="Expression"/> that represents the semantics of the <see cref="SingleValueOpenPropertyAccessNode"/>.
+        /// </summary>
+        /// <param name="openNode">They query node to create an expression from.</param>
+        /// <param name="context">The query binder context.</param>
+        /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+        public virtual Expression CreateOpenPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
+        {
+            Expression source = BindAccessExpression(openNode.Source, context);
+
+            // First check that property exists in source
+            // It's the case when we are apply transformation based on earlier transformation
+            if (source.Type.GetProperty(openNode.Name) != null)
+            {
+                return Expression.Property(source, openNode.Name);
+            }
+
+            // Property doesn't exists go for dynamic properties dictionary
+            PropertyInfo prop = GetDynamicPropertyContainer(openNode, context);
+            MemberExpression propertyAccessExpression = Expression.Property(source, prop.Name);
+            IndexExpression readDictionaryIndexerExpression = Expression.Property(propertyAccessExpression,
+                            DictionaryStringObjectIndexerName, Expression.Constant(openNode.Name));
+            MethodCallExpression containsKeyExpression = Expression.Call(propertyAccessExpression,
+                propertyAccessExpression.Type.GetMethod("ContainsKey"), Expression.Constant(openNode.Name));
+            ConstantExpression nullExpression = Expression.Constant(null);
+
+            if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
+            {
+                BinaryExpression dynamicDictIsNotNull = Expression.NotEqual(propertyAccessExpression, Expression.Constant(null));
+                BinaryExpression dynamicDictIsNotNullAndContainsKey = Expression.AndAlso(dynamicDictIsNotNull, containsKeyExpression);
+                return Expression.Condition(
+                    dynamicDictIsNotNullAndContainsKey,
+                    readDictionaryIndexerExpression,
+                    nullExpression);
+            }
+            else
+            {
+                return Expression.Condition(
+                    containsKeyExpression,
+                    readDictionaryIndexerExpression,
+                    nullExpression);
+            }
+        }
         #endregion
 
         #region Private helper methods
@@ -978,10 +1117,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             var member = source as MemberExpression;
             return member != null
-                && context.CurrentParameter.Type.IsGenericType
-                && context.CurrentParameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
+                && context.CurrentParameter.Type.IsFlatteningWrapper()
                 && member.Expression == context.CurrentParameter;
         }
+
         #endregion
 
         #region Protected methods
@@ -1046,7 +1185,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <returns>Returns null if no aggregations were used so far</returns>
         protected Expression GetFlattenedPropertyExpression(string propertyPath, QueryBinderContext context)
         {
-            if (context == null || context.FlattenedProperties == null || !context.FlattenedProperties.Any())
+            if (!(context?.FlattenedProperties?.Any() == true))
             {
                 return null;
             }
@@ -1059,6 +1198,27 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return null;
             // TODO: sam xu, return null?
             // throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, propertyPath));
+        }
+
+        /// <summary>
+        /// Wrap a value type with Expression.Convert.
+        /// </summary>
+        /// <param name="expression">The <see cref="Expression"/> to be wrapped.</param>
+        /// <returns>The wrapped  <see cref="Expression"/></returns>
+        protected static Expression WrapConvert(Expression expression)
+        {
+            if (expression == null)
+            {
+                throw Error.ArgumentNull(nameof(expression));
+            }
+
+            // Expression that we are generating looks like Value = $it.PropertyName where Value is defined as object and PropertyName can be value 
+            // Proper .NET expression must look like as Value = (object) $it.PropertyName for proper boxing or AccessViolationException will be thrown
+            // Cast to object isn't translatable by EF6 as a result skipping (object) in that case
+            // Update: We have removed support for EF6
+            return (!expression.Type.IsValueType)
+                ? expression
+                : Expression.Convert(expression, typeof(object));
         }
         #endregion
 
@@ -1121,13 +1281,12 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                //   return GetFlattenedPropertyExpression(propertyPath, context)
-                //      ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, (!propertyPath.Contains("\\", StringComparison.Ordinal) ? "Instance\\" : String.Empty) + propertyName), context);
-
+                // TODO: Verify behaviour for custom IAggregationBinder implementation
                 bool isAggregated = context.ElementClrType == typeof(AggregationWrapper);
+                propertyPath = context.ElementClrType.IsComputeWrapper(out _) && !propertyPath.Contains('\\') ? string.Concat("Instance\\", propertyName) : propertyName;
 
                 return GetFlattenedPropertyExpression(propertyPath, context)
-                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyName, isAggregated), context);
+                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyPath), context);
             }
         }
 
@@ -1151,6 +1310,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     propertyValue = Expression.Property(propertyValue, propertyName);
                 }
             }
+
             return propertyValue;
         }
 
@@ -1239,7 +1399,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return source;
         }
 
-        internal Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
+        internal static Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
         {
             Type conversionType = context.Model.GetClrType(convertNode.TypeReference, context.AssembliesResolver);
 
@@ -1391,6 +1551,147 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     return NullConstant;
                 }
             }
+        }
+
+        internal static IDictionary<string, Expression> GetFlattenedProperties(ParameterExpression source, QueryBinderContext context, IQueryable query)
+        {
+            if (!typeof(GroupByWrapper).IsAssignableFrom(query.ElementType))
+            {
+                return null;
+            }
+
+            // TODO: Logic below this line is most likely untested
+            MethodCallExpression expression = query.Expression as MethodCallExpression;
+            if (expression == null)
+            {
+                return null;
+            }
+
+            // After $apply we could have other clauses, like $filter, $orderby etc.
+            // Skip all filter expressions
+            expression = SkipFilters(expression);
+
+            if (expression == null)
+            {
+                return null;
+            }
+
+            Dictionary<string, Expression> flattenedPropertiesMap = new Dictionary<string, Expression>();
+            CollectContainerAssignments(source, expression, flattenedPropertiesMap);
+            if (query?.ElementType?.IsComputeWrapper(out _) == true)
+            {
+                MemberExpression instanceProperty = Expression.Property(source, "Instance");
+                if (typeof(DynamicTypeWrapper).IsAssignableFrom(instanceProperty.Type))
+                {
+                    MethodCallExpression computeExpression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+                    computeExpression = SkipFilters(computeExpression);
+                    if (computeExpression != null)
+                    {
+                        CollectContainerAssignments(instanceProperty, computeExpression, flattenedPropertiesMap);
+                    }
+                }
+            }
+
+            return flattenedPropertiesMap;
+        }
+
+        private static MethodCallExpression SkipFilters(MethodCallExpression expression)
+        {
+            while (expression.Method.Name == "Where")
+            {
+                expression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+            }
+
+            return expression;
+        }
+
+        private static void CollectContainerAssignments(Expression source, MethodCallExpression expression, Dictionary<string, Expression> result)
+        {
+            CollectAssigments(result, Expression.Property(source, "GroupByContainer"), ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, "GroupByContainer"));
+            CollectAssigments(result, Expression.Property(source, "Container"), ExtractContainerExpression(expression, "Container"));
+        }
+
+        private static void CollectAssigments(IDictionary<string, Expression> flattenPropertyContainer, Expression source, MemberInitExpression expression, string prefix = null)
+        {
+            if (expression == null)
+            {
+                return;
+            }
+
+            string nameToAdd = null;
+            Type resultType = null;
+            MemberInitExpression nextExpression = null;
+            Expression nestedExpression = null;
+            foreach (var expr in expression.Bindings.OfType<MemberAssignment>())
+            {
+                var initExpr = expr.Expression as MemberInitExpression;
+                if (initExpr != null && expr.Member.Name == "Next")
+                {
+                    nextExpression = initExpr;
+                }
+                else if (expr.Member.Name == "Name")
+                {
+                    nameToAdd = (expr.Expression as ConstantExpression).Value as string;
+                }
+                else if (expr.Member.Name == "Value" || expr.Member.Name == "NestedValue")
+                {
+                    resultType = expr.Expression.Type;
+                    if (resultType == typeof(object) && expr.Expression.NodeType == ExpressionType.Convert)
+                    {
+                        resultType = ((UnaryExpression)expr.Expression).Operand.Type;
+                    }
+
+                    if (typeof(GroupByWrapper).IsAssignableFrom(resultType))
+                    {
+                        nestedExpression = expr.Expression;
+                    }
+                }
+            }
+
+            if (prefix != null)
+            {
+                nameToAdd = prefix + "\\" + nameToAdd;
+            }
+
+            if (typeof(GroupByWrapper).IsAssignableFrom(resultType))
+            {
+                flattenPropertyContainer.Add(nameToAdd, Expression.Property(source, "NestedValue"));
+            }
+            else
+            {
+                flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, "Value"), resultType));
+            }
+
+            if (nextExpression != null)
+            {
+                CollectAssigments(flattenPropertyContainer, Expression.Property(source, "Next"), nextExpression, prefix);
+            }
+
+            if (nestedExpression != null)
+            {
+                var nestedAccessor = ((nestedExpression as MemberInitExpression).Bindings.First() as MemberAssignment).Expression as MemberInitExpression;
+                var newSource = Expression.Property(Expression.Property(source, "NestedValue"), "GroupByContainer");
+                CollectAssigments(flattenPropertyContainer, newSource, nestedAccessor, nameToAdd);
+            }
+        }
+
+        private static MemberInitExpression ExtractContainerExpression(MethodCallExpression expression, string containerName)
+        {
+            if (expression == null || expression.Arguments.Count < 2)
+            {
+                return null;
+            }
+
+            var memberInitExpression = ((expression.Arguments[1] as UnaryExpression).Operand as LambdaExpression).Body as MemberInitExpression;
+            if (memberInitExpression != null)
+            {
+                var containerAssigment = memberInitExpression.Bindings.FirstOrDefault(m => m.Member.Name == containerName) as MemberAssignment;
+                if (containerAssigment != null)
+                {
+                    return containerAssigment.Expression as MemberInitExpression;
+                }
+            }
+            return null;
         }
 
         private static Expression Any(Expression source, Expression filter)
