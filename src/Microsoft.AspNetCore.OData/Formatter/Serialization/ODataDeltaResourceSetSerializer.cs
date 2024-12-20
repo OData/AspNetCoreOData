@@ -326,8 +326,12 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
             throw Error.ArgumentNull(nameof(writer));
         }
 
-        //TODO:in future, use SerializerProvider -- requires differentiating between resource serializer and deleted resource serializer for same EdmType
-        ODataDeletedResourceSerializer deletedResourceSerializer = new ODataDeletedResourceSerializer(SerializerProvider);
+        IODataEdmTypeSerializer deletedResourceSerializer = SerializerProvider.GetEdmTypeSerializer(expectedType);
+        if (deletedResourceSerializer == null)
+        {
+            throw new SerializationException(
+                Error.Format(SRResources.TypeCannotBeSerialized, expectedType.FullName()));
+        }
 
         await deletedResourceSerializer.WriteObjectInlineAsync(value, expectedType, writer, writeContext);
     }
@@ -443,6 +447,12 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
         throw new SerializationException(message);
     }
 
+    // Discover whether or not WriteDeltaDeletedResourceAsync is overridden in a derived class.
+    // WriteDeltaDeletedResourceAsync is deprecated in favor of WriteDeletedResourceAsync, but
+    // to avoid breaking changes, this retains the behavior of calling a custom
+    // WriteDeltaDeletedResourceAsync method for the case that the service has overriden that
+    // method with a custom implementation. In the next breaking change, WriteDeltaDeletedResourceAsync
+    // should be removed, and this private method can be deleted.
     private bool WriteDeltaDeletedResourceAsyncIsOverridden()
     {
         MethodInfo method = GetType().GetMethod("WriteDeltaDeletedResourceAsync", new Type[] { typeof(object), typeof(ODataWriter), typeof(ODataSerializerContext) });

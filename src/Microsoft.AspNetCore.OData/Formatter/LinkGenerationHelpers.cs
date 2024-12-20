@@ -37,6 +37,11 @@ public static class LinkGenerationHelpers
             throw Error.ArgumentNull(nameof(resourceContext));
         }
 
+        if (resourceContext.Request == null)
+        {
+            return null;
+        }
+
         IList<ODataPathSegment> idLinkPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
         bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource?.EntityType;

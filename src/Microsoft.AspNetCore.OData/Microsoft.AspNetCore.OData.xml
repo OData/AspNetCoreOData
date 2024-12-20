@@ -4507,30 +4507,6 @@
             <param name="value">The collection value for which the annotations have to be added.</param>
             <param name="metadataLevel">The OData metadata level of the response.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer">
-            <summary>
-            ODataSerializer for serializing instances of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmDeltaDeletedResourceObject"/>/>
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.#ctor(Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.WriteObjectInlineAsync(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer.CreateDeletedResource(System.Uri,Microsoft.OData.DeltaDeletedEntryReason,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
-            <summary>
-            Creates the <see cref="T:Microsoft.OData.ODataResource"/> to be written while writing this resource.
-            </summary>
-            <param name="id">The id of the Deleted Resource to be written (may be null if properties contains all key properties)</param>
-            <param name="reason">The <see cref="T:Microsoft.OData.DeltaDeletedEntryReason"/> for the removal of the resource.</param>
-            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
-            <param name="resourceContext">The context for the resource instance being written.</param>
-            <returns>The created <see cref="T:Microsoft.OData.ODataResource"/>.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer">
             <summary>
             OData serializer for serializing a collection of <see cref="T:Microsoft.OData.Edm.IEdmEntityType" />
@@ -4812,6 +4788,16 @@
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataResource"/> to be written while writing this resource.
             </summary>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataResource"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDeletedResource(System.Uri,Microsoft.OData.DeltaDeletedEntryReason,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataResource"/> to be written while writing this resource.
+            </summary>
+            <param name="id">The id of the Deleted Resource to be written (may be null if properties contains all key properties)</param>
+            <param name="reason">The <see cref="T:Microsoft.OData.DeltaDeletedEntryReason"/> for the removal of the resource.</param>
             <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
             <param name="resourceContext">The context for the resource instance being written.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataResource"/>.</returns>
@@ -7105,11 +7091,6 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.EntityReferenceMustHasKeySegment">
             <summary>
               Looks up a localized string similar to The Uri &apos;{0}&apos; in the parameter is invalid..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.EntitySetMissingDuringSerialization">
-            <summary>
-              Looks up a localized string similar to The related entity set could not be found from the OData path. The related entity set is required to serialize the payload..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.EntityTypeMismatch">

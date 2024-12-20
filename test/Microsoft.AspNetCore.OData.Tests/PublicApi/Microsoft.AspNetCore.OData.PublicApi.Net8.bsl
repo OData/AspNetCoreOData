@@ -2166,21 +2166,6 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataCollectionS
 	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
 }
 
-public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeletedResourceSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer, IODataEdmTypeSerializer, IODataSerializer {
-	public ODataDeletedResourceSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
-
-	public virtual Microsoft.OData.ODataDeletedResource CreateDeletedResource (System.Uri id, Microsoft.OData.DeltaDeletedEntryReason reason, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
-	[
-	AsyncStateMachineAttribute(),
-	]
-	public virtual System.Threading.Tasks.Task WriteObjectAsync (object graph, System.Type type, Microsoft.OData.ODataMessageWriter messageWriter, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
-
-	[
-	AsyncStateMachineAttribute(),
-	]
-	public virtual System.Threading.Tasks.Task WriteObjectInlineAsync (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
-}
-
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer, IODataEdmTypeSerializer, IODataSerializer {
 	public ODataDeltaResourceSetSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
@@ -2288,9 +2273,9 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public ODataResourceSerializer (Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializerProvider serializerProvider)
 
 	public virtual void AppendDynamicProperties (Microsoft.OData.ODataResource resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
-	protected void AppendDynamicPropertiesInternal (Microsoft.OData.ODataResourceBase resource, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateComplexNestedResourceInfo (Microsoft.OData.Edm.IEdmStructuralProperty complexProperty, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataProperty CreateComputedProperty (string propertyName, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
+	public virtual Microsoft.OData.ODataDeletedResource CreateDeletedResource (System.Uri id, Microsoft.OData.DeltaDeletedEntryReason reason, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateDynamicComplexNestedResourceInfo (string propertyName, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference edmType, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual string CreateETag (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateNavigationLink (Microsoft.OData.Edm.IEdmNavigationProperty navigationProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
@@ -2300,11 +2285,8 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	public virtual Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode CreateSelectExpandNode (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataStreamPropertyInfo CreateStreamProperty (Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataProperty CreateStructuralProperty (Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
-	protected System.Collections.Generic.IEnumerable`1[[Microsoft.OData.ODataProperty]] CreateStructuralPropertyBag (Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual Microsoft.OData.ODataNestedResourceInfo CreateUntypedNestedResourceInfo (Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, object propertyValue, Microsoft.OData.Edm.IEdmTypeReference valueType, Microsoft.OData.UriParser.PathSelectItem pathSelectItem, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	public virtual object CreateUntypedPropertyValue (Microsoft.OData.Edm.IEdmStructuralProperty structuralProperty, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext, out Microsoft.OData.Edm.IEdmTypeReference& actualType)
-	protected void InitializeODataResource (Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.OData.ODataResourceBase resource, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
-	protected virtual bool ShouldWriteNavigation (Microsoft.OData.ODataNestedResourceInfo navigationLink, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext)
 	[
 	AsyncStateMachineAttribute(),
 	]
@@ -2319,11 +2301,6 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSer
 	AsyncStateMachineAttribute(),
 	]
 	public virtual System.Threading.Tasks.Task WriteObjectInlineAsync (object graph, Microsoft.OData.Edm.IEdmTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext)
-
-	[
-	AsyncStateMachineAttribute(),
-	]
-	protected System.Threading.Tasks.Task WriteResourceContent (Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext, bool isDelta)
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer : Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEdmTypeSerializer, IODataEdmTypeSerializer, IODataSerializer {
