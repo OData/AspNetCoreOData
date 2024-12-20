@@ -42,6 +42,39 @@ namespace Microsoft.AspNetCore.OData.Common
 
         public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
 
+        public static bool IsFlatteningWrapper(this Type type)
+        {
+            if (type == null)
+            {
+                return false;
+            }
+
+            if (type.IsGenericType)
+            {
+                Type genericTypeDefinition = type.GetGenericTypeDefinition();
+
+                if (!typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition))
+                {
+                    return false;
+                }
+
+                // Default implementation
+                if (genericTypeDefinition == typeof(FlatteningWrapper<>))
+                {
+                    return true;
+                }
+
+                // Custom implementation
+                PropertyInfo sourceProperty = genericTypeDefinition.GetProperty("Source");
+                if (sourceProperty != null && sourceProperty.PropertyType == genericTypeDefinition.GetGenericArguments()[0])
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
         {
             if (type == null)

@@ -183,22 +183,12 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, Container = new AggregationPropertyContainer() {Name = CategoryID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Next.Value))), Next = new LastInChain() {Name = SupplierID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Value))), }, }, })");
         }
 
-        [Fact]
-        public void ClassicEFQueryShape()
+        private Expression VerifyQueryDeserialization(string filter, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null)
         {
-            var filters = VerifyQueryDeserialization(
-                "aggregate(SupplierID with sum as SupplierID)",
-                ".GroupBy($it => new NoGroupByWrapper())"
-                + ".Select($it => new NoGroupByAggregationWrapper() {Container = new LastInChain() {Name = SupplierID, Value = $it.AsQueryable().Sum($it => $it.SupplierID), }, })",
-                classicEF: true);
+            return VerifyQueryDeserialization<Product>(filter, expectedResult, settingsCustomizer);
         }
 
-        private Expression VerifyQueryDeserialization(string filter, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null, bool classicEF = false)
-        {
-            return VerifyQueryDeserialization<Product>(filter, expectedResult, settingsCustomizer, classicEF);
-        }
-
-        private Expression VerifyQueryDeserialization<T>(string clauseString, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null, bool classicEF = false) where T : class
+        private Expression VerifyQueryDeserialization<T>(string clauseString, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null) where T : class
         {
             IEdmModel model = GetModel<T>();
             ApplyClause clause = CreateApplyNode(clauseString, model, typeof(T));
@@ -214,23 +204,16 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 return settings;
             };
 
-            var binder = classicEF
-                ? new AggregationBinderEFFake(
-                    customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                    assembliesResolver,
-                    typeof(T),
-                    model,
-                    clause.Transformations.First())
-                : new AggregationBinder(
-                    customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                    assembliesResolver,
-                    typeof(T),
-                    model,
-                    clause.Transformations.First());
+            QueryBinderContext queryBinderContext = new QueryBinderContext(
+                model,
+                customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
+                typeof(T));
+
+            var binder = new AggregationBinder();
 
             var query = Enumerable.Empty<T>().AsQueryable();
 
-            var queryResult = binder.Bind(query);
+            var queryResult = binder.ApplyBind(query, clause.Transformations.First(), queryBinderContext, out Type resultClrType);
 
             var applyExpr = queryResult.Expression;
 
@@ -284,19 +267,6 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 value = _modelCache[key] = model.GetEdmModel();
             }
             return value;
-        }
-
-        private class AggregationBinderEFFake : AggregationBinder
-        {
-            internal AggregationBinderEFFake(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation) 
-                : base(settings, assembliesResolver, elementType, model, transformation)
-            {
-            }
-
-            internal override bool IsClassicEF(IQueryable query)
-            {
-                return true;
-            }
         }
     }
 }

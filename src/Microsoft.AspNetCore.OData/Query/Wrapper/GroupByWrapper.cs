@@ -21,12 +21,12 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         protected static readonly IPropertyMapper DefaultPropertyMapper = new IdentityPropertyMapper();
 
         /// <summary>
-        /// Gets or sets the property container that contains the properties being expanded. 
+        /// Gets or sets the property container that contains the grouping properties. 
         /// </summary>
         public virtual AggregationPropertyContainer GroupByContainer { get; set; }
 
         /// <summary>
-        /// Gets or sets the property container that contains the properties being expanded. 
+        /// Gets or sets the property container that contains the aggregation properties. 
         /// </summary>
         public virtual AggregationPropertyContainer Container { get; set; }
 
