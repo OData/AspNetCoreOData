@@ -247,6 +247,22 @@ internal static class ExpressionBinderHelper
         return CreateFunctionCallWithNullPropagation(functionCall, arguments, querySettings);
     }
 
+    //Custom methods might contain nullable parameters and, therefore, also should be able to take arguments of type Nullable<T>
+    public static Expression MakeCustomFunctionCall(MethodInfo method, params Expression[] arguments)
+    {
+        Expression functionCall;
+        if (method.IsStatic)
+        {
+            functionCall = Expression.Call(null, method, arguments);
+        }
+        else
+        {
+            functionCall = Expression.Call(arguments.First(), method, arguments.Skip(1));
+        }
+
+        return functionCall;
+    }
+
     public static Expression CreateFunctionCallWithNullPropagation(Expression functionCall, Expression[] arguments, ODataQuerySettings querySettings)
     {
         if (querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
