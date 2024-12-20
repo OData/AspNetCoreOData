@@ -477,7 +477,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 }
 
                 await writer.WriteStartAsync(odataDeletedResource).ConfigureAwait(false);
-                await WriteResourceContent(writer, selectExpandNode, resourceContext, /*isDelta*/ true);
+                await WriteResourceContent(writer, selectExpandNode, resourceContext, /*isDelta*/ true).ConfigureAwait(false);
                 await writer.WriteEndAsync().ConfigureAwait(false);
             }
             else
@@ -496,7 +496,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                     {
                         bool isDelta = graph is IDelta || graph is IEdmChangedObject;
                         await writer.WriteStartAsync(resource).ConfigureAwait(false);
-                        await WriteResourceContent(writer, selectExpandNode, resourceContext, isDelta);
+                        await WriteResourceContent(writer, selectExpandNode, resourceContext, isDelta).ConfigureAwait(false);
                         await writer.WriteEndAsync().ConfigureAwait(false);
                     }
                 }

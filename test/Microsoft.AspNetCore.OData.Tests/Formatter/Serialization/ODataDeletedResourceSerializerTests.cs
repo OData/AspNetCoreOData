@@ -76,10 +76,10 @@ public class ODataDeletedResourceSerializerTests
         _customer.TrySetPropertyValue("Size", _size);
 
         _orderSet = _model.EntityContainer.FindEntitySet("Orders");
-        _order = new DeltaDeletedResource<Order>();
+        _order = new DeltaDeletedResource<Order>{Id = new Uri("http://customers/1")};
         _order.TrySetPropertyValue("ID", 20);
 
-        _orders = new DeltaSet<Order>{ _order };
+        _orders = new DeltaSet<Order> { _order };
         _customer.TrySetPropertyValue("Orders", _orders);
 
         _serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
@@ -91,7 +91,7 @@ public class ODataDeletedResourceSerializerTests
         _ordersNavigation = _customerType.FindNavigationProperty("Orders");
         _serializer = new ODataResourceSerializer(_serializerProvider);
         _path = new ODataPath(new EntitySetSegment(_customerSet));
-        _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path, Type = typeof(DeltaDeletedResource<Customer>)};
+        _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path, Type = typeof(DeltaDeletedResource<Customer>) };
         _entityContext = new ResourceContext(_writeContext, _customerSet.EntityType.AsReference(), _customer);
     }
 
@@ -127,6 +127,33 @@ public class ODataDeletedResourceSerializerTests
         await ExceptionAssert.ThrowsArgumentNullAsync(
             () => serializer.WriteObjectAsync(graph: _customer, type: typeof(Customer), messageWriter: messageWriter, writeContext: null),
             "writeContext");
+    }
+
+    [Fact]
+    public async Task WriteDeletedResourceCallsWriteDeltaDeletedResourceAsyncIfOverridden()
+    {
+        // Arrange
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        var serializer = new Mock<MyDeltaResourceSetSerializer>(serializerProvider.Object);
+        serializer.Setup(s=>s.WriteDeltaDeletedResourceAsync(_orders.First(),It.IsAny<ODataWriter>(), It.IsAny<ODataSerializerContext>()))
+            .Verifiable();
+        serializer.CallBase = true;
+
+        // Act
+        await serializer.Object.WriteObjectAsync(_orders, typeof(DeltaSet<Order>), ODataTestUtil.GetMockODataMessageWriter(ODataVersion.V401), _writeContext);
+
+        // Assert
+        serializer.Verify();
+    }
+
+    public class MyDeltaResourceSetSerializer : ODataDeltaResourceSetSerializer
+    {
+        public MyDeltaResourceSetSerializer(IODataSerializerProvider serializerProvider) : base(serializerProvider) { }
+
+        public override async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            await base.WriteDeltaDeletedResourceAsync(value, writer, writeContext).ConfigureAwait(false);
+        }
     }
 
     [Fact]
