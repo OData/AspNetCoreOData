@@ -970,6 +970,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Missing non-standard type support for &apos;{0}&apos;..
+        /// </summary>
+        internal static string MissingNonStandardTypeSupportFor {
+            get {
+                return ResourceManager.GetString("MissingNonStandardTypeSupportFor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find the services container for route &apos;{0}&apos;. This should not happen and represents a bug..
         /// </summary>
         internal static string MissingODataContainer {
