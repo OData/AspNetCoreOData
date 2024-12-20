@@ -1080,6 +1080,10 @@ public abstract class ExpressionBinderBase
                 // we handle enum conversions ourselves
                 convertedExpression = source;
             }
+            else if (TypeHelper.IsDateOnly(sourceType) || TypeHelper.IsTimeOnly(sourceType))
+            {
+                convertedExpression = source;
+            }
             else
             {
                 switch (Type.GetTypeCode(sourceType))
