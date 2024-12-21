@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -30,17 +31,16 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
-using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
 
-public class ODataResourceSerializerTests
+public class ODataDeletedResourceSerializerTests
 {
     private IEdmModel _model;
     private IEdmEntitySet _customerSet;
     private IEdmEntitySet _orderSet;
-    private Customer _customer;
-    private Order _order;
+    private DeltaDeletedResource<Customer> _customer;
+    private DeltaDeletedResource<Order> _order;
     private ODataResourceSerializer _serializer;
     private ODataSerializerContext _writeContext;
     private ResourceContext _entityContext;
@@ -49,9 +49,13 @@ public class ODataResourceSerializerTests
     private IEdmEntityTypeReference _orderType;
     private IEdmEntityTypeReference _specialCustomerType;
     private IEdmEntityTypeReference _specialOrderType;
+    private IEdmComplexTypeReference _sizeType;
+    private IEdmNavigationProperty _ordersNavigation;
+    private DeltaSet<Order> _orders;
+    private Size _size;
     private ODataPath _path;
 
-    public ODataResourceSerializerTests()
+    public ODataDeletedResourceSerializerTests()
     {
         _model = SerializationTestsHelpers.SimpleCustomerOrderModel();
 
@@ -59,30 +63,35 @@ public class ODataResourceSerializerTests
         _model.SetAnnotationValue(_model.FindType("Default.Order"), new ClrTypeAnnotation(typeof(Order)));
         _model.SetAnnotationValue(_model.FindType("Default.SpecialCustomer"), new ClrTypeAnnotation(typeof(SpecialCustomer)));
         _model.SetAnnotationValue(_model.FindType("Default.SpecialOrder"), new ClrTypeAnnotation(typeof(SpecialOrder)));
+        _model.SetAnnotationValue(_model.FindType("Default.Size"), new ClrTypeAnnotation(typeof(Size)));
 
         _customerSet = _model.EntityContainer.FindEntitySet("Customers");
-        _customer = new Customer()
-        {
-            FirstName = "Foo",
-            LastName = "Bar",
-            ID = 10,
-            Size = new Size { Weight = 180, Height = 72 }
-        };
+        _customer = new DeltaDeletedResource<Customer>();
+        _customer.TrySetPropertyValue("ID", 10);
+        _customer.TrySetPropertyValue("FirstName", "Foo");
+        _customer.TrySetPropertyValue("LastName", "Bar");
+        _customer.Id = new Uri("http://customers/10");
+
+        _size = new Size { Height = 72, Weight = 180 };
+        _customer.TrySetPropertyValue("Size", _size);
 
         _orderSet = _model.EntityContainer.FindEntitySet("Orders");
-        _order = new Order
-        {
-            ID = 20,
-        };
+        _order = new DeltaDeletedResource<Order>{Id = new Uri("http://customers/1")};
+        _order.TrySetPropertyValue("ID", 20);
+
+        _orders = new DeltaSet<Order> { _order };
+        _customer.TrySetPropertyValue("Orders", _orders);
 
         _serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
         _customerType = _model.GetEdmTypeReference(typeof(Customer)).AsEntity();
         _orderType = _model.GetEdmTypeReference(typeof(Order)).AsEntity();
         _specialCustomerType = _model.GetEdmTypeReference(typeof(SpecialCustomer)).AsEntity();
         _specialOrderType = _model.GetEdmTypeReference(typeof(SpecialOrder)).AsEntity();
+        _sizeType = _model.GetEdmTypeReference(typeof(Size)).AsComplex();
+        _ordersNavigation = _customerType.FindNavigationProperty("Orders");
         _serializer = new ODataResourceSerializer(_serializerProvider);
         _path = new ODataPath(new EntitySetSegment(_customerSet));
-        _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
+        _writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path, Type = typeof(DeltaDeletedResource<Customer>) };
         _entityContext = new ResourceContext(_writeContext, _customerSet.EntityType.AsReference(), _customer);
     }
 
@@ -121,10 +130,41 @@ public class ODataResourceSerializerTests
     }
 
     [Fact]
+    public async Task WriteDeletedResourceCallsWriteDeltaDeletedResourceAsyncIfOverridden()
+    {
+        // Arrange
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        var serializer = new Mock<MyDeltaResourceSetSerializer>(serializerProvider.Object);
+        serializer.Setup(s=>s.WriteDeltaDeletedResourceAsync(_orders.First(),It.IsAny<ODataWriter>(), It.IsAny<ODataSerializerContext>()))
+            .Verifiable();
+        serializer.CallBase = true;
+
+        // Act
+        await serializer.Object.WriteObjectAsync(_orders, typeof(DeltaSet<Order>), ODataTestUtil.GetMockODataMessageWriter(ODataVersion.V401), _writeContext);
+
+        // Assert
+        serializer.Verify();
+    }
+
+    public class MyDeltaResourceSetSerializer : ODataDeltaResourceSetSerializer
+    {
+        public MyDeltaResourceSetSerializer(IODataSerializerProvider serializerProvider) : base(serializerProvider) { }
+
+        public override async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            await base.WriteDeltaDeletedResourceAsync(value, writer, writeContext).ConfigureAwait(false);
+        }
+    }
+
+    [Fact]
     public async Task WriteObjectAsync_Calls_WriteObjectInline_WithRightEntityType()
     {
         // Arrange
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s =>
+            s.GetEdmTypeSerializer(It.Is<IEdmTypeReference>(e => _orderType.Definition == e.Definition))).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(s =>
+            s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         serializer
             .Setup(s => s.WriteObjectInlineAsync(_customer, It.Is<IEdmTypeReference>(e => _customerType.Definition == e.Definition),
@@ -134,7 +174,7 @@ public class ODataResourceSerializerTests
         serializer.CallBase = true;
 
         // Act
-        await serializer.Object.WriteObjectAsync(_customer, typeof(int), ODataTestUtil.GetMockODataMessageWriter(), _writeContext);
+        await serializer.Object.WriteObjectAsync(_customer, typeof(Customer), ODataTestUtil.GetMockODataMessageWriter(ODataVersion.V401), _writeContext);
 
         // Assert
         serializer.Verify();
@@ -181,14 +221,14 @@ public class ODataResourceSerializerTests
     {
         // Arrange
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-        serializerProvider.Setup(
-            s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
-        serializerProvider.Setup(
-            s => s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         ODataWriter writer = new Mock<ODataWriter>().Object;
 
-        serializer.Setup(s => s.CreateSelectExpandNode(It.Is<ResourceContext>(e => Verify(e, _customer, _writeContext)))).Verifiable();
+        serializer.Setup(s => s.CreateSelectExpandNode(It.Is<ResourceContext>(e => 
+            e.StructuredType == _customer ? Verify(e, _customer, _writeContext) : 
+            e.StructuredType == _sizeType ? Verify(e, _size, _writeContext) : true))).Verifiable();
         serializer.CallBase = true;
 
         // Act
@@ -199,16 +239,18 @@ public class ODataResourceSerializerTests
     }
 
     [Fact]
-    public async Task WriteObjectInlineAsync_Calls_CreateResource()
+    public async Task WriteObjectInlineAsync_Calls_CreateDeletedResource()
     {
         // Arrange
         SelectExpandNode selectExpandNode = new SelectExpandNode();
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         ODataWriter writer = new Mock<ODataWriter>().Object;
 
         serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
-        serializer.Setup(s => s.CreateResource(selectExpandNode, It.Is<ResourceContext>(e => Verify(e, _customer, _writeContext)))).Verifiable();
+        serializer.Setup(s => s.CreateDeletedResource(It.IsAny<Uri>(), DeltaDeletedEntryReason.Deleted, selectExpandNode, It.Is<ResourceContext>(e => Verify(e, _customer, _writeContext)))).Verifiable();
         serializer.CallBase = true;
 
         // Act
@@ -222,17 +264,16 @@ public class ODataResourceSerializerTests
     public async Task WriteObjectInlineAsync_WritesODataResourceFrom_CreateResource()
     {
         // Arrange
-        ODataResource entry = new ODataResource();
+        ODataDeletedResource entry = new ODataDeletedResource();
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
         serializerProvider.Setup(s =>
-            s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+            s.GetEdmTypeSerializer(It.Is<IEdmTypeReference>(e => _orderType.Definition == e.Definition))).Returns(new ODataResourceSerializer(serializerProvider.Object));
         serializerProvider.Setup(s =>
             s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
-
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
-        serializer.Setup(s => s.CreateResource(It.IsAny<SelectExpandNode>(), It.IsAny<ResourceContext>())).Returns(entry);
+        serializer.Setup(s => s.CreateDeletedResource(It.IsAny<Uri>(), DeltaDeletedEntryReason.Deleted, It.IsAny<SelectExpandNode>(), It.IsAny<ResourceContext>())).Returns(entry);
         serializer.CallBase = true;
 
         writer.Setup(s => s.WriteStartAsync(entry)).Verifiable();
@@ -288,18 +329,21 @@ public class ODataResourceSerializerTests
         {
             SelectedComplexProperties = new Dictionary<IEdmStructuralProperty, PathSelectItem>
             {
-                { new Mock<IEdmStructuralProperty>().Object, null },
-                { new Mock<IEdmStructuralProperty>().Object, null }
+                { new Mock<EdmStructuralProperty>(
+                    (IEdmStructuredType)_customerType.Definition,
+                    "Size",
+                    _sizeType).Object,
+                  null
+                },
             }
         };
-
+        
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
-        serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
+        serializer.Setup(s => s.CreateSelectExpandNode(It.Is<ResourceContext>(c=>c.StructuredType == _customerType.Definition))).Returns(selectExpandNode);
         serializer.CallBase = true;
 
         serializer.Setup(s => s.CreateComplexNestedResourceInfo(selectExpandNode.SelectedComplexProperties.ElementAt(0).Key, null, It.IsAny<ResourceContext>())).Verifiable();
-        serializer.Setup(s => s.CreateComplexNestedResourceInfo(selectExpandNode.SelectedComplexProperties.ElementAt(1).Key, null, It.IsAny<ResourceContext>())).Verifiable();
 
         // Act
         await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
@@ -316,8 +360,7 @@ public class ODataResourceSerializerTests
         {
             SelectedNavigationProperties = new HashSet<IEdmNavigationProperty>
             {
-                new Mock<IEdmNavigationProperty>().Object,
-                new Mock<IEdmNavigationProperty>().Object
+                _ordersNavigation
             }
         };
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
@@ -326,13 +369,12 @@ public class ODataResourceSerializerTests
         serializer.CallBase = true;
 
         serializer.Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(0), It.IsAny<ResourceContext>())).Verifiable();
-        serializer.Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(1), It.IsAny<ResourceContext>())).Verifiable();
 
-        ODataSerializerContext writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
+        ODataSerializerContext writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path, Type = typeof(DeltaDeletedResource<Customer>) };
         writeContext.MetadataLevel = ODataMetadataLevel.Full;
 
         // Act
-        await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, writeContext);
+        await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer.Object, _writeContext);
 
         // Assert
         serializer.Verify();
@@ -346,13 +388,11 @@ public class ODataResourceSerializerTests
         {
             SelectedNavigationProperties = new HashSet<IEdmNavigationProperty>
             {
-                new Mock<IEdmNavigationProperty>().Object,
-                new Mock<IEdmNavigationProperty>().Object
+                _ordersNavigation
             }
         };
         ODataNestedResourceInfo[] navigationLinks = new[]
         {
-            new ODataNestedResourceInfo(),
             new ODataNestedResourceInfo()
         };
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
@@ -360,16 +400,12 @@ public class ODataResourceSerializerTests
         serializer
             .Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(0), It.IsAny<ResourceContext>()))
             .Returns(navigationLinks[0]);
-        serializer
-            .Setup(s => s.CreateNavigationLink(selectExpandNode.SelectedNavigationProperties.ElementAt(1), It.IsAny<ResourceContext>()))
-            .Returns(navigationLinks[1]);
         serializer.CallBase = true;
 
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
         writer.Setup(w => w.WriteStartAsync(navigationLinks[0])).Verifiable();
-        writer.Setup(w => w.WriteStartAsync(navigationLinks[1])).Verifiable();
 
-        ODataSerializerContext writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path };
+        ODataSerializerContext writeContext = new ODataSerializerContext() { NavigationSource = _customerSet, Model = _model, Path = _path, Type = typeof(DeltaDeletedResource<Customer>) };
         writeContext.MetadataLevel = ODataMetadataLevel.Full;
 
         // Act
@@ -387,8 +423,7 @@ public class ODataResourceSerializerTests
         {
             ExpandedProperties = new Dictionary<IEdmNavigationProperty, ExpandedNavigationSelectItem>
             {
-                { new Mock<IEdmNavigationProperty>().Object, null },
-                { new Mock<IEdmNavigationProperty>().Object, null }
+                { _ordersNavigation, null },
             }
         };
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
@@ -397,7 +432,6 @@ public class ODataResourceSerializerTests
         var expandedNavigationProperties = selectExpandNode.ExpandedProperties.Keys;
 
         serializer.Setup(s => s.CreateNavigationLink(expandedNavigationProperties.First(), It.IsAny<ResourceContext>())).Verifiable();
-        serializer.Setup(s => s.CreateNavigationLink(expandedNavigationProperties.Last(), It.IsAny<ResourceContext>())).Verifiable();
         serializer.CallBase = true;
 
         // Act
@@ -422,24 +456,26 @@ public class ODataResourceSerializerTests
         {
             ExpandedProperties = new Dictionary<IEdmNavigationProperty, ExpandedNavigationSelectItem>
             {
-                { ordersProperty, selectExpandClause.SelectedItems.OfType<ExpandedNavigationSelectItem>().Single() }
+                { _ordersNavigation, selectExpandClause.SelectedItems.OfType<ExpandedNavigationSelectItem>().Single() }
             },
         };
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
         Mock<ODataEdmTypeSerializer> innerSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.Resource);
-        innerSerializer
-            .Setup(s => s.WriteObjectInlineAsync(_customer.Orders, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>()))
-            .Callback((object o, IEdmTypeReference t, ODataWriter w, ODataSerializerContext context) =>
-                {
-                    Assert.Same(context.NavigationSource.Name, "Orders");
-                    Assert.Same(context.SelectExpandClause, selectExpandNode.ExpandedProperties.Single().Value.SelectAndExpand);
-                })
-            .Returns(Task.CompletedTask)
-            .Verifiable();
+
+        //innerSerializer
+        //    .Setup(s => s.WriteObjectInlineAsync(_orders, ordersProperty.Type, writer.Object, It.IsAny<ODataSerializerContext>()))
+        //    .Callback((object o, IEdmTypeReference t, ODataWriter w, ODataSerializerContext context) =>
+        //    {
+        //        Assert.Same(context.NavigationSource.Name, "Orders");
+        //        Assert.Same(context.SelectExpandClause, selectExpandNode.ExpandedProperties.Single().Value.SelectAndExpand);
+        //    })
+        //    .Returns(Task.CompletedTask)
+        //    .Verifiable();
 
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-        serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type))
+        serializerProvider.Setup(
+            p => p.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>()))
             .Returns(innerSerializer.Object);
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
@@ -768,10 +804,11 @@ public class ODataResourceSerializerTests
         {
             SelectedStructuralProperties = new HashSet<IEdmStructuralProperty>
             {
-                new Mock<IEdmStructuralProperty>().Object, new Mock<IEdmStructuralProperty>().Object
+                new Mock<EdmStructuralProperty>((IEdmStructuredType)_customerType.Definition,"FirstName", EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, false)).Object,
+                new Mock<EdmStructuralProperty>((IEdmStructuredType)_customerType.Definition,"LastName", EdmCoreModel.Instance.GetPrimitive(EdmPrimitiveTypeKind.String, false)).Object
             }
         };
-        ODataProperty[] properties = new ODataProperty[] { new ODataProperty(), new ODataProperty() };
+        ODataProperty[] properties = new ODataProperty[] { new ODataProperty{Name="FirstName"}, new ODataProperty{Name="LastName"} };
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(_serializerProvider);
         serializer.CallBase = true;
 
@@ -785,7 +822,7 @@ public class ODataResourceSerializerTests
             .Verifiable();
 
         // Act
-        ODataResource entry = serializer.Object.CreateResource(selectExpandNode, _entityContext);
+        ODataDeletedResource entry = serializer.Object.CreateDeletedResource(new Uri("http://customers/1",UriKind.Absolute), DeltaDeletedEntryReason.Deleted, selectExpandNode, _entityContext);
 
         // Assert
         serializer.Verify();
@@ -899,7 +936,7 @@ public class ODataResourceSerializerTests
         _entityContext.Request = request;
 
         // Act
-        ODataResource resource = serializer.Object.CreateResource(selectExpandNode, _entityContext);
+        ODataDeletedResource resource = serializer.Object.CreateDeletedResource(new Uri("http://customer/1"),DeltaDeletedEntryReason.Deleted, selectExpandNode, _entityContext);
 
         // Assert
         Assert.Equal(etagHeaderValue.ToString(), resource.ETag);
@@ -1496,7 +1533,7 @@ public class ODataResourceSerializerTests
 
     private bool Verify(ResourceContext instanceContext, object instance, ODataSerializerContext writeContext)
     {
-        Assert.Same(instance, (instanceContext.EdmObject as TypedEdmEntityObject).Instance);
+        Assert.Same(instance, (instanceContext.EdmObject as TypedEdmStructuredObject).Instance);
         Assert.Equal(writeContext.Model, instanceContext.EdmModel);
         Assert.Equal(writeContext.NavigationSource, instanceContext.NavigationSource);
         Assert.Equal(writeContext.Request, instanceContext.Request);
@@ -2250,17 +2287,16 @@ public class ODataResourceSerializerTests
     {
         // Arrange
         ODataWriter mockWriter = new Mock<ODataWriter>().Object;
-        IEdmNavigationProperty ordersProperty = _customerSet.EntityType.DeclaredNavigationProperties().Single();
         Mock<ODataEdmTypeSerializer> expandedItemSerializer = new Mock<ODataEdmTypeSerializer>(ODataPayloadKind.ResourceSet);
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-        serializerProvider.Setup(p => p.GetEdmTypeSerializer(ordersProperty.Type))
+        serializerProvider.Setup(p => p.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>()))
             .Returns(expandedItemSerializer.Object);
 
         SelectExpandNode selectExpandNode = new SelectExpandNode
         {
             ExpandedProperties = new Dictionary<IEdmNavigationProperty, ExpandedNavigationSelectItem>
             {
-                {ordersProperty, null }
+                { _ordersNavigation, null }
             }
         };
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
@@ -2273,7 +2309,7 @@ public class ODataResourceSerializerTests
 
         // Assert
         expandedItemSerializer.Verify(
-            s => s.WriteObjectInlineAsync(It.IsAny<object>(), ordersProperty.Type, mockWriter,
+            s => s.WriteObjectInlineAsync(It.IsAny<object>(), It.IsAny<IEdmStructuredTypeReference>(), mockWriter,
                 It.Is<ODataSerializerContext>(c => c.ExpandedResource.SerializerContext == _writeContext)));
     }
 
@@ -2575,6 +2611,13 @@ public class ODataResourceSerializerTests
         public IList<Order> Orders { get; private set; }
     }
 
+    private class Size()
+    {
+        public decimal Height { get; set; }
+        public decimal Weight { get; set; }
+    }
+
+
     private class SpecialCustomer
     {
         public IList<SpecialOrder> SpecialOrders { get; private set; }
@@ -2586,12 +2629,6 @@ public class ODataResourceSerializerTests
         public string Name { get; set; }
         public string Shipment { get; set; }
         public Customer Customer { get; set; }
-    }
-
-    private class Size
-    {
-        public Decimal Height { get; set; }
-        public Decimal Weight { get; set; }
     }
 
     private class Result

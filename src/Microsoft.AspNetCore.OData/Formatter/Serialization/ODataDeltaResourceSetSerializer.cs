@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics.Contracts;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
@@ -56,10 +57,6 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
         }
 
         IEdmEntitySetBase entitySet = writeContext.NavigationSource as IEdmEntitySetBase;
-        if (entitySet == null)
-        {
-            throw new SerializationException(SRResources.EntitySetMissingDuringSerialization);
-        }
 
         IEdmTypeReference feedType = writeContext.GetEdmType(graph, type);
         Contract.Assert(feedType != null);
@@ -162,11 +159,19 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
                 }
 
                 lastResource = item;
-                DeltaItemKind kind = GetDelteItemKind(item);
+                DeltaItemKind kind = GetDeltaItemKind(item);
                 switch (kind)
                 {
                     case DeltaItemKind.DeletedResource:
-                        await WriteDeltaDeletedResourceAsync(item, writer, writeContext).ConfigureAwait(false);
+                        // hack. if the WriteDeltaDeletedResourceAsync isn't overridden, call the new version
+                        if (WriteDeltaDeletedResourceAsyncIsOverridden())
+                        {
+                            await WriteDeltaDeletedResourceAsync(item, writer, writeContext).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            await WriteDeletedResourceAsync(item, elementType, writer, writeContext).ConfigureAwait(false);
+                        }
                         break;
                     case DeltaItemKind.DeltaDeletedLink:
                         await WriteDeltaDeletedLinkAsync(item, writer, writeContext).ConfigureAwait(false);
@@ -212,7 +217,7 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
     /// <param name="writeContext">The serializer context.</param>
     /// <returns>The function that generates the NextLink from an object.</returns>
     /// <returns></returns>
-    internal static Func<object, Uri> GetNextLinkGenerator(ODataDeltaResourceSet deltaResourceSet, IEnumerable enumerable, ODataSerializerContext writeContext)
+    internal static Func<object, Uri> GetNextLinkGenerator(ODataResourceSetBase deltaResourceSet, IEnumerable enumerable, ODataSerializerContext writeContext)
     {
         return ODataResourceSetSerializer.GetNextLinkGenerator(deltaResourceSet, enumerable, writeContext);
     }
@@ -266,6 +271,8 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
     /// <param name="value">The object to be written.</param>
     /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
     /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
+    [Obsolete("WriteDeltaDeletedResourceAsync(object, ODataWriter, ODataSerializerContext) is Deprecated and will be removed in the next version." +
+        "Please use WriteDeletedResourceAsync(object, IEdmEntityTypeReference, ODataWriter, ODataSerializerContext)")]
     public virtual async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
     {
         if (writer == null)
@@ -302,6 +309,31 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
             await writer.WriteStartAsync(odataDeletedResource).ConfigureAwait(false);
             await writer.WriteEndAsync().ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Writes the given deltaDeletedEntry specified by the parameter graph as a part of an existing OData message using the given
+    /// messageWriter and the writeContext.
+    /// </summary>
+    /// <param name="value">The object to be written.</param>
+    /// <param name="expectedType">The expected type of the deleted resource.</param>
+    /// <param name="writer">The <see cref="ODataDeltaWriter" /> to be used for writing.</param>
+    /// <param name="writeContext">The <see cref="ODataSerializerContext"/>.</param>
+    public virtual async Task WriteDeletedResourceAsync(object value, IEdmStructuredTypeReference expectedType, ODataWriter writer, ODataSerializerContext writeContext)
+    {
+        if (writer == null)
+        {
+            throw Error.ArgumentNull(nameof(writer));
+        }
+
+        IODataEdmTypeSerializer deletedResourceSerializer = SerializerProvider.GetEdmTypeSerializer(expectedType);
+        if (deletedResourceSerializer == null)
+        {
+            throw new SerializationException(
+                Error.Format(SRResources.TypeCannotBeSerialized, expectedType.FullName()));
+        }
+
+        await deletedResourceSerializer.WriteObjectInlineAsync(value, expectedType, writer, writeContext);
     }
 
     /// <summary>
@@ -382,7 +414,7 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
         }
     }
 
-    internal DeltaItemKind GetDelteItemKind(object item)
+    internal DeltaItemKind GetDeltaItemKind(object item)
     {
         IEdmChangedObject edmChangedObject = item as IEdmChangedObject;
         if (edmChangedObject != null)
@@ -413,5 +445,18 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
 
         string message = Error.Format(SRResources.CannotWriteType, typeof(ODataDeltaResourceSetSerializer).Name, feedType.FullName());
         throw new SerializationException(message);
+    }
+
+    // Discover whether or not WriteDeltaDeletedResourceAsync is overridden in a derived class.
+    // WriteDeltaDeletedResourceAsync is deprecated in favor of WriteDeletedResourceAsync, but
+    // to avoid breaking changes, this retains the behavior of calling a custom
+    // WriteDeltaDeletedResourceAsync method for the case that the service has overriden that
+    // method with a custom implementation. In the next breaking change, WriteDeltaDeletedResourceAsync
+    // should be removed, and this private method can be deleted.
+    private bool WriteDeltaDeletedResourceAsyncIsOverridden()
+    {
+        MethodInfo method = GetType().GetMethod("WriteDeltaDeletedResourceAsync", new Type[] { typeof(object), typeof(ODataWriter), typeof(ODataSerializerContext) });
+        Contract.Assert(method != null, "WriteDeltaDeletedResourceAsync is not defined.");
+        return method.DeclaringType != typeof(ODataDeltaResourceSetSerializer);
     }
 }

@@ -111,7 +111,7 @@ public class ODataDeltaResourceSetSerializerTests
     }
 
     [Fact]
-    public async Task WriteObjectAsync_Throws_EntitySetMissingDuringSerialization()
+    public async Task WriteObjectAsync_Throws_ModelMissingDuringSerialization()
     {
         // Arrange
         object graph = new object();
@@ -119,9 +119,9 @@ public class ODataDeltaResourceSetSerializerTests
         ODataDeltaResourceSetSerializer serializer = new ODataDeltaResourceSetSerializer(provider.Object);
 
         // Act & Assert
-        await ExceptionAssert.ThrowsAsync<SerializationException>(
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
             () => serializer.WriteObjectAsync(graph: graph, type: null, messageWriter: ODataTestUtil.GetMockODataMessageWriter(), writeContext: new ODataSerializerContext()),
-            "The related entity set could not be found from the OData path. The related entity set is required to serialize the payload.");
+            "The request must have an associated EDM model. Consider registering Edm model calling AddOData().");
     }
 
     [Fact]

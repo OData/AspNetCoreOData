@@ -18,16 +18,18 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter;
 
 internal static class ODataTestUtil
 {
-    public static ODataMessageWriter GetMockODataMessageWriter()
+    public static ODataMessageWriter GetMockODataMessageWriter(ODataVersion version = ODataVersion.V4)
     {
         MockODataRequestMessage requestMessage = new MockODataRequestMessage();
-        return new ODataMessageWriter(requestMessage);
+        ODataMessageWriterSettings settings = new ODataMessageWriterSettings(version);
+        return new ODataMessageWriter(requestMessage, settings);
     }
 
-    public static ODataMessageReader GetMockODataMessageReader()
+    public static ODataMessageReader GetMockODataMessageReader(ODataVersion version = ODataVersion.V4)
     {
         MockODataRequestMessage requestMessage = new MockODataRequestMessage();
-        return new ODataMessageReader(requestMessage);
+        ODataMessageReaderSettings settings = new ODataMessageReaderSettings(version);
+        return new ODataMessageReader(requestMessage, settings);
     }
 
     public static IODataSerializerProvider GetMockODataSerializerProvider(ODataEdmTypeSerializer serializer)

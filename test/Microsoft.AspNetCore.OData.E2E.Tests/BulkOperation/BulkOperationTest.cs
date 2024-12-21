@@ -47,7 +47,7 @@ public class BulkOperationTest : WebApiTestBase<BulkOperationTest>
             ]}";
 
         string expectedResponse = "{" +
-            "\"@context\":\"http://localhost/convention/$metadata#Employees/$delta\"," +
+            "\"@odata.context\":\"http://localhost/convention/$metadata#Employees/$delta\"," +
             "\"value\":[" +
             "{\"ID\":1,\"Name\":\"Employee1\",\"Friends@delta\":[{\"Id\":1,\"Name\":\"Friend1\",\"Orders@delta\":[{\"Id\":1,\"Price\":10},{\"Id\":2,\"Price\":20}]},{\"Id\":2,\"Name\":\"Friend2\"}]}," +
             "{\"ID\":2,\"Name\":\"Employee2\",\"Friends@delta\":[{\"Id\":3,\"Name\":\"Friend3\",\"Orders@delta\":[{\"Id\":3,\"Price\":30},{\"Id\":4,\"Price\":40}]},{\"Id\":4,\"Name\":\"Friend4\"}]}]}";
@@ -75,7 +75,7 @@ public class BulkOperationTest : WebApiTestBase<BulkOperationTest>
                 {'ID':2,'Name':'Employee2','Friends@odata.delta':[{'@id':'Friends(1)'}]}
             ]}";
 
-        string expectedResponse = "{\"@context\":\"http://localhost/convention/$metadata#Employees/$delta\",\"value\":[{\"ID\":1,\"Name\":\"Employee1\",\"Friends@delta\":[{\"@removed\":{\"reason\":\"changed\"},\"@id\":\"http://host/service/Friends(1)\"}]},{\"ID\":2,\"Name\":\"Employee2\",\"Friends@delta\":[{\"Id\":1}]}]}";
+        string expectedResponse = "{\"@odata.context\":\"http://localhost/convention/$metadata#Employees/$delta\",\"value\":[{\"ID\":1,\"Name\":\"Employee1\",\"Friends@delta\":[{\"@odata.removed\":{\"reason\":\"changed\"},\"@odata.id\":\"http://host/service/Friends(1)\",\"id\":1}]},{\"ID\":2,\"Name\":\"Employee2\",\"Friends@delta\":[{\"Id\":1}]}]}";
 
         var requestForUpdate = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri);
 

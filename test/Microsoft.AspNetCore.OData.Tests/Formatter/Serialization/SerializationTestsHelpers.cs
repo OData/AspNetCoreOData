@@ -17,10 +17,17 @@ internal class SerializationTestsHelpers
     public static IEdmModel SimpleCustomerOrderModel()
     {
         var model = new EdmModel();
+
+        var sizeType = new EdmComplexType("Default", "Size");
+        sizeType.AddStructuralProperty("Height", EdmPrimitiveTypeKind.Decimal);
+        sizeType.AddStructuralProperty("Weight", EdmPrimitiveTypeKind.Decimal);
+        model.AddElement(sizeType);
+
         var customerType = new EdmEntityType("Default", "Customer");
         customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32);
         customerType.AddStructuralProperty("FirstName", EdmPrimitiveTypeKind.String);
         customerType.AddStructuralProperty("LastName", EdmPrimitiveTypeKind.String);
+        customerType.AddStructuralProperty("Size", new EdmComplexTypeReference(sizeType,true));
         IEdmTypeReference primitiveTypeReference = EdmCoreModel.Instance.GetPrimitive(
             EdmPrimitiveTypeKind.String,
             isNullable: true);
