@@ -16,7 +16,7 @@ public partial class PublicApiTest
     private const string AssemblyName = "Microsoft.AspNetCore.OData.dll";
     private const string OutputFileName = "Microsoft.AspNetCore.OData.PublicApi.out";
 
-    private const string BaseLineFileName = "Microsoft.AspNetCore.OData.PublicApi.Net8.bsl";
+    private const string BaseLineFileName = "Microsoft.AspNetCore.OData.PublicApi.bsl";
 
     private const string BaseLineFileFolder = @"test\Microsoft.AspNetCore.OData.Tests\PublicApi\";
 

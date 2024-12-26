@@ -1277,7 +1277,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <param name="navigationLink">The navigation link to be written.</param>
     /// <param name="resourceContext">The resource context for the resource whose navigation link is being written.</param>
     /// <returns>true if navigation link should be written; otherwise false.</returns>
-    private bool ShouldWriteNavigation(ODataNestedResourceInfo navigationLink, ResourceContext resourceContext) 
+    protected virtual bool ShouldWriteNavigation(ODataNestedResourceInfo navigationLink, ResourceContext resourceContext)
     {
         if (navigationLink?.Url != null || (navigationLink != null && resourceContext.SerializerContext.MetadataLevel == ODataMetadataLevel.Full))
         {

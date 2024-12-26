@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -30,7 +31,6 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
-using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
 
@@ -697,6 +697,58 @@ public class ODataResourceSerializerTests
 
         // Assert
         writer.Verify();
+    }
+
+    [Fact]
+    public async Task WriteObjectInlineAsync_Calls_CreateDeletedResource()
+    {
+        // Arrange
+        SelectExpandNode selectExpandNode = new SelectExpandNode();
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
+        Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+        ODataWriter writer = new Mock<ODataWriter>().Object;
+
+        serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
+        serializer.Setup(s => s.CreateDeletedResource(It.IsAny<Uri>(), DeltaDeletedEntryReason.Deleted, selectExpandNode, It.Is<ResourceContext>(e => Verify(e, _customer, _writeContext)))).Verifiable();
+        serializer.CallBase = true;
+
+        // Act
+        await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer, _writeContext);
+
+        // Assert
+        serializer.Verify();
+    }
+
+    [Fact]
+    public async Task WriteDeletedResource_Calls_WriteDeltaDeletedResourceAsyncIfOverridden()
+    {
+        // Arrange
+        DeltaDeletedResource<Order> order = new DeltaDeletedResource<Order> { Id = new Uri("http://customers/1") };
+        DeltaSet<Order> orders = new DeltaSet<Order> { order };
+
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        var serializer = new Mock<MyDeltaResourceSetSerializer>(serializerProvider.Object);
+        serializer.Setup(s => s.WriteDeltaDeletedResourceAsync(orders.First(), It.IsAny<ODataWriter>(), It.IsAny<ODataSerializerContext>()))
+            .Verifiable();
+        serializer.CallBase = true;
+
+        // Act
+        await serializer.Object.WriteObjectAsync(orders, typeof(DeltaSet<Order>), ODataTestUtil.GetMockODataMessageWriter(ODataVersion.V401), _writeContext);
+
+        // Assert
+        serializer.Verify();
+    }
+
+    public class MyDeltaResourceSetSerializer : ODataDeltaResourceSetSerializer
+    {
+        public MyDeltaResourceSetSerializer(IODataSerializerProvider serializerProvider) : base(serializerProvider) { }
+
+        public override async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            await base.WriteDeltaDeletedResourceAsync(value, writer, writeContext).ConfigureAwait(false);
+        }
     }
 
     [Fact]
