@@ -15,7 +15,7 @@ namespace ODataRoutingSample.OpenApi;
 
 public static class ODataPathTranslater
 {
-    public static ODataPath Translate(this ODataPathTemplate pathTemplate)
+    public static ODataPath Translate(this ODataPathTemplate pathTemplate, IEdmModel model)
     {
         if (pathTemplate.Count == 0)
         {
@@ -45,7 +45,7 @@ public static class ODataPathTranslater
                     break;
 
                 case CastSegmentTemplate cast:
-                    newSegments.Add(cast.ConvertTo());
+                    newSegments.Add(cast.ConvertTo(model));
                     break;
 
                 case PropertySegmentTemplate property:
@@ -126,10 +126,10 @@ public static class ODataPathTranslater
         return new ODataKeySegment(key.EntityType, key.KeyMappings);
     }
 
-    public static ODataTypeCastSegment ConvertTo(this CastSegmentTemplate cast)
+    public static ODataTypeCastSegment ConvertTo(this CastSegmentTemplate cast, IEdmModel model)
     {
         // So far, only support the entity type cast
-        return new ODataTypeCastSegment(cast.ExpectedType as IEdmEntityType);
+        return new ODataTypeCastSegment(cast.ExpectedType as IEdmEntityType, model);
     }
 
     //public static ODataTypeCastSegment ConvertTo(this PropertySegmentTemplate property)
