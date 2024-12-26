@@ -703,6 +703,9 @@ public class ODataResourceSerializerTests
     public async Task WriteObjectInlineAsync_Calls_CreateDeletedResource()
     {
         // Arrange
+        DeltaDeletedResource<Customer> customer = new DeltaDeletedResource<Customer>();
+        customer.Id = new Uri("http://customers/10");
+
         SelectExpandNode selectExpandNode = new SelectExpandNode();
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
         serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
@@ -711,11 +714,11 @@ public class ODataResourceSerializerTests
         ODataWriter writer = new Mock<ODataWriter>().Object;
 
         serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
-        serializer.Setup(s => s.CreateDeletedResource(It.IsAny<Uri>(), DeltaDeletedEntryReason.Deleted, selectExpandNode, It.Is<ResourceContext>(e => Verify(e, _customer, _writeContext)))).Verifiable();
+        serializer.Setup(s => s.CreateDeletedResource(It.IsAny<Uri>(), DeltaDeletedEntryReason.Deleted, selectExpandNode, It.Is<ResourceContext>(e => Verify(e, customer, _writeContext)))).Verifiable();
         serializer.CallBase = true;
 
         // Act
-        await serializer.Object.WriteObjectInlineAsync(_customer, _customerType, writer, _writeContext);
+        await serializer.Object.WriteObjectInlineAsync(customer, _customerType, writer, _writeContext);
 
         // Assert
         serializer.Verify();
