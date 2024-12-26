@@ -4774,7 +4774,15 @@
             <param name="writer">The ODataWriter.</param>
             <returns>A task that represents the asynchronous write operation</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Boolean)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Boolean)">
+            <summary>
+            Writes the context of a Resource
+            </summary>
+            <param name="writer">The <see cref="T:Microsoft.OData.ODataWriter" /> to use to write the resource contents</param>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
+            <param name="isDelta">Whether to only write changed properties of the resource</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> that describes the set of properties and actions to select and expand while writing this entity.
@@ -4896,7 +4904,15 @@
             <param name="resourceContext">The context for the entity instance being written.</param>
             <returns>The navigation link to be written.</returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralPropertyBag(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateStructuralPropertyBag(Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.OData.ODataProperty"/>s to be written while writing this entity.
+            </summary>
+            <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode" /> to determine the properties to be written</param>
+            <param name="resourceContext">The context for the entity instance being written.</param>
+            <returns>The navigation link to be written.</returns>
+            <returns>ODataProperties to be written</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateComputedProperty(System.String,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Creates the <see cref="T:Microsoft.OData.ODataProperty"/> to be written for the given resource.
@@ -7281,6 +7297,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingNonODataContainer">
             <summary>
               Looks up a localized string similar to Cannot find the services container for the non-OData route. This can occur when using OData components on the non-OData route and is usually a configuration issue. Call EnableDependencyInjection() to enable OData components on non-OData routes. This may also occur when a request was mistakenly handled by the ASP.NET Core routing layer instead of the OData routing layer, for instance the URL does not include the OData route prefix configured via a call to MapODataServiceRoute()..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingNonStandardTypeSupportFor">
+            <summary>
+              Looks up a localized string similar to Missing non-standard type support for &apos;{0}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingODataContainer">

@@ -509,7 +509,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <summary>
     /// Writes the context of a Resource
     /// </summary>
-    /// <param name="writer">The <see cref="ODataWriter"> to use to write the resource contents</param>
+    /// <param name="writer">The <see cref="ODataWriter" /> to use to write the resource contents</param>
     /// <param name="selectExpandNode">The <see cref="SelectExpandNode"/> describing the response graph.</param>
     /// <param name="resourceContext">The context for the resource instance being written.</param>
     /// <param name="isDelta">Whether to only write changed properties of the resource</param>
@@ -1390,7 +1390,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <summary>
     /// Creates the <see cref="ODataProperty"/>s to be written while writing this entity.
     /// </summary>
-    /// <param name="selectExpandNode">The <see cref="SelectExpandNode"> to determine the properties to be written</param>
+    /// <param name="selectExpandNode">The <see cref="SelectExpandNode" /> to determine the properties to be written</param>
     /// <param name="resourceContext">The context for the entity instance being written.</param>
     /// <returns>The navigation link to be written.</returns>
     /// <returns>ODataProperties to be written</returns>
