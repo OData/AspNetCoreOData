@@ -3,8 +3,8 @@
 
 Component | Build  | Status 
 --------|--------- |---------
-ASP.NET Core OData|Rolling | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-rolling)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1132)
-ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-nightly)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1169)
+ASP.NET Core OData|Rolling | [![Build Status](https://identitydivision.visualstudio.com/OData/_apis/build/status%2FAspNetCoreOData%2FAspNetCoreOData-main-rolling-1ES?repoName=OData%2FAspNetCoreOData&branchName=main)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=2403&repoName=OData%2FAspNetCoreOData&branchName=main)
+ASP.NET Core OData|Nightly | [![Build Status](https://identitydivision.visualstudio.com/OData/_apis/build/status%2FAspNetCoreOData%2FAspNetCoreOData-main-nightly-1ES?repoName=OData%2FAspNetCoreOData&branchName=main)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=2404&repoName=OData%2FAspNetCoreOData&branchName=main)
 .NET Foundation|Release|[![Build status](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)
 
 ## 1. Introduction
