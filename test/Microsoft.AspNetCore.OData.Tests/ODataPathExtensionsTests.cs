@@ -190,6 +190,40 @@ public class ODataPathExtensionsTests
         Assert.Equal("$metadata", segments.GetPathString());
     }
 
+    [Fact]
+    public void GetPropertyAndStructuredTypeFromPath_Returns_CorrectInformation()
+    {
+        // Arrange
+        var model = new EdmModel();
+        EdmEntityType customer = new EdmEntityType("NS", "Customer");
+        customer.AddKeys(customer.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32));
+        model.AddElement(customer);
+        EdmEntityContainer container = new EdmEntityContainer("NS", "Default");
+        var customers = container.AddEntitySet("Customers", customer);
+        model.AddElement(container);
+
+        // function with entity set path
+        EdmFunction getTopCustomers = new EdmFunction("NS", "GetTopCustomers",
+            new EdmCollectionTypeReference(new EdmCollectionType(new EdmEntityTypeReference(customer, false))),
+            isBound: false,
+            entitySetPathExpression: customers.Path,
+            isComposable: false
+        );
+        var getTopCustomersImport = container.AddFunctionImport("GetTopCustomers", getTopCustomers, customers.Path, includeInServiceDocument: true);
+
+        OperationImportSegment importSegment = new OperationImportSegment(getTopCustomersImport, customers);
+        ODataPath path = new ODataPath(importSegment);
+
+        // Act
+        (IEdmProperty p, IEdmStructuredType t, string n) = path.GetPropertyAndStructuredTypeFromPath();
+
+        // Assert
+        Assert.Null(p);
+        Assert.NotNull(t);
+        Assert.Same(customer, t);
+        Assert.Equal("GetTopCustomers", n);
+    }
+
     /// <summary>
     /// Test path segment used to test handling of unknown path segments.
     /// </summary>

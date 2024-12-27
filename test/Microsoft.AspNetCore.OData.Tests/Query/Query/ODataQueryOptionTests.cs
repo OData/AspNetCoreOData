@@ -726,6 +726,38 @@ public class ODataQueryOptionTests
     }
 
     [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Validate_Works_ForSelectOnReturnOfUnboundFunctionCall_WithOrWithoutSelectEnabled(bool enableSelect)
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel(c => c.CustomerId, builder =>
+        {
+            builder.Function("GetTopCustomers").ReturnsCollectionFromEntitySet<Customer>("Customers");
+        });
+
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/service/GetTopCustomers()?$select=*");
+
+        ODataQueryContext queryContext = new ODataQueryContext(model, typeof(Customer));
+        queryContext.DefaultQueryConfigurations.EnableSelect = enableSelect;
+        var options = new ODataQueryOptions(queryContext, request);
+        ODataValidationSettings validationSettings = new ODataValidationSettings { MaxOrderByNodeCount = 1 };
+
+        // Act & Assert
+        Exception exception = Record.Exception(() => options.Validate(validationSettings));
+
+        if (enableSelect)
+        {
+            Assert.Null(exception);
+        }
+        else
+        {
+            Assert.NotNull(exception);
+            Assert.Equal("The property 'CustomerId' cannot be used in the $select query option.", exception.Message);
+        }
+    }
+
+    [Theory]
     [InlineData("$orderby")]
     [InlineData("$filter")]
     [InlineData("$top")]
@@ -1274,7 +1306,7 @@ public class ODataQueryOptionTests
         return GetEdmModel<int>(null);
     }
 
-    private static IEdmModel GetEdmModel<TKey>(Expression<Func<Customer, TKey>> keyDefinitionExpression)
+    private static IEdmModel GetEdmModel<TKey>(Expression<Func<Customer, TKey>> keyDefinitionExpression, Action<ODataModelBuilder> moreConfigs = null)
     {
         Mock<ODataModelBuilder> mock = new Mock<ODataModelBuilder>();
         mock.Setup(b => b.ValidateModel(It.IsAny<IEdmModel>())).Callback(() => { });
@@ -1292,6 +1324,12 @@ public class ODataQueryOptionTests
         customer.Property(c => c.SharePrice);
         customer.Property(c => c.ShareSymbol);
         builder.EntitySet<Customer>("Customers");
+
+        if (moreConfigs != null)
+        {
+            moreConfigs(builder);
+        }
+
         return builder.GetEdmModel();
     }
 
