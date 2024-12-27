@@ -265,6 +265,23 @@ public static class ODataPathExtensions
                 return (null, structuredType, name);
             }
 
+            if (segment is OperationImportSegment operationImportSegment)
+            {
+                IEdmOperationImport operationImport = operationImportSegment.OperationImports.First();
+                IEdmTypeReference edmType = operationImport.Operation.ReturnType;
+                if (edmType == null)
+                {
+                    return (null, null, operationImport.Name);
+                }
+
+                if (edmType.IsCollection())
+                {
+                    edmType = edmType.AsCollection().ElementType();
+                }
+
+                return (null, edmType.Definition as IEdmStructuredType, operationImport.Name);
+            }
+
             if (segment is TypeSegment typeSegment)
             {
                 structuredType = typeSegment.EdmType.AsElementType() as IEdmStructuredType;
