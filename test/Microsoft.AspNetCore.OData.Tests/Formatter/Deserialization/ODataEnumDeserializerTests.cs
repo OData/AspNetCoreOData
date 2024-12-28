@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -114,12 +115,14 @@ public class ODataEnumDeserializerTests
         Assert.Equal("Blue", color.Value);
     }
 
-    [Fact]
-    public async Task ReadAsync_Works_ForModelAlias()
+    [Theory]
+    [InlineData("{\"@odata.type\":\"#NS.level\",\"value\":\"veryhigh\"}", Level.High)]
+    [InlineData("{\"@odata.type\":\"#NS.level\",\"value\":\"High\"}", Level.High)]
+    [InlineData("{\"@odata.type\":\"#NS.level\",\"value\":\"low\"}", Level.Low)]
+    [InlineData("{\"@odata.type\":\"#NS.level\",\"value\":\"Low\"}", Level.Low)]
+    public async Task ReadAsync_Works_ForModelAlias(string content, Level expectedLevel)
     {
         // Arrange
-        string content = "{\"@odata.type\":\"#NS.level\",\"value\":\"veryhigh\"}";
-
         var builder = new ODataConventionModelBuilder();
         builder.EnumType<Level>().Namespace = "NS";
         IEdmModel model = builder.GetEdmModel();
@@ -139,7 +142,48 @@ public class ODataEnumDeserializerTests
 
         // Assert
         Level level = Assert.IsType<Level>(value);
-        Assert.Equal(Level.High, level);
+        Assert.Equal(expectedLevel, level);
+    }
+
+    [Theory]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"mon\"}", Day.Monday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday\"}", Day.Monday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday\"}", Day.Monday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\" monday, friday  \"}", Day.Monday | Day.Friday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"mon, fri\"}", Day.Monday | Day.Friday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday,  tuesday \"}", Day.Monday | Day.Tuesday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\" Monday, tuesday  \"}", Day.Monday | Day.Tuesday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Tuesday\"}", Day.Monday | Day.Tuesday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"monday, tuesday, thursday\"}", Day.Monday | Day.Tuesday | Day.Thursday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Tuesday, thursday\"}", Day.Monday | Day.Tuesday | Day.Thursday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, tuesday, Thursday\"}", Day.Monday | Day.Tuesday | Day.Thursday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Tuesday, Thursday\"}", Day.Monday | Day.Tuesday | Day.Thursday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, Friday\"}", Day.Monday | Day.Friday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, tuesday,  fri\"}", Day.Monday | Day.Tuesday | Day.Friday)]
+    [InlineData("{\"@odata.type\":\"#NS.day\",\"value\":\"Monday, fri, Wednesday\"}", Day.Monday | Day.Friday | Day.Wednesday)]
+    public async Task ReadAsync_Works_ForModelAliasWithFlags(string content, Day expectedDay)
+    {
+        // Arrange
+        var builder = new ODataConventionModelBuilder();
+        builder.EnumType<Day>().Namespace = "NS";
+        IEdmModel model = builder.GetEdmModel();
+
+        ODataEnumDeserializer deserializer = new ODataEnumDeserializer();
+        ODataDeserializerContext readContext = new ODataDeserializerContext
+        {
+            Model = model,
+            ResourceType = typeof(Day)
+        };
+
+        HttpRequest request = RequestFactory.Create("Post", "http://localhost/", _edmModel);
+
+        // Act
+        object value = await deserializer.ReadAsync(ODataTestUtil.GetODataMessageReader(request.GetODataMessage(content), model),
+            typeof(Day), readContext);
+
+        // Assert
+        Day day = Assert.IsType<Day>(value);
+        Assert.Equal(expectedDay, day);
     }
 
     [Fact]
@@ -175,5 +219,25 @@ public class ODataEnumDeserializerTests
 
         [EnumMember(Value = "veryhigh")]
         High
+    }
+
+    [Flags]
+    [DataContract(Name = "day")]
+    public enum Day
+    {
+        [EnumMember(Value = "mon")]
+        Monday = 1,
+
+        [EnumMember(Value = "tuesday")]
+        Tuesday = 2,
+
+        [EnumMember(Value = "wednesday")]
+        Wednesday = 4,
+
+        [EnumMember(Value = "thursday")]
+        Thursday = 8,
+
+        [EnumMember(Value = "fri")]
+        Friday = 16
     }
 }
