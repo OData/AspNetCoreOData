@@ -32,6 +32,6 @@
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
 
     <!-- readme file -->
-    <file src="$SourcesRoot$\src\Microsoft.AspNetCore.OData\Docs\README.md" target="docs\" />
+    <file src="$SourcesRoot$\README.md" target="docs\" />
   </files>
 </package>
