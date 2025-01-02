@@ -26,13 +26,13 @@ Install-Package Microsoft.AspNetCore.OData
 
 Here's a simple example of how to create an OData service using `Microsoft.AspNetCore.OData`:
 
-**i. Create an ASP.NET Core Application**:
+**I. Create an ASP.NET Core Application**:
 - Open Visual Studio and create a new ASP.NET Core Web API project.
 
-**ii. Add the `Microsoft.AspNetCore.OData` Package**:
+**II. Add the `Microsoft.AspNetCore.OData` Package**:
 - Install the package using the instructions above.
 
-**iii. Define Your Models**:
+**III. Define Your Models**:
 - Create your data models. For example:
   ```cs
     namespace MyODataApp.Models
@@ -46,7 +46,7 @@ Here's a simple example of how to create an OData service using `Microsoft.AspNe
     }
   ```
 
-iv. **Add an OData Controller**:
+**IV. Add an OData Controller**:
 - Create a controller to handle OData requests:
   ```cs
     using Microsoft.AspNetCore.Mvc;
@@ -85,7 +85,7 @@ iv. **Add an OData Controller**:
     }
   ```
 
-**v. Configure OData in `Startup.cs`**:
+**V. Configure OData in `Startup.cs`**:
 - Configure OData routes and services:
 
 - If you work with `Program.cs`, update as below. Refer to the [Getting Started Guide](https://learn.microsoft.com/odata/webapi-8/getting-started).
@@ -161,7 +161,7 @@ iv. **Add an OData Controller**:
     }
   ```
 
-**vi. Run Your Application**:
+**VI. Run Your Application**:
 
 - Start your application and navigate to `/odata/Products` to see your OData service in action.
 
@@ -176,10 +176,15 @@ This is the official ASP.NET Core OData repository.
 **Blogs**:
 
 * [$compute and $search in ASP.NET Core OData 8](https://devblogs.microsoft.com/odata/compute-and-search-in-asp-net-core-odata-8/)
+
 * [API versioning extension with ASP.NET Core OData 8](https://devblogs.microsoft.com/odata/api-versioning-extension-with-asp-net-core-odata-8/)
+
 * [Build formatter extensions in ASP.NET Core OData 8 and hooks in ODataConnectedService](https://devblogs.microsoft.com/odata/build-formatter-extensions-in-asp-net-core-odata-8-and-hooks-in-odataconnectedservice/)
+
 * [Attribute Routing in ASP.NET Core OData 8.0 RC](https://devblogs.microsoft.com/odata/attribute-routing-in-asp-net-core-odata-8-0-rc/)
+
 * [Routing in ASP.NET Core OData 8.0 Preview](https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview/)
+
 * [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
 
 
