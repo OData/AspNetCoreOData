@@ -13,6 +13,7 @@
     <license type="expression">MIT</license>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>Microsoft AspNetCore WebApi OData</tags>
+    <readme>docs\README.md</readme>
     <icon>images\odata.png</icon>
     <repository type="git" url="https://github.com/OData/AspNetCoreOData.git" branch="master" />
     <dependencies>
@@ -29,5 +30,8 @@
     <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.xml" target="lib\net8.0" />
     <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.pdb" target="lib\net8.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
+
+    <!-- readme file -->
+    <file src="$SourcesRoot$\README.md" target="docs\" />
   </files>
 </package>
