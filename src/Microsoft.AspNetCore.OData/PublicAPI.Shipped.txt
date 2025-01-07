@@ -2065,3 +2065,6 @@ virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConventio
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.Order.get -> int
 virtual Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider) -> Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
 virtual Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options = null) -> System.Collections.Generic.IEnumerable<string>
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeletedResourceAsync(object value, Microsoft.OData.Edm.IEdmStructuredTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDeletedResource(System.Uri id, Microsoft.OData.DeltaDeletedEntryReason reason, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataDeletedResource
+

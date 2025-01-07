@@ -166,7 +166,9 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
                         // hack. if the WriteDeltaDeletedResourceAsync isn't overridden, call the new version
                         if (WriteDeltaDeletedResourceAsyncIsOverridden())
                         {
+#pragma warning disable CS0618 // Type or member is obsolete
                             await WriteDeltaDeletedResourceAsync(item, writer, writeContext).ConfigureAwait(false);
+#pragma warning restore CS0618 // Type or member is obsolete
                         }
                         else
                         {
