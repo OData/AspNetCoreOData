@@ -274,10 +274,7 @@ public static class ODataPathExtensions
                     return (null, null, operationImport.Name);
                 }
 
-                if (edmType.IsCollection())
-                {
-                    edmType = edmType.AsCollection().ElementType();
-                }
+                edmType = edmType.Definition.AsElementType();
 
                 return (null, edmType.Definition as IEdmStructuredType, operationImport.Name);
             }
