@@ -725,6 +725,7 @@ public class ODataResourceSerializerTests
     }
 
     [Fact]
+    [Obsolete]
     public async Task WriteDeletedResource_Calls_WriteDeltaDeletedResourceAsyncIfOverridden()
     {
         // Arrange
@@ -748,6 +749,7 @@ public class ODataResourceSerializerTests
     {
         public MyDeltaResourceSetSerializer(IODataSerializerProvider serializerProvider) : base(serializerProvider) { }
 
+        [Obsolete]
         public override async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
         {
             await base.WriteDeltaDeletedResourceAsync(value, writer, writeContext).ConfigureAwait(false);
