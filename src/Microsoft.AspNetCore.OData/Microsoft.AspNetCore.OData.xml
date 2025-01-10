@@ -3522,6 +3522,16 @@
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
             <inheritdoc />
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataEnumDeserializer.ReadFlagsEnumValue(Microsoft.OData.ODataEnumValue,Microsoft.OData.Edm.IEdmEnumType,System.Type,Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation)">
+            <summary>
+            Reads the value of a flags enum.
+            </summary>
+            <param name="enumValue">The OData enum value.</param>
+            <param name="enumType">The EDM enum type.</param>
+            <param name="clrType">The EDM enum CLR type.</param>
+            <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
+            <returns>The deserialized flags enum value.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataPrimitiveDeserializer">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData primitive types.
@@ -4660,6 +4670,14 @@
             <param name="enumType">The EDM enum type of the value.</param>
             <param name="writeContext">The serializer write context.</param>
             <returns>The created <see cref="T:Microsoft.OData.ODataEnumValue"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataEnumSerializer.GetFlagsEnumValue(System.Enum,Microsoft.OData.ModelBuilder.ClrEnumMemberAnnotation)">
+            <summary>
+            Gets the combined names of the flags set in a Flags enum value.
+            </summary>
+            <param name="graphEnum">The enum value.</param>
+            <param name="memberMapAnnotation">The annotation containing the mapping of CLR enum members to EDM enum members.</param>
+            <returns>A comma-separated string of the names of the flags that are set.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataErrorSerializer">
             <summary>

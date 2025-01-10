@@ -1041,7 +1041,11 @@ public class Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter : Microso
 	public virtual bool CanWriteResult (Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterCanWriteContext context)
 	public static System.Uri GetDefaultBaseAddress (Microsoft.AspNetCore.Http.HttpRequest request)
 	public virtual System.Collections.Generic.IReadOnlyList`1[[System.String]] GetSupportedContentTypes (string contentType, System.Type objectType)
+	[
+	AsyncStateMachineAttribute(),
+	]
 	public virtual System.Threading.Tasks.Task WriteResponseBodyAsync (Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context, System.Text.Encoding selectedEncoding)
+
 	public virtual void WriteResponseHeaders (Microsoft.AspNetCore.Mvc.Formatters.OutputFormatterWriteContext context)
 }
 

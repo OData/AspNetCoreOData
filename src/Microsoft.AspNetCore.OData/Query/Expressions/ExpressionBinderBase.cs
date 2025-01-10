@@ -700,7 +700,7 @@ public abstract class ExpressionBinderBase
         MethodInfo methodInfo;
         if (UriFunctionsBinder.TryGetMethodInfo(node.Name, methodArgumentsType, out methodInfo))
         {
-            return ExpressionBinderHelper.MakeFunctionCall(methodInfo, QuerySettings, arguments);
+            return ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
         }
 
         return null;

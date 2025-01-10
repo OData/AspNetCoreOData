@@ -94,7 +94,7 @@ public class EdmPrimitiveHelperTests
 
     [Theory]
     [MemberData(nameof(ConvertPrimitiveValue_NonStandardPrimitives_Data))]
-    [MemberData(nameof(ConvertPrimitiveValue_NonStandardPrimitives_ExtraData))] 
+    [MemberData(nameof(ConvertPrimitiveValue_NonStandardPrimitives_ExtraData))]
     public void ConvertPrimitiveValue_NonStandardPrimitives(object valueToConvert, object result, Type conversionType)
     {
         // Arrange & Act
@@ -122,6 +122,52 @@ public class EdmPrimitiveHelperTests
         // Assert
         DateTime dt = Assert.IsType<DateTime>(actual);
         Assert.Equal(valueToConvert.LocalDateTime, dt);
+    }
+
+    [Theory]
+    [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
+    public void ConvertDateTimeValue_ImplicitKind(DateTimeOffset valueToConvert)
+    {
+        // Arrange & Act
+        object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime));
+
+        //if server local time is UTC, then expect Utc Kind
+        DateTimeKind expectedTimeKind = TimeZoneInfo.Local.Equals(TimeZoneInfo.Utc)
+            ? DateTimeKind.Utc
+            : DateTimeKind.Local;
+
+        // Assert
+        DateTime dt = Assert.IsType<DateTime>(actual);
+        Assert.Equal(expectedTimeKind, dt.Kind);
+    }
+
+    [Theory]
+    [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
+    public void ConvertDateTimeValue_ExplicitLocalKind(DateTimeOffset valueToConvert)
+    {
+        // Arrange & Act
+        object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime), TimeZoneInfo.Local);
+
+        //if server local time is UTC, then expect Utc Kind
+        DateTimeKind expectedTimeKind = TimeZoneInfo.Local.Equals(TimeZoneInfo.Utc)
+            ? DateTimeKind.Utc
+            : DateTimeKind.Local;
+
+        // Assert
+        DateTime dt = Assert.IsType<DateTime>(actual);
+        Assert.Equal(expectedTimeKind, dt.Kind);
+    }
+
+    [Theory]
+    [MemberData(nameof(ConvertDateTime_NonStandardPrimitives_Data))]
+    public void ConvertDateTimeValue_ExplicitUtcKind(DateTimeOffset valueToConvert)
+    {
+        // Arrange & Act
+        object actual = EdmPrimitiveHelper.ConvertPrimitiveValue(valueToConvert, typeof(DateTime), TimeZoneInfo.Utc);
+
+        // Assert
+        DateTime dt = Assert.IsType<DateTime>(actual);
+        Assert.Equal(DateTimeKind.Utc, dt.Kind);
     }
 
     [Theory]
