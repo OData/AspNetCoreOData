@@ -1,4 +1,7 @@
-﻿abstract Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.RequestDelegate nextHandler) -> System.Threading.Tasks.Task
+Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CancellationToken.get -> System.Threading.CancellationToken
+static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode openCollectionNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Reflection.PropertyInfo
+virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindCollectionOpenPropertyAccessNode(Microsoft.OData.UriParser.CollectionOpenPropertyAccessNode openCollectionNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+abstract Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.ProcessBatchAsync(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Http.RequestDelegate nextHandler) -> System.Threading.Tasks.Task
 abstract Microsoft.AspNetCore.OData.Batch.ODataBatchRequestItem.SendRequestAsync(Microsoft.AspNetCore.Http.RequestDelegate handler) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem>
 abstract Microsoft.AspNetCore.OData.Batch.ODataBatchResponseItem.WriteResponseAsync(Microsoft.OData.ODataBatchWriter writer) -> System.Threading.Tasks.Task
 abstract Microsoft.AspNetCore.OData.Deltas.Delta.Clear() -> void
@@ -2062,3 +2065,6 @@ virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConventio
 virtual Microsoft.AspNetCore.OData.Routing.Conventions.SingletonRoutingConvention.Order.get -> int
 virtual Microsoft.AspNetCore.OData.Routing.Parser.DefaultODataPathTemplateParser.Parse(Microsoft.OData.Edm.IEdmModel model, string odataPath, System.IServiceProvider requestProvider) -> Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate
 virtual Microsoft.AspNetCore.OData.Routing.Template.ODataPathTemplate.GetTemplates(Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options = null) -> System.Collections.Generic.IEnumerable<string>
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataDeltaResourceSetSerializer.WriteDeletedResourceAsync(object value, Microsoft.OData.Edm.IEdmStructuredTypeReference expectedType, Microsoft.OData.ODataWriter writer, Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext writeContext) -> System.Threading.Tasks.Task
+virtual Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateDeletedResource(System.Uri id, Microsoft.OData.DeltaDeletedEntryReason reason, Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode selectExpandNode, Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext) -> Microsoft.OData.ODataDeletedResource
+

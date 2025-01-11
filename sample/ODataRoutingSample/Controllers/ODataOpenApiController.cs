@@ -130,7 +130,7 @@ public class ODataOpenApiController : ControllerBase
                 continue;
             }
 
-            var path = metadata.Template.Translate();
+            var path = metadata.Template.Translate(model);
             if (path == null)
             {
                 continue;

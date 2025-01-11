@@ -171,7 +171,7 @@ internal class ContainmentPathBuilder
         NavigationPropertySegment navigationPropertySegment = segment as NavigationPropertySegment;
         if (navigationPropertySegment != null)
         {
-            return navigationPropertySegment.NavigationSource.EntityType;
+            return navigationPropertySegment.NavigationSource?.EntityType;
         }
 
         return null;

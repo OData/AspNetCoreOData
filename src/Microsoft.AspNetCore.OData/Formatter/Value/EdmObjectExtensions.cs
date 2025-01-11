@@ -19,7 +19,7 @@ public static class EdmTypeExtensions
     /// Method to determine whether the current type is a Delta resource set.
     /// </summary>
     /// <param name="type">IEdmType to be compared</param>
-    /// <returns>True or False if type is same as <see cref="EdmDeltaCollectionType"/></returns>
+    /// <returns>True or False if type is a <see cref="EdmDeltaCollectionType"/> or a <see cref="IDeltaSet"/></returns>
     public static bool IsDeltaResourceSet(this IEdmType type)
     {
         if (type == null)
@@ -27,7 +27,7 @@ public static class EdmTypeExtensions
             throw Error.ArgumentNull(nameof(type));
         }
 
-        return (type.GetType() == typeof(EdmDeltaCollectionType));
+        return (type is EdmDeltaCollectionType || type is IDeltaSet);
     }
 
     /// <summary>

@@ -66,7 +66,7 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         Contract.Assert(resourceSetType != null);
 
         IEdmStructuredTypeReference resourceType = GetResourceType(resourceSetType);
-            
+
         ODataWriter writer = await messageWriter.CreateODataResourceSetWriterAsync(entitySet, resourceType.StructuredDefinition())
             .ConfigureAwait(false);
         await WriteObjectInlineAsync(graph, resourceSetType, writer, writeContext)
@@ -167,7 +167,7 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         Func<object, Uri> nextLinkGenerator = GetNextLinkGenerator(resourceSet, asyncEnumerable, writeContext);
 
         WriteResourceSetInternal(resourceSet, elementType, resourceSetType, writeContext, out bool isUntypedCollection, out IODataEdmTypeSerializer resourceSerializer);
-            
+
         await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
         object lastResource = null;
 
@@ -427,20 +427,7 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
             WriteEntityTypeOperations(resourceSet, resourceSetContext, structuredType, writeContext);
         }
 
-        if (writeContext.ExpandedResource == null)
-        {
-            // If we have more OData format specific information apply it now, only if we are the root feed.
-            PageResult odataResourceSetAnnotations = resourceSetInstance as PageResult;
-            ApplyODataResourceSetAnnotations(resourceSet, odataResourceSetAnnotations, writeContext);
-        }
-        else
-        {
-            ICountOptionCollection countOptionCollection = resourceSetInstance as ICountOptionCollection;
-            if (countOptionCollection != null && countOptionCollection.TotalCount != null)
-            {
-                resourceSet.Count = countOptionCollection.TotalCount;
-            }
-        }
+        WriteResourceSetInformation(resourceSet, resourceSetInstance, writeContext);
 
         return resourceSet;
     }
@@ -472,20 +459,7 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
             WriteEntityTypeOperations(resourceSet, resourceSetContext, structuredType, writeContext);
         }
 
-        if (writeContext.ExpandedResource == null)
-        {
-            // If we have more OData format specific information apply it now, only if we are the root feed.
-            PageResult odataResourceSetAnnotations = resourceSetInstance as PageResult;
-            ApplyODataResourceSetAnnotations(resourceSet, odataResourceSetAnnotations, writeContext);
-        }
-        else
-        {
-            ICountOptionCollection countOptionCollection = resourceSetInstance as ICountOptionCollection;
-            if (countOptionCollection != null && countOptionCollection.TotalCount != null)
-            {
-                resourceSet.Count = countOptionCollection.TotalCount;
-            }
-        }
+        WriteResourceSetInformation(resourceSet, resourceSetInstance, writeContext);
 
         return resourceSet;
     }
@@ -509,6 +483,27 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
             else
             {
                 resourceSet.AddFunction((ODataFunction)odataOperation);
+            }
+        }
+    }
+
+    private void WriteResourceSetInformation(
+        ODataResourceSet resourceSet, 
+        object resourceSetInstance, 
+        ODataSerializerContext writeContext)
+    {
+        if (writeContext.ExpandedResource == null)
+        {
+            // If we have more OData format specific information apply it now, only if we are the root feed.
+            PageResult odataResourceSetAnnotations = resourceSetInstance as PageResult;
+            ApplyODataResourceSetAnnotations(resourceSet, odataResourceSetAnnotations, writeContext);
+        }
+        else
+        {
+            ICountOptionCollection countOptionCollection = resourceSetInstance as ICountOptionCollection;
+            if (countOptionCollection != null && countOptionCollection.TotalCount != null)
+            {
+                resourceSet.Count = countOptionCollection.TotalCount;
             }
         }
     }

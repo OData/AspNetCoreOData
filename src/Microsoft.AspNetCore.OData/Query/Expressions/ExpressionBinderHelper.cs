@@ -102,7 +102,7 @@ internal static class ExpressionBinderHelper
             left = CreateDateBinaryExpression(left, querySettings);
             right = CreateDateBinaryExpression(right, querySettings);
         }
-        else if((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
+        else if ((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
             (IsTimeOfDay(leftUnderlyingType) && IsType<TimeOnly>(rightUnderlyingType)))
         {
             left = CreateTimeBinaryExpression(left, querySettings);
@@ -245,6 +245,22 @@ internal static class ExpressionBinderHelper
         }
 
         return CreateFunctionCallWithNullPropagation(functionCall, arguments, querySettings);
+    }
+
+    //Custom methods might contain nullable parameters and, therefore, also should be able to take arguments of type Nullable<T>
+    public static Expression MakeCustomFunctionCall(MethodInfo method, params Expression[] arguments)
+    {
+        Expression functionCall;
+        if (method.IsStatic)
+        {
+            functionCall = Expression.Call(null, method, arguments);
+        }
+        else
+        {
+            functionCall = Expression.Call(arguments.First(), method, arguments.Skip(1));
+        }
+
+        return functionCall;
     }
 
     public static Expression CreateFunctionCallWithNullPropagation(Expression functionCall, Expression[] arguments, ODataQuerySettings querySettings)
@@ -649,11 +665,11 @@ internal static class ExpressionBinderHelper
         {
             if (settings.EnableConstantParameterization)
             {
-	            return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
+                return LinqParameterContainer.Parameterize(typeof(DateTime), EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo));
             }
             else
             {
-	            return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
+                return Expression.Constant(EdmPrimitiveHelper.ConvertPrimitiveValue(dto.Value, typeof(DateTime), timeZoneInfo), typeof(DateTime));
             }
         }
         return expression;

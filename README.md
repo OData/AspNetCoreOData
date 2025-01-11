@@ -1,15 +1,174 @@
-# ASP.NET Core OData 8.x
+# ASP.NET Core OData
 ---
 
 Component | Build  | Status 
 --------|--------- |---------
-ASP.NET Core OData|Rolling | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-rolling)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1132)
-ASP.NET Core OData|Nightly | [![Build status](https://identitydivision.visualstudio.com/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-nightly)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=1169)
+ASP.NET Core OData|Rolling | [![Build Status](https://identitydivision.visualstudio.com/OData/_apis/build/status%2FAspNetCoreOData%2FAspNetCoreOData-main-rolling-1ES?repoName=OData%2FAspNetCoreOData&branchName=main)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=2403&repoName=OData%2FAspNetCoreOData&branchName=main)
+ASP.NET Core OData|Nightly | [![Build Status](https://identitydivision.visualstudio.com/OData/_apis/build/status%2FAspNetCoreOData%2FAspNetCoreOData-main-nightly-1ES?repoName=OData%2FAspNetCoreOData&branchName=main)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=2404&repoName=OData%2FAspNetCoreOData&branchName=main)
 .NET Foundation|Release|[![Build status](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)
 
-## 1. Introduction
+## 1. Basic Usage
 
-**Be noted**:  Switch to use "main" as default branch. 1/6/2022
+### Microsoft.AspNetCore.OData Package Installation
+Using .NET CLI:
+```bash
+dotnet add package Microsoft.AspNetCore.OData
+```
+
+Using Package Manager:
+```bash
+Install-Package Microsoft.AspNetCore.OData
+```
+
+### Getting Started
+
+#### Creating an OData Service
+
+Here's a simple example of how to create an OData service using `Microsoft.AspNetCore.OData`:
+
+**I. Create an ASP.NET Core Application**:
+- Open Visual Studio and create a new ASP.NET Core Web API project.
+
+**II. Add the `Microsoft.AspNetCore.OData` Package**:
+- Install the package using the instructions above.
+
+**III. Define Your Models**:
+- Create your data models. For example:
+  ```cs
+    namespace MyODataApp.Models
+    {
+        public class Product
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public decimal Price { get; set; }
+        }
+    }
+  ```
+
+**IV. Add an OData Controller**:
+- Create a controller to handle OData requests:
+  ```cs
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.OData.Routing.Controllers;
+    using MyODataApp.Models;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    namespace MyODataApp.Controllers
+    {
+        public class ProductsController : ODataController
+        {
+            private static List<Product> products = new List<Product>
+            {
+                new Product { Id = 1, Name = "Product 1", Price = 10.0M },
+                new Product { Id = 2, Name = "Product 2", Price = 20.0M }
+            };
+
+            [EnableQuery]
+            public IActionResult Get()
+            {
+                return Ok(products);
+            }
+
+            [EnableQuery]
+            public IActionResult Get(int key)
+            {
+                var product = products.FirstOrDefault(p => p.Id == key);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return Ok(product);
+            }
+        }
+    }
+  ```
+
+**V. Configure OData in `Startup.cs`**:
+- Configure OData routes and services:
+
+- If you work with `Program.cs`, update as below. Refer to the [Getting Started Guide](https://learn.microsoft.com/odata/webapi-8/getting-started).
+
+  ```cs
+    // using statements
+    var builder = WebApplication.CreateBuilder(args);
+
+    var modelBuilder = new ODataConventionModelBuilder();
+    modelBuilder.EntityType<Order>();
+    modelBuilder.EntitySet<Customer>("Customers");
+
+    builder.Services.AddControllers().AddOData(
+        options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
+            "odata",
+            GetEdmModel()));
+
+    var app = builder.Build();
+
+    // Send "~/$odata" to debug routing if enable the following middleware
+    // app.UseODataRouteDebug();
+    app.UseRouting();
+
+    app.MapControllers();
+
+    app.Run();
+
+    static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<Product>("Products");
+        return builder.GetEdmModel();
+    }
+  ```
+
+  ```cs
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.OData.Edm;
+    using Microsoft.OData.ModelBuilder;
+
+    namespace MyODataApp
+    {
+        public class Startup
+        {
+            public void ConfigureServices(IServiceCollection services)
+            {
+                services.AddControllers();
+                services.AddOData(opt => opt.AddModel("odata", GetEdmModel()).Filter().Select().Expand().OrderBy().Count().SetMaxTop(100));
+            }
+
+            public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+            {
+                // Send "~/$odata" to debug routing if enable the following middleware
+                // app.UseODataRouteDebug();
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                    endpoints.Select().Expand().Filter().OrderBy().Count().MaxTop(100);
+                    endpoints.MapODataRoute("odata", "odata", GetEdmModel());
+                });
+            }
+
+            private static IEdmModel GetEdmModel()
+            {
+                var builder = new ODataConventionModelBuilder();
+                builder.EntitySet<Product>("Products");
+                return builder.GetEdmModel();
+            }
+        }
+    }
+  ```
+
+**VI. Run Your Application**:
+
+- Start your application and navigate to `/odata/Products` to see your OData service in action.
+
+
+**That's it.**
+
+## 2. Github Repository
 
 This is the official ASP.NET Core OData repository.
 [ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0) is a server side library built upon ODataLib and ASP.NET Core.
@@ -27,6 +186,17 @@ This is the official ASP.NET Core OData repository.
 * [Routing in ASP.NET Core OData 8.0 Preview](https://devblogs.microsoft.com/odata/routing-in-asp-net-core-8-0-preview/)
 
 * [ASP.NET Core OData 8.0 Preview for .NET 5](https://devblogs.microsoft.com/odata/asp-net-odata-8-0-preview-for-net-5/)
+
+
+#### **Documentation**:
+
+For comprehensive documentation, please refer to the following links:
+- [ASP.NET Core OData Overview](https://learn.microsoft.com/odata/webapi-8/overview)
+- [Getting Started](https://learn.microsoft.com/odata/webapi-8/getting-started)
+- [Fundamentals Overview](https://learn.microsoft.com/odata/webapi-8/fundamentals/overview)
+- [Tutorials](https://learn.microsoft.com/odata/webapi-8/tutorials/basic-crud)
+- [OData Dev Blogs](https://devblogs.microsoft.com/odata/)
+- [OData.org](https://www.odata.org/blog/)
 
 **Example**:
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/main/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
@@ -47,41 +217,6 @@ This is the official ASP.NET Core OData repository.
  * [AspNetCoreOData.NewtonsoftJson.sln](AspNetCoreOData.NewtonsoftJson.sln)
  
    - Includes **Microsoft.AspNetCore.OData.NewtonsoftJson** project, Unit Test, E2E Test & Samples
-	
-## 2. Basic Usage
-
-In the ASP.NET Core Web Application project, update your `Startup.cs` as below:
-
-```C#
-public class Startup
-{
-    public void ConfigureServices(IServiceCollection services)
-    {
-        services.AddDbContext<BookStoreContext>(opt => opt.UseInMemoryDatabase("BookLists"));
-        services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", GetEdmModel()));
-    }
-
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-        // Send "~/$odata" to debug routing if enable the following middleware
-        // app.UseODataRouteDebug();
-
-        app.UseRouting();
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
-    }
-
-    private static IEdmModel GetEdmModel()
-    {
-        // …
-    }
-}
-```
-
-That's it. 
-
 
 ## 3. Building, Testing, Debugging and Release
 

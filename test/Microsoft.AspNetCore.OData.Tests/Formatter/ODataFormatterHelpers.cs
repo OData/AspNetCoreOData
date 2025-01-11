@@ -157,7 +157,7 @@ public static class ODataFormatterHelpers
 
         services.AddSingleton<ODataEnumSerializer>();
         services.AddSingleton<ODataPrimitiveSerializer>();
-        //   services.AddSingleton<ODataDeltaResourceSetSerializer>();
+        services.AddSingleton<ODataDeltaResourceSetSerializer>();
         services.AddSingleton<ODataResourceSetSerializer>();
         services.AddSingleton<ODataCollectionSerializer>();
         services.AddSingleton<ODataResourceSerializer>();

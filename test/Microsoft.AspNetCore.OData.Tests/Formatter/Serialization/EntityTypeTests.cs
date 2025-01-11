@@ -55,7 +55,8 @@ public class EntityTypeTests
             "\"BaseSalary\":0," +
             "\"Birthday\":\"2020-09-10T01:02:03Z\"," +
             "\"WorkCompanyId\":0," +
-            "\"HomeAddress\":null" +
+            "\"HomeAddress\":null," +
+            "\"Location\":null" +
             "}", actual);
     }
 

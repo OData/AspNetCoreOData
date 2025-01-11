@@ -9,11 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -23,7 +22,6 @@ using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
@@ -33,7 +31,6 @@ using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Moq;
 using Xunit;
-using ServiceLifetime = Microsoft.OData.ServiceLifetime;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Serialization;
 
@@ -69,6 +66,7 @@ public class ODataResourceSerializerTests
             FirstName = "Foo",
             LastName = "Bar",
             ID = 10,
+            Size = new Size { Weight = 180, Height = 72 }
         };
 
         _orderSet = _model.EntityContainer.FindEntitySet("Orders");
@@ -183,7 +181,10 @@ public class ODataResourceSerializerTests
     {
         // Arrange
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
-        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(new ODataPrimitiveSerializer());
+        serializerProvider.Setup(
+            s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(
+            s => s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         ODataWriter writer = new Mock<ODataWriter>().Object;
 
@@ -223,6 +224,11 @@ public class ODataResourceSerializerTests
         // Arrange
         ODataResource entry = new ODataResource();
         Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s =>
+            s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(s =>
+            s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
+
         Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
         Mock<ODataWriter> writer = new Mock<ODataWriter>();
 
@@ -691,6 +697,63 @@ public class ODataResourceSerializerTests
 
         // Assert
         writer.Verify();
+    }
+
+    [Fact]
+    public async Task WriteObjectInlineAsync_Calls_CreateDeletedResource()
+    {
+        // Arrange
+        DeltaDeletedResource<Customer> customer = new DeltaDeletedResource<Customer>();
+        customer.Id = new Uri("http://customers/10");
+
+        SelectExpandNode selectExpandNode = new SelectExpandNode();
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmStructuredTypeReference>())).Returns(new ODataResourceSerializer(serializerProvider.Object));
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmPrimitiveTypeReference>())).Returns(new ODataPrimitiveSerializer());
+        Mock<ODataResourceSerializer> serializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+        ODataWriter writer = new Mock<ODataWriter>().Object;
+
+        serializer.Setup(s => s.CreateSelectExpandNode(It.IsAny<ResourceContext>())).Returns(selectExpandNode);
+        serializer.Setup(s => s.CreateDeletedResource(It.IsAny<Uri>(), DeltaDeletedEntryReason.Deleted, selectExpandNode, It.Is<ResourceContext>(e => Verify(e, customer, _writeContext)))).Verifiable();
+        serializer.CallBase = true;
+
+        // Act
+        await serializer.Object.WriteObjectInlineAsync(customer, _customerType, writer, _writeContext);
+
+        // Assert
+        serializer.Verify();
+    }
+
+    [Fact]
+    [Obsolete]
+    public async Task WriteDeletedResource_Calls_WriteDeltaDeletedResourceAsyncIfOverridden()
+    {
+        // Arrange
+        DeltaDeletedResource<Order> order = new DeltaDeletedResource<Order> { Id = new Uri("http://customers/1") };
+        DeltaSet<Order> orders = new DeltaSet<Order> { order };
+
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        var serializer = new Mock<MyDeltaResourceSetSerializer>(serializerProvider.Object);
+        serializer.Setup(s => s.WriteDeltaDeletedResourceAsync(orders.First(), It.IsAny<ODataWriter>(), It.IsAny<ODataSerializerContext>()))
+            .Verifiable();
+        serializer.CallBase = true;
+
+        // Act
+        await serializer.Object.WriteObjectAsync(orders, typeof(DeltaSet<Order>), ODataTestUtil.GetMockODataMessageWriter(ODataVersion.V401), _writeContext);
+
+        // Assert
+        serializer.Verify();
+    }
+
+    public class MyDeltaResourceSetSerializer : ODataDeltaResourceSetSerializer
+    {
+        public MyDeltaResourceSetSerializer(IODataSerializerProvider serializerProvider) : base(serializerProvider) { }
+
+        [Obsolete]
+        public override async Task WriteDeltaDeletedResourceAsync(object value, ODataWriter writer, ODataSerializerContext writeContext)
+        {
+            await base.WriteDeltaDeletedResourceAsync(value, writer, writeContext).ConfigureAwait(false);
+        }
     }
 
     [Fact]
@@ -2565,6 +2628,7 @@ public class ODataResourceSerializerTests
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string City { get; set; }
+        public Size Size { get; set; }
         public IList<Order> Orders { get; private set; }
     }
 
@@ -2579,6 +2643,12 @@ public class ODataResourceSerializerTests
         public string Name { get; set; }
         public string Shipment { get; set; }
         public Customer Customer { get; set; }
+    }
+
+    private class Size
+    {
+        public Decimal Height { get; set; }
+        public Decimal Weight { get; set; }
     }
 
     private class Result
