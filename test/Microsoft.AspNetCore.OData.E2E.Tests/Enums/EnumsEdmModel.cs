@@ -21,6 +21,7 @@ internal class EnumsEdmModel
         employee.CollectionProperty<Skill>(c => c.SkillSet);
         employee.EnumProperty<Gender>(c => c.Gender);
         employee.EnumProperty<AccessLevel>(c => c.AccessLevel);
+        employee.EnumProperty<EmployeeType>(c => c.EmployeeType);
         employee.ComplexProperty<FavoriteSports>(c => c.FavoriteSports);
 
         var skill = builder.EnumType<Skill>();
@@ -36,6 +37,12 @@ internal class EnumsEdmModel
         accessLevel.Member(AccessLevel.Execute);
         accessLevel.Member(AccessLevel.Read);
         accessLevel.Member(AccessLevel.Write);
+
+        var employeeType = builder.EnumType<EmployeeType>();
+        employeeType.Member(EmployeeType.FullTime);
+        employeeType.Member(EmployeeType.PartTime);
+        employeeType.Member(EmployeeType.Contract);
+        employeeType.Member(EmployeeType.Intern);
 
         var favoriteSports = builder.ComplexType<FavoriteSports>();
         favoriteSports.EnumProperty<Sport>(f => f.LikeMost);

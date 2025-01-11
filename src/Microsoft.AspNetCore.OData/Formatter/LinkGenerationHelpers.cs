@@ -37,9 +37,14 @@ public static class LinkGenerationHelpers
             throw Error.ArgumentNull(nameof(resourceContext));
         }
 
+        if (resourceContext.Request == null)
+        {
+            return null;
+        }
+
         IList<ODataPathSegment> idLinkPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
-        bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource.EntityType;
+        bool isSameType = resourceContext.StructuredType == resourceContext.NavigationSource?.EntityType;
         if (includeCast && !isSameType)
         {
             idLinkPathSegments.Add(new TypeSegment(resourceContext.StructuredType, navigationSource: null));
@@ -257,7 +262,7 @@ public static class LinkGenerationHelpers
         IList<ODataPathSegment> actionPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
         // generate link with cast if the navigation source doesn't match the entity type the action is bound to.
-        if (resourceContext.NavigationSource.EntityType != bindingParameterType.Definition)
+        if (resourceContext.NavigationSource?.EntityType != bindingParameterType.Definition)
         {
             actionPathSegments.Add(new TypeSegment((IEdmEntityType)bindingParameterType.Definition, null));
             // entity set can be null
@@ -305,7 +310,7 @@ public static class LinkGenerationHelpers
         IList<ODataPathSegment> functionPathSegments = resourceContext.GenerateBaseODataPathSegments();
 
         // generate link with cast if the navigation source type doesn't match the entity type the function is bound to.
-        if (resourceContext.NavigationSource.EntityType != bindingParameterType.Definition)
+        if (resourceContext.NavigationSource?.EntityType != bindingParameterType.Definition)
         {
             functionPathSegments.Add(new TypeSegment(bindingParameterType.Definition, null));
         }

@@ -628,15 +628,6 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The related entity set could not be found from the OData path. The related entity set is required to serialize the payload..
-        /// </summary>
-        internal static string EntitySetMissingDuringSerialization {
-            get {
-                return ResourceManager.GetString("EntitySetMissingDuringSerialization", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The entity type &apos;{0}&apos; does not match the expected entity type &apos;{1}&apos; as set on the query context..
         /// </summary>
         internal static string EntityTypeMismatch {
@@ -975,6 +966,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string MissingNonODataContainer {
             get {
                 return ResourceManager.GetString("MissingNonODataContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing non-standard type support for &apos;{0}&apos;..
+        /// </summary>
+        internal static string MissingNonStandardTypeSupportFor {
+            get {
+                return ResourceManager.GetString("MissingNonStandardTypeSupportFor", resourceCulture);
             }
         }
         
@@ -1794,6 +1794,15 @@ namespace Microsoft.AspNetCore.OData {
         internal static string TypeMustBeEnumOrNullableEnum {
             get {
                 return ResourceManager.GetString("TypeMustBeEnumOrNullableEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; must be an open type. The dynamic properties container property is only expected on open types..
+        /// </summary>
+        internal static string TypeMustBeOpenType {
+            get {
+                return ResourceManager.GetString("TypeMustBeOpenType", resourceCulture);
             }
         }
         

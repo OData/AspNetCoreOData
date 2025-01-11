@@ -136,6 +136,69 @@ public class DefaultContainerBuilderTests
         Assert.NotEqual(o11, o21);
     }
 
+    [Fact]
+    public void MessageReaderIsScoped()
+    {
+        // Arrange
+        IServiceCollection services = new ServiceCollection();
+        services.AddDefaultWebApiServices();
+        IServiceProvider container = services.BuildServiceProvider();
+
+        // Act
+        IServiceProvider scopedContainer1 = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageReaderSettings reader11 = scopedContainer1.GetService<ODataMessageReaderSettings>();
+        ODataMessageReaderSettings reader12 = scopedContainer1.GetService<ODataMessageReaderSettings>();
+
+        // Assert
+        Assert.NotNull(reader11);
+        Assert.NotNull(reader12);
+        Assert.Equal(reader11, reader12);
+
+        IServiceProvider scopedContainer2 = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageReaderSettings reader21 = scopedContainer2.GetService<ODataMessageReaderSettings>();
+        ODataMessageReaderSettings reader22 = scopedContainer2.GetService<ODataMessageReaderSettings>();
+
+        Assert.NotNull(reader21);
+        Assert.NotNull(reader22);
+        Assert.Equal(reader21, reader22);
+
+        Assert.NotEqual(reader11, reader21);
+    }
+
+
+    [Fact]
+    public void MessageWriterIsScoped()
+    {
+        // Arrange
+        IServiceCollection services = new ServiceCollection();
+        services.AddDefaultWebApiServices();
+        IServiceProvider container = services.BuildServiceProvider();
+
+        // Act
+        IServiceProvider scopedContainer1 = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageWriterSettings writer11 = scopedContainer1.GetService<ODataMessageWriterSettings>();
+        ODataMessageWriterSettings writer12 = scopedContainer1.GetService<ODataMessageWriterSettings>();
+
+        // Assert
+        Assert.NotNull(writer11);
+        Assert.NotNull(writer12);
+        Assert.Equal(writer11, writer12);
+
+        IServiceProvider scopedContainer2 = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageWriterSettings writer21 = scopedContainer2.GetService<ODataMessageWriterSettings>();
+        ODataMessageWriterSettings writer22 = scopedContainer2.GetService<ODataMessageWriterSettings>();
+
+        Assert.NotNull(writer21);
+        Assert.NotNull(writer22);
+        Assert.Equal(writer21, writer22);
+
+        Assert.NotEqual(writer11, writer21);
+    }
+
     private interface ITestService { }
 
     private class TestService : ITestService { }

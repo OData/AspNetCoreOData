@@ -232,6 +232,126 @@ public class DateOnlyAndTimeOnlyWithEfTest : WebApiTestBase<DateOnlyAndTimeOnlyW
         Assert.Equal(expect, string.Join(",", result["value"].Select(e => e["Id"].ToString())));
     }
 
+    [Theory]
+    [InlineData("?$apply=groupby((Birthday))", 5)]
+    [InlineData("?$apply=groupby((PublishDay))", 4)]
+    [InlineData("?$apply=groupby((CreatedTime))", 5)]
+    [InlineData("?$apply=groupby((EndTime))", 4)]
+    [InlineData("?$apply=groupby((EndDay))", 5)]
+    public async Task CanGroupBy_OnDateOnlyAndTimeOnlyProperties(string applyGroupBy, int expectCount)
+    {
+        // Arrange
+        string Uri = "odata/DateOnlyTimeOnlyModels" + applyGroupBy;
+        var request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+        var result = await response.Content.ReadAsObject<JArray>();
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(expectCount, result.Count());
+    }
+
+    [Fact]
+    public async Task CanSearch_OnDateOnlyAndTimeOnlyProperties()
+    {
+        // Arrange
+        string Uri = "odata/DateOnlyTimeOnlyModels(3)?$search=(2013-04-08 AND 00:03:03.0050000)";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var stringResponse = await response.Content.ReadAsStringAsync();
+        var result = JObject.Parse(stringResponse);
+
+        Assert.Equal("2013-04-08", result["Birthday"]);
+        Assert.Equal("2018-09-18", result["PublishDay"]);
+        Assert.Equal("00:03:03.0050000", result["CreatedTime"]);
+        Assert.Equal("03:13:06.0080000", result["ResumeTime"]);
+    }
+
+    public static TheoryDataSet<string, string> CanCompute_OnDateOnlyAndTimeOnlyProperties_Input
+    {
+        get
+        {
+            return new TheoryDataSet<string, string>
+            {
+                {
+                    "$compute=year(Birthday) as BirthYear&$select=BirthYear",
+                    "{\"@odata.context\":\"http://localhost/odata/$metadata#DateOnlyTimeOnlyModels(BirthYear)/$entity\",\"BirthYear\":2013}"
+                },
+                {
+                    "$compute=hour(ResumeTime) as ResumeHour&$select=ResumeHour",
+                    "{\"@odata.context\":\"http://localhost/odata/$metadata#DateOnlyTimeOnlyModels(ResumeHour)/$entity\",\"ResumeHour\":3}"
+                }
+            };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CanCompute_OnDateOnlyAndTimeOnlyProperties_Input))]
+    public async Task CanCompute_OnDateOnlyAndTimeOnlyProperties(string query,string expectedResponse)
+    {
+        // Arrange
+        string Uri = $"odata/DateOnlyTimeOnlyModels(3)?{query}";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var stringResponse = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(expectedResponse, stringResponse);
+    }
+
+    public static TheoryDataSet<string, string> CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties_Input
+    {
+        get
+        {
+            return new TheoryDataSet<string, string>
+            {
+                {
+                    "?$apply=groupby((PublishDay),aggregate(Id with max as MaxId))&$orderby=PublishDay",
+                    "[{\"PublishDay\":null,\"MaxId\":4},{\"PublishDay\":\"2016-11-16\",\"MaxId\":1},{\"PublishDay\":\"2018-09-18\",\"MaxId\":3},{\"PublishDay\":\"2020-07-20\",\"MaxId\":5}]"
+                },
+                {
+                    "?$apply=groupby((EndTime),aggregate(Birthday with min as MinBirthday))",
+                    "[{\"EndTime\":\"01:11:04.0060000\",\"MinBirthday\":\"2011-02-06\"},{\"EndTime\":null,\"MinBirthday\":\"2012-03-07\"},{\"EndTime\":\"03:13:06.0080000\",\"MinBirthday\":\"2013-04-08\"},{\"EndTime\":\"05:15:08.0100000\",\"MinBirthday\":\"2015-06-10\"}]"
+                }
+            };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties_Input))]
+    public async Task CanGroupByWithAggregate_OnDateOnlyAndTimeOnlyProperties(string applyGroupBy, string expectedResult)
+    {
+        // Arrange
+        string Uri = "odata/DateOnlyTimeOnlyModels" + applyGroupBy;
+        var request = new HttpRequestMessage(HttpMethod.Get, Uri);
+
+        HttpClient client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+        var result = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+        Assert.Equal(expectedResult, result.ToString());
+    }
+
     [Fact]
     public async Task PostEntity_WithDateOnlyAndTimeOnlyProperties()
     {

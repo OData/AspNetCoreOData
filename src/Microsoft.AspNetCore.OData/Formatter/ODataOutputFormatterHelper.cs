@@ -89,8 +89,14 @@ internal static class ODataOutputFormatterHelper
         writerSettings.BaseUri = baseAddress;
 
         //use v401 to write delta payloads. 
-        if (serializer.ODataPayloadKind == ODataPayloadKind.Delta)
+        if (serializer.ODataPayloadKind == ODataPayloadKind.Delta && version < ODataVersion.V401)
         {
+            // Preserve setting of OmitODataPrefix
+            if (writerSettings.Version.GetValueOrDefault() == ODataVersion.V4)
+            {
+                writerSettings.SetOmitODataPrefix(writerSettings.GetOmitODataPrefix(ODataVersion.V4), ODataVersion.V401);
+            }
+
             writerSettings.Version = ODataVersion.V401;
         }
         else
@@ -141,7 +147,7 @@ internal static class ODataOutputFormatterHelper
             metadataLevel = ODataMediaTypes.GetMetadataLevel(contentType.MediaType.ToString(), parameters);
         }
 
-        using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
+        await using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
         {
             ODataSerializerContext writeContext = BuildSerializerContext(request);
             writeContext.NavigationSource = targetNavigationSource;

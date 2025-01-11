@@ -700,7 +700,7 @@ public abstract class ExpressionBinderBase
         MethodInfo methodInfo;
         if (UriFunctionsBinder.TryGetMethodInfo(node.Name, methodArgumentsType, out methodInfo))
         {
-            return ExpressionBinderHelper.MakeFunctionCall(methodInfo, QuerySettings, arguments);
+            return ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
         }
 
         return null;
@@ -1078,6 +1078,10 @@ public abstract class ExpressionBinderBase
             if (TypeHelper.IsEnum(sourceType))
             {
                 // we handle enum conversions ourselves
+                convertedExpression = source;
+            }
+            else if (TypeHelper.IsDateOnly(sourceType) || TypeHelper.IsTimeOnly(sourceType))
+            {
                 convertedExpression = source;
             }
             else
