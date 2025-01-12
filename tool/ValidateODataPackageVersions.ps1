@@ -1,4 +1,3 @@
-
 <#
 .SYNOPSIS
 Validates the package versions in the .csproj file against the lower bound of the ODataLibPackageDependency version range in the builder.versions.settings.targets.
@@ -90,7 +89,9 @@ foreach($key in $odataPackageDependenciesDict.Keys) {
     # Validate the versions
     foreach ($version in $packageVersions) {
         if ($version -ne $lowerBoundVersion) {
-            throw "Error.ODataPackageVersionsMismatch: '$key' Package version '$version' in '$CSPROJ_FILENAME' do not match the lower bound '$lowerBoundVersion' of the '$key' in '$BUILDER_VERSION_TARGETS_FILENAME'."
+            $exception = New-Object System.Exception(
+                "Error: '$key' Package version '$version' in '$csprojPath' do not match the lower bound '$lowerBoundVersion' of the '$key' in '$builderVersionTargetsPath'.")
+            throw $exception
         }
     }
 
