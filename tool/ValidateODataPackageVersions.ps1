@@ -23,14 +23,12 @@ $BUILDER_VERSION_TARGETS_FILENAME = "builder.versions.settings.targets"
 $CSPROJ_FILENAME = "Microsoft.AspNetCore.OData.csproj"
 
 # Path to your builder.versions.settings.targets file
-if ($builderVersionTargetsPath -eq "")
-{
+if ($builderVersionTargetsPath -eq "") {
     $builderVersionTargetsPath = "$PSScriptRoot\$BUILDER_VERSION_TARGETS_FILENAME"
 }
 
 # Path to your .csproj file
-if ($csprojPath -eq "")
-{
+if ($csprojPath -eq "") {
     $csprojPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath "src/Microsoft.AspNetCore.OData/$CSPROJ_FILENAME"
 }
 
@@ -79,7 +77,7 @@ $csprojPackageReferencesDict = @{
 }
 
 
-foreach($key in $odataPackageDependenciesDict.Keys) {
+foreach ($key in $odataPackageDependenciesDict.Keys) {
     $lowerBoundVersion = $odataPackageDependenciesDict[$key]
     $packageReferences = $PackageReference | Where-Object { $_.Include -match $csprojPackageReferencesDict[$key] }
     $packageVersions = $packageReferences.Version
@@ -90,7 +88,7 @@ foreach($key in $odataPackageDependenciesDict.Keys) {
     foreach ($version in $packageVersions) {
         if ($version -ne $lowerBoundVersion) {
             $exception = New-Object System.Exception(
-                "Error: '$key' Package version '$version' in '$csprojPath' do not match the lower bound '$lowerBoundVersion' of the '$key' in '$builderVersionTargetsPath'.")
+                "Error.VersionMismatch: '$key' version '$version' in '$csprojPath' do not match the lower bound '$lowerBoundVersion' of '$key' in '$builderVersionTargetsPath'.")
             throw $exception
         }
     }
