@@ -58,7 +58,7 @@ public class LocationHeaderTests : WebApiTestBase<LocationHeaderTests>
 
         string locationHeader = response.Headers.GetValues("Location").Single();
 
-        Assert.Equal("http://localhost/location/Customers('abc%2F$+%2F-8')", locationHeader);
+        Assert.Equal("http://localhost/location/Customers('abc%2F%24%2B%2F-8')", locationHeader);
     }
 
     [Fact]
