@@ -24,7 +24,8 @@ internal class SerializationTestsHelpers
         model.AddElement(sizeType);
 
         var customerType = new EdmEntityType("Default", "Customer");
-        customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32);
+        var idProperty = customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32);
+        customerType.AddKeys(idProperty);
         customerType.AddStructuralProperty("FirstName", EdmPrimitiveTypeKind.String);
         customerType.AddStructuralProperty("LastName", EdmPrimitiveTypeKind.String);
         customerType.AddStructuralProperty("Size", new EdmComplexTypeReference(sizeType,true));

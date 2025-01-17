@@ -102,7 +102,14 @@ public static class NoContainmentPagingDataSource
             Orders = orders.Skip((idx - 1) * TargetSize).Take(TargetSize).ToList()
         }));
 
+    private static readonly List<UntypedPagingCustomerOrder> untypedCustomerOrders = new List<UntypedPagingCustomerOrder>(
+        Enumerable.Range(1, TargetSize).Select(idx => new UntypedPagingCustomerOrder
+        {
+            Id = idx
+        }));
+
     public static List<NoContainmentPagingCustomer> Customers => customers;
+    public static List<UntypedPagingCustomerOrder> UntypedCustomerOrders => untypedCustomerOrders;
 
     public static List<NoContainmentPagingOrder> Orders => orders;
 }
