@@ -1634,7 +1634,6 @@ public class ApplyQueryOptionTest
         var model = new ODataModelBuilder()
                         .Add_Products_EntityType()
                         .Add_DerivedProducts_EntityType()
-                        .Add_DerivedProducts_EntityType()
                         .Add_Categories_EntityType()
                         .Add_DerivedCategories_EntityType()
                         .Add_Products_EntitySet()
