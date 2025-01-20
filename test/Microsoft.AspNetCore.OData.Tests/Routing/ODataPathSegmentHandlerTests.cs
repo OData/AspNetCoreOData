@@ -402,14 +402,60 @@ public class ODataPathSegmentHandlerTests
         IEnumerable<KeyValuePair<string, object>> keys = new KeyValuePair<string, object>[]
         {
             KeyValuePair.Create("Id", (object)4),
-            KeyValuePair.Create("Name", (object)"2425/&Foo")
+            KeyValuePair.Create("Name", (object)"'24 25/&Foo,?\"")
         };
 
         // Act
         string actual = ODataPathSegmentHandler.ConvertKeysToString(keys, entityType);
 
         // Assert
-        Assert.Equal("Id=4,Name='2425%2F&Foo'", actual);
+        Assert.Equal("Id=4,Name='%27%2724%2025%2F%26Foo%2C%3F%22'", actual);
+    }
+
+    [Fact]
+    public void ConvertKeysToString_ConvertKeysValues_ProducesSameEncodingAsODL()
+    {
+        // Arrange
+        EdmEntityType entityType = new EdmEntityType("NS", "Entity");
+        IEdmStructuralProperty key1 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(false));
+        IEdmStructuralProperty key2 = entityType.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(false));
+
+        entityType.AddKeys(key1, key2);
+        IEnumerable<KeyValuePair<string, object>> keys = new KeyValuePair<string, object>[]
+        {
+            KeyValuePair.Create("Id", (object)4),
+            KeyValuePair.Create("Name", (object)"'24 25/&Foo,?\"")
+        };
+
+        // Act
+        string actual = '(' + ODataPathSegmentHandler.ConvertKeysToString(keys, entityType) + ')';
+
+        ODataPath path = new ODataPath(new KeySegment(keys, entityType, null));
+
+        // Assert
+        Assert.Equal(path.ToResourcePathString(ODataUrlKeyDelimiter.Parentheses), actual);
+    }
+
+    [Fact]
+    public void ConvertKeysToString_ConvertKeysValues_ShouldNotQuoteNull()
+    {
+        // Arrange
+        EdmEntityType entityType = new EdmEntityType("NS", "Entity");
+        IEdmStructuralProperty key1 = entityType.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(false));
+        IEdmStructuralProperty key2 = entityType.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(true));
+
+        entityType.AddKeys(key1, key2);
+        IEnumerable<KeyValuePair<string, object>> keys = new KeyValuePair<string, object>[]
+        {
+            KeyValuePair.Create("Id", (object)4),
+            KeyValuePair.Create("Name", (object)null)
+        };
+
+        // Act
+        string actual = ODataPathSegmentHandler.ConvertKeysToString(keys, entityType);
+
+        // Assert
+        Assert.Equal("Id=4,Name=null", actual);
     }
 
     [Fact]
