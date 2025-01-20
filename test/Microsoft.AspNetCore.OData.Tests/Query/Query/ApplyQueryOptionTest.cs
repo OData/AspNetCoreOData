@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -1534,6 +1535,61 @@ public class ApplyQueryOptionTest
     //    Assert.Equal("redmond", address0["City"].ToString());
     //}
 
+    [Fact]
+    public void SortOnNestedDynamicPropertyWorks()
+    {
+        // Arrange
+        var modelBuilder = new ODataModelBuilder();
+        var addressType = modelBuilder.ComplexType<Address>();
+        addressType.HasDynamicProperties(a => a.DynamicProperties);
+        var customerType = modelBuilder.EntityType<Customer>();
+        customerType.ComplexProperty(c => c.Address);
+        var model = modelBuilder.GetEdmModel();
+        var context = new ODataQueryContext(model, typeof(Customer));
+        var request = RequestFactory.Create("Get", "http://localhost/?$apply=groupby((Address/DynamicCity))&$orderby=Address/DynamicCity");
+        var options = new ODataQueryOptions(context, request);
+        Customer[] customers =
+        {
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 2" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 2" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
+                }
+            };
+        // Act
+        IQueryable queryable = options.ApplyTo(customers.AsQueryable());
+        // Assert
+        Dictionary<string, object>[] expectedGroups =
+        {
+                new Dictionary<string, object> { { "Address/DynamicCity", "City 1" } },
+                new Dictionary<string, object> { { "Address/DynamicCity", "City 2" } }
+            };
+        var actualGroups = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();
+        Assert.Equal(expectedGroups.Length, actualGroups.Count);
+        var aggEnum = actualGroups.GetEnumerator();
+        foreach (var expected in expectedGroups)
+        {
+            aggEnum.MoveNext();
+            var agg = aggEnum.Current;
+            foreach (var key in expected.Keys)
+            {
+                object value = GetValue(agg, key);
+                Assert.Equal(expected[key], value);
+            }
+        }
+    }
+
     public static List<Product> ProductApplyForTypeCastTestData
     {
         get
@@ -1594,32 +1650,40 @@ public class ApplyQueryOptionTest
                         "groupby((Microsoft.AspNetCore.OData.Tests.Models.Product/ProductName))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{"ProductName", "Product 1"}},
-                            new Dictionary<string, object> {{"ProductName", "Product 2"}}
+                            new Dictionary<string, object> { {"ProductName", "Product 1"} },
+                            new Dictionary<string, object> { {"ProductName", "Product 2"} }
                         }
                     },
                     {
                         "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/DerivedProductName))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{ "DerivedProductName", "Product A"}},
-                            new Dictionary<string, object> {{ "DerivedProductName", "Product B"}}
+                            new Dictionary<string, object> { { "DerivedProductName", "Product A"} },
+                            new Dictionary<string, object> { { "DerivedProductName", "Product B"} }
                         }
                     },
                     {
                         "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/CategoryName))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{ "Category/CategoryName", "Category 1" } },
-                            new Dictionary<string, object> {{ "Category/CategoryName", "Category 2" } }
+                            new Dictionary<string, object> { { "Category/CategoryName", "Category 1" } },
+                            new Dictionary<string, object> { { "Category/CategoryName", "Category 2" } }
+                        }
+                    },
+                    {
+                        "groupby((Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category A" } },
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category B" } }
                         }
                     },
                     {
                         "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))",
                         new List<Dictionary<string, object>>
                         {
-                            new Dictionary<string, object> {{ "Category/DerivedCategoryName", "Category A"}},
-                            new Dictionary<string, object> {{ "Category/DerivedCategoryName", "Category B" } }
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category A" } },
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category B" } }
                         }
                     }
                 };
