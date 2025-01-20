@@ -560,9 +560,9 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         {
             // nested resourceSet
             ITruncatedCollection truncatedCollection = resourceSetInstance as ITruncatedCollection;
-            if (truncatedCollection != null && truncatedCollection.IsTruncated)
+            if (truncatedCollection != null)
             {
-                return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj); };
+                return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection, obj); };
             }
         }
 
@@ -599,9 +599,9 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         {
             // nested resourceSet
             ITruncatedCollection truncatedCollection = resourceSetInstance as ITruncatedCollection;
-            if (truncatedCollection != null && truncatedCollection.IsTruncated)
+            if (truncatedCollection != null)
             {
-                return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection.PageSize, obj); };
+                return (obj) => { return GetNestedNextPageLink(writeContext, truncatedCollection, obj); };
             }
         }
 
@@ -695,32 +695,35 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         }
     }
 
-    private static Uri GetNestedNextPageLink(ODataSerializerContext writeContext, int pageSize, object obj)
+    private static Uri GetNestedNextPageLink(ODataSerializerContext writeContext, ITruncatedCollection truncatedCollection, object obj)
     {
-        Contract.Assert(writeContext.ExpandedResource != null);
-        IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedResource.NavigationSource;
-        NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
-
-        Uri navigationLink = linkBuilder.BuildNavigationLink(
-            writeContext.ExpandedResource,
-            writeContext.NavigationProperty);
-
-        Uri nestedNextLink = GenerateQueryFromExpandedItem(writeContext, navigationLink);
-
-        SkipTokenHandler nextLinkGenerator = null;
-        if (writeContext.QueryContext != null)
+        if (truncatedCollection.IsTruncated)
         {
-            nextLinkGenerator = writeContext.QueryContext.GetSkipTokenHandler();
-        }
+            Contract.Assert(writeContext.ExpandedResource != null);
+            IEdmNavigationSource sourceNavigationSource = writeContext.ExpandedResource.NavigationSource;
+            NavigationSourceLinkBuilderAnnotation linkBuilder = writeContext.Model.GetNavigationSourceLinkBuilder(sourceNavigationSource);
 
-        if (nestedNextLink != null)
-        {
-            if (nextLinkGenerator != null)
+            Uri navigationLink = linkBuilder.BuildNavigationLink(
+                writeContext.ExpandedResource,
+                writeContext.NavigationProperty);
+
+            Uri nestedNextLink = GenerateQueryFromExpandedItem(writeContext, navigationLink);
+
+            SkipTokenHandler nextLinkGenerator = null;
+            if (writeContext.QueryContext != null)
             {
-                return nextLinkGenerator.GenerateNextPageLink(nestedNextLink, pageSize, obj, writeContext);
+                nextLinkGenerator = writeContext.QueryContext.GetSkipTokenHandler();
             }
 
-            return GetNextPageHelper.GetNextPageLink(nestedNextLink, pageSize);
+            if (nestedNextLink != null)
+            {
+                if (nextLinkGenerator != null)
+                {
+                    return nextLinkGenerator.GenerateNextPageLink(nestedNextLink, truncatedCollection.PageSize, obj, writeContext);
+                }
+
+                return GetNextPageHelper.GetNextPageLink(nestedNextLink, truncatedCollection.PageSize);
+            }
         }
 
         return null;
