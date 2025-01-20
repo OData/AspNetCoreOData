@@ -1540,14 +1540,21 @@ public class ApplyQueryOptionTest
     {
         // Arrange
         var modelBuilder = new ODataModelBuilder();
+
         var addressType = modelBuilder.ComplexType<Address>();
         addressType.HasDynamicProperties(a => a.DynamicProperties);
+
         var customerType = modelBuilder.EntityType<Customer>();
         customerType.ComplexProperty(c => c.Address);
+
         var model = modelBuilder.GetEdmModel();
+
         var context = new ODataQueryContext(model, typeof(Customer));
+
         var request = RequestFactory.Create("Get", "http://localhost/?$apply=groupby((Address/DynamicCity))&$orderby=Address/DynamicCity");
+
         var options = new ODataQueryOptions(context, request);
+
         Customer[] customers =
         {
                 new Customer
@@ -1567,8 +1574,10 @@ public class ApplyQueryOptionTest
                     Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
                 }
             };
+
         // Act
         IQueryable queryable = options.ApplyTo(customers.AsQueryable());
+
         // Assert
         Dictionary<string, object>[] expectedGroups =
         {
@@ -1577,6 +1586,7 @@ public class ApplyQueryOptionTest
             };
         var actualGroups = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();
         Assert.Equal(expectedGroups.Length, actualGroups.Count);
+
         var aggEnum = actualGroups.GetEnumerator();
         foreach (var expected in expectedGroups)
         {
