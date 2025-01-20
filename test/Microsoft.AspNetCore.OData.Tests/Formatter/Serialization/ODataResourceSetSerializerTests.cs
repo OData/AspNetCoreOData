@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
@@ -750,6 +751,59 @@ public class ODataResourceSetSerializerTests
 
         // Assert
         Assert.Null(resourceSet.Count);
+    }
+
+    private class InnerCollection : IEnumerable, ICountOptionCollection
+    {
+        public long? TotalCount => 4;
+
+        Enumerator enumerator = new();
+        public IEnumerator GetEnumerator()
+        {
+            return enumerator;
+        }
+
+        private class Enumerator : IEnumerator
+        {
+            private object current = new();
+            private int position = 0;
+            public object Current => current;
+
+            public bool MoveNext()
+            {
+                position++;
+                return position <= 2;
+            }
+
+            public void Reset()
+            {
+                position = 0;
+            }
+        }
+    }
+
+    [Fact]
+    public void CreateResourceSet_CountValue_ForInnerResourceSets_ICountOptionCollection()
+    {
+        // Arrange
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+        var request = RequestFactory.Create();
+        InnerCollection result = new();
+        IEdmNavigationProperty navProp = _customerSet.EntityType.NavigationProperties().First();
+        SelectExpandClause selectExpandClause = new SelectExpandClause(new SelectItem[0], allSelected: true);
+        ResourceContext entity = new ResourceContext
+        {
+            SerializerContext =
+                new ODataSerializerContext { Request = request, NavigationSource = _customerSet, Model = _model }
+        };
+        ODataSerializerContext nestedContext = new ODataSerializerContext(entity, selectExpandClause, navProp);
+
+        // Act
+        ODataResourceSet resourceSet = serializer.CreateResourceSet(result, _customersType, nestedContext);
+
+        // Assert
+        Assert.Equal(4, resourceSet.Count);
     }
 
     [Fact]
