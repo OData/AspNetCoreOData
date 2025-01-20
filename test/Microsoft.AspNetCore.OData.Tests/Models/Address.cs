@@ -4,6 +4,7 @@
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.OData.Tests.Models;
 
@@ -22,4 +23,6 @@ public class Address
     public ZipCode ZipCode { get; set; }
 
     public string IgnoreThis { get; set; }
+
+    public Dictionary<string, object> DynamicProperties { get; set; }
 }
