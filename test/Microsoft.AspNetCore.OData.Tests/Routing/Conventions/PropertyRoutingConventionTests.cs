@@ -220,6 +220,25 @@ public class PropertyRoutingConventionTests
     }
 
     [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public void PropertyRoutingConventionOnSingletonWithoutKeyDefinedOnEntityTypeAsExpectedBasedOnConfiguration(int paramerterCount)
+    {
+        // Arrange
+        ControllerModel controller = ControllerModelHelpers.BuildControllerModelWithAllActions<MainSupplierController>();
+        ActionModel action = controller.Actions.First(a => a.ActionName == "GetName" && a.Parameters.Count == paramerterCount);
+
+        ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+        context.Action = action;
+
+        // Act
+        bool returnValue = PropertyConvention.AppliesToAction(context);
+        Assert.True(returnValue);
+
+        Assert.Equal(["/MainSupplier/Name", "/MainSupplier/Name/$value"], action.Selectors.Select(s => s.AttributeRouteModel.Template));
+    }
+
+    [Theory]
     [InlineData("PostToName")]
     [InlineData("Get")]
     [InlineData("PostToSubAddressOfUsAddressFromVipCustomer")]
@@ -294,6 +313,13 @@ public class PropertyRoutingConventionTests
         container.AddEntitySet("AnotherCustomers", customer);
         container.AddSingleton("Me", customer);
         model.AddElement(container);
+
+        // Let's build a singleton using an entity type without a key.
+        // So 'Supplier' doesn't contain a key by design.
+        EdmEntityType supplier = new EdmEntityType("NS", "Supplier");
+        supplier.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+        model.AddElement(supplier);
+        container.AddSingleton("MainSupplier", supplier);
         return model;
     }
 
@@ -371,6 +397,18 @@ public class PropertyRoutingConventionTests
         // Post ~/Me/NS.VipCustomer/SubAddress/CN.UsAddress
         public void PostToSubLocationsOfUsAddressFromVipCustomer()
         { }
+    }
+
+    private class MainSupplierController
+    {
+        public void GetName()
+        { }
+
+        public void GetName(int key)
+        {
+            // Be noted, the type of 'MainSupplier' doesn't contain a key.
+            // So, conventional routing doesn't care about the parameters.
+        }
     }
 
     private class AnotherCustomersController

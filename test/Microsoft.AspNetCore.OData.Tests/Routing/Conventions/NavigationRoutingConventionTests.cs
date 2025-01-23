@@ -176,6 +176,26 @@ public class NavigationRoutingConventionTests
     }
 
     [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void NavigationRoutingConventionOnSingletonWithoutKeyDefinedOnEntityTypeAsExpectedBasedOnConfiguration(int paramerterCount)
+    {
+        // Arrange
+        ControllerModel controller = ControllerModelHelpers.BuildControllerModelWithAllActions<MainSupplierController>();
+        ActionModel action = controller.Actions.First(a => a.ActionName == "GetCustomers" && a.Parameters.Count == paramerterCount);
+
+        ODataControllerActionContext context = ODataControllerActionContextHelpers.BuildContext(string.Empty, EdmModel, controller);
+        context.Action = action;
+
+        // Act
+        bool returnValue = NavigationConvention.AppliesToAction(context);
+        Assert.True(returnValue);
+
+        Assert.Equal(["/MainSupplier/Customers", "/MainSupplier/Customers/$count"], action.Selectors.Select(s => s.AttributeRouteModel.Template));
+    }
+
+    [Theory]
     [InlineData("PostToName")]
     [InlineData("Get")]
     [InlineData("GetSubOrdersFrom")]
@@ -285,6 +305,23 @@ public class NavigationRoutingConventionTests
         customers.AddNavigationTarget(subOrderNavProp, orders, new EdmPathExpression("NS.VipCustomer/SubOrder"));
         me.AddNavigationTarget(subOrderNavProp, orders, new EdmPathExpression("NS.VipCustomer/SubOrder"));
 
+        // Let's build a singleton using an entity type without a key
+        // So 'Supplier' doesn't contain a key by design.
+        EdmEntityType supplier = new EdmEntityType("NS", "Supplier");
+        supplier.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+        model.AddElement(supplier);
+
+        supplier.AddUnidirectionalNavigation(
+            new EdmNavigationPropertyInfo
+            {
+                Name = "Customers",
+                TargetMultiplicity = EdmMultiplicity.Many,
+                Target = customer,
+                ContainsTarget = true
+            });
+
+        container.AddSingleton("MainSupplier", supplier);
+
         return model;
     }
 
@@ -330,6 +367,18 @@ public class NavigationRoutingConventionTests
         { }
 
         public void PatchToSubOrderFromVipCustomer(CancellationToken cancellation)
+        { }
+    }
+
+    private class MainSupplierController
+    {
+        public void GetCustomers(int key, CancellationToken cancellation)
+        { }
+
+        public void GetCustomers(int key)
+        { }
+
+        public void GetCustomers()
         { }
     }
 

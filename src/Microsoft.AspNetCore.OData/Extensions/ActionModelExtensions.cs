@@ -103,6 +103,11 @@ public static class ActionModelExtensions
 
         // TODO: shall we make sure the type is matching?
         var keys = entityType.Key().ToArray();
+        if (keys.Length == 0)
+        {
+            return false;
+        }
+
         if (keys.Length == 1)
         {
             // one key
