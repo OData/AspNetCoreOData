@@ -121,7 +121,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             customer.UlongProperty = eTagsCustomer.UlongProperty;
             customer.GuidProperty = eTagsCustomer.GuidProperty;
             customer.DateTimeOffsetProperty = eTagsCustomer.DateTimeOffsetProperty;
-
+            customer.RowVersion[7]++;
             return Ok(customer);
         }
 
@@ -172,7 +172,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
            
             ETagsCustomer customer = appliedCustomers.Single();
             patch.Patch(customer);
-
+            customer.RowVersion[7]++;
             return Ok(customer);
         }
     }
@@ -188,6 +188,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
                 ShortProperty = (short)(Int16.MaxValue - i),
                 DoubleProperty = 2.0 * (i + 1),
                 Notes = Enumerable.Range(0, i + 1).Select(j => "This is note " + (i * 10 + j)).ToList(),
+                RowVersion = new byte[] { 0, 0, 0, 0, 0, 0, 16, 28 },
                 RelatedCustomer = new ETagsCustomer
                 {
                     Id = i + 1,
