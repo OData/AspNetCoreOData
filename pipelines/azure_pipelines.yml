@@ -69,6 +69,11 @@ extends:
           inputs:
             version: 8.x
             includePreviewVersions: true
+        - task: PowerShell@2
+          displayName: Validate OData Package Versions
+          inputs:
+            targetType: 'inline'
+            script: 'powershell.exe -executionpolicy remotesigned -File $(Build.SourcesDirectory)\tool\ValidateODataPackageVersions.ps1'
         - task: DotNetCoreCLI@2
           displayName: build Microsoft.AspNetCore.OData
           inputs:
