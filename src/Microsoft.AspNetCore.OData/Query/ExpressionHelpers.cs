@@ -29,7 +29,9 @@ internal static class ExpressionHelpers
     public static IQueryable Skip(IQueryable query, int count, Type type, bool parameterize)
     {
         MethodInfo skipMethod = ExpressionHelperMethods.QueryableSkipGeneric.MakeGenericMethod(type);
-        Expression skipValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
+        Expression skipValueExpression = parameterize
+            ? LinqParameterContainer.Parameterize(typeof(int), count)
+            : Expression.Constant(count);
 
         Expression skipQuery = Expression.Call(null, skipMethod, new[] { query.Expression, skipValueExpression });
 
@@ -58,7 +60,9 @@ internal static class ExpressionHelpers
             skipMethod = ExpressionHelperMethods.EnumerableSkipGeneric.MakeGenericMethod(type);
         }
 
-        Expression skipValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
+        Expression skipValueExpression = parameterize
+            ? LinqParameterContainer.Parameterize(typeof(int), count)
+            : Expression.Constant(count);
         Expression skipQuery = Expression.Call(null, skipMethod, new[] { source, skipValueExpression });
         return skipQuery;
     }
@@ -75,7 +79,9 @@ internal static class ExpressionHelpers
             takeMethod = ExpressionHelperMethods.EnumerableTakeGeneric.MakeGenericMethod(elementType);
         }
 
-        Expression takeValueExpression = parameterize ? LinqParameterContainer.Parameterize(typeof(int), count) : Expression.Constant(count);
+        Expression takeValueExpression = parameterize
+            ? LinqParameterContainer.Parameterize(typeof(int), count)
+            : Expression.Constant(count);
         Expression takeQuery = Expression.Call(null, takeMethod, new[] { source, takeValueExpression });
         return takeQuery;
     }
@@ -110,7 +116,8 @@ internal static class ExpressionHelpers
                 }
                 else
                 {
-                    orderByMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(elementType,
+                    orderByMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(
+                        elementType,
                         returnType);
                 }
             }
@@ -123,7 +130,8 @@ internal static class ExpressionHelpers
                 }
                 else
                 {
-                    orderByMethod = ExpressionHelperMethods.EnumerableOrderByDescendingGeneric.MakeGenericMethod(elementType,
+                    orderByMethod = ExpressionHelperMethods.EnumerableOrderByDescendingGeneric.MakeGenericMethod(
+                        elementType,
                         returnType);
                 }
             }
@@ -139,7 +147,8 @@ internal static class ExpressionHelpers
                 }
                 else
                 {
-                    orderByMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(elementType,
+                    orderByMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(
+                        elementType,
                         returnType);
                 }
             }
@@ -152,22 +161,26 @@ internal static class ExpressionHelpers
                 }
                 else
                 {
-                    orderByMethod = ExpressionHelperMethods.EnumerableThenByDescendingGeneric.MakeGenericMethod(elementType,
+                    orderByMethod = ExpressionHelperMethods.EnumerableThenByDescendingGeneric.MakeGenericMethod(
+                        elementType,
                         returnType);
                 }
             }
         }
+
         return Expression.Call(null, orderByMethod, new[] { source, orderByLambda });
     }
 
-    public static IQueryable OrderByIt(IQueryable query, OrderByDirection direction, Type type, bool alreadyOrdered = false)
+    public static IQueryable OrderByIt(IQueryable query, OrderByDirection direction, Type type,
+        bool alreadyOrdered = false)
     {
         ParameterExpression odataItParameter = Expression.Parameter(type, "$it");
         LambdaExpression orderByLambda = Expression.Lambda(odataItParameter, odataItParameter);
         return OrderBy(query, orderByLambda, direction, type, alreadyOrdered);
     }
 
-    public static IQueryable OrderByProperty(IQueryable query, IEdmModel model, IEdmProperty property, OrderByDirection direction, Type type, bool alreadyOrdered = false)
+    public static IQueryable OrderByProperty(IQueryable query, IEdmModel model, IEdmProperty property,
+        OrderByDirection direction, Type type, bool alreadyOrdered = false)
     {
         // property aliasing
         string propertyName = model.GetClrPropertyName(property);
@@ -175,7 +188,8 @@ internal static class ExpressionHelpers
         return OrderBy(query, orderByLambda, direction, type, alreadyOrdered);
     }
 
-    public static IQueryable OrderBy(IQueryable query, LambdaExpression orderByLambda, OrderByDirection direction, Type type, bool alreadyOrdered = false)
+    public static IQueryable OrderBy(IQueryable query, LambdaExpression orderByLambda, OrderByDirection direction,
+        Type type, bool alreadyOrdered = false)
     {
         Type returnType = orderByLambda.Body.Type;
 
@@ -193,11 +207,13 @@ internal static class ExpressionHelpers
             }
             else
             {
-                orderByMethod = ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(type, returnType);
+                orderByMethod =
+                    ExpressionHelperMethods.QueryableThenByDescendingGeneric.MakeGenericMethod(type, returnType);
             }
 
             orderedQuery = query as IOrderedQueryable;
-            orderedQuery = orderByMethod.Invoke(null, new object[] { orderedQuery, orderByLambda }) as IOrderedQueryable;
+            orderedQuery =
+                orderByMethod.Invoke(null, new object[] { orderedQuery, orderByLambda }) as IOrderedQueryable;
         }
         else
         {
@@ -207,7 +223,8 @@ internal static class ExpressionHelpers
             }
             else
             {
-                orderByMethod = ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(type, returnType);
+                orderByMethod =
+                    ExpressionHelperMethods.QueryableOrderByDescendingGeneric.MakeGenericMethod(type, returnType);
             }
 
             orderedQuery = orderByMethod.Invoke(null, new object[] { query, orderByLambda }) as IOrderedQueryable;
@@ -224,7 +241,8 @@ internal static class ExpressionHelpers
 
     public static IQueryable Select(IQueryable query, LambdaExpression expression, Type type)
     {
-        MethodInfo selectMethod = ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(type, expression.Body.Type);
+        MethodInfo selectMethod =
+            ExpressionHelperMethods.QueryableSelectGeneric.MakeGenericMethod(type, expression.Body.Type);
         return selectMethod.Invoke(null, new object[] { query, expression }) as IQueryable;
     }
 
@@ -232,7 +250,8 @@ internal static class ExpressionHelpers
     public static IQueryable SelectMany(IQueryable query, LambdaExpression expression, Type type)
     {
         Type elementType = TypeHelper.GetInnerElementType(expression.Body.Type);
-        MethodInfo selectManyMethod = ExpressionHelperMethods.QueryableSelectManyGeneric.MakeGenericMethod(type, elementType);
+        MethodInfo selectManyMethod =
+ ExpressionHelperMethods.QueryableSelectManyGeneric.MakeGenericMethod(type, elementType);
         return selectManyMethod.Invoke(null, new object[] { query, expression }) as IQueryable;
     }
 
@@ -276,6 +295,15 @@ internal static class ExpressionHelpers
         {
             return Expression.Constant(null, type);
         }
+    }
+
+    public static Expression SequenceEquals(Expression left, Expression right)
+    {
+        MethodInfo sequenceEqualMethod = typeof(Enumerable)
+            .GetMethods(BindingFlags.Static | BindingFlags.Public)
+            .First(m => m.Name == "SequenceEqual" && m.GetParameters().Length == 2)
+            .MakeGenericMethod(right.Type.GetElementType());
+        return Expression.Call(sequenceEqualMethod, left, right);
     }
 
     public static LambdaExpression GetPropertyAccessLambda(Type type, string propertyName)

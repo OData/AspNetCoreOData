@@ -45,6 +45,7 @@ public class ETagsOtherTypesTest : WebApiTestBase<ETagsOtherTypesTest>
         var customer = builder.EntitySet<ETagsCustomer>("ETagsCustomers").EntityType;
         customer.Property(c => c.DoubleProperty).IsConcurrencyToken();
         customer.Ignore(c => c.StringWithConcurrencyCheckAttributeProperty);
+        customer.Ignore(c => c.RowVersion);
         return builder.GetEdmModel();
     }
 
@@ -53,6 +54,7 @@ public class ETagsOtherTypesTest : WebApiTestBase<ETagsOtherTypesTest>
         var builder = new ODataConventionModelBuilder();
         var customer = builder.EntitySet<ETagsCustomer>("ETagsCustomers").EntityType;
         customer.Ignore(c => c.StringWithConcurrencyCheckAttributeProperty);
+        customer.Ignore(c => c.RowVersion);
         customer.Property(c => c.ShortProperty).IsConcurrencyToken();
         return builder.GetEdmModel();
     }
