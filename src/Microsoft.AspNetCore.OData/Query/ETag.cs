@@ -133,14 +133,27 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 MemberExpression name = Expression.Property(param, item.Key);
                 object itemValue = item.Value;
-                Expression value = itemValue != null
-                    ? LinqParameterContainer.Parameterize(itemValue.GetType(), itemValue)
-                    : Expression.Constant(value: null);
+                
                 Expression equal;
-                if (itemValue != null && itemValue.GetType().IsArray)
-                    equal = ExpressionHelpers.SequenceEquals(name, value);
+                if (itemValue != null)
+                {
+                    Type itemType = itemValue.GetType();
+                    Expression value = LinqParameterContainer.Parameterize(itemType, itemValue);
+                    if (itemType.IsArray)
+                    {
+                        equal = ExpressionHelpers.SequenceEquals(name, value);
+                    }
+                    else
+                    {
+                        equal = Expression.Equal(name, value);
+                    }
+                }
                 else
+                {
+                    Expression value = Expression.Constant(value: null);
                     equal = Expression.Equal(name, value);
+                }
+                
                 where = where == null ? equal : Expression.AndAlso(where, equal);
             }
 
