@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ETags
             eTagsCustomers.Property(c => c.Id).IsConcurrencyToken();
             eTagsCustomers.Property(c => c.Name).IsConcurrencyToken();
             eTagsCustomers.Property(c => c.BoolProperty).IsConcurrencyToken();
-            eTagsCustomers.Property(c => c.ByteProperty).IsConcurrencyToken();.
+            eTagsCustomers.Property(c => c.ByteProperty).IsConcurrencyToken();
             eTagsCustomers.Property(c => c.CharProperty).IsConcurrencyToken();
             eTagsCustomers.Property(c => c.DecimalProperty).IsConcurrencyToken();
             eTagsCustomers.Property(c => c.DoubleProperty).IsConcurrencyToken();
