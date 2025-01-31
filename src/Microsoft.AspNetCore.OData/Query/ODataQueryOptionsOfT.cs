@@ -5,11 +5,19 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.Query
 {
@@ -94,6 +102,93 @@ namespace Microsoft.AspNetCore.OData.Query
             ValidateQuery(query);
             return base.ApplyTo(query, querySettings);
         }
+
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// Bind the <see cref="HttpContext"/> and <see cref="ParameterInfo"/> to generate the <see cref="ODataQueryOptions{TEntity}"/>.
+        /// </summary>
+        /// <param name="context">The HttpContext.</param>
+        /// <param name="parameter">The parameter info.</param>
+        /// <returns>The built <see cref="ODataQueryOptions{TEntity}"/></returns>
+        public static ValueTask<ODataQueryOptions<TEntity>> BindAsync(HttpContext context, ParameterInfo parameter)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            if (parameter == null)
+            {
+                throw Error.ArgumentNull(nameof(parameter));
+            }
+
+            Type entityClrType = typeof(TEntity);
+            IEdmModel model = GetEdmModel(context);
+            ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, context.ODataFeature().Path);
+            var result = new ODataQueryOptions<TEntity>(entitySetContext, context.Request);
+
+            return ValueTask.FromResult(result);
+        }
+
+        private static IEdmModel GetEdmModel(HttpContext context)
+        {
+            Endpoint endpoint = context.GetEndpoint();
+
+            // 1. If customer calls "WithOData({prefix})", let's use it to fetch the model associated when calling 'AddOData(...)'
+            ODataPrefixMetadata prefixMetadata = endpoint.Metadata.GetMetadata<ODataPrefixMetadata>();
+            if (prefixMetadata != null)
+            {
+                ODataOptions options = context.RequestServices.GetService<IOptions<ODataOptions>>()?.Value;
+                if (options != null)
+                {
+                    if (options.RouteComponents.TryGetValue(prefixMetadata.Prefix, out var routeComponents))
+                    {
+                        var odataFeature = context.ODataFeature();
+                        odataFeature.RoutePrefix = prefixMetadata.Prefix;
+                        odataFeature.Model = routeComponents.EdmModel;
+                        odataFeature.Services = routeComponents.ServiceProvider;
+                        return routeComponents.EdmModel;
+                    }
+                }
+
+                throw new InvalidOperationException($"The '{prefixMetadata.Prefix}' when calling WithOData() is not registered in AddOData().");
+            }
+
+            // 2. Let's retrieve the model from the cache
+            IODataEndpointModelMapper endpointModelMapper = context.RequestServices.GetService<IODataEndpointModelMapper>();
+            IEdmModel model;
+            if (endpointModelMapper != null && endpointModelMapper.Maps.TryGetValue(endpoint, out model))
+            {
+                return model;
+            }
+
+            // 3. Let's build the model on the fly
+            Type entityClrType = typeof(TEntity);
+            IAssemblyResolver resolver = context.RequestServices.GetService<IAssemblyResolver>();
+            ODataConventionModelBuilder builder = resolver != null ?
+                new ODataConventionModelBuilder(resolver, true) :
+                new ODataConventionModelBuilder();
+
+            EntityTypeConfiguration entityTypeConfiguration = builder.AddEntityType(entityClrType);
+            builder.AddEntitySet(entityClrType.Name, entityTypeConfiguration);
+
+            var modelConfigs = endpoint.Metadata.OfType<IODataModelConfiguration>();
+            foreach (var config in modelConfigs)
+            {
+                config.Apply(context, builder);
+            }
+
+            model = builder.GetEdmModel();
+
+            // Add the model into the cache
+            if (endpointModelMapper != null)
+            {
+                endpointModelMapper.Maps[endpoint] = model;
+            }
+
+            return model;
+        }
+#endif
 
         private static void ValidateQuery(IQueryable query)
         {

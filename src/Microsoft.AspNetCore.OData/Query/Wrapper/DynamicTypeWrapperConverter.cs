@@ -47,15 +47,15 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
             if (type.IsGenericType)
             {
                 // Since 'type' is tested in 'CanConvert()', it must be a generic type
-                Type generaticType = type.GetGenericTypeDefinition();
+                Type genericType = type.GetGenericTypeDefinition();
                 Type elementType = type.GetGenericArguments()[0];
 
-                if (generaticType == typeof(ComputeWrapper<>))
+                if (genericType == typeof(ComputeWrapper<>))
                 {
                     return (JsonConverter)Activator.CreateInstance(typeof(ComputeWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
 
-                if (generaticType == typeof(FlatteningWrapper<>))
+                if (genericType == typeof(FlatteningWrapper<>))
                 {
                     return (JsonConverter)Activator.CreateInstance(typeof(FlatteningWrapperConverter<>).MakeGenericType(new Type[] { elementType }));
                 }
