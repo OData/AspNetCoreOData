@@ -7,6 +7,7 @@
 
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,8 @@ internal static class ODataQueryContextExtensions
         {
             returnSettings.CopyFrom(settings);
         }
+
+        returnSettings.TimeZone = context.Request.GetTimeZoneInfo();
 
         return returnSettings;
     }
