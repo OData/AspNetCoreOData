@@ -26,7 +26,7 @@ internal static class ODataQueryContextExtensions
             returnSettings.CopyFrom(settings);
         }
 
-        returnSettings.TimeZone = context.Request.GetTimeZoneInfo();
+        returnSettings.TimeZone ??= context.Request.GetTimeZoneInfo();
 
         return returnSettings;
     }
