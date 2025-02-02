@@ -48,6 +48,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         /// </summary>
         public bool UseInstanceForProperties { get; set; }
 
+        /// <summary>
+        /// Gets the instance value.
+        /// </summary>
+        public abstract object InstanceValue { get; }
+
         /// <inheritdoc />
         public IEdmTypeReference GetEdmType()
         {

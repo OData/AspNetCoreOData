@@ -952,6 +952,11 @@ Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
+Microsoft.AspNetCore.OData.Query.IQueryableODataExtension
+Microsoft.AspNetCore.OData.Query.ODataCastOptions
+Microsoft.AspNetCore.OData.Query.ODataCastOptions.MapProvider.get -> System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper>
+Microsoft.AspNetCore.OData.Query.ODataCastOptions.MapProvider.set -> void
+Microsoft.AspNetCore.OData.Query.ODataCastOptions.ODataCastOptions() -> void
 Microsoft.AspNetCore.OData.Query.ODataQueryContext
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.DefaultQueryConfigurations.get -> Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
 Microsoft.AspNetCore.OData.Query.ODataQueryContext.ElementClrType.get -> System.Type
@@ -1763,6 +1768,8 @@ static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicProper
 static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Reflection.PropertyInfo
 static Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag(this Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.Net.Http.Headers.EntityTagHeaderValue entityTagHeaderValue) -> Microsoft.AspNetCore.OData.Query.ETag
 static Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag<TEntity>(this Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.Net.Http.Headers.EntityTagHeaderValue entityTagHeaderValue) -> Microsoft.AspNetCore.OData.Query.ETag<TEntity>
+static Microsoft.AspNetCore.OData.Query.IQueryableODataExtension.OCast<TResult>(this object source, Microsoft.AspNetCore.OData.Query.ODataCastOptions options = null) -> TResult
+static Microsoft.AspNetCore.OData.Query.IQueryableODataExtension.OCast<TResult>(this System.Linq.IQueryable source, Microsoft.AspNetCore.OData.Query.ODataCastOptions options = null) -> System.Collections.Generic.IEnumerable<TResult>
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(string queryOptionName) -> bool
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(string queryOptionName, bool isDollarSignOptional) -> bool
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.LimitResults<T>(System.Linq.IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited) -> System.Linq.IQueryable<T>
