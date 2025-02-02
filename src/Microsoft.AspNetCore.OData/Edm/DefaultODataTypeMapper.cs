@@ -248,6 +248,11 @@ namespace Microsoft.AspNetCore.OData.Edm
                             elementClrType = entityType;
                         }
 
+                        if (elementClrType.IsGroupByWrapper(out entityType))
+                        {
+                            elementClrType = entityType;
+                        }
+
                         IEdmType elementType = GetEdmType(edmModel, elementClrType, testCollections: false);
                         if (elementType != null)
                         {
