@@ -373,9 +373,23 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             bool isSelectedAll = IsSelectAll(selectExpandClause);
             if (isSelectedAll)
             {
+                // If we have an EF query provider, then we remove the non-structural properties. The reason for this is to avoid 
+                // Creating an expression that will generate duplicate LEFT joins when a LEFT join already exists in the IQueryable 
+                // as observed here: https://github.com/OData/AspNetCoreOData/issues/497
+
+                Expression updatedExpression = null;
+                if (IsEfQueryProvider(context))
+                {
+                    updatedExpression = RemoveNonStructuralProperties(context, source, structuredType);
+                }
+                else
+                {
+                    updatedExpression = source;
+                }
+
                 // Initialize property 'Instance' on the wrapper class
                 wrapperProperty = wrapperType.GetProperty("Instance");
-                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, source));
+                wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, updatedExpression));
 
                 wrapperProperty = wrapperType.GetProperty("UseInstanceForProperties");
                 wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, Expression.Constant(true)));
@@ -430,6 +444,81 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             Type wrapperGenericType = GetWrapperGenericType(isInstancePropertySet, isTypeNamePropertySet, isContainerPropertySet);
             wrapperType = wrapperGenericType.MakeGenericType(elementType);
             return Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments);
+        }
+
+        // Generates the expression
+        //      { Instance = new Customer() {Id = $it.Id, Name= $it.Name}}
+        private static Expression RemoveNonStructuralProperties(QueryBinderContext context, Expression source, IEdmStructuredType structuredType)
+        {
+            IEdmModel model = context.Model;
+            Expression updatedSource = null;
+
+            Type elementType = source.Type;
+            IEnumerable<IEdmStructuralProperty> structuralProperties = structuredType.StructuralProperties();
+
+            PropertyInfo[] props = elementType.GetProperties();
+            List<MemberBinding> bindings = new List<MemberBinding>();
+            ODataQuerySettings settings = context.QuerySettings;
+            bool isSourceNullable = ExpressionBinderHelper.IsNullable(source.Type);
+
+            foreach (PropertyInfo prop in props)
+            {
+                bool isPropertyNullable = ExpressionBinderHelper.IsNullable(prop.PropertyType);
+
+                foreach (var sp in structuralProperties)
+                {
+                    if (prop.CanWrite && model.GetClrPropertyName(sp) == prop.Name)
+                    {
+                        Expression propertyValue = Expression.Property(source, prop);
+                        Type nullablePropertyType = TypeHelper.ToNullable(propertyValue.Type);
+                        Expression nullablePropertyValue = ExpressionHelpers.ToNullable(propertyValue);
+
+                        if ((settings.HandleNullPropagation == HandleNullPropagationOption.True) || (isSourceNullable && isPropertyNullable))
+                        {
+                            propertyValue = Expression.Condition(
+                                test: Expression.Equal(source, Expression.Constant(value: null)),
+                                ifTrue: Expression.Constant(value: null, type: nullablePropertyType),
+                                ifFalse: nullablePropertyValue);
+                        }
+                        else if (isSourceNullable)
+                        {
+                            object defaultValue = prop.PropertyType.IsValueType ? Activator.CreateInstance(prop.PropertyType) : null;
+                            
+                            // property is non-nullable
+                            propertyValue = Expression.Condition(
+                                test: Expression.Equal(source, Expression.Constant(value: null)),
+                                ifTrue: Expression.Constant(value: defaultValue),
+                                ifFalse: propertyValue);
+                        }
+                        else if (isPropertyNullable)
+                        {
+                            propertyValue = nullablePropertyValue;
+                        }
+
+                        bindings.Add(Expression.Bind(prop, propertyValue));
+                        break;
+                    }
+                }
+            }
+
+            NewExpression newExpression = Expression.New(source.Type);
+            updatedSource = Expression.MemberInit(newExpression, bindings);
+
+            return updatedSource;     
+        }
+
+        private bool IsEfQueryProvider(QueryBinderContext context)
+        {
+            if (context.QueryProvider != null &&
+                context.QueryProvider == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF5 ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6 ||
+                context.QueryProvider == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEFCore2)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private static bool ParseComputedDynamicProperties(QueryBinderContext context, IList<DynamicPathSegment> dynamicPathSegments, bool isSelectedAll,
