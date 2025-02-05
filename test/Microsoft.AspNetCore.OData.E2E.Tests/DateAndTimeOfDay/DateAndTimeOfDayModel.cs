@@ -42,8 +42,8 @@ public class DCustomer
     
     public DateTime SameDayDateTime { get; set; }
     public DateTime? SameDayNullableDateTime { get; set; }
-    public DateTimeOffset SameDayDateTimeOffset { get; set; }
-    public DateTimeOffset? SameDayNullableDateTimeOffset { get; set; }
+    public DateTimeOffset SameDayOffset { get; set; }
+    public DateTimeOffset? SameDayNullableOffset { get; set; }
 }
 
 public class EfCustomer

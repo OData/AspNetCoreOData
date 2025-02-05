@@ -53,8 +53,8 @@ public class DCustomersController : ODataController
                 
                 SameDayDateTime = dto.AddHours(e).DateTime,
                 SameDayNullableDateTime = e % 2 == 0 ? null : dto.AddHours(e).DateTime,
-                SameDayDateTimeOffset = dto.AddHours(6 - e),
-                SameDayNullableDateTimeOffset = e % 3 == 0 ? null : dto.AddHours(e),
+                SameDayOffset = dto.AddHours(6 - e),
+                SameDayNullableOffset = e % 3 == 0 ? null : dto.AddHours(e),
 
             }).ToList();
     }
