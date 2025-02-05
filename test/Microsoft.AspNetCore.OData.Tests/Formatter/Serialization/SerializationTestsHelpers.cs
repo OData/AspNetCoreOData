@@ -106,9 +106,8 @@ internal class SerializationTestsHelpers
             specialOrderType.NavigationProperties().Single(np => np.Name == "SpecialCustomer"),
             customerSet);
 
-        NavigationSourceLinkBuilderAnnotation linkAnnotation = new MockNavigationSourceLinkBuilderAnnotation();
-        model.SetNavigationSourceLinkBuilder(customerSet, linkAnnotation);
-        model.SetNavigationSourceLinkBuilder(orderSet, linkAnnotation);
+        model.SetNavigationSourceLinkBuilder(customerSet, new NavigationSourceLinkBuilderAnnotation(customerSet, model));
+        model.SetNavigationSourceLinkBuilder(orderSet, new NavigationSourceLinkBuilderAnnotation(orderSet, model));
 
         model.AddElement(container);
         return model;

@@ -651,7 +651,7 @@ public class ODataResourceSetSerializerTests
         // Arange
         IEnumerable instance = new TruncatedEnumerable(2);
 
-        var request = RequestFactory.Create("GET", "http://localhost/Customers?$expend=Orders", opt => opt.AddRouteComponents(_model));
+        var request = RequestFactory.Create("GET", "http://localhost/Customers?$expand=Orders", opt => opt.AddRouteComponents(_model));
 
         IEdmNavigationProperty navProp = _customerSet.EntityType.NavigationProperties().First();
         SelectExpandClause selectExpandClause = new SelectExpandClause(new SelectItem[0], allSelected: true);
