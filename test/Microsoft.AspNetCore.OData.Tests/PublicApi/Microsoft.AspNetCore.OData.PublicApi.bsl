@@ -1204,6 +1204,10 @@ public enum Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption : int {
 	True = 1
 }
 
+public interface Microsoft.AspNetCore.OData.Query.ICountOptionCollection : IEnumerable {
+	System.Nullable`1[[System.Int64]] TotalCount  { public abstract get; }
+}
+
 public interface Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser {
 	bool CanParse (Microsoft.AspNetCore.Http.HttpRequest request)
 	System.Threading.Tasks.Task`1[[System.String]] ParseAsync (Microsoft.AspNetCore.Http.HttpRequest request)
