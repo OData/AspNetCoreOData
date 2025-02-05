@@ -39,6 +39,11 @@ public class DCustomer
     public IList<DateTimeOffset?> NullableOffsets { get; set; }
     public IList<Date?> NullableDates { get; set; }
     public IList<TimeOfDay?> NullableTimeOfDays { get; set; }
+    
+    public DateTime SameDayDateTime { get; set; }
+    public DateTime? SameDayNullableDateTime { get; set; }
+    public DateTimeOffset SameDayDateTimeOffset { get; set; }
+    public DateTimeOffset? SameDayNullableDateTimeOffset { get; set; }
 }
 
 public class EfCustomer

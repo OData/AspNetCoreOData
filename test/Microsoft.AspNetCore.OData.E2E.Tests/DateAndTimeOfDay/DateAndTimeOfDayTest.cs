@@ -273,6 +273,18 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
                 new[] {"$orderby=NullableTimeOfDay", "3 > 1 > 2 > 4 > 5"},
                 new[] {"$orderby=NullableTimeOfDay desc", "5 > 4 > 2 > 1 > 3"},
+                
+                new[] {"$orderby=date(SameDayDateTime), Id desc", "5 > 4 > 3 > 2 > 1"},
+                new[] {"$orderby=date(SameDayNullableDateTime), Id desc", "4 > 2 > 5 > 3 > 1"},
+                
+                new[] {"$orderby=date(SameDayDateTimeOffset), Id desc", "5 > 4 > 3 > 2 > 1"},
+                new[] {"$orderby=date(SameDayNullableDateTimeOffset), Id desc", "3 > 5 > 4 > 2 > 1"},
+                
+                new[] {"$orderby=time(SameDayDateTime)", "1 > 2 > 3 > 4 > 5"},
+                new[] {"$orderby=time(SameDayNullableDateTime)", "2 > 4 > 1 > 3 > 5"},
+                
+                new[] {"$orderby=time(SameDayDateTimeOffset)", "5 > 4 > 3 > 2 > 1"},
+                new[] {"$orderby=time(SameDayNullableDateTimeOffset)", "3 > 1 > 2 > 4 > 5"},
             };
             TheoryDataSet<string, string, string> data = new TheoryDataSet<string, string, string>();
             foreach (string mode in modes)
@@ -559,6 +571,10 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
                 new[] {"$orderby=NullableOffset", "3 > 1 > 2 > 4 > 5"},
                 new[] {"$orderby=NullableOffset desc", "5 > 4 > 2 > 1 > 3"},
+                
+                new[] {"$orderby=date(NullableDateTime), Id desc", "4 > 2 > 3 > 1 > 5"},
+                
+                new[] {"$orderby=time(DateTime)", "1 > 2 > 3 > 4 > 5"},
             };
             TheoryDataSet<string, string> data = new TheoryDataSet<string, string>();
             foreach (string[] order in orders)

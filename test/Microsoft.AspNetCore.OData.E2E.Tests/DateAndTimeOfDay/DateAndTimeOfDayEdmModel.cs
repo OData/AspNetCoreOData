@@ -41,6 +41,11 @@ public class DateAndTimeOfDayEdmModel
         customerType.CollectionProperty(c => c.NullableDates);
         customerType.CollectionProperty(c => c.NullableTimeOfDays);
 
+        customerType.Property(c => c.SameDayDateTime);
+        customerType.Property(c => c.SameDayNullableDateTime);
+        customerType.Property(c => c.SameDayDateTimeOffset);
+        customerType.Property(c => c.SameDayNullableDateTimeOffset);
+
         var customers = builder.EntitySet<DCustomer>("DCustomers");
        // customers.HasIdLink(link, true);
        // customers.HasEditLink(link, true);

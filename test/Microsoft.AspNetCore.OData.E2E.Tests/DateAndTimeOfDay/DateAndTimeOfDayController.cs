@@ -50,6 +50,11 @@ public class DCustomersController : ODataController
                 NullableOffsets = new [] { dto.AddMonths(e), (DateTimeOffset?)null, dto.AddDays(e) },
                 NullableDates = new [] { (Date)dto.AddYears(e).Date, (Date?)null, (Date)dto.AddMonths(e).Date },
                 NullableTimeOfDays = new [] { (TimeOfDay)dto.AddHours(e).TimeOfDay, (TimeOfDay?)null, (TimeOfDay)dto.AddMinutes(e).TimeOfDay },
+                
+                SameDayDateTime = dto.AddHours(e).DateTime,
+                SameDayNullableDateTime = e % 2 == 0 ? null : dto.AddHours(e).DateTime,
+                SameDayDateTimeOffset = dto.AddHours(6 - e),
+                SameDayNullableDateTimeOffset = e % 3 == 0 ? null : dto.AddHours(e),
 
             }).ToList();
     }
