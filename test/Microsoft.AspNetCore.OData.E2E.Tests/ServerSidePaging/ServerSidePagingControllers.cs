@@ -359,9 +359,9 @@ public class CollectionPagingCustomersController : ODataController
             Tags = new List<string> { "Tier 1", "Gen-Z", "HNW" },
             Categories = new List<CollectionPagingCategory>
             {
-            CollectionPagingCategory.Retailer,
-            CollectionPagingCategory.Wholesaler,
-            CollectionPagingCategory.Distributor
+                CollectionPagingCategory.Retailer,
+                CollectionPagingCategory.Wholesaler,
+                CollectionPagingCategory.Distributor
             },
             Locations = new List<CollectionPagingLocation>(
                 Enumerable.Range(1, TargetSize).Select(dx => new CollectionPagingLocation
