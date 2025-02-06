@@ -390,10 +390,12 @@ public abstract class ExpressionBinderBase
 
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
-
-        // EF doesn't support new Date(int, int, int), also doesn't support other property access, for example DateTime.Date.
-        // Therefore, we just return the source (DateTime or DateTimeOffset).
-        return arguments[0];
+        
+        Type type = Nullable.GetUnderlyingType(arguments[0].Type) ?? arguments[0].Type;
+        PropertyInfo property = type.GetProperty(nameof(DateTime.Date));
+        
+        Expression propertyAccessExpr = ExpressionBinderHelper.MakePropertyAccess(property, arguments[0], QuerySettings);
+        return ExpressionBinderHelper.CreateFunctionCallWithNullPropagation(propertyAccessExpr, arguments, QuerySettings);
     }
 
     private Expression BindNow(SingleValueFunctionCallNode node)
@@ -403,7 +405,7 @@ public abstract class ExpressionBinderBase
         // Function Now() does not take any arguments.
         Expression[] arguments = BindArguments(node.Parameters);
         Contract.Assert(arguments.Length == 0);
-
+        
         return Expression.Property(null, typeof(DateTimeOffset), "UtcNow");
     }
 
@@ -416,9 +418,11 @@ public abstract class ExpressionBinderBase
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
 
-        // EF doesn't support new TimeOfDay(int, int, int, int), also doesn't support other property access, for example DateTimeOffset.DateTime.
-        // Therefore, we just return the source (DateTime or DateTimeOffset).
-        return arguments[0];
+        Type type = Nullable.GetUnderlyingType(arguments[0].Type) ?? arguments[0].Type;
+        PropertyInfo property = type.GetProperty(nameof(DateTime.TimeOfDay));
+
+        Expression propertyAccessExpr = ExpressionBinderHelper.MakePropertyAccess(property, arguments[0], QuerySettings);
+        return ExpressionBinderHelper.CreateFunctionCallWithNullPropagation(propertyAccessExpr, arguments, QuerySettings);
     }
 
     private Expression BindFractionalSeconds(SingleValueFunctionCallNode node)
