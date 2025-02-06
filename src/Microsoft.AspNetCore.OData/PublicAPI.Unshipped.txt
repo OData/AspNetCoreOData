@@ -1,0 +1,2 @@
+Microsoft.AspNetCore.OData.Query.ICountOptionCollection
+Microsoft.AspNetCore.OData.Query.ICountOptionCollection.TotalCount.get -> long?
