@@ -604,12 +604,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
         InitializeODataResource(selectExpandNode, resource, resourceContext);
 
-        string etag = CreateETag(resourceContext);
-        if (etag != null)
-        {
-            resource.ETag = etag;
-        }
-
         // Try to add the dynamic properties if the structural type is open.
         AppendDynamicProperties(resource, selectExpandNode, resourceContext);
 
@@ -665,12 +659,6 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         };
 
         InitializeODataResource(selectExpandNode, resource, resourceContext);
-
-        string etag = CreateETag(resourceContext);
-        if (etag != null)
-        {
-            resource.ETag = etag;
-        }
 
         // Try to add the dynamic properties if the structural type is open.
         AppendDynamicPropertiesInternal(resource, selectExpandNode, resourceContext);
@@ -742,6 +730,12 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 {
                     resource.EditLink = selfLinks.EditLink;
                 }
+            }
+
+            string etag = CreateETag(resourceContext);
+            if (etag != null)
+            {
+                resource.ETag = etag;
             }
         }
    }
