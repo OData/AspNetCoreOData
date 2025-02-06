@@ -444,6 +444,160 @@ public class QueryBinderTests
         Assert.Equal(expected, expression.ToString());
     }
 
+    [Fact]
+    public void GetFullPropertyPath_WithSingleComplexNode()
+    {
+        // Arrange
+        Mock<IEdmStructuredTypeReference> structuredType = new Mock<IEdmStructuredTypeReference>();
+        Mock<IEdmNavigationSource> navigationSource = new Mock<IEdmNavigationSource>();
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", structuredType.Object, navigationSource.Object);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        Mock<IEdmComplexTypeReference> type = new Mock<IEdmComplexTypeReference>();
+
+        Mock<IEdmProperty> property = new Mock<IEdmProperty>();
+        property.Setup(p => p.Name).Returns("Address");
+        property.Setup(p => p.PropertyKind).Returns(EdmPropertyKind.Structural);
+        property.Setup(p => p.Type).Returns(type.Object);
+
+        SingleComplexNode node = new SingleComplexNode(source, property.Object);
+
+        // Act
+        string fullPropertyPath = QueryBinder.GetFullPropertyPath(node);
+
+        // Assert
+        Assert.Equal("Address", fullPropertyPath);
+    }
+
+    [Fact]
+    public void GetFullPropertyPath_WithSingleValuePropertyAccessNode()
+    {
+        // Arrange
+        Mock<IEdmStructuredTypeReference> structuredType = new Mock<IEdmStructuredTypeReference>();
+        Mock<IEdmNavigationSource> navigationSource = new Mock<IEdmNavigationSource>();
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", structuredType.Object, navigationSource.Object);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        Mock<IEdmTypeReference> type = new Mock<IEdmTypeReference>();
+
+        Mock<IEdmProperty> property = new Mock<IEdmProperty>();
+        property.Setup(p => p.Name).Returns("ZipCode");
+        property.Setup(p => p.PropertyKind).Returns(EdmPropertyKind.Structural);
+        property.Setup(p => p.Type).Returns(type.Object);
+
+        SingleValuePropertyAccessNode node = new SingleValuePropertyAccessNode(source, property.Object);
+
+        // Act
+        string fullPropertyPath = QueryBinder.GetFullPropertyPath(node);
+
+        // Assert
+        Assert.Equal("ZipCode", fullPropertyPath);
+    }
+
+    [Fact]
+    public void GetFullPropertyPath_WithSingleNavigationNode()
+    {
+        // Arrange
+        Mock<IEdmStructuredTypeReference> structuredType = new Mock<IEdmStructuredTypeReference>();
+        Mock<IEdmNavigationSource> navigationSource = new Mock<IEdmNavigationSource>();
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", structuredType.Object, navigationSource.Object);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        Mock<IEdmEntityTypeReference> type = new Mock<IEdmEntityTypeReference>();
+
+        Mock<IEdmNavigationProperty> property = new Mock<IEdmNavigationProperty>();
+        property.Setup(p => p.Name).Returns("Address");
+        property.Setup(p => p.Type).Returns(type.Object);
+
+        Mock<IEdmPathExpression> bindingPath = new Mock<IEdmPathExpression>();
+
+        SingleNavigationNode node = new SingleNavigationNode(source, property.Object, bindingPath.Object);
+
+        // Act
+        string fullPropertyPath = QueryBinder.GetFullPropertyPath(node);
+
+        // Assert
+        Assert.Equal("Address", fullPropertyPath);
+    }
+
+    [Fact]
+    public void GetFullPropertyPath_WithSingleValueOpenPropertyAccess()
+    {
+        // Arrange
+        Mock<IEdmStructuredTypeReference> structuredType = new Mock<IEdmStructuredTypeReference>();
+        Mock<IEdmNavigationSource> navigationSource = new Mock<IEdmNavigationSource>();
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", structuredType.Object, navigationSource.Object);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        SingleValueOpenPropertyAccessNode node = new SingleValueOpenPropertyAccessNode(source, "ZipCode");
+
+        // Act
+        string fullPropertyPath = QueryBinder.GetFullPropertyPath(node);
+
+        // Assert
+        Assert.Equal("ZipCode", fullPropertyPath);
+    }
+
+    [Fact]
+    public void GetFullPropertyPath_WithSingleValuePropertyAccessNodeInSingleComplexNode()
+    {
+        // Arrange
+        Mock<IEdmStructuredTypeReference> structuredType = new Mock<IEdmStructuredTypeReference>();
+        Mock<IEdmNavigationSource> navigationSource = new Mock<IEdmNavigationSource>();
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", structuredType.Object, navigationSource.Object);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        Mock<IEdmComplexTypeReference> complexType = new Mock<IEdmComplexTypeReference>();
+
+        Mock<IEdmProperty> complexProperty = new Mock<IEdmProperty>();
+        complexProperty.Setup(p => p.Name).Returns("Address");
+        complexProperty.Setup(p => p.PropertyKind).Returns(EdmPropertyKind.Structural);
+        complexProperty.Setup(p => p.Type).Returns(complexType.Object);
+
+        SingleComplexNode complexNode = new SingleComplexNode(source, complexProperty.Object);
+
+        Mock<IEdmTypeReference> type = new Mock<IEdmTypeReference>();
+
+        Mock<IEdmProperty> property = new Mock<IEdmProperty>();
+        property.Setup(p => p.Name).Returns("ZipCode");
+        property.Setup(p => p.PropertyKind).Returns(EdmPropertyKind.Structural);
+        property.Setup(p => p.Type).Returns(type.Object);
+
+        SingleValuePropertyAccessNode node = new SingleValuePropertyAccessNode(complexNode, property.Object);
+
+        // Act
+        string fullPropertyPath = QueryBinder.GetFullPropertyPath(node);
+
+        // Assert
+        Assert.Equal("Address\\ZipCode", fullPropertyPath);
+    }
+
+    [Fact]
+    public void GetFullPropertyPath_WithSingleValueOpenPropertyAccessNodeInSingleComplexNode()
+    {
+        // Arrange
+        Mock<IEdmStructuredTypeReference> structuredType = new Mock<IEdmStructuredTypeReference>();
+        Mock<IEdmNavigationSource> navigationSource = new Mock<IEdmNavigationSource>();
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable("$it", structuredType.Object, navigationSource.Object);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        Mock<IEdmComplexTypeReference> complexType = new Mock<IEdmComplexTypeReference>();
+
+        Mock<IEdmProperty> complexProperty = new Mock<IEdmProperty>();
+        complexProperty.Setup(p => p.Name).Returns("Address");
+        complexProperty.Setup(p => p.PropertyKind).Returns(EdmPropertyKind.Structural);
+        complexProperty.Setup(p => p.Type).Returns(complexType.Object);
+
+        SingleComplexNode complexNode = new SingleComplexNode(source, complexProperty.Object);
+
+        SingleValueOpenPropertyAccessNode node = new SingleValueOpenPropertyAccessNode(complexNode, "ZipCode");
+
+        // Act
+        string fullPropertyPath = QueryBinder.GetFullPropertyPath(node);
+
+        // Assert
+        Assert.Equal("Address\\ZipCode", fullPropertyPath);
+    }
     private static SingleValueNode CreateEmployeeRangeVariableReferenceNode()
     {
         // Create the type reference and navigation source

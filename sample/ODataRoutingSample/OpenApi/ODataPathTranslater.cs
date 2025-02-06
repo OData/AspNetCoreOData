@@ -51,9 +51,6 @@ public static class ODataPathTranslater
                 case PropertySegmentTemplate property:
                     // TODO: 
                     return null;
-                    //PropertySegmentTemplate property = (PropertySegmentTemplate)segment;
-                    //newSegments.Add(property.ConvertTo());
-                    //break;
 
                 case NavigationSegmentTemplate navigation:
                     newSegments.Add(navigation.ConvertTo());
@@ -77,15 +74,9 @@ public static class ODataPathTranslater
 
                 case ValueSegmentTemplate value:
                     return null;
-                    //ValueSegmentTemplate value = (ValueSegmentTemplate)segment;
-                    //newSegments.Add(value.ConvertTo());
-                    //break;
 
                 case NavigationLinkSegmentTemplate navigationLink:
                     return null;
-                    //NavigationLinkSegmentTemplate navigationLink = (NavigationLinkSegmentTemplate)segment;
-                    //newSegments.Add(navigationLink.ConvertTo());
-                    //break;
 
                 case CountSegmentTemplate count:
                     newSegments.Add(count.ConvertTo());
@@ -93,18 +84,16 @@ public static class ODataPathTranslater
 
                 case PathTemplateSegmentTemplate:
                     return null;
-                    //KeySegmentTemplate key = (KeySegmentTemplate)segment;
-                    //newSegments.Add(key.ConvertTo());
-                    //break;
 
                 case DynamicSegmentTemplate:
                     return null;
-                    //KeySegmentTemplate key = (KeySegmentTemplate)segment;
-                    //newSegments.Add(key.ConvertTo());
-                    //break;
+
+                case NavigationLinkTemplateSegmentTemplate navigationLinkTemplate:
+                    return null;
 
                 default:
-                    throw new NotSupportedException();
+                    return null;
+                    // throw new NotSupportedException("Please update codes here, maybe just return null if you add some new OData endpoints into this sample.");
             }
         }
 

@@ -42,3 +42,18 @@ public class ETagsCustomer
     [Contained]
     public ETagsCustomer ContainedCustomer { get; set; }
 }
+
+public class ETagSimpleThing
+{
+    [Key]
+    public int Id { get; set; }
+    [Timestamp]
+    public ulong RowChangeNumber { get; set; }
+    public string Name { get; set; }
+    public ETagComplexThing ComplexThing { get; set; }
+}
+
+public class ETagComplexThing
+{
+    public string Name { get; set; }
+}

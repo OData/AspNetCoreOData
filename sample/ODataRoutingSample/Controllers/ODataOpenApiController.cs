@@ -56,6 +56,13 @@ public class ODataOpenApiController : ControllerBase
         return CreateContent(document);
     }
 
+    [HttpGet("v3/$openapi")]
+    public ContentResult GetV3OpenApi(string data)
+    {
+        OpenApiDocument document = CreateDocument("v3");
+        return CreateContent(document);
+    }
+
     private ContentResult CreateContent(OpenApiDocument document)
     {
         HttpContext httpContext = Request.HttpContext;

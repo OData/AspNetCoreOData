@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -1534,6 +1535,214 @@ public class ApplyQueryOptionTest
     //    Assert.Equal("redmond", address0["City"].ToString());
     //}
 
+    [Fact]
+    public void SortOnNestedDynamicPropertyWorks()
+    {
+        // Arrange
+        var modelBuilder = new ODataModelBuilder();
+
+        var addressType = modelBuilder.ComplexType<Address>();
+        addressType.HasDynamicProperties(a => a.DynamicProperties);
+
+        var customerType = modelBuilder.EntityType<Customer>();
+        customerType.ComplexProperty(c => c.Address);
+
+        var model = modelBuilder.GetEdmModel();
+
+        var context = new ODataQueryContext(model, typeof(Customer));
+
+        var request = RequestFactory.Create("Get", "http://localhost/?$apply=groupby((Address/DynamicCity))&$orderby=Address/DynamicCity");
+
+        var options = new ODataQueryOptions(context, request);
+
+        Customer[] customers =
+        {
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 2" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 2" } } },
+                },
+                new Customer
+                {
+                    Address = new Address { DynamicProperties = new Dictionary<string, object> { { "DynamicCity", "City 1" } } },
+                }
+            };
+
+        // Act
+        IQueryable queryable = options.ApplyTo(customers.AsQueryable());
+
+        // Assert
+        Dictionary<string, object>[] expectedGroups =
+        {
+                new Dictionary<string, object> { { "Address/DynamicCity", "City 1" } },
+                new Dictionary<string, object> { { "Address/DynamicCity", "City 2" } }
+            };
+        var actualGroups = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();
+        Assert.Equal(expectedGroups.Length, actualGroups.Count);
+
+        var aggEnum = actualGroups.GetEnumerator();
+        foreach (var expected in expectedGroups)
+        {
+            aggEnum.MoveNext();
+            var agg = aggEnum.Current;
+            foreach (var key in expected.Keys)
+            {
+                object value = GetValue(agg, key);
+                Assert.Equal(expected[key], value);
+            }
+        }
+    }
+
+    public static List<Product> ProductApplyForTypeCastTestData
+    {
+        get
+        {
+            List<Product> productList = new List<Product>();
+
+            Product p1 = new DerivedProduct
+            {
+                ProductID = 1,
+                ProductName = "Product 1",
+                DerivedProductName = "Product A",
+                Category = new DerivedCategory
+                {
+                    CategoryID = 1,
+                    CategoryName = "Category 1",
+                    DerivedCategoryName = "Category A",
+                },
+            };
+            productList.Add(p1);
+            Product p2 = new DerivedProduct
+            {
+                ProductID = 2,
+                ProductName = "Product 1",
+                DerivedProductName = "Product A",
+                Category = new DerivedCategory
+                {
+                    CategoryID = 1,
+                    CategoryName = "Category 1",
+                    DerivedCategoryName = "Category A",
+                },
+            };
+            productList.Add(p2);
+            Product p3 = new DerivedProduct
+            {
+                ProductID = 3,
+                ProductName = "Product 2",
+                DerivedProductName = "Product B",
+                Category = new DerivedCategory
+                {
+                    CategoryID = 2,
+                    CategoryName = "Category 2",
+                    DerivedCategoryName = "Category B",
+                },
+            };
+            productList.Add(p3);
+
+            return productList;
+        }
+    }
+
+    public static TheoryDataSet<string, List<Dictionary<string, object>>> ProductTestAppliesForTypeCast
+    {
+        get
+        {
+            return new TheoryDataSet<string, List<Dictionary<string, object>>>
+                {
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.Product/ProductName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> { {"ProductName", "Product 1"} },
+                            new Dictionary<string, object> { {"ProductName", "Product 2"} }
+                        }
+                    },
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/DerivedProductName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> { { "DerivedProductName", "Product A"} },
+                            new Dictionary<string, object> { { "DerivedProductName", "Product B"} }
+                        }
+                    },
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/CategoryName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> { { "Category/CategoryName", "Category 1" } },
+                            new Dictionary<string, object> { { "Category/CategoryName", "Category 2" } }
+                        }
+                    },
+                    {
+                        "groupby((Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category A" } },
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category B" } }
+                        }
+                    },
+                    {
+                        "groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))",
+                        new List<Dictionary<string, object>>
+                        {
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category A" } },
+                            new Dictionary<string, object> { { "Category/DerivedCategoryName", "Category B" } }
+                        }
+                    }
+                };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(ProductTestAppliesForTypeCast))]
+    public void ApplyTo_Returns_Correct_Queryable_ForTypeCast(string apply, List<Dictionary<string, object>> aggregation)
+    {
+        // Arrange
+        var model = new ODataModelBuilder()
+                        .Add_Products_EntityType()
+                        .Add_DerivedProducts_EntityType()
+                        .Add_Categories_EntityType()
+                        .Add_DerivedCategories_EntityType()
+                        .Add_Products_EntitySet()
+                        .GetEdmModel();
+        var context = new ODataQueryContext(model, typeof(Product)) { RequestContainer = new MockServiceProvider() };
+        var queryOptionParser = new ODataQueryOptionParser(
+            context.Model,
+            context.ElementType,
+            context.NavigationSource,
+            new Dictionary<string, string> { { "$apply", apply } });
+        var applyOption = new ApplyQueryOption(apply, context, queryOptionParser);
+        IEnumerable<Product> products = ProductApplyForTypeCastTestData;
+
+        // Act
+        IQueryable queryable = applyOption.ApplyTo(products.AsQueryable(), new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True });
+
+        // Assert
+        Assert.NotNull(queryable);
+        var actualProducts = Assert.IsAssignableFrom<IEnumerable<DynamicTypeWrapper>>(queryable).ToList();
+
+        Assert.Equal(aggregation.Count(), actualProducts.Count());
+
+        var aggEnum = actualProducts.GetEnumerator();
+
+        foreach (var expected in aggregation)
+        {
+            aggEnum.MoveNext();
+            var agg = aggEnum.Current;
+            foreach (var key in expected.Keys)
+            {
+                object value = GetValue(agg, key);
+                Assert.Equal(expected[key], value);
+            }
+        }
+    }
 
     private object GetValue(DynamicTypeWrapper wrapper, string path)
     {

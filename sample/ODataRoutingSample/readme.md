@@ -90,8 +90,21 @@ If you run the sample and send the following request in a Web brower:
           {
             "$ref": "#/components/parameters/skip"
           },
-
-          
+     ....
+}
 ```
 
 You can use `$format=application/{yaml|json};version={2.0|3.0}` to get openApi in different format and version.
+
+You may notice the above Raw OpenAPI document can achieve using the middleware or using the controller (ODataOpenApiController).
+
+By default, the sample enables the OpenAPI middleware using
+
+```C#
+    // If you want to use /$openapi, enable the middleware.
+     app.UseODataOpenApi();
+```
+
+So the OpenAPI request is handled by middleware and the controller action is not hit by default.
+
+If you want to use/test the `ODataOpenApiController`, please simply remove 'app.UseODataOpenApi();`. Then the controller/action will be called.
