@@ -6,8 +6,10 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.ModelBuilder;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging;
@@ -71,6 +73,56 @@ public class NoContainmentPagingCustomer
 {
     public int Id { get; set; }
     public List<NoContainmentPagingOrder> Orders { get; set; }
+}
+
+public class UntypedPagingCustomerOrder
+{
+    public int Id { get; set; }
+
+    public IEnumerable<NoContainmentPagingOrder> Orders { get; } = new TruncatedEnumerable(2);
+    private class TruncatedEnumerable(int pageSize) : IEnumerable<NoContainmentPagingOrder>, ITruncatedCollection
+    {
+        public int PageSize => pageSize;
+
+        public bool IsTruncated => enumerator.Position > pageSize;
+
+        Enumerator enumerator = new(pageSize);
+        public IEnumerator GetEnumerator()
+        {
+            return enumerator;
+        }
+
+        IEnumerator<NoContainmentPagingOrder> IEnumerable<NoContainmentPagingOrder>.GetEnumerator()
+        {
+            return enumerator;
+        }
+
+        private class Enumerator(int pageSize) : IEnumerator<NoContainmentPagingOrder>
+        {
+            public int Position { get; set; } = 0;
+
+            public NoContainmentPagingOrder Current => new();
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+            }
+
+            public bool MoveNext()
+            {
+                // This enumerator simply advances the cursor position and returns false if we have passed the pagesize to stop enumeration
+                Position++;
+                return Position <= pageSize;
+            }
+
+            public void Reset()
+            {
+                Position = 0;
+            }
+        }
+    }
+
 }
 
 public class NoContainmentPagingOrder

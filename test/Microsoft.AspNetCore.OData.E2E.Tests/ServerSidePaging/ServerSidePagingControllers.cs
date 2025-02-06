@@ -9,8 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.ServerSidePaging;
 
@@ -218,6 +221,62 @@ public class NoContainmentPagingCustomersController : ODataController
         }
 
         return Ok(customer.Orders);
+    }
+}
+public class UntypedPagingCustomerOrdersController : ODataController
+{
+    public ActionResult Get()
+    {
+        ODataQuerySettings querySettings = new ODataQuerySettings();
+        IEdmModel model = HttpContext.ODataFeature().Model;
+        ODataQueryOptions queryOptions = CreateQueryOptions(model);
+        SetSelectExpandClauseOnODataFeature(model.EntityContainer.FindEntitySet("UntypedPagingCustomerOrders").EntityType, new Dictionary<string, string> { { "$expand", "Orders" } });
+
+        return Ok(queryOptions.ApplyTo(NoContainmentPagingDataSource.UntypedCustomerOrders.AsQueryable(), querySettings, AllowedQueryOptions.All & ~AllowedQueryOptions.SkipToken));
+    }
+
+    private ODataQueryOptions CreateQueryOptions(IEdmModel model)
+    {
+        ODataQueryContext context = CreateQueryContext(model, Request.ODataFeature().Path);
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, Request);
+        return queryOptions;
+    }
+
+    private static ODataQueryContext CreateQueryContext(IEdmModel model, ODataPath path)
+    {
+        IEdmStructuredType edmStructuredType = null;
+        foreach (var segment in path)
+        {
+            if (segment.EdmType is IEdmCollectionType collectionType)
+                edmStructuredType = collectionType.ElementType.AsEntity().EntityDefinition();
+            if (segment.EdmType is IEdmEntityType entityType)
+                edmStructuredType = entityType;
+            if (segment.EdmType is IEdmComplexType complexType)
+                edmStructuredType = complexType;
+        }
+        if (edmStructuredType == null)
+        {
+            throw new ArgumentException("No structured type in path");
+        }
+
+        return new ODataQueryContext(model, edmStructuredType, path);
+    }
+
+    private void SetSelectExpandClauseOnODataFeature(IEdmType edmEntityType, IDictionary<string, string> options = null)
+    {
+        if (!Request.IsCountRequest() && Request.ODataFeature().SelectExpandClause == null)
+        {
+            SelectExpandClause selectExpand;
+
+            ODataPath odataPath = Request.ODataFeature().Path;
+            var segment = odataPath.FirstSegment as EntitySetSegment;
+            IEdmNavigationSource source = segment?.EntitySet;
+            ODataQueryOptionParser parser = new ODataQueryOptionParser(Request.GetModel(), edmEntityType, source, options, Request.ODataFeature().Services);
+            selectExpand = parser.ParseSelectAndExpand();
+
+            //Set the SelectExpand Clause on the ODataFeature otherwise OData formatter won't show the expand and select properties in the response.
+            Request.ODataFeature().SelectExpandClause = selectExpand;
+        }
     }
 }
 
