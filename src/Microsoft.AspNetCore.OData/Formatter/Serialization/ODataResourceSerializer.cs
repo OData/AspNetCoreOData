@@ -267,8 +267,9 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         foreach (KeyValuePair<IEdmNavigationProperty, Type> navigationProperty in navigationProperties)
         {
             ODataNestedResourceInfo nestedResourceInfo = CreateNavigationLink(navigationProperty.Key, resourceContext);
+            selectExpandNode.ExpandedProperties.TryGetValue(navigationProperty.Key, out var selectItem);
             await writer.WriteStartAsync(nestedResourceInfo).ConfigureAwait(false);
-            await WriteDeltaComplexAndExpandedNavigationPropertyAsync(navigationProperty.Key, null, resourceContext, writer, navigationProperty.Value).ConfigureAwait(false);
+            await WriteDeltaComplexAndExpandedNavigationPropertyAsync(navigationProperty.Key, selectItem, resourceContext, writer, navigationProperty.Value).ConfigureAwait(false);
             await writer.WriteEndAsync().ConfigureAwait(false);
         }
     }
