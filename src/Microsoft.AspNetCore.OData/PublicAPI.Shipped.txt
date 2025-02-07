@@ -952,7 +952,8 @@ Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.Default = 0 -> Micr
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.False = 2 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.True = 1 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions
-Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
+Microsoft.AspNetCore.OData.Query.ICountOptionCollection
+Microsoft.AspNetCore.OData.Query.ICountOptionCollection.TotalCount.get -> long?Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
 Microsoft.AspNetCore.OData.Query.ODataQueryContext

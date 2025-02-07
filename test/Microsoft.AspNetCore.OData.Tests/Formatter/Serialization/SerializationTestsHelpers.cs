@@ -24,7 +24,8 @@ internal class SerializationTestsHelpers
         model.AddElement(sizeType);
 
         var customerType = new EdmEntityType("Default", "Customer");
-        customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32);
+        var idProperty = customerType.AddStructuralProperty("ID", EdmPrimitiveTypeKind.Int32);
+        customerType.AddKeys(idProperty);
         customerType.AddStructuralProperty("FirstName", EdmPrimitiveTypeKind.String);
         customerType.AddStructuralProperty("LastName", EdmPrimitiveTypeKind.String);
         customerType.AddStructuralProperty("Size", new EdmComplexTypeReference(sizeType,true));
@@ -105,9 +106,8 @@ internal class SerializationTestsHelpers
             specialOrderType.NavigationProperties().Single(np => np.Name == "SpecialCustomer"),
             customerSet);
 
-        NavigationSourceLinkBuilderAnnotation linkAnnotation = new MockNavigationSourceLinkBuilderAnnotation();
-        model.SetNavigationSourceLinkBuilder(customerSet, linkAnnotation);
-        model.SetNavigationSourceLinkBuilder(orderSet, linkAnnotation);
+        model.SetNavigationSourceLinkBuilder(customerSet, new NavigationSourceLinkBuilderAnnotation(customerSet, model));
+        model.SetNavigationSourceLinkBuilder(orderSet, new NavigationSourceLinkBuilderAnnotation(orderSet, model));
 
         model.AddElement(container);
         return model;

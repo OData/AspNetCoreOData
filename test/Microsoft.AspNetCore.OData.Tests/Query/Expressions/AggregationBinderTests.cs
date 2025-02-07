@@ -12,7 +12,9 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -193,6 +195,46 @@ public class AggregationBinderTests
             classicEF: true);
     }
 
+    [Fact]
+    public void NSCast_OnSingleEntity_GeneratesExpression_WithAsOperator()
+    {
+        var filters = VerifyQueryDeserialization(
+            "groupby((Microsoft.AspNetCore.OData.Tests.Models.Product/ProductName))",
+            ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = ProductName, Value = ($it As Product).ProductName, }, })"
+            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, })");
+    }
+
+    [Theory]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.Product/ProductName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = ProductName, Value = ($it As Product).ProductName, }, })")]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/DerivedProductName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = DerivedProductName, Value = ($it As DerivedProduct).DerivedProductName, }, })")]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/CategoryName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new NestedPropertyLastInChain() {Name = Category, NestedValue = new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = CategoryName, Value = ($it As DerivedProduct).Category.CategoryName, }, }, }, })")]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new NestedPropertyLastInChain() {Name = Category, NestedValue = new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = DerivedCategoryName, Value = (($it As DerivedProduct).Category As DerivedCategory).DerivedCategoryName, }, }, }, })")]
+    public void Inheritance_WithDerivedInstance(string filter, string expectedResult)
+    {
+        var filters = VerifyQueryDeserialization<DerivedProduct>(filter, expectedResult
+            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, })");
+    }
+
+    [Theory]
+    [InlineData("groupby((ProductName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = ProductName, Value = $it.ProductName, }, })")]
+    [InlineData("groupby((Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new NestedPropertyLastInChain() {Name = Category, NestedValue = new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = DerivedCategoryName, Value = ($it.Category As DerivedCategory).DerivedCategoryName, }, }, }, })")]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/DerivedProductName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = DerivedProductName, Value = ($it As DerivedProduct).DerivedProductName, }, })")]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/CategoryName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new NestedPropertyLastInChain() {Name = Category, NestedValue = new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = CategoryName, Value = ($it As DerivedProduct).Category.CategoryName, }, }, }, })")]
+    [InlineData("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct/Category/Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/DerivedCategoryName))", ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new NestedPropertyLastInChain() {Name = Category, NestedValue = new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = DerivedCategoryName, Value = (($it As DerivedProduct).Category As DerivedCategory).DerivedCategoryName, }, }, }, })")]
+    public void Inheritance_WithBaseInstance(string filter, string expectedResult)
+    {
+        var filters = VerifyQueryDeserialization<Product>(filter, expectedResult
+            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, })");
+    }
+
+    [Fact]
+    public void CastToNonDerivedType_Throws()
+    {
+        ExceptionAssert.Throws<ODataException>(
+            () => VerifyQueryDeserialization<Product>("groupby((Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory/CategoryName))"),
+            "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.");
+    }
+
     private Expression VerifyQueryDeserialization(string filter, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null, bool classicEF = false)
     {
         return VerifyQueryDeserialization<Product>(filter, expectedResult, settingsCustomizer, classicEF);
@@ -288,7 +330,7 @@ public class AggregationBinderTests
 
     private class AggregationBinderEFFake : AggregationBinder
     {
-        internal AggregationBinderEFFake(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation) 
+        internal AggregationBinderEFFake(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation)
             : base(settings, assembliesResolver, elementType, model, transformation)
         {
         }

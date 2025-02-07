@@ -42,6 +42,7 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
             typeof(ContainmentPagingCustomersController),
             typeof(ContainmentPagingCompanyController),
             typeof(NoContainmentPagingCustomersController),
+            typeof(UntypedPagingCustomerOrdersController),
             typeof(ContainmentPagingMenusController),
             typeof(ContainmentPagingRibbonController),
             typeof(CollectionPagingCustomersController));
@@ -56,6 +57,7 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         builder.EntitySet<ContainmentPagingCustomer>("ContainmentPagingCustomers");
         builder.Singleton<ContainmentPagingCustomer>("ContainmentPagingCompany");
         builder.EntitySet<NoContainmentPagingCustomer>("NoContainmentPagingCustomers");
+        builder.EntitySet<UntypedPagingCustomerOrder>("UntypedPagingCustomerOrders");
         builder.EntitySet<NoContainmentPagingOrder>("NoContainmentPagingOrders");
         builder.EntitySet<NoContainmentPagingOrderItem>("NoContainmentPagingOrderItems");
         builder.EntitySet<ContainmentPagingMenu>("ContainmentPagingMenus");
@@ -239,6 +241,24 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         Assert.Contains("/prefix/NoContainmentPagingCustomers/2/Orders?$expand=Items&$skip=2", content);
 
         Assert.Contains("/prefix/NoContainmentPagingCustomers?$expand=Orders", content);
+    }
+
+    [Fact]
+    public async Task VerifyExpectedNextLinksGeneratedForNestedExpandUntypedOrders()
+    {
+        // Arrange
+        var requestUri = "/prefix/UntypedPagingCustomerOrders?$expand=Orders";
+        var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+         
+        // Assert
+        Assert.Contains("/prefix/UntypedPagingCustomerOrders/1/Orders?$skip=2", content);
+        Assert.Contains("/prefix/UntypedPagingCustomerOrders/2/Orders?$skip=2", content);
+        Assert.Contains("/prefix/UntypedPagingCustomerOrders/3/Orders?$skip=2", content);
     }
 
     [Fact]

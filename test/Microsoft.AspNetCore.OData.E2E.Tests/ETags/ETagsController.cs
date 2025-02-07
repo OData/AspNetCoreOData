@@ -177,6 +177,34 @@ public class ETagsCustomersController : ODataController
     }
 }
 
+public class ETagSimpleThingsController : ODataController
+{
+    private readonly static ETagSimpleThing[] things =
+    [
+        new ETagSimpleThing { Id = 1, Name = "Thing 1", ComplexThing = new ETagComplexThing { Name = "Complex 1" } },
+        new ETagSimpleThing { Id = 2, Name = "Thing 2" }
+    ];
+
+    [EnableQuery]
+    public ActionResult<IEnumerable<ETagSimpleThing>> Get()
+    {
+        return Ok(things);
+    }
+
+    [EnableQuery]
+    public ActionResult<ETagSimpleThing> Get(int key)
+    {
+        var thing = things.FirstOrDefault(t => t.Id == key);
+
+        if (thing == null)
+        {
+            return NotFound();
+        }
+
+        return thing;
+    }
+}
+
 internal class Helpers
 {
     internal static ETagsCustomer CreateCustomer(int i)

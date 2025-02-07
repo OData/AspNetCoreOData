@@ -19,11 +19,14 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Edm;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Formatter.Models;
+using Microsoft.AspNetCore.OData.Tests.Query.Container;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -611,6 +614,87 @@ public class ODataResourceSetSerializerTests
         mockWriter.Verify();
     }
 
+    private class TruncatedEnumerable(int pageSize) : IEnumerable, ITruncatedCollection
+    {
+        public int PageSize => pageSize;
+
+        public bool IsTruncated => enumerator.Position > pageSize;
+
+        Enumerator enumerator = new(pageSize);
+        public IEnumerator GetEnumerator()
+        {
+            return enumerator;
+        }
+
+        private class Enumerator(int pageSize) : IEnumerator
+        {
+            public int Position { get; set; } = 0;
+
+            public object Current => new();
+
+            public bool MoveNext()
+            {
+                // This enumerator simply advances the cursor position and returns false if we have passed the pagesize to stop enumeration
+                Position++;
+                return Position <= pageSize;
+            }
+
+            public void Reset()
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
+    [Fact]
+    public async Task WriteObjectInlineAsync_Sets_NextPageLink_OnWriteEndAsync_ForInnerResourceSets()
+    {
+        // Arange
+        IEnumerable instance = new TruncatedEnumerable(2);
+
+        var request = RequestFactory.Create("GET", "http://localhost/Customers?$expand=Orders", opt => opt.AddRouteComponents(_model));
+
+        IEdmNavigationProperty navProp = _customerSet.EntityType.NavigationProperties().First();
+        SelectExpandClause selectExpandClause = new SelectExpandClause(new SelectItem[0], allSelected: true);
+        ResourceContext entity = new ResourceContext
+        {
+            SerializerContext =
+                new ODataSerializerContext { Request = request, NavigationSource = _customerSet, Model = _model }
+        };
+        ODataSerializerContext nestedContext = new ODataSerializerContext(entity, selectExpandClause, navProp);
+        nestedContext.ExpandedResource.StructuredType = _customerSet.EntityType;
+        object idValue = 1;
+        var edmCustomer = new Mock<EdmEntityObject>(_customerSet.EntityType);
+        edmCustomer.Setup(e => e.TryGetPropertyValue("ID", out idValue)).Returns(true);
+        nestedContext.ExpandedResource.EdmObject = edmCustomer.Object;
+
+        ODataResourceSet resourceSet = new ODataResourceSet();
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+        Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
+        serializer.CallBase = true;
+        serializer.Setup(s => s.CreateResourceSet(instance, _customersType, nestedContext)).Returns(resourceSet);
+        var mockWriter = new Mock<ODataWriter>();
+
+        mockWriter.Setup(m => m.WriteStartAsync(It.Is<ODataResourceSet>(f => f.NextPageLink == null))).Verifiable();
+        mockWriter
+            .Setup(m => m.WriteEndAsync())
+            .Callback(() =>
+            {
+                //Assert
+                Assert.Equal("http://localhost/Customers/1/Orders?$skip=2", resourceSet.NextPageLink?.AbsoluteUri);
+            })
+            .Returns(Task.CompletedTask)
+            .Verifiable();
+
+        // Act
+        await serializer.Object.WriteObjectInlineAsync(instance, _customersType, mockWriter.Object, nestedContext);
+
+        // Assert
+        mockWriter.Verify();
+    }
+
     [Fact]
     public void CreateResource_Sets_CountValueForPageResult()
     {
@@ -750,6 +834,59 @@ public class ODataResourceSetSerializerTests
 
         // Assert
         Assert.Null(resourceSet.Count);
+    }
+
+    private class InnerCollection : IEnumerable, ICountOptionCollection
+    {
+        public long? TotalCount => 4;
+
+        Enumerator enumerator = new();
+        public IEnumerator GetEnumerator()
+        {
+            return enumerator;
+        }
+
+        private class Enumerator : IEnumerator
+        {
+            private object current = new();
+            private int position = 0;
+            public object Current => current;
+
+            public bool MoveNext()
+            {
+                position++;
+                return position <= 2;
+            }
+
+            public void Reset()
+            {
+                position = 0;
+            }
+        }
+    }
+
+    [Fact]
+    public void CreateResourceSet_CountValue_ForInnerResourceSets_ICountOptionCollection()
+    {
+        // Arrange
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider.Object);
+        var request = RequestFactory.Create();
+        InnerCollection result = new();
+        IEdmNavigationProperty navProp = _customerSet.EntityType.NavigationProperties().First();
+        SelectExpandClause selectExpandClause = new SelectExpandClause(new SelectItem[0], allSelected: true);
+        ResourceContext entity = new ResourceContext
+        {
+            SerializerContext =
+                new ODataSerializerContext { Request = request, NavigationSource = _customerSet, Model = _model }
+        };
+        ODataSerializerContext nestedContext = new ODataSerializerContext(entity, selectExpandClause, navProp);
+
+        // Act
+        ODataResourceSet resourceSet = serializer.CreateResourceSet(result, _customersType, nestedContext);
+
+        // Assert
+        Assert.Equal(4, resourceSet.Count);
     }
 
     [Fact]
