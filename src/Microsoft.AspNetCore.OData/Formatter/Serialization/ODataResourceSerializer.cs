@@ -494,8 +494,9 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                     }
                     else
                     {
-                        bool isGeneric = graph.GetType().IsGenericType;
-                        bool isDelta = isGeneric && graph.GetType().GetGenericTypeDefinition() == typeof(Delta<>);
+                        Type graphType = graph.GetType();
+                        bool isGeneric = graphType.IsGenericType;
+                        bool isDelta = isGeneric && graphType.GetGenericTypeDefinition() == typeof(Delta<>);
                         await writer.WriteStartAsync(resource).ConfigureAwait(false);
                         await WriteResourceContent(writer, selectExpandNode, resourceContext, isDelta).ConfigureAwait(false);
                         await writer.WriteEndAsync().ConfigureAwait(false);
