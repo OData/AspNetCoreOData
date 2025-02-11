@@ -699,6 +699,12 @@ public abstract partial class QueryBinder
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
 
+        // EF6 and earlier don't support translating the Date property, so just return the original value
+        if (context.IsClassicEF)
+        {
+            return arguments[0];
+        }
+
         Type type = Nullable.GetUnderlyingType(arguments[0].Type) ?? arguments[0].Type;
         PropertyInfo property = type.GetProperty(nameof(DateTime.Date));
         
@@ -720,6 +726,12 @@ public abstract partial class QueryBinder
 
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
+        
+        // EF6 and earlier don't support translating the TimeOfDay property, so just return the original value
+        if (context.IsClassicEF)
+        {
+            return arguments[0];
+        }
 
         Type type = Nullable.GetUnderlyingType(arguments[0].Type) ?? arguments[0].Type;
         PropertyInfo property = type.GetProperty(nameof(DateTime.TimeOfDay));

@@ -161,7 +161,7 @@ public class FilterQueryOption
         FilterClause filterClause = FilterClause;
         Contract.Assert(filterClause != null);
 
-        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
+        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType, query.Provider);
 
         if (Compute != null)
         {

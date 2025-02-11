@@ -148,7 +148,7 @@ public class SearchQueryOption
             throw Error.NotSupported(SRResources.ApplyToOnUntypedQueryOption, "ApplyTo");
         }
 
-        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
+        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType, query.Provider);
 
         return binder.ApplyBind(query, SearchClause, binderContext);
     }

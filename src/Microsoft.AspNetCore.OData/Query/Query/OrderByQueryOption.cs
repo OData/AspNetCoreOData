@@ -262,7 +262,7 @@ public class OrderByQueryOption
         bool orderByItSeen = false;
 
         IOrderByBinder binder = Context.GetOrderByBinder();
-        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
+        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType, query.Provider);
         if (Compute != null)
         {
             binderContext.AddComputedProperties(Compute.ComputeClause.ComputedItems);

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData;
@@ -82,6 +83,20 @@ public class QueryBinderContext
         _lambdaParameters[DollarThis] = thisParameters;
 
         // Categories?$expand=Products($filter=OrderItems/any(oi:oi/UnitPrice ne UnitPrice)
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="QueryBinderContext" /> class.
+    /// </summary>
+    /// <param name="model">The Edm model.</param>
+    /// <param name="querySettings">The query setting.</param>
+    /// <param name="clrType">The current element CLR type in this context (scope).</param>
+    /// <param name="queryProvider">The query provider for the queryable being applied to.</param>
+    public QueryBinderContext(IEdmModel model, ODataQuerySettings querySettings, Type clrType,
+        IQueryProvider queryProvider)
+        : this(model, querySettings, clrType)
+    {
+        IsClassicEF = TypeHelper.IsClassicEFQueryProvider(queryProvider.GetType());
     }
 
     /// <summary>
@@ -186,6 +201,11 @@ public class QueryBinderContext
     /// Basically for $compute in $select and $expand
     /// </summary>
     public Expression Source { get; set; }
+    
+    /// <summary>
+    /// If the queryable provider is EF6
+    /// </summary>
+    public bool IsClassicEF { get; init; }
 
     /// <summary>
     /// Gets the parameter using parameter name.

@@ -211,7 +211,7 @@ public class SelectExpandQueryOption
 
         ISelectExpandBinder binder = Context.GetSelectExpandBinder();
 
-        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
+        QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType, queryable.Provider)
         {
             NavigationSource = Context.NavigationSource,
         };

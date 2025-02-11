@@ -10,6 +10,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -29,9 +30,7 @@ internal class TransformationBinderBase : ExpressionBinderBase
     protected Type ElementType { get { return this.LambdaParameter.Type; } }
 
     protected ParameterExpression LambdaParameter { get; set; }
-
-    protected bool ClassicEF { get; private set; }
-
+    
     /// <summary>
     /// Gets CLR type returned from the query.
     /// </summary>
@@ -39,24 +38,12 @@ internal class TransformationBinderBase : ExpressionBinderBase
     {
         get; protected set;
     }
-
-    /// <summary>
-    /// Checks IQueryable provider for need of EF6 optimization
-    /// </summary>
-    /// <param name="query"></param>
-    /// <returns>True if EF6 optimization are needed.</returns>
-    internal virtual bool IsClassicEF(IQueryable query)
-    {
-        var providerNS = query.Provider.GetType().Namespace;
-        return (providerNS == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6
-            || providerNS == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace);
-    }
-
+    
     protected void PreprocessQuery(IQueryable query)
     {
         Contract.Assert(query != null);
 
-        this.ClassicEF = IsClassicEF(query);
+        InitializeQuery(query);
         this.BaseQuery = query;
         EnsureFlattenedPropertyContainer(this.LambdaParameter);
     }

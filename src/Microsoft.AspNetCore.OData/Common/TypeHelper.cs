@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -417,6 +418,13 @@ internal static class TypeHelper
             // Proceed further
         }
         return false;
+    }
+
+    internal static bool IsClassicEFQueryProvider(Type queryProviderType)
+    {
+        var providerNS = queryProviderType.Namespace;
+        return providerNS == HandleNullPropagationOptionHelper.ObjectContextQueryProviderNamespaceEF6
+                || providerNS == HandleNullPropagationOptionHelper.EntityFrameworkQueryProviderNamespace;
     }
 
     private static Type GetInnerGenericType(Type interfaceType)

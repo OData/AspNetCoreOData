@@ -165,7 +165,7 @@ public class ApplyQueryOption
                 var filterTransformation = transformation as FilterTransformationNode;
 
                 IFilterBinder binder = Context.GetFilterBinder();
-                QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);
+                QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType, query.Provider);
 
                 query = binder.ApplyBind(query, filterTransformation.FilterClause, binderContext);
             }

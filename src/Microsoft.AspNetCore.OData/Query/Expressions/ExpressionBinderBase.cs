@@ -84,6 +84,11 @@ public abstract class ExpressionBinderBase
         QuerySettings = querySettings;
         Model = model;
     }
+    
+    /// <summary>
+    /// If queryable the query is being applied to is EF6
+    /// </summary>
+    protected bool ClassicEF { get; private set; }
     #endregion
 
     #region Abstract properties and methods
@@ -391,6 +396,12 @@ public abstract class ExpressionBinderBase
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
         
+        // EF6 and earlier don't support translating the Date property, so just return the original value
+        if (ClassicEF)
+        {
+            return arguments[0];
+        }
+        
         Type type = Nullable.GetUnderlyingType(arguments[0].Type) ?? arguments[0].Type;
         PropertyInfo property = type.GetProperty(nameof(DateTime.Date));
         
@@ -417,6 +428,12 @@ public abstract class ExpressionBinderBase
 
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
+        
+        // EF6 and earlier don't support translating the TimeOfDay property, so just return the original value
+        if (ClassicEF)
+        {
+            return arguments[0];
+        }
 
         Type type = Nullable.GetUnderlyingType(arguments[0].Type) ?? arguments[0].Type;
         PropertyInfo property = type.GetProperty(nameof(DateTime.TimeOfDay));
@@ -985,6 +1002,15 @@ public abstract class ExpressionBinderBase
 
         throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, propertyPath));
     }
+
+    /// <summary>
+    /// Initialize the state of the binder using the queryable to apply to
+    /// </summary>
+    /// <param name="query">Queryable the query is being applied to</param>
+    protected void InitializeQuery(IQueryable query)
+    {
+        ClassicEF = IsClassicEF(query);
+    }
     #endregion
 
     #region Internal methods
@@ -1339,6 +1365,16 @@ public abstract class ExpressionBinderBase
                 return NullConstant;
             }
         }
+    }
+    
+    /// <summary>
+    /// Checks IQueryable provider for need of EF6 optimization
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns>True if EF6 optimization are needed.</returns>
+    internal virtual bool IsClassicEF(IQueryable query)
+    {
+        return TypeHelper.IsClassicEFQueryProvider(query.Provider.GetType());
     }
     #endregion
 }
