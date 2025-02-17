@@ -1,6 +1,10 @@
 # ASP.NET Core OData
 ---
 
+For the OData2Linq readme, [click here](https://github.com/ArnaudB88/OData2Linq).
+
+---
+
 Component | Build  | Status 
 --------|--------- |---------
 ASP.NET Core OData|Rolling | [![Build Status](https://identitydivision.visualstudio.com/OData/_apis/build/status%2FAspNetCoreOData%2FAspNetCoreOData-main-rolling-1ES?repoName=OData%2FAspNetCoreOData&branchName=main)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=2403&repoName=OData%2FAspNetCoreOData&branchName=main)

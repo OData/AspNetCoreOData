@@ -1,0 +1,31 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: odata2linq-ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['6.0.x']
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup dotnet ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Restore dependencies
+      run: dotnet restore ./AspNetCoreOData.sln
+    - name: Build
+      run: dotnet build ./AspNetCoreOData.sln --no-restore
+    - name: Test
+      run: dotnet test ./AspNetCoreOData.sln --no-build --verbosity normal
