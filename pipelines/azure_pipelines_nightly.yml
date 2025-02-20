@@ -24,6 +24,8 @@ variables:
   value: anycpu
 - name: ProductBinPath
   value: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
+- group: OData-ESRP-CodeSigning
+
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
@@ -128,13 +130,13 @@ extends:
         - task: EsrpCodeSigning@5
           displayName: ESRP CodeSigning - WebAPI OData Product Signing
           inputs:
-            ConnectedServiceName: 'ESRP CodeSigning - OData'
-            AppRegistrationClientId: 'ce6e119c-a8c2-4744-9699-cd5389102d0d'
-            AppRegistrationTenantId: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
-            AuthAKVName: ODataESRPKeyVault
-            AuthCertName: ODataCodeSignAuth-AutoRotate
-            AuthSignCertName: ODataCodeSigningCert2024
-            ServiceEndpointUrl: 'https://api.esrp.microsoft.com/api/v2'
+            ConnectedServiceName: $(ODataEsrpConnectionServiceName)
+            AppRegistrationClientId: '$(ODataEsrpAppRegistrationClientId)'
+            AppRegistrationTenantId: '$(ODataEsrpAppRegistrationTenantId)'
+            AuthAKVName: $(ODataEsrpAuthKVName)
+            AuthCertName: $(ODataEsrpAuthCertName)
+            AuthSignCertName: $(ODataEsrpAuthSignCertName)
+            ServiceEndpointUrl: '$(ODataEsrpServiceEndpointUrl)'
             FolderPath: $(ProductBinPath)
             Pattern: Microsoft.AspNetCore.OData.dll,Microsoft.AspNetCore.OData.NewtonsoftJson.dll
             signConfigType: inlineSignParams
@@ -225,13 +227,13 @@ extends:
         - task: EsrpCodeSigning@5
           displayName: ESRP CodeSigning - WebAPI OData Packages Signing
           inputs:
-            ConnectedServiceName: ESRP CodeSigning - OData
-            AppRegistrationClientId: 'ce6e119c-a8c2-4744-9699-cd5389102d0d'
-            AppRegistrationTenantId: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
-            AuthAKVName: ODataESRPKeyVault
-            AuthCertName: ODataCodeSignAuth-AutoRotate
-            AuthSignCertName: ODataCodeSigningCert2024
-            ServiceEndpointUrl: 'https://api.esrp.microsoft.com/api/v2'
+            ConnectedServiceName: $(ODataEsrpConnectionServiceName)
+            AppRegistrationClientId: '$(ODataEsrpAppRegistrationClientId)'
+            AppRegistrationTenantId: '$(ODataEsrpAppRegistrationTenantId)'
+            AuthAKVName: $(ODataEsrpAuthKVName)
+            AuthCertName: $(ODataEsrpAuthCertName)
+            AuthSignCertName: $(ODataEsrpAuthSignCertName)
+            ServiceEndpointUrl: '$(ODataEsrpServiceEndpointUrl)'
             FolderPath: $(Build.ArtifactStagingDirectory)\Nuget
             Pattern: '*.nupkg'
             signConfigType: inlineSignParams
