@@ -125,10 +125,16 @@ extends:
           displayName: Use .NET Core SDK 2.x
           inputs:
             version: 2.x
-        - task: EsrpCodeSigning@1
+        - task: EsrpCodeSigning@5
           displayName: ESRP CodeSigning - WebAPI OData Product Signing
           inputs:
             ConnectedServiceName: 'ESRP CodeSigning - OData'
+            AppRegistrationClientId: 'ce6e119c-a8c2-4744-9699-cd5389102d0d'
+            AppRegistrationTenantId: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
+            AuthAKVName: ODataESRPKeyVault
+            AuthCertName: ODataCodeSignAuth-AutoRotate
+            AuthSignCertName: ODataCodeSigningCert2024
+            ServiceEndpointUrl: 'https://api.esrp.microsoft.com/api/v2'
             FolderPath: $(ProductBinPath)
             Pattern: Microsoft.AspNetCore.OData.dll,Microsoft.AspNetCore.OData.NewtonsoftJson.dll
             signConfigType: inlineSignParams
@@ -216,10 +222,16 @@ extends:
           inputs:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.Release.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Nuget -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic) -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
-        - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@1
+        - task: EsrpCodeSigning@5
           displayName: ESRP CodeSigning - WebAPI OData Packages Signing
           inputs:
             ConnectedServiceName: ESRP CodeSigning - OData
+            AppRegistrationClientId: 'ce6e119c-a8c2-4744-9699-cd5389102d0d'
+            AppRegistrationTenantId: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
+            AuthAKVName: ODataESRPKeyVault
+            AuthCertName: ODataCodeSignAuth-AutoRotate
+            AuthSignCertName: ODataCodeSigningCert2024
+            ServiceEndpointUrl: 'https://api.esrp.microsoft.com/api/v2'
             FolderPath: $(Build.ArtifactStagingDirectory)\Nuget
             Pattern: '*.nupkg'
             signConfigType: inlineSignParams
