@@ -65,6 +65,7 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
         ODataWriter writer = await messageWriter.CreateODataDeltaResourceSetWriterAsync(entitySet, entityType.EntityDefinition())
             .ConfigureAwait(false);
 
+        writeContext.IsDelta = true;
         await WriteObjectInlineAsync(graph, feedType, writer, writeContext).ConfigureAwait(false);
     }
 
@@ -99,6 +100,7 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
                 Error.Format(SRResources.CannotWriteType, GetType().Name, graph.GetType().FullName));
         }
 
+        writeContext.IsDelta = true;
         await WriteDeltaResourceSetAsync(enumerable, expectedType, writer, writeContext).ConfigureAwait(false);
     }
 
@@ -335,6 +337,7 @@ public class ODataDeltaResourceSetSerializer : ODataEdmTypeSerializer
                 Error.Format(SRResources.TypeCannotBeSerialized, expectedType.FullName()));
         }
 
+        writeContext.IsDelta = true;
         await deletedResourceSerializer.WriteObjectInlineAsync(value, expectedType, writer, writeContext);
     }
 

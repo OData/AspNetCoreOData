@@ -470,7 +470,6 @@ Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Naviga
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.NavigationSource.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ODataSerializerContext() -> void
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ODataSerializerContext(Microsoft.AspNetCore.OData.Formatter.ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty) -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Path.get -> Microsoft.OData.UriParser.ODataPath
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.Path.set -> void
 Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.QueryOptions.get -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
@@ -953,7 +952,6 @@ Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.False = 2 -> Micros
 Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption.True = 1 -> Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption
 Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions
 Microsoft.AspNetCore.OData.Query.ICountOptionCollection
-Microsoft.AspNetCore.OData.Query.ICountOptionCollection.TotalCount.get -> long?Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.CanParse(Microsoft.AspNetCore.Http.HttpRequest request) -> bool
 Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser.ParseAsync(Microsoft.AspNetCore.Http.HttpRequest request) -> System.Threading.Tasks.Task<string>
 Microsoft.AspNetCore.OData.Query.ODataQueryContext
