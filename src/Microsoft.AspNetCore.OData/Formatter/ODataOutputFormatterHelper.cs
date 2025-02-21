@@ -159,6 +159,7 @@ internal static class ODataOutputFormatterHelper
             writeContext.QueryOptions = queryOptions;
             writeContext.SetComputedProperties(queryOptions?.Compute?.ComputeClause);
             writeContext.Type = type;
+            writeContext.IsDelta = serializer.ODataPayloadKind == ODataPayloadKind.Delta;
 
             //Set the SelectExpandClause on the context if it was explicitly specified.
             if (selectExpandDifferentFromQueryOptions != null)
