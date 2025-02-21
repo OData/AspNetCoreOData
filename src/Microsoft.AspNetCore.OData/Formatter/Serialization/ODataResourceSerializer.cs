@@ -134,7 +134,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
 
         IEnumerable<IEdmStructuralProperty> complexProperties = selectExpandNode.SelectedComplexProperties.Keys;
 
-        if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
+        if (resourceContext.EdmObject != null && resourceContext.SerializerContext.IsDelta)
         {
             IDelta deltaObject = null;
             if (resourceContext.EdmObject is TypedEdmEntityObject obj)
@@ -477,7 +477,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                 }
 
                 await writer.WriteStartAsync(odataDeletedResource).ConfigureAwait(false);
-                await WriteResourceContent(writer, selectExpandNode, resourceContext, /*isDelta*/ true).ConfigureAwait(false);
+                await WriteResourceContent(writer, selectExpandNode, resourceContext).ConfigureAwait(false);
                 await writer.WriteEndAsync().ConfigureAwait(false);
             }
             else
@@ -494,9 +494,8 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                     }
                     else
                     {
-                        bool isDelta = graph is IDelta || graph is IEdmChangedObject;
                         await writer.WriteStartAsync(resource).ConfigureAwait(false);
-                        await WriteResourceContent(writer, selectExpandNode, resourceContext, isDelta).ConfigureAwait(false);
+                        await WriteResourceContent(writer, selectExpandNode, resourceContext).ConfigureAwait(false);
                         await writer.WriteEndAsync().ConfigureAwait(false);
                     }
                 }
@@ -512,11 +511,10 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
     /// <param name="writer">The <see cref="ODataWriter" /> to use to write the resource contents</param>
     /// <param name="selectExpandNode">The <see cref="SelectExpandNode"/> describing the response graph.</param>
     /// <param name="resourceContext">The context for the resource instance being written.</param>
-    /// <param name="isDelta">Whether to only write changed properties of the resource</param>
-    private async Task WriteResourceContent(ODataWriter writer, SelectExpandNode selectExpandNode, ResourceContext resourceContext, bool isDelta)
+    private async Task WriteResourceContent(ODataWriter writer, SelectExpandNode selectExpandNode, ResourceContext resourceContext)
     {
         // TODO: These should be aligned; do we need different methods for delta versus non-delta complex/navigation properties?
-        if (isDelta)
+        if (resourceContext.SerializerContext.IsDelta)
         {
             await WriteUntypedPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
             await WriteStreamPropertiesAsync(selectExpandNode, resourceContext, writer).ConfigureAwait(false);
@@ -1130,7 +1128,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
             return;
         }
 
-        if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
+        if (resourceContext.EdmObject != null && resourceContext.SerializerContext.IsDelta)
         {
             IDelta deltaObject = resourceContext.EdmObject as IDelta;
             IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
@@ -1400,7 +1398,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         {
             IEnumerable<IEdmStructuralProperty> structuralProperties = selectExpandNode.SelectedStructuralProperties;
 
-            if (null != resourceContext.EdmObject && resourceContext.EdmObject.IsDeltaResource())
+            if (resourceContext.EdmObject != null && resourceContext.SerializerContext.IsDelta)
             {
                 IDelta deltaObject = null;
                 if (resourceContext.EdmObject is TypedEdmEntityObject obj)
@@ -1412,8 +1410,8 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
                     deltaObject = resourceContext.EdmObject as IDelta;
                 }
 
-                if(deltaObject != null)
-                { 
+                if (deltaObject != null)
+                {
                     IEnumerable<string> changedProperties = deltaObject.GetChangedPropertyNames();
                     structuralProperties = structuralProperties.Where(p => changedProperties.Contains(p.Name) || p.IsKey());
                 }

@@ -2351,7 +2351,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSet
 
 public class Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext {
 	public ODataSerializerContext ()
-	public ODataSerializerContext (Microsoft.AspNetCore.OData.Formatter.ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty)
+	public ODataSerializerContext (Microsoft.AspNetCore.OData.Formatter.ResourceContext resourceContext, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty)
 
 	System.Threading.CancellationToken CancellationToken  { public get; }
 	System.Collections.Generic.ISet`1[[System.String]] ComputedProperties  { public get; }
