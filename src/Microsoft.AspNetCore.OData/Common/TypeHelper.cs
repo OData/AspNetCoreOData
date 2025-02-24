@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -41,6 +42,100 @@ namespace Microsoft.AspNetCore.OData.Common
         public static bool IsSelectExpandWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
 
         public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
+
+        public static bool IsFlatteningWrapper(this Type type)
+        {
+            if (type == null)
+            {
+                return false;
+            }
+
+            if (type.IsGenericType)
+            {
+                Type genericTypeDefinition = type.GetGenericTypeDefinition();
+
+                // Default implementation
+                if (genericTypeDefinition == typeof(FlatteningWrapper<>))
+                {
+                    Debug.Assert(
+                        typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
+                        && genericTypeDefinition.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IFlatteningWrapper<>))
+                        && genericTypeDefinition.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>)),
+                        "FlatteningWrapper<T> must inherit from DynamicTypeWrapper and implement IFlatteningWrapper<T> and IGroupByWrapper<T>");
+                    return true;
+                }
+
+                // FlatteningWrapper<T> must inherit from DynamicTypeWrapper
+                if (!typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition))
+                {
+                    return false;
+                }
+
+                // Custom implementation
+                Type[] genericTypeInterfaces = genericTypeDefinition.GetInterfaces();
+                bool typeImplementsIFlatteningWrapper = false;
+                bool typeImplementsIGroupByWrapper = false;
+                for (int i = 0; i < genericTypeInterfaces.Length; i++)
+                {
+                    Type genericTypeInterface = genericTypeInterfaces[i];
+                    // FlatteningWrapper<T> must implement IFlatteningWrapper<T> and IGroupByWrapper<T>
+                    if (genericTypeInterface.IsGenericType && genericTypeInterface.GetGenericTypeDefinition() == typeof(IFlatteningWrapper<>))
+                    {
+                        typeImplementsIFlatteningWrapper = true;
+                    }
+
+                    if (genericTypeInterface.IsGenericType && genericTypeInterface.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>))
+                    {
+                        typeImplementsIGroupByWrapper = true;
+                    }
+
+                    if (typeImplementsIFlatteningWrapper && typeImplementsIGroupByWrapper)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool IsGroupByWrapper(this Type type)
+        {
+            if (type == null || type.IsValueType || type == typeof(string))
+            {
+                return false;
+            }
+
+            // Default implementation
+            if (typeof(GroupByWrapper).IsAssignableFrom(type))
+            {
+                Debug.Assert(
+                    typeof(DynamicTypeWrapper).IsAssignableFrom(type)
+                    && type.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>)),
+                    "GroupByWrapper must inherit from DynamicTypeWrapper and implement IGroupByWrapper<T>");
+                return true;
+            }
+
+            // GroupByWrapper must inherit from DynamicTypeWrapper
+            if (!typeof(DynamicTypeWrapper).IsAssignableFrom(type))
+            {
+                return false;
+            }
+
+            // Custom implementation
+            Type[] typeInterfaces = type.GetInterfaces();
+            for (int i = 0; i < typeInterfaces.Length; i++)
+            {
+                Type typeInterface = typeInterfaces[i];
+                // GroupByWrapper must implement IGroupByWrapper<T>
+                if (typeInterface.IsGenericType && typeInterface.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
         {

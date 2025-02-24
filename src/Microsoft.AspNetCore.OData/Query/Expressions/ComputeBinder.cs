@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, wrapperPropertyValueExpression));
 
             // Set new compute properties
-            wrapperProperty = ResultClrType.GetProperty("Container");
+            wrapperProperty = ResultClrType.GetProperty(QueryConstants.GroupByWrapperContainerProperty);
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
             var initilizedMember =

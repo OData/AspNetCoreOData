@@ -2616,6 +2616,15 @@ public sealed class Microsoft.AspNetCore.OData.Formatter.Wrapper.ODataResourceWr
 	Microsoft.OData.ODataResourceBase Resource  { public get; }
 }
 
+public interface Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`1 {
+	string Name  { public abstract get; public abstract set; }
+	T NestedValue  { public abstract get; public abstract set; }
+	Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`1 Next  { public abstract get; public abstract set; }
+	object Value  { public abstract get; public abstract set; }
+
+	void ToDictionaryCore (System.Collections.Generic.Dictionary`2[[System.String],[System.Object]] dictionary, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper propertyMapper, bool includeAutoSelected)
+}
+
 public interface Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper {
 	string MapProperty (string propertyName)
 }
@@ -2921,6 +2930,15 @@ public class Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator {
 	public TopQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1 {
+	T Source  { public abstract get; public abstract set; }
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`1 {
+	T Container  { public abstract get; public abstract set; }
+	T GroupByContainer  { public abstract get; public abstract set; }
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper {
