@@ -10182,6 +10182,48 @@
             <param name="request">A http request containing the query options.</param>
             <returns>A string representing the query options part of an OData URL.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataCastOptions">
+            <summary>
+            The cast options.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataCastOptions.MapProvider">
+            <summary>
+            Gets/sets the map provider.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.IQueryableODataExtension">
+            <summary>
+            Provides a set of static methods for querying data structures that implement <see cref="T:System.Linq.IQueryable"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IQueryableODataExtension.OCast``1(System.Object,Microsoft.AspNetCore.OData.Query.ODataCastOptions)">
+            <summary>
+            Converts the source to the specified type.
+            </summary>
+            <typeparam name="TResult">The type to convert the source to.</typeparam>
+            <param name="source">The source.</param>
+            <param name="options">The cast options.</param>
+            <returns>The converted object if it's OData object. Otherwise, return same source or the default.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IQueryableODataExtension.OCast``1(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataCastOptions)">
+            <summary>
+            Converts the elements of an <see cref="T:System.Linq.IQueryable"/> to the specified type.
+            </summary>
+            <typeparam name="TResult">The type to convert the elements of source to.</typeparam>
+            <param name="source">The <see cref="T:System.Linq.IQueryable"/> that contains the elements to be converted.</param>
+            <param name="options">The cast options.</param>
+            <returns>Contains each element of the source sequence converted to the specified type.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IQueryableODataExtension.CreateInstance(Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper,System.Type,Microsoft.AspNetCore.OData.Query.ODataCastOptions)">
+            <summary>
+            Create the object based on <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper"/>
+            </summary>
+            <param name="wrapper">The select expand wrapper.</param>
+            <param name="resultType">The created type.</param>
+            <param name="options">The options.</param>
+            <returns>The created object.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ModelBoundQuerySettingsExtensions">
             <summary>
             This class describes the model bound settings to use during query composition.
@@ -13084,6 +13126,11 @@
             Indicates whether the underlying instance can be used to obtain property values.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.InstanceValue">
+            <summary>
+            Gets the instance value.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper.GetEdmType">
             <inheritdoc />
         </member>
@@ -13119,6 +13166,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1.Instance">
             <summary>
             Gets or sets the instance of the element being selected and expanded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1.InstanceValue">
+            <summary>
+            Gets the instance value.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.BadRequestODataResult">
