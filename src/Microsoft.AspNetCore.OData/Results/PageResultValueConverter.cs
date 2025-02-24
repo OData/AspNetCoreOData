@@ -21,8 +21,8 @@ namespace Microsoft.AspNetCore.OData.Results
                 return false;
             }
 
-            Type generaticType = typeToConvert.GetGenericTypeDefinition();
-            return generaticType == typeof(PageResult<>);
+            Type genericType = typeToConvert.GetGenericTypeDefinition();
+            return genericType == typeof(PageResult<>);
         }
 
         /// <summary>
@@ -34,10 +34,10 @@ namespace Microsoft.AspNetCore.OData.Results
         public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options)
         {
             // Since 'type' is tested in 'CanConvert()', it must be a generic type
-            Type generaticType = type.GetGenericTypeDefinition();
+            Type genericType = type.GetGenericTypeDefinition();
             Type entityType = type.GetGenericArguments()[0];
 
-            if (generaticType == typeof(PageResult<>))
+            if (genericType == typeof(PageResult<>))
             {
                 return (JsonConverter)Activator.CreateInstance(typeof(PageResultConverter<>).MakeGenericType(new Type[] { entityType }));
             }

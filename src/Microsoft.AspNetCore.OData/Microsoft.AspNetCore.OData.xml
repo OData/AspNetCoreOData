@@ -2553,6 +2553,29 @@
             Gets the whole expand path.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataEndpointModelMapper">
+            <summary>
+            A cache for <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:Microsoft.OData.Edm.IEdmModel"/> mapping.
+            It's typically used for minimal API scenario.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.IODataEndpointModelMapper.Maps">
+            <summary>
+            Gets the map between <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:Microsoft.OData.Edm.IEdmModel"/>
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration">
+            <summary>
+            Defines a contract used to apply extra logic on the model builder.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration.Apply(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.ModelBuilder.ODataModelBuilder)">
+            <summary>
+            Applies model configurations using the provided builder.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="builder">The <see cref="T:Microsoft.OData.ModelBuilder.ODataModelBuilder">builder</see> used to apply configurations.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper">
             <summary>
             Provides the mapping between CLR type and Edm type.
@@ -3205,6 +3228,50 @@
             <param name="request">The Http request.</param>
             <param name="segments">The OData path segments.</param>
             <returns>The generated OData link.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Extensions.ODataEndpointConventionBuilderExtensions">
+            <summary>
+            Extension methods for annotating OData metadata on an <see cref="T:Microsoft.AspNetCore.Http.Endpoint" />.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ODataEndpointConventionBuilderExtensions.UseOData``1(``0,System.String)">
+            <summary>
+            Adds an OData prefix metadata to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            The prefix should be same as the defined prefix when calling 'AddRouteComponents'
+            This method typically is used in Minimal API scenarios.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="prefix">The route component prefix.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+            <remarks>
+            When we target on .NET 7 or above, we can get the 'ServiceProvider' from Endpoint builder,
+            Then, we should check the 'AddOData' is called and associated route with given prefix registered.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ODataEndpointConventionBuilderExtensions.UseOData``1(``0,Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration)">
+            <summary>
+            Adds an OData model configuration metadata to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            This method typically is used in Minimal API scenarios.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="config">The model configuration.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata">
+            <summary>
+            Defines a contract use to specify the OData prefix metadata in <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata.#ctor(System.String)">
+            <summary>
+             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata"/> class.
+            </summary>
+            <param name="prefix">The route component prefix</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataPrefixMetadata.Prefix">
+            <summary>
+            Gets the route component prefix.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions">
             <summary>
@@ -6696,6 +6763,31 @@
             <summary>
             Provides extension methods to add OData services.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataOptions,System.IServiceProvider})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
@@ -10786,6 +10878,14 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="querySettings">The settings to use in query composition.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Bind the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute">
             <summary>
