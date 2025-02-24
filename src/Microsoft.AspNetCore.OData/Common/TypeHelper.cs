@@ -36,11 +36,28 @@ namespace Microsoft.AspNetCore.OData.Common
             return (type != null && typeof(DynamicTypeWrapper).IsAssignableFrom(type));
         }
 
+        public static bool IsCollectionDynamicTypeWrapper(this Type type)
+        {
+            if (!IsCollection(type, out Type elementType))
+            {
+                return false;
+            }
+
+            //while (elementType != null && elementType != typeof(object))
+            //{
+            //    elementType = elementType.BaseType;
+            //}
+
+            return elementType.IsDynamicTypeWrapper();
+        }
+
         public static bool IsDeltaSetWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(DeltaSet<>), type, out entityType);
 
         public static bool IsSelectExpandWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
 
         public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
+
+        public static bool IsGroupByWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(GroupByWrapper<>), type, out entityType);
 
         private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
         {

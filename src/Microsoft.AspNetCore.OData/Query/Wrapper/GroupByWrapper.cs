@@ -15,6 +15,9 @@ using Microsoft.AspNetCore.OData.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
+    internal class GroupByWrapper<T> : GroupByWrapper
+    { }
+
     internal class GroupByWrapper : DynamicTypeWrapper
     {
         private Dictionary<string, object> _values;
@@ -86,14 +89,14 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         }
     }
 
-    internal class GroupByWrapperConverter : JsonConverter<GroupByWrapper>
+    internal class GroupByWrapperConverter<T> : JsonConverter<GroupByWrapper<T>>
     {
-        public override GroupByWrapper Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override GroupByWrapper<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, nameof(GroupByWrapper)));
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(GroupByWrapper<T>).Name));
         }
 
-        public override void Write(Utf8JsonWriter writer, GroupByWrapper value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, GroupByWrapper<T> value, JsonSerializerOptions options)
         {
             if (value != null)
             {

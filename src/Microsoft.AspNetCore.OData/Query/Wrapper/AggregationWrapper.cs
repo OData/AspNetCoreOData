@@ -11,18 +11,18 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
-    internal class AggregationWrapper : GroupByWrapper
+    internal class AggregationWrapper<T> : GroupByWrapper<T>
     {
     }
 
-    internal class AggregationWrapperConverter : JsonConverter<AggregationWrapper>
+    internal class AggregationWrapperConverter<T> : JsonConverter<AggregationWrapper<T>>
     {
-        public override AggregationWrapper Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override AggregationWrapper<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, nameof(AggregationWrapper)));
+            throw new NotImplementedException(Error.Format(SRResources.JsonConverterDoesnotSupportRead, typeof(AggregationWrapper<T>).Name));
         }
 
-        public override void Write(Utf8JsonWriter writer, AggregationWrapper value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, AggregationWrapper<T> value, JsonSerializerOptions options)
         {
             if (value != null)
             {

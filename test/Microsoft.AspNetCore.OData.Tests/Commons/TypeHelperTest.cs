@@ -23,13 +23,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Commons
     public class TypeHelperTest
     {
         [Theory]
-        [InlineData(typeof(AggregationWrapper), true)]
+        [InlineData(typeof(AggregationWrapper<object>), true)]
         [InlineData(typeof(ComputeWrapper<object>), true)]
-        [InlineData(typeof(EntitySetAggregationWrapper), true)]
+        [InlineData(typeof(EntitySetAggregationWrapper<object>), true)]
         [InlineData(typeof(FlatteningWrapper<object>), true)]
         [InlineData(typeof(GroupByWrapper), true)]
-        [InlineData(typeof(NoGroupByAggregationWrapper), true)]
-        [InlineData(typeof(NoGroupByWrapper), true)]
+        [InlineData(typeof(NoGroupByAggregationWrapper<object>), true)]
+        [InlineData(typeof(NoGroupByWrapper<object>), true)]
         [InlineData(typeof(object), false)]
         [InlineData(typeof(SelectExpandWrapper), false)]
         [InlineData(null, false)]
