@@ -2465,6 +2465,22 @@
             <param name="operation">The operation for which the operation link is to be generated.</param>
             <param name="operationLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to set.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata">
+            <summary>
+            Represents Edm model metadata used during OData query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata.#ctor(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata" /> class.
+            </summary>
+            <param name="model">The Edm model.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata.Model">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks">
             <summary>
             EntitySelfLinks contains the Id, Edit and Read links for an entity.
@@ -2515,6 +2531,29 @@
             <summary>
             Gets the whole expand path.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IEdmModelMetadata">
+            <summary>
+            Represents the Edm model metadata used during OData query.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Edm.IEdmModelMetadata.Model">
+            <summary>
+            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration">
+            <summary>
+            Defines a contract used to apply extra logic on the model builder.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration.Apply(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.ModelBuilder.ODataModelBuilder,System.Type)">
+            <summary>
+            Applies model configurations using the provided builder.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="builder">The <see cref="T:Microsoft.OData.ModelBuilder.ODataModelBuilder">builder</see> used to apply configurations.</param>
+            <param name="clrType">The top CLR type.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper">
             <summary>
@@ -3168,6 +3207,26 @@
             <param name="request">The Http request.</param>
             <param name="segments">The OData path segments.</param>
             <returns>The generated OData link.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext">
+            <summary>
+            Provides an abstraction for wrapping the <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/> and the <see cref="T:System.Reflection.MethodInfo"/> associated with a route handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.MethodInfo">
+            <summary>
+            The <see cref="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.MethodInfo"/> associated with the current route handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.InvocationContext">
+            <summary>
+            The <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/> associated with the current route filter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.HttpContext">
+            <summary>
+            Gets the <see cref="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.HttpContext"/>.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions">
             <summary>
@@ -6410,6 +6469,19 @@
             Gets the inner nested resource infos.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.IODataMetadataHandler">
+            <summary>
+            A handler used to output OData CSDL.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.IODataMetadataHandler.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Implements the core logic associated with the filter given a <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
+            </summary>
+            <param name="context">The http context.</param>
+            <param name="model">The Edm model.</param>
+            <returns>An awaitable result of calling the handler.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">
             <summary>
             Provides extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to add OData routes.
@@ -6447,6 +6519,90 @@
             <param name="routePattern">The given route pattern.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions">
+            <summary>
+            Extension methods for adding <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to a route handler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
+            It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
+            </summary>
+            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
+            <param name="pattern">The route pattern.</param>
+            <param name="model">The related Edm model.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.IODataMetadataHandler)">
+            <summary>
+            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata based on <see cref="T:Microsoft.AspNetCore.OData.IODataMetadataHandler"/>.
+            </summary>
+            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
+            <param name="pattern">The route pattern.</param>
+            <param name="model">The related Edm model.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Builder.RouteHandlerBuilder,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations},System.Action{Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings},System.Action{Microsoft.AspNetCore.OData.Query.ODataQuerySettings})">
+            <summary>
+            Registers the default OData query filter onto the route handler.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/>.</param>
+            <param name="defaultConfigSetup">The action to configure default  settings.</param>
+            <param name="validationSetup">The action to configure validataion settings.</param>
+            <param name="querySetup">The action to configure query settings.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Routing.RouteGroupBuilder,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations},System.Action{Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings},System.Action{Microsoft.AspNetCore.OData.Query.ODataQuerySettings})">
+            <summary>
+            Registers the default OData query filter onto the route group.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
+            <param name="validationSetup">The action to configure validataion settings.</param>
+            <param name="querySetup">The action to configure query settings.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Builder.RouteHandlerBuilder,Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter)">
+            <summary>
+            Registers an OData query filter onto the route handler.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/>.</param>
+            <param name="queryFilter">The <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Routing.RouteGroupBuilder,Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter)">
+            <summary>
+            Registers an OData query filter onto the route group.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
+            <param name="queryFilter">The <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter``1(Microsoft.AspNetCore.Builder.RouteHandlerBuilder)">
+            <summary>
+            Registers an OData query filter of type <typeparamref name="TFilterType"/> onto the route handler.
+            </summary>
+            <typeparam name="TFilterType">The type of the <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to register.</typeparam>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter``1(Microsoft.AspNetCore.Routing.RouteGroupBuilder)">
+            <summary>
+            Registers an OData query filter of type <typeparamref name="TFilterType"/> onto the route group.
+            </summary>
+            <typeparam name="TFilterType">The type of the <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to register.</typeparam>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithModel``1(``0,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Adds an OData Edm model metadata to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            This method typically is used in Minimal API scenarios.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="model">The Edm model.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
             <summary>
             Sets up default OData options for <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>.
@@ -6457,6 +6613,19 @@
              Configure the default <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>
             </summary>
             <param name="options">The Json Options.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMetadataHandler">
+            <summary>
+            The default metadata handler used to output OData CSDL.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMetadataHandler.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Implements the core logic associated with the filter given a <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
+            </summary>
+            <param name="context">The http context.</param>
+            <param name="model">The Edm model.</param>
+            <returns>An awaitable result of calling the handler.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions">
             <summary>
@@ -6738,6 +6907,22 @@
             <summary>
             Provides extension methods to add OData services.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
@@ -8462,6 +8647,12 @@
             This class describes the default configurations to use during query composition.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableAll">
+            <summary>
+            Enable all query options.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute">
             <summary>
             This partial class defines the configuration on <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>.
@@ -8800,12 +8991,12 @@
             <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
             <returns>The EDM model for the given type and request.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData">
+        <member name="T:Microsoft.AspNetCore.OData.Query.RequestQueryData">
             <summary>
             Holds request level query information.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData.QueryValidationRunBeforeActionExecution">
+        <member name="P:Microsoft.AspNetCore.OData.Query.RequestQueryData.QueryValidationRunBeforeActionExecution">
             <summary>
             Gets or sets a value indicating whether query validation was run before action (controller method) is executed.
             </summary>
@@ -8814,7 +9005,7 @@
             For cases where the run failed before action execution. We will run validation on result.
             </remarks>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData.ProcessedQueryOptions">
+        <member name="P:Microsoft.AspNetCore.OData.Query.RequestQueryData.ProcessedQueryOptions">
             <summary>
             Gets or sets the processed query options.
             </summary>
@@ -10202,6 +10393,26 @@
             Gets a value representing the total count of the collection.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter">
+            <summary>
+            Provides an interface for implementing a filter to run codes before and after a route handler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the OData query composition before route handler is executing.
+            </summary>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutedAsync(System.Object,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the OData query composition after route handler is executed.
+            </summary>
+            <param name="responseValue">The response value from the route handler.</param>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser">
             <summary>
             Exposes the ability to read and parse the content of a <see cref="T:Microsoft.AspNetCore.Http.HttpRequest" />
@@ -10555,6 +10766,141 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator"/>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter">
+            <summary>
+            The default implementation to <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to run codes before and after a route handler.
+            This typically is used for minimal api scenario.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidationSettings">
+            <summary>
+            Gets the validation settings. Customers can use this to configure the validation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.QuerySettings">
+            <summary>
+            Gets the query settings. Customers can use this to configure each query executing.
+            </summary>
+            <remarks>
+            It could be confusing between DefaultQueryConfigurations and ODataQuerySettings.
+            DefaultQueryConfigurations is used to config the functionalities for query options. For example: is $filter enabled?
+            ODataQuerySettings is used to set options for every query executing.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.InvokeAsync(Microsoft.AspNetCore.Http.EndpointFilterInvocationContext,Microsoft.AspNetCore.Http.EndpointFilterDelegate)">
+            <summary>
+            Implements the core logic associated with the filter given a <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/>
+            and the next filter to call in the pipeline.
+            </summary>
+            <param name="invocationContext">The <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/> associated with the current request/response.</param>
+            <param name="next">The next filter in the pipeline.</param>
+            <returns>An awaitable result of calling the handler and apply any modifications made by filters in the pipeline.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the query composition before route handler is executing.
+            </summary>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.ValueTask"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutedAsync(System.Object,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the query composition after route handler is executed.
+            </summary>
+            <param name="responseValue">The response value from the route handler.</param>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.ValueTask"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ExecuteQuery(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Execute the query.
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+            <param name="request">The internal request.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateSelectExpandOnly(Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Validate the select and expand options.
+            </summary>
+            <param name="queryOptions">The query options.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Object,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Applies the query to the given entity based on incoming query from uri and query settings.
+            </summary>
+            <param name="entity">The original entity from the response message.</param>
+            <param name="queryOptions">
+            The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
+            </param>
+            <returns>The new entity after the $select and $expand query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Applies the query to the given IQueryable based on incoming query from uri and query settings. By default,
+            the implementation supports $top, $skip, $orderby and $filter. Override this method to perform additional
+            query composition of the query.
+            </summary>
+            <param name="queryable">The original queryable instance from the response message.</param>
+            <param name="queryOptions">
+            The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetODataQueryContext(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Get the OData query context.
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
+            <param name="request">The OData path.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateAndValidateQueryOptions(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Create and validate a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> from a query and context during action executed.
+            Developers can override this virtual method to provide its own <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.
+            </summary>
+            <param name="request">The incoming request.</param>
+            <param name="queryContext">The query context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetElementType(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Get the element type.
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateQuery(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Validates the OData query in the incoming request. By default, the implementation throws an exception if
+            the query contains unsupported query parameters. Override this method to perform additional validation of
+            the query.
+            </summary>
+            <param name="queryOptions">
+            The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> for action executing validation.
+            </summary>
+            <param name="invocationContext">The action executing context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> or null if we can't create it during action executing.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetModel(System.Type,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Gets the EDM model for the given type and request.Override this method to customize the EDM model used for
+            querying.
+            </summary>
+            <param name="elementClrType">The CLR type to retrieve a model for.</param>
+            <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
+            <returns>The EDM model for the given type and request.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
             This defines a composite OData query options that can be used to perform query composition.
@@ -10828,6 +11174,14 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="querySettings">The settings to use in query composition.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute">
             <summary>

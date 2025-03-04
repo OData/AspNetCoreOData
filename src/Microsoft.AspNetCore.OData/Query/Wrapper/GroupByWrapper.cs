@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.OData.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 
+[JsonConverter(typeof(DynamicTypeWrapperConverter))]
 internal class GroupByWrapper : DynamicTypeWrapper
 {
     private Dictionary<string, object> _values;

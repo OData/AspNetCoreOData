@@ -5,9 +5,13 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
 
@@ -93,6 +97,27 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions
     {
         ValidateQuery(query);
         return base.ApplyTo(query, querySettings);
+    }
+
+    /// <summary>
+    /// Binds the <see cref="HttpContext"/> and <see cref="ParameterInfo"/> to generate the <see cref="ODataQueryOptions{TEntity}"/>.
+    /// </summary>
+    /// <param name="context">The HttpContext.</param>
+    /// <param name="parameter">The parameter info.</param>
+    /// <returns>The built <see cref="ODataQueryOptions{TEntity}"/></returns>
+    public static ValueTask<ODataQueryOptions<TEntity>> BindAsync(HttpContext context, ParameterInfo parameter)
+    {
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        Type entityClrType = typeof(TEntity);
+        IEdmModel model = context.GetEdmModel(entityClrType);
+        ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, context.ODataFeature().Path);
+        var result = new ODataQueryOptions<TEntity>(entitySetContext, context.Request);
+
+        return ValueTask.FromResult(result);
     }
 
     private static void ValidateQuery(IQueryable query)

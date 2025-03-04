@@ -827,28 +827,28 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         Contract.Assert(model != null);
         return model;
     }
+}
+
+/// <summary>
+/// Holds request level query information.
+/// </summary>
+internal class RequestQueryData
+{
+    /// <summary>
+    /// Gets or sets a value indicating whether query validation was run before action (controller method) is executed.
+    /// </summary>
+    /// <remarks>
+    /// Marks if the query validation was run before the action execution. This is not always possible.
+    /// For cases where the run failed before action execution. We will run validation on result.
+    /// </remarks>
+    public bool QueryValidationRunBeforeActionExecution { get; set; }
 
     /// <summary>
-    /// Holds request level query information.
+    /// Gets or sets the processed query options.
     /// </summary>
-    private class RequestQueryData
-    {
-        /// <summary>
-        /// Gets or sets a value indicating whether query validation was run before action (controller method) is executed.
-        /// </summary>
-        /// <remarks>
-        /// Marks if the query validation was run before the action execution. This is not always possible.
-        /// For cases where the run failed before action execution. We will run validation on result.
-        /// </remarks>
-        public bool QueryValidationRunBeforeActionExecution { get; set; }
-
-        /// <summary>
-        /// Gets or sets the processed query options.
-        /// </summary>
-        /// <remarks>
-        /// Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
-        /// This is because ValidateQuery internally modifies query options (expands are prime example of this).
-        /// </remarks>
-        public ODataQueryOptions ProcessedQueryOptions { get; set; }
-    }
+    /// <remarks>
+    /// Stores the processed query options to be used later if OnActionExecuting was able to verify the query.
+    /// This is because ValidateQuery internally modifies query options (expands are prime example of this).
+    /// </remarks>
+    public ODataQueryOptions ProcessedQueryOptions { get; set; }
 }

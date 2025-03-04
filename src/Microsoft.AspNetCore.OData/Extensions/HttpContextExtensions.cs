@@ -7,8 +7,13 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using System;
+using System.Linq;
 
 namespace Microsoft.AspNetCore.OData.Extensions;
 
@@ -74,5 +79,51 @@ public static class HttpContextExtensions
         }
 
         return httpContext.RequestServices?.GetService<IOptions<ODataOptions>>()?.Value;
+    }
+
+    internal static IEdmModel GetEdmModel(this HttpContext httpContext, Type clrType)
+    {
+        if (httpContext == null)
+        {
+            throw Error.ArgumentNull(nameof(httpContext));
+        }
+
+        // 1. Get model for the request if it's configured/cached, used it.
+        IODataFeature odataFeature = httpContext.ODataFeature();
+        IEdmModel model = odataFeature.Model;
+        if (model is not null)
+        {
+            return model;
+        }
+
+        // 2. Retrieve it from metadata?
+        var endpoint = httpContext.GetEndpoint();
+        IEdmModelMetadata modelMetadata = endpoint.Metadata.GetMetadata<IEdmModelMetadata>();
+        if (modelMetadata is not null)
+        {
+            // Cached it into the ODataFeature()
+            odataFeature.Model = modelMetadata.Model;
+            return modelMetadata.Model;
+        }
+
+        // Ok, we don't have the model configured, let's build the model on the fly
+        IAssemblyResolver resolver = httpContext.RequestServices.GetService<IAssemblyResolver>() ?? new DefaultAssemblyResolver();
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder(resolver, isQueryCompositionMode: true);
+
+        EntityTypeConfiguration entityTypeConfiguration = builder.AddEntityType(clrType);
+        builder.AddEntitySet(clrType.Name, entityTypeConfiguration);
+
+        // Do the model configuration if the configuration service is registered.
+        var modelConfig = httpContext.RequestServices.GetService<IODataModelConfiguration>();
+        if (modelConfig is not null)
+        {
+            modelConfig.Apply(httpContext, builder, clrType);
+        }
+
+        model = builder.GetEdmModel();
+
+        // Cached it into the ODataFeature()
+        odataFeature.Model = model;
+        return model;
     }
 }

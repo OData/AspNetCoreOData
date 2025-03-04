@@ -1,0 +1,28 @@
+﻿@ODataMiniApi_HostAddress = http://localhost:5177
+
+GET {{ODataMiniApi_HostAddress}}/myschools?$select=schoolName&$expand=MailAddress
+
+###
+
+# be noted: if use the model directly, the mailAddress is configured as complex property
+GET {{ODataMiniApi_HostAddress}}/myschools?$select=schoolName,MailAddress
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/schools?$select=schoolName,schoolid&$expand=MailAddress&$top=1
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/schools?$select=schoolName,schoolid,MailAddress&$top=1
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/v1/$odata?$format=application/json
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$odata?$format=application/xml
+
+###
+GET {{ODataMiniApi_HostAddress}}/customized/$odata
+
+###
