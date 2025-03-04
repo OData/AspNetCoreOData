@@ -246,6 +246,45 @@ public static RouteHandlerBuilder AddODataQueryEndpointFilter<[DynamicallyAccess
  // more for overloads 
 ```
 
+#### Query configuration
+
+OData Query configuration has the following types:
+
+1) ModelBound Query settings: Config the query functionalities on the C# types and properties. (Skip in this design)
+2) DefaultQueryConfigurations: Config whether the certain query options is enabled or disabled. 
+3) ODataValidatationSettings: Config for the query validatation. For example, is the query top value bigger than a certain value?
+4) ODataQuerySettings: Config for query executing. For example, set the PageSize, etc.
+
+Why do we have them? I don't know. :(
+
+`DefaultQueryConfigurations` is global level configuration, see the section about 'AddOData()'.
+For `ODataValidatationSettings` and `ODataQuerySettings`, I have the following overload for the extensions:
+
+```C#
+public static RouteHandlerBuilder AddODataQueryEndpointFilter(this RouteHandlerBuilder builder,
+    Action<ODataValidationSettings> validationSetup = default,
+    Action<ODataQuerySettings> querySetup = default)
+```
+and
+```C#
+public static RouteGroupBuilder AddODataQueryEndpointFilter(this RouteGroupBuilder builder,
+    Action<ODataValidationSettings> validationSetup = default,
+    Action<ODataQuerySettings> querySetup = default)
+```
+
+So, developers can use the Action to config the settings as:
+
+```C#
+app.MapGet("/myschools", (AppDb db) =>
+{
+    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+    return db.Schools;
+})
+    .WithModel(model)
+    .AddODataQueryEndpointFilter(querySetup: q => q.PageSize = 3);
+```
+
+
 ### Edm model providing for endpoind filter
 
 Same as `ODataQueryOptions<T>` parameter binding, Endpoint filter needs the Edm model to the OData query.
@@ -260,7 +299,7 @@ b)	Provide the model for certain endpoints.
 We will add extension methods to accept the Edm model associated with the endpoint filter. 
 
 ```C#
-public static RouteHandlerBuilder AddODataQueryFilter(this RouteHandlerBuilder builder, IODataQueryFilter queryFilter, IEdmModel model) =>
+public static RouteHandlerBuilder AddODataQueryEndpointFilter(this RouteHandlerBuilder builder, IODataQueryFilter queryFilter, IEdmModel model) =>
 builder.AddEndpointFilter(queryFilter);
 ```
 
