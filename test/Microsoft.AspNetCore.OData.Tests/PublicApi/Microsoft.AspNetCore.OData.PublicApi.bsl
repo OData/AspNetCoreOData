@@ -2529,6 +2529,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObjectCollecti
 }
 
 [
+ObsoleteAttribute(),
 NonValidatingParameterBindingAttribute(),
 ]
 public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaComplexObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmComplexObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmComplexObject, IEdmObject, IEdmStructuredObject {
@@ -2574,6 +2575,7 @@ public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaLink : Microsoft
 }
 
 [
+ObsoleteAttribute(),
 NonValidatingParameterBindingAttribute(),
 ]
 public class Microsoft.AspNetCore.OData.Formatter.Value.EdmDeltaResourceObject : Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject, IDynamicMetaObjectProvider, IDelta, IDeltaSetItem, IEdmChangedObject, IEdmEntityObject, IEdmObject, IEdmStructuredObject {

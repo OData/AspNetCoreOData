@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.OData.Formatter.Value;
 /// Represents an <see cref="IEdmChangedObject"/> with no backing CLR <see cref="Type"/>.
 /// Used to hold the Entry object in the Delta Feed Payload.
 /// </summary>
+[Obsolete("EdmDeltaResourceObject is obsolete and will be dropped in the 10.x release. Please use EdmEntityObject instead.")]
 [NonValidatingParameterBinding]
 public class EdmDeltaResourceObject : EdmEntityObject, IEdmChangedObject
 {
