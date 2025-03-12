@@ -1,3 +1,0 @@
-Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.ODataSerializerContext(Microsoft.AspNetCore.OData.Formatter.ResourceContext resource, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.OData.Edm.IEdmProperty edmProperty) -> void
-Microsoft.AspNetCore.OData.Query.ICountOptionCollection.TotalCount.get -> long?
-Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser
