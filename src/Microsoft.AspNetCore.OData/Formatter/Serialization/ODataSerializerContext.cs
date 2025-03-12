@@ -44,12 +44,13 @@ public class ODataSerializerContext
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class.
     /// </summary>
-    /// <param name="resource">The resource whose property is being nested.</param>
+    /// <param name="resource">The context for the resource instance being written</param>
     /// <param name="selectExpandClause">The <see cref="SelectExpandClause"/> for the property being nested.</param>
     /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
     /// If the resource property is the dynamic complex, the resource property is null.
     /// </param>
     /// <remarks>This constructor is used to construct the serializer context for writing nested and expanded properties.</remarks>
+    // TODO: Rename "resource" to "resourceContext" in next major release.
     public ODataSerializerContext(ResourceContext resource, SelectExpandClause selectExpandClause, IEdmProperty edmProperty)
         : this(resource, edmProperty, null, null)
     {
@@ -59,22 +60,22 @@ public class ODataSerializerContext
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataSerializerContext"/> class for nested resources.
     /// </summary>
-    /// <param name="resource">The resource whose property is being nested.</param>
+    /// <param name="resourceContext">The context for the resource instance being written.</param>
     /// <param name="edmProperty">The complex property being nested or the navigation property being expanded.
     /// If the resource property is the dynamic complex, the resource property is null.
     /// </param>
     /// <param name="queryContext">The <see cref="ODataQueryContext"/> for the property being nested.</param>
     /// <param name="currentSelectItem">The <see cref="SelectItem"/> for the property being nested.></param>
-    internal ODataSerializerContext(ResourceContext resource, IEdmProperty edmProperty, ODataQueryContext queryContext, SelectItem currentSelectItem)
+    internal ODataSerializerContext(ResourceContext resourceContext, IEdmProperty edmProperty, ODataQueryContext queryContext, SelectItem currentSelectItem)
     {
-        if (resource == null)
+        if (resourceContext == null)
         {
-            throw Error.ArgumentNull("resource");
+            throw Error.ArgumentNull($"{nameof(resourceContext)}");
         }
 
         // Clone the resource's context. Use a helper function so it can
         // handle platform-specific differences in ODataSerializerContext.
-        ODataSerializerContext context = resource.SerializerContext;
+        ODataSerializerContext context = resourceContext.SerializerContext;
         this.Request = context.Request;
 
         Model = context.Model;
@@ -89,7 +90,8 @@ public class ODataSerializerContext
 
         QueryContext = queryContext;
 
-        ExpandedResource = resource; // parent resource
+        ExpandedResource = resourceContext; // parent resource
+        IsDelta = context.IsDelta;
 
         CurrentSelectItem = currentSelectItem;
 
@@ -107,7 +109,7 @@ public class ODataSerializerContext
             if (pathSelectItem != null)
             {
                 SelectExpandClause = pathSelectItem.SelectAndExpand;
-                NavigationSource = resource.NavigationSource; // Use it's parent navigation source.
+                NavigationSource = resourceContext.NavigationSource; // Use it's parent navigation source.
 
                 SetComputedProperties(pathSelectItem.ComputeOption);
             }
@@ -133,7 +135,7 @@ public class ODataSerializerContext
             }
             else
             {
-                NavigationSource = resource.NavigationSource;
+                NavigationSource = resourceContext.NavigationSource;
             }
         }
     }
@@ -323,6 +325,11 @@ public class ODataSerializerContext
             return _isDeltaOfT.Value;
         }
     }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether a delta payload is being serialized.
+    /// </summary>
+    internal bool IsDelta { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="ExpandedNavigationSelectItem"/>.

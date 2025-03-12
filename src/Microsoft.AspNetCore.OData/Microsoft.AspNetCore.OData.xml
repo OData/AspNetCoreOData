@@ -4792,14 +4792,13 @@
             <param name="writer">The ODataWriter.</param>
             <returns>A task that represents the asynchronous write operation</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Writes the context of a Resource
             </summary>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataWriter" /> to use to write the resource contents</param>
             <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
             <param name="resourceContext">The context for the resource instance being written.</param>
-            <param name="isDelta">Whether to only write changed properties of the resource</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -5124,7 +5123,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/> class.
             </summary>
-            <param name="resource">The resource whose property is being nested.</param>
+            <param name="resource">The context for the resource instance being written</param>
             <param name="selectExpandClause">The <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause"/> for the property being nested.</param>
             <param name="edmProperty">The complex property being nested or the navigation property being expanded.
             If the resource property is the dynamic complex, the resource property is null.
@@ -5135,7 +5134,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/> class for nested resources.
             </summary>
-            <param name="resource">The resource whose property is being nested.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
             <param name="edmProperty">The complex property being nested or the navigation property being expanded.
             If the resource property is the dynamic complex, the resource property is null.
             </param>
@@ -5231,6 +5230,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause">
             <summary>
             Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.IsDelta">
+            <summary>
+            Gets or sets a value indicating whether a delta payload is being serialized.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CurrentExpandedSelectItem">
@@ -5757,27 +5761,6 @@
             Returning DeltaKind of the object within DeltaResourceSet payload
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject"/>s.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
-            </summary>
-            <param name="edmType">The edm type of the collection.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject})">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
-            </summary>
-            <param name="edmType">The edm type of the collection.</param>
-            <param name="list">The list that is wrapped by the new collection.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.GetEdmType">
-            <inheritdoc/>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject"/> with no backing CLR <see cref="T:System.Type"/>.
@@ -5801,6 +5784,27 @@
             </summary>
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+            <param name="list">The list that is wrapped by the new collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.GetEdmType">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObject">
             <summary>
