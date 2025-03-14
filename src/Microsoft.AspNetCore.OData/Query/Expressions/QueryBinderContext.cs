@@ -233,7 +233,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// A mapping of flattened single value nodes and their values. For example { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
         /// </summary>
-        public IDictionary<SingleValueNode, Expression> FlattenedPropertiesMap { get; internal set; }
+        public IDictionary<SingleValueNode, Expression> FlattenedExpressionMapping { get; internal set; }
 
         #endregion Aggregation
 
@@ -304,6 +304,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
+        /// <summary>
+        /// Ensures that the flattened properties are populated for the given source and query.
+        /// </summary>
+        /// <param name="source">The source parameter expression representing the root of the query.</param>
+        /// <param name="query">The queryable object representing the current query context.</param>
+        /// <remarks>
+        /// This method populates the <see cref="FlattenedProperties"/> dictionary with the flattened properties
+        /// from the base query. It is typically used when the binder is applied to an aggregated query to ensure
+        /// that the properties are correctly flattened.
+        /// </remarks>
         internal void EnsureFlattenedProperties(ParameterExpression source, IQueryable query)
         {
             if (query != null)

@@ -77,13 +77,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter))")]
-        public async Task TestGroupByPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -100,13 +103,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Year))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Year))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Year))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Year))")]
-        public async Task TestGroupByMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Year))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -131,13 +137,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name))")]
-        public async Task TestGroupByNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -153,13 +162,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name,Customer/Id))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name,Customer/Id))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name,Customer/Id))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name,Customer/Id))")]
-        public async Task TestGroupByMultipleNestedPropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultipleNestedPropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name,Customer/Id))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -179,13 +191,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name))")]
-        public async Task TestGroupByMultiNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -198,15 +213,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             Assert.Matches("\\{\"Product\":\\{\"Category\":\\{\"Name\":\"Non-Food\"\\}\\}\\}", content);
             Assert.Matches("\\{\"Product\":\\{\"Category\":\\{\"Name\":\"Food\"\\}\\}\\}", content);
         }
-
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name,Customer/Id))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name,Customer/Id))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id))")]
-        public async Task TestGroupByHybridNestedPropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByHybridNestedPropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name,Customer/Id))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -225,13 +242,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Product/Name))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Product/Name))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Product/Name))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Product/Name))")]
-        public async Task TestGroupByNestedAndNonNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedAndNonNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Product/Name))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -250,13 +270,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate(Amount with sum as SumAmount)")]
-        [InlineData("custom/Sales?$apply=aggregate(Amount with sum as SumAmount)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate(Amount with sum as SumAmount)")]
-        [InlineData("customsql/Sales?$apply=aggregate(Amount with sum as SumAmount)")]
-        public async Task TestAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate(Amount with sum as SumAmount)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -269,13 +292,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate(Product/TaxRate with min as MinTaxRate)")]
-        [InlineData("custom/Sales?$apply=aggregate(Product/TaxRate with min as MinTaxRate)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate(Product/TaxRate with min as MinTaxRate)")]
-        [InlineData("customsql/Sales?$apply=aggregate(Product/TaxRate with min as MinTaxRate)")]
-        public async Task TestAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate(Product/TaxRate with min as MinTaxRate)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -288,13 +314,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate)")]
-        [InlineData("custom/Sales?$apply=aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate)")]
-        [InlineData("customsql/Sales?$apply=aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate)")]
-        public async Task TestAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -309,13 +338,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate($count as SalesCount)")]
-        [InlineData("custom/Sales?$apply=aggregate($count as SalesCount)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate($count as SalesCount)")]
-        [InlineData("customsql/Sales?$apply=aggregate($count as SalesCount)")]
-        public async Task TestAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate($count as SalesCount)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -328,13 +360,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate(Product/Name with countdistinct as DistinctProducts)")]
-        [InlineData("custom/Sales?$apply=aggregate(Product/Name with countdistinct as DistinctProducts)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate(Product/Name with countdistinct as DistinctProducts)")]
-        [InlineData("customsql/Sales?$apply=aggregate(Product/Name with countdistinct as DistinctProducts)")]
-        public async Task TestAggregateNestedPropertyWithCountDistinctAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregateNestedPropertyWithCountDistinctAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate(Product/Name with countdistinct as DistinctProducts)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -347,13 +382,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -378,13 +416,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByPrimitivePropertyAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -409,13 +450,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByPrimitivePropertyAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -444,13 +488,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByMultiplePropertiesAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiplePropertiesAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -479,13 +526,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Year),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Year),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Year),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Year),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByMultiplePropertiesAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiplePropertiesAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Year),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -514,13 +564,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByMultiplePropertiesAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiplePropertiesAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Year),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -553,13 +606,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByNestedPropertyAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -575,13 +631,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByNestedPropertyAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -597,13 +656,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByNestedPropertyAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedPropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -619,13 +681,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByMultipleNestedPropertiesAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultipleNestedPropertiesAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -645,13 +710,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByMultipleNestedPropertiesAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultipleNestedPropertiesAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -671,13 +739,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByMultipleNestedPropertiesAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultipleNestedPropertiesAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -693,17 +764,20 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             Assert.Matches("\\{\"MaxTaxRate\":0\\.06,\"AverageAmount\":8(?:\\.0+)?,\"Customer\":\\{\"Id\":\"C2\"\\},\"Product\":\\{\"Name\":\"Coffee\"\\}\\}", content);
             Assert.Matches("\\{\"MaxTaxRate\":0\\.14,\"AverageAmount\":4(?:\\.0+)?,\"Customer\":\\{\"Id\":\"C2\"\\},\"Product\":\\{\"Name\":\"Paper\"\\}\\}", content);
             Assert.Matches("\\{\"MaxTaxRate\":0\\.06,\"AverageAmount\":2(?:\\.0+)?,\"Customer\":\\{\"Id\":\"C3\"\\},\"Product\":\\{\"Name\":\"Sugar\"\\}\\}", content);
-            Assert.Matches("\\{\"MaxTaxRate\":0\\.14,\"AverageAmount\":1\\.5(?:0+)?,\"Customer\":\\{\"Id\":\"C3\"\\},\"Product\":\\{\"Name\":\"Paper\"\\}\\}", content);            
+            Assert.Matches("\\{\"MaxTaxRate\":0\\.14,\"AverageAmount\":1\\.5(?:0+)?,\"Customer\":\\{\"Id\":\"C3\"\\},\"Product\":\\{\"Name\":\"Paper\"\\}\\}", content);
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByMultiNestedPropertyAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiNestedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -718,13 +792,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByMultiNestedPropertyAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -739,13 +816,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByMultiNestedPropertyAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiNestedPropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -760,13 +840,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByHybridNestedPropertiesAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByHybridNestedPropertiesAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -785,13 +868,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByHybridNestedPropertiesAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByHybridNestedPropertiesAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -810,13 +896,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByHybridNestedPropertiesAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByHybridNestedPropertiesAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -835,13 +924,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with sum as SumAmount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with sum as SumAmount))")]
-        public async Task TestGroupByNestedAndNonNestedPropertyAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedAndNonNestedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with sum as SumAmount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -860,13 +952,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))")]
-        public async Task TestGroupByNestedAndNonNestedPropertyAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedAndNonNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Product/TaxRate with min as MinTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -885,13 +980,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))")]
-        public async Task TestGroupByNestedAndNonNestedPropertyAndAggregateMultiplePropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedAndNonNestedPropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Product/Name),aggregate(Amount with average as AverageAmount,Product/TaxRate with max as MaxTaxRate))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -910,13 +1008,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter),aggregate($count as SalesCount))")]
-        public async Task TestGroupByPrimitivePropertyAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -941,13 +1042,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Year),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Year),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Year),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Year),aggregate($count as SalesCount))")]
-        public async Task TestGroupByMultiplePropertiesAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiplePropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Year),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -976,13 +1080,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name),aggregate($count as SalesCount))")]
-        public async Task TestGroupByNestedPropertyAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedPropertyAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -998,13 +1105,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate($count as SalesCount))")]
-        public async Task TestGroupByMultipleNestedPropertiesAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultipleNestedPropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Name,Customer/Id),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1024,13 +1134,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name),aggregate($count as SalesCount))")]
-        public async Task TestGroupByMultiNestedPropertyAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiNestedPropertyAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1045,13 +1158,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate($count as SalesCount))")]
-        public async Task TestGroupByMultipleHybridNestedPropertiesAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultipleHybridNestedPropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name,Customer/Id),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1070,13 +1186,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Product/Name),aggregate($count as SalesCount))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Product/Name),aggregate($count as SalesCount))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate($count as SalesCount))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Product/Name),aggregate($count as SalesCount))")]
-        public async Task TestGroupByNestedAndNonNestedPropertiesAndAggregateDollarCountAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedAndNonNestedPropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Product/Name),aggregate($count as SalesCount))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1091,17 +1210,20 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             Assert.Matches("\\{\"Quarter\":\"2022-3\",\"SalesCount\":1,\"Product\":\\{\"Name\":\"Coffee\"\\}\\}", content);
             Assert.Matches("\\{\"Quarter\":\"2022-1\",\"SalesCount\":1,\"Product\":\\{\"Name\":\"Coffee\"\\}\\}", content);
             Assert.Matches("\\{\"Quarter\":\"2022-4\",\"SalesCount\":2,\"Product\":\\{\"Name\":\"Paper\"\\}\\}", content);
-            Assert.Matches("\\{\"Quarter\":\"2022-3\",\"SalesCount\":1,\"Product\":\\{\"Name\":\"Paper\"\\}\\}", content);            
+            Assert.Matches("\\{\"Quarter\":\"2022-3\",\"SalesCount\":1,\"Product\":\\{\"Name\":\"Paper\"\\}\\}", content);
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        public async Task TestGroupByPrimitivePropertyAndAggregateNestedPropertyWithCountDistinctAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAndAggregateNestedPropertyWithCountDistinctAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter),aggregate(Product/Name with countdistinct as DistinctProducts))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1126,13 +1248,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter,Year),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter,Year),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter,Year),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter,Year),aggregate(Product/Name with countdistinct as DistinctProducts))")]
-        public async Task TestGroupByMultiplePropertiesAndAggregateNestedPropertyWithCountDistinctAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiplePropertiesAndAggregateNestedPropertyWithCountDistinctAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter,Year),aggregate(Product/Name with countdistinct as DistinctProducts))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1161,13 +1286,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate(Amount with custom.stdev as StdDev)")]
-        [InlineData("custom/Sales?$apply=aggregate(Amount with custom.stdev as StdDev)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate(Amount with custom.stdev as StdDev)")]
-        [InlineData("customsql/Sales?$apply=aggregate(Amount with custom.stdev as StdDev)")]
-        public async Task TestAggregatePrimitivePropertyWithCustomAggregateFunctionAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregatePrimitivePropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate(Amount with custom.stdev as StdDev)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1180,13 +1308,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=aggregate(Product/TaxRate with custom.stdev as StdDev)")]
-        [InlineData("custom/Sales?$apply=aggregate(Product/TaxRate with custom.stdev as StdDev)")]
-        [InlineData("defaultsql/Sales?$apply=aggregate(Product/TaxRate with custom.stdev as StdDev)")]
-        [InlineData("customsql/Sales?$apply=aggregate(Product/TaxRate with custom.stdev as StdDev)")]
-        public async Task TestAggregateNestedPropertyWithCustomAggregateFunctionAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestAggregateNestedPropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=aggregate(Product/TaxRate with custom.stdev as StdDev)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1199,13 +1330,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with custom.stdev as StdDev))")]
-        [InlineData("custom/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with custom.stdev as StdDev))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with custom.stdev as StdDev))")]
-        [InlineData("customsql/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with custom.stdev as StdDev))")]
-        public async Task TestGroupByMultiNestedPropertyAndAggregatePrimitivePropertyWithCustomAggregateFunctionAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByMultiNestedPropertyAndAggregatePrimitivePropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Product/Category/Name),aggregate(Amount with custom.stdev as StdDev))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1220,13 +1354,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Customer/Id),aggregate(Product/TaxRate with custom.stdev as StdDev))")]
-        [InlineData("custom/Sales?$apply=groupby((Customer/Id),aggregate(Product/TaxRate with custom.stdev as StdDev))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Customer/Id),aggregate(Product/TaxRate with custom.stdev as StdDev))")]
-        [InlineData("customsql/Sales?$apply=groupby((Customer/Id),aggregate(Product/TaxRate with custom.stdev as StdDev))")]
-        public async Task TestGroupByNestedPropertyAndAggregateNestedPropertyWithCustomAggregateFunctionAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByNestedPropertyAndAggregateNestedPropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Customer/Id),aggregate(Product/TaxRate with custom.stdev as StdDev))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1248,11 +1385,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Gender))")]
-        [InlineData("custom/Employees?$apply=groupby((Gender))")]
-        public async Task TestGroupByDynamicPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByDynamicPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Gender))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1267,11 +1407,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=aggregate(Commission with average as AverageCommission)")]
-        [InlineData("custom/Employees?$apply=aggregate(Commission with average as AverageCommission)")]
-        public async Task TestAggregateSingleDynamicPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestAggregateSingleDynamicPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=aggregate(Commission with average as AverageCommission)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1284,11 +1427,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Gender),aggregate(Commission with sum as SumCommission))")]
-        [InlineData("custom/Employees?$apply=groupby((Gender),aggregate(Commission with sum as SumCommission))")]
-        public async Task TestGroupByDynamicPrimitivePropertyAndAggregateDynamicPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByDynamicPrimitivePropertyAndAggregateDynamicPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Gender),aggregate(Commission with sum as SumCommission))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1307,11 +1453,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Gender),aggregate(BaseSalary with max as MaxSalary))")]
-        [InlineData("custom/Employees?$apply=groupby((Gender),aggregate(BaseSalary with max as MaxSalary))")]
-        public async Task TestGroupByDynamicPrimitivePropertyAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByDynamicPrimitivePropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Gender),aggregate(BaseSalary with max as MaxSalary))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1330,13 +1479,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=groupby((Quarter),aggregate(Amount with min as MinAmount))/groupby((Quarter))")]
-        [InlineData("custom/Sales?$apply=groupby((Quarter),aggregate(Amount with min as MinAmount))/groupby((Quarter))")]
-        [InlineData("defaultsql/Sales?$apply=groupby((Quarter),aggregate(Amount with min as MinAmount))/groupby((Quarter))")]
-        [InlineData("customsql/Sales?$apply=groupby((Quarter),aggregate(Amount with min as MinAmount))/groupby((Quarter))")]
-        public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyThenGroupByPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyThenGroupByPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter),aggregate(Amount with min as MinAmount))/groupby((Quarter))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1353,13 +1505,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength with sum as CombinedProductNameLength)")]
-        [InlineData("custom/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength with sum as CombinedProductNameLength)")]
-        [InlineData("defaultsql/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength with sum as CombinedProductNameLength)")]
-        [InlineData("customsql/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength with sum as CombinedProductNameLength)")]
-        public async Task TestComputeNestedStringPropertyLengthThenAggregateComputedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestComputeNestedStringPropertyLengthThenAggregateComputedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength with sum as CombinedProductNameLength)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1372,13 +1527,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength add Id with sum as CombinedProductNameLength)")]
-        [InlineData("custom/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength add Id with sum as CombinedProductNameLength)")]
-        [InlineData("defaultsql/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength add Id with sum as CombinedProductNameLength)")]
-        [InlineData("customsql/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength add Id with sum as CombinedProductNameLength)")]
-        public async Task TestComputeNestedStringPropertyLengthThenAggregateSumOfComputedAndPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestComputeNestedStringPropertyLengthThenAggregateSumOfComputedAndPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/aggregate(ProductNameLength add Id with sum as CombinedProductNameLength)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1391,13 +1549,16 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/groupby((Product/Name),aggregate(Id with sum as Total, ProductNameLength with max as MaxProductNameLength))")]
-        [InlineData("custom/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/groupby((Product/Name),aggregate(Id with sum as Total, ProductNameLength with max as MaxProductNameLength))")]
-        [InlineData("defaultsql/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/groupby((Product/Name),aggregate(Id with sum as Total, ProductNameLength with max as MaxProductNameLength))")]
-        [InlineData("customsql/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/groupby((Product/Name),aggregate(Id with sum as Total, ProductNameLength with max as MaxProductNameLength))")]
-        public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregatePrimitiveAndComputedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        [InlineData("defaultsql")]
+        [InlineData("customsql")]
+        public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregatePrimitiveAndComputedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Sales?$apply=compute(length(Product/Name) as ProductNameLength)/groupby((Product/Name),aggregate(Id with sum as Total, ProductNameLength with max as MaxProductNameLength))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1413,11 +1574,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Address/City,Address/State))/groupby((Address/State),aggregate(Address/City with max as MaxCity))")]
-        [InlineData("custom/Employees?$apply=groupby((Address/City,Address/State))/groupby((Address/State),aggregate(Address/City with max as MaxCity))")]
-        public async Task TestGroupByMultipleNestedPropertiesThenGroupByNestedPropertyAndAggregateNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByMultipleNestedPropertiesThenGroupByNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Address/City,Address/State))/groupby((Address/State),aggregate(Address/City with max as MaxCity))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1436,11 +1600,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Company/VP/Address/City,Company/VP/Address/State))/groupby((Company/VP/Address/State),aggregate(Company/VP/Address/City with max as MaxCity))")]
-        [InlineData("custom/Employees?$apply=groupby((Company/VP/Address/City,Company/VP/Address/State))/groupby((Company/VP/Address/State),aggregate(Company/VP/Address/City with max as MaxCity))")]
-        public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAggregateMultiNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAggregateMultiNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Company/VP/Address/City,Company/VP/Address/State))/groupby((Company/VP/Address/State),aggregate(Company/VP/Address/City with max as MaxCity))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1458,11 +1625,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Company/VP/Name,Company/VP/BaseSalary))/groupby((Company/VP/BaseSalary),aggregate(Company/VP/Name with max as MaxName))")]
-        [InlineData("custom/Employees?$apply=groupby((Company/VP/Name,Company/VP/BaseSalary))/groupby((Company/VP/BaseSalary),aggregate(Company/VP/Name with max as MaxName))")]
-        public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAggregateMultiNestedPropertyWithMaxAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAggregateMultiNestedPropertyWithMaxAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Company/VP/Name,Company/VP/BaseSalary))/groupby((Company/VP/BaseSalary),aggregate(Company/VP/Name with max as MaxName))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1479,11 +1649,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Company/VP/Name,Company/VP/BaseSalary))/groupby((Company/VP/Name),aggregate(Company/VP/BaseSalary with average as AverageBaseSalary))")]
-        [InlineData("custom/Employees?$apply=groupby((Company/VP/Name,Company/VP/BaseSalary))/groupby((Company/VP/Name),aggregate(Company/VP/BaseSalary with average as AverageBaseSalary))")]
-        public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAverageMultiNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAverageMultiNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Company/VP/Name,Company/VP/BaseSalary))/groupby((Company/VP/Name),aggregate(Company/VP/BaseSalary with average as AverageBaseSalary))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1500,11 +1673,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Address/State),aggregate(BaseSalary with min as MinBaseSalary))/groupby((Address/State))")]
-        [InlineData("custom/Employees?$apply=groupby((Address/State),aggregate(BaseSalary with min as MinBaseSalary))/groupby((Address/State))")]
-        public async Task TestGroupByNestedPropertyAndAggregatePrimitivePropertyThenGroupByNestedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByNestedPropertyAndAggregatePrimitivePropertyThenGroupByNestedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Address/State),aggregate(BaseSalary with min as MinBaseSalary))/groupby((Address/State))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1521,11 +1697,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=compute(length(Name) as NameLen)/aggregate(NameLen with sum as TotalLen)")]
-        [InlineData("custom/Employees?$apply=compute(length(Name) as NameLen)/aggregate(NameLen with sum as TotalLen)")]
-        public async Task TestComputeStringPropertyLengthThenAggregateComputedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestComputeStringPropertyLengthThenAggregateComputedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=compute(length(Name) as NameLen)/aggregate(NameLen with sum as TotalLen)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1538,11 +1717,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=compute(length(Name) as NameLen)/aggregate(NameLen add Id with sum as TotalLen)")]
-        [InlineData("custom/Employees?$apply=compute(length(Name) as NameLen)/aggregate(NameLen add Id with sum as TotalLen)")]
-        public async Task TestComputeStringPropertyLengthThenAggregateSumOfComputedPropertyAndPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestComputeStringPropertyLengthThenAggregateSumOfComputedPropertyAndPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=compute(length(Name) as NameLen)/aggregate(NameLen add Id with sum as TotalLen)";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1555,11 +1737,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=compute(length(Address/State) as StateLen)/groupby((Address/State),aggregate(Id with sum as Total,StateLen with max as MaxStateLen))")]
-        [InlineData("custom/Employees?$apply=compute(length(Address/State) as StateLen)/groupby((Address/State),aggregate(Id with sum as Total,StateLen with max as MaxStateLen))")]
-        public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregateComputedAndPrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregateComputedAndPrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=compute(length(Address/State) as StateLen)/groupby((Address/State),aggregate(Id with sum as Total,StateLen with max as MaxStateLen))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1580,11 +1765,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=compute(length(Name) as NameLen)/groupby((NameLen),aggregate(Id with sum as Total))")]
-        [InlineData("custom/Employees?$apply=compute(length(Name) as NameLen)/groupby((NameLen),aggregate(Id with sum as Total))")]
-        public async Task TestComputeStringPropertyLengthThenGroupByComputedPropertyAndAggregatePrimitivePropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestComputeStringPropertyLengthThenGroupByComputedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=compute(length(Name) as NameLen)/groupby((NameLen),aggregate(Id with sum as Total))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1606,11 +1794,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=compute(length(Address/City) as CityLength)/groupby((Address/State),aggregate(Address/City with max as MaxCity,Address/City with min as MinCity,CityLength with max as MaxCityLen))")]
-        [InlineData("custom/Employees?$apply=compute(length(Address/City) as CityLength)/groupby((Address/State),aggregate(Address/City with max as MaxCity,Address/City with min as MinCity,CityLength with max as MaxCityLen))")]
-        public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregateComputedAndNestedPropertiesAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregateComputedAndNestedPropertiesAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=compute(length(Address/City) as CityLength)/groupby((Address/State),aggregate(Address/City with max as MaxCity,Address/City with min as MinCity,CityLength with max as MaxCityLen))";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert
@@ -1633,11 +1824,14 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         }
 
         [Theory]
-        [InlineData("default/Employees?$apply=groupby((Gender),aggregate(BaseSalary with max as MaxSalary))&$orderby=MaxSalary desc")]
-        [InlineData("custom/Employees?$apply=groupby((Gender),aggregate(BaseSalary with max as MaxSalary))&$orderby=MaxSalary desc")]
-        public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyThenOrderByAggregatedPropertyAsync(string queryUrl)
+        [InlineData("default")]
+        [InlineData("custom")]
+        public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyThenOrderByAggregatedPropertyAsync(string routePrefix)
         {
-            // Arrange & Act
+            // Arrange
+            var queryUrl = $"{routePrefix}/Employees?$apply=groupby((Gender),aggregate(BaseSalary with max as MaxSalary))&$orderby=MaxSalary desc";
+
+            // Act
             var response = await SetupAndFireRequestAsync(queryUrl);
 
             // Assert

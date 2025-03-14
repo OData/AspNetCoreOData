@@ -104,12 +104,10 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
                 groupingParam);
         }
         
-        public virtual IQueryable FlattenReferencedProperties(
+        public virtual AggregationFlatteningResult FlattenReferencedProperties(
             TransformationNode transformationNode,
             IQueryable query,
-            QueryBinderContext context,
-            out ParameterExpression contextParameter,
-            out IDictionary<SingleValueNode, Expression> flattenedPropertiesMap)
+            QueryBinderContext context)
         {
             if (transformationNode == null)
             {
@@ -126,14 +124,6 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            flattenedPropertiesMap = null;
-            contextParameter = context.CurrentParameter;
-
-            if (context.FlattenedProperties?.Any() == true)
-            {
-                return query;
-            }
-
             IEnumerable<GroupByPropertyNode> groupingProperties = null;
             if (transformationNode.Kind == TransformationNodeKind.GroupBy)
             {
@@ -146,7 +136,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
 
             if ((aggregateExpressions?.Count ?? 0) == 0 || !(groupingProperties?.Any() == true))
             {
-                return query;
+                return null;
             }
 
             Type wrapperType = typeof(TestFlatteningWrapper<>).MakeGenericType(context.TransformationElementType);
@@ -174,9 +164,13 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
             int aliasIdx = aggregateExpressions.Count - 1;
             NamedPropertyExpression[] properties = new NamedPropertyExpression[aggregateExpressions.Count];
 
-            flattenedPropertiesMap = new Dictionary<SingleValueNode, Expression>(aggregateExpressions.Count);
-            contextParameter = Expression.Parameter(wrapperType, "$it");
-            MemberExpression containerExpr = Expression.Property(contextParameter, GroupingPropertiesContainerProperty);
+            AggregationFlatteningResult flatteningResult = new AggregationFlatteningResult
+            {
+                RedefinedContextParameter = Expression.Parameter(wrapperType, "$it"),
+                FlattenedPropertiesMapping = new Dictionary<SingleValueNode, Expression>(aggregateExpressions.Count)
+            };
+
+            MemberExpression containerExpr = Expression.Property(flatteningResult.RedefinedContextParameter, GroupingPropertiesContainerProperty);
 
             for (int i = 0; i < aggregateExpressions.Count; i++)
             {
@@ -195,7 +189,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
                     Expression.Property(containerExpr, "Value"),
                     type);
                 containerExpr = Expression.Property(containerExpr, "Next");
-                flattenedPropertiesMap.Add(aggregateExpression.Expression, flattenedAccessExpression);
+                flatteningResult.FlattenedPropertiesMapping.Add(aggregateExpression.Expression, flattenedAccessExpression);
                 aliasIdx--;
             }
 
@@ -203,11 +197,9 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
 
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, TestAggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
-            LambdaExpression flattenedLambda = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments), context.CurrentParameter);
+            flatteningResult.FlattenedExpression = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments), context.CurrentParameter);
 
-            query = ExpressionHelpers.Select(query, flattenedLambda, context.TransformationElementType);
-
-            return query;
+            return flatteningResult;
         }
 
         private IList<NamedPropertyExpression> CreateGroupByMemberAssignments(IEnumerable<GroupByPropertyNode> groupByPropertyNodes, QueryBinderContext context)
@@ -253,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.TestCommon.Query.Expressions
             }
 
             var lambdaParam = baseType == context.TransformationElementType ? context.CurrentParameter : Expression.Parameter(baseType, "$it");
-            if (!(context.FlattenedPropertiesMap?.TryGetValue(aggregateExpr.Expression, out Expression body) == true))
+            if (!(context.FlattenedExpressionMapping?.TryGetValue(aggregateExpr.Expression, out Expression body) == true))
             {
                 body = BindAccessExpression(aggregateExpr.Expression, context, lambdaParam);
             }

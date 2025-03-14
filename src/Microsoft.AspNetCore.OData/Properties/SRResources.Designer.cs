@@ -1438,6 +1438,24 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property must be set..
+        /// </summary>
+        internal static string PropertyMustBeSet {
+            get {
+                return ResourceManager.GetString("PropertyMustBeSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property must be set when the &apos;{1}&apos; property is set..
+        /// </summary>
+        internal static string PropertyMustBeSetWhenAnotherPropertyIsSet {
+            get {
+                return ResourceManager.GetString("PropertyMustBeSetWhenAnotherPropertyIsSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value must be a string..
         /// </summary>
         internal static string PropertyMustBeString {
@@ -1830,6 +1848,24 @@ namespace Microsoft.AspNetCore.OData {
         internal static string TypeMustBeResourceSet {
             get {
                 return ResourceManager.GetString("TypeMustBeResourceSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not implement &apos;{1}&apos; interface..
+        /// </summary>
+        internal static string TypeMustImplementInterface {
+            get {
+                return ResourceManager.GetString("TypeMustImplementInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from &apos;{1}&apos;..
+        /// </summary>
+        internal static string TypeMustInheritFromType {
+            get {
+                return ResourceManager.GetString("TypeMustInheritFromType", resourceCulture);
             }
         }
         

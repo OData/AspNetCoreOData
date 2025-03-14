@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
@@ -393,20 +394,36 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            // Relevance of this call before FlattenReferencedProperties call?
+            // Ensure that the flattened properties are populated for the current query context.
             context.EnsureFlattenedProperties(context.CurrentParameter, source);
 
-            source = binder.FlattenReferencedProperties(
-                transformationNode,
-                source,
-                context,
-                out ParameterExpression contextParameter,
-                out IDictionary<SingleValueNode, Expression> flattenedPropertiesMap);
-
-            context.FlattenedPropertiesMap = flattenedPropertiesMap;
-            if (contextParameter != null)
+            // ApplyBind may be called multiple times if there are multiple groupby transformations
+            // e.g., $apply=groupby((a,b),aggregate(c))/groupby((d),aggregate(e))
+            // In this case, the first groupby will be applied to the original source,
+            // and the second groupby will be applied to the result of the first groupby
+            // There would be no reason to flatten the properties again if they were already flattened
+            if (!(context.FlattenedProperties?.Any() == true))
             {
-                context.SetParameter(DollarThis, contextParameter);
+                AggregationFlatteningResult flatteningResult = binder.FlattenReferencedProperties(
+                    transformationNode,
+                    source,
+                    context);
+
+                if (flatteningResult?.FlattenedExpression != null)
+                {
+                    Type originalTransformationElementType = context.TransformationElementType;
+
+                    AggregationBinderValidator.ValidateFlatteningResult(flatteningResult);
+                    context.FlattenedExpressionMapping = flatteningResult.FlattenedPropertiesMapping;
+                    context.SetParameter(DollarThis, flatteningResult.RedefinedContextParameter);
+
+                    LambdaExpression flattenedLambda = flatteningResult.FlattenedExpression as LambdaExpression;
+                    Contract.Assert(flattenedLambda != null, "flattenedLambda != null");
+                    Type flattenedType = flattenedLambda.Body.Type;
+                    AggregationBinderValidator.ValidateFlattenedExpressionType(flattenedType);
+
+                    source = ExpressionHelpers.Select(source, flattenedLambda, originalTransformationElementType);
+                }
             }
 
             // We are aiming for: query.GroupBy($it => new DynamicType1 {...}).Select($it => new DynamicType2 {...})
@@ -415,6 +432,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             LambdaExpression groupByLambda = binder.BindGroupBy(transformationNode, context) as LambdaExpression;
             Contract.Assert(groupByLambda != null, "groupLambda != null");
             Type groupByType = groupByLambda.Body.Type;
+            AggregationBinderValidator.ValidateGroupByExpressionType(groupByType);
 
             // Invoke GroupBy method
             IQueryable grouping = ExpressionHelpers.GroupBy(source, groupByLambda, source.ElementType, groupByType);
@@ -422,11 +440,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             LambdaExpression selectLambda = binder.BindSelect(transformationNode, context) as LambdaExpression;
             Contract.Assert(selectLambda != null, "selectLambda != null");
             resultClrType = selectLambda.Body.Type;
+            AggregationBinderValidator.ValidateSelectExpressionType(resultClrType);
 
             // Invoke Select method
             Type groupingType = typeof(IGrouping<,>).MakeGenericType(groupByType, context.TransformationElementType);
 
-            return ExpressionHelpers.Select(grouping, selectLambda, groupingType);
+            IQueryable result = ExpressionHelpers.Select(grouping, selectLambda, groupingType);
+
+            return result;
         }
     }
 }

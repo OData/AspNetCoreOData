@@ -43,98 +43,82 @@ namespace Microsoft.AspNetCore.OData.Common
 
         public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
 
-        public static bool IsFlatteningWrapper(this Type type)
+        /// <summary>
+        /// Determines whether the specified type is a <see cref="FlatteningWrapper{T}"/> or a custom implementation
+        /// that inherits from <see cref="DynamicTypeWrapper"/> and implements both <see cref="IFlatteningWrapper{T}"/>
+        /// and <see cref="IGroupByWrapper{T}"/>.
+        /// </summary>
+        /// <param name="typeToCheck">The type to check.</param>
+        /// <returns>
+        /// <c>true</c> if the specified type is a <see cref="FlatteningWrapper{T}"/> or a custom implementation
+        /// that meets the criteria; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsFlatteningWrapper(this Type typeToCheck)
         {
-            if (type == null)
+            if (typeToCheck == null)
             {
                 return false;
             }
 
-            if (type.IsGenericType)
+            if (typeToCheck.IsGenericType)
             {
-                Type genericTypeDefinition = type.GetGenericTypeDefinition();
+                Type genericTypeDefinition = typeToCheck.GetGenericTypeDefinition();
 
                 // Default implementation
                 if (genericTypeDefinition == typeof(FlatteningWrapper<>))
                 {
                     Debug.Assert(
                         typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
-                        && genericTypeDefinition.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IFlatteningWrapper<>))
-                        && genericTypeDefinition.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>)),
+                        && genericTypeDefinition.ImplementsInterface(typeof(IFlatteningWrapper<>))
+                        && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<>)),
                         "FlatteningWrapper<T> must inherit from DynamicTypeWrapper and implement IFlatteningWrapper<T> and IGroupByWrapper<T>");
+
                     return true;
                 }
 
-                // FlatteningWrapper<T> must inherit from DynamicTypeWrapper
-                if (!typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition))
-                {
-                    return false;
-                }
-
                 // Custom implementation
-                Type[] genericTypeInterfaces = genericTypeDefinition.GetInterfaces();
-                bool typeImplementsIFlatteningWrapper = false;
-                bool typeImplementsIGroupByWrapper = false;
-                for (int i = 0; i < genericTypeInterfaces.Length; i++)
-                {
-                    Type genericTypeInterface = genericTypeInterfaces[i];
-                    // FlatteningWrapper<T> must implement IFlatteningWrapper<T> and IGroupByWrapper<T>
-                    if (genericTypeInterface.IsGenericType && genericTypeInterface.GetGenericTypeDefinition() == typeof(IFlatteningWrapper<>))
-                    {
-                        typeImplementsIFlatteningWrapper = true;
-                    }
-
-                    if (genericTypeInterface.IsGenericType && genericTypeInterface.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>))
-                    {
-                        typeImplementsIGroupByWrapper = true;
-                    }
-
-                    if (typeImplementsIFlatteningWrapper && typeImplementsIGroupByWrapper)
-                    {
-                        return true;
-                    }
-                }
+                // Must inherit from DynamicTypeWrapper
+                // Must implement IFlatteningWrapper<T> and IGroupByWrapper<T>
+                return typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition) &
+                    genericTypeDefinition.ImplementsInterface(typeof(IFlatteningWrapper<>))
+                    && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<>));
             }
 
             return false;
         }
 
-        public static bool IsGroupByWrapper(this Type type)
+        /// <summary>
+        /// Determines whether the specified type is a <see cref="GroupByWrapper"/> or a custom implementation
+        /// that inherits from <see cref="DynamicTypeWrapper"/> and implements <see cref="IGroupByWrapper{T}"/>.
+        /// </summary>
+        /// <param name="typeToCheck">The type to check.</param>
+        /// <returns>
+        /// <c>true</c> if the specified type is a <see cref="GroupByWrapper"/> or a custom implementation
+        /// that meets the criteria; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsGroupByWrapper(this Type typeToCheck)
         {
-            if (type == null || type.IsValueType || type == typeof(string))
+            if (typeToCheck == null || typeToCheck.IsValueType || typeToCheck == typeof(string))
             {
                 return false;
             }
 
             // Default implementation
-            if (typeof(GroupByWrapper).IsAssignableFrom(type))
+            if (typeof(GroupByWrapper).IsAssignableFrom(typeToCheck))
             {
                 Debug.Assert(
-                    typeof(DynamicTypeWrapper).IsAssignableFrom(type)
-                    && type.GetInterfaces().Any(d => d.IsGenericType && d.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>)),
+                    typeof(DynamicTypeWrapper).IsAssignableFrom(typeToCheck)
+                    && typeToCheck.ImplementsInterface(typeof(IGroupByWrapper<>)),
                     "GroupByWrapper must inherit from DynamicTypeWrapper and implement IGroupByWrapper<T>");
+
                 return true;
             }
 
-            // GroupByWrapper must inherit from DynamicTypeWrapper
-            if (!typeof(DynamicTypeWrapper).IsAssignableFrom(type))
-            {
-                return false;
-            }
-
             // Custom implementation
-            Type[] typeInterfaces = type.GetInterfaces();
-            for (int i = 0; i < typeInterfaces.Length; i++)
-            {
-                Type typeInterface = typeInterfaces[i];
-                // GroupByWrapper must implement IGroupByWrapper<T>
-                if (typeInterface.IsGenericType && typeInterface.GetGenericTypeDefinition() == typeof(IGroupByWrapper<>))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            // Must inherit from DynamicTypeWrapper
+            // Must implement IGroupByWrapper<T>
+            return typeof(DynamicTypeWrapper).IsAssignableFrom(typeToCheck) &&
+                typeToCheck.ImplementsInterface(typeof(IGroupByWrapper<>));
         }
 
         private static bool IsTypeWrapper(Type wrappedType, Type type, out Type entityType)
@@ -547,6 +531,68 @@ namespace Microsoft.AspNetCore.OData.Common
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Determines whether the specified type inherits from a given generic base type.
+        /// </summary>
+        /// <param name="typeToCheck">The type to examine.</param>
+        /// <param name="genericBaseType">The open generic type definition to check against (e.g., typeof(Base&lt;&gt;)).</param>
+        /// <returns><c>true</c> if <paramref name="typeToCheck"/> inherits from <paramref name="genericBaseType"/>; otherwise, <c>false</c>.</returns>
+        public static bool InheritsFromGenericBase(this Type typeToCheck, Type genericBaseType)
+        {
+            if (typeToCheck == null || typeToCheck == null || !genericBaseType.IsGenericTypeDefinition)
+                return false;
+
+            Type baseType = typeToCheck.BaseType;
+
+            while (baseType != null && baseType != typeof(object))
+            {
+                if (baseType.IsGenericType && baseType.GetGenericTypeDefinition() == genericBaseType)
+                {
+                    return true;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specified target type implements the given interface type.
+        /// </summary>
+        /// <param name="targetType">The type to check for implementation of the interface.</param>
+        /// <param name="interfaceType">The interface type to check against.</param>
+        /// <returns>
+        /// <c>true</c> if the target type implements the specified interface type; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method supports both generic and non-generic interfaces. For generic interfaces, it checks if the target type
+        /// implements any interface that matches the generic type definition of the specified interface type.
+        /// </remarks>
+        public static bool ImplementsInterface(this Type targetType, Type interfaceType)
+        {
+            if (interfaceType.IsGenericTypeDefinition) // Generic interface (e.g., I<>)
+            {
+                Type[] implementedInterfaces = targetType.GetInterfaces();
+                for (int i = 0; i < implementedInterfaces.Length; i++)
+                {
+                    Type implementedInterface = implementedInterfaces[i];
+
+                    if (implementedInterface.IsGenericType &&
+                        implementedInterface.GetGenericTypeDefinition() == interfaceType)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else // Non-generic interface
+            {
+                return interfaceType.IsAssignableFrom(targetType);
+            }
+
+            return false;
         }
     }
 }

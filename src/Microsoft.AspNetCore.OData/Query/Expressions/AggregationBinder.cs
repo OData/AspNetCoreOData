@@ -109,10 +109,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             //     GroupByContainer = $it.Key.GroupByContainer // If groupby section present
             //     Container => new AggregationPropertyContainer() {
             //         Name = "Alias1",
-            //         Value = $it.AsQuaryable().Sum(i => i.AggregatableProperty),
+            //         Value = $it.AsQueryable().Sum(i => i.AggregatableProperty),
             //         Next = new LastInChain() {
             //             Name = "Alias2",
-            //             Value = $it.AsQuaryable().Sum(i => i.AggregatableProperty)
+            //             Value = $it.AsQueryable().Sum(i => i.AggregatableProperty)
             //         }
             //     }
             // })
@@ -160,12 +160,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         }
 
         /// <inheritdoc/>
-        public virtual IQueryable FlattenReferencedProperties(
+        public virtual AggregationFlatteningResult FlattenReferencedProperties(
             TransformationNode transformationNode,
             IQueryable query,
-            QueryBinderContext context,
-            out ParameterExpression contextParameter,
-            out IDictionary<SingleValueNode, Expression> flattenedPropertiesMap)
+            QueryBinderContext context)
         {
             if (transformationNode == null)
             {
@@ -182,14 +180,6 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 throw Error.ArgumentNull(nameof(context));
             }
 
-            flattenedPropertiesMap = null;
-            contextParameter = context.CurrentParameter;
-
-            if (context.FlattenedProperties?.Any() == true)
-            {
-                return query;
-            }
-
             IEnumerable<GroupByPropertyNode> groupingProperties = GetGroupingProperties(transformationNode);            
             // Aggregate expressions to flatten - excludes VirtualPropertyCount
             List<AggregateExpression> aggregateExpressions = GetAggregateExpressions(transformationNode, context)?.OfType<AggregateExpression>()
@@ -197,7 +187,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if ((aggregateExpressions?.Count ?? 0) == 0 || !(groupingProperties?.Any() == true))
             {
-                return query;
+                return null;
             }
 
             Type wrapperType = typeof(FlatteningWrapper<>).MakeGenericType(context.TransformationElementType);
@@ -225,9 +215,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             int aliasIdx = aggregateExpressions.Count - 1;
             NamedPropertyExpression[] properties = new NamedPropertyExpression[aggregateExpressions.Count];
 
-            flattenedPropertiesMap = new Dictionary<SingleValueNode, Expression>(aggregateExpressions.Count);
-            contextParameter = Expression.Parameter(wrapperType, "$it");
-            MemberExpression containerExpression = Expression.Property(contextParameter, QueryConstants.GroupByWrapperGroupByContainerProperty);
+            AggregationFlatteningResult flatteningResult = new AggregationFlatteningResult
+            {
+                RedefinedContextParameter = Expression.Parameter(wrapperType, "$it"),
+                FlattenedPropertiesMapping = new Dictionary<SingleValueNode, Expression>(aggregateExpressions.Count)
+            };
+
+            MemberExpression containerExpression = Expression.Property(flatteningResult.RedefinedContextParameter, QueryConstants.GroupByWrapperGroupByContainerProperty);
 
             for (int i = 0; i < aggregateExpressions.Count; i++)
             {
@@ -249,7 +243,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                         QueryConstants.AggregationPropertyContainerValueProperty),
                     type);
                 containerExpression = Expression.Property(containerExpression, QueryConstants.AggregationPropertyContainerNextProperty);
-                flattenedPropertiesMap.Add(aggregateExpression.Expression, flattenedAccessExpression);
+                flatteningResult.FlattenedPropertiesMapping.Add(aggregateExpression.Expression, flattenedAccessExpression);
                 aliasIdx--;
             }
 
@@ -257,11 +251,9 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             wrapperTypeMemberAssignments.Add(Expression.Bind(wrapperProperty, AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
-            LambdaExpression flattenedLambda = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments), context.CurrentParameter);
+            flatteningResult.FlattenedExpression = Expression.Lambda(Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments), context.CurrentParameter);
 
-            query = ExpressionHelpers.Select(query, flattenedLambda, context.TransformationElementType);
-
-            return query;
+            return flatteningResult;
         }
 
         private static Expression WrapDynamicCastIfNeeded(Expression propertyAccessExpression)
@@ -419,7 +411,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             ParameterExpression lambdaParameter = baseType == context.TransformationElementType ? context.CurrentParameter : Expression.Parameter(baseType, "$it");
-            if (!(context.FlattenedPropertiesMap?.TryGetValue(aggregateExpression.Expression, out Expression body) == true))
+            if (!(context.FlattenedExpressionMapping?.TryGetValue(aggregateExpression.Expression, out Expression body) == true))
             {
                 body = BindAccessExpression(aggregateExpression.Expression, context, lambdaParameter);
             }

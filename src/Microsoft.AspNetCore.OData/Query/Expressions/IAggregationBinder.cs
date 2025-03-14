@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     {
         /// <summary>
         /// Flattens properties referenced in aggregate clause to avoid generation of nested queries by Entity Framework.
-        /// For query like groupby((A),aggregate(B/C with max as Alias1,B/D with max as Alias2)), generates an expression like:
+        /// For query like groupby((A),aggregate(B/C with max as Alias1,B/D with max as Alias2)), generate an expression like:
         /// .Select($it => new FlatteningWrapper() {
         ///     Source = $it,
         ///     Container = new {
@@ -38,15 +38,11 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="transformationNode">The <see cref="TransformationNode"/>.</param>
         /// <param name="query">The original <see cref="IQueryable"/>.</param>
         /// <param name="context">The query binder context.</param>
-        /// <param name="contextParameter">The parameter at the root of the current query binder context. The parameter can be reinitialized in the course of flattening.</param>
-        /// <param name="flattenedPropertiesMap">Mapping of flattened single value nodes and their values. For example { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }</param>
         /// <returns>Query with Select expression with flattened properties.</returns>
-        IQueryable FlattenReferencedProperties(
+        AggregationFlatteningResult FlattenReferencedProperties(
             TransformationNode transformationNode,
             IQueryable query,
-            QueryBinderContext context,
-            out ParameterExpression contextParameter,
-            out IDictionary<SingleValueNode, Expression> flattenedPropertiesMap);
+            QueryBinderContext context);
 
         /// <summary>
         /// Translates an OData $apply parse tree represented by a <see cref="TransformationNode"/> to

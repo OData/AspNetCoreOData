@@ -1189,7 +1189,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return null;
             }
 
-            if (context.FlattenedProperties.TryGetValue(propertyPath, out var expression))
+            if (context.FlattenedProperties.TryGetValue(propertyPath, out Expression expression))
             {
                 return expression;
             }
@@ -1663,6 +1663,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
+                source = ConvertToAggregationPropertyContainerIfNeeded(source);
+
                 flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, QueryConstants.AggregationPropertyContainerValueProperty), resultType));
             }
 
@@ -1697,6 +1699,47 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Wraps <paramref name="source"/> expression with a Convert expression to enforce type <see cref="AggregationPropertyContainer"/> if needed.
+        /// </summary>
+        /// <param name="source">The source expression.</param>
+        /// <returns>The wrapped expression, or the original <paramref name="source"/> expression, as the case may be.</returns>
+        /// <remarks>
+        /// Wrapping with a Convert expression is only needed when dealing with <see cref="AggregationPropertyContainer"/> (default implementation).
+        /// It's needed because <see cref="AggregationPropertyContainer"/> inherits from <see cref="NamedProperty{T}"/> - meaning that
+        /// <see cref="AggregationPropertyContainer"/> implements <see cref="IAggregationPropertyContainer{T}"/> "Name" and "Value" properties
+        /// indirectly via <see cref="NamedProperty{T}"/>.
+        /// Without Convert({expression}, typeof(AggregationPropertyContainer)), the "Value" property cannot be resolved and translation fails.
+        /// </remarks>
+        private static Expression ConvertToAggregationPropertyContainerIfNeeded(Expression source)
+        {
+            // NOTE: We should reconsider the inheritance of AggregationPropertyContainer from NamedProperty<T> for the following reasons:
+            // 1) Unnecessary complexity for aggregation scenarios
+            // - The NamedProperty<T> type, which inherits from PropertyContainer, was designed primarily for SelectExpand scenarios.
+            // - It introduces a significant amount of logic that is not required for aggregation.
+            // - Aggregation functionality only depends on the Name and Value properties, as well as the ToDictionaryCore method.
+            // - The ToDictionaryCore method requires a boolean includeAutoSelected parameter, which is irrelevant in aggregation scenarios and is simply ignored.
+            // 2) Challenges in exposing wrapper and container types as public API
+            // - The inheritance structure complicates making essential wrapper types (e.g., GroupByWrapper, FlatteningWrapper<T>) and container types (e.g., AggregationPropertyContainer) public.
+            // - Exposing these types as part of the public API is necessary to enable subclassing AggregationBinder, instead of forcing developers to implement IAggregationBinder from scratch.
+            // - However, due to the dependency on NamedProperty<T>, making these types public would require exposing approximately 128 private types from PropertyContainer, which is impractical.
+
+            Debug.Assert(source != null, $"{nameof(source)} != null");
+
+            Expression targetSource = source;
+
+            do
+            {
+                if (targetSource.Type.InheritsFromGenericBase(typeof(NamedProperty<>)))
+                {
+                    return Expression.Convert(source, typeof(AggregationPropertyContainer));
+                }
+
+            } while ((targetSource is MemberExpression memberExpression) && ((targetSource = memberExpression.Expression) != null));
+
+            return source;
         }
 
         private static Expression Any(Expression source, Expression filter)
