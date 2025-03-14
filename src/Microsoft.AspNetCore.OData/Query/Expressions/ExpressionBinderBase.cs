@@ -812,8 +812,14 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         private static void CollectContainerAssignments(Expression source, MethodCallExpression expression, Dictionary<string, Expression> result)
         {
-            CollectAssigments(result, Expression.Property(source, "GroupByContainer"), ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, "GroupByContainer"));
-            CollectAssigments(result, Expression.Property(source, "Container"), ExtractContainerExpression(expression, "Container"));
+            CollectAssigments(
+                result,
+                Expression.Property(source, QueryConstants.GroupByWrapperGroupByContainerProperty),
+                ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, QueryConstants.GroupByWrapperGroupByContainerProperty));
+            CollectAssigments(
+                result,
+                Expression.Property(source, QueryConstants.GroupByWrapperContainerProperty),
+                ExtractContainerExpression(expression, QueryConstants.GroupByWrapperContainerProperty));
         }
 
         private static void CollectAssigments(IDictionary<string, Expression> flattenPropertyContainer, Expression source, MemberInitExpression expression, string prefix = null)
@@ -830,15 +836,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             foreach (var expr in expression.Bindings.OfType<MemberAssignment>())
             {
                 var initExpr = expr.Expression as MemberInitExpression;
-                if (initExpr != null && expr.Member.Name == "Next")
+                if (initExpr != null && expr.Member.Name == QueryConstants.AggregationPropertyContainerNextProperty)
                 {
                     nextExpression = initExpr;
                 }
-                else if (expr.Member.Name == "Name")
+                else if (expr.Member.Name == QueryConstants.AggregationPropertyContainerNameProperty)
                 {
                     nameToAdd = (expr.Expression as ConstantExpression).Value as string;
                 }
-                else if (expr.Member.Name == "Value" || expr.Member.Name == "NestedValue")
+                else if (expr.Member.Name == QueryConstants.AggregationPropertyContainerValueProperty || expr.Member.Name == QueryConstants.AggregationPropertyContainerNestedValueProperty)
                 {
                     resultType = expr.Expression.Type;
                     if (resultType == typeof(object) && expr.Expression.NodeType == ExpressionType.Convert)
@@ -860,22 +866,22 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             if (typeof(GroupByWrapper).IsAssignableFrom(resultType))
             {
-                flattenPropertyContainer.Add(nameToAdd, Expression.Property(source, "NestedValue"));
+                flattenPropertyContainer.Add(nameToAdd, Expression.Property(source, QueryConstants.AggregationPropertyContainerNestedValueProperty));
             }
             else
             {
-                flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, "Value"), resultType));
+                flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, QueryConstants.AggregationPropertyContainerValueProperty), resultType));
             }
 
             if (nextExpression != null)
             {
-                CollectAssigments(flattenPropertyContainer, Expression.Property(source, "Next"), nextExpression, prefix);
+                CollectAssigments(flattenPropertyContainer, Expression.Property(source, QueryConstants.AggregationPropertyContainerNextProperty), nextExpression, prefix);
             }
 
             if (nestedExpression != null)
             {
                 var nestedAccessor = ((nestedExpression as MemberInitExpression).Bindings.First() as MemberAssignment).Expression as MemberInitExpression;
-                var newSource = Expression.Property(Expression.Property(source, "NestedValue"), "GroupByContainer");
+                var newSource = Expression.Property(Expression.Property(source, QueryConstants.AggregationPropertyContainerNestedValueProperty), QueryConstants.GroupByWrapperGroupByContainerProperty);
                 CollectAssigments(flattenPropertyContainer, newSource, nestedAccessor, nameToAdd);
             }
         }
