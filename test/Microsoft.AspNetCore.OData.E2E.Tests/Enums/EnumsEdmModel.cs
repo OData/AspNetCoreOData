@@ -34,9 +34,11 @@ internal class EnumsEdmModel
         gender.Member(Gender.Male);
 
         var accessLevel = builder.EnumType<AccessLevel>();
+        accessLevel.Member(AccessLevel.None);
         accessLevel.Member(AccessLevel.Execute);
         accessLevel.Member(AccessLevel.Read);
         accessLevel.Member(AccessLevel.Write);
+        accessLevel.Member(AccessLevel.Admin);
 
         var employeeType = builder.EnumType<EmployeeType>();
         employeeType.Member(EmployeeType.FullTime);
@@ -92,6 +94,10 @@ internal class EnumsEdmModel
 
         var functionConfiguration = employee.Function("FindAccessLevel");
         functionConfiguration.Returns<AccessLevel>();
+
+        var actionAddAccessRight = employee.Action("AddAccessRight");
+        actionAddAccessRight.Parameter<AccessLevel>("accessRight");
+        actionAddAccessRight.Returns<AccessLevel>();
     }
 
     private static void AddUnboundActionsAndFunctions(ODataModelBuilder odataModelBuilder)

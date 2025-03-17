@@ -31,11 +31,15 @@ public class Employee
 [Flags]
 public enum AccessLevel
 {
+    None = 0,
+
     Read = 1,
 
     Write = 2,
 
-    Execute = 4
+    Execute = 4,
+
+    Admin = 7 // Read | Write | Execute
 }
 
 [Flags]
