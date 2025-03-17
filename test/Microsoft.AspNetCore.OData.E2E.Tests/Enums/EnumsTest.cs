@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
@@ -96,7 +97,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
 
         var accessLevel = employee.Properties().SingleOrDefault(p => p.Name == "AccessLevel") as IEdmStructuralProperty;
         edmEnumType = accessLevel.Type.Definition as IEdmEnumType;
-        Assert.Equal(3, edmEnumType.Members.Count());
+        Assert.Equal(5, edmEnumType.Members.Count());
         Assert.True(edmEnumType.IsFlags);
 
         var employeeType = employee.Properties().SingleOrDefault(p => p.Name == "EmployeeType") as IEdmStructuralProperty;
@@ -848,9 +849,31 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         Assert.Equal("Read, Write", value);
     }
 
-#endregion
 
-#region Enum with function
+
+    [Theory]
+    [InlineData("/convention/Employees(2)/AddAccessRight")]
+    [InlineData("/explicit/Employees(3)/AddAccessRight")]
+    public async Task InvokeActionWithEnumParameterAndVerifyReturnValue(string requestUri)
+    {
+        // Arrange
+        await ResetDatasource();
+        var client = CreateClient();
+        var content = JObject.Parse(@"{""accessRight"":""Read,Execute""}");
+
+        // Act
+        var response = await client.PostAsJsonAsync(requestUri, content);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+
+        var json = await response.Content.ReadAsObject<JObject>();
+        Assert.Equal("Read, Execute", json.GetValue("value").ToString());
+    }
+
+    #endregion
+
+    #region Enum with function
 
     [Fact]
     public async Task EnumInFunctionOutput()

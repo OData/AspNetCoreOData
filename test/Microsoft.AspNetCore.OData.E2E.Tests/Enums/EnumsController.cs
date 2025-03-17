@@ -157,6 +157,19 @@ public class EmployeesController : ODataController
         return Updated(employee.SkillSet);
     }
 
+    [HttpPost("Employees({key})/AddAccessRight")]
+    public IActionResult AddAccessRight(int key, [FromODataBody] AccessLevel accessRight)
+    {
+        var employee = Employees.FirstOrDefault(e => e.ID == key);
+        if (employee == null)
+        {
+            return NotFound();
+        }
+
+        employee.AccessLevel = accessRight;
+        return Ok(employee.AccessLevel);
+    }
+
     public IActionResult Put(int key, [FromBody]Employee employee)
     {
         employee.ID = key;
