@@ -41,7 +41,58 @@ namespace Microsoft.AspNetCore.OData.Common
 
         public static bool IsSelectExpandWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(SelectExpandWrapper<>), type, out entityType);
 
-        public static bool IsComputeWrapper(this Type type, out Type entityType) => IsTypeWrapper(typeof(ComputeWrapper<>), type, out entityType);
+        /// <summary>
+        /// Determines whether the specified type is a <see cref="ComputeWrapper{T}"/> or a custom implementation
+        /// that inherits from <see cref="DynamicTypeWrapper"/> and implements both <see cref="IComputeWrapper{T}"/>
+        /// and <see cref="IGroupByWrapper{TContainer, TWrapper}"/>.
+        /// </summary>
+        /// <param name="typeToCheck">The type to check.</param>
+        /// <param name="entityType">The entity type if the specified type is a <see cref="ComputeWrapper{T}"/> or a custom implementation; otherwise, null.</param>
+        /// <returns>
+        /// <c>true</c> if the specified type is a <see cref="ComputeWrapper{T}"/> or a custom implementation
+        /// that meets the criteria; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsComputeWrapper(this Type typeToCheck, out Type entityType)
+        {
+            entityType = null;
+            if (typeToCheck == null)
+            {
+                return false;
+            }
+
+            if (typeToCheck.IsGenericType)
+            {
+                Type genericTypeDefinition = typeToCheck.GetGenericTypeDefinition();
+
+                // Default implementation
+                if (genericTypeDefinition == typeof(ComputeWrapper<>))
+                {
+                    entityType = typeToCheck.GetGenericArguments()[0];
+
+                    Debug.Assert(
+                        typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition)
+                        && genericTypeDefinition.ImplementsInterface(typeof(IComputeWrapper<>))
+                        && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>)),
+                        "ComputeWrapper<T> must inherit from DynamicTypeWrapper and implement IComputeWrapper<T> and IGroupByWrapper<TContainer, TWrapper>");
+
+                    return true;
+                }
+
+                // Custom implementation
+                // Must inherit from DynamicTypeWrapper
+                // Must implement IComputeWrapper<T> and IGroupByWrapper<TContainer, TWrapper>
+                if (typeof(DynamicTypeWrapper).IsAssignableFrom(genericTypeDefinition) &
+                    genericTypeDefinition.ImplementsInterface(typeof(IComputeWrapper<>))
+                    && genericTypeDefinition.ImplementsInterface(typeof(IGroupByWrapper<,>)))
+                {
+                    entityType = typeToCheck.GetGenericArguments()[0];
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Determines whether the specified type is a <see cref="FlatteningWrapper{T}"/> or a custom implementation

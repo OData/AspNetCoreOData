@@ -30,6 +30,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// <summary>
     /// The base class for all expression binders.
     /// </summary>
+    [Obsolete("ExpressionBinderBase is obsolete and will be dropped in the 10.x release. Please use QueryBinder instead.")]
     public abstract class ExpressionBinderBase
     {
         #region Properties

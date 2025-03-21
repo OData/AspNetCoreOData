@@ -35,5 +35,11 @@ namespace Microsoft.AspNetCore.OData.Query
 
         /// <summary>Name for <see cref="IFlatteningWrapper{T}.Source"/> property.</summary>
         public const string FlatteningWrapperSourceProperty = "Source";
+
+        /// <summary>Name for <see cref="IComputeWrapper{T}.Instance"/> property.</summary>
+        public const string ComputeWrapperInstanceProperty = "Instance";
+
+        /// <summary>Name for <see cref="IComputeWrapper{T}.Model"/> property.</summary>
+        public const string ComputeWrapperModelProperty = "Model";
     }
 }
