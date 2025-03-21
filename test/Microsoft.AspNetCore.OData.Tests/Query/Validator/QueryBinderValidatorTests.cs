@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Xunit;
 
@@ -227,6 +228,65 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
                 "The 'FlattenedPropertiesMapping' property must be set when the 'FlattenedExpression' property is set. (Parameter 'flatteningResult')",
                 exception.Message);
         }
+
+        [Fact]
+        public void ValidateComputeExpressionType_DefaultComputeWrapper_DoesNotThrow()
+        {
+            // Arrange
+            Type defaultComputeWrapper = typeof(ComputeWrapper<TestSale>);
+
+            // Act & Assert
+            QueryBinderValidator.ValidateComputeExpressionType(defaultComputeWrapper);
+        }
+
+        [Fact]
+        public void ValidateComputeExpressionType_ValidComputeWrapper_DoesNotThrow()
+        {
+            // Arrange
+            Type validComputeWrapper = typeof(ValidComputeWrapper<TestSale>);
+
+            // Act & Assert
+            QueryBinderValidator.ValidateComputeExpressionType(validComputeWrapper);
+        }
+
+        [Fact]
+        public void ValidateComputeExpressionType_InvalidComputeWrapperWithoutInheritance_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            Type invalidComputeWrapper = typeof(InvalidComputeWrapperWithoutInheritance);
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() => QueryBinderValidator.ValidateComputeExpressionType(invalidComputeWrapper));
+            Assert.Equal(
+                $"The type '{typeof(InvalidComputeWrapperWithoutInheritance).FullName}' does not inherit from 'Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper'.",
+                exception.Message);
+        }
+
+        [Fact]
+        public void ValidateComputeExpressionType_InvalidComputeWrapperWithoutIGroupByWrapperOfTInterface_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            Type invalidComputeWrapper = typeof(InvalidComputeWrapperWithoutIGroupByWrapperOfTInterface);
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() => QueryBinderValidator.ValidateComputeExpressionType(invalidComputeWrapper));
+            Assert.Equal(
+                $"The type '{typeof(InvalidComputeWrapperWithoutIGroupByWrapperOfTInterface).FullName}' does not implement 'Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper{{TContainer,TWrapper}}' interface.",
+                exception.Message);
+        }
+
+        [Fact]
+        public void ValidateComputeExpressionType_InvalidComputeWrapperWithoutIComputeWrapperOfTInterface_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            Type invalidComputeWrapper = typeof(InvalidComputeWrapperWithoutIComputeWrapperOfTInterface);
+
+            // Act & Assert
+            var exception = Assert.Throws<InvalidOperationException>(() => QueryBinderValidator.ValidateComputeExpressionType(invalidComputeWrapper));
+            Assert.Equal(
+                $"The type '{typeof(InvalidComputeWrapperWithoutIComputeWrapperOfTInterface).FullName}' does not implement 'Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper{{T}}' interface.",
+                exception.Message);
+        }
     }
 
     // Inherits from DynamicTypeWrapper and implements IGroupByWrapper<TContainer, TWrapper>
@@ -300,6 +360,46 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
 
     // Does not implement IFlatteningWrapper<T>
     internal class InvalidFlatteningWrapperWithoutIFlatteningWrapperOfTInterface
+        : ValidGroupByWrapper, IGroupByWrapper<AggregationPropertyContainerForValidGroupWrapper, ValidGroupByWrapper>
+    {
+    }
+
+    // Inherits from DynamicTypeWrapper, implements IGroupByWrapper<TContainer, TWrapper>, and implements IComputeWrapper<T>
+    internal class ValidComputeWrapper<TestSale>
+        : ValidGroupByWrapper, IGroupByWrapper<AggregationPropertyContainerForValidGroupWrapper, ValidGroupByWrapper>, IComputeWrapper<TestSale>
+    {
+        public TestSale Instance { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IEdmModel Model { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    // Does not inherit from DynamicTypeWrapper
+    internal class InvalidComputeWrapperWithoutInheritance
+        : IGroupByWrapper<AggregationPropertyContainerForValidGroupWrapper, ValidGroupByWrapper>, IComputeWrapper<TestSale>
+    {
+        public AggregationPropertyContainerForValidGroupWrapper GroupByContainer
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public AggregationPropertyContainerForValidGroupWrapper Container
+        {
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
+        }
+        public TestSale Instance { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IEdmModel Model { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    // Does not implement IGroupByWrapper<TContainer, TWrapper>
+    internal class InvalidComputeWrapperWithoutIGroupByWrapperOfTInterface : DynamicTypeWrapper, IComputeWrapper<TestSale>
+    {
+        public override Dictionary<string, object> Values => throw new NotImplementedException();
+        public TestSale Instance { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IEdmModel Model { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    }
+
+    // Does not implement IComputeWrapper<T>
+    internal class InvalidComputeWrapperWithoutIComputeWrapperOfTInterface
         : ValidGroupByWrapper, IGroupByWrapper<AggregationPropertyContainerForValidGroupWrapper, ValidGroupByWrapper>
     {
     }

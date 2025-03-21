@@ -71,10 +71,45 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Wrapper
         }
 
         [Fact]
-        public void TestInvalidFlatteningWrapperWithNoIFlatteningOfTInterfaceReturnsFalse()
+        public void TestInvalidFlatteningWrapperWithNoIFlatteningWrapperOfTInterfaceReturnsFalse()
         {
             // Arrange & Act & Assert
             Assert.False(typeof(InvalidFlatteningWrapperWithoutIFlatteningWrapperOfTInterface).IsFlatteningWrapper());
+        }
+
+        [Fact]
+        public void TestDefaultComputeWrapperReturnsTrue()
+        {
+            // Arrange & Act & Assert
+            Assert.True(typeof(ComputeWrapper<TestSale>).IsComputeWrapper(out _));
+        }
+
+        [Fact]
+        public void TestValidComputeWrapperReturnsTrue()
+        {
+            // Arrange & Act & Assert
+            Assert.True(typeof(ValidComputeWrapper<TestSale>).IsComputeWrapper(out _));
+        }
+
+        [Fact]
+        public void TestInvalidComputeWrapperWithNoDynamicTypeWrapperInheritanceReturnsFalse()
+        {
+            // Arrange & Act & Assert
+            Assert.False(typeof(InvalidComputeWrapperWithoutInheritance).IsComputeWrapper(out _));
+        }
+
+        [Fact]
+        public void TestInvalidComputeWrapperWithNoIGroupByWrapperOfTInterfaceReturnsFalse()
+        {
+            // Arrange & Act & Assert
+            Assert.False(typeof(InvalidComputeWrapperWithoutIGroupByWrapperOfTInterface).IsComputeWrapper(out _));
+        }
+
+        [Fact]
+        public void TestInvalidComputeWrapperWithNoIComputeWrapperOfTInterfaceReturnsFalse()
+        {
+            // Arrange & Act & Assert
+            Assert.False(typeof(InvalidComputeWrapperWithoutIComputeWrapperOfTInterface).IsComputeWrapper(out _));
         }
     }
 }

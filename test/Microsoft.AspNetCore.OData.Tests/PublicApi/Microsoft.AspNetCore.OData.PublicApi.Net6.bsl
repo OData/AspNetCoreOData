@@ -2776,6 +2776,10 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder
 	Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult FlattenReferencedProperties (Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
 
+public interface Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder {
+	System.Linq.Expressions.Expression BindCompute (Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+}
+
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 	System.Linq.Expressions.Expression BindFilter (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
@@ -2792,6 +2796,9 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinde
 	System.Linq.Expressions.Expression BindSelectExpand (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
 
+[
+ObsoleteAttribute(),
+]
 public abstract class Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase {
 	System.Linq.Expressions.ParameterExpression Parameter  { protected abstract get; }
 
@@ -2908,6 +2915,11 @@ public sealed class Microsoft.AspNetCore.OData.Query.Expressions.BinderExtension
 	[
 	ExtensionAttribute(),
 	]
+	public static System.Linq.IQueryable ApplyBind (Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder binder, System.Linq.IQueryable source, Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, out System.Type& resultClrType)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static System.Linq.Expressions.Expression ApplyBind (Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder binder, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, bool alreadyOrdered)
 
 	[
@@ -2930,6 +2942,12 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningR
 	System.Linq.Expressions.Expression FlattenedExpression  { public get; public set; }
 	System.Collections.Generic.IDictionary`2[[Microsoft.OData.UriParser.SingleValueNode],[System.Linq.Expressions.Expression]] FlattenedPropertiesMapping  { public get; public set; }
 	System.Linq.Expressions.ParameterExpression RedefinedContextParameter  { public get; public set; }
+}
+
+public class Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder : Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder, IComputeBinder {
+	public ComputeBinder ()
+
+	public virtual System.Linq.Expressions.Expression BindCompute (Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder : Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder, IFilterBinder {
@@ -3197,6 +3215,11 @@ public class Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator : ITop
 	public TopQueryValidator ()
 
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1 {
+	T Instance  { public abstract get; public abstract set; }
+	Microsoft.OData.Edm.IEdmModel Model  { public abstract get; public abstract set; }
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1 {

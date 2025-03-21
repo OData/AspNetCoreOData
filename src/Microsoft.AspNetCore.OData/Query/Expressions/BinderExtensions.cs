@@ -449,5 +449,50 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             return result;
         }
+
+        /// <summary>
+        /// Translate an OData parse tree represented by <see cref="ComputeTransformationNode"/> to
+        /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
+        /// </summary>
+        /// <param name="binder">An instance of the <see cref="IComputeBinder"/>.</param>
+        /// <param name="source">The original <see cref="IQueryable"/> source.</param>
+        /// <param name="computeTransformationNode">The <see cref="ComputeTransformationNode"/> representing an OData parse tree.</param>
+        /// <param name="context">An instance of the <see cref="QueryBinderContext"/> containing the current query context.</param>
+        /// <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+        /// <returns>The modified <see cref="IQueryable"/> source.</returns>
+        public static IQueryable ApplyBind(this IComputeBinder binder, IQueryable source, ComputeTransformationNode computeTransformationNode, QueryBinderContext context, out Type resultClrType)
+        {
+            if (binder == null)
+            {
+                throw Error.ArgumentNull(nameof(binder));
+            }
+
+            if (source == null)
+            {
+                throw Error.ArgumentNull(nameof(source));
+            }
+
+            if (computeTransformationNode == null)
+            {
+                throw Error.ArgumentNull(nameof(computeTransformationNode));
+            }
+
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            // Ensure that the flattened properties are populated for the current query context.
+            context.EnsureFlattenedProperties(context.CurrentParameter, source);
+
+            LambdaExpression computeLambda = binder.BindCompute(computeTransformationNode, context) as LambdaExpression;
+            Contract.Assert(computeLambda != null, $"{nameof(computeLambda)} != null");
+            resultClrType = computeLambda.Body.Type;
+            QueryBinderValidator.ValidateComputeExpressionType(resultClrType);
+
+            IQueryable result = ExpressionHelpers.Select(source, computeLambda, context.TransformationElementType);
+
+            return result;
+        }
     }
 }

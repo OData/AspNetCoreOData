@@ -139,6 +139,23 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Gets the <see cref="IComputeBinder"/>.
+        /// </summary>
+        /// <param name="context">The query context.</param>
+        /// <returns>The built <see cref="IComputeBinder"/>.</returns>
+        public static IComputeBinder GetComputeBinder(this ODataQueryContext context)
+        {
+            if (context == null)
+            {
+                throw Error.ArgumentNull(nameof(context));
+            }
+
+            IComputeBinder binder = context.RequestContainer?.GetService<IComputeBinder>();
+
+            return binder ?? new ComputeBinder();
+        }
+
+        /// <summary>
         /// Gets the <see cref="IAssemblyResolver"/>.
         /// </summary>
         /// <param name="context">The query context.</param>

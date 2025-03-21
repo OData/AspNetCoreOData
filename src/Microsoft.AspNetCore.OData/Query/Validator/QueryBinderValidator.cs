@@ -24,6 +24,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         private static string dynamicTypeWrapperName = typeof(DynamicTypeWrapper).FullName;
         private static readonly Type flatteningWrapperInterfaceTypeOfT = typeof(IFlatteningWrapper<>);
         private static string flatteningWrapperInterfaceTypeOfTName = $"{flatteningWrapperInterfaceTypeOfT.Namespace}.{flatteningWrapperInterfaceTypeOfT.Name.Split('`')[0]}{{T}}";
+        private static readonly Type computeWrapperInterfaceTypeOfT = typeof(IComputeWrapper<>);
+        private static string computeWrapperInterfaceTypeOfTName = $"{computeWrapperInterfaceTypeOfT.Namespace}.{computeWrapperInterfaceTypeOfT.Name.Split('`')[0]}{{T}}";
 
         /// <summary>
         /// Validates that the type representing the expression returned by
@@ -112,6 +114,27 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     SRResources.TypeMustImplementInterface,
                     flattenedExpressionType.FullName,
                     flatteningWrapperInterfaceTypeOfTName);
+            }
+        }
+
+        /// <summary>
+        /// Validates that the provided type implements <see cref="IGroupByWrapper{TContainer, TWrapper}"/> and <see cref="IComputeWrapper{T}"/>, and inherits from <see cref="DynamicTypeWrapper"/>.
+        /// </summary>
+        /// <param name="computeExpressionType">The type representing the flattened expression returned by
+        /// <see cref="IComputeBinder.BindCompute(ComputeTransformationNode, QueryBinderContext)"/>.</param>
+        /// <exception cref="InvalidOperationException">Thrown if <paramref name="computeExpressionType"/>
+        /// does not implement the required interfaces or inherit from the required base class.</exception>
+        public static void ValidateComputeExpressionType(Type computeExpressionType)
+        {
+            ValidateTransformationExpressionType(computeExpressionType);
+
+            // Type must implement IComputeWrapper<T> interface
+            if (!computeExpressionType.ImplementsInterface(computeWrapperInterfaceTypeOfT))
+            {
+                throw Error.InvalidOperation(
+                    SRResources.TypeMustImplementInterface,
+                    computeExpressionType.FullName,
+                    computeWrapperInterfaceTypeOfTName);
             }
         }
 

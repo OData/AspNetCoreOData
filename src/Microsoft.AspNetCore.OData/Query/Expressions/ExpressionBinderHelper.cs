@@ -188,7 +188,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 }
                 else
                 {
-                    throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, binaryOperator, typeof(ExpressionBinderBase).Name);
+                    throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, binaryOperator, typeof(QueryBinder).Name);
                 }
             }
         }

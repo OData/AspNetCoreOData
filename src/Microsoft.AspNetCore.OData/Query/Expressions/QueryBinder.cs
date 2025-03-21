@@ -1280,33 +1280,40 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
             else
             {
-                // TODO: Verify behaviour for custom IAggregationBinder implementation
-                bool isAggregated = context.ElementClrType == typeof(AggregationWrapper);
-                propertyPath = context.ElementClrType.IsComputeWrapper(out _) && !propertyPath.Contains('\\') ? string.Concat("Instance\\", propertyName) : propertyName;
+                Expression propertyAccessExpression = propertyAccessExpression = GetFlattenedPropertyExpression(propertyPath, context);
+                if (propertyAccessExpression == null)
+                {
+                    Expression propertyExpression = source.Type.IsComputeWrapper(out _)
+                        // e.g., if source.Type is ComputeWrapper<Sale>, for Amount property, the valid source will be $it.Instance
+                        ? GetPropertyExpression(source, QueryConstants.ComputeWrapperInstanceProperty)
+                        : source;
 
-                return GetFlattenedPropertyExpression(propertyPath, context)
-                    ?? ConvertNonStandardPrimitives(GetPropertyExpression(source, propertyPath), context);
+                    propertyExpression = GetPropertyExpression(propertyExpression, propertyName);
+                    propertyAccessExpression = ConvertNonStandardPrimitives(propertyExpression, context);
+                }
+
+                return propertyAccessExpression;
             }
         }
 
-        internal static Expression GetPropertyExpression(Expression source, string propertyPath, bool isAggregated = false)
+        private static Expression GetPropertyExpression(Expression source, string propertyPath)
         {
             string[] propertyNameParts = propertyPath.Split('\\');
             Expression propertyValue = source;
-            foreach (var propertyName in propertyNameParts)
+            foreach (string propertyName in propertyNameParts)
             {
-                // Trying to fix problem with $apply and $orderby. https://github.com/OData/AspNetCoreOData/issues/420
-                if (isAggregated)
-                {
-                    propertyValue = Expression.Property(propertyValue, "Values");
-                    var propertyInfo = typeof(Dictionary<string, object>).GetProperty("Item");
-                    var arguments = new List<Expression> { Expression.Constant(propertyName) };
+                propertyValue = Expression.Property(propertyValue, propertyName);
 
-                    propertyValue = Expression.MakeIndex(propertyValue, propertyInfo, arguments);
-                }
-                else
+                // Consider a scenario like:
+                // Sales?$apply=compute(Amount mul Product/TaxRate as Tax)/compute(Amount add Tax as Total,Amount div 10 as Discount)/compute(Total sub Discount as SalePrice)
+                // To get to the Amount property, we'll need the expression $it->Instance->Instance->Amount
+                // $it is of type ComputeWrapper<T1> (where T1 is of type ComputeWrapper<T2>)
+                // $it->Instance is of ComputeWrapper<T2> (where T2 is of type Sale)
+                // $it->Instance->Instance is of type Sale
+                // $it=>Instance->Instance->Amount is the correct member expression for Amount property
+                if (propertyValue.Type.IsComputeWrapper(out _))
                 {
-                    propertyValue = Expression.Property(propertyValue, propertyName);
+                    propertyValue = GetPropertyExpression(propertyValue, QueryConstants.ComputeWrapperInstanceProperty);
                 }
             }
 
@@ -1578,7 +1585,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             CollectContainerAssignments(source, expression, flattenedPropertiesMap);
             if (query?.ElementType?.IsComputeWrapper(out _) == true)
             {
-                MemberExpression instanceProperty = Expression.Property(source, "Instance");
+                MemberExpression instanceProperty = Expression.Property(source, QueryConstants.ComputeWrapperInstanceProperty);
                 if (typeof(DynamicTypeWrapper).IsAssignableFrom(instanceProperty.Type))
                 {
                     MethodCallExpression computeExpression = expression.Arguments.FirstOrDefault() as MethodCallExpression;

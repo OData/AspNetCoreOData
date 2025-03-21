@@ -157,9 +157,13 @@ namespace Microsoft.AspNetCore.OData.Query
                 }
                 else if (transformation.Kind == TransformationNodeKind.Compute)
                 {
-                    ComputeBinder binder = new ComputeBinder(querySettings, assembliesResolver, ResultClrType, Context.Model, (ComputeTransformationNode)transformation);
-                    query = binder.Bind(query);
-                    this.ResultClrType = binder.ResultClrType;
+                    ComputeTransformationNode computeTransformationNode = transformation as ComputeTransformationNode;
+
+                    IComputeBinder binder = Context.GetComputeBinder();
+                    QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, ResultClrType);
+
+                    query = binder.ApplyBind(query, computeTransformationNode, binderContext, out Type resultClrType);
+                    this.ResultClrType = resultClrType;
                 }
                 else if (transformation.Kind == TransformationNodeKind.Filter)
                 {
