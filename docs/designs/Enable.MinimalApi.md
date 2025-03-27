@@ -18,11 +18,9 @@ This service provides a Web API as:
 
 `GET {host}/customers`
 
-This API returns a collection of customers, then OData developers want to enable OData query functionalities on this API, for example:
+This API returns a collection of customers, then OData developers want to enable OData functionalities on this API, for example:
 
 `GET {host}/customers?$select=name&$top=1`
-
-We should figure out ways to empower developers enabling all OData query options. 
 
 ### Route handlers
 The lambda expression in preceding `MapGet` is called <strong>Route Handler</strong>. They are methods that execute when the route matches. Route handlers can be:
@@ -37,8 +35,34 @@ where:
 ```C#
 public delegate Task RequestDelegate(HttpContext context);
 ```
-
 Route handlers can be synchronous or asynchronous.
+
+## Scenarios
+
+### Enable OData response
+
+We enable developers to call an extension method named `WithODataResult()` on the route handler to get 'OData format' response:
+
+![image](https://github.com/user-attachments/assets/9203a3e5-baa1-4168-a5f1-2556d792bfc2)
+
+<strong>Be noted, </strong>It only contains the 'Id' and 'Name' in the OData format. This is because an Edm model is built on the fly since we don't provide the model explicity. In this case, all other properties are built as navigation properties by default.
+
+Developers can call `WithODataModel(model)` to provide an Edm model explicitly, in this case, the serialization of OData format can use that model directly.
+
+Developers can also call `WithODataVersion(version)` to get different OData format. See below:
+
+![image](https://github.com/user-attachments/assets/f6e9bac5-9f33-4bde-ba90-c57206139cf3)
+
+Except the above extension methods, we want to provide more to enable developers to customize the OData format response:
+
+* WithODataServices(lambda) : to config the services within dependency injection
+* WithODataBaseAddressFactory(lambda): to config the base address for OData format, especially for the context URI
+* WithODataPathFactory(lambda) : to config the related OData path for the request
+
+For example:
+![image](https://github.com/user-attachments/assets/b7f91007-0e6d-478d-a564-519671a441fb)
+
+
 
 ## Scenarios
 We want to support the following scenarios for OData Minimal API:
