@@ -47,7 +47,7 @@ We enable developers to call an extension method named `WithODataResult()` on th
 
 <strong>Be noted, </strong>It only contains the 'Id' and 'Name' in the OData format. This is because an Edm model is built on the fly since we don't provide the model explicity. In this case, all other properties are built as navigation properties by default.
 
-Developers can call `WithODataModel(model)` to provide an Edm model explicitly, in this case, the serialization of OData format can use that model directly.
+Developers can call `WithODataModel(model)` to provide an Edm model (`Info` property is built as complex type property in the pre-built Edm Model) explicitly, in this case, the serialization of OData format can use that model directly.
 
 Developers can also call `WithODataVersion(version)` to get different OData format. See below:
 
@@ -62,6 +62,29 @@ Except the above extension methods, we want to provide more to enable developers
 For example:
 ![image](https://github.com/user-attachments/assets/b7f91007-0e6d-478d-a564-519671a441fb)
 
+### Enable OData query explicity
+
+We want to enable binding `ODataQueryOptions<T>` as route handler parameter and empower developers to call `ApplyTo()` explicitly as follows:
+
+![image](https://github.com/user-attachments/assets/d30ee517-823f-4e7b-83b2-2d0e8ab57a7e)
+
+As mentioned, the model is built on the fly and all complex properties are built as navigation properties. That's why `$expand=info` is used.
+
+Developers can combine the extension methods `WithOData*()` to get other payload. For example:
+
+![image](https://github.com/user-attachments/assets/b3a5b34d-d82d-4e7b-99b2-9324370eec33)
+
+In this case, developer should use `$select=info` to get the value since `info` is a complex type property in the pre-built Edm model.
+
+### Enable OData query implicitly
+
+We enable developers to call an extension method named `AddODataQueryEndpointFilter(...)` on the route handler to enable OData query functionality implicitly.
+
+![image](https://github.com/user-attachments/assets/7bc9f9be-5cb9-471a-be3a-a6e7fb860eae)
+
+Again, developer can combine other extensions method together to get other result, for example:
+
+![image](https://github.com/user-attachments/assets/22c0d9d2-8666-4b2b-91df-c1bb0b19cb98)
 
 
 ## Scenarios
