@@ -100,7 +100,7 @@ internal static class SegmentTemplateHelpers
                         ILoggerFactory loggerFactory = context.HttpContext?.RequestServices?.GetService<ILoggerFactory>();
                         if (loggerFactory != null)
                         {
-                            loggerFactory.CreateLogger("ODataFunctionParameterMatcher").LogError(message, ex);
+                            loggerFactory.CreateLogger("ODataFunctionParameterMatcher").LogError(ex, "{Message}", message);
                             return null;
                         }
                         else

@@ -199,7 +199,7 @@ public class AttributeRoutingConvention : IODataControllerActionConvention
 
             // Whether we throw exception or mark it as warning is a design pattern.
             // throw new ODataException(warning);
-            _logger.LogWarning(warning);
+            _logger.LogWarning("{Message}", warning);
             return null;
         }
     }

@@ -208,7 +208,7 @@ public class KeySegmentTemplate : ODataSegmentTemplate
                     ILoggerFactory loggerFactory = context.HttpContext?.RequestServices?.GetService<ILoggerFactory>();
                     if (loggerFactory != null)
                     {
-                        loggerFactory.CreateLogger<KeySegmentTemplate>().LogError(message, ex);
+                        loggerFactory.CreateLogger<KeySegmentTemplate>().LogError(ex, "{Message}", message);
                         return false;
                     }
                     else
