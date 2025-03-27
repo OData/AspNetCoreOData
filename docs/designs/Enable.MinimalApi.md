@@ -66,7 +66,7 @@ For example:
 
 We want to enable binding `ODataQueryOptions<T>` as route handler parameter and empower developers to call `ApplyTo()` explicitly as follows:
 
-![image](https://github.com/user-attachments/assets/d30ee517-823f-4e7b-83b2-2d0e8ab57a7e)
+![image](https://github.com/user-attachments/assets/04ef199b-7985-4f95-ad0f-8a1a51ea2a70)
 
 As mentioned, the model is built on the fly and all complex properties are built as navigation properties. That's why `$expand=info` is used.
 
