@@ -87,58 +87,133 @@ Again, developer can combine other extensions method together to get other resul
 ![image](https://github.com/user-attachments/assets/22c0d9d2-8666-4b2b-91df-c1bb0b19cb98)
 
 
-## Scenarios
-We want to support the following scenarios for OData Minimal API:
+### Use RouteHandlerGroup
 
-1. Enable binding `ODataQueryOptions<T>` as route handler parameter and Empower developers to call ApplyTo manually.
-For example,
+If lots of same route handlers have the same metadata, developers can enable the metadata on the Group. 
+
 ```C#
-app.MapGet("/customers", (ODataQueryOptions<Customer> queryOptions) =>
+var group = app.MapGroup("")
+    .WithODataResult()
+    .WithODataModel(model);
+
+group.MapGet("v0/orders", (AppDb db) => db.Orders);
+
+group.MapGet("v1/orders", (AppDb db, ODataQueryOptions<Order> queryOptions) =>
 {
-      var data = "new Customer[] { …. }");
-      return queryOptions.ApplyTo(data);
+    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
+    return queryOptions.ApplyTo(db.Orders);
+});
+
+group.MapGet("v2/orders", (AppDb db) =>
+{
+    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+    return db.Orders;
+})
+    .AddODataQueryEndpointFilter();
+```
+
+In this scenario, all three endpoints use the same 'Model' and return OData format response.
+
+Developer can also call `WithOData*()` method on certain route handler to overwrite the metadata on the group.
+
+
+## Design Details
+
+### ODataResult
+
+We can get OData format repsone by implementing a custom `IResult` type. 
+
+We create a class named `ODataResult` as below
+
+```C#
+public interface IODataResult
+{
+    object Value { get; }
+}
+
+internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
+{
+    public async Task ExecuteAsync(HttpContext httpContext)
+    {
+        ...
+    }
+
+    public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
+    {
+        // ... Think more: will we need this to do something? maybe no needed.
+        // Maybe we don't need 'WithODataResult()' method and use this to update the metadata?
+    }
 }
 ```
-In this usage, we can re-use most functionalities from the existing `ODataQueryOptions<T>` class.
 
-2. Empower customers to do <strong>query filter</strong> implicitly.
-For example:
-```C#
-app.MapGet("/customers", [EnableQuery] () => "new Customer[] { …. }");
-```
-In this case, we can reuse EnableQueryAttribute.
-Unfortunately, it seems this filter mechanism is not supported in minimal API.
-On the contrary, we will use the ‘Endpoint Filter’ to achieve similar functionality. Below is the sample codes, for Endpoint Filters more details [here](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/min-api-filters?view=aspnetcore-9.0).
-```C#
-app.MapGet("/customers",  () => "new Customer[] { …. }").AddODataQueryFilter(…);
-```
+Make `ODataResult` as internal class to hide the details and it maybe change later. Developer can call `WithODataResult()` extension methods to enable a route handler to return OData format response.
 
-3. Provide a HttpRequest-less `ODataQueryOptions<T>` (Without using IEdmModel, using CLR type directly) and customers can use it in the Delegate to generate the Linq Expression and apply to the data.
+### WithODataResult()
+
+`WithODataResult()` is an extension method as below:
 
 ```C#
-app.MapGet("/customers", (HttpRequest request) =>
+public static TBuilder WithODataResult<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
 {
-      var data = "new Customer[] { …. }");
-      var query = ODataQueryBuilder.BuildFromString<Customer>(request.QueryString);
-      return query.ApplyTo(data);
+    builder.AddEndpointFilter(async (invocationContext, next) =>
+    {
+        object result = await next(invocationContext);
+
+        // If it's null or if it's already the ODataResult, simply do nothing
+        if (result is null || result is ODataResult)
+        {
+            return result;
+        }
+
+        return new ODataResult(result);
+    });
+
+    // Add/update odata metadata
 }
 ```
-I prefer this solution, but we haven’t finished the 'independent' `ODataQueryBuilder` from query string. Moreover, this can be designed and implemented individually, so I’d skip this functionality and leave it for later.
 
-## ODataQueryOptions< T >
-To enable `ODataQueryOptions<T>` as route handler parameter in Minimal API, we should figure out two parts:
-1.	How to get parameter binding for `ODataQueryOptions<T>`.
-2.	How to provide the Edm model related.
-   
-### Parameter binding
-In controller/action scenario, [model binding](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/model-binding?view=aspnetcore-9.0) is used to bind `ODataQueryOptions<T>` as action parameter. In Minimal API, there’s no model binding because it’s “MINIMAL”. To enable it as route handler parameter, we should ‘customize’ parameter binding for `ODataQueryOptions<T>`.
+Be noted, `With` prefix means to add/update endpoint metadata.
+
+
+### Other WithOData*() extensions
+
+Other `WithOData*()` are similiar extension methods same as `WithODataResult()`, For example:
+
+```C#
+public static TBuilder WithODataModel<TBuilder>(this TBuilder builder, IEdmModel model) where TBuilder : IEndpointConventionBuilder
+{
+     // Add/update odata metadata
+}
+```
+
+All of them are used to add/update certain part of OData metadata.
+
+### OData metadata
+
+We define a class named `ODataMiniMetadata` to hold the metadata used for OData functionalities.
+
+All `WithOData*()` add `ODataMinimetadata` if it's non-existed and update part of its content.
+
+```C#
+public class ODataMiniMetadata
+{
+    public IEdmModel Model { get; set; }
+    public bool IsODataFormat { get; set; }
+    public Func<HttpContext, Type, ODataPath> PathFactory { get; set; }
+    ......
+}
+```
+
+###  Parameter binding for ODataQueryOptions< T >
+
+In controller/action scenario, [model binding](https://learn.microsoft.com/en-us/aspnet/core/mvc/models/model-binding?view=aspnetcore-9.0) is used to bind `ODataQueryOptions<T>` as action parameter. In Minimal API, there’s no model binding because it’s “MINIMAL”. To enable it as route handler parameter, we should 'customize' parameter binding for `ODataQueryOptions<T>`.
 There are two ways to customize parameter binding:
 1.	For route, query, and header binding sources, bind custom types by adding a static `TryParse` method for the type.
 2.	Control the binding process by implementing a `BindAsync` method on a type.
 
 For parameter binding in minimal API, see [here](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/parameter-binding?view=aspnetcore-9.0)
 
-I prefer option #2 because it provides `HttpContext` and parameter information for more functionality. Therefore, we will add a static method in `ODataQueryOptions<T>` as:
+I prefer option #2 because it provides `HttpContext` and parameter information for more functionaliiesy. As a result, we add a static method in `ODataQueryOptions<T>` as:
 ```C#
 public class ODataQueryOptions<T> : ODataQueryOptions
 {
@@ -151,44 +226,7 @@ public class ODataQueryOptions<T> : ODataQueryOptions
 }
 ```
 
-### Edm model providing
-So far, the Edm model is needed to do OData query binding. There are two ways to provide the Edm model.
-- From the Global configuration (Model Based)
-
-  For example:
-  we use the `AddRouteComponents` based on `ODataOptions` to config the Edm model.
-
-```C#
-      builder.Services.AddOData(opt => opt.EnableQueryFeatures()
-          .AddRouteComponents("customized", EdmModelBuilder.GetEdmModel())
-```
-
-  Then, we use an extension method to config the Edm model as:
-
-```C#
-    app.MapGet("/customers", (ODataQueryOptions<Customers> options) => {
-          // …
-       }).UseOData("customized");
-```
-
-    Cons: 
-        1. First, we need the “prefix” twice to map the route handler and Edm Model. 
-        2. Second, it could be confusing with the existing controller/action mode.
-
-- Build the Edm model on the fly (Edm model-less)
- Use the generic type of `T` in the `ODataQueryOptions<T>` to build the Edm model on the fly.
- Note: the model should be built only one time, and we should cache it to get better performance.
-
-- Provide the model for certain endpoints.
-   For example, to provide the directly for a certain endpoint as:
-
-```C#
-    app.MapGet("/customers", (ODataQueryOptions<Customers> options) => {
-          // …
-        }).UseModel(new EdmModel(…));
-```
-
-I prefer second and third pattern and keep `AddRouteComponents` for controller-action only.
+In this usage, we can re-use most functionalities from the existing `ODataQueryOptions<T>` class.
 
 ### OData Query Endpoint Filter
 
@@ -219,7 +257,7 @@ So far, a standard endpoint filter is enough for OData query.
 #### IODataQueryEndpointFilter
 
 The below design is based on the standard endpoint filter.
-We will create a new interface as below:
+We create a new interface as below:
 ```C#
 public interface IODataQueryEndpointFilter : IEndpointFilter
 {
@@ -275,11 +313,11 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
 in which the logic is:
 
 -	Minimal API request pipeline will call ‘InvokeAsync’ on the filter one by one.
--	In ODataQueryFilter.InvokeAsync, OnFilterExecutingAsync is called before route handler. In which, we will construct the ODataQueryOptions<T> and run OData query validation on it.
+-	In `ODataQueryEndpointFilter.InvokeAsync`, `OnFilterExecutingAsync` is called before route handler. In which, we will construct the `ODataQueryOptions<T>` and run OData query validation on it.
 -	Call Route handler
--	OnFilterExecutedAsync is called after route handler. In which, we will use the ODataQueryOptions<T> to bind the OData query on the data.
+-	`OnFilterExecutedAsync` is called after route handler. In which, we will use the `ODataQueryOptions<T>` to bind the OData query on the data.
 
-### Extension methods
+
 We will provide extension methods as follows to empower developers to enable OData query filter easily:
 
 ```C#
@@ -293,18 +331,85 @@ public static RouteHandlerBuilder AddODataQueryEndpointFilter<[DynamicallyAccess
  // more for overloads 
 ```
 
-#### Query configuration
+### Edm model providing
+So far, the Edm model is needed to do OData query binding. Especially, it's required to do the OData format response. 
+
+There are two ways to provide the Edm model as mentioned.
+
+- Build the Edm model on the fly (Edm model-less)
+ 
+ If no `WithODataModel()` is called, we build the required Edm model on the fly.
+
+ a) Without `ODataQueryOptions<T>`, we build the Edm model using the type of returned value.
+ b) With `ODataQueryOptions<T>`, we build the Edm model using the generic type of `T`.
+ 
+ Note: the model should be built only one time, and we should cache it to get better performance.
+
+ If `ODataMiniMetadata` existed, the built model is cached on it. Otherwise, it is cached in the singleton service named `IEndpointModelMapper`. If we find a better place, we can replace this global/static cache.
+
+
+- Use `WithODataModel()` extension
+
+For example:
+
+```C#
+    app.MapGet("/customers", (ODataQueryOptions<Customers> options) => {
+          // …
+        }).WithODataModel(new EdmModel(…));
+```
+
+
+### OData Options/Configuration
+
+## New AddOData()
+
+As mentioned, we need configure minimal services used in OData minimal query services into service provider (DI).
+The existing `AddOData(..)` is extension methods defined on IMvcBuilder or IMveBuilderCore. In minimal API, there are not used. So, we add new `AddOData()` extension methods on `IServiceCollection` directly:
+
+```C#
+public static IServiceCollection AddOData(this IServiceCollection services, Action<ODataMinOptions> setupAction)
+{
+    // add the minimal services used for OData query 
+}
+```
+
+Where, `ODataMiniOptions` is used to config the global settings. 
+
+```C#
+public class ODataMiniOptions
+{
+    public DefaultQueryConfigurations QueryConfigurations { get => _queryConfigurations; }
+
+    public ODataVersion Version { get; set; } = ODataVersionConstraint.DefaultODataVersion;
+
+    public bool EnableNoDollarQueryOptions { get; set; } = true;
+
+    public bool EnableCaseInsensitive { get; set; } = true;
+}
+```
+
+So, developers can enable all OData query options like:
+
+```C#
+builder.Services.AddOData(q => q.EnableAll());
+```
+
+`DefaultQueryConfigurations` in `ODataMiniOptions` is global level configuration. Developer can config query options for a certain route handler by calling `WithODataOptions(lambda)`.
+
+```C#
+app.MapGet("/customer", (AppData db) => {....})
+   . WithODataOptions(opt => ...);
+```
+The options on route handler has high priority.
+
+### Each query configuration
 
 OData Query configuration has the following types:
+ 
+1) ODataValidatationSettings: Config for the query validatation. For example, is the query top value bigger than a certain value?
+2) ODataQuerySettings: Config for query executing. For example, set the PageSize, etc.
 
-1) ModelBound Query settings: Config the query functionalities on the C# types and properties. (Skip in this design)
-2) DefaultQueryConfigurations: Config whether the certain query options is enabled or disabled. 
-3) ODataValidatationSettings: Config for the query validatation. For example, is the query top value bigger than a certain value?
-4) ODataQuerySettings: Config for query executing. For example, set the PageSize, etc.
 
-Why do we have them? I don't know. :(
-
-`DefaultQueryConfigurations` is global level configuration, see the section about 'AddOData()'.
 For `ODataValidatationSettings` and `ODataQuerySettings`, I have the following overload for the extensions:
 
 ```C#
@@ -327,80 +432,42 @@ app.MapGet("/myschools", (AppDb db) =>
     db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     return db.Schools;
 })
-    .WithModel(model)
+    .WithODataModel(model)
     .AddODataQueryEndpointFilter(querySetup: q => q.PageSize = 3);
 ```
 
 
-### Edm model providing for endpoind filter
-
-Same as `ODataQueryOptions<T>` parameter binding, Endpoint filter needs the Edm model to the OData query.
-We have a couple ways
-
-a)	Build the Edm model on the fly (Edm model-less)
-
-It’s by fault if no model provided. We will build the Edm model using the return type of route handler.
-
-b)	Provide the model for certain endpoints.
-
-We will add extension methods to accept the Edm model associated with the endpoint filter. 
-
-```C#
-public static RouteHandlerBuilder AddODataQueryEndpointFilter(this RouteHandlerBuilder builder, IODataQueryFilter queryFilter, IEdmModel model) =>
-builder.AddEndpointFilter(queryFilter);
-```
-
-c)	Use  ‘UseModel(IEdmModel)’ for Endpoint Filter.
-
-I prefer not to do ‘b’ since we can achieve the same thing using ‘c’.
-
 ## Serialization
 
-The result of OData query will be serialized as normal JSON payload. Be noted, it doesn’t contain the OData control metadata, for example @odata.context.
+As mentioned, 
 
-I think that’s true because:
+1) Without enable OData result, the serialization result is normal JSON payload.
+2) `WithODataResult()` called, the result is OData JSON payload.
 
-- It’s minimal API, developers only need the data with query functionalities.
-- More important, Minimal API removes the formatters because and just because it’s minimal.
-  
-In this case, we must add the JsonConverter to all OData query related classes, for example: SelectSome<T>.
 
+The exsiting serializers are used to do serialization OData JSON payload. Typically, we don't need to reinvite the wheel.
+
+To support the Normal JSON payload after enabling OData query options, we need to config the JSON converter for the OData wrapper class, for example: `SelectAll<T>`
+
+So, we will register the JSON converter into the `JsonOptions` when calling `AddOData()`.
 
 ## Deserialization 
 
 I’d like to seek more scenarios for OData deserialization in Minimal API. (Brainstorm?)
 
 One of such scenarios is to support ‘Delta<T>’ for Patch/Put request. 
-If this is valid?? scenario, we can do same parameter binding for `Delta<T>` as `ODataQueryOptions<T>`. 
+If this is valid scenario, we can do same parameter binding for `Delta<T>` as `ODataQueryOptions<T>`. 
 Of course, developers can get the same data using IDictionary<string, object> as a replacement for ‘Delta<T>’. 
 Let’s have more discussion about it and it’s scope it out now.
 
 ## Customize the services
-Developers may need to customize/extend the services used during OData query, for example, to implement the ISearchBinder by himself. 
+Developers may need to customize/extend the services used during OData query/serialization, for example, to implement the ISearchBinder by himself. 
 
-We can do it:
+We provide `WithODataService(lambda)` extension method to enable developer to customize the services.
 
--	Allow to config the OData related services into global DI, then we can retrieve it if have. There’s no harm since we only use it if the global DI has it. Otherwise, use the default services.
--	Allow to config the OData related services into the Endpoint metadata. Then we can retrieve it from metadata if have. 
+The service provider is cached in the metadata if `ODataMiniMetadata ` existed.
 
-I’d prefer to use the DI not use the metadata Since metadata provides the ‘data’, the DI provides the services. We can have more discussion about this.
+## TBD
 
-## About ODataOptions
 
-`DataOptions` are used widely in controller/action pattern for OData. But, in the minimal API pattern, I’d not use it to config OData query because:
 
-1)	Some configurations in ODataOptions are used to config the ODat routing related. In minimal API, they are useless.
-2)	Some APIs in ODataOptions are used to config the endpoint, for example ‘AddRouteComponents’, but now, it’s not used again in minimal API.
-3)	DefaultQueryConfigurations in ODataOptions is used to config whether the OData query options are enabled or not. So far, it’s still needed in minimal API. So, we’d provide similar configuration in the new ‘AddOData’ extension method.
-
-## New AddOData()
-
-As mentioned, we need configure minimal services used in OData minimal query services into service provider (DI).
-The existing `AddOData(..)` is extension methods defined on IMvcBuilder or IMveBuilderCore. In minimal API, there are not used. So, we will add new `AddOData()` extension methods on `IServiceCollection` directly:
-
-```C#
-public static IServiceCollection AddOData(this IServiceCollection services, Action<DefaultQueryConfigurations> setupAction)
-{
-    // add the minimal services used for OData query 
-}
-```
