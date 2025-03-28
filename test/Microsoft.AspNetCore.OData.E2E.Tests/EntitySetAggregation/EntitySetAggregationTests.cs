@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,8 +21,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
 {
-    // The test can't work in EFCore, because it's not supported with Groupby and select many on collection.
-    // Later, we'd switch it to EF6.
+#if NET6_0_OR_GREATER
     public class EntitySetAggregationTests : WebODataTestBase<EntitySetAggregationTests.TestsStartup>
     {
         public class TestsStartup : TestStartupBase
@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             {
                 // Use the sql server got the access error.
                // services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=EntitySetAggregationContext;Trusted_Connection=True;"));
-                services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase("EntitySetAggregationTest"));
+                services.AddDbContext<EntitySetAggregationContext>(opt => opt.UseInMemoryDatabase(Guid.NewGuid().ToString()));
 
                 services.ConfigureControllers(typeof(CustomersController), typeof(OrdersController));
 
@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
         {
         }
 
-        [Theory(Skip = "See the comments above")]
+        [Theory]
         [InlineData("sum",600)]
         [InlineData("min", 25)]
         [InlineData("max", 225)]
@@ -74,7 +74,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(expected, TotalPrice);
         }
 
-        [Theory(Skip = "See the comments above")]
+        [Theory]
         [InlineData("?$apply=aggregate(Orders(Price with sum as TotalPrice, Id with sum as TotalId))")]
         [InlineData("?$apply=aggregate(Orders(Price with sum as TotalPrice), Orders(Id with sum as TotalId))")]
         public async Task MultipleAggregationOnEntitySetWorks(string queryString)
@@ -102,8 +102,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             // Sum of the 6 Orders IDs
             Assert.Equal(1 + 2 + 3 + 4 + 5 + 6, totalId); 
         }
-
-#if NET6_0_OR_GREATER
 
         [Fact]
         public async Task GroupByWithAggregationAndOrderByWorks()
@@ -208,9 +206,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(expectedResult, stringObject.ToString());
         }
 
-#endif
-
-        [Fact(Skip = "See the comments above")]
+        [Fact]
         public async Task AggregationOnEntitySetWorksWithPropertyAggregation()
         {
             // Arrange
@@ -237,7 +233,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 + 2 + 3, totalId); 
         }
 
-        [Fact(Skip = "See the comments above")]
+        [Fact]
         public async Task TestAggregationOnEntitySetsWithArithmeticOperators()
         {
             // Arrange
@@ -259,7 +255,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal((1 + 4 + 9) * (25 * 25 + 75 * 75), TotalPrice);
         }
 
-        [Fact(Skip = "See the comments above")]
+        [Fact]
         public async Task TestAggregationOnEntitySetsWithArithmeticOperatorsAndPropertyNavigation()
         {
             // Arrange
@@ -281,7 +277,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(1 * (25 + 75) + 2 * (25 + 75) + 3 * (25 + 75), TotalPrice);
         }
 
-        [Fact(Skip = "See the comments above")]
+        [Fact]
         public async Task AggregationOnEntitySetWorksWithGroupby()
         {
             // Arrange
@@ -310,7 +306,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.EntitySetAggregation
             Assert.Equal(2 * (25 + 75), customerOnePrice);
         }
     }
-
+#endif
     public class NestedComplexPropertyAggregationTests : WebApiTestBase<NestedComplexPropertyAggregationTests>
     {
         public NestedComplexPropertyAggregationTests(WebApiTestFixture<NestedComplexPropertyAggregationTests> fixture)

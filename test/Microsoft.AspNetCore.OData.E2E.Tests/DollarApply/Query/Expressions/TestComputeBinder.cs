@@ -1,5 +1,5 @@
-//-----------------------------------------------------------------------------
-// <copyright file="ComputeBinder.cs" company=".NET Foundation">
+﻿//-----------------------------------------------------------------------------
+// <copyright file="TestComputeBinder.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -9,25 +9,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Container;
+using Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Wrapper;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
-using Microsoft.AspNetCore.OData.Query.Wrapper;
+using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
-namespace Microsoft.AspNetCore.OData.Query.Expressions
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Expressions
 {
-    /// <summary>
-    /// The default implementation to bind an OData $apply parse tree represented by a <see cref="ComputeTransformationNode"/> to an <see cref="Expression"/>.
-    /// </summary>
-    public class ComputeBinder : QueryBinder, IComputeBinder
+    internal class TestComputeBinder : QueryBinder, IComputeBinder
     {
-        /// <inheritdoc/>
-        public virtual Expression BindCompute(ComputeTransformationNode computeTransformationNode, QueryBinderContext context)
+        public Expression BindCompute(ComputeTransformationNode computeTransformationNode, QueryBinderContext context)
         {
-            // NOTE: compute(X add Y as Z, A mul B as C) adds new properties to the output
-
-            Type wrapperType = typeof(ComputeWrapper<>).MakeGenericType(context.TransformationElementType);
+            Type wrapperType = typeof(TestComputeWrapper<>).MakeGenericType(context.TransformationElementType);
             // Set Instance property
             PropertyInfo wrapperInstanceProperty = wrapperType.GetProperty(QueryConstants.ComputeWrapperInstanceProperty);
             List<MemberAssignment> wrapperTypeMemberAssignments = new List<MemberAssignment>
@@ -54,7 +51,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             PropertyInfo wrapperContainerProperty = wrapperType.GetProperty(QueryConstants.GroupByWrapperContainerProperty);
             wrapperTypeMemberAssignments.Add(Expression.Bind(
                 wrapperContainerProperty,
-                AggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
+                TestAggregationPropertyContainer.CreateNextNamedPropertyContainer(properties)));
 
             return Expression.Lambda(
                 Expression.MemberInit(Expression.New(wrapperType), wrapperTypeMemberAssignments), context.CurrentParameter);
