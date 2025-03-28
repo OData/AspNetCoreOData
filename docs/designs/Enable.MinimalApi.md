@@ -80,7 +80,7 @@ In this case, developer should use `$select=info` to get the value since `info` 
 
 We enable developers to call an extension method named `AddODataQueryEndpointFilter(...)` on the route handler to enable OData query functionality implicitly.
 
-![image](https://github.com/user-attachments/assets/7bc9f9be-5cb9-471a-be3a-a6e7fb860eae)
+![Image](https://github.com/user-attachments/assets/8ac12b28-ed6e-4fdc-966e-00d3c9de6d2b)
 
 Again, developer can combine other extensions method together to get other result, for example:
 
