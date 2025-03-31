@@ -5,16 +5,93 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.AspNetCore.OData.Results;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Microsoft.AspNetCore.OData.Query.Container;
+
+// Add the jsonconverter for this?
+internal class TruncatedCollectionValueConverter : JsonConverterFactory
+{
+    /// <inheritdoc />
+    public override bool CanConvert(Type typeToConvert)
+    {
+        if (typeToConvert == null || !typeToConvert.IsGenericType)
+        {
+            return false;
+        }
+
+        Type genericType = typeToConvert.GetGenericTypeDefinition();
+        return genericType == typeof(TruncatedCollection<>);
+    }
+
+    /// <summary>
+    /// Creates a converter for a specified type.
+    /// </summary>
+    /// <param name="type">The type handled by the converter.</param>
+    /// <param name="options">The serialization options to use.</param>
+    /// <returns>A converter for which T is compatible with typeToConvert.</returns>
+    public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options)
+    {
+        // Since 'type' is tested in 'CanConvert()', it must be a generic type
+        Type genericType = type.GetGenericTypeDefinition();
+        Type entityType = type.GetGenericArguments()[0];
+
+        if (genericType == typeof(TruncatedCollection<>))
+        {
+            return (JsonConverter)Activator.CreateInstance(typeof(TruncatedCollectionConverter<>).MakeGenericType(new Type[] { entityType }));
+        }
+
+        return null;
+    }
+}
+
+internal class TruncatedCollectionConverter<T> : JsonConverter<TruncatedCollection<T>>
+{
+    public override TruncatedCollection<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        Contract.Assert(false, "SingleResult{TEntity} should never be deserialized into");
+        throw new NotImplementedException();
+    }
+
+    public override void Write(Utf8JsonWriter writer, TruncatedCollection<T> value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        {
+            writer.WritePropertyName("count");
+            writer.WriteNumberValue(value.TotalCount.Value);
+        }
+
+        writer.WritePropertyName("items");
+        JsonSerializer.Serialize(writer, value, options);
+
+        writer.WriteEndObject();
+    }
+}
+
+public class Truncated<T>
+{
+    private IEnumerable<T> sources;
+    private int TotalCount;
+
+    public Truncated(IEnumerable<T> source, int count)
+    {
+        this.sources = source;
+        this.TotalCount = TotalCount;
+    }
+}
+
 
 /// <summary>
 /// Represents a class that truncates a collection to a given page size.
 /// </summary>
 /// <typeparam name="T">The collection element type.</typeparam>
+[JsonConverter(typeof(TruncatedCollectionValueConverter))]
 public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable<T>, ICountOptionCollection
 {
     // The default capacity of the list.

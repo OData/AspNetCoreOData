@@ -17,12 +17,20 @@ public class AppDb : DbContext
 
     public DbSet<Student> Students => Set<Student>();
 
+    public DbSet<Customer> Customers => Set<Customer>();
+
+    public DbSet<Order> Orders => Set<Order>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<School>().HasKey(x => x.SchoolId);
         modelBuilder.Entity<Student>().HasKey(x => x.StudentId);
         modelBuilder.Entity<School>().OwnsOne(x => x.MailAddress);
+
+        modelBuilder.Entity<Customer>().HasKey(x => x.Id);
+        modelBuilder.Entity<Order>().HasKey(x => x.Id);
+        modelBuilder.Entity<Customer>().OwnsOne(x => x.Info);
     }
 }
 
@@ -87,7 +95,12 @@ static class AppDbExtension
                     // Pluto School
                     new Student { SchoolId = 9, StudentId = 91, FirstName = "Michael", LastName = "Wu", FavoriteSport = "Soccer", Grade = 97, BirthDay = new DateOnly(2022, 9, 22) },
                     new Student { SchoolId = 9, StudentId = 93, FirstName = "Rachel", LastName = "Wottle", FavoriteSport = "Soccer", Grade = 81, BirthDay = new DateOnly(2022, 10, 5) },
-                    new Student { SchoolId = 9, StudentId = 97, FirstName = "Aakash", LastName = "Aarav", FavoriteSport = "Soccer", Grade = 98, BirthDay = new DateOnly(2003, 3, 15) }
+                    new Student { SchoolId = 9, StudentId = 97, FirstName = "Aakash", LastName = "Aarav", FavoriteSport = "Soccer", Grade = 98, BirthDay = new DateOnly(2003, 3, 15) },
+
+                    // Shyline high School
+                    new Student { SchoolId = 10, StudentId = 101, FirstName = "Steve", LastName = "Chu", FavoriteSport = "Soccer", Grade = 77, BirthDay = new DateOnly(2002, 11, 12) },
+                    new Student { SchoolId = 10, StudentId = 123, FirstName = "Wash", LastName = "Dish", FavoriteSport = "Tennis", Grade = 81, BirthDay = new DateOnly(2002, 12, 5) },
+                    new Student { SchoolId = 10, StudentId = 106, FirstName = "Ren", LastName = "Wu", FavoriteSport = "Soccer", Grade = 88, BirthDay = new DateOnly(2003, 3, 15) }
                 };
 
                 foreach (var s in students)
@@ -100,14 +113,15 @@ static class AppDbExtension
                 var schools = new List<School>
                 {
                     new School { SchoolId = 1, SchoolName = "Mercury Middle School", MailAddress = new Address { ApartNum = 241, City = "Kirk", Street = "156TH AVE", ZipCode = "98051" } },
-                    new School { SchoolId = 2, SchoolName = "Venus High School", MailAddress = new Address { ApartNum = 543, City = "AR", Street = "51TH AVE PL", ZipCode = "98043" } },
+                    new HighSchool { SchoolId = 2, SchoolName = "Venus High School", MailAddress = new Address { ApartNum = 543, City = "AR", Street = "51TH AVE PL", ZipCode = "98043" }, NumberOfStudents = 1187, PrincipalName = "Venus TT" },
                     new School { SchoolId = 3, SchoolName = "Earth University", MailAddress = new Address { ApartNum = 101, City = "Belly", Street = "24TH ST", ZipCode = "98029" } },
                     new School { SchoolId = 4, SchoolName = "Mars Elementary School ", MailAddress = new Address { ApartNum = 123, City = "Issaca", Street = "Mars Rd", ZipCode = "98023" }  },
                     new School { SchoolId = 5, SchoolName = "Jupiter College", MailAddress = new Address { ApartNum = 443, City = "Redmond", Street = "Sky Freeway", ZipCode = "78123" } },
                     new School { SchoolId = 6, SchoolName = "Saturn Middle School", MailAddress = new Address { ApartNum = 11, City = "Moon", Street = "187TH ST", ZipCode = "68133" } },
-                    new School { SchoolId = 7, SchoolName = "Uranus High School", MailAddress = new Address { ApartNum = 123, City = "Greenland", Street = "Sun Street", ZipCode = "88155" } },
+                    new HighSchool { SchoolId = 7, SchoolName = "Uranus High School", MailAddress = new Address { ApartNum = 123, City = "Greenland", Street = "Sun Street", ZipCode = "88155" }, NumberOfStudents = 886, PrincipalName = "Uranus Sun" },
                     new School { SchoolId = 8, SchoolName = "Neptune Elementary School", MailAddress = new Address  { ApartNum = 77, City = "BadCity", Street = "Moon way", ZipCode = "89155" } },
-                    new School { SchoolId = 9, SchoolName = "Pluto University", MailAddress = new Address { ApartNum = 12004, City = "Sahamish", Street = "Universals ST", ZipCode = "10293" } }
+                    new School { SchoolId = 9, SchoolName = "Pluto University", MailAddress = new Address { ApartNum = 12004, City = "Sahamish", Street = "Universals ST", ZipCode = "10293" } },
+                    new HighSchool { SchoolId =10, SchoolName = "Shyline High School", MailAddress = new Address { ApartNum = 4004, City = "Sammamish", Street = "8TH ST", ZipCode = "98029"}, NumberOfStudents = 976, PrincipalName = "Laly Fort" }
                 };
 
                 foreach (var s in schools)
@@ -115,6 +129,47 @@ static class AppDbExtension
                     s.Students = students.Where(std => std.SchoolId == s.SchoolId).ToList();
 
                     context.Schools.Add(s);
+                }
+                #endregion
+
+                context.SaveChanges();
+            }
+
+            if (context.Customers.Count() == 0)
+            {
+                #region Customers and Orders
+
+                var customers = new List<Customer>
+                {
+                    new Customer { Id = 1, Name = "Alice", Info = new Info { Email = "alice@example.com", Phone = "123-456-7819" },
+                        Orders = [
+                            new Order { Id = 11, Amount = 9},
+                            new Order { Id = 12, Amount = 19},
+                        ] },
+                    new Customer { Id = 2, Name = "Johnson", Info = new Info { Email = "johnson@abc.com", Phone = "233-468-7289" },
+                        Orders = [
+                            new Order { Id = 21, Amount =8},
+                            new Order { Id = 22, Amount = 76},
+                        ] },
+                    new Customer { Id = 3, Name = "Peter", Info = new Info { Email = "peter@earth.org", Phone = "223-656-7889" },
+                        Orders = [
+                            new Order { Id = 32, Amount = 7 }
+                        ] },
+
+                    new Customer { Id = 4, Name = "Sam", Info = new Info { Email = "sam@ms.edu", Phone = "245-876-0989" },
+                        Orders = [
+                            new Order { Id = 41, Amount = 5 },
+                            new Order { Id = 42, Amount = 32}
+                        ] }
+                };
+
+                foreach (var s in customers)
+                {
+                    context.Customers.Add(s);
+                    foreach (var o in s.Orders)
+                    {
+                        context.Orders.Add(o);
+                    }
                 }
                 #endregion
 

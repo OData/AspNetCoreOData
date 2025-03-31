@@ -32,4 +32,16 @@ public class DefaultQueryConfigurations : DefaultQuerySettings
         MaxTop = null;
         return this;
     }
+
+    public DefaultQueryConfigurations UpdateAll(DefaultQueryConfigurations options)
+    {
+        EnableExpand = options.EnableExpand;
+        EnableSelect = options.EnableSelect;
+        EnableFilter = options.EnableFilter;
+        EnableOrderBy = options.EnableOrderBy;
+        EnableCount = options.EnableCount;
+        EnableSkipToken = options.EnableSkipToken;
+        MaxTop = options.MaxTop;
+        return this;
+    }
 }

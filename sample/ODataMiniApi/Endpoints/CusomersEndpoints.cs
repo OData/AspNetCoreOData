@@ -1,0 +1,84 @@
+﻿//-----------------------------------------------------------------------------
+// <copyright file="CustomersEndpoints.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
+using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OData;
+using Microsoft.OData.Edm;
+
+namespace ODataMiniApi.Students;
+
+/// <summary>
+/// Add customers endpoint
+/// </summary>
+public static class CustomersEndpoints
+{
+    public static IEndpointRouteBuilder MapCustomersEndpoints(this IEndpointRouteBuilder app, IEdmModel model)
+    {
+        app.MapGet("/customers", (AppDb db) => db.Customers.Include(s => s.Orders))
+            .WithODataResult()
+           // .WithODataModel(model)
+            .WithODataVersion(ODataVersion.V401)
+            .WithODataBaseAddressFactory(c => new Uri("http://abc.com"))
+            ;
+
+        app.MapGet("v1/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
+            return queryOptions.ApplyTo(db.Customers.Include(s => s.Orders));
+        })
+        //    .WithODataResult()
+         //   .WithODataModel(model)
+            ;
+
+        app.MapGet("v2/customers", (AppDb db) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return db.Customers.Include(s => s.Orders);
+        })
+            .AddODataQueryEndpointFilter()
+            .WithODataResult()
+            //.WithODataModel(model)
+            ;
+
+        return app;
+    }
+
+    // Scenarios using groups
+    public static IEndpointRouteBuilder MapOrdersEndpoints(this IEndpointRouteBuilder app, IEdmModel model)
+    {
+        var group = app.MapGroup("")
+            .WithODataResult()
+            .WithODataModel(model);
+
+        group.MapGet("v0/orders", (AppDb db) => db.Orders)
+            ;
+
+        group.MapGet("v1/orders", (AppDb db, ODataQueryOptions<Order> queryOptions) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
+            return queryOptions.ApplyTo(db.Orders);
+        })
+          //  .WithODataResult()
+          //  .WithODataModel(model)
+            ;
+
+        group.MapGet("v2/orders", (AppDb db) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return db.Orders;
+        })
+            .AddODataQueryEndpointFilter()
+            //.WithODataResult()
+            //.WithODataModel(model)
+            ;
+
+        return app;
+    }
+
+}

@@ -19,9 +19,9 @@ public sealed class EdmModelMetadata : IEdmModelMetadata
     /// Initializes a new instance of the <see cref="EdmModelMetadata" /> class.
     /// </summary>
     /// <param name="model">The Edm model.</param>
-    public EdmModelMetadata(IEdmModel model)
+    public EdmModelMetadata(IEdmModel model = null)
     {
-        ArgumentNullException.ThrowIfNull(model);
+        //ArgumentNullException.ThrowIfNull(model);
 
         Model = model;
     }

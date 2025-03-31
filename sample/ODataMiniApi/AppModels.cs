@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,6 +19,10 @@ public class EdmModelBuilder
         builder.EntitySet<School>("Schools");
         builder.ComplexType<Address>();
         builder.ComplexType<Student>();
+
+        builder.EntitySet<Customer>("Customers");
+        builder.EntitySet<Order>("Orders");
+        builder.ComplexType<Info>();
         return builder.GetEdmModel();
     }
 }
@@ -33,6 +36,13 @@ public class School
     public Address MailAddress { get; set; }
 
     public virtual IList<Student> Students { get; set; }
+}
+
+public class HighSchool : School
+{
+    // Additional properties specific to HighSchool
+    public int NumberOfStudents { get; set; }
+    public string PrincipalName { get; set; }
 }
 
 public class Student
@@ -62,4 +72,29 @@ public class Address
     public string Street { get; set; }
 
     public string ZipCode { get; set; }
+}
+
+
+public class Customer
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; }
+
+    public Info Info { get; set; }
+
+    public List<Order> Orders { get; set; }
+}
+
+public class Order
+{
+    public int Id { get; set; }
+
+    public int Amount { get; set; }
+}
+
+public class Info
+{
+    public string Email { get; set; }
+    public string Phone { get; set; }
 }

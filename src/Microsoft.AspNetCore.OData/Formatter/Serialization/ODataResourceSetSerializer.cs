@@ -492,6 +492,8 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         object resourceSetInstance, 
         ODataSerializerContext writeContext)
     {
+        ICountOptionCollection countOptionCollection1 = resourceSetInstance as ICountOptionCollection;
+
         if (writeContext.ExpandedResource == null)
         {
             // If we have more OData format specific information apply it now, only if we are the root feed.

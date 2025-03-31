@@ -1,5 +1,13 @@
 ﻿@ODataMiniApi_HostAddress = http://localhost:5177
 
+###
+
+GET {{ODataMiniApi_HostAddress}}/giveschools?$select=SchoolName
+
+###
+
+# It's wrong to use $expand=MailAddress
+# because the MailAddress is complex type in the pre-built edm model.
 GET {{ODataMiniApi_HostAddress}}/myschools?$select=schoolName&$expand=MailAddress
 
 ###
@@ -13,7 +21,7 @@ GET {{ODataMiniApi_HostAddress}}/schools?$select=schoolName,schoolid&$expand=Mai
 
 ###
 
-GET {{ODataMiniApi_HostAddress}}/schools?$select=schoolName,schoolid,MailAddress&$top=1
+GET {{ODataMiniApi_HostAddress}}/schools?$select=schoolName,schoolid,MailAddress&$top=1&$count=true
 
 ###
 
@@ -26,3 +34,55 @@ GET {{ODataMiniApi_HostAddress}}/v1/$odata?$format=application/xml
 GET {{ODataMiniApi_HostAddress}}/customized/$odata
 
 ###
+
+# We need to figure out what payload should look like?
+# Since it's a collection, how to add '@odata.count' property into the collection?
+# Or use the PageResult<T>
+GET {{ODataMiniApi_HostAddress}}/schoolspage?$select=schoolName,MailAddress&$count=true
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/schoolspage?$count=true
+
+### 
+
+GET {{ODataMiniApi_HostAddress}}/odata/students
+
+### 
+GET {{ODataMiniApi_HostAddress}}/odata/students?$select=FirstName&$top=3
+
+###
+
+@id=1
+GET {{ODataMiniApi_HostAddress}}/schools/{{id}}?$select=SchoolName
+
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/odata/schools
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/giveschools1
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/giveschools2
+
+###
+GET {{ODataMiniApi_HostAddress}}/giveschools2?$select=schoolName
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/giveschools3
+
+###
+GET {{ODataMiniApi_HostAddress}}/giveschools3?$select=schoolName
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/getschools1
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/odata/getschools1

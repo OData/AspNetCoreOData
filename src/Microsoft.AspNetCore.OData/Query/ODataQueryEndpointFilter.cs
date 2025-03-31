@@ -13,12 +13,23 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.AspNetCore.OData.Results;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder.Config;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -39,7 +50,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// <remarks>
     /// It could be confusing between DefaultQueryConfigurations and ODataQuerySettings.
     /// DefaultQueryConfigurations is used to config the functionalities for query options. For example: is $filter enabled?
-    /// ODataQuerySettings is used to set options for every query executing.
+    /// ODataQuerySettings is used to set options for each query executing.
     /// </remarks>
     public ODataQuerySettings QuerySettings { get; } = new ODataQuerySettings();
 
@@ -67,7 +78,9 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         // (namely the MethodInfo) even when applied early as group conventions.
         MethodInfo methodInfo = endpoint.Metadata.OfType<MethodInfo>().FirstOrDefault();
 
-        methodInfo = methodInfo ?? endpoint.RequestDelegate.Method; // Maybe we should not take this into consideration since the RequestDelegate return type is 'Task', we cannot idendify the real return type from Task?
+        // If the endpoint metadata doesn't contain 'MethodInfo', it's a 'RequestDelegate' method.
+        // Maybe we should not take this into consideration? since the RequestDelegate return type is 'Task', we cannot idendify the real return type from Task?
+        methodInfo = methodInfo ?? endpoint.RequestDelegate.Method;
 
         if (methodInfo is null)
         {
@@ -81,9 +94,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         // calling into next filter or the route handler.
         var result = await next(invocationContext);
 
-        var finalResult = await OnFilterExecutedAsync(result, odataFilterContext);
-
-        return finalResult;
+        return await OnFilterExecutedAsync(result, odataFilterContext);
     }
 
     /// <summary>
@@ -97,7 +108,8 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
 
         HttpContext httpContext = context.HttpContext;
 
-        // Use RequestQueryData to save the query validatation before route handler executing. This is same logic as EnableQueryAttribute.
+        // Use RequestQueryData to save the query validatation before route handler executing.
+        // This is same logic as EnableQueryAttribute. This is not required. However, it can give a better perf.
         RequestQueryData requestQueryData = new RequestQueryData()
         {
             QueryValidationRunBeforeActionExecution = false,
@@ -108,7 +120,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         ODataQueryOptions queryOptions = CreateQueryOptionsOnExecuting(context);
         if (queryOptions == null)
         {
-            return; // skip validation
+            return; // skip validation if we cannot create the query option on executing.
         }
 
         // Create and validate the query options.
@@ -129,25 +141,102 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// <returns>The <see cref="ValueTask"/>.</returns>
     public virtual async ValueTask<object> OnFilterExecutedAsync(object responseValue, ODataQueryFilterInvocationContext context)
     {
-        // Apply the query if there are any query options, if there is a page size set, in the case of
-        // SingleResult or in the case of $count request.
-        //bool shouldApplyQuery = responseValue != null &&
-        //   request.GetEncodedUrl() != null &&
-        //   (!String.IsNullOrWhiteSpace(request.QueryString.Value) ||
-        //   _querySettings.PageSize.HasValue ||
-        //   _querySettings.ModelBoundPageSize.HasValue ||
-        //   singleResultCollection != null ||
-        //   request.IsCountRequest() ||
-        //   ContainsAutoSelectExpandProperty(responseValue, singleResultCollection, actionDescriptor, request));
+        if (responseValue == null)
+        {
+            return null;
+        }
 
-        //if (!shouldApplyQueryould)
-        //{
-        //    return responseValue;
-        //}
+        ArgumentNullException.ThrowIfNull(context);
+        object originalValue = responseValue;
 
-        object queryResult = ExecuteQuery(responseValue, null, context);
+        // TODO: Process the SingleResult<T> and PageResult<T> as return type later
+        IQueryable singleResultCollection = null;
+
+        bool isODataResult = false;
+        if (responseValue is ODataResult odataResult)
+        {
+            isODataResult = true;
+            responseValue = odataResult.Value;
+        }
+
+        if (!QuerySettings.PageSize.HasValue && responseValue != null)
+        {
+            GetModelBoundPageSize(context, responseValue, singleResultCollection);
+        }
+
+        HttpRequest request = context.HttpContext.Request;
+        bool shouldApplyQuery = responseValue != null &&
+           request.GetEncodedUrl() != null &&
+           (!string.IsNullOrWhiteSpace(request.QueryString.Value) ||
+           QuerySettings.PageSize.HasValue ||
+           QuerySettings.ModelBoundPageSize.HasValue ||
+           singleResultCollection != null);
+
+        if (!shouldApplyQuery)
+        {
+            return originalValue;
+        }
+
+        object queryResult = ExecuteQuery(responseValue, singleResultCollection, context);
+
+        ITruncatedCollection truncatedCollection = queryResult as ITruncatedCollection;
+        if (queryResult is IEnumerable enumerable)
+        {
+            Writeformation(enumerable);
+            truncatedCollection = enumerable as ITruncatedCollection;
+        }
+        Type type = queryResult.GetType();
+
+        if (typeof(ITruncatedCollection).IsAssignableFrom(type))
+        {
+            Type genericType = type.GetGenericTypeDefinition();
+            Type entityType = type.GetGenericArguments()[0];
+
+            object[] parameters = new object[]
+            {
+                truncatedCollection,
+                null,
+                ((ICountOptionCollection)(queryResult)).TotalCount
+            };
+
+            var newResult = Activator.CreateInstance(typeof(PageResult<>).MakeGenericType(entityType), parameters);
+            return newResult;
+        }
+
+        if (isODataResult)
+        {
+            return new ODataResult(queryResult);
+        }
 
         return queryResult;
+    }
+
+    private static object Writeformation(object resourceSetInstance)
+    {
+        var truncatedCollection = resourceSetInstance as ITruncatedCollection;
+
+        return truncatedCollection;
+    }
+
+    private void GetModelBoundPageSize(ODataQueryFilterInvocationContext context, object responseValue, IQueryable singleResultCollection)
+    {
+        ODataQueryContext queryContext;
+
+        try
+        {
+            queryContext = GetODataQueryContext(responseValue, singleResultCollection, context);
+        }
+        catch (InvalidOperationException e)
+        {
+            throw new InvalidOperationException(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+        }
+
+        ModelBoundQuerySettings querySettings = queryContext.Model.GetModelBoundQuerySettings(queryContext.TargetProperty,
+            queryContext.TargetStructuredType);
+        if (querySettings != null && querySettings.PageSize.HasValue)
+        {
+            QuerySettings.ModelBoundPageSize = querySettings.PageSize;
+        }
     }
 
     /// <summary>
@@ -155,8 +244,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// </summary>
     /// <param name="responseValue">The response value.</param>
     /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
-    /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
-    /// <param name="request">The internal request.</param>
+    /// <param name="context">The action context, i.e. action and controller name.</param>
     /// <returns></returns>
     protected virtual object ExecuteQuery(
         object responseValue,
@@ -258,14 +346,8 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// </param>
     public virtual IQueryable ApplyQuery(IQueryable queryable, ODataQueryOptions queryOptions, ODataQuerySettings querySettings)
     {
-        if (queryable == null)
-        {
-            throw Error.ArgumentNull("queryable");
-        }
-        if (queryOptions == null)
-        {
-            throw Error.ArgumentNull("queryOptions");
-        }
+        ArgumentNullException.ThrowIfNull(queryable, nameof(queryable));
+        ArgumentNullException.ThrowIfNull(queryOptions, nameof(queryOptions));
 
         return queryOptions.ApplyTo(queryable, querySettings);
     }
@@ -275,11 +357,9 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// </summary>
     /// <param name="responseValue">The response value.</param>
     /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
-    /// <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
-    /// <param name="request">The OData path.</param>
+    /// <param name="invocationContext">The action context, i.e. action and controller name.</param>
     /// <returns></returns>
-    private ODataQueryContext GetODataQueryContext(
-        object responseValue,
+    private ODataQueryContext GetODataQueryContext(object responseValue,
         IQueryable singleResultCollection,
         ODataQueryFilterInvocationContext invocationContext)
     {
@@ -298,7 +378,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// Create and validate a new instance of <see cref="ODataQueryOptions"/> from a query and context during action executed.
     /// Developers can override this virtual method to provide its own <see cref="ODataQueryOptions"/>.
     /// </summary>
-    /// <param name="request">The incoming request.</param>
+    /// <param name="httpContext">The http context.</param>
     /// <param name="queryContext">The query context.</param>
     /// <returns>The created <see cref="ODataQueryOptions"/>.</returns>
     protected virtual ODataQueryOptions CreateAndValidateQueryOptions(HttpContext httpContext, ODataQueryContext queryContext)
@@ -373,20 +453,14 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// the query contains unsupported query parameters. Override this method to perform additional validation of
     /// the query.
     /// </summary>
+    /// <param name="httpContext" />
     /// <param name="queryOptions">
     /// The <see cref="ODataQueryOptions"/> instance constructed based on the incoming request.
     /// </param>
     protected virtual void ValidateQuery(HttpContext httpContext, ODataQueryOptions queryOptions)
     {
-        if (httpContext == null)
-        {
-            throw Error.ArgumentNull(nameof(httpContext));
-        }
-
-        if (queryOptions == null)
-        {
-            throw Error.ArgumentNull(nameof(queryOptions));
-        }
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+        ArgumentNullException.ThrowIfNull(queryOptions, nameof(queryOptions));
 
         IQueryCollection queryParameters = httpContext.Request.Query;
         foreach (var kvp in queryParameters)
@@ -405,26 +479,30 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// <summary>
     /// Creates the <see cref="ODataQueryOptions"/> for action executing validation.
     /// </summary>
-    /// <param name="invocationContext">The action executing context.</param>
+    /// <param name="context">The OData query filter invocation context.</param>
     /// <returns>The created <see cref="ODataQueryOptions"/> or null if we can't create it during action executing.</returns>
-    protected virtual ODataQueryOptions CreateQueryOptionsOnExecuting(ODataQueryFilterInvocationContext invocationContext)
+    protected virtual ODataQueryOptions CreateQueryOptionsOnExecuting(ODataQueryFilterInvocationContext context)
     {
-        if (invocationContext == null)
-        {
-            throw new ArgumentNullException(nameof(invocationContext));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         ODataQueryContext queryContext;
 
-        // For non-OData Json based controllers.
         // For these cases few options are supported like IEnumerable<T>, Task<IEnumerable<T>>, T, Task<T>
         // Other cases where we cannot determine the return type upfront, are not supported
         // Like IActionResult, SingleResult. For such cases, the validation is run in OnActionExecuted
         // When we have the result.
-        
 
-        Type returnType = invocationContext.MethodInfo.ReturnType;
-        Type elementType;
+        // From Minimal API doc
+        // Minimal endpoints support the following types of return values:
+        // 1. string -This includes Task<string> and ValueTask<string>.
+        // 2. T(Any other type) - This includes Task<T> and ValueTask<T>.
+        // 3. IResult based -This includes Task<IResult> and ValueTask<IResult>
+
+        Type returnType = context.MethodInfo.ReturnType;
+        if (returnType is null)
+        {
+            return null;
+        }
 
         if (returnType.IsGenericType)
         {
@@ -435,43 +513,24 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
             }
         }
 
-        // For Task<> get the base object.
-        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
-        {
-            returnType = returnType.GetGenericArguments().First();
-        }
+        TypeHelper.IsCollection(returnType, out Type elementType);
 
-        // For NetCore2.2+ new type ActionResult<> was created which encapsulates IActionResult and T result.
-        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(ActionResult<>))
-        {
-            returnType = returnType.GetGenericArguments().First();
-        }
+        IEdmModel edmModel = GetModel(elementType, context);
 
-        if (TypeHelper.IsCollection(returnType))
-        {
-            elementType = TypeHelper.GetImplementedIEnumerableType(returnType);
-        }
-        else if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
-        {
-            elementType = returnType.GetGenericArguments().First();
-        }
-        else
-        {
-            return null;
-        }
-
-        IEdmModel edmModel = GetModel(elementType, invocationContext);
         queryContext = new ODataQueryContext(edmModel, elementType);
 
-        // Create and validate the query options.
-        ODataQueryOptions queryOptions = new ODataQueryOptions(queryContext, invocationContext.HttpContext.Request);
+        // Get or create the service provider based on the model. It should save into the ODataFeature() in the method.
+        context.HttpContext.GetOrCreateServiceProvider();
+        IODataFeature odataFeature = context.HttpContext.ODataFeature();
 
-        if (queryContext.RequestContainer is null)
+        if (odataFeature.Services is null)
         {
-            queryContext.RequestContainer = invocationContext.HttpContext.RequestServices;
+            // Why? For example, developer overwrites 'GetModel', and in his version, he didn't create the ServiceProvider.
+            odataFeature.Services = context.HttpContext.BuildDefaultServiceProvider(edmModel);
         }
 
-        return queryOptions;
+        // Create the query options.
+        return new ODataQueryOptions(queryContext, context.HttpContext.Request);
     }
 
     /// <summary>
@@ -481,11 +540,37 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// <param name="elementClrType">The CLR type to retrieve a model for.</param>
     /// <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
     /// <returns>The EDM model for the given type and request.</returns>
-    protected virtual IEdmModel GetModel(Type elementClrType, ODataQueryFilterInvocationContext invocationContext)
+    protected virtual IEdmModel GetModel(Type elementClrType, ODataQueryFilterInvocationContext context)
     {
-        HttpContext httpContext = invocationContext.HttpContext;
+        HttpContext httpContext = context.HttpContext;
 
-        return httpContext.GetEdmModel(elementClrType);
+        return httpContext.GetOrCreateEdmModel(elementClrType);
+    }
+
+    private IServiceProvider BuildRouteContainer(IEdmModel model, ODataVersion version, IServiceProvider sp)
+    {
+        Contract.Assert(model != null);
+
+        IServiceCollection services = new ServiceCollection();
+
+        // Inject the core odata services.
+        services.AddDefaultODataServices(version);
+
+        // Inject the default query configuration from this options.
+        services.AddSingleton(sp.GetRequiredService<DefaultQueryConfigurations>());
+
+        // Inject the default Web API OData services.
+        services.AddDefaultWebApiServices();
+
+        // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
+        services.AddSingleton<ODataUriResolver>(sp.GetRequiredService<ODataUriResolver>());
+
+        // Inject the Edm model.
+        // From Current ODL implement, such injection only be used in reader and writer if the input
+        // model is null.
+        services.AddSingleton(sp => model);
+
+        return services.BuildServiceProvider();
     }
 }
 

@@ -6,14 +6,23 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -22,7 +31,7 @@ namespace Microsoft.AspNetCore.OData.Query;
 /// Currently this only supports $filter, $orderby, $top, $skip.
 /// </summary>
 [ODataQueryParameterBinding]
-public class ODataQueryOptions<TEntity> : ODataQueryOptions
+public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
@@ -105,19 +114,37 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions
     /// <param name="context">The HttpContext.</param>
     /// <param name="parameter">The parameter info.</param>
     /// <returns>The built <see cref="ODataQueryOptions{TEntity}"/></returns>
-    public static ValueTask<ODataQueryOptions<TEntity>> BindAsync(HttpContext context, ParameterInfo parameter)
+    public static async ValueTask<ODataQueryOptions<TEntity>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
         if (context == null)
         {
             throw Error.ArgumentNull(nameof(context));
         }
 
+        IODataEndpointModelMapper endpointModelMapper = context.RequestServices.GetService<IODataEndpointModelMapper>();
+        if (endpointModelMapper is null)
+        {
+            throw new ODataException($"Please call 'AddOData()' or register to 'IODataEndpointModelMapper' service.");
+        }
+
         Type entityClrType = typeof(TEntity);
-        IEdmModel model = context.GetEdmModel(entityClrType);
-        ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, context.ODataFeature().Path);
+        IEdmModel model = context.GetOrCreateEdmModel(entityClrType);
+        ODataPath path = context.GetOrCreateODataPath(entityClrType);
+        context.ODataFeature().Services = context.GetOrCreateServiceProvider();
+
+        ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, path);
         var result = new ODataQueryOptions<TEntity>(entitySetContext, context.Request);
 
-        return ValueTask.FromResult(result);
+        return await ValueTask.FromResult(result);
+    }
+
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
+    {
+        // Make sure we have the metadata added into the endpoint.
+        // In this case, it seems we do't need the 'IODataEndpointModelMapper'.
+        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, (ODataMiniMetadata m) => { });
+        //builder.Metadata.Add(new EdmModelMetadata(new EdmModel("abc")));
+        // builder.FilterFactories
     }
 
     private static void ValidateQuery(IQueryable query)
