@@ -90,6 +90,8 @@ app.MapGet("/", () =>
 #region ODataMetadata
 app.MapODataMetadata("/v1/$odata", model);
 app.MapODataMetadata("/customized/$odata", model, new CustomizedMetadataHandler());
+
+app.MapODataServiceDocument("v1/$doc", model);
 #endregion
 
 #region School Endpoints

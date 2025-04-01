@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -21,19 +22,22 @@ public static class CustomersEndpoints
     public static IEndpointRouteBuilder MapCustomersEndpoints(this IEndpointRouteBuilder app, IEdmModel model)
     {
         app.MapGet("/customers", (AppDb db) => db.Customers.Include(s => s.Orders))
-            .WithODataResult()
-           // .WithODataModel(model)
+           //.WithODa
+            .WithODataResult() // default: built the complex type property by default?
+            // If enable Query, define them as entity type
+            // If no query, define them as complex type?
+            .WithODataModel(model)
             .WithODataVersion(ODataVersion.V401)
-            .WithODataBaseAddressFactory(c => new Uri("http://abc.com"))
-            ;
+            .WithODataBaseAddressFactory(c => new Uri("http://abc.com"));
+            //.WithODataServices(c => c.AddSingleton<ODataMessageWriterSettings>;
 
         app.MapGet("v1/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
         {
             db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
             return queryOptions.ApplyTo(db.Customers.Include(s => s.Orders));
         })
-        //    .WithODataResult()
-         //   .WithODataModel(model)
+            .WithODataResult()
+            .WithODataModel(model)
             ;
 
         app.MapGet("v2/customers", (AppDb db) =>

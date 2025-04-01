@@ -4,7 +4,9 @@
 
 GET {{ODataMiniApi_HostAddress}}/customers
 
-
+### [AutoExpand]
+### 4.01 Delta Payload Get "odata." prefix even in 4.01?
+### 
 ###
 
 GET {{ODataMiniApi_HostAddress}}/v1/customers?$select=name,info&$top=2&$orderby=id

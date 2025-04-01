@@ -41,11 +41,39 @@ public static class ODataEndpointConventionBuilderExtensions
     /// <param name="pattern">The route pattern.</param>
     /// <param name="model">The related Edm model.</param>
     /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+    public static IEndpointConventionBuilder MapODataServiceDocument(
+        this IEndpointRouteBuilder endpoints,
+        [StringSyntax("Route")] string pattern,
+        IEdmModel model)
+        => endpoints.MapGet(pattern, () => ODataResultExtensions.OData(model.GenerateServiceDocument()));
+
+    /// <summary>
+    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
+    /// It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
+    /// </summary>
+    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
+    /// <param name="pattern">The route pattern.</param>
+    /// <param name="model">The related Edm model.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static IEndpointConventionBuilder MapODataMetadata(
         this IEndpointRouteBuilder endpoints,
         [StringSyntax("Route")] string pattern,
         IEdmModel model)
         => endpoints.MapODataMetadata(pattern, model, new ODataMetadataHandler());
+
+    /// <summary>
+    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
+    /// It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
+    /// </summary>
+    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
+    /// <param name="pattern">The route pattern.</param>
+    /// <param name="model">The related Edm model.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+    public static IEndpointConventionBuilder MapODataMetadata1(
+        this IEndpointRouteBuilder endpoints,
+        [StringSyntax("Route")] string pattern,
+        IEdmModel model)
+        => endpoints.MapGet(pattern, () => ODataResultExtensions.OData(model));
 
     /// <summary>
     /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata based on <see cref="IODataMetadataHandler"/>.

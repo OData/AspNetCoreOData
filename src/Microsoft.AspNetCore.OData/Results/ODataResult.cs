@@ -51,8 +51,15 @@ public interface IODataResult
     object Value { get; }
 }
 
+internal class ODataServiceDocuementResult : ODataResult
+{
+    public ODataServiceDocuementResult(object value) : base(value)
+    {
+    }
+}
+
 /// <summary>
-/// Defines an implentatation that represents the result of an OData formatter result.
+/// Defines an implementation that represents the result of an OData format result.
 /// It's used for minimal API.
 /// </summary>
 internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
@@ -73,7 +80,7 @@ internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
 
     public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
     {
-        //builder.M
+        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, m => { });
     }
 
     /// <summary>
@@ -81,7 +88,7 @@ internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <returns>A task that represents the asynchronous execute operation.</returns>
-    public async Task ExecuteAsync(HttpContext httpContext)
+    public virtual async Task ExecuteAsync(HttpContext httpContext)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
 

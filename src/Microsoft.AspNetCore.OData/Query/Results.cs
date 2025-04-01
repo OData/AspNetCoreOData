@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using System;
+using System.Diagnostics;
 
 namespace Microsoft.AspNetCore.OData.Results;
 
@@ -24,5 +25,11 @@ public static class ODataResultExtensions
         return new ODataResult(value);
     }
 
+    internal static ODataResult OData(object value, ODataMiniOptions? options = null)
+    {
+        return new ODataResult(value);
+    }
 }
+
+
 

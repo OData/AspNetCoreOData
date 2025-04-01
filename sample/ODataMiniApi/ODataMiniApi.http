@@ -34,6 +34,9 @@ GET {{ODataMiniApi_HostAddress}}/v1/$odata?$format=application/xml
 GET {{ODataMiniApi_HostAddress}}/customized/$odata
 
 ###
+GET {{ODataMiniApi_HostAddress}}/v1/$doc
+
+###
 
 # We need to figure out what payload should look like?
 # Since it's a collection, how to add '@odata.count' property into the collection?
