@@ -62,8 +62,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
             ElementType = Model.GetEdmTypeReference(ElementClrType)?.Definition;
 
-            // Check if element type is null and not of AggregationWrapper type and not of NoGroupByAggregationWrapper type.
-            if (ElementType == null && ElementClrType != typeof(AggregationWrapper) && ElementClrType != typeof(NoGroupByAggregationWrapper))
+            // Check if element type is null and not of DynamicTypeWrapper or its derived types.
+            if (ElementType == null && !typeof(DynamicTypeWrapper).IsAssignableFrom(ElementClrType))
             {
                 throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, ElementClrType.FullName));
             }
@@ -72,8 +72,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Here:
             // $this -> instance in EmailAddresses
             // $it -> instance in Customers
-            // When we process $select=..., we create QueryBindContext, the input clrType is "Customer".
-            // When we process nested $filter, we create another QueryBindContext, the input clrType is "string".
+            // When we process $select=..., we create QueryBinderContext, the input clrType is "Customer".
+            // When we process nested $filter, we create another QueryBinderContext, the input clrType is "string".
             ParameterExpression thisParameters = Expression.Parameter(clrType, DollarIt);
             _lambdaParameters = new Dictionary<string, ParameterExpression>();
 
@@ -209,6 +209,34 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             }
         }
 
+        /// <summary>
+        /// Sets the specified parameter
+        /// </summary>
+        /// <param name="name">The parameter name.</param>
+        /// <param name="parameterExpr">The parameter expression.</param>
+        internal void SetParameter(string name, ParameterExpression parameterExpr)
+        {
+            if (name != null)
+            {
+                _lambdaParameters[name] = parameterExpr;
+            }
+        }
+
+        #region Aggregation
+
+        // TODO: Can we update ElementClrType from SetParameter and reference ElementClrType where TransformationElementType is used?
+        /// <summary>
+        /// The type of the element in a transformation query.
+        /// </summary>
+        public Type TransformationElementType { get { return this.CurrentParameter.Type; } }
+
+        /// <summary>
+        /// A mapping of flattened single value nodes and their values. For example { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
+        /// </summary>
+        public IDictionary<SingleValueNode, Expression> FlattenedExpressionMapping { get; internal set; }
+
+        #endregion Aggregation
+
         internal (string, ParameterExpression) HandleLambdaParameters(IEnumerable<RangeVariable> rangeVariables)
         {
             ParameterExpression lambdaIt = null;
@@ -270,20 +298,28 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 return;
             }
 
-            foreach (var property in computedProperties)
+            foreach (ComputeExpression property in computedProperties)
             {
                 ComputedProperties[property.Alias] = property;
             }
         }
 
+        /// <summary>
+        /// Ensures that the flattened properties are populated for the given source and query.
+        /// </summary>
+        /// <param name="source">The source parameter expression representing the root of the query.</param>
+        /// <param name="query">The queryable object representing the current query context.</param>
+        /// <remarks>
+        /// This method populates the <see cref="FlattenedProperties"/> dictionary with the flattened properties
+        /// from the base query. It is typically used when the binder is applied to an aggregated query to ensure
+        /// that the properties are correctly flattened.
+        /// </remarks>
         internal void EnsureFlattenedProperties(ParameterExpression source, IQueryable query)
         {
-            TransformationBinderBase binder = new TransformationBinderBase(this.QuerySettings, this.AssembliesResolver, this.ElementClrType, this.Model)
+            if (query != null)
             {
-                BaseQuery = query
-            };
-
-            this.FlattenedProperties = binder.GetFlattenedProperties(source);
+                this.FlattenedProperties = QueryBinder.GetFlattenedProperties(source, this, query);
+            }
         }
     }
 }

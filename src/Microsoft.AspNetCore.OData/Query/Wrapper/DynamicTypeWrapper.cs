@@ -21,10 +21,10 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
         public abstract Dictionary<string, object> Values { get; }
 
         /// <summary>
-        /// Attempts to get the value of the Property called <paramref name="propertyName"/> from the underlying Entity.
+        /// Attempts to get the value of the property called <paramref name="propertyName"/> from the underlying entity.
         /// </summary>
-        /// <param name="propertyName">The name of the Property</param>
-        /// <param name="value">The new value of the Property</param>
+        /// <param name="propertyName">The name of the property</param>
+        /// <param name="value">The new value of the property</param>
         /// <returns>True if successful</returns>
         [SuppressMessage("Microsoft.Design", "CA1007:UseGenericsWhereAppropriate", Justification = "Generics not appropriate here")]
         public bool TryGetPropertyValue(string propertyName, out object value)

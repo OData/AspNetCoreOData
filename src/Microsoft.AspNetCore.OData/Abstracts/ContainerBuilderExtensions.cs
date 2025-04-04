@@ -110,6 +110,8 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddService<IFilterBinder, FilterBinder>(ServiceLifetime.Singleton);
             builder.AddService<IOrderByBinder, OrderByBinder>(ServiceLifetime.Singleton);
             builder.AddService<ISelectExpandBinder, SelectExpandBinder>(ServiceLifetime.Singleton);
+            builder.AddService<IAggregationBinder, AggregationBinder>(ServiceLifetime.Singleton);
+            builder.AddService<IComputeBinder, ComputeBinder>(ServiceLifetime.Singleton);
 
             // HttpRequestScope.
             builder.AddService<HttpRequestScope>(ServiceLifetime.Scoped);
