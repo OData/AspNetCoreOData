@@ -26,7 +26,7 @@ using Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Expressions
 {
-    internal class TestAggregationBinder : QueryBinder, IAggregationBinder
+    internal class TestAggregationBinder : QueryBinder, IAggregationBinder, IFlatteningBinder
     {
         public virtual Expression BindGroupBy(TransformationNode transformationNode, QueryBinderContext context)
         {

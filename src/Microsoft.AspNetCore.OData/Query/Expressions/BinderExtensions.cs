@@ -402,12 +402,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // In this case, the first groupby will be applied to the original source,
             // and the second groupby will be applied to the result of the first groupby
             // There would be no reason to flatten the properties again if they were already flattened
-            if (context.FlattenedProperties == null || context.FlattenedProperties.Count == 0)
+            if (binder is IFlatteningBinder flatteningBinder
+                && (context.FlattenedProperties == null || context.FlattenedProperties.Count == 0))
             {
-                AggregationFlatteningResult flatteningResult = binder.FlattenReferencedProperties(
-                    transformationNode,
-                    source,
-                    context);
+                AggregationFlatteningResult flatteningResult = flatteningBinder.FlattenReferencedProperties(
+                        transformationNode,
+                        source,
+                        context);
 
                 if (flatteningResult?.FlattenedExpression != null)
                 {

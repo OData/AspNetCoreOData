@@ -9395,42 +9395,6 @@
             an <see cref="T:System.Linq.Expressions.Expression"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
-            <summary>
-            Flattens properties referenced in aggregate clause to avoid generation of nested queries by Entity Framework.
-            </summary>
-            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
-            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
-            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
-            <returns>
-            An <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> containing the modified query source and
-            additional metadata resulting from the flattening operation.
-            </returns>
-            <remarks>
-            This method generates a Select expression that flattens the properties referenced in the aggregate clause.
-            Flattening properties helps prevent the generation of nested queries by Entity Framework,
-            resulting in more efficient SQL generation.
-            For query like:
-            <code>
-            groupby((A),aggregate(B/C with max as Alias1,B/D with max as Alias2))
-            </code>
-            generate an expression similar to:
-            <code>
-            $it => new FlatteningWrapper() {
-                Source = $it,
-                Container = new {
-                    Value = $it.B.C
-                    Next = new {
-                        Value = $it.B.D
-                    }
-                }
-            }
-            </code>
-            Also populate expressions to access B/C and B/D in aggregate stage to look like:
-            B/C : $it.Container.Value
-            B/D : $it.Container.Next.Value
-            </remarks>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
@@ -9528,6 +9492,53 @@
             <param name="context">The query binder context.</param>
             <returns>The filter binder result.</returns>
             <remarks>reconsider to return "LambdaExpression"? </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder">
+            <summary>
+            Provides an abstraction for flattening property access expressions within an OData $apply clause
+            to support efficient translation of aggregation pipelines in LINQ providers like Entity Framework.
+            </summary>
+            <remarks>
+            Entity Framework versions earlier than EF Core 6.0 may generate nested queries when accessing navigation properties
+            in aggregation clauses. Flattening these properties can help generate flatter, more efficient SQL queries.
+            This interface allows conditional support for flattening based on the capabilities of the underlying LINQ provider.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Flattens properties referenced in aggregate clause to avoid generation of nested queries by Entity Framework.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> containing the modified query source and
+            additional metadata resulting from the flattening operation.
+            </returns>
+            <remarks>
+            This method generates a Select expression that flattens the properties referenced in the aggregate clause.
+            Flattening properties helps prevent the generation of nested queries by Entity Framework,
+            resulting in more efficient SQL generation.
+            For query like:
+            <code>
+            groupby((A),aggregate(B/C with max as Alias1,B/D with max as Alias2))
+            </code>
+            generate an expression similar to:
+            <code>
+            $it => new FlatteningWrapper() {
+                Source = $it,
+                Container = new {
+                    Value = $it.B.C
+                    Next = new {
+                        Value = $it.B.D
+                    }
+                }
+            }
+            </code>
+            Also populate expressions to access B/C and B/D in aggregate stage to look like:
+            B/C : $it.Container.Value
+            B/D : $it.Container.Next.Value
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
@@ -13318,7 +13329,7 @@
             Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1"/>, and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
             </summary>
             <param name="flattenedExpressionType">The type representing the flattened expression returned by
-            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="flattenedExpressionType"/>
             does not implement the required interfaces or inherit from the required base class.</exception>
         </member>

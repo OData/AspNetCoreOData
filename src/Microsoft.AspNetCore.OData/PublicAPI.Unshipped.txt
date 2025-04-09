@@ -917,11 +917,12 @@ Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.FilterBinder() -> void
 Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
-Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult
 Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilter(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder
+Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.BindOrderBy(Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult
 Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder

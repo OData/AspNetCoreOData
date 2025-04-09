@@ -5,21 +5,27 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-// Conditional compilation due to known bug affecting EF Core and lower
+// Conditional compilation due to known bug affecting EF Core 5 and lower
 #if NET6_0_OR_GREATER
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Expressions;
 using Microsoft.AspNetCore.OData.E2E.Tests.DollarApply.Query.Wrapper;
 using Microsoft.AspNetCore.OData.E2E.Tests.Extensions;
+using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -58,11 +64,21 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
                     nestedServices.AddSingleton<IAggregationBinder, TestAggregationBinder>();
                     nestedServices.AddSingleton<IComputeBinder, TestComputeBinder>();
                 });
+                options.AddRouteComponents("nonflatteningsql", model, (nestedServices) =>
+                {
+                    nestedServices.AddSingleton<IAggregationBinder, TestNonFlatteningAggregationBinder>();
+                    nestedServices.AddSingleton<IComputeBinder, TestComputeBinder>();
+                });
 
                 options.AddRouteComponents("default", model);
                 options.AddRouteComponents("custom", model, (nestedServices) =>
                 {
                     nestedServices.AddSingleton<IAggregationBinder, TestAggregationBinder>();
+                    nestedServices.AddSingleton<IComputeBinder, TestComputeBinder>();
+                });
+                options.AddRouteComponents("nonflattening", model, (nestedServices) =>
+                {
+                    nestedServices.AddSingleton<IAggregationBinder, TestNonFlatteningAggregationBinder>();
                     nestedServices.AddSingleton<IComputeBinder, TestComputeBinder>();
                 });
             }).AddJsonOptions(options =>
@@ -83,8 +99,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -109,8 +127,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -143,8 +163,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -168,8 +190,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultipleNestedPropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -197,8 +221,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -220,8 +246,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByHybridNestedPropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -248,8 +276,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedAndNonNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -276,8 +306,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -298,8 +330,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -320,8 +354,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -344,8 +380,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -366,8 +404,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregateNestedPropertyWithCountDistinctAsync(string routePrefix)
         {
             // Arrange
@@ -388,8 +428,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -422,8 +464,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -456,8 +500,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -494,8 +540,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiplePropertiesAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -532,8 +580,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiplePropertiesAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -570,8 +620,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiplePropertiesAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -612,8 +664,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -637,8 +691,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -662,8 +718,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedPropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -687,8 +745,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultipleNestedPropertiesAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -716,8 +776,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultipleNestedPropertiesAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -745,8 +807,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultipleNestedPropertiesAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -774,8 +838,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiNestedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -798,8 +864,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -822,8 +890,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiNestedPropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -846,8 +916,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByHybridNestedPropertiesAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -874,8 +946,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByHybridNestedPropertiesAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -902,8 +976,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByHybridNestedPropertiesAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -930,8 +1006,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedAndNonNestedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -958,8 +1036,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedAndNonNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -986,8 +1066,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedAndNonNestedPropertyAndAggregateMultiplePropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -1014,8 +1096,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1048,8 +1132,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiplePropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1086,8 +1172,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedPropertyAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1111,8 +1199,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultipleNestedPropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1140,8 +1230,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiNestedPropertyAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1164,8 +1256,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultipleHybridNestedPropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1192,8 +1286,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedAndNonNestedPropertiesAndAggregateDollarCountAsync(string routePrefix)
         {
             // Arrange
@@ -1220,8 +1316,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAndAggregateNestedPropertyWithCountDistinctAsync(string routePrefix)
         {
             // Arrange
@@ -1254,8 +1352,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiplePropertiesAndAggregateNestedPropertyWithCountDistinctAsync(string routePrefix)
         {
             // Arrange
@@ -1292,8 +1392,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregatePrimitivePropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
             // Arrange
@@ -1314,8 +1416,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestAggregateNestedPropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
             // Arrange
@@ -1336,8 +1440,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByMultiNestedPropertyAndAggregatePrimitivePropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
             // Arrange
@@ -1360,8 +1466,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByNestedPropertyAndAggregateNestedPropertyWithCustomAggregateFunctionAsync(string routePrefix)
         {
             // Arrange
@@ -1391,6 +1499,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByDynamicPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1413,6 +1522,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestAggregateSingleDynamicPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1433,6 +1543,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByDynamicPrimitivePropertyAndAggregateDynamicPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1459,6 +1570,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByDynamicPrimitivePropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1485,8 +1597,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyThenGroupByPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1511,8 +1625,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeNestedStringPropertyLengthThenAggregateComputedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1533,8 +1649,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeNestedStringPropertyLengthThenAggregateSumOfComputedAndPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1555,8 +1673,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregatePrimitiveAndComputedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1580,6 +1700,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByMultipleNestedPropertiesThenGroupByNestedPropertyAndAggregateNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1606,6 +1727,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAggregateMultiNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1631,6 +1753,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAggregateMultiNestedPropertyWithMaxAsync(string routePrefix)
         {
             // Arrange
@@ -1655,6 +1778,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByMultipleMultiNestedPropertiesThenGroupByMultiNestedPropertyAndAverageMultiNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1679,6 +1803,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByNestedPropertyAndAggregatePrimitivePropertyThenGroupByNestedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1703,6 +1828,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestComputeStringPropertyLengthThenAggregateComputedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1723,6 +1849,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestComputeStringPropertyLengthThenAggregateSumOfComputedPropertyAndPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1743,6 +1870,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregateComputedAndPrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1771,6 +1899,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestComputeStringPropertyLengthThenGroupByComputedPropertyAndAggregatePrimitivePropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1800,6 +1929,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestComputeNestedStringPropertyLengthThenGroupByNestedPropertyAndAggregateComputedAndNestedPropertiesAsync(string routePrefix)
         {
             // Arrange
@@ -1830,6 +1960,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestGroupByPrimitivePropertyAndAggregatePrimitivePropertyThenOrderByAggregatedPropertyAsync(string routePrefix)
         {
             // Arrange
@@ -1856,8 +1987,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByChainingAsync(string routePrefix)
         {
             // Arrange
@@ -1879,6 +2012,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         public async Task TestComputeWithSubstringAsync(string routePrefix)
         {
             // Arrange
@@ -1899,8 +2033,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByAndAggregateThenFilterAsync(string routePrefix)
         {
             // Arrange
@@ -1925,8 +2061,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByAndAggregateThenFilterTransformationAsync(string routePrefix)
         {
             // Arrange
@@ -1951,8 +2089,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByAndAggregateThenOrderByAsync(string routePrefix)
         {
             // Arrange
@@ -1978,8 +2118,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestFilterTransformationThenGroupByAsync(string routePrefix)
         {
             // Arrange
@@ -2003,8 +2145,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByThenTopWithCountAsync(string routePrefix)
         {
             // Arrange
@@ -2033,8 +2177,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestGroupByAndAggregateThenOrderByWithCountAsync(string routePrefix)
         {
             // Arrange
@@ -2066,8 +2212,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestEntitySetAggregationWorksAsync(string routePrefix)
         {
             // Arrange
@@ -2092,8 +2240,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeWithCommonOperatorsAsync(string routePrefix)
         {
             // Arrange
@@ -2125,8 +2275,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeWithCommonOperatorsThenAggregateAsync(string routePrefix)
         {
             // Arrange
@@ -2150,8 +2302,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeWithCommonOperatorsThenGroupByAggregateAsync(string routePrefix)
         {
             // Arrange
@@ -2178,8 +2332,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeChainingAsync(string routePrefix)
         {
             // Arrange
@@ -2212,8 +2368,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeChainingThenAggregateAsync(string routePrefix)
         {
             // Arrange
@@ -2240,8 +2398,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeChainingThenGroupByAndAggregateAsync(string routePrefix)
         {
             // Arrange
@@ -2271,8 +2431,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeThenAggregateThenComputeAsync(string routePrefix)
         {
             // Arrange
@@ -2298,8 +2460,10 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [Theory]
         [InlineData("default")]
         [InlineData("custom")]
+        [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
+        [InlineData("nonflatteningsql")]
         public async Task TestComputeThenGroupByAndAggregateThenComputeAsync(string routePrefix)
         {
             // Arrange
@@ -2325,6 +2489,68 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             Assert.Matches("\\{\"QtrAvgSalesPrice\":3\\.12(?:0+)?,\"QtrAvgTotal\":3\\.42(?:0+)?,\"Quarter\":\"2022-4\",\"QtrAvgAmount\":3(?:\\.0+)?,\"QtrAvgDiscount\":0\\.3(?:0+)?,\"QtrAvgTax\":0\\.42(?:0+)?\\}", content);
         }
 
+        [Fact]
+        public void TestQueryForFlatteningAggregationBinderAsync()
+        {
+            var applyClause = "groupby((Year,Quarter),aggregate(Product/TaxRate with average as AverageProductTaxRate,Product/TaxRate with sum as SumProductTaxRate))";
+            var expected = ".Select($it => new TestFlatteningWrapper`1() {" +
+                "Source = $it, " +
+                "GroupByContainer = new TestAggregationPropertyContainer() {" +
+                "Name = \"Property1\", " +
+                "Value = Convert($it.Product.TaxRate, Object), " +
+                "Next = new LastInChain() {" +
+                "Name = \"Property0\", " +
+                "Value = Convert($it.Product.TaxRate, Object)}}})" +
+                ".GroupBy($it => new TestGroupByWrapper() {" +
+                "GroupByContainer = new TestAggregationPropertyContainer() {" +
+                "Name = \"Quarter\", " +
+                "Value = $it.Source.Quarter, " +
+                "Next = new LastInChain() {" +
+                "Name = \"Year\", " +
+                "Value = Convert($it.Source.Year, Object)}}})" +
+                ".Select($it => new TestGroupByWrapper() {" +
+                "GroupByContainer = $it.Key.GroupByContainer, " +
+                "Container = new TestAggregationPropertyContainer() {" +
+                "Name = \"SumProductTaxRate\", " +
+                "Value = Convert(Convert($it, IEnumerable`1).Sum($it => Convert($it.GroupByContainer.Next.Value, Decimal)), Object), " +
+                "Next = new LastInChain() {" +
+                "Name = \"AverageProductTaxRate\", " +
+                "Value = Convert(Convert($it, IEnumerable`1).Average($it => Convert($it.GroupByContainer.Value, Decimal)), Object)}}})";
+
+            SetupAndVerifyQueryExpression<Sale>(
+                new TestAggregationBinder(),
+                "Sales",
+                applyClause,
+                (actual) => Assert.Equal(expected, actual));
+        }
+
+        [Fact]
+        public void TestQueryForNonFlatteningAggregationBinderAsync()
+        {
+            var applyClause = "groupby((Year,Quarter),aggregate(Product/TaxRate with average as AverageProductTaxRate,Product/TaxRate with sum as SumProductTaxRate))";
+            var expected = ".GroupBy($it => new TestGroupByWrapper() {" +
+                "GroupByContainer = new TestAggregationPropertyContainer() {" +
+                "Name = \"Quarter\", " +
+                "Value = $it.Quarter, " +
+                "Next = new LastInChain() {" +
+                "Name = \"Year\", " +
+                "Value = Convert($it.Year, Object)}}})" +
+                ".Select($it => new TestGroupByWrapper() {" +
+                "GroupByContainer = $it.Key.GroupByContainer, " +
+                "Container = new TestAggregationPropertyContainer() {" +
+                "Name = \"SumProductTaxRate\", " +
+                "Value = Convert(Convert($it, IEnumerable`1).Sum($it => $it.Product.TaxRate), Object), " +
+                "Next = new LastInChain() {" +
+                "Name = \"AverageProductTaxRate\", " +
+                "Value = Convert(Convert($it, IEnumerable`1).Average($it => $it.Product.TaxRate), Object)}}})";
+
+            SetupAndVerifyQueryExpression<Sale>(
+                new TestNonFlatteningAggregationBinder(),
+                "Sales",
+                applyClause,
+                (actual) => Assert.Equal(expected, actual));
+        }
+
         private Task<HttpResponseMessage> SetupAndFireRequestAsync(string queryUrl)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
@@ -2332,6 +2558,28 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             var client = CreateClient();
 
             return client.SendAsync(request);
+        }
+
+        private void SetupAndVerifyQueryExpression<T>(IAggregationBinder binder, string entitySetName, string applyExpression, Action<string> verifyAction)
+        {
+            var model = DollarApplyEdmModel.GetEdmModel();
+            var entityType = model.FindDeclaredType(typeof(T).FullName) as IEdmEntityType;
+            var entitySet = model.EntityContainer.FindEntitySet(entitySetName);
+
+            var queryOptionParser = new ODataQueryOptionParser(model, entityType, entitySet, new Dictionary<string, string> { { "$apply", applyExpression } });
+            var applyClause = queryOptionParser.ParseApply();
+
+            var binderContext = new QueryBinderContext(model, new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }, typeof(T));
+            var querySource = Enumerable.Empty<T>().AsQueryable();
+            
+            var queryResult = binder.ApplyBind(querySource, applyClause.Transformations.First(), binderContext, out Type resultClrType);
+            
+            var queryExpression = queryResult.Expression;
+            var queryToString = queryExpression.ToString();
+
+            var normalized = queryToString.Replace("System.Linq.EmptyPartition`1[" + typeof(T).FullName + "]", string.Empty);
+
+            verifyAction(normalized);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
 {
     [Route("default")]
     [Route("custom")]
+    [Route("nonflattening")]
     public class InMemorySalesController : ODataController
     {
         private readonly DollarApplyDbContext db;
@@ -35,6 +36,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
 
     [Route("defaultsql")]
     [Route("customsql")]
+    [Route("nonflatteningsql")]
     public class SqlSalesController : ODataController
     {
         private readonly DollarApplySqlDbContext db;
@@ -55,6 +57,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
 
     [Route("default")]
     [Route("custom")]
+    [Route("nonflattening")]
     public class InMemoryProductsController : ODataController
     {
         private readonly DollarApplyDbContext db;
@@ -75,6 +78,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
 
     [Route("defaultsql")]
     [Route("customsql")]
+    [Route("nonflatteningsql")]
     public class SqlProductsController : ODataController
     {
         private readonly DollarApplySqlDbContext db;

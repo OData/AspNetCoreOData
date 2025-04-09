@@ -2662,7 +2662,6 @@ public class Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1 : 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder {
 	System.Linq.Expressions.Expression BindGroupBy (Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	System.Linq.Expressions.Expression BindSelect (Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
-	Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult FlattenReferencedProperties (Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder {
@@ -2671,6 +2670,10 @@ public interface Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder {
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder {
 	System.Linq.Expressions.Expression BindFilter (Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+}
+
+public interface Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder {
+	Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult FlattenReferencedProperties (Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder {
@@ -2819,7 +2822,7 @@ public sealed class Microsoft.AspNetCore.OData.Query.Expressions.BinderExtension
 	public static System.Linq.IQueryable ApplyBind (Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder binder, System.Linq.IQueryable query, Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, bool alreadyOrdered)
 }
 
-public class Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder : Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder, IAggregationBinder {
+public class Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder : Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder, IAggregationBinder, IFlatteningBinder {
 	public AggregationBinder ()
 
 	public virtual System.Linq.Expressions.Expression BindGroupBy (Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)

@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// Validates that the provided type implements <see cref="IGroupByWrapper{TContainer, TWrapper}"/> and <see cref="IFlatteningWrapper{T}"/>, and inherits from <see cref="DynamicTypeWrapper"/>.
         /// </summary>
         /// <param name="flattenedExpressionType">The type representing the flattened expression returned by
-        /// <see cref="IAggregationBinder.FlattenReferencedProperties(TransformationNode, IQueryable, QueryBinderContext)"/>.</param>
+        /// <see cref="IFlatteningBinder.FlattenReferencedProperties(TransformationNode, IQueryable, QueryBinderContext)"/>.</param>
         /// <exception cref="InvalidOperationException">Thrown if <paramref name="flattenedExpressionType"/>
         /// does not implement the required interfaces or inherit from the required base class.</exception>
         public static void ValidateFlattenedExpressionType(Type flattenedExpressionType)

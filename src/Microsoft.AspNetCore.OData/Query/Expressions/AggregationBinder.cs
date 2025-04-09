@@ -26,7 +26,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// <summary>
     /// The default implementation to bind an OData $apply represented by <see cref="ApplyClause"/> to an <see cref="Expression"/>.
     /// </summary>
-    public class AggregationBinder : QueryBinder, IAggregationBinder
+    public class AggregationBinder : QueryBinder, IAggregationBinder, IFlatteningBinder
     {
         /// <inheritdoc/>
         public virtual Expression BindGroupBy(TransformationNode transformationNode, QueryBinderContext context)
