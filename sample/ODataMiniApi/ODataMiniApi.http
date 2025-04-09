@@ -35,6 +35,8 @@ GET {{ODataMiniApi_HostAddress}}/customized/$odata
 
 ###
 GET {{ODataMiniApi_HostAddress}}/v1/$doc
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$metadata?$format=application/json
 
 ###
 

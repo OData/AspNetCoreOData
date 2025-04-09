@@ -6,7 +6,9 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -19,6 +21,7 @@ using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -51,10 +54,135 @@ public interface IODataResult
     object Value { get; }
 }
 
-internal class ODataServiceDocuementResult : ODataResult
+internal class ODataMetadataResult : IResult
 {
-    public ODataServiceDocuementResult(object value) : base(value)
+    internal static ODataMetadataResult Instance = new ODataMetadataResult();
+
+    public async Task ExecuteAsync(HttpContext httpContext)
     {
+        var endpoint = httpContext.GetEndpoint();
+        ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        IEdmModel model = metadata.Model;
+
+        IServiceProvider sp = GetServiceProvider(httpContext);
+        ODataMetadataSerializer serializer = sp.GetService<ODataMetadataSerializer>() ?? new ODataMetadataSerializer();
+
+        ODataMessageWriterSettings writerSettings = sp.GetService<ODataMessageWriterSettings>() ?? new ODataMessageWriterSettings();
+        writerSettings.BaseUri = ODataOutputFormatter.GetDefaultBaseAddress(httpContext.Request);
+
+        writerSettings.ODataUri = new ODataUri
+        {
+            ServiceRoot = writerSettings.BaseUri,
+        };
+        writerSettings.Version = metadata.Version;
+
+        HttpResponse response = httpContext.Response;
+
+        SetResponseHeader(httpContext, metadata);
+
+        IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, sp);
+
+        await using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
+        {
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+            await serializer.WriteObjectAsync(model, typeof(IEdmModel), messageWriter, writeContext).ConfigureAwait(false);
+        }
+    }
+
+    private IServiceProvider GetServiceProvider(HttpContext httpContext)
+    {
+        var endpoint = httpContext.GetEndpoint();
+        ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        return metadata.ServiceProvider;
+    }
+
+    private static void SetResponseHeader(HttpContext httpContext, ODataMiniMetadata metadata)
+    {
+        ODataVersion version = ODataResult.GetODataVersion(httpContext.Request, metadata);
+
+        // Add version header.
+        httpContext.Response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(version);
+
+        if (IsJson(httpContext))
+        {
+            httpContext.Response.ContentType = "application/json";
+        }
+        else
+        {
+            httpContext.Response.ContentType = "application/xml";
+        }
+    }
+
+    internal static bool IsJson(HttpContext context)
+    {
+        var acceptHeaders = context.Request.Headers.Accept;
+        if (acceptHeaders.Any(h => h.Contains("application/json", StringComparison.OrdinalIgnoreCase)))
+        {
+            // If Accept header set on Request, we use it.
+            return true;
+        }
+        else if (acceptHeaders.Any(h => h.Contains("application/xml", StringComparison.OrdinalIgnoreCase)))
+        {
+            return false;
+        }
+
+        StringValues formatValues;
+        bool dollarFormat = context.Request.Query.TryGetValue("$format", out formatValues) || context.Request.Query.TryGetValue("format", out formatValues);
+        if (dollarFormat)
+        {
+            if (formatValues.Any(h => h.Contains("application/json", StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+            else if (formatValues.Any(h => h.Contains("application/xml", StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+}
+
+internal class ODataServiceDocumentResult : ODataResult
+{
+    public IEdmModel Model { get; set; }
+
+    public ODataServiceDocumentResult(IEdmModel model) : base(model)
+    {
+        Model = model;
+    }
+
+    public override async Task ExecuteAsync(HttpContext httpContext)
+    {
+        ODataServiceDocument serviceDocument = Model.GenerateServiceDocument();
+
+        IServiceProvider sp = GetServiceProvider(httpContext);
+        ODataServiceDocumentSerializer serializer = sp.GetService<ODataServiceDocumentSerializer>() ?? new ODataServiceDocumentSerializer();
+
+        ODataMessageWriterSettings writerSettings = sp.GetService<ODataMessageWriterSettings>() ?? new ODataMessageWriterSettings();
+        writerSettings.BaseUri = ODataOutputFormatter.GetDefaultBaseAddress(httpContext.Request);
+
+        writerSettings.ODataUri = new ODataUri
+        {
+            ServiceRoot = writerSettings.BaseUri,
+        };
+
+        HttpResponse response = httpContext.Response;
+        IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, sp);
+
+        await using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, Model))
+        {
+            ODataSerializerContext writeContext = new ODataSerializerContext();
+            await serializer.WriteObjectAsync(serviceDocument, typeof(ODataServiceDocument), messageWriter, writeContext).ConfigureAwait(false);
+        }
+    }
+
+    private IServiceProvider GetServiceProvider(HttpContext httpContext)
+    {
+        var endpoint = httpContext.GetEndpoint();
+        ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        return metadata.ServiceProvider;
     }
 }
 
@@ -67,7 +195,7 @@ internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataResult"/> class
     /// </summary>
-    /// <param name="value">The wrapper real value.</param>
+    /// <param name="value">The wrappered real value.</param>
     public ODataResult(object value)
     {
         Value = value;
@@ -78,9 +206,12 @@ internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
     /// </summary>
     public object Value { get; }
 
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/> and <see cref="MethodInfo"/>.
+    /// </summary>
     public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
     {
-        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, m => { });
+        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, null);
     }
 
     /// <summary>
@@ -165,7 +296,7 @@ internal class ODataResult : IResult, IODataResult, IEndpointMetadataProvider
         return ODataOutputFormatter.GetDefaultBaseAddress(httpContext.Request);
     }
 
-    private ODataVersion GetODataVersion(HttpRequest request, ODataMiniMetadata options)
+    internal static ODataVersion GetODataVersion(HttpRequest request, ODataMiniMetadata options)
     {
         ODataVersion? version = request.ODataMaxServiceVersion() ??
             request.ODataMinServiceVersion() ??

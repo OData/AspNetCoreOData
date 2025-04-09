@@ -145,6 +145,8 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
         ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, (ODataMiniMetadata m) => { });
         //builder.Metadata.Add(new EdmModelMetadata(new EdmModel("abc")));
         // builder.FilterFactories
+
+        // builder.Metadata.Add()
     }
 
     private static void ValidateQuery(IQueryable query)

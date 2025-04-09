@@ -111,19 +111,19 @@ public static class HttpContextExtensions
             return model;
         }
 
-        // P3. Let's retrieve the model from the global cache
-        IODataEndpointModelMapper endpointModelMapper = httpContext.RequestServices.GetService<IODataEndpointModelMapper>();
-        if (odataMiniMetadata is null && endpointModelMapper is null)
-        {
-            throw new ODataException($"Please call 'AddOData()' or register to 'IODataEndpointModelMapper' service.");
-        }
+        //// P3. Let's retrieve the model from the global cache
+        //IODataEndpointModelMapper endpointModelMapper = httpContext.RequestServices.GetService<IODataEndpointModelMapper>();
+        //if (odataMiniMetadata is null && endpointModelMapper is null)
+        //{
+        //    throw new ODataException($"Please call 'AddOData()' or register to 'IODataEndpointModelMapper' service.");
+        //}
 
-        model = endpointModelMapper?.GetModel(httpContext);
-        if (model is not null)
-        {
-            odataFeature.Model = model;
-            return model;
-        }
+        //model = endpointModelMapper?.GetModel(httpContext);
+        //if (model is not null)
+        //{
+        //    odataFeature.Model = model;
+        //    return model;
+        //}
 
         // 4.Ok, we don't have the model configured, let's build the model on the fly
         IAssemblyResolver resolver = httpContext.RequestServices.GetService<IAssemblyResolver>() ?? new DefaultAssemblyResolver();
@@ -147,11 +147,11 @@ public static class HttpContextExtensions
             // make sure the 'ServiceProvider' is built after the model configuration.
             odataMiniMetadata.Model = model;
         }
-        else
-        {
-            // if using metadata, don't catch it into global
-            endpointModelMapper.RegisterModel(httpContext, model);
-        }
+        //else
+        //{
+        //    // if using metadata, don't catch it into global
+        //    endpointModelMapper.RegisterModel(httpContext, model);
+        //}
 
         // Cached it into the ODataFeature()
         odataFeature.Model = model;
@@ -209,13 +209,14 @@ public static class HttpContextExtensions
         }
 
         // 3.
-        IODataEndpointModelMapper endpointModelMapper = httpContext.RequestServices.GetService<IODataEndpointModelMapper>();
-        if (endpointModelMapper is not null)
-        {
-            odataFeature.Services = endpointModelMapper.GetServiceProvider(httpContext);
-        }
+        //IODataEndpointModelMapper endpointModelMapper = httpContext.RequestServices.GetService<IODataEndpointModelMapper>();
+        //if (endpointModelMapper is not null)
+        //{
+        //    odataFeature.Services = endpointModelMapper.GetServiceProvider(httpContext);
+        //}
 
-        return odataFeature.Services;
+        //return odataFeature.Services;
+        return null;
     }
 
     internal static IServiceProvider BuildDefaultServiceProvider(this HttpContext httpContext, IEdmModel model)

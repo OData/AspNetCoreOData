@@ -6537,6 +6537,15 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataServiceDocument(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
             <summary>
+            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData service document.
+            </summary>
+            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
+            <param name="pattern">The route pattern.</param>
+            <param name="model">The related Edm model used to generate the service document.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata1(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
             Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
             It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
             </summary>
@@ -6623,6 +6632,45 @@
             <param name="model">The Edm model.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataResult``1(``0)">
+            <summary>
+            Enables OData response annotation to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices``1(``0,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Customizes the services used for OData to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="services">The services.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataModel``1(``0,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Adds the OData model to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="model">The Edm model.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataBaseAddressFactory``1(``0,System.Func{Microsoft.AspNetCore.Http.HttpContext,System.Uri})">
+            <summary>
+            Adds the base address factory to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="baseAddressFactory">The base address factory which is used to calculate the base address for OData payload.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion``1(``0,Microsoft.OData.ODataVersion)">
+            <summary>
+            Configures the OData version to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="version">The OData version.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
             <summary>
             Sets up default OData options for <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>.
@@ -6646,6 +6694,19 @@
             <param name="context">The http context.</param>
             <param name="model">The Edm model.</param>
             <returns>An awaitable result of calling the handler.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMiniMetadata">
+            <summary>
+            Metadata that specifies the OData minimal API.
+            Or seperate them into pieces?
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.ServiceProvider">
+            <summary>
+            Gets the service provider associated to this metadata.
+            Be noted, it seems we build and cache the service provider per endpoint.
+            If it's over-built, let's figure out a better solution for this.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions">
             <summary>
@@ -13740,7 +13801,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.ODataResult">
             <summary>
-            Defines an implentatation that represents the result of an OData formatter result.
+            Defines an implementation that represents the result of an OData format result.
             It's used for minimal API.
             </summary>
         </member>
@@ -13748,11 +13809,16 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class
             </summary>
-            <param name="value">The wrapper real value.</param>
+            <param name="value">The wrappered real value.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Results.ODataResult.Value">
             <summary>
             Gets the wrapper value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.PopulateMetadata(System.Reflection.MethodInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
+            <summary>
+            Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.MethodInfo"/>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">

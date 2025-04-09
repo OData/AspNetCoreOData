@@ -11,8 +11,6 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
@@ -24,7 +22,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData;
 
@@ -34,32 +31,17 @@ namespace Microsoft.AspNetCore.OData;
 public static class ODataEndpointConventionBuilderExtensions
 {
     /// <summary>
-    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
-    /// It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
+    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData service document.
     /// </summary>
     /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
     /// <param name="pattern">The route pattern.</param>
-    /// <param name="model">The related Edm model.</param>
+    /// <param name="model">The related Edm model used to generate the service document.</param>
     /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static IEndpointConventionBuilder MapODataServiceDocument(
         this IEndpointRouteBuilder endpoints,
         [StringSyntax("Route")] string pattern,
         IEdmModel model)
-        => endpoints.MapGet(pattern, () => ODataResultExtensions.OData(model.GenerateServiceDocument()));
-
-    /// <summary>
-    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
-    /// It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
-    /// </summary>
-    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
-    /// <param name="pattern">The route pattern.</param>
-    /// <param name="model">The related Edm model.</param>
-    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-    public static IEndpointConventionBuilder MapODataMetadata(
-        this IEndpointRouteBuilder endpoints,
-        [StringSyntax("Route")] string pattern,
-        IEdmModel model)
-        => endpoints.MapODataMetadata(pattern, model, new ODataMetadataHandler());
+        => endpoints.MapGet(pattern, () => new ODataServiceDocumentResult(model)).WithODataModel(model);
 
     /// <summary>
     /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
@@ -73,7 +55,21 @@ public static class ODataEndpointConventionBuilderExtensions
         this IEndpointRouteBuilder endpoints,
         [StringSyntax("Route")] string pattern,
         IEdmModel model)
-        => endpoints.MapGet(pattern, () => ODataResultExtensions.OData(model));
+        => endpoints.MapODataMetadata(pattern, model, new ODataMetadataHandler());
+
+    /// <summary>
+    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
+    /// It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
+    /// </summary>
+    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
+    /// <param name="pattern">The route pattern.</param>
+    /// <param name="model">The related Edm model.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+    public static IEndpointConventionBuilder MapODataMetadata(
+        this IEndpointRouteBuilder endpoints,
+        [StringSyntax("Route")] string pattern,
+        IEdmModel model)
+        => endpoints.MapGet(pattern, () => ODataMetadataResult.Instance).WithODataModel(model);
 
     /// <summary>
     /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata based on <see cref="IODataMetadataHandler"/>.
@@ -210,11 +206,6 @@ public static class ODataEndpointConventionBuilderExtensions
         });
     }
 
-    public static IServiceProvider BuildServiceProvider(Action<IServiceCollection> servicesSetup)
-    {
-        return null;
-    }
-
     /// <summary>
     /// Adds an OData Edm model metadata to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
     /// This method typically is used in Minimal API scenarios.
@@ -304,35 +295,6 @@ public static class ODataEndpointConventionBuilderExtensions
         // builder.Finally(c => c.Metadata)
         return builder.WithMetadata(options);
     }
-
-    //public static TBuilder WithOData<TBuilder>(this TBuilder builder, Action<ODataMiniOptions> setupAction = null) where TBuilder : IEndpointConventionBuilder
-    //{
-    //    builder.AddEndpointFilter(async (invocationContext, next) =>
-    //    {
-    //        object result = await next(invocationContext);
-
-    //        // If it's null or if it's already the ODataResult, simply do nothing
-    //        if (result is null || result is ODataResult)
-    //        {
-    //            return result;
-    //        }
-
-    //        ODataMiniOptions options = invocationContext.HttpContext.RequestServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
-    //        if (options is null)
-    //        {
-    //            options = new ODataMiniOptions();
-    //        }
-    //        setupAction?.Invoke(options);
-
-    //        return new ODataResult(result, options);
-    //    });
-
-    //    builder.Add(b => b.ApplicationServices)
-
-
-    //    builder.Finally(c => AddAndConfigureODataForEndpoint(c));
-    //    return builder.WithMetadata(options);
-    //}
 
     public static TBuilder WithOData<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
         => builder.WithOData(opt => opt.IsODataFormat = true);
@@ -452,78 +414,13 @@ public static class ODataEndpointConventionBuilderExtensions
         return builder;
     }
 
-
-    // Be noted: 
-    // Model is provided using WithModel()
-    // 
-    public static TBuilder AddODataResult<TBuilder>(this TBuilder builder, Action<ODataMiniOptions> setupAction = null) where TBuilder : IEndpointConventionBuilder
-    {
-       // builder.WithOrder
-        builder.AddEndpointFilter(async (invocationContext, next) =>
-        {
-            object result = await next(invocationContext);
-
-            // If it's null or if it's already the ODataResult, simply do nothing
-            if (result is null || result is ODataResult)
-            {
-                return result;
-            }
-
-            //ODataMiniOptions options = invocationContext.HttpContext.RequestServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
-            //if (options is null)
-            //{
-            //    options = new ODataMiniOptions();
-            //}
-            //setupAction?.Invoke(options);
-            var endpoint = invocationContext.HttpContext.GetEndpoint();
-            ODataMiniMetadata odataMetadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
-            if (odataMetadata is not null && odataMetadata.IsODataFormat)
-            {
-                return new ODataResult(result/*, options*/);
-            }
-
-            return result;
-        });
-
-     //   builder.Add(b => b.ApplicationServices)
-
-
-        builder.Finally(c => AddAndConfigureODataForEndpoint(c, setupAction));
-        return builder;
-    }
-
-    private static void AddAndConfigureODataForEndpoint(EndpointBuilder endpointBuilder, Action<ODataMiniOptions> setupAction = null)
-    {
-        // retrieve the global configuration
-        ODataMiniOptions options = endpointBuilder.ApplicationServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
-        if (options is null)
-        {
-            options = new ODataMiniOptions();
-        }
-        else
-        {
-            //options = options.Clone();
-        }
-
-        setupAction?.Invoke(options);
-
-        endpointBuilder.Metadata.Add(options);
-
-        if (!endpointBuilder.Metadata.Any(m => m is IODataServiceProvider))
-        {
-            endpointBuilder.Metadata.Add(new ODataServiceProvider());
-        }
-
-        if (!endpointBuilder.Metadata.Any(m => m is IEdmModelMetadata))
-        {
-            // Add an empty model metadata, so we can override it
-            endpointBuilder.Metadata.Add(new EdmModelMetadata());
-        }
-    }
-
+    /// <summary>
+    /// Enables OData response annotation to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataResult<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
     {
-        // builder.WithOrder
         builder.AddEndpointFilter(async (invocationContext, next) =>
         {
             object result = await next(invocationContext);
@@ -535,13 +432,13 @@ public static class ODataEndpointConventionBuilderExtensions
             }
 
             // Maybe we have a scenario like:
-            // Enable OData result in app.MapGroup first,
-            // Then Disable OData result for a certain Routehandler.
+            // First, enable OData result in app.MapGroup(...).WithODataResult(),
+            // Then, disable OData result for a certain Routehandler by cusomizing the metadaga
             var endpoint = invocationContext.HttpContext.GetEndpoint();
             ODataMiniMetadata odataMetadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
             if (odataMetadata is not null && odataMetadata.IsODataFormat)
             {
-                return new ODataResult(result/*, options*/);
+                return new ODataResult(result/*, odataMetadata*/);
             }
 
             return result;
@@ -567,24 +464,62 @@ public static class ODataEndpointConventionBuilderExtensions
         return builder;
     }
 
-    public static TBuilder WithODataServices<TBuilder>(this TBuilder builder, Action<IServiceCollection> services) where TBuilder : IEndpointConventionBuilder
+    public static TBuilder WithODataBatch<TBuilder>(this TBuilder builder, Action<IServiceCollection> services) where TBuilder : IEndpointConventionBuilder
     {
-        builder.Add(b => ConfigureODataMetadata(b, m => m.Services = services));
+       // builder.Add(b => ConfigureODataMetadata(b, m => m.Services = services));
         return builder;
     }
 
+    /// <summary>
+    /// Customizes the services used for OData to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="services">The services.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+    public static TBuilder WithODataServices<TBuilder>(this TBuilder builder, Action<IServiceCollection> services) where TBuilder : IEndpointConventionBuilder
+    {
+        ArgumentNullException.ThrowIfNull(services, nameof(services));
+
+        builder.Add(b => ConfigureODataMetadata(b, m => m.Services = services));
+
+        builder.Finally(b => { });
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the OData model to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="model">The Edm model.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataModel<TBuilder>(this TBuilder builder, IEdmModel model) where TBuilder : IEndpointConventionBuilder
     {
+        ArgumentNullException.ThrowIfNull(model, nameof(model));
+
         builder.Add(b => ConfigureODataMetadata(b, m => m.Model = model));
         return builder;
     }
 
+    /// <summary>
+    /// Adds the base address factory to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="baseAddressFactory">The base address factory which is used to calculate the base address for OData payload.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataBaseAddressFactory<TBuilder>(this TBuilder builder, Func<HttpContext, Uri> baseAddressFactory) where TBuilder : IEndpointConventionBuilder
     {
+        ArgumentNullException.ThrowIfNull(baseAddressFactory, nameof(baseAddressFactory));
+
         builder.Add(b => ConfigureODataMetadata(b, m => m.BaseAddressFactory = baseAddressFactory));
         return builder;
     }
 
+    /// <summary>
+    /// Configures the OData version to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="version">The OData version.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataVersion<TBuilder>(this TBuilder builder, ODataVersion version) where TBuilder : IEndpointConventionBuilder
     {
         builder.Add(b => ConfigureODataMetadata(b, m => m.Version = version));
@@ -593,12 +528,12 @@ public static class ODataEndpointConventionBuilderExtensions
 
     internal static void ConfigureODataMetadata(EndpointBuilder endpointBuilder, Action<ODataMiniMetadata> setupAction)
     {
-        // retrieve the previous configuration
         var metadata = endpointBuilder.Metadata.OfType<ODataMiniMetadata>().FirstOrDefault();
         if (metadata is null)
         {
             metadata = new ODataMiniMetadata();
 
+            // retrieve the global minimal API OData configuration
             ODataMiniOptions options = endpointBuilder.ApplicationServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
             if (options is not null)
             {
@@ -608,22 +543,9 @@ public static class ODataEndpointConventionBuilderExtensions
             endpointBuilder.Metadata.Add(metadata);
         }
 
-        setupAction.Invoke(metadata);
+        setupAction?.Invoke(metadata);
     }
 }
-
-public interface IODataServiceProvider
-{
-    IServiceProvider ServiceProvider { get; }
-}
-
-public class ODataServiceProvider : IODataServiceProvider
-{
-    public IServiceProvider ServiceProvider => throw new NotImplementedException();
-}
-
-
-
 
 public class ODataMiniMetadata1 : IODataMiniMetadata
 {
@@ -643,148 +565,4 @@ public interface IODataMiniMetadata
     IEdmModel Model { get; }
 
     bool IsODataFormat { get; set; }
-}
-
-public class ODataMiniMetadata
-{
-    private IServiceProvider _serviceProvider = null;
-    //private readonly List<Action<IServiceCollection>> _conventions = new();
-
-    public IEdmModel Model { get; set; }
-
-    public bool IsODataFormat { get; set; }
-
-    public Func<HttpContext, Type, ODataPath> PathFactory { get; set; }
-
-    public ODataVersion Version { get; set; } = ODataVersionConstraint.DefaultODataVersion;
-
-    public Func<HttpContext, Uri> BaseAddressFactory { get; set; }
-
-    public ODataMiniOptions Options { get; } = new ODataMiniOptions();
-
-    //internal bool IsReadOnly { get; set; } = false;
-
-    public Action<IServiceCollection> Services { get; set; }
-
-    public IServiceProvider ServiceProvider
-    {
-        get
-        {
-            if (_serviceProvider == null)
-            {
-                _serviceProvider = BuildRouteContainer();
-    //               IsReadOnly = true;
-            }
-
-            return _serviceProvider;
-        }
-    }
-
-    //public void Add(Action<IServiceCollection> convention)
-    //{
-    //    if (IsReadOnly)
-    //    {
-    //        throw new InvalidOperationException("Services cannot be registered after running.");
-    //    }
-
-    //    _conventions.Add(convention);
-    //}
-
-    internal ODataMiniMetadata UpdateOptions(ODataMiniOptions other)
-    {
-        Options.QueryConfigurations.UpdateAll(other.QueryConfigurations);
-        Options.EnableNoDollarQueryOptions = other.EnableNoDollarQueryOptions;
-        Options.EnableCaseInsensitive = other.EnableCaseInsensitive;
-        return this;
-    }
-
-    internal void UpdateRouteContainer(Action<IServiceCollection> servicesSetup = null)
-    {
-        IServiceCollection services = new ServiceCollection();
-
-        // Inject the core odata services.
-        services.AddDefaultODataServices(Version);
-
-        // Inject the default query configuration from this options.
-        services.AddSingleton(sp => this.Options.QueryConfigurations);
-
-        // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices();
-
-        // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-        services.AddSingleton<ODataUriResolver>(sp =>
-            new UnqualifiedODataUriResolver
-            {
-                EnableCaseInsensitive = this.Options.EnableCaseInsensitive, // by default to enable case insensitive
-                EnableNoDollarQueryOptions = this.Options.EnableNoDollarQueryOptions // retrieve it from global setting
-            });
-
-        // Inject the Edm model.
-        // From Current ODL implement, such injection only be used in reader and writer if the input
-        // model is null.
-        services.AddSingleton(sp => Model);
-
-        // Inject the customized services.
-        //foreach (var setupConfig in _conventions)
-        //{
-        //    setupConfig?.Invoke(services);
-        //}
-        servicesSetup?.Invoke(services);
-
-       // ServiceProvider = services.BuildServiceProvider();
-    }
-
-    internal IServiceProvider BuildRouteContainer()
-    {
-        IServiceCollection services = new ServiceCollection();
-
-        // Inject the core odata services.
-        services.AddDefaultODataServices(Version);
-
-        // Inject the default query configuration from this options.
-        services.AddSingleton(sp => this.Options.QueryConfigurations);
-
-        // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices();
-
-        // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-        services.AddSingleton<ODataUriResolver>(sp =>
-            new UnqualifiedODataUriResolver
-            {
-                EnableCaseInsensitive = this.Options.EnableCaseInsensitive, // by default to enable case insensitive
-                EnableNoDollarQueryOptions = this.Options.EnableNoDollarQueryOptions // retrieve it from global setting
-            });
-
-        // Inject the Edm model.
-        // From Current ODL implement, such injection only be used in reader and writer if the input
-        // model is null.
-        // How about the model is null?
-        services.AddSingleton(sp => Model);
-
-        // Inject the customized services.
-        //foreach (var setupConfig in _conventions)
-        //{
-        //    setupConfig?.Invoke(services);
-        //}
-        Services?.Invoke(services);
-
-        return services.BuildServiceProvider();
-    }
-
-    internal static ODataPath DefaultPathFactory(HttpContext context, Type elementType)
-    {
-        IEdmModel model = context.GetOrCreateEdmModel(elementType);
-        IEdmType edmType = model.GetEdmType(elementType);
-
-        var entitySet = model.EntityContainer?.EntitySets().FirstOrDefault(e => e.EntityType == edmType);
-        if (entitySet != null)
-        {
-            return new ODataPath(new EntitySetSegment(entitySet));
-        }
-        else
-        {
-            entitySet = new EdmEntitySet(model.EntityContainer, elementType.Name, edmType as IEdmEntityType);
-            return new ODataPath(new EntitySetSegment(entitySet));
-        }
-    }
 }
