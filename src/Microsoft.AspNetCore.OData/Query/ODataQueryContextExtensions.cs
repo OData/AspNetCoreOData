@@ -183,6 +183,18 @@ internal static class ODataQueryContextExtensions
     }
 
     /// <summary>
+    /// Gets the <see cref="ISearchQueryValidator"/>.
+    /// </summary>
+    /// <param name="context">The query context.</param>
+    /// <returns>The built <see cref="ISearchQueryValidator"/>.</returns>
+    public static ISearchQueryValidator GetSearchQueryValidator(this ODataQueryContext context)
+    {
+        // By default, there's no default search query validator.
+        // Therefore, if the developer doesn't provide an implementation, we just return the null validator.
+        return context?.RequestContainer?.GetService<ISearchQueryValidator>();
+    }
+
+    /// <summary>
     /// Gets the <see cref="IOrderByQueryValidator"/>.
     /// </summary>
     /// <param name="context">The query context.</param>
