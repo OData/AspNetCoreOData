@@ -2554,6 +2554,7 @@
             <param name="context">The HttpContext.</param>
             <param name="builder">The <see cref="T:Microsoft.OData.ModelBuilder.ODataModelBuilder">builder</see> used to apply configurations.</param>
             <param name="clrType">The top CLR type.</param>
+            <returns>The model builder or a totally new builder to use.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper">
             <summary>
@@ -10960,6 +10961,7 @@
             </summary>
             <param name="responseValue">The response value.</param>
             <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="context">The context.</param>
             <returns></returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateQuery(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
@@ -10986,7 +10988,7 @@
             querying.
             </summary>
             <param name="elementClrType">The CLR type to retrieve a model for.</param>
-            <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
+            <param name="context">The action descriptor for the action being queried on.</param>
             <returns>The EDM model for the given type and request.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
@@ -11270,6 +11272,13 @@
             <param name="context">The HttpContext.</param>
             <param name="parameter">The parameter info.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.PopulateMetadata(System.Reflection.ParameterInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
+            <summary>
+            Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.ParameterInfo"/>.
+            </summary>
+            <param name="parameter" >The parameter info.</param>
+            <param name="builder">The endpoint builder that we can add metadata into.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute">
             <summary>
@@ -13760,21 +13769,15 @@
             <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
             <returns>A task that represents the asynchronous execute operation.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.IODataResult.PopulateMetadata(System.Reflection.MethodInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
+            <summary>
+            Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.MethodInfo"/>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.ODataResult">
             <summary>
-            Defines an implementation that represents the result of an OData format result.
-            It's used for minimal API.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.#ctor(System.Object)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class
-            </summary>
-            <param name="value">The wrappered real value.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Results.ODataResult.Value">
-            <summary>
-            Gets the wrapper value.
+            Use abstract class not interface is because we want to implement 'IEndpointMetadataProvider'
+            If use interface, ASP.NET Core throws exceptions.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.PopulateMetadata(System.Reflection.MethodInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
@@ -13782,9 +13785,21 @@
             Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.MethodInfo"/>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataResultImpl">
             <summary>
-            Write an HTTP response reflecting the result.
+            Defines an implementation that represents the result of an OData format result.
+            It's used for minimal API.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResultImpl.#ctor(System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class
+            </summary>
+            <param name="value">The wrappered real value.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResultImpl.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Writes an HTTP response reflecting the result.
             </summary>
             <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
             <returns>A task that represents the asynchronous execute operation.</returns>

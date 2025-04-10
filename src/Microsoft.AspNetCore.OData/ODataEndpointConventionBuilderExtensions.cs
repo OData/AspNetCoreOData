@@ -64,7 +64,7 @@ public static class ODataEndpointConventionBuilderExtensions
         [StringSyntax("Route")] string pattern,
         Delegate handler)
     {
-        return endpoints.MapGet(pattern, () => new ODataResult(handler.DynamicInvoke(/*how to identify the parameters???*/)));
+        return endpoints.MapGet(pattern, () => new ODataResultImpl(handler.DynamicInvoke(/*how to identify the parameters???*/)));
 
         // It seems it's hard to generate the parameters and call the Delegate correctly.
     }
@@ -218,7 +218,7 @@ public static class ODataEndpointConventionBuilderExtensions
                 ODataMiniMetadata metadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
                 if (metadata is not null && metadata.IsODataFormat)
                 {
-                    return new ODataResult(result/*, options*/);
+                    return new ODataResultImpl(result/*, options*/);
                 }
 
                 return result;
@@ -303,7 +303,7 @@ public static class ODataEndpointConventionBuilderExtensions
             ODataMiniMetadata metadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
             if (metadata is not null && metadata.IsODataFormat)
             {
-                return new ODataResult(result/*, options*/);
+                return new ODataResultImpl(result/*, options*/);
             }
 
             return result;
@@ -355,7 +355,7 @@ public static class ODataEndpointConventionBuilderExtensions
             ODataMiniMetadata metadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
             if (metadata is not null && metadata.IsODataFormat)
             {
-                return new ODataResult(result/*, options*/);
+                return new ODataResultImpl(result/*, options*/);
             }
 
             return result;
@@ -416,7 +416,9 @@ public static class ODataEndpointConventionBuilderExtensions
             ODataMiniMetadata odataMetadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
             if (odataMetadata is not null && odataMetadata.IsODataFormat)
             {
-                return new ODataResult(result/*, odataMetadata*/);
+                // Now, Let's focus on the POCO data result.
+                // We can figure out more types later, for example, TypedResult<T>, Results<T>, etc.
+                return new ODataResultImpl(result/*, odataMetadata*/);
             }
 
             return result;

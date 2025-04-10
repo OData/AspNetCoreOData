@@ -14,21 +14,33 @@ using System.Diagnostics;
 
 namespace Microsoft.AspNetCore.OData.Results;
 
-
-
 public static class ODataResultExtensions
 {
-    public static IResult OData(this IResultExtensions resultExtensions, object value, ODataMiniOptions? options = null)
+    public static ODataResult OData(this IResultExtensions resultExtensions, object value, ODataMiniOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(resultExtensions);
 
-        return new ODataResult(value);
+        return new ODataResultImpl(value);
     }
 
-    internal static ODataResult OData(object value, ODataMiniOptions? options = null)
+    public static ODataResult AsOData(this IResultExtensions resultExtensions, object value, ODataMiniOptions? options = null)
     {
-        return new ODataResult(value);
+        ArgumentNullException.ThrowIfNull(resultExtensions);
+
+        return new ODataResultImpl(value);
     }
+
+    public static ODataResult AsOData<T>(this IResultExtensions resultExtensions, object value, ODataMiniMetadata? metadata = null)
+    {
+        return new ODataResultImpl(value);
+    }
+
+    //internal static ODataResult OData(object value, ODataMiniOptions? options = null)
+    //{
+    //    //ArgumentNullException.ThrowIfNull(resultExtensions);
+
+    //    return new ODataResult(value);
+    //}
 }
 
 

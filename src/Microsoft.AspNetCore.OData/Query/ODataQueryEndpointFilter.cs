@@ -14,22 +14,15 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Results;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
-using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -179,43 +172,12 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
 
         object queryResult = ExecuteQuery(responseValue, singleResultCollection, context);
 
-        ITruncatedCollection truncatedCollection = queryResult as ITruncatedCollection;
-        if (queryResult is IEnumerable enumerable)
-        {
-            Writeformation(enumerable);
-            truncatedCollection = enumerable as ITruncatedCollection;
-        }
-        Type type = queryResult.GetType();
-
-        if (typeof(ITruncatedCollection).IsAssignableFrom(type))
-        {
-            Type genericType = type.GetGenericTypeDefinition();
-            Type entityType = type.GetGenericArguments()[0];
-
-            object[] parameters = new object[]
-            {
-                truncatedCollection,
-                null,
-                ((ICountOptionCollection)(queryResult)).TotalCount
-            };
-
-            var newResult = Activator.CreateInstance(typeof(PageResult<>).MakeGenericType(entityType), parameters);
-            return newResult;
-        }
-
         if (isODataResult)
         {
-            return new ODataResult(queryResult);
+            return new ODataResultImpl(queryResult);
         }
 
         return queryResult;
-    }
-
-    private static object Writeformation(object resourceSetInstance)
-    {
-        var truncatedCollection = resourceSetInstance as ITruncatedCollection;
-
-        return truncatedCollection;
     }
 
     private void GetModelBoundPageSize(ODataQueryFilterInvocationContext context, object responseValue, IQueryable singleResultCollection)
@@ -246,9 +208,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
     /// <param name="context">The action context, i.e. action and controller name.</param>
     /// <returns></returns>
-    protected virtual object ExecuteQuery(
-        object responseValue,
-        IQueryable singleResultCollection,
+    protected virtual object ExecuteQuery(object responseValue, IQueryable singleResultCollection,
          ODataQueryFilterInvocationContext context)
     {
         ODataQueryContext queryContext = GetODataQueryContext(responseValue, singleResultCollection, context);
@@ -284,17 +244,6 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
             // response is a collection.
             IQueryable queryable = enumerable as IQueryable ?? enumerable.AsQueryable();
             queryable = ApplyQuery(queryable, queryOptions, querySettings);
-
-            //if (request.IsCountRequest())
-            //{
-            //    long? count = request.ODataFeature().TotalCount;
-
-            //    if (count.HasValue)
-            //    {
-            //        // Return the count value if it is a $count request.
-            //        return count.Value;
-            //    }
-            //}
 
             return queryable;
         }
@@ -413,11 +362,12 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// </summary>
     /// <param name="responseValue">The response value.</param>
     /// <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+    /// <param name="context">The context.</param>
     /// <returns></returns>
     internal static Type GetElementType(
         object responseValue,
         IQueryable singleResultCollection,
-        ODataQueryFilterInvocationContext invocationContext)
+        ODataQueryFilterInvocationContext context)
     {
         Contract.Assert(responseValue != null);
 
@@ -435,14 +385,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         Type elementClrType = TypeHelper.GetImplementedIEnumerableType(enumerable.GetType());
         if (elementClrType == null)
         {
-            // The element type cannot be determined because the type of the content
-            // is not IEnumerable<T> or IQueryable<T>.
-            throw Error.InvalidOperation("Cannot create an EDM model as the action &apos;{0}&apos; on controller &apos;{1}&apos; has a return type &apos;{2}&apos; that does not implement IEnumerable&lt;T&gt;");
-                //SRResources.FailedToRetrieveTypeToBuildEdmModel,
-                //typeof(EnableQueryAttribute).Name,
-                //actionDescriptor.ActionName,
-                //actionDescriptor.ControllerName,
-                //responseValue.GetType().FullName);
+            throw Error.InvalidOperation("The element type cannot be determined because the type of the content is not IEnumerable<T> or IQueryable<T>.");
         }
 
         return elementClrType;
@@ -513,6 +456,11 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
             }
         }
 
+        if (returnType == typeof(ODataResult))
+        {
+            return null;
+        }
+
         TypeHelper.IsCollection(returnType, out Type elementType);
 
         IEdmModel edmModel = GetModel(elementType, context);
@@ -538,39 +486,13 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// querying.
     /// </summary>
     /// <param name="elementClrType">The CLR type to retrieve a model for.</param>
-    /// <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
+    /// <param name="context">The action descriptor for the action being queried on.</param>
     /// <returns>The EDM model for the given type and request.</returns>
     protected virtual IEdmModel GetModel(Type elementClrType, ODataQueryFilterInvocationContext context)
     {
         HttpContext httpContext = context.HttpContext;
 
         return httpContext.GetOrCreateEdmModel(elementClrType);
-    }
-
-    private IServiceProvider BuildRouteContainer(IEdmModel model, ODataVersion version, IServiceProvider sp)
-    {
-        Contract.Assert(model != null);
-
-        IServiceCollection services = new ServiceCollection();
-
-        // Inject the core odata services.
-        services.AddDefaultODataServices(version);
-
-        // Inject the default query configuration from this options.
-        services.AddSingleton(sp.GetRequiredService<DefaultQueryConfigurations>());
-
-        // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices();
-
-        // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-        services.AddSingleton<ODataUriResolver>(sp.GetRequiredService<ODataUriResolver>());
-
-        // Inject the Edm model.
-        // From Current ODL implement, such injection only be used in reader and writer if the input
-        // model is null.
-        services.AddSingleton(sp => model);
-
-        return services.BuildServiceProvider();
     }
 }
 

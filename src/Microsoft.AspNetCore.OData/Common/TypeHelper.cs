@@ -382,6 +382,11 @@ internal static class TypeHelper
             return type.GetGenericArguments().First();
         }
 
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ValueTask<>))
+        {
+            return type.GetGenericArguments().First();
+        }
+
         return type;
     }
 

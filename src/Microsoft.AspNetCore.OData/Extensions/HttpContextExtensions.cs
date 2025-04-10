@@ -93,7 +93,7 @@ public static class HttpContextExtensions
             throw Error.ArgumentNull(nameof(httpContext));
         }
 
-        // P1. Get model for the request if it's configured/cached, used it.
+        // P1. Get model from the request if it's configured/cached, used it.
         IODataFeature odataFeature = httpContext.ODataFeature();
         IEdmModel model = odataFeature.Model;
         if (model is not null)
@@ -101,7 +101,7 @@ public static class HttpContextExtensions
             return model;
         }
 
-        // P2. Retrieve it from metadata if 'WithODataModel' called.
+        // P2. Retrieve it from metadata if 'WithODataModel(model)' called/cached.
         var endpoint = httpContext.GetEndpoint();
         var odataMiniMetadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
         model = odataMiniMetadata?.Model;
@@ -196,14 +196,6 @@ public static class HttpContextExtensions
             return odataFeature.Services;
         }
 
-        // 3.
-        //IODataEndpointModelMapper endpointModelMapper = httpContext.RequestServices.GetService<IODataEndpointModelMapper>();
-        //if (endpointModelMapper is not null)
-        //{
-        //    odataFeature.Services = endpointModelMapper.GetServiceProvider(httpContext);
-        //}
-
-        //return odataFeature.Services;
         return null;
     }
 

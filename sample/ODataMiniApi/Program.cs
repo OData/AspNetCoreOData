@@ -38,6 +38,8 @@ me.Services = services =>
     services.AddSingleton<IFilterBinder, FilterBinder>();
 };
 
+app.MapGet("test", () => "hello world").WithODataResult();
+
 // Group
 var group = app.MapGroup("")
     .WithOData2(metadata => metadata.IsODataFormat = true, services => services.AddSingleton<IFilterBinder>(new FilterBinder()));

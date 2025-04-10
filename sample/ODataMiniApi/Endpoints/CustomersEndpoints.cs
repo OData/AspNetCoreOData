@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -28,7 +29,16 @@ public static class CustomersEndpoints
             .WithODataModel(model)
             .WithODataVersion(ODataVersion.V401)
             .WithODataBaseAddressFactory(c => new Uri("http://abc.com"));
-            //.WithODataServices(c => c.AddSingleton<ODataMessageWriterSettings>;
+        //.WithODataServices(c => c.AddSingleton<ODataMessageWriterSettings>;
+
+        app.MapGet("v0/customers", (AppDb db) => Results.Extensions.AsOData(db.Customers.Include(s => s.Orders)));
+
+        app.MapGet("v00/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
+            var result = queryOptions.ApplyTo(db.Customers.Include(s => s.Orders));
+            return Results.Extensions.AsOData(result);
+        });
 
         app.MapGet("v1/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
         {
@@ -57,9 +67,20 @@ public static class CustomersEndpoints
             //.WithODataModel(model)
             ;
 
+        app.MapGet("v3/customers", (AppDb db) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return Results.Extensions.AsOData(db.Customers.Include(s => s.Orders));
+        })
+            .AddODataQueryEndpointFilter()
+            
+            //.WithODataModel(model)
+            ;
+
+
         // To discuss? To provide the MapODataGet, MapODataPost, MapODataPatch....
         // It seems we cannot generate the Delegate easily.
-        app.MapODataGet("v3/customers", (AppDb db) =>
+        app.MapODataGet("v5/customers", (AppDb db) =>
         {
             db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
             return db.Customers.Include(s => s.Orders);
