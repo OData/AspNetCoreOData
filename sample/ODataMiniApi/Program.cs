@@ -88,10 +88,12 @@ app.MapGet("/", () =>
 
 // OData $metadata, I use $odata for routing.
 #region ODataMetadata
-app.MapODataMetadata1("/v1/$odata", model);
-app.MapODataMetadata("/customized/$odata", model, new CustomizedMetadataHandler());
+//app.MapODataMetadata1("/v1/$odata", model);
+//app.MapODataMetadata("/customized/$odata", model, new CustomizedMetadataHandler());
 
 app.MapODataServiceDocument("v1/$document", model);
+app.MapODataServiceDocument("v1/$document1", model)
+    .WithODataBaseAddressFactory(c => new Uri("http://localhost:5177/v1"));
 app.MapODataMetadata("v1/$metadata", model);
 
 #endregion

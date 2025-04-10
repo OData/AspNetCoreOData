@@ -15,7 +15,7 @@ using Microsoft.OData.Edm.Validation;
 using System.Text.Encodings.Web;
 
 namespace ODataMiniApi;
-
+/*
 public class CustomizedMetadataHandler : ODataMetadataHandler
 {
     protected override async ValueTask WriteAsJsonAsync(HttpContext context, IEdmModel model)
@@ -69,3 +69,4 @@ public class CustomizedMetadataHandler : ODataMetadataHandler
         }
     }
 }
+*/

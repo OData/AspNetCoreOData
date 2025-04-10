@@ -1,0 +1,70 @@
+﻿@ODataMiniApi_HostAddress = http://localhost:5177
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$document
+
+##
+// The above request gets the following result:
+//{
+//  "@odata.context": "http://localhost:5177/$metadata",
+//  "value": [
+//    {
+//      "name": "Schools",
+//      "kind": "EntitySet",
+//      "url": "Schools"
+//    },
+//    {
+//      "name": "Customers",
+//      "kind": "EntitySet",
+//      "url": "Customers"
+//    },
+//    {
+//      "name": "Orders",
+//      "kind": "EntitySet",
+//      "url": "Orders"
+//    }
+//  ]
+//}
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$document1
+
+##
+// The above request gets the following result (has customized context URL)
+//{
+//  "@odata.context": "http://localhost:5177/v1/$metadata",
+//  "value": [
+//    {
+//      "name": "Schools",
+//      "kind": "EntitySet",
+//      "url": "Schools"
+//    },
+//    {
+//      "name": "Customers",
+//      "kind": "EntitySet",
+//      "url": "Customers"
+//    },
+//    {
+//      "name": "Orders",
+//      "kind": "EntitySet",
+//      "url": "Orders"
+//    }
+//  ]
+//}
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$metadata
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$metadata?$format=application/xml
+
+# The above two requests get the CSDL-XML file (No-indent by default)
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$metadata?$format=application/json
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/$metadata
+Accept: application/json
+
+# The above two requests get the CSDL-JSON file

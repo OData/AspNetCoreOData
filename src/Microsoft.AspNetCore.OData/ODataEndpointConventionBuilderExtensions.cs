@@ -41,21 +41,7 @@ public static class ODataEndpointConventionBuilderExtensions
         this IEndpointRouteBuilder endpoints,
         [StringSyntax("Route")] string pattern,
         IEdmModel model)
-        => endpoints.MapGet(pattern, () => new ODataServiceDocumentResult(model)).WithODataModel(model);
-
-    /// <summary>
-    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
-    /// It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
-    /// </summary>
-    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
-    /// <param name="pattern">The route pattern.</param>
-    /// <param name="model">The related Edm model.</param>
-    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-    public static IEndpointConventionBuilder MapODataMetadata1(
-        this IEndpointRouteBuilder endpoints,
-        [StringSyntax("Route")] string pattern,
-        IEdmModel model)
-        => endpoints.MapODataMetadata(pattern, model, new ODataMetadataHandler());
+        => endpoints.MapGet(pattern, () => ODataServiceDocumentResult.Instance).WithODataModel(model);
 
     /// <summary>
     /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
@@ -70,26 +56,6 @@ public static class ODataEndpointConventionBuilderExtensions
         [StringSyntax("Route")] string pattern,
         IEdmModel model)
         => endpoints.MapGet(pattern, () => ODataMetadataResult.Instance).WithODataModel(model);
-
-    /// <summary>
-    /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata based on <see cref="IODataMetadataHandler"/>.
-    /// </summary>
-    /// <param name="endpoints">The <see cref="IEndpointRouteBuilder"/> to add the route to.</param>
-    /// <param name="pattern">The route pattern.</param>
-    /// <param name="model">The related Edm model.</param>
-    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-    public static IEndpointConventionBuilder MapODataMetadata(
-        this IEndpointRouteBuilder endpoints,
-        [StringSyntax("Route")] string pattern,
-        IEdmModel model,
-        IODataMetadataHandler metadataHandler)
-    {
-        ArgumentNullException.ThrowIfNull(model);
-        ArgumentNullException.ThrowIfNull(metadataHandler);
-
-        // Let's focus on the metadata CSDL only now.
-        return endpoints.MapGet(pattern, async httpContext => await metadataHandler.InvokeAsync(httpContext, model));
-    }
 
     // It's better to add ODataQueryFilter as early as possible,
     // So, we can do the validation as early as possible,

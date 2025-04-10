@@ -6480,19 +6480,6 @@
             Gets the inner nested resource infos.
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.IODataMetadataHandler">
-            <summary>
-            A handler used to output OData CSDL.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.IODataMetadataHandler.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Implements the core logic associated with the filter given a <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
-            </summary>
-            <param name="context">The http context.</param>
-            <param name="model">The Edm model.</param>
-            <returns>An awaitable result of calling the handler.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions">
             <summary>
             Provides extension methods for <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to add OData routes.
@@ -6544,29 +6531,10 @@
             <param name="model">The related Edm model used to generate the service document.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata1(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
-            It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
-            </summary>
-            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
-            <param name="pattern">The route pattern.</param>
-            <param name="model">The related Edm model.</param>
-            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
             <summary>
             Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
             It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
-            </summary>
-            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
-            <param name="pattern">The route pattern.</param>
-            <param name="model">The related Edm model.</param>
-            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.IODataMetadataHandler)">
-            <summary>
-            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata based on <see cref="T:Microsoft.AspNetCore.OData.IODataMetadataHandler"/>.
             </summary>
             <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
             <param name="pattern">The route pattern.</param>
@@ -6681,19 +6649,6 @@
              Configure the default <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>
             </summary>
             <param name="options">The Json Options.</param>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.ODataMetadataHandler">
-            <summary>
-            The default metadata handler used to output OData CSDL.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMetadataHandler.InvokeAsync(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Implements the core logic associated with the filter given a <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
-            </summary>
-            <param name="context">The http context.</param>
-            <param name="model">The Edm model.</param>
-            <returns>An awaitable result of calling the handler.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMiniMetadata">
             <summary>
@@ -13799,6 +13754,23 @@
         <member name="M:Microsoft.AspNetCore.OData.Results.ODataErrorResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
             <inheritdoc/>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataMetadataResult">
+            <summary>
+            Defines a contract that represents the result of OData metadata.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Results.ODataMetadataResult.Instance">
+            <summary>
+            Gets the static instance since we don't need the instance of it.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataMetadataResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Write an HTTP response reflecting the result.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <returns>A task that represents the asynchronous execute operation.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.ODataResult">
             <summary>
             Defines an implementation that represents the result of an OData format result.
@@ -13827,6 +13799,16 @@
             </summary>
             <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
             <returns>A task that represents the asynchronous execute operation.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataServiceDocumentResult">
+            <summary>
+            Defines a contract that represents the result of OData service document.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Results.ODataServiceDocumentResult.Instance">
+            <summary>
+            Gets the static instance since we don't need the instance of it.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.PageResult">
             <summary>
