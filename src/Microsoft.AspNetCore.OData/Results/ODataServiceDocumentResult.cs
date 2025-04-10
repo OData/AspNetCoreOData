@@ -26,8 +26,15 @@ internal class ODataServiceDocumentResult : IResult
     /// </summary>
     public static ODataServiceDocumentResult Instance = new ODataServiceDocumentResult();
 
+    /// <summary>
+    /// Write an HTTP response reflecting the result.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <returns>A task that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var endpoint = httpContext.GetEndpoint();
         ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
         IServiceProvider sp = metadata.ServiceProvider;

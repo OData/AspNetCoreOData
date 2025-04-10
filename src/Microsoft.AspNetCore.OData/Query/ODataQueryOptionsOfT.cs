@@ -116,19 +116,11 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
     /// <returns>The built <see cref="ODataQueryOptions{TEntity}"/></returns>
     public static async ValueTask<ODataQueryOptions<TEntity>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
-        if (context == null)
-        {
-            throw Error.ArgumentNull(nameof(context));
-        }
-
-        IODataEndpointModelMapper endpointModelMapper = context.RequestServices.GetService<IODataEndpointModelMapper>();
-        if (endpointModelMapper is null)
-        {
-            throw new ODataException($"Please call 'AddOData()' or register to 'IODataEndpointModelMapper' service.");
-        }
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
 
         Type entityClrType = typeof(TEntity);
-        IEdmModel model = context.GetOrCreateEdmModel(entityClrType);
+        IEdmModel model = context.GetOrCreateEdmModel(entityClrType, parameter);
         ODataPath path = context.GetOrCreateODataPath(entityClrType);
         context.ODataFeature().Services = context.GetOrCreateServiceProvider();
 
@@ -138,16 +130,18 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
         return await ValueTask.FromResult(result);
     }
 
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/> and <see cref="ParameterInfo"/>.
+    /// </summary>
+    /// <param name="parameter" >The parameter info.</param>
+    /// <param name="builder">The endpoint builder that we can add metadata into.</param>
     public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
     {
         // Make sure we have the metadata added into the endpoint.
-        // In this case, it seems we do't need the 'IODataEndpointModelMapper'.
-        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, (ODataMiniMetadata m) => { });
-        //builder.Metadata.Add(new EdmModelMetadata(new EdmModel("abc")));
-        // builder.FilterFactories
-
-        // builder.Metadata.Add()
-    }
+        // Shall we build the 'EdmModel' here? ==> No, because the 'convention' runs after this population.
+        // If developer calls 'WithODataModel()', then any model created here will be replaced. So, no need/required to create model here.
+        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, null);
+   }
 
     private static void ValidateQuery(IQueryable query)
     {

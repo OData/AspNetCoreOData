@@ -13,8 +13,26 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.Edm.Csdl;
 using Microsoft.OData.Edm.Validation;
 using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 
 namespace ODataMiniApi;
+
+
+[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = true, Inherited = true)]
+public class ODataModelConfigurationAttribute : Attribute, IODataModelConfiguration
+{
+    public ODataModelBuilder Apply(HttpContext context, ODataModelBuilder builder, Type clrType)
+    {
+        if (clrType == typeof(Customer))
+        {
+            builder.AddComplexType(typeof(Info));
+        }
+
+        return builder;
+    }
+}
+
 /*
 public class CustomizedMetadataHandler : ODataMetadataHandler
 {

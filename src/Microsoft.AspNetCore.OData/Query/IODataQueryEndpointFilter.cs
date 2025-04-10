@@ -16,8 +16,6 @@ namespace Microsoft.AspNetCore.OData.Query;
 /// </summary>
 public interface IODataQueryEndpointFilter : IEndpointFilter
 {
-    //bool IsOData { get; }
-
     /// <summary>
     /// Performs the OData query composition before route handler is executing.
     /// </summary>

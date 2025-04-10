@@ -35,6 +35,8 @@ internal class ODataMetadataResult : IResult
     /// <returns>A task that represents the asynchronous execute operation.</returns>
     public async Task ExecuteAsync(HttpContext httpContext)
     {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+
         var endpoint = httpContext.GetEndpoint();
         ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
         IEdmModel model = metadata.Model;
@@ -43,7 +45,7 @@ internal class ODataMetadataResult : IResult
         ODataMetadataSerializer serializer = sp.GetService<ODataMetadataSerializer>() ?? new ODataMetadataSerializer();
 
         ODataMessageWriterSettings writerSettings = sp.GetService<ODataMessageWriterSettings>() ?? new ODataMessageWriterSettings();
-        writerSettings.BaseUri = ODataOutputFormatter.GetDefaultBaseAddress(httpContext.Request);
+        writerSettings.BaseUri = GetBaseAddress(httpContext, metadata);
 
         writerSettings.ODataUri = new ODataUri
         {
@@ -116,6 +118,16 @@ internal class ODataMetadataResult : IResult
         }
 
         return false;
+    }
+
+    private Uri GetBaseAddress(HttpContext httpContext, ODataMiniMetadata metadata)
+    {
+        if (metadata.BaseAddressFactory is not null)
+        {
+            return metadata.BaseAddressFactory(httpContext);
+        }
+
+        return ODataOutputFormatter.GetDefaultBaseAddress(httpContext.Request);
     }
 }
 

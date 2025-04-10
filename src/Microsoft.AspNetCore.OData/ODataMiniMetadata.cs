@@ -103,8 +103,7 @@ public class ODataMiniMetadata
             });
 
         // Inject the Edm model.
-        // From Current ODL implement, such injection only be used in reader and writer if the input
-        // model is null.
+        // From Current ODL implement, such injection only be used in reader and writer.
         services.AddSingleton(sp => Model);
 
         // Inject the customized services.

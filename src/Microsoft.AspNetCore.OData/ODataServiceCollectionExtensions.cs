@@ -187,8 +187,6 @@ public static class ODataServiceCollectionExtensions
             options.SerializerOptions.Converters.Add(new TruncatedCollectionValueConverter());
         });
 
-        services.AddSingleton<IODataEndpointModelMapper, DefaultODataEndpointModelMapper>();
-
         return services;
     }
 

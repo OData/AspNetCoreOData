@@ -25,6 +25,14 @@ GET {{ODataMiniApi_HostAddress}}/v2/customers?$select=name&$top=2&$orderby=id&$e
 ###
 GET {{ODataMiniApi_HostAddress}}/v2/customers?$select=name,info&$top=2&$orderby=id%20desc
 
+###
+# GET {{ODataMiniApi_HostAddress}}/v11/customers?$select=name&$expand=info // throw exception because 'info' is not navigation property
+GET {{ODataMiniApi_HostAddress}}/v11/customers?$select=name,info
+
+###
+GET {{ODataMiniApi_HostAddress}}/v3/customers
+// throw exception since the delegate needs parameters, but we cannot easily provide the parameters.
+
 
 ### $filter=amount gt 15
 GET {{ODataMiniApi_HostAddress}}/v0/?$filter=amount%20gt%2015

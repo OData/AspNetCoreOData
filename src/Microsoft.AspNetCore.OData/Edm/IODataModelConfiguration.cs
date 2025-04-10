@@ -22,5 +22,7 @@ public interface IODataModelConfiguration
     /// <param name="context">The HttpContext.</param>
     /// <param name="builder">The <see cref="ODataModelBuilder">builder</see> used to apply configurations.</param>
     /// <param name="clrType">The top CLR type.</param>
-    void Apply(HttpContext context, ODataModelBuilder builder, Type clrType);
+    /// <returns>The model builder or a totally new builder to use.</returns>
+    ODataModelBuilder Apply(HttpContext context, ODataModelBuilder builder, Type clrType);
 }
+

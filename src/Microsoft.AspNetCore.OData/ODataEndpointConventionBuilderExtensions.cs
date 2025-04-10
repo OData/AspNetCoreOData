@@ -57,6 +57,18 @@ public static class ODataEndpointConventionBuilderExtensions
         IEdmModel model)
         => endpoints.MapGet(pattern, () => ODataMetadataResult.Instance).WithODataModel(model);
 
+    // TBD: What do you think about this extensions?
+    // If we accept this pattern, we can not use 'WithODataResult()'
+    public static RouteHandlerBuilder MapODataGet(
+        this IEndpointRouteBuilder endpoints,
+        [StringSyntax("Route")] string pattern,
+        Delegate handler)
+    {
+        return endpoints.MapGet(pattern, () => new ODataResult(handler.DynamicInvoke(/*how to identify the parameters???*/)));
+
+        // It seems it's hard to generate the parameters and call the Delegate correctly.
+    }
+
     // It's better to add ODataQueryFilter as early as possible,
     // So, we can do the validation as early as possible,
     // but will do the applyTo as later as possbile.

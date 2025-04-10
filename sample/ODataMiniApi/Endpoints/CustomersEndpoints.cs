@@ -7,7 +7,6 @@
 
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -38,7 +37,15 @@ public static class CustomersEndpoints
         })
             .WithODataResult()
             .WithODataModel(model)
-            ;
+        ;
+
+        // Be noted, [ODataModelConfiguration] configures the 'Info' as complex type
+        // So, in this case, the 'Info' property on 'Customer' is a structural property, not a navigation property.
+        app.MapGet("v11/customers", (AppDb db, [ODataModelConfiguration] ODataQueryOptions<Customer> queryOptions) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return queryOptions.ApplyTo(db.Customers.Include(s => s.Orders));
+        });
 
         app.MapGet("v2/customers", (AppDb db) =>
         {
@@ -50,6 +57,13 @@ public static class CustomersEndpoints
             //.WithODataModel(model)
             ;
 
+        // To discuss? To provide the MapODataGet, MapODataPost, MapODataPatch....
+        // It seems we cannot generate the Delegate easily.
+        app.MapODataGet("v3/customers", (AppDb db) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            return db.Customers.Include(s => s.Orders);
+        });
         return app;
     }
 

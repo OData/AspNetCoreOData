@@ -3028,17 +3028,6 @@
             <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> instance to extend.</param>
             <returns>The <see cref="M:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions.ODataOptions(Microsoft.AspNetCore.Http.HttpContext)"/> instance from the DI container.</returns>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Extensions.IODataEndpointModelMapper1.Maps">
-            <summary>
-            Gets the map between <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:Microsoft.OData.Edm.IEdmModel"/>
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.IODataEndpointModelMapper.RegisterModel(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Gets the map between <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:Microsoft.OData.Edm.IEdmModel"/>
-            To provide the 'HttpContext' to acess the global ServiceProvider
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.HttpRequestExtensions">
             <summary>
             Provides extension methods for the <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
@@ -13809,6 +13798,13 @@
             <summary>
             Gets the static instance since we don't need the instance of it.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataServiceDocumentResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Write an HTTP response reflecting the result.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <returns>A task that represents the asynchronous execute operation.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.PageResult">
             <summary>
