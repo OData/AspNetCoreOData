@@ -6,15 +6,14 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics.Contracts;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.OData.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 
-internal class FlatteningWrapper<T> : GroupByWrapper
+internal class FlatteningWrapper<T> : GroupByWrapper, IGroupByWrapper<AggregationPropertyContainer, GroupByWrapper>, IFlatteningWrapper<T>
 {
-    // TODO: how to use 'Source'?
     public T Source { get; set; }
 }
 

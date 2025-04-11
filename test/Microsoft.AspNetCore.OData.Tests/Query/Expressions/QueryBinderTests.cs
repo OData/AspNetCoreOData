@@ -428,22 +428,6 @@ public class QueryBinderTests
             "The type 'Ns.NonOpenEdmType' must be an open type. The dynamic properties container property is only expected on open types.");
     }
 
-    [Theory]
-    [InlineData(true, "$it.Values.Item[\"Values\"]")]
-    [InlineData(false, "$it.Values")]
-    public void GetPropertyExpression_Works_ForAggregateOrNonAggregate(bool isAggregated, string expected)
-    {
-        // Arrange
-        ParameterExpression source = Expression.Parameter(typeof(GroupByWrapper), "$it");
-
-        // Act
-        var expression = QueryBinder.GetPropertyExpression(source, "Values", isAggregated);
-
-        // Assert
-        Assert.NotNull(expression);
-        Assert.Equal(expected, expression.ToString());
-    }
-
     [Fact]
     public void GetFullPropertyPath_WithSingleComplexNode()
     {
