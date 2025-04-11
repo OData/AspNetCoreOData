@@ -15,18 +15,18 @@ using Microsoft.AspNetCore.OData.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
-    internal class GroupByWrapper : DynamicTypeWrapper
+    internal class GroupByWrapper : DynamicTypeWrapper, IGroupByWrapper<AggregationPropertyContainer, GroupByWrapper>
     {
         private Dictionary<string, object> _values;
         protected static readonly IPropertyMapper DefaultPropertyMapper = new IdentityPropertyMapper();
 
         /// <summary>
-        /// Gets or sets the property container that contains the properties being expanded. 
+        /// Gets or sets the property container that contains the grouping properties. 
         /// </summary>
         public virtual AggregationPropertyContainer GroupByContainer { get; set; }
 
         /// <summary>
-        /// Gets or sets the property container that contains the properties being expanded. 
+        /// Gets or sets the property container that contains the aggregation properties. 
         /// </summary>
         public virtual AggregationPropertyContainer Container { get; set; }
 
@@ -80,7 +80,7 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper
 
                 if (this.Container != null)
                 {
-                    _values.MergeWithReplace(this.Container.ToDictionary(DefaultPropertyMapper));
+                    this._values.MergeWithReplace(this.Container.ToDictionary(DefaultPropertyMapper));
                 }
             }
         }

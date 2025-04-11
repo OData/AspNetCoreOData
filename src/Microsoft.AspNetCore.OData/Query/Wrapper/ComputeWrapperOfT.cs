@@ -7,23 +7,27 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper
 {
-    internal class ComputeWrapper<T> : GroupByWrapper, IEdmEntityObject
+    /// <inheritdoc/>
+    internal class ComputeWrapper<T> : GroupByWrapper, IGroupByWrapper<AggregationPropertyContainer, GroupByWrapper>, IComputeWrapper<T>, IEdmEntityObject
     {
+        /// <summary>
+        /// Gets or sets the source object that provides the values used in the compute expression.
+        /// </summary>
         public T Instance { get; set; }
 
         /// <summary>
-        /// The Edm Model associated with the wrapper.
+        /// Gets or sets the Edm model associated with the wrapper.
         /// </summary>
         public IEdmModel Model { get; set; }
 

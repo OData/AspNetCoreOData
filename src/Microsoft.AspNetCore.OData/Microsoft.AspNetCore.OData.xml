@@ -1088,6 +1088,42 @@
             <param name="type">The test type.</param>
             <returns>true/false</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsComputeWrapper(System.Type,System.Type@)">
+            <summary>
+            Determines whether the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1"/> or a custom implementation
+            that inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> and implements both <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/>
+            and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/>.
+            </summary>
+            <param name="typeToCheck">The type to check.</param>
+            <param name="entityType">The entity type if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1"/> or a custom implementation; otherwise, null.</param>
+            <returns>
+            <c>true</c> if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1"/> or a custom implementation
+            that meets the criteria; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsFlatteningWrapper(System.Type)">
+            <summary>
+            Determines whether the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.FlatteningWrapper`1"/> or a custom implementation
+            that inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> and implements both <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1"/>
+            and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/>.
+            </summary>
+            <param name="typeToCheck">The type to check.</param>
+            <returns>
+            <c>true</c> if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.FlatteningWrapper`1"/> or a custom implementation
+            that meets the criteria; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsGroupByWrapper(System.Type)">
+            <summary>
+            Determines whether the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper"/> or a custom implementation
+            that inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> and implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/>.
+            </summary>
+            <param name="typeToCheck">The type to check.</param>
+            <returns>
+            <c>true</c> if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper"/> or a custom implementation
+            that meets the criteria; otherwise, <c>false</c>.
+            </returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetInnerElementType(System.Type)">
             <summary>
             Return the collection element type.
@@ -1194,6 +1230,28 @@
             </summary>
             <param name="type"></param>
             <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.InheritsFromGenericBase(System.Type,System.Type)">
+            <summary>
+            Determines whether the specified type inherits from a given generic base type.
+            </summary>
+            <param name="typeToCheck">The type to examine.</param>
+            <param name="genericBaseType">The open generic type definition to check against (e.g., typeof(Base&lt;&gt;)).</param>
+            <returns><c>true</c> if <paramref name="typeToCheck"/> inherits from <paramref name="genericBaseType"/>; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.ImplementsInterface(System.Type,System.Type)">
+            <summary>
+            Determines whether the specified target type implements the given interface type.
+            </summary>
+            <param name="targetType">The type to check for implementation of the interface.</param>
+            <param name="interfaceType">The interface type to check against.</param>
+            <returns>
+            <c>true</c> if the target type implements the specified interface type; otherwise, <c>false</c>.
+            </returns>
+            <remarks>
+            This method supports both generic and non-generic interfaces. For generic interfaces, it checks if the target type
+            implements any interface that matches the generic type definition of the specified interface type.
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Error">
             <summary>
@@ -7425,6 +7483,11 @@
               Looks up a localized string similar to The property &apos;{0}&apos; cannot be used in the $orderby query option..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.NotSupportedChildTransformationKind">
+            <summary>
+              Looks up a localized string similar to Transformation kind &apos;{0}&apos; is not supported as a child transformation of kind &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NotSupportedTransformationKind">
             <summary>
               Looks up a localized string similar to Transformation kind {0} is not supported..
@@ -7528,6 +7591,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeEnum">
             <summary>
               Looks up a localized string similar to The value with type &apos;{0}&apos; must have type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeSet">
+            <summary>
+              Looks up a localized string similar to The &apos;{0}&apos; property must be set..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeSetWhenAnotherPropertyIsSet">
+            <summary>
+              Looks up a localized string similar to The &apos;{0}&apos; property must be set when the &apos;{1}&apos; property is set..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeString">
@@ -7748,6 +7821,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustBeResourceSet">
             <summary>
               Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustImplementInterface">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; does not implement &apos;{1}&apos; interface..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustInheritFromType">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeOfDynamicPropertyNotSupported">
@@ -8185,7 +8268,7 @@
             <summary>
             Represent properties used in groupby and aggregate clauses to make them accessible in further clauses/transformations
             </summary>
-            <remakrs>
+            <remarks>
             When we have $apply=groupby((Prop1,Prop2, Prop3))&amp;$orderby=Prop1, Prop2
             We will have following expression in .GroupBy
             $it => new AggregationPropertyContainer() {
@@ -8201,10 +8284,10 @@
                 }
             }
             when in $orderby (see AggregationBinder CollectProperties method)
-            Prop1 could be referenced us $it => (string)$it.Value
-            Prop2 could be referenced us $it => (int)$it.Next.Value
-            Prop3 could be referenced us $it => (int)$it.Next.Next.Value
-            Generic type for Value is used to avoid type casts for on primitive types that not supported in EF
+            Prop1 could be referenced as $it => (string)$it.Value
+            Prop2 could be referenced as $it => (int)$it.Next.Value
+            Prop3 could be referenced as $it => (int)$it.Next.Next.Value
+            Generic type for Value is used to avoid type casts for primitive types that are not supported in EF
             
             Also we have 4 use cases and base type have all required properties to support no cast usage. 
             1. Primitive property with Next
@@ -8212,8 +8295,68 @@
             3. Nested property with Next
             4. Nested property without Next
             However, EF doesn't allow to set different properties for the same type in two places in an lambda-expression => using new type with just new name to workaround that issue
-            
-            </remakrs>
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2">
+            <summary>
+            Represent properties used in groupby and aggregate clauses of $apply query to make them accessible in further clauses/transformations.
+            </summary>
+            <typeparam name="TWrapper">The type of the group-by wrapper associated with this container.</typeparam>
+            <typeparam name="TContainer">The concrete type of the aggregation property container, enabling self-referencing.</typeparam>
+            <remarks>
+            When we have
+            <code>$apply=groupby((Prop1,Prop2,Prop3))&amp;$orderby=Prop1,Prop2</code>
+            where <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> implements <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2"/>,
+            we will have following expression in .GroupBy:
+            <code>
+            $it => new AggregationPropertyContainer() {
+                Name = "Prop1",
+                Value = $it.Prop1, /* string */
+                Next = new AggregationPropertyContainer() {
+                    Name = "Prop2",
+                    Value = $it.Prop2, /* int */
+                    Next = new LastInChain() {
+                        Name = "Prop3",
+                        Value = $it.Prop3 /* int */
+                    }
+                }
+            }
+            </code>
+            When in $orderby,
+            Prop1 could be referenced as $it => (string)$it.Value,
+            Prop2 could be referenced as $it => (int)$it.Next.Value,
+            Prop3 could be referenced as $it => (int)$it.Next.Next.Value.
+            Generic type for Value is used to avoid type casts for primitive types that are not supported in Entity Framework.
+            Also, we have 4 use cases and this interface declares all required properties to support no cast usage.
+            1). Primitive property with Next
+            2). Primitive property without Next
+            3). Nested property with Next
+            4). Nested property without Next.
+            However, Entity Framework doesn't allow to set different properties for the same type in two places in a lambda expression.
+            Using new type with just new name to workaround that issue.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Name">
+            <summary>Gets or sets the name of the property.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Value">
+            <summary>Gets or sets the value of the property.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.NestedValue">
+            <summary>Gets or sets the nested value of the property.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Next">
+            <summary>Gets or sets the next property container.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.ToDictionaryCore(System.Collections.Generic.Dictionary{System.String,System.Object},Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper,System.Boolean)">
+            <summary>
+            Adds the properties in this container to the given dictionary.
+            </summary>
+            <param name="dictionary">The dictionary to which the properties in this container should be added.</param>
+            <param name="propertyMapper">The property mapper to use for mapping
+            between the names of properties in this container and the names that
+            should be used when adding the properties to the given dictionary.</param>
+            <param name="includeAutoSelected">A value indicating whether auto-selected properties should be included.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper">
             <summary>
@@ -8855,27 +8998,166 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable`1"/>.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable`1"/> after the ETag has been applied.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable)">
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder">
             <summary>
-            Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
-            For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
-            .Select(
-                $it => new FlattenninWrapper () {
-                    Source = $it, // Will used in groupby stage
-                    Container = new {
-                        Value = $it.B.C
-                        Next = new {
-                            Value = $it.B.D
-                        }
+            The default implementation to bind an OData $apply represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ApplyClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreateAggregateExpression(System.Linq.Expressions.ParameterExpression,Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase,System.Type,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for an aggregate.
+            </summary>
+            <param name="groupingParameter">The parameter representing the group.</param>
+            <param name="aggregateExpression">The aggregate expression.</param>
+            <param name="baseType">The element type at the base of the transformation.</param>
+            <param name="context">The query binder context.</param>
+            <returns>An expression representing the aggregate.</returns>
+            <exception cref="T:Microsoft.OData.ODataException"></exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreateEntitySetAggregateExpression(System.Linq.Expressions.ParameterExpression,Microsoft.OData.UriParser.Aggregation.EntitySetAggregateExpression,System.Type,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for an entity set aggregate.
+            </summary>
+            <param name="groupingParameter">The parameter representing the group.</param>
+            <param name="entitySetAggregateExpression">The entity set aggregate expression.</param>
+            <param name="baseType">The element type at the base of the transformation.</param>
+            <param name="context">The query binder context.</param>
+            <returns>An expression for the entity set aggregate.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+             $it => $it.AsQueryable()
+                 .SelectMany($it => $it.SomeEntitySet)
+                 .GroupBy($gr => new Object())
+                 .Select($p => new DynamicTypeWrapper() {
+                     Container = new AggregationPropertyContainer() {
+                         Name = "Alias1",
+                         Value = $it.AsQueryable().AggregateMethod1($it => $it.SomePropertyOfSomeEntitySet),
+                         Next = new LastInChain() {
+                             Name = "Alias2",
+                             Value = $p.AsQueryable().AggregateMethod2($it => $it.AnotherPropertyOfSomeEntitySet)
+                         }
+                     }
+                 })
+            </code>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreatePropertyAggregateExpression(System.Linq.Expressions.ParameterExpression,Microsoft.OData.UriParser.Aggregation.AggregateExpression,System.Type,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for a property aggregate.
+            </summary>
+            <param name="groupingParameter">The parameter representing the group.</param>
+            <param name="aggregateExpression">The aggregate expression.</param>
+            <param name="baseType">The element type at the base of the transformation.</param>
+            <param name="context">The query binder context.</param>
+            <returns>An expression for a property aggregate.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+             $it => $it.AsQueryable().Select($it => $it.SomeProperty).AggregateMethod()
+            </code>
+            Example:
+            <code>
+            $it => $it.AsQueryable().Sum($it => $it.SomeProperty)
+            </code>
+            If the aggregation method is <see cref="F:Microsoft.OData.UriParser.Aggregation.AggregationMethod.Custom"/>, the method uses a custom aggregation function provided by the caller.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreateGroupByMemberAssignments(System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode},Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates a list of <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression"/> from a collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode"/>.
+            </summary>
+            <param name="groupByNodes">GroupBy nodes.</param>
+            <param name="context">The query binder context.</param>
+            <returns>A list of <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression"/> representing properties in the GroupBy clause.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.GetGroupingProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode)">
+            <summary>
+            Gets a collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode"/> from a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.
+            </summary>
+            <param name="transformationNode">The transformation node.</param>
+            <returns>A collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.GetAggregateExpressions(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets a collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase"/> from a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.
+            </summary>
+            <param name="context">The query binder context.</param>
+            <param name="transformationNode">The <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <returns>A collection of aggregate expressions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FixCustomMethodReturnTypes(System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase},Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Fixes return types for custom aggregation methods.
+            </summary>
+            <param name="aggregateExpressions">The aggregation expressions.</param>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FixCustomMethodReturnType(Microsoft.OData.UriParser.Aggregation.AggregateExpression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Fixes return type for custom aggregation method.
+            </summary>
+            <param name="aggregationExpression">The aggregation expression</param>
+            <param name="context">The query binder context.</param>
+            <returns>The </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.GetCustomMethod(Microsoft.OData.UriParser.Aggregation.AggregateExpression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets a custom aggregation method for the aggregation expression.
+            </summary>
+            <param name="aggregationExpression">The aggregation expression.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The custom method.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult">
+            <summary>
+            Represents the result of flattening properties referenced in the aggregate clause.
+            </summary>
+            <remarks>
+            Flattening properties referenced in an aggregate clause helps prevent the generation of nested queries by Entity Framework.
+            For example, given a query like:
+            groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2))
+            The expression is rewritten as:
+            .Select($it => new FlatteningWrapper() {
+                Source = $it,
+                Container = new {
+                    Value = $it.B.C,
+                    Next = new {
+                        Value = $it.B.D
                     }
                 }
-            )
-            Also we need to populate expressions to access B/C and B/D in aggregate stage. It will look like:
-            B/C : $it.Container.Value
-            B/D : $it.Container.Next.Value
+            })
+            A mapping is also maintained between the original properties and their flattened expressions:
+            B/C → $it.Container.Value
+            B/D → $it.Container.Next.Value
+            This mapping is used during the aggregation stage to generate aggregate expressions.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.RedefinedContextParameter">
+            <summary>
+            Gets or sets the context parameter that has been redefined during the flattening process.
             </summary>
-            <param name="query"></param>
-            <returns>Query with Select that flattens properties</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedExpression">
+            <summary>
+            Gets or sets the expression that has been rewritten as part of the flattening process.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedPropertiesMapping">
+            <summary>
+            Gets or sets the mapping of single-value nodes to their corresponding flattened expressions.
+            Example: { { $it.B.C, $it.Value }, { $it.B.D, $it.Next.Value } }
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">
             <summary>
@@ -8966,6 +9248,38 @@
             <param name="searchClause">The OData $search parse tree.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
             <returns>The applied result.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type@)">
+            <summary>
+            Translate an OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="binder">An instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.</param>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="transformationNode">The OData $apply parse tree.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+            <returns>The applied result.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type@)">
+            <summary>
+            Translate an OData parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="binder">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder"/>.</param>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/> source.</param>
+            <param name="computeTransformationNode">The <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> representing an OData parse tree.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+            <returns>The modified <see cref="T:System.Linq.IQueryable"/> source.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder">
+            <summary>
+            The default implementation to bind an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase">
             <summary>
@@ -9075,6 +9389,94 @@
             <param name="context">The query binder context.</param>
             <returns>The filter binder result.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder">
+            <summary>
+            Exposes the ability to translate an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that performs a GroupBy operation.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context..</param>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> representing the GroupBy operation in LINQ.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+            $it => new DynamicTypeWrapper() {
+                GroupByContainer = new AggregationPropertyContainer() {
+                    Name = "Prop1",
+                    Value = $it.Prop1,
+                    Next = new AggregationPropertyContainer() {
+                        Name = "Prop2",
+                        Value = $it.Prop2,
+                        Next = new LastInChain() {
+                            Name = "Prop3",
+                            Value = $it.Prop3
+                        }
+                    }
+                }
+            }
+            </code>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that performs a Select operation.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> representing the Select operation in LINQ.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+            $it => new DynamicTypeWrapper() {
+                GroupByContainer = $it.Key.GroupByContainer // If groupby clause present
+                Container = new AggregationPropertyContainer() {
+                    Name = "Alias1",
+                    Value = $it.AsQueryable().Sum(i => i.AggregatableProperty),
+                    Next = new LastInChain() {
+                        Name = "Alias2",
+                        Value = $it.AsQueryable().Sum(i => i.AggregatableProperty)
+                    }
+                }
+            }
+            </code>
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder">
+            <summary>
+            Exposes the ability to translate an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="computeTransformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <remarks>
+            Generates an expression structured like:
+            $it => new ComputeWrapper&lt;T&gt;
+            {
+                Instance = $it,
+                Model = parametrized(IEdmModel),
+                Container => new AggregationPropertyContainer() {
+                    Name = "Z", 
+                    Value = $it.X + $it.Y, 
+                    Next = new LastInChain() {
+                        Name = "C",
+                        Value = $it.A * $it.B
+                }
+            }
+            </remarks>
+            <returns>The generated LINQ expression representing the OData $apply parse tree.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder">
             <summary>
             Exposes the ability to translate an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to the <see cref="T:System.Linq.Expressions.Expression"/>.
@@ -9090,6 +9492,53 @@
             <param name="context">The query binder context.</param>
             <returns>The filter binder result.</returns>
             <remarks>reconsider to return "LambdaExpression"? </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder">
+            <summary>
+            Provides an abstraction for flattening property access expressions within an OData $apply clause
+            to support efficient translation of aggregation pipelines in LINQ providers like Entity Framework.
+            </summary>
+            <remarks>
+            Entity Framework versions earlier than EF Core 6.0 may generate nested queries when accessing navigation properties
+            in aggregation clauses. Flattening these properties can help generate flatter, more efficient SQL queries.
+            This interface allows conditional support for flattening based on the capabilities of the underlying LINQ provider.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Flattens properties referenced in aggregate clause to avoid generation of nested queries by Entity Framework.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> containing the modified query source and
+            additional metadata resulting from the flattening operation.
+            </returns>
+            <remarks>
+            This method generates a Select expression that flattens the properties referenced in the aggregate clause.
+            Flattening properties helps prevent the generation of nested queries by Entity Framework,
+            resulting in more efficient SQL generation.
+            For query like:
+            <code>
+            groupby((A),aggregate(B/C with max as Alias1,B/D with max as Alias2))
+            </code>
+            generate an expression similar to:
+            <code>
+            $it => new FlatteningWrapper() {
+                Source = $it,
+                Container = new {
+                    Value = $it.B.C
+                    Next = new {
+                        Value = $it.B.D
+                    }
+                }
+            }
+            </code>
+            Also populate expressions to access B/C and B/D in aggregate stage to look like:
+            B/C : $it.Container.Value
+            B/D : $it.Container.Next.Value
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
@@ -9426,6 +9875,23 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAccessExpression(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression)">
+            <summary>
+            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from the <see cref="T:Microsoft.OData.UriParser.QueryNode"/>.
+            </summary>
+            <param name="node">The <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to be bound.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <param name="baseElement">The <see cref="T:System.Linq.Expressions.Expression"/> for the base element.</param>
+            <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateOpenPropertyAccessExpression(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/>.
+            </summary>
+            <param name="openNode">They query node to create an expression from.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.IsFlatteningSource(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Recognize $it.Source where $it is FlatteningWrapper
@@ -9466,6 +9932,27 @@
             <param name="propertyPath">The property path.</param>
             <param name="context">The query binder context.</param>
             <returns>Returns null if no aggregations were used so far</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.WrapConvert(System.Linq.Expressions.Expression)">
+            <summary>
+            Wrap a value type with Expression.Convert.
+            </summary>
+            <param name="expression">The <see cref="T:System.Linq.Expressions.Expression"/> to be wrapped.</param>
+            <returns>The wrapped  <see cref="T:System.Linq.Expressions.Expression"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.ConvertToAggregationPropertyContainerIfNeeded(System.Linq.Expressions.Expression)">
+            <summary>
+            Wraps <paramref name="source"/> expression with a Convert expression to enforce type <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> if needed.
+            </summary>
+            <param name="source">The source expression.</param>
+            <returns>The wrapped expression, or the original <paramref name="source"/> expression, as the case may be.</returns>
+            <remarks>
+            Wrapping with a Convert expression is only needed when dealing with <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> (default implementation).
+            It's needed because <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedProperty`1"/> - meaning that
+            <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> implements <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2"/> "Name" and "Value" properties
+            indirectly via <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedProperty`1"/>.
+            Without Convert({expression}, typeof(AggregationPropertyContainer)), the "Value" property cannot be resolved and translation fails.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindPropertyAccessExpression(Microsoft.OData.UriParser.SingleValueNode,System.Reflection.PropertyInfo,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
@@ -9889,6 +10376,35 @@
             </summary>
             <param name="name">The parameter name.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.SetParameter(System.String,System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Sets the specified parameter
+            </summary>
+            <param name="name">The parameter name.</param>
+            <param name="parameterExpr">The parameter expression.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.TransformationElementType">
+            <summary>
+            The type of the element in a transformation query.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedExpressionMapping">
+            <summary>
+            A mapping of flattened single value nodes and their values. For example { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.EnsureFlattenedProperties(System.Linq.Expressions.ParameterExpression,System.Linq.IQueryable)">
+            <summary>
+            Ensures that the flattened properties are populated for the given source and query.
+            </summary>
+            <param name="source">The source parameter expression representing the root of the query.</param>
+            <param name="query">The queryable object representing the current query context.</param>
+            <remarks>
+            This method populates the <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties"/> dictionary with the flattened properties
+            from the base query. It is typically used when the binder is applied to an aggregated query to ensure
+            that the properties are correctly flattened.
+            </remarks>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
             <summary>
             Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
@@ -10051,18 +10567,6 @@
             <param name="elementType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> which may contain the derived types.</param>
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
             <returns>The <see cref="T:System.Linq.Expressions.Expression"/> with derived types if any are present.</returns>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.ResultClrType">
-            <summary>
-            Gets CLR type returned from the query.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.IsClassicEF(System.Linq.IQueryable)">
-            <summary>
-            Checks IQueryable provider for need of EF6 optimization
-            </summary>
-            <param name="query"></param>
-            <returns>True if EF6 optimization are needed.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.UriFunctionsBinder">
             <summary>
@@ -10442,6 +10946,20 @@
             </summary>
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAggregationBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetComputeBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
@@ -11118,6 +11636,38 @@
             </summary> 
             <param name="nodeIn">The node to be translated.</param> 
             <returns>The translated node.</returns> 
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryConstants">
+            <summary>
+            Constant values used in aggregation operation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.GroupByWrapperContainerProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.Container"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.GroupByWrapperGroupByContainerProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.GroupByContainer"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerNameProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Name"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerValueProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Value"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerNestedValueProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.NestedValue"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerNextProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Next"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.FlatteningWrapperSourceProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1.Source"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.ComputeWrapperInstanceProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Instance"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.ComputeWrapperModelProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Model"/> property.</summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider">
             <summary>
@@ -12738,6 +13288,68 @@
             </summary>
             <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator">
+            <summary>
+            Represents a validator used to validate the results of translating an OData parse tree into expressions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateGroupByExpressionType(System.Type)">
+            <summary>
+            Validates that the type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>
+            implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and derives from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="groupByExpressionType">The type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="groupByExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateSelectExpressionType(System.Type)">
+            <summary>
+            Validates that the type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>
+            implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and derives from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="selectExpressionType">The type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="selectExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateFlatteningResult(Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult)">
+            <summary>
+            Validates the provided <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> instance to ensure all required properties are set.
+            </summary>
+            <param name="flatteningResult">The <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> instance to validate.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="flatteningResult"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if <paramref name="flatteningResult"/> has a null or empty <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedExpression"/>,
+            <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.RedefinedContextParameter"/>, or <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedPropertiesMapping"/>.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateFlattenedExpressionType(System.Type)">
+            <summary>
+            Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1"/>, and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="flattenedExpressionType">The type representing the flattened expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="flattenedExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateComputeExpressionType(System.Type)">
+            <summary>
+            Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/>, and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="computeExpressionType">The type representing the flattened expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="computeExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateTransformationExpressionType(System.Type)">
+            <summary>
+            Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="transformationExpressionType">The type to validate.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="transformationExpressionType"/>
+            does not implement the required interface or inherit from the required base class.</exception>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
             <summary>
             The base for validator context.
@@ -12972,9 +13584,17 @@
             <param name="topQueryOption">The $top query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.Instance">
+            <summary>
+            Gets or sets the source object that provides the values used in the compute expression.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.Model">
             <summary>
-            The Edm Model associated with the wrapper.
+            Gets or sets the Edm model associated with the wrapper.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper">
@@ -12989,10 +13609,10 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.TryGetPropertyValue(System.String,System.Object@)">
             <summary>
-            Attempts to get the value of the Property called <paramref name="propertyName"/> from the underlying Entity.
+            Attempts to get the value of the property called <paramref name="propertyName"/> from the underlying entity.
             </summary>
-            <param name="propertyName">The name of the Property</param>
-            <param name="value">The new value of the Property</param>
+            <param name="propertyName">The name of the property</param>
+            <param name="value">The new value of the property</param>
             <returns>True if successful</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter">
@@ -13017,12 +13637,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.GroupByContainer">
             <summary>
-            Gets or sets the property container that contains the properties being expanded. 
+            Gets or sets the property container that contains the grouping properties. 
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.Container">
             <summary>
-            Gets or sets the property container that contains the properties being expanded. 
+            Gets or sets the property container that contains the aggregation properties. 
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.Equals(System.Object)">
@@ -13030,6 +13650,55 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.GetHashCode">
             <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1">
+            <summary>
+            Represents a wrapper for a source object with computed values in an OData query.
+            </summary>
+            <typeparam name="T">The type of the source object.</typeparam>
+            <remarks>
+            The source object type can either be the type of the wrapped entity or another instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/>
+            when compute expressions are chained.
+            For example, in the OData query:
+            <code>
+            /Sales?$apply=compute(Amount mul Product/TaxRate as Tax)/compute(Amount add Tax as SalesPrice)
+            </code>
+            In the first compute expression, the source object will be the wrapped "Sale" entity.
+            In the second compute expression, the source object will be an instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/> where T is "Sale".
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Instance">
+            <summary>
+            Gets or sets the source object that provides the values used in the compute expression.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Model">
+            <summary>
+            Gets or sets the Edm model associated with the wrapper.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1">
+            <summary>
+            Represents the result of flattening properties referenced in aggregate clause of a $apply query.
+            </summary>
+            <typeparam name="T">The type of the source object that contains the properties to be flattened.</typeparam>
+            <remarks>Flattening is necessary to avoid generation of nested queries by Entity Framework.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1.Source">
+            <summary>Gets or sets the source object that contains the properties to be flattened.</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2">
+            <summary>
+            Represents the result of a $apply query operation.
+            </summary>
+            <typeparam name="TContainer">The type of the aggregation property container associated with this group.</typeparam>
+            <typeparam name="TWrapper">The type of the group-by wrapper itself, enforcing recursive typing.</typeparam>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.GroupByContainer">
+            <summary>Gets or sets the property container that contains the grouping properties.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.Container">
+            <summary>Gets or sets the property container that contains the aggregation properties.</summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper">
             <summary>
