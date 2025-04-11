@@ -9,7 +9,6 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,31 +20,53 @@ namespace Microsoft.AspNetCore.OData;
 
 /// <summary>
 /// Metadata that specifies the OData minimal API.
-/// Or seperate them into pieces?
 /// </summary>
+// Or seperate them into pieces?
 public class ODataMiniMetadata
 {
     private IServiceProvider _serviceProvider = null;
-    //private readonly List<Action<IServiceCollection>> _conventions = new();
 
+    /// <summary>
+    /// Gets or sets the model
+    /// </summary>
     public IEdmModel Model { get; set; }
 
+    /// <summary>
+    /// Gets or sets a boolean value indicating to generate OData response.
+    /// </summary>
     public bool IsODataFormat { get; set; }
 
+    /// <summary>
+    /// Gets or sets the path factory.
+    /// </summary>
     public Func<HttpContext, Type, ODataPath> PathFactory { get; set; }
 
-    public ODataVersion Version { get; set; } = ODataVersionConstraint.DefaultODataVersion;
+    /// <summary>
+    /// Gets or sets the OData version.
+    /// </summary>
+    public ODataVersion Version
+    {
+        get => Options.Version;
+        set => Options.SetVersion(value);
+    }
 
+    /// <summary>
+    /// Gets or sets the base address factory.
+    /// </summary>
     public Func<HttpContext, Uri> BaseAddressFactory { get; set; }
 
+    /// <summary>
+    /// Gets or sets the minimal options.
+    /// </summary>
     public ODataMiniOptions Options { get; } = new ODataMiniOptions();
 
-    //internal bool IsReadOnly { get; set; } = false;
-
+    /// <summary>
+    /// Gets or sets the services
+    /// </summary>
     public Action<IServiceCollection> Services { get; set; }
 
     /// <summary>
-    /// Gets the service provider associated to this metadata.
+    /// Gets or sets the service provider associated to this metadata.
     /// Be noted, it seems we build and cache the service provider per endpoint.
     /// If it's over-built, let's figure out a better solution for this.
     /// </summary>
@@ -56,64 +77,11 @@ public class ODataMiniMetadata
             if (_serviceProvider == null)
             {
                 _serviceProvider = BuildRouteContainer();
-    //               IsReadOnly = true;
             }
 
             return _serviceProvider;
         }
-    }
-
-    //public void Add(Action<IServiceCollection> convention)
-    //{
-    //    if (IsReadOnly)
-    //    {
-    //        throw new InvalidOperationException("Services cannot be registered after running.");
-    //    }
-
-    //    _conventions.Add(convention);
-    //}
-
-    internal ODataMiniMetadata UpdateOptions(ODataMiniOptions other)
-    {
-        Options.QueryConfigurations.UpdateAll(other.QueryConfigurations);
-        Options.EnableNoDollarQueryOptions = other.EnableNoDollarQueryOptions;
-        Options.EnableCaseInsensitive = other.EnableCaseInsensitive;
-        return this;
-    }
-
-    internal void UpdateRouteContainer(Action<IServiceCollection> servicesSetup = null)
-    {
-        IServiceCollection services = new ServiceCollection();
-
-        // Inject the core odata services.
-        services.AddDefaultODataServices(Version);
-
-        // Inject the default query configuration from this options.
-        services.AddSingleton(sp => this.Options.QueryConfigurations);
-
-        // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices();
-
-        // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
-        services.AddSingleton<ODataUriResolver>(sp =>
-            new UnqualifiedODataUriResolver
-            {
-                EnableCaseInsensitive = this.Options.EnableCaseInsensitive, // by default to enable case insensitive
-                EnableNoDollarQueryOptions = this.Options.EnableNoDollarQueryOptions // retrieve it from global setting
-            });
-
-        // Inject the Edm model.
-        // From Current ODL implement, such injection only be used in reader and writer.
-        services.AddSingleton(sp => Model);
-
-        // Inject the customized services.
-        //foreach (var setupConfig in _conventions)
-        //{
-        //    setupConfig?.Invoke(services);
-        //}
-        servicesSetup?.Invoke(services);
-
-       // ServiceProvider = services.BuildServiceProvider();
+        set => _serviceProvider = value;
     }
 
     internal IServiceProvider BuildRouteContainer()
@@ -144,10 +112,6 @@ public class ODataMiniMetadata
         services.AddSingleton(sp => Model);
 
         // Inject the customized services.
-        //foreach (var setupConfig in _conventions)
-        //{
-        //    setupConfig?.Invoke(services);
-        //}
         Services?.Invoke(services);
 
         return services.BuildServiceProvider();

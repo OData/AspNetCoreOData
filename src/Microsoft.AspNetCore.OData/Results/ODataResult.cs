@@ -7,11 +7,8 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
@@ -25,97 +22,48 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Results;
 
-
-// Supports the inheritance scenarios
-// for example: 
-// The Action result type is IList<Customer>
-// But the real value is IList<VipCustomer>?
-//internal class ODataResult<T> : ODataResult
-//{
-//    public ODataResult(object value) : base(value)
-//    {
-//    }
-//}
-
-public interface IODataResult : IEndpointMetadataProvider
-{
-    object Value { get; }
-
-    /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/> and <see cref="MethodInfo"/>.
-    /// </summary>
-    public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
-    {
-        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, m => m.IsODataFormat = true);
-    }
-}
-
-/// <summary>
-/// Use abstract class not interface is because we want to implement 'IEndpointMetadataProvider'
-/// If use interface, ASP.NET Core throws exceptions.
-/// </summary>
-public abstract class ODataResult : IResult, IEndpointMetadataProvider
-{
-    protected ODataResult(object value)
-    {
-        Value = value;
-    }
-
-    public object Value { get; }
-
-    /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/> and <see cref="MethodInfo"/>.
-    /// </summary>
-    public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
-    {
-        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, m => m.IsODataFormat = true);
-    }
-
-    public virtual async Task ExecuteAsync(HttpContext httpContext)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static ODataResult Create(object value, ODataMiniMetadata metadata = null)
-    {
-        return new ODataResultImpl(value);
-    }
-}
-
 /// <summary>
 /// Defines an implementation that represents the result of an OData format result.
 /// It's used for minimal API.
 /// </summary>
-internal class ODataResultImpl : ODataResult/*, IResult, IEndpointMetadataProvider*/
+internal class ODataResult : IODataResult, IResult
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ODataResult"/> class
+    /// Initializes a new instance of the <see cref="ODataResult"/> class.
     /// </summary>
     /// <param name="value">The wrappered real value.</param>
-    public ODataResultImpl(object value) : base(value)
+    public ODataResult(object value)
+        : this(value, value?.GetType())
     {
-       // Value = value;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ODataResult"/> class.
+    /// </summary>
+    /// <param name="value">The wrappered real value.</param>
+    /// <param name="expectedType">The expected type.</param>
+    public ODataResult(object value, Type expectedType)
+    {
+        Value = value;
+        ExpectedType = expectedType;
     }
 
     /// <summary>
     /// Gets the value.
     /// </summary>
-    //public object Value { get; }
+    public object Value { get; }
 
     /// <summary>
-    /// Populates metadata for the related <see cref="Endpoint"/> and <see cref="MethodInfo"/>.
+    /// Gets the expected type.
     /// </summary>
-    //public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
-    //{
-    //    ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, m => m.IsODataFormat = true);
-    //}
+    public Type ExpectedType { get; }
 
     /// <summary>
     /// Writes an HTTP response reflecting the result.
     /// </summary>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <returns>A task that represents the asynchronous execute operation.</returns>
-    public override async Task ExecuteAsync(HttpContext httpContext)
+    public virtual async Task ExecuteAsync(HttpContext httpContext)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
 

@@ -31,14 +31,14 @@ public static class CustomersEndpoints
             .WithODataBaseAddressFactory(c => new Uri("http://abc.com"));
         //.WithODataServices(c => c.AddSingleton<ODataMessageWriterSettings>;
 
-        app.MapGet("v0/customers", (AppDb db) => Results.Extensions.AsOData(db.Customers.Include(s => s.Orders)));
+        // app.MapGet("v0/customers", (AppDb db) => Results.Extensions.AsOData(db.Customers.Include(s => s.Orders)));
 
-        app.MapGet("v00/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
-        {
-            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
-            var result = queryOptions.ApplyTo(db.Customers.Include(s => s.Orders));
-            return Results.Extensions.AsOData(result);
-        });
+        //app.MapGet("v00/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
+        //{
+        //    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking; // This line seems required otherwise it will throw exception
+        //    var result = queryOptions.ApplyTo(db.Customers.Include(s => s.Orders));
+        //    return Results.Extensions.AsOData(result);
+        //});
 
         app.MapGet("v1/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
         {
@@ -67,24 +67,23 @@ public static class CustomersEndpoints
             //.WithODataModel(model)
             ;
 
-        app.MapGet("v3/customers", (AppDb db) =>
-        {
-            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            return Results.Extensions.AsOData(db.Customers.Include(s => s.Orders));
-        })
-            .AddODataQueryEndpointFilter()
+        //app.MapGet("v3/customers", (AppDb db) =>
+        //{
+        //    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        //    return Results.Extensions.AsOData(db.Customers.Include(s => s.Orders));
+        //})
+        //    .AddODataQueryEndpointFilter()
             
-            //.WithODataModel(model)
-            ;
-
+        //    //.WithODataModel(model)
+        //    ;
 
         // To discuss? To provide the MapODataGet, MapODataPost, MapODataPatch....
         // It seems we cannot generate the Delegate easily.
-        app.MapODataGet("v5/customers", (AppDb db) =>
-        {
-            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
-            return db.Customers.Include(s => s.Orders);
-        });
+        //app.MapODataGet("v5/customers", (AppDb db) =>
+        //{
+        //    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        //    return db.Customers.Include(s => s.Orders);
+        //});
         return app;
     }
 

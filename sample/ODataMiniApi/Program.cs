@@ -42,7 +42,8 @@ app.MapGet("test", () => "hello world").WithODataResult();
 
 // Group
 var group = app.MapGroup("")
-    .WithOData2(metadata => metadata.IsODataFormat = true, services => services.AddSingleton<IFilterBinder>(new FilterBinder()));
+//    .WithOData2(metadata => metadata.IsODataFormat = true, services => services.AddSingleton<IFilterBinder>(new FilterBinder()))
+    ;
 
 group.MapGet("v1", () => "hello v1")
     .AddEndpointFilter(async (efiContext, next) =>
@@ -78,10 +79,10 @@ app.MapGet("/giveschools3", (AppDb db) =>
     .WithODataResult()
     .AddODataQueryEndpointFilter(querySetup: q => q.PageSize = 3, validationSetup: q => q.MaxSkip = 4); 
 
-app.MapGet("/odata/schools", (AppDb db) =>
-{
-    return Results.Extensions.OData(db.Schools.Include(s => s.Students));
-});
+//app.MapGet("/odata/schools", (AppDb db) =>
+//{
+//    return Results.Extensions.OData(db.Schools.Include(s => s.Students));
+//});
 
 var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
 { WriteIndented = true };
@@ -107,7 +108,7 @@ app.MapGet("/myschools", (AppDb db) =>
     db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     return db.Schools;
 })
-    .WithModel(model)
+    .WithODataModel(model)
  //   .AddODataQueryEndpointFilter(new ODataQueryEndpointFilter(app.Services.GetRequiredService<ILoggerFactory>()));
     .AddODataQueryEndpointFilter(querySetup: q => q.PageSize = 3, validationSetup: q => q.MaxSkip = 4);
 
@@ -118,13 +119,13 @@ app.MapGet("/schoolspage", (AppDb db) =>
     return new PageResult<School>(db.Schools, new Uri("/schoolspage?$skip=2", UriKind.Relative), count: db.Schools.Count());
     //return db.Schools;
 })
-    .WithModel(model)
+    .WithODataModel(model)
     .AddODataQueryEndpointFilter(querySetup: q => q.PageSize = 3);
 
 app.MapGet("/schools", (AppDb db, ODataQueryOptions<School> options) => {
     db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     return options.ApplyTo(db.Schools);
-}).WithModel(model);
+}).WithODataModel(model);
 
 // Use the model built on the fly
 app.MapGet("/schools/{id}", async (int id, AppDb db, ODataQueryOptions<School> options) => {

@@ -174,7 +174,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
 
         if (isODataResult)
         {
-            return new ODataResultImpl(queryResult);
+            return new ODataResult(queryResult);
         }
 
         return queryResult;

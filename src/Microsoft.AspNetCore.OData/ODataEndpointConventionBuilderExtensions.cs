@@ -57,29 +57,6 @@ public static class ODataEndpointConventionBuilderExtensions
         IEdmModel model)
         => endpoints.MapGet(pattern, () => ODataMetadataResult.Instance).WithODataModel(model);
 
-    // TBD: What do you think about this extensions?
-    // If we accept this pattern, we can not use 'WithODataResult()'
-    public static RouteHandlerBuilder MapODataGet(
-        this IEndpointRouteBuilder endpoints,
-        [StringSyntax("Route")] string pattern,
-        Delegate handler)
-    {
-        return endpoints.MapGet(pattern, () => new ODataResultImpl(handler.DynamicInvoke(/*how to identify the parameters???*/)));
-
-        // It seems it's hard to generate the parameters and call the Delegate correctly.
-    }
-
-    // It's better to add ODataQueryFilter as early as possible,
-    // So, we can do the validation as early as possible,
-    // but will do the applyTo as later as possbile.
-    public static TBuilder AddODataQueryEndpointFilter<TBuilder>(this TBuilder builder, IODataQueryEndpointFilter queryFilter) where TBuilder : IEndpointConventionBuilder =>
-        builder.AddEndpointFilter(queryFilter);
-
-    public static TBuilder AddODataQueryEndpointFilter<TBuilder, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TFilterType>(this TBuilder builder)
-        where TBuilder : IEndpointConventionBuilder
-        where TFilterType : IODataQueryEndpointFilter =>
-        builder.AddEndpointFilter<TBuilder, TFilterType>();
-
     /// <summary>
     /// Registers the default OData query filter onto the route handler.
     /// </summary>
@@ -153,245 +130,6 @@ public static class ODataEndpointConventionBuilderExtensions
         where TFilterType : IODataQueryEndpointFilter =>
         builder.AddEndpointFilter<TFilterType>();
 
-
-    public static TBuilder AddODataQueryEndpointFilterFactory<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
-    {
-        return builder.AddODataQueryEndpointFilterFactory(new ODataQueryEndpointFilter());
-    }
-
-    public static TBuilder AddODataQueryEndpointFilterFactory<TBuilder>(this TBuilder builder, IODataQueryEndpointFilter queryFilter) where TBuilder : IEndpointConventionBuilder
-    {
-        return builder.AddEndpointFilterFactory((filterFactoryContext, next) =>
-        {
-            MethodInfo methodInfo = filterFactoryContext.MethodInfo;
-
-            return async invocationContext =>
-            {
-                ILoggerFactory loggerFactory = invocationContext.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
-                ILogger logger = loggerFactory.CreateLogger("ODataQuery");
-                logger.LogInformation("Starting OdataQuery. ..");
-
-                var odataFilterContext = new ODataQueryFilterInvocationContext { MethodInfo = methodInfo, InvocationContext = invocationContext };
-
-                await queryFilter.OnFilterExecutingAsync(odataFilterContext);
-
-                var result = await next(invocationContext);
-
-                logger.LogInformation("Ending OdataQuery. ..");
-
-                return await queryFilter.OnFilterExecutedAsync(result, odataFilterContext);
-            };
-        });
-    }
-
-    /// <summary>
-    /// Adds an OData Edm model metadata to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
-    /// This method typically is used in Minimal API scenarios.
-    /// </summary>
-    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
-    /// <param name="model">The Edm model.</param>
-    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-    public static TBuilder WithModel<TBuilder>(this TBuilder builder, IEdmModel model) where TBuilder : IEndpointConventionBuilder
-        => builder.WithMetadata(new EdmModelMetadata(model));
-
-    public static TBuilder WithModel1<TBuilder>(this TBuilder builder, IEdmModel model, Action<IServiceCollection> setupAction) where TBuilder : IEndpointConventionBuilder
-        => builder.WithMetadata(new EdmModelMetadata(model));
-
-    public static TBuilder WithOData<TBuilder>(this TBuilder builder, ODataMiniMetadata metadata) where TBuilder : IEndpointConventionBuilder
-    {
-        if (metadata.IsODataFormat)
-        {
-            builder.AddEndpointFilter(async (invocationContext, next) =>
-            {
-                object result = await next(invocationContext);
-
-                // If it's null or if it's already the ODataResult, simply do nothing
-                if (result is null || result is ODataResult)
-                {
-                    return result;
-                }
-
-                // Maybe we have a scenario like:
-                // Enable OData formatter in Group first,
-                // Then Disable OData formatter for a certain Routehandler.
-                var endpoint = invocationContext.HttpContext.GetEndpoint();
-                ODataMiniMetadata metadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
-                if (metadata is not null && metadata.IsODataFormat)
-                {
-                    return new ODataResultImpl(result/*, options*/);
-                }
-
-                return result;
-            });
-        }
-
-        //builder.AddEndpointFilterFactory((filterFactoryContext, next) =>
-        //{
-        //    MethodInfo methodInfo = filterFactoryContext.MethodInfo;
-
-        //    return async invocationContext =>
-        //    {
-        //        ILoggerFactory loggerFactory = invocationContext.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>();
-        //        ILogger logger = loggerFactory.CreateLogger("ODataQuery");
-        //        logger.LogInformation("Starting OdataQuery. ..");
-
-        //        var odataFilterContext = new ODataQueryFilterInvocationContext { MethodInfo = methodInfo, InvocationContext = invocationContext };
-
-        //        await queryFilter.OnFilterExecutingAsync(odataFilterContext);
-
-        //        var result = await next(invocationContext);
-
-        //        logger.LogInformation("Ending OdataQuery. ..");
-
-        //        return await queryFilter.OnFilterExecutedAsync(result, odataFilterContext);
-        //    };
-
-        //    return invocationContext => next(invocationContext);
-        //});
-
-        builder.Add(b =>
-        {
-            // Remove the existing, the last wins
-            var existings = b.Metadata.OfType<ODataMiniMetadata>().ToList();
-            foreach (var m in existings)
-            {
-                b.Metadata.Remove(m);
-            }
-
-            b.Metadata.Add(metadata);
-        });
-
-        return builder;
-    }
-
-    public static TBuilder AddOData<TBuilder>(this TBuilder builder, Action<ODataMiniMetadata> setupAction) where TBuilder : IEndpointConventionBuilder
-    {
-        
-        ODataMiniMetadata options = new ODataMiniMetadata();
-        setupAction?.Invoke(options);
-
-        // builder.Finally(c => c.Metadata)
-        return builder.WithMetadata(options);
-    }
-
-    public static TBuilder WithOData<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
-        => builder.WithOData(opt => opt.IsODataFormat = true);
-
-    // Provide an EdmModel for endpoint
-    public static TBuilder WithOData<TBuilder>(this TBuilder builder, IEdmModel model, bool isODataFormat = false) where TBuilder : IEndpointConventionBuilder
-        => builder.WithOData(opt =>
-        {
-            opt.Model = model;
-            opt.IsODataFormat = isODataFormat;
-        });
-
-
-    public static TBuilder WithOData<TBuilder>(this TBuilder builder, Action<ODataMiniMetadata> setupAction = null) where TBuilder : IEndpointConventionBuilder
-    {
-        // builder.WithOrder
-        builder.AddEndpointFilter(async (invocationContext, next) =>
-        {
-            object result = await next(invocationContext);
-
-            // If it's null or if it's already the ODataResult, simply do nothing
-            if (result is null || result is ODataResult)
-            {
-                return result;
-            }
-
-            var endpoint = invocationContext.HttpContext.GetEndpoint();
-            ODataMiniMetadata metadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
-            if (metadata is not null && metadata.IsODataFormat)
-            {
-                return new ODataResultImpl(result/*, options*/);
-            }
-
-            return result;
-        });
-
-        builder.Finally(b =>
-        {
-            ODataMiniMetadata metadata = b.Metadata.OfType<ODataMiniMetadata>().FirstOrDefault();
-            if (metadata is not null)
-            {
-                b.Metadata.Remove(metadata);
-            }
-            else 
-            {
-                metadata = new ODataMiniMetadata();
-            }
-
-            // retrieve the global configuration
-            ODataMiniOptions miniOptions = b.ApplicationServices?.GetService<IOptions<ODataMiniOptions>>()?.Value;
-
-            if (miniOptions is not null)
-            {
-                metadata.UpdateOptions(miniOptions);
-            }
-
-            setupAction?.Invoke(metadata);
-            b.Metadata.Add(metadata);
-        });
-
-        return builder;
-    }
-
-    public static TBuilder WithOData2<TBuilder>(this TBuilder builder,
-        Action<ODataMiniMetadata> metadataSetup = null,
-        Action<IServiceCollection> servicesSetup = null) where TBuilder : IEndpointConventionBuilder
-    {
-        // builder.WithOrder
-        builder.AddEndpointFilter(async (invocationContext, next) =>
-        {
-            object result = await next(invocationContext);
-
-            // If it's null or if it's already the ODataResult, simply do nothing
-            if (result is null || result is ODataResult)
-            {
-                return result;
-            }
-
-            var endpoint = invocationContext.HttpContext.GetEndpoint();
-            ODataMiniMetadata metadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
-            if (metadata is not null && metadata.IsODataFormat)
-            {
-                return new ODataResultImpl(result/*, options*/);
-            }
-
-            return result;
-        });
-
-        builder.Finally(b =>
-        {
-            ODataMiniMetadata metadata = b.Metadata.OfType<ODataMiniMetadata>().FirstOrDefault();
-            if (metadata is not null)
-            {
-                b.Metadata.Remove(metadata);
-            }
-            else
-            {
-                metadata = new ODataMiniMetadata();
-            }
-
-            // retrieve the global configuration
-            ODataMiniOptions miniOptions = b.ApplicationServices?.GetService<IOptions<ODataMiniOptions>>()?.Value;
-
-            if (miniOptions is not null)
-            {
-                metadata.UpdateOptions(miniOptions);
-            }
-
-            // call update route container before the 'metadata setup' so it's ok to update/retrieve the service in metadata setup.
-            metadata.UpdateRouteContainer(servicesSetup);
-
-            metadataSetup?.Invoke(metadata);
-
-            b.Metadata.Add(metadata);
-        });
-
-        return builder;
-    }
-
     /// <summary>
     /// Enables OData response annotation to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
     /// </summary>
@@ -418,7 +156,7 @@ public static class ODataEndpointConventionBuilderExtensions
             {
                 // Now, Let's focus on the POCO data result.
                 // We can figure out more types later, for example, TypedResult<T>, Results<T>, etc.
-                return new ODataResultImpl(result/*, odataMetadata*/);
+                return new ODataResult(result/*, odataMetadata*/);
             }
 
             return result;
@@ -428,14 +166,22 @@ public static class ODataEndpointConventionBuilderExtensions
         return builder;
     }
 
+    /// <summary>
+    /// Enables OData options to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="setupAction">The OData minimal options setup.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataOptions<TBuilder>(this TBuilder builder, Action<ODataMiniOptions> setupAction) where TBuilder : IEndpointConventionBuilder
     {
+        ArgumentNullException.ThrowIfNull(setupAction, nameof(setupAction));
+
         builder.Add(b => ConfigureODataMetadata(b, m =>
         {
             ODataMiniOptions options = b.ApplicationServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
             if (options is not null)
             {
-                m.Options.Update(options);
+                m.Options.UpdateFrom(options);
             }
 
             setupAction.Invoke(m.Options);
@@ -462,7 +208,7 @@ public static class ODataEndpointConventionBuilderExtensions
 
         builder.Add(b => ConfigureODataMetadata(b, m => m.Services = services));
 
-        builder.Finally(b => { });
+        //builder.Finally(b => { });
         return builder;
     }
 
@@ -517,7 +263,7 @@ public static class ODataEndpointConventionBuilderExtensions
             ODataMiniOptions options = endpointBuilder.ApplicationServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
             if (options is not null)
             {
-                metadata.Options.Update(options);
+                metadata.Options.UpdateFrom(options);
             }
 
             endpointBuilder.Metadata.Add(metadata);
@@ -525,24 +271,4 @@ public static class ODataEndpointConventionBuilderExtensions
 
         setupAction?.Invoke(metadata);
     }
-}
-
-public class ODataMiniMetadata1 : IODataMiniMetadata
-{
-    // True: OData payload
-    // False: Normal JSON payload
-    public bool IsODataFormat { get; set; }
-
-    public IEdmModel EdmModel { get; set; }
-
-    public IServiceProvider ServiceProvider { get; set; }
-
-    public IEdmModel Model => throw new NotImplementedException();
-}
-
-public interface IODataMiniMetadata
-{
-    IEdmModel Model { get; }
-
-    bool IsODataFormat { get; set; }
 }

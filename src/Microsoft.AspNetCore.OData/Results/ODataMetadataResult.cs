@@ -75,7 +75,7 @@ internal class ODataMetadataResult : IResult
 
     private static void SetResponseHeader(HttpContext httpContext, ODataMiniMetadata metadata)
     {
-        ODataVersion version = ODataResultImpl.GetODataVersion(httpContext.Request, metadata);
+        ODataVersion version = ODataResult.GetODataVersion(httpContext.Request, metadata);
 
         // Add version header.
         httpContext.Response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(version);

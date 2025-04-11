@@ -54,7 +54,7 @@ internal class ODataServiceDocumentResult : IResult
 
         HttpResponse response = httpContext.Response;
 
-        ODataVersion version = ODataResultImpl.GetODataVersion(httpContext.Request, metadata);
+        ODataVersion version = ODataResult.GetODataVersion(httpContext.Request, metadata);
         httpContext.Response.ContentType = "application/json";
 
         // Add version header.

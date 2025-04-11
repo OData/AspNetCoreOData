@@ -6581,20 +6581,19 @@
             <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/> that can be used to further customize the route handler.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithModel``1(``0,Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Adds an OData Edm model metadata to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
-            This method typically is used in Minimal API scenarios.
-            </summary>
-            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
-            <param name="model">The Edm model.</param>
-            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataResult``1(``0)">
             <summary>
             Enables OData response annotation to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
             </summary>
             <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataOptions``1(``0,System.Action{Microsoft.AspNetCore.OData.ODataMiniOptions})">
+            <summary>
+            Enables OData options to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="setupAction">The OData minimal options setup.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices``1(``0,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
@@ -6643,15 +6642,145 @@
         <member name="T:Microsoft.AspNetCore.OData.ODataMiniMetadata">
             <summary>
             Metadata that specifies the OData minimal API.
-            Or seperate them into pieces?
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Model">
+            <summary>
+            Gets or sets the model
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.IsODataFormat">
+            <summary>
+            Gets or sets a boolean value indicating to generate OData response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.PathFactory">
+            <summary>
+            Gets or sets the path factory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Version">
+            <summary>
+            Gets or sets the OData version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.BaseAddressFactory">
+            <summary>
+            Gets or sets the base address factory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Options">
+            <summary>
+            Gets or sets the minimal options.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Services">
+            <summary>
+            Gets or sets the services
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.ServiceProvider">
             <summary>
-            Gets the service provider associated to this metadata.
+            Gets or sets the service provider associated to this metadata.
             Be noted, it seems we build and cache the service provider per endpoint.
             If it's over-built, let's figure out a better solution for this.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMiniOptions">
+            <summary>
+            The options for minimal API scenarios
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryConfigurations">
+            <summary>
+            Gets the query configurations. for example enable '$select' or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.Version">
+            <summary>
+            Gets the OData version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions">
+            <summary>
+            Gets whether or not the OData system query options should be prefixed with '$'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableCaseInsensitive">
+            <summary>
+            Ges whether or not case insensitive.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
+            <summary>
+            Config whether or not no '$' sign query option.
+            </summary>
+            <param name="enableNoDollarQueryOptions">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetCaseInsensitive(System.Boolean)">
+            <summary>
+            Config the case insensitive.
+            </summary>
+            <param name="enableCaseInsensitive">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetVersion(Microsoft.OData.ODataVersion)">
+            <summary>
+            Config the OData version.
+            </summary>
+            <param name="version">The OData version.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableAll(System.Nullable{System.Int32})">
+            <summary>
+            Enables all OData query options.
+            </summary>
+            <param name="maxTopValue"></param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Expand">
+            <summary>
+            Enable $expand query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Select">
+            <summary>
+            Enable $select query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Filter">
+            <summary>
+            Enable $filter query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.OrderBy">
+            <summary>
+            Enable $orderby query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Count">
+            <summary>
+            Enable $count query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SkipToken">
+            <summary>
+            Enable $skiptoken query option.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(System.Nullable{System.Int32})">
+             <summary>
+            Sets the maximum value of $top that a client can request.
+             </summary>
+             <param name="maxTopValue">The maximum value of $top that a client can request.</param>
+             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions">
             <summary>
@@ -6977,59 +7106,6 @@
             </summary>
             <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the services to.</param>
             <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> so that additional calls can be chained.</returns>
-        </member>
-        <member name="F:Microsoft.AspNetCore.OData.ODataMiniOptions._queryConfigurations">
-            <summary>
-            Gets the query configurations.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions">
-            <summary>
-            Gets or sets whether or not the OData system query options should be prefixed with '$'.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Expand">
-            <summary>
-            Enable $expand query options.
-            </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Select">
-            <summary>
-            Enable $select query options.
-            </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Filter">
-            <summary>
-            Enable $filter query options.
-            </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.OrderBy">
-            <summary>
-            Enable $orderby query options.
-            </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Count">
-            <summary>
-            Enable $count query options.
-            </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SkipToken">
-            <summary>
-            Enable $skiptoken query option.
-            </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(System.Nullable{System.Int32})">
-             <summary>
-            Sets the maximum value of $top that a client can request.
-             </summary>
-             <param name="maxTopValue">The maximum value of $top that a client can request.</param>
-             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataUriFunctions">
             <summary>
@@ -13699,6 +13775,21 @@
             OData error.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.IODataResult">
+            <summary>
+            A contracts for OData result 
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.IODataResult.Value">
+            <summary>
+            Gets the real value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.IODataResult.ExpectedType">
+            <summary>
+            Gets the expected type.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.NotFoundODataResult">
             <summary>
             Represents a result that when executed will produce a Not Found (404) response.
@@ -13769,35 +13860,36 @@
             <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
             <returns>A task that represents the asynchronous execute operation.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Results.IODataResult.PopulateMetadata(System.Reflection.MethodInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
-            <summary>
-            Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.MethodInfo"/>.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.ODataResult">
-            <summary>
-            Use abstract class not interface is because we want to implement 'IEndpointMetadataProvider'
-            If use interface, ASP.NET Core throws exceptions.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.PopulateMetadata(System.Reflection.MethodInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
-            <summary>
-            Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.MethodInfo"/>.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Results.ODataResultImpl">
             <summary>
             Defines an implementation that represents the result of an OData format result.
             It's used for minimal API.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResultImpl.#ctor(System.Object)">
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.#ctor(System.Object)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class.
             </summary>
             <param name="value">The wrappered real value.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResultImpl.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.#ctor(System.Object,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class.
+            </summary>
+            <param name="value">The wrappered real value.</param>
+            <param name="expectedType">The expected type.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.ODataResult.Value">
+            <summary>
+            Gets the value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.ODataResult.ExpectedType">
+            <summary>
+            Gets the expected type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
             <summary>
             Writes an HTTP response reflecting the result.
             </summary>
