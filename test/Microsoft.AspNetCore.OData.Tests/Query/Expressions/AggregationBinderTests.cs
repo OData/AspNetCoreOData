@@ -172,7 +172,7 @@ public class AggregationBinderTests
             "groupby((ProductName), aggregate(SupplierID with sum as SupplierID))",
             ".Select($it => new FlatteningWrapper`1() {Source = $it, GroupByContainer = new LastInChain() {Name = Property0, Value = Convert($it.SupplierID), }, })"
             + ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = ProductName, Value = $it.Source.ProductName, }, })"
-            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, Container = new LastInChain() {Name = SupplierID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Value))), }, })");
+            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, Container = new LastInChain() {Name = SupplierID, Value = Convert(Convert($it).Sum($it => Convert(Convert($it.GroupByContainer).Value))), }, })");
     }
 
     [Fact]
@@ -182,17 +182,7 @@ public class AggregationBinderTests
             "groupby((ProductName), aggregate(SupplierID with sum as SupplierID, CategoryID with sum as CategoryID))",
             ".Select($it => new FlatteningWrapper`1() {Source = $it, GroupByContainer = new AggregationPropertyContainer() {Name = Property1, Value = Convert($it.SupplierID), Next = new LastInChain() {Name = Property0, Value = Convert($it.CategoryID), }, }, })"
             + ".GroupBy($it => new GroupByWrapper() {GroupByContainer = new LastInChain() {Name = ProductName, Value = $it.Source.ProductName, }, })"
-            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, Container = new AggregationPropertyContainer() {Name = CategoryID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Next.Value))), Next = new LastInChain() {Name = SupplierID, Value = Convert(Convert($it).Sum($it => Convert($it.GroupByContainer.Value))), }, }, })");
-    }
-
-    [Fact]
-    public void ClassicEFQueryShape()
-    {
-        var filters = VerifyQueryDeserialization(
-            "aggregate(SupplierID with sum as SupplierID)",
-            ".GroupBy($it => new NoGroupByWrapper())"
-            + ".Select($it => new NoGroupByAggregationWrapper() {Container = new LastInChain() {Name = SupplierID, Value = $it.AsQueryable().Sum($it => $it.SupplierID), }, })",
-            classicEF: true);
+            + ".Select($it => new AggregationWrapper() {GroupByContainer = $it.Key.GroupByContainer, Container = new AggregationPropertyContainer() {Name = CategoryID, Value = Convert(Convert($it).Sum($it => Convert(Convert($it.GroupByContainer.Next).Value))), Next = new LastInChain() {Name = SupplierID, Value = Convert(Convert($it).Sum($it => Convert(Convert($it.GroupByContainer).Value))), }, }, })");
     }
 
     [Fact]
@@ -235,12 +225,12 @@ public class AggregationBinderTests
             "Encountered invalid type cast. 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory' is not assignable from 'Microsoft.AspNetCore.OData.Tests.Models.Product'.");
     }
 
-    private Expression VerifyQueryDeserialization(string filter, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null, bool classicEF = false)
+    private Expression VerifyQueryDeserialization(string filter, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null)
     {
-        return VerifyQueryDeserialization<Product>(filter, expectedResult, settingsCustomizer, classicEF);
+        return VerifyQueryDeserialization<Product>(filter, expectedResult, settingsCustomizer);
     }
 
-    private Expression VerifyQueryDeserialization<T>(string clauseString, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null, bool classicEF = false) where T : class
+    private Expression VerifyQueryDeserialization<T>(string clauseString, string expectedResult = null, Action<ODataQuerySettings> settingsCustomizer = null) where T : class
     {
         IEdmModel model = GetModel<T>();
         ApplyClause clause = CreateApplyNode(clauseString, model, typeof(T));
@@ -256,23 +246,16 @@ public class AggregationBinderTests
             return settings;
         };
 
-        var binder = classicEF
-            ? new AggregationBinderEFFake(
-                customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                assembliesResolver,
-                typeof(T),
-                model,
-                clause.Transformations.First())
-            : new AggregationBinder(
-                customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
-                assembliesResolver,
-                typeof(T),
-                model,
-                clause.Transformations.First());
+        QueryBinderContext queryBinderContext = new QueryBinderContext(
+            model,
+            customizeSettings(new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }),
+            typeof(T));
+
+        var binder = new AggregationBinder();
 
         var query = Enumerable.Empty<T>().AsQueryable();
 
-        var queryResult = binder.Bind(query);
+        var queryResult = binder.ApplyBind(query, clause.Transformations.First(), queryBinderContext, out Type resultClrType);
 
         var applyExpr = queryResult.Expression;
 
@@ -326,18 +309,5 @@ public class AggregationBinderTests
             value = _modelCache[key] = model.GetEdmModel();
         }
         return value;
-    }
-
-    private class AggregationBinderEFFake : AggregationBinder
-    {
-        internal AggregationBinderEFFake(ODataQuerySettings settings, IAssemblyResolver assembliesResolver, Type elementType, IEdmModel model, TransformationNode transformation)
-            : base(settings, assembliesResolver, elementType, model, transformation)
-        {
-        }
-
-        internal override bool IsClassicEF(IQueryable query)
-        {
-            return true;
-        }
     }
 }

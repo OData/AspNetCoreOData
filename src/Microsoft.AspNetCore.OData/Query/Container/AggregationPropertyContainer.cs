@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.OData.Query.Container;
 /// <summary>
 /// Represent properties used in groupby and aggregate clauses to make them accessible in further clauses/transformations
 /// </summary>
-/// <remakrs>
+/// <remarks>
 /// When we have $apply=groupby((Prop1,Prop2, Prop3))&amp;$orderby=Prop1, Prop2
 /// We will have following expression in .GroupBy
 /// $it => new AggregationPropertyContainer() {
@@ -32,10 +32,10 @@ namespace Microsoft.AspNetCore.OData.Query.Container;
 ///     }
 /// }
 /// when in $orderby (see AggregationBinder CollectProperties method)
-/// Prop1 could be referenced us $it => (string)$it.Value
-/// Prop2 could be referenced us $it => (int)$it.Next.Value
-/// Prop3 could be referenced us $it => (int)$it.Next.Next.Value
-/// Generic type for Value is used to avoid type casts for on primitive types that not supported in EF
+/// Prop1 could be referenced as $it => (string)$it.Value
+/// Prop2 could be referenced as $it => (int)$it.Next.Value
+/// Prop3 could be referenced as $it => (int)$it.Next.Next.Value
+/// Generic type for Value is used to avoid type casts for primitive types that are not supported in EF
 /// 
 /// Also we have 4 use cases and base type have all required properties to support no cast usage. 
 /// 1. Primitive property with Next
@@ -43,9 +43,8 @@ namespace Microsoft.AspNetCore.OData.Query.Container;
 /// 3. Nested property with Next
 /// 4. Nested property without Next
 /// However, EF doesn't allow to set different properties for the same type in two places in an lambda-expression => using new type with just new name to workaround that issue
-/// 
-/// </remakrs>
-internal class AggregationPropertyContainer : NamedProperty<object>
+/// </remarks>
+internal class AggregationPropertyContainer : NamedProperty<object>, IAggregationPropertyContainer<GroupByWrapper, AggregationPropertyContainer>
 {
     public GroupByWrapper NestedValue
     {
@@ -59,7 +58,7 @@ internal class AggregationPropertyContainer : NamedProperty<object>
         }
     }
 
-    public AggregationPropertyContainer Next { get; set; }
+    public IAggregationPropertyContainer<GroupByWrapper, AggregationPropertyContainer> Next { get; set; }
 
     public override void ToDictionaryCore(Dictionary<string, object> dictionary, IPropertyMapper propertyMapper,
         bool includeAutoSelected)
@@ -99,9 +98,9 @@ internal class AggregationPropertyContainer : NamedProperty<object>
         Expression container = null;
 
         // build the linked list of properties.
-        foreach (NamedPropertyExpression property in properties)
+        for (int i = 0; i < properties.Count; i++)
         {
-            container = CreateNextNamedPropertyCreationExpression(property, container);
+            container = CreateNextNamedPropertyCreationExpression(properties[i], container);
         }
 
         return container;
@@ -138,20 +137,20 @@ internal class AggregationPropertyContainer : NamedProperty<object>
 
         List<MemberBinding> memberBindings = new List<MemberBinding>();
 
-        memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty("Name"), property.Name));
+        memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty(QueryConstants.AggregationPropertyContainerNameProperty), property.Name));
 
         if (property.Value.Type == typeof(GroupByWrapper))
         {
-            memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty("NestedValue"), property.Value));
+            memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty(QueryConstants.AggregationPropertyContainerNestedValueProperty), property.Value));
         }
         else
         {
-            memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty("Value"), property.Value));
+            memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty(QueryConstants.AggregationPropertyContainerValueProperty), property.Value));
         }
 
         if (next != null)
         {
-            memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty("Next"), next));
+            memberBindings.Add(Expression.Bind(namedPropertyType.GetProperty(QueryConstants.AggregationPropertyContainerNextProperty), next));
         }
 
         if (property.NullCheck != null)

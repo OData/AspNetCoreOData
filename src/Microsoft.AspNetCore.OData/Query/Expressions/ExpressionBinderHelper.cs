@@ -186,7 +186,7 @@ internal static class ExpressionBinderHelper
             }
             else
             {
-                throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, binaryOperator, typeof(ExpressionBinderBase).Name);
+                throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, binaryOperator, typeof(QueryBinder).Name);
             }
         }
     }
@@ -373,7 +373,7 @@ internal static class ExpressionBinderHelper
 
     public static Expression ExtractValueFromNullableExpression(Expression source)
     {
-        return Nullable.GetUnderlyingType(source.Type) != null ? Expression.Property(source, "Value") : source;
+        return Nullable.GetUnderlyingType(source.Type) != null ? Expression.Property(source, QueryConstants.AggregationPropertyContainerValueProperty) : source;
     }
 
     public static Expression BindHas(Expression left, Expression flag, ODataQuerySettings querySettings)
@@ -731,13 +731,13 @@ internal static class ExpressionBinderHelper
                 // Entity Framework doesn't have ToString method for enum types.
                 // Convert enum types to their underlying numeric types.
                 sourceValue = Expression.Convert(
-                    Expression.Property(source, "Value"),
+                    Expression.Property(source, QueryConstants.AggregationPropertyContainerValueProperty),
                     Enum.GetUnderlyingType(TypeHelper.GetUnderlyingTypeOrSelf(source.Type)));
             }
             else
             {
                 // Entity Framework has ToString method for numeric types.
-                sourceValue = Expression.Property(source, "Value");
+                sourceValue = Expression.Property(source, QueryConstants.AggregationPropertyContainerValueProperty);
             }
 
             // Entity Framework doesn't have ToString method for nullable numeric types.

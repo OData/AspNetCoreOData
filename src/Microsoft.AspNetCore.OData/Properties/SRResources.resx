@@ -748,4 +748,19 @@
   <data name="TypeMustBeOpenType" xml:space="preserve">
     <value>The type '{0}' must be an open type. The dynamic properties container property is only expected on open types.</value>
   </data>
+  <data name="NotSupportedChildTransformationKind" xml:space="preserve">
+    <value>Transformation kind '{0}' is not supported as a child transformation of kind '{1}'.</value>
+  </data>
+  <data name="TypeMustImplementInterface" xml:space="preserve">
+    <value>The type '{0}' does not implement '{1}' interface.</value>
+  </data>
+  <data name="TypeMustInheritFromType" xml:space="preserve">
+    <value>The type '{0}' does not inherit from '{1}'.</value>
+  </data>
+  <data name="PropertyMustBeSetWhenAnotherPropertyIsSet" xml:space="preserve">
+    <value>The '{0}' property must be set when the '{1}' property is set.</value>
+  </data>
+  <data name="PropertyMustBeSet" xml:space="preserve">
+    <value>The '{0}' property must be set.</value>
+  </data>
 </root>
