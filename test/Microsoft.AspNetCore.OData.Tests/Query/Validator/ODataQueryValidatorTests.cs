@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="ODataQueryValidatorTest.cs" company=".NET Foundation">
+// <copyright file="ODataQueryValidatorTests.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -19,12 +19,12 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
 {
-    public class ODataQueryValidatorTest
+    public class ODataQueryValidatorTests
     {
         private ODataQueryValidator _validator;
         private ODataQueryContext _context;
 
-        public ODataQueryValidatorTest()
+        public ODataQueryValidatorTests()
         {
             _validator = new ODataQueryValidator();
             _context = ValidationTestHelper.CreateCustomerContext(false);

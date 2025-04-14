@@ -1,6 +1,12 @@
-﻿using Microsoft.OData.UriParser;
-using Microsoft.OData.UriParser.Aggregation;
+﻿//-----------------------------------------------------------------------------
+// <copyright file="IComputeBinder.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
 using System.Linq.Expressions;
+using Microsoft.OData.UriParser.Aggregation;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions
 {
@@ -17,8 +23,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="context">An instance of the <see cref="QueryBinderContext"/>.</param>
         /// <remarks>
         /// Generates an expression structured like:
-        /// $it => new ComputeWrapper&lt;T&gt;
-        /// {
+        /// $it => new ComputeWrapper&lt;T&gt; {
         ///     Instance = $it,
         ///     Model = parametrized(IEdmModel),
         ///     Container => new AggregationPropertyContainer() {
@@ -27,6 +32,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         ///         Next = new LastInChain() {
         ///             Name = "C",
         ///             Value = $it.A * $it.B
+        ///         }
         ///     }
         /// }
         /// </remarks>
