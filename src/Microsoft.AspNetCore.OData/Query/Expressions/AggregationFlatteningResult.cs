@@ -16,10 +16,10 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     /// </summary>
     /// <remarks>
     /// Flattening properties referenced in an aggregate clause helps prevent the generation of nested queries by Entity Framework.
-    /// For example, given a query like:
-    /// groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2))
-    /// The expression is rewritten as:
-    /// .Select($it => new FlatteningWrapper() {
+    /// For example, given a query like: <c>groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2))</c>
+    /// the expression is rewritten as:
+    /// <code>
+    /// .Select($it => new FlatteningWrapper&lt;T&gt; {
     ///     Source = $it,
     ///     Container = new {
     ///         Value = $it.B.C,
@@ -28,6 +28,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
     ///         }
     ///     }
     /// })
+    /// </code>
     /// A mapping is also maintained between the original properties and their flattened expressions:
     /// B/C → $it.Container.Value
     /// B/D → $it.Container.Next.Value
