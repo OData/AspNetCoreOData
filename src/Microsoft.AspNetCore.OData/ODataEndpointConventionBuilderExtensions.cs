@@ -176,17 +176,7 @@ public static class ODataEndpointConventionBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(setupAction, nameof(setupAction));
 
-        builder.Add(b => ConfigureODataMetadata(b, m =>
-        {
-            ODataMiniOptions options = b.ApplicationServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
-            if (options is not null)
-            {
-                m.Options.UpdateFrom(options);
-            }
-
-            setupAction.Invoke(m.Options);
-        }));
-
+        builder.Add(b => ConfigureODataMetadata(b, m => setupAction.Invoke(m.Options)));
         return builder;
     }
 
@@ -252,6 +242,8 @@ public static class ODataEndpointConventionBuilderExtensions
         return builder;
     }
 
+    // Will update the odata metadata if existed.
+    // Otherwise, will create a new metadata and insert into endpoint.
     internal static void ConfigureODataMetadata(EndpointBuilder endpointBuilder, Action<ODataMiniMetadata> setupAction)
     {
         var metadata = endpointBuilder.Metadata.OfType<ODataMiniMetadata>().FirstOrDefault();

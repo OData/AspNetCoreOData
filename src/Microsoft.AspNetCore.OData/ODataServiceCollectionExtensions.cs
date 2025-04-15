@@ -6,20 +6,12 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
-using System.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Formatter.Deserialization;
-using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Container;
-using Microsoft.AspNetCore.OData.Query.Expressions;
-using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing;
@@ -29,12 +21,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Microsoft.OData;
-using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.UriParser;
-using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.AspNetCore.OData.Extensions;
 
 namespace Microsoft.AspNetCore.OData;
 
@@ -74,7 +61,7 @@ public static class ODataServiceCollectionExtensions
 
         services.Configure(setupAction);
 
-        services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+        services.Configure<Http.Json.JsonOptions>(options =>
         {
             options.SerializerOptions.PropertyNameCaseInsensitive = false;
             options.SerializerOptions.PropertyNamingPolicy = null;

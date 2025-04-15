@@ -22,7 +22,7 @@ public class ODataMiniOptions
     private ODataVersion _version = ODataVersionConstraint.DefaultODataVersion;
 
     /// <summary>
-    /// Gets the query configurations. for example enable '$select' or not.
+    /// Gets the query configurations. for example, enable '$select' or not.
     /// </summary>
     public DefaultQueryConfigurations QueryConfigurations { get => _queryConfigurations; }
 
@@ -45,7 +45,7 @@ public class ODataMiniOptions
     /// Config whether or not no '$' sign query option.
     /// </summary>
     /// <param name="enableNoDollarQueryOptions">Case insensitive or not.</param>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions SetNoDollarQueryOptions(bool enableNoDollarQueryOptions)
     {
         _enableNoDollarQueryOptions = enableNoDollarQueryOptions;
@@ -56,7 +56,7 @@ public class ODataMiniOptions
     /// Config the case insensitive.
     /// </summary>
     /// <param name="enableCaseInsensitive">Case insensitive or not.</param>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions SetCaseInsensitive(bool enableCaseInsensitive)
     {
         _enableCaseInsensitive = enableCaseInsensitive;
@@ -67,7 +67,7 @@ public class ODataMiniOptions
     /// Config the OData version.
     /// </summary>
     /// <param name="version">The OData version.</param>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions SetVersion(ODataVersion version)
     {
         _version = version;
@@ -78,7 +78,7 @@ public class ODataMiniOptions
     /// Enables all OData query options.
     /// </summary>
     /// <param name="maxTopValue"></param>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions EnableAll(int? maxTopValue = null)
     {
         _queryConfigurations.EnableExpand = true;
@@ -94,7 +94,7 @@ public class ODataMiniOptions
     /// <summary>
     /// Enable $expand query options.
     /// </summary>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions Expand()
     {
         _queryConfigurations.EnableExpand = true;
@@ -104,7 +104,7 @@ public class ODataMiniOptions
     /// <summary>
     /// Enable $select query options.
     /// </summary>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions Select()
     {
         _queryConfigurations.EnableSelect = true;
@@ -114,7 +114,7 @@ public class ODataMiniOptions
     /// <summary>
     /// Enable $filter query options.
     /// </summary>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions Filter()
     {
         _queryConfigurations.EnableFilter = true;
@@ -124,7 +124,7 @@ public class ODataMiniOptions
     /// <summary>
     /// Enable $orderby query options.
     /// </summary>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions OrderBy()
     {
         _queryConfigurations.EnableOrderBy = true;
@@ -134,7 +134,7 @@ public class ODataMiniOptions
     /// <summary>
     /// Enable $count query options.
     /// </summary>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions Count()
     {
         _queryConfigurations.EnableCount = true;
@@ -144,7 +144,7 @@ public class ODataMiniOptions
     /// <summary>
     /// Enable $skiptoken query option.
     /// </summary>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions SkipToken()
     {
         _queryConfigurations.EnableSkipToken = true;
@@ -155,7 +155,7 @@ public class ODataMiniOptions
     ///Sets the maximum value of $top that a client can request.
     /// </summary>
     /// <param name="maxTopValue">The maximum value of $top that a client can request.</param>
-    /// <returns>The current <see cref="ODataOptions"/> instance to enable further configuration.</returns>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions SetMaxTop(int? maxTopValue)
     {
         if (maxTopValue.HasValue && maxTopValue.Value < 0)

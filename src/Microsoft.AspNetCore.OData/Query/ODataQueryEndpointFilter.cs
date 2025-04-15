@@ -293,6 +293,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     /// <param name="queryOptions">
     /// The <see cref="ODataQueryOptions"/> instance constructed based on the incoming request.
     /// </param>
+    /// <param name="querySettings">The settings.</param>
     public virtual IQueryable ApplyQuery(IQueryable queryable, ODataQueryOptions queryOptions, ODataQuerySettings querySettings)
     {
         ArgumentNullException.ThrowIfNull(queryable, nameof(queryable));

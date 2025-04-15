@@ -138,7 +138,7 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
     public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
     {
         // Make sure we have the metadata added into the endpoint.
-        // Shall we build the 'EdmModel' here? ==> No, because the 'convention' runs after this population.
+        // Shall we build the 'EdmModel' here? ==> Emm...No, because the 'convention' runs after this population.
         // If developer calls 'WithODataModel()', then any model created here will be replaced. So, no need/required to create model here.
         ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, null);
    }
