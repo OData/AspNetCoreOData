@@ -4,7 +4,7 @@
     <id>Microsoft.AspNetCore.OData.NewtonsoftJson</id>
     <title>Microsoft ASP.NET Core OData opt-in component to support Newtonsoft.Json serializer converters</title>
     <version>$VersionNuGetSemantic$</version>
-    <authors>OData,.NET Foundation</authors>
+    <authors>Microsoft,OData,.NET Foundation</authors>
     <copyright>&#169; .NET Foundation and Contributors. All rights reserved.</copyright>
     <description>This package contains customized Newtonsoft.Json serializer converters to support OData serialization.</description>
     <summary>This package contains customized Newtonsoft.Json serializer converters to support OData serialization.</summary>
