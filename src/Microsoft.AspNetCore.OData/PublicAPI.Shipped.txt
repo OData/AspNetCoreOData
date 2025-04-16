@@ -794,6 +794,16 @@ Microsoft.AspNetCore.OData.Query.ComputeQueryOption.ResultClrType.get -> System.
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator
 Microsoft.AspNetCore.OData.Query.ComputeQueryOption.Validator.set -> void
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.Name.get -> string
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.Name.set -> void
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.NestedValue.get -> TWrapper
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.NestedValue.set -> void
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.Next.get -> Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.Next.set -> void
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.ToDictionaryCore(System.Collections.Generic.Dictionary<string, object> dictionary, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper propertyMapper, bool includeAutoSelected) -> void
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.Value.get -> object
+Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer<TWrapper, TContainer>.Value.set -> void
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper
 Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper.MapProperty(string propertyName) -> string
 Microsoft.AspNetCore.OData.Query.Container.ITruncatedCollection
@@ -891,12 +901,31 @@ Microsoft.AspNetCore.OData.Query.ETag.this[string key].set -> void
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ApplyTo(System.Linq.IQueryable<TEntity> query) -> System.Linq.IQueryable<TEntity>
 Microsoft.AspNetCore.OData.Query.ETag<TEntity>.ETag() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.AggregationBinder() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.AggregationFlatteningResult() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedExpression.get -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedExpression.set -> void
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedPropertiesMapping.get -> System.Collections.Generic.IDictionary<Microsoft.OData.UriParser.SingleValueNode, System.Linq.Expressions.Expression>
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedPropertiesMapping.set -> void
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.RedefinedContextParameter.get -> System.Linq.Expressions.ParameterExpression
+Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.RedefinedContextParameter.set -> void
 Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions
+Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder
+Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder.ComputeBinder() -> void
 Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.FilterBinder() -> void
+Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder
+Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder
+Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder.BindFilter(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder
+Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder
 Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder.BindOrderBy(Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult
 Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder
@@ -922,6 +951,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperti
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.CurrentParameter.get -> System.Linq.Expressions.ParameterExpression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ElementType.get -> Microsoft.OData.Edm.IEdmType
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedExpressionMapping.get -> System.Collections.Generic.IDictionary<Microsoft.OData.UriParser.SingleValueNode, System.Linq.Expressions.Expression>
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.GetParameter(string name) -> System.Linq.Expressions.ParameterExpression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Model.get -> Microsoft.OData.Edm.IEdmModel
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.NavigationSource.get -> Microsoft.OData.Edm.IEdmNavigationSource
@@ -932,6 +962,7 @@ Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.QuerySettings.ge
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.RemoveParameter(string name) -> void
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Source.get -> System.Linq.Expressions.Expression
 Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.Source.set -> void
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.TransformationElementType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.FilterBinder.get -> Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder
 Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.OrderByBinder.get -> Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder
@@ -1080,6 +1111,7 @@ Microsoft.AspNetCore.OData.Query.SearchQueryOption.RawValue.get -> string
 Microsoft.AspNetCore.OData.Query.SearchQueryOption.ResultClrType.get -> System.Type
 Microsoft.AspNetCore.OData.Query.SearchQueryOption.SearchClause.get -> Microsoft.OData.UriParser.SearchClause
 Microsoft.AspNetCore.OData.Query.SearchQueryOption.SearchQueryOption(string rawValue, Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.OData.UriParser.ODataQueryOptionParser queryOptionParser) -> void
+Microsoft.AspNetCore.OData.Query.SearchQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.ApplyTo(object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings) -> object
 Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.ApplyTo(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings) -> System.Linq.IQueryable
@@ -1150,6 +1182,8 @@ Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SearchQueryOption searchQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator
 Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator
@@ -1222,6 +1256,19 @@ Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.TopQueryValidator()
 Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper
 Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.DynamicTypeWrapper() -> void
 Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.TryGetPropertyValue(string propertyName, out object value) -> bool
+Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper<T>
+Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper<T>.Instance.get -> T
+Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper<T>.Instance.set -> void
+Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper<T>.Model.get -> Microsoft.OData.Edm.IEdmModel
+Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper<T>.Model.set -> void
+Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper<T>
+Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper<T>.Source.get -> T
+Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper<T>.Source.set -> void
+Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper<TContainer, TWrapper>
+Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper<TContainer, TWrapper>.Container.get -> TContainer
+Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper<TContainer, TWrapper>.Container.set -> void
+Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper<TContainer, TWrapper>.GroupByContainer.get -> TContainer
+Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper<TContainer, TWrapper>.GroupByContainer.set -> void
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary() -> System.Collections.Generic.IDictionary<string, object>
 Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper.ToDictionary(System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper> propertyMapperProvider) -> System.Collections.Generic.IDictionary<string, object>
@@ -1755,6 +1802,8 @@ static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQuery
 static Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> void
 static Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> bool
 static Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateErrorResponse(string message, System.Exception exception = null) -> Microsoft.AspNetCore.Mvc.SerializableError
+static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder binder, System.Linq.IQueryable source, Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, out System.Type resultClrType) -> System.Linq.IQueryable
+static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder binder, System.Linq.IQueryable source, Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, out System.Type resultClrType) -> System.Linq.IQueryable
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder binder, System.Collections.IEnumerable query, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Collections.IEnumerable
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder binder, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder binder, System.Linq.IQueryable query, Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.IQueryable
@@ -1765,6 +1814,7 @@ static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(t
 static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.ISelectExpandBinder binder, System.Linq.IQueryable source, Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.IQueryable
 static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.ApplyNullPropagationForFilterBody(System.Linq.Expressions.Expression body, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDynamicPropertyContainer(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Reflection.PropertyInfo
+static Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.WrapConvert(System.Linq.Expressions.Expression expression) -> System.Linq.Expressions.Expression
 static Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag(this Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.Net.Http.Headers.EntityTagHeaderValue entityTagHeaderValue) -> Microsoft.AspNetCore.OData.Query.ETag
 static Microsoft.AspNetCore.OData.Query.HttpRequestODataQueryExtensions.GetETag<TEntity>(this Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.Net.Http.Headers.EntityTagHeaderValue entityTagHeaderValue) -> Microsoft.AspNetCore.OData.Query.ETag<TEntity>
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions.IsSystemQueryOption(string queryOptionName) -> bool
@@ -1874,12 +1924,17 @@ virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateQueryOptions
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.GetModel(System.Type elementClrType, Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.Mvc.Abstractions.ActionDescriptor actionDescriptor) -> Microsoft.OData.Edm.IEdmModel
 virtual Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.ValidateQuery(Microsoft.AspNetCore.Http.HttpRequest request, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> void
 virtual Microsoft.AspNetCore.OData.Query.ETag.ApplyTo(System.Linq.IQueryable query) -> System.Linq.IQueryable
+virtual Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode transformationNode, System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult
+virtual Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode computeTransformationNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindCollectionConstantNode(Microsoft.OData.UriParser.CollectionConstantNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindConstantNode(Microsoft.OData.UriParser.ConstantNode constantNode) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase.BindSingleValueFunctionCallNode(Microsoft.OData.UriParser.SingleValueFunctionCallNode node) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder.BindFilter(Microsoft.OData.UriParser.FilterClause filterClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinder.BindOrderBy(Microsoft.OData.UriParser.OrderByClause orderByClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> Microsoft.AspNetCore.OData.Query.Expressions.OrderByBinderResult
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.Bind(Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAccessExpression(Microsoft.OData.UriParser.QueryNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression baseElement = null) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAllNode(Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAnyNode(Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindBinaryOperatorNode(Microsoft.OData.UriParser.BinaryOperatorNode binaryOperatorNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
@@ -1926,6 +1981,7 @@ virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindToLower(Mic
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindToUpper(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindTrim(Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindUnaryOperatorNode(Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateOpenPropertyAccessExpression(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode openNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindComputedProperty(System.Linq.Expressions.Expression source, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, string computedProperty, System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression> includedProperties) -> void
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindOrderByProperties(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList<Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression> includedProperties, bool isSelectedAll) -> void
 virtual Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.BindSelectExpand(Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
