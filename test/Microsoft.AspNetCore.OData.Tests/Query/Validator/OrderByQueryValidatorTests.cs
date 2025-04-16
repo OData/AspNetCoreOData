@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="OrderByQueryValidatorTest.cs" company=".NET Foundation">
+// <copyright file="OrderByQueryValidatorTests.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -19,12 +19,12 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator;
 
-public class OrderByQueryValidatorTest
+public class OrderByQueryValidatorTests
 {
     private OrderByQueryValidator _validator;
     private ODataQueryContext _context;
 
-    public OrderByQueryValidatorTest()
+    public OrderByQueryValidatorTests()
     {
         _context = ValidationTestHelper.CreateCustomerContext();
         _validator = new OrderByQueryValidator();

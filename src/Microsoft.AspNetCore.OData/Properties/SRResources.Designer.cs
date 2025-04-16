@@ -1240,6 +1240,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transformation kind &apos;{0}&apos; is not supported as a child transformation of kind &apos;{1}&apos;..
+        /// </summary>
+        internal static string NotSupportedChildTransformationKind {
+            get {
+                return ResourceManager.GetString("NotSupportedChildTransformationKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transformation kind {0} is not supported..
         /// </summary>
         internal static string NotSupportedTransformationKind {
@@ -1425,6 +1434,24 @@ namespace Microsoft.AspNetCore.OData {
         internal static string PropertyMustBeEnum {
             get {
                 return ResourceManager.GetString("PropertyMustBeEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property must be set..
+        /// </summary>
+        internal static string PropertyMustBeSet {
+            get {
+                return ResourceManager.GetString("PropertyMustBeSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;{0}&apos; property must be set when the &apos;{1}&apos; property is set..
+        /// </summary>
+        internal static string PropertyMustBeSetWhenAnotherPropertyIsSet {
+            get {
+                return ResourceManager.GetString("PropertyMustBeSetWhenAnotherPropertyIsSet", resourceCulture);
             }
         }
         
@@ -1814,7 +1841,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeRelated", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
         /// </summary>
@@ -1823,7 +1850,25 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeResourceSet", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not implement &apos;{1}&apos; interface..
+        /// </summary>
+        internal static string TypeMustImplementInterface {
+            get {
+                return ResourceManager.GetString("TypeMustImplementInterface", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from &apos;{1}&apos;..
+        /// </summary>
+        internal static string TypeMustInheritFromType {
+            get {
+                return ResourceManager.GetString("TypeMustInheritFromType", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; of dynamic property &apos;{1}&apos; is not supported..
         /// </summary>
