@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ public class CustomersController : ODataController
 
     [EnableQuery]
     [HttpGet("odata/Customers")]
-    public IAsyncEnumerable<Customer> Get()
+    public IAsyncEnumerable<Customer> CustomersForODataRoute()
     {
         return _context.Customers.AsAsyncEnumerable();
     }
@@ -50,6 +51,23 @@ public class CustomersController : ODataController
     public ActionResult<IAsyncEnumerable<Customer>> CustomersDataNew()
     {
         return Ok(_context.Customers.AsAsyncEnumerable());
+    }
+
+    [EnableQuery]
+    [HttpGet("v3/Customers")]
+    public IActionResult SearchCustomersForV3Route([FromQuery] Variant variant = Variant.None)
+    {
+        var asyncEnumerable = _context.Customers.AsAsyncEnumerable();
+        if (variant == Variant.Generic)
+        {
+            asyncEnumerable = GenericAsyncEnumerableWithDelay(asyncEnumerable, TimeSpan.FromSeconds(1));
+        }
+        else if (variant == Variant.Typed)
+        {
+            asyncEnumerable = TypedAsyncEnumerableWithDelay(asyncEnumerable, TimeSpan.FromSeconds(1));
+        }
+
+        return Ok(asyncEnumerable);
     }
 
     public async IAsyncEnumerable<Customer> CreateCollectionAsync<T>()
@@ -130,5 +148,30 @@ public class CustomersController : ODataController
         }
 
         _context.SaveChanges();
+    }
+
+    public enum Variant
+    {
+        None = 0,
+        Typed = 1,
+        Generic = 2,
+    }
+
+    private async IAsyncEnumerable<Customer> TypedAsyncEnumerableWithDelay(IAsyncEnumerable<Customer> asyncEnumerable, TimeSpan delay)
+    {
+        await foreach (var entity in asyncEnumerable)
+        {
+            await Task.Delay(delay);
+            yield return entity;
+        }
+    }
+
+    private async IAsyncEnumerable<TEntity> GenericAsyncEnumerableWithDelay<TEntity>(IAsyncEnumerable<TEntity> asyncEnumerable, TimeSpan delay)
+    {
+        await foreach (var entity in asyncEnumerable)
+        {
+            await Task.Delay(delay);
+            yield return entity;
+        }
     }
 }

@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -97,9 +98,8 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
             throw new SerializationException(Error.Format(SRResources.CannotSerializerNull, ResourceSet));
         }
 
-        if (writeContext.Type != null &&
-            writeContext.Type.IsGenericType &&
-            writeContext.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>) && 
+        if (writeContext.Type != null && 
+            IsAsyncEnumerableType(writeContext.Type) && 
             graph is IAsyncEnumerable<object> asyncEnumerable)
         {
             await WriteResourceSetAsync(asyncEnumerable, expectedType, writer, writeContext).ConfigureAwait(false);
@@ -778,5 +778,17 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
 
         string message = Error.Format(SRResources.CannotWriteType, typeof(ODataResourceSetSerializer).Name, resourceSetType.FullName());
         throw new SerializationException(message);
+    }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="Type"/> represents an <see cref="IAsyncEnumerable{T}"/> type.
+    /// </summary>
+    /// <param name="type">The <see cref="Type"/> to evaluate.</param>
+    /// <returns><see langword="true"/> if the specified <paramref name="type"/> is an <see cref="IAsyncEnumerable{T}"/> type;
+    /// otherwise, <see langword="false"/>.</returns>
+    private static bool IsAsyncEnumerableType(Type type)
+    {
+        return (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)) ||
+               (type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
     }
 }
