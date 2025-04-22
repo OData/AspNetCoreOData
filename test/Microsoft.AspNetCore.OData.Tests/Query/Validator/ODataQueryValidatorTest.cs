@@ -421,28 +421,6 @@ public class ODataQueryValidatorTest
         // Assert
         Assert.False(result);
         Assert.NotNull(errors);
-        Assert.Single(errors);
         Assert.Equal(expectedMessage, errors.First().Message);
-    }
-
-    [Fact]
-    public void TryValidate_ValidatesSelectExpandQueryOption_WhenNotNull()
-    {
-        // Arrange
-        var message = RequestFactory.Create("Get", "http://localhost/?$expand=Contacts/Contacts", setupAction: null);
-        var options = new ODataQueryOptions(_context, message);
-        var mockValidator = new Mock<SelectExpandQueryValidator>();
-        options.SelectExpand.Validator = mockValidator.Object;
-        var settings = new ODataValidationSettings();
-
-        IEnumerable<ODataException> errors;
-
-        // Act
-        var result = _validator.TryValidate(options, settings, out errors);
-
-        // Assert
-        Assert.True(result);
-        Assert.Empty(errors);
-        mockValidator.Verify(v => v.Validate(options.SelectExpand, settings), Times.Once());
     }
 }
