@@ -11272,6 +11272,17 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate all OData queries, including $skip, $top, $orderby and $filter, based on the given <paramref name="validationSettings"/>.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="errors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing validation
+            errors, if any occurred; otherwise, <see langword="null"/> if validation was successful or no validator is
+            configured.</param>
+            <returns><see langword="true"/> if the validation was successful or no validator is configured; otherwise, <see
+            langword="false"/> if validation failed.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.EnsureStableSortOrderBy(Microsoft.AspNetCore.OData.Query.OrderByQueryOption,Microsoft.AspNetCore.OData.Query.ODataQueryContext,System.Collections.Generic.List{System.String})">
             <summary>
             Ensures the given <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption"/> will produce a stable sort.
@@ -11865,6 +11876,15 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ComputeQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the $compute query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.CountQueryOption">
             <summary>
             Represents the value of the $count query option and exposes a way to retrieve the number of entities that satisfy a query.
@@ -11905,6 +11925,16 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance
             which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the count query based on the given <paramref name="validationSettings"/>.
+            It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.CountQueryOption.GetEntityCount(System.Linq.IQueryable)">
             <summary>
@@ -12038,6 +12068,15 @@
             Validate the filter query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.FilterQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the filter query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions">
             <summary>
@@ -12189,6 +12228,15 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.OrderByQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SearchQueryOption">
             <summary>
             This defines a $search OData query option for querying.
@@ -12241,6 +12289,15 @@
             Validate the $search query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SearchQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the $search query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption">
             <summary>
@@ -12325,6 +12382,15 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the $select and $expand query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption">
             <summary>
             This defines a $skip OData query option for querying.
@@ -12380,6 +12446,15 @@
             Validate the skip query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate validate the skip query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SkipTokenHandler">
             <summary>
@@ -12473,6 +12548,15 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the skiptoken query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.TopQueryOption">
             <summary>
             This defines a $top OData query option for querying.
@@ -12528,6 +12612,15 @@
             Validate the top query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.TopQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the top query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.SelectExpandIncludedProperty._propertySegment">
             <summary>
@@ -12618,6 +12711,16 @@
             <param name="computeQueryOption">The $compute query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption" />.
+            </summary>
+            <param name="computeQueryOption">The $compute query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption"/> 
@@ -12631,6 +12734,16 @@
             <param name="countQueryOption">The $count query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.CountQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption" />.
+            </summary>
+            <param name="countQueryOption"></param>
+            <param name="validationSettings"></param>
+            <param name="validationErrors">When this method returns, contains a collection of <see cref="T:Microsoft.OData.ODataException"/> instances describing any
+            validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" /> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -12642,6 +12755,15 @@
             </summary>
             <param name="filterQueryOption">The $filter query.</param>
             <param name="settings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" />.
+            </summary>
+            <param name="filterQueryOption">The $filter query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateFilter(Microsoft.OData.UriParser.FilterClause,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
@@ -12935,10 +13057,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates the OData query.
+            Validates the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption" />.
             </summary>
             <param name="computeQueryOption">The $compute query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.ComputeQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption" />.
+            </summary>
+            <param name="computeQueryOption">The $compute query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator">
             <summary>
@@ -12948,10 +13079,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.CountQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates the OData query.
+            Validates the <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption" />.
             </summary>
             <param name="countQueryOption">The $count query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.CountQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.CountQueryOption" />.
+            </summary>
+            <param name="countQueryOption"></param>
+            <param name="validationSettings"></param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator">
             <summary>
@@ -12961,10 +13101,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates the OData query.
+            Validates the <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" />.
             </summary>
             <param name="filterQueryOption">The $filter query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.FilterQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.FilterQueryOption" />.
+            </summary>
+            <param name="filterQueryOption">The $filter query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator">
             <summary>
@@ -12974,10 +13123,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates the OData query.
+            Validates the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions" />.
             </summary>
             <param name="options">The OData query options to validate.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions" />.
+            </summary>
+            <param name="options">The OData query options to validate.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">The collection of validation errors.</param>
+            <returns>True if the validation succeeded; otherwise, false.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator">
             <summary>
@@ -12992,6 +13150,15 @@
             <param name="orderByOption">The $orderby query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption" />.
+            </summary>
+            <param name="orderByOption">The $orderby query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator">
             <summary>
             Provides the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SearchQueryOption"/>
@@ -13000,10 +13167,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SearchQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates the OData $search query.
+            Validates the <see cref="T:Microsoft.AspNetCore.OData.Query.SearchQueryOption" />.
             </summary>
             <param name="searchQueryOption">The $search query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SearchQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SearchQueryOption" />.
+            </summary>
+            <param name="searchQueryOption"></param>
+            <param name="validationSettings"></param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator">
             <summary>
@@ -13013,10 +13189,19 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
-            Validates the OData query.
+            Validates the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/>
             </summary>
             <param name="selectExpandQueryOption">The $select and $expand query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/>.
+            </summary>
+            <param name="selectExpandQueryOption">The $select and $expand query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator">
             <summary>
@@ -13031,6 +13216,15 @@
             <param name="skipQueryOption">The $skip query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SkipQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption" />.
+            </summary>
+            <param name="skipQueryOption">The $skip query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator">
             <summary>
             Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption"/>
@@ -13043,6 +13237,15 @@
             </summary>
             <param name="skipToken">The $skiptoken query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption" />.
+            </summary>
+            <param name="skipToken">The $skiptoken query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator">
             <summary>
@@ -13057,6 +13260,15 @@
             <param name="topQueryOption">The $top query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.TopQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption" />.
+            </summary>
+            <param name="topQueryOption">The $top query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator">
             <summary>
             Represents a validator used to validate OData queries based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -13068,6 +13280,15 @@
             </summary>
             <param name="options">The OData query to validate.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Try validates the OData query.
+            </summary>
+            <param name="options">The OData query to validate.</param>
+            <param name="validationSettings">The settings used for validation.</param>
+            <param name="validationErrors">The collection of validation errors.</param>
+            <returns>True if validation is successful; otherwise, false.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings">
             <summary>
@@ -13172,6 +13393,15 @@
             </summary>
             <param name="orderByOption">The $orderby query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.OrderByQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.OrderByQueryOption" />.
+            </summary>
+            <param name="orderByOption">The $orderby query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator.ValidateOrderBy(Microsoft.OData.UriParser.OrderByClause,Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext)">
             <summary>
@@ -13485,6 +13715,15 @@
             <param name="selectExpandQueryOption">The $select and $expand query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/>.
+            </summary>
+            <param name="selectExpandQueryOption">The $select and $expand query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator.ValidateSelectExpand(Microsoft.OData.UriParser.SelectExpandClause,Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext)">
             <summary>
             Validates all select and expand items in $select and $expand.
@@ -13636,6 +13875,15 @@
             <param name="skipQueryOption">The $skip query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SkipQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SkipQueryOption" />.
+            </summary>
+            <param name="skipQueryOption">The $skip query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -13648,6 +13896,15 @@
             <param name="skipToken">The $skiptoken query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption" />.
+            </summary>
+            <param name="skipToken">The $skiptoken query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -13659,6 +13916,15 @@
             </summary>
             <param name="topQueryOption">The $top query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.TopQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{Microsoft.OData.ODataException}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.TopQueryOption" />.
+            </summary>
+            <param name="topQueryOption">The $top query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of <see cref="T:Microsoft.OData.ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1">
             <inheritdoc/>

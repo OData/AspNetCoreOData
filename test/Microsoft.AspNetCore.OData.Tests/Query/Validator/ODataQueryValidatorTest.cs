@@ -71,12 +71,43 @@ public class ODataQueryValidatorTest
     }
 
     [Fact]
+    public void TryValidate_ReturnsFalseAndErrors_WhenOptionsIsNull()
+    {
+        // Arrange
+        IEnumerable<ODataException> errors;
+
+        // Act
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.NotNull(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'options')", errors.First().Message);
+    }
+
+    [Fact]
     public void ValidateThrowsOnNullSettings()
     {
         var message = RequestFactory.Create();
 
         ExceptionAssert.Throws<ArgumentNullException>(() =>
             _validator.Validate(new ODataQueryOptions(_context, message), null));
+    }
+
+    [Fact]
+    public void TryValidate_ReturnsFalseAndErrors_WhenValidationSettingsIsNull()
+    {
+        // Arrange
+        var message = RequestFactory.Create();
+        IEnumerable<ODataException> errors;
+
+        // Act
+        var result = _validator.TryValidate(new ODataQueryOptions(_context, message), null, out errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.NotNull(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
     }
 
     [Fact]
@@ -155,6 +186,32 @@ public class ODataQueryValidatorTest
     [Theory]
     [MemberData(nameof(SupportedQueryOptions))]
     [MemberData(nameof(UnsupportedQueryOptions))]
+    public void AllowedQueryOptions_ReturnsFalseWithErrors_IfNotAllowed_UsingTryValidate(AllowedQueryOptions exclude, string query, string optionName)
+    {
+        // Arrange
+        var message = RequestFactory.Create("Get", "http://localhost/?" + query, setupAction: null);
+        var option = new ODataQueryOptions(_context, message);
+        var expectedMessage = string.Format(
+            "Query option '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.",
+            optionName);
+        var settings = new ODataValidationSettings()
+        {
+            AllowedQueryOptions = AllowedQueryOptions.All & ~exclude,
+        };
+
+        // Act
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.NotNull(errors);
+        Assert.Equal(expectedMessage, errors.First().Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(SupportedQueryOptions))]
+    [MemberData(nameof(UnsupportedQueryOptions))]
     public void AllowedQueryOptions_ThrowIfNoneAllowed(AllowedQueryOptions unused, string query, string optionName)
     {
         // Arrange
@@ -176,6 +233,35 @@ public class ODataQueryValidatorTest
 
     [Theory]
     [MemberData(nameof(SupportedQueryOptions))]
+    [MemberData(nameof(UnsupportedQueryOptions))]
+    public void TryValidate_ReturnsFalseAndErrors_WhenQueryOptionIsNotAllowed(AllowedQueryOptions unused, string query, string optionName)
+    {
+        // Arrange
+        var message = RequestFactory.Create("Get", "http://localhost/?" + query, setupAction: null);
+        var option = new ODataQueryOptions(_context, message);
+        var expectedMessage = string.Format(
+            "Query option '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.",
+            optionName);
+        var settings = new ODataValidationSettings()
+        {
+            AllowedQueryOptions = AllowedQueryOptions.None,
+        };
+
+        IEnumerable<ODataException> errors;
+
+        // Act
+        var result = _validator.TryValidate(option, settings, out errors);
+
+        // Assert
+        Assert.NotEqual(unused, settings.AllowedQueryOptions);
+        Assert.False(result);
+        Assert.NotNull(errors);
+        Assert.Equal(expectedMessage, errors.First().Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(SupportedQueryOptions))]
     public void SupportedQueryOptions_SucceedIfGroupAllowed(AllowedQueryOptions unused, string query, string unusedName)
     {
         // Arrange
@@ -190,6 +276,30 @@ public class ODataQueryValidatorTest
         Assert.NotEqual(unused, settings.AllowedQueryOptions);
         Assert.NotNull(unusedName);
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(SupportedQueryOptions))]
+    public void TryValidate_ReturnsTrue_WhenQueryOptionIsAllowed(AllowedQueryOptions unused, string query, string unusedName)
+    {
+        // Arrange
+        var message = RequestFactory.Create("Get", "http://localhost/?$" + query, setupAction: null);
+        var option = new ODataQueryOptions(_context, message);
+        var settings = new ODataValidationSettings()
+        {
+            AllowedQueryOptions = AllowedQueryOptions.Supported,
+        };
+
+        IEnumerable<ODataException> errors;
+
+        // Act
+        var result = _validator.TryValidate(option, settings, out errors);
+
+        // Act & Assert
+        Assert.NotEqual(unused, settings.AllowedQueryOptions);
+        Assert.NotNull(unusedName);
+        Assert.True(result);
+        Assert.Empty(errors);
     }
 
     [Theory]
@@ -287,5 +397,52 @@ public class ODataQueryValidatorTest
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [InlineData("$select=")]
+    [InlineData("$select=  ")]
+    [InlineData("$expand=")]
+    [InlineData("$expand=  ")]
+    [InlineData("$select=   &$expand=  &")]
+    public void TryValidate_ReturnsFalseAndErrors_WhenSelectExpandIsEmptyOrWhitespace(string query)
+    {
+        // Arrange
+        var message = RequestFactory.Create("Get", $"http://localhost/?{query}", setupAction: null);
+        var options = new ODataQueryOptions(_context, message);
+        var settings = new ODataValidationSettings();
+        var expectedMessage = "'select' and 'expand' cannot be empty or whitespace. Omit the parameter from the query if it is not used.";
+
+        IEnumerable<ODataException> errors;
+
+        // Act
+        var result = _validator.TryValidate(options, settings, out errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.NotNull(errors);
+        Assert.Single(errors);
+        Assert.Equal(expectedMessage, errors.First().Message);
+    }
+
+    [Fact]
+    public void TryValidate_ValidatesSelectExpandQueryOption_WhenNotNull()
+    {
+        // Arrange
+        var message = RequestFactory.Create("Get", "http://localhost/?$expand=Contacts/Contacts", setupAction: null);
+        var options = new ODataQueryOptions(_context, message);
+        var mockValidator = new Mock<SelectExpandQueryValidator>();
+        options.SelectExpand.Validator = mockValidator.Object;
+        var settings = new ODataValidationSettings();
+
+        IEnumerable<ODataException> errors;
+
+        // Act
+        var result = _validator.TryValidate(options, settings, out errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+        mockValidator.Verify(v => v.Validate(options.SelectExpand, settings), Times.Once());
     }
 }

@@ -245,6 +245,31 @@ public class OrderByQueryOption
         }
     }
 
+    /// <summary>
+    /// Attempts to validate the orderby query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+    /// </summary>
+    /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        if (validationSettings == null)
+        {
+            List<ODataException> errors = new List<ODataException> { new(Error.ArgumentNull(nameof(validationSettings)).Message) };
+            validationErrors = errors;
+            return false;
+        }
+
+        validationErrors = Enumerable.Empty<ODataException>();
+        if (Validator != null)
+        {
+            Validator.TryValidate(this, validationSettings, out validationErrors);
+        }
+
+        return !validationErrors.Any();
+    }
+
     private IOrderedQueryable ApplyToCore(IQueryable query, ODataQuerySettings querySettings)
     {
         if (Context.ElementClrType == null)

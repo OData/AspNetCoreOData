@@ -5,8 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Microsoft.OData;
-using Microsoft.OData.ModelBuilder.Config;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
@@ -40,5 +40,40 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
                 throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="SkipTokenQueryOption" />.
+    /// </summary>
+    /// <param name="skipToken">The $skiptoken query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        List<ODataException> errors = new List<ODataException>();
+
+        if (skipToken == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(skipToken)).Message));
+        }
+
+        if (validationSettings == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+        }
+
+        if (skipToken?.Context != null)
+        {
+            DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
+            if (!defaultConfigs.EnableSkipToken)
+            {
+                errors.Add(new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions")));
+            }
+        }
+
+        // If there are any errors, return false
+        validationErrors = errors;
+        return errors.Count == 0;
     }
 }

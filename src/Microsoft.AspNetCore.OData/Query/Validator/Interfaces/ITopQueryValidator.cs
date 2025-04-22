@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Microsoft.OData;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -19,4 +22,13 @@ public interface ITopQueryValidator
     /// <param name="topQueryOption">The $top query.</param>
     /// <param name="validationSettings">The validation settings.</param>
     void Validate(TopQueryOption topQueryOption, ODataValidationSettings validationSettings);
+
+    /// <summary>
+    /// Attempts to validate the <see cref="TopQueryOption" />.
+    /// </summary>
+    /// <param name="topQueryOption">The $top query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    bool TryValidate(TopQueryOption topQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors);
 }

@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -26,12 +28,12 @@ public class OrderByQueryValidator : IOrderByQueryValidator
     {
         if (orderByOption == null)
         {
-            throw Error.ArgumentNull("orderByOption");
+            throw Error.ArgumentNull(nameof(orderByOption));
         }
 
         if (validationSettings == null)
         {
-            throw Error.ArgumentNull("validationSettings");
+            throw Error.ArgumentNull(nameof(validationSettings));
         }
 
         OrderByValidatorContext validatorContext = new OrderByValidatorContext
@@ -53,6 +55,66 @@ public class OrderByQueryValidator : IOrderByQueryValidator
 
             clause = clause.ThenBy;
         }
+    }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="OrderByQueryOption" />.
+    /// </summary>
+    /// <param name="orderByOption">The $orderby query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        List<ODataException> errors = new List<ODataException>();
+
+        if (orderByOption == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(orderByOption)).Message));
+        }
+
+        if (validationSettings == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+        }
+
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
+        OrderByValidatorContext validatorContext = new OrderByValidatorContext
+        {
+            OrderBy = orderByOption,
+            Context = orderByOption.Context,
+            ValidationSettings = validationSettings,
+            Property = orderByOption.Context.TargetProperty,
+            StructuredType = orderByOption.Context.TargetStructuredType,
+            CurrentDepth = 0
+        };
+
+        OrderByClause clause = orderByOption.OrderByClause;
+        while (clause != null)
+        {
+            try
+            {
+                validatorContext.IncrementNodeCount();
+
+                ValidateOrderBy(clause, validatorContext);
+            }
+            catch(Exception ex)
+            {
+                errors.Add(new ODataException(ex.Message));
+            }
+
+            clause = clause.ThenBy;
+        }
+
+        // If there are any errors, return false
+        validationErrors = errors;
+        return errors.Count == 0;
     }
 
     /// <summary>

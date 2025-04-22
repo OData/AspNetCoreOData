@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query;
@@ -123,13 +124,39 @@ public class CountQueryOption
     {
         if (validationSettings == null)
         {
-            throw Error.ArgumentNull("validationSettings");
+            throw Error.ArgumentNull(nameof(validationSettings));
         }
 
         if (Validator != null)
         {
             Validator.Validate(this, validationSettings);
         }
+    }
+
+    /// <summary>
+    /// Attempts to validate the count query based on the given <paramref name="validationSettings"/>.
+    /// It throws an ODataException if validation failed.
+    /// </summary>
+    /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        if (validationSettings == null)
+        {
+            List<ODataException> errors = new List<ODataException> { new(Error.ArgumentNull(nameof(validationSettings)).Message) };
+            validationErrors = errors;
+            return false;
+        }
+
+        validationErrors = Enumerable.Empty<ODataException>();
+        if (Validator != null)
+        {
+            Validator.TryValidate(this, validationSettings, out validationErrors);
+        }
+
+        return !validationErrors.Any();
     }
 
     /// <summary>

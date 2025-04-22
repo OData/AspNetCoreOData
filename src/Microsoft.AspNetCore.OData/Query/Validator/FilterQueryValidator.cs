@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
@@ -47,6 +49,61 @@ public class FilterQueryValidator : IFilterQueryValidator
         };
 
         ValidateFilter(filterQueryOption.FilterClause, validatorContext);
+    }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="FilterQueryOption" />.
+    /// </summary>
+    /// <param name="filterQueryOption">The $filter query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        List<ODataException> errors = new List<ODataException>();
+
+        // Validate input parameters
+        if (filterQueryOption == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(filterQueryOption)).Message));
+        }
+
+        if (validationSettings == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+        }
+
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
+        // Create a validation context
+        var validatorContext = new FilterValidatorContext
+        {
+            Filter = filterQueryOption,
+            Context = filterQueryOption.Context,
+            ValidationSettings = validationSettings,
+            Property = filterQueryOption.Context.TargetProperty,
+            StructuredType = filterQueryOption.Context.TargetStructuredType,
+            CurrentDepth = 0
+        };
+
+        // Validate the filter clause
+        try
+        {
+            ValidateFilter(filterQueryOption.FilterClause, validatorContext);
+        }
+        catch (Exception ex)
+        {
+            errors.Add(new ODataException(ex.Message));
+        }
+
+        // Set the output parameter
+        validationErrors = errors;
+        return errors.Count == 0;
     }
 
     /// <summary>

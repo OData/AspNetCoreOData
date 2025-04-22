@@ -72,6 +72,75 @@ public class SelectExpandQueryValidator : ISelectExpandQueryValidator
     }
 
     /// <summary>
+    /// Attempts to validate the <see cref="SelectExpandQueryOption"/>.
+    /// </summary>
+    /// <param name="selectExpandQueryOption">The $select and $expand query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        List<ODataException> errors = new List<ODataException>();
+        
+        if (selectExpandQueryOption == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(selectExpandQueryOption)).Message));
+        }
+
+        if (validationSettings == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+        }
+
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
+        SelectExpandValidatorContext validatorContext = new SelectExpandValidatorContext
+        {
+            SelectExpand = selectExpandQueryOption,
+            Context = selectExpandQueryOption.Context,
+            ValidationSettings = validationSettings,
+            Property = selectExpandQueryOption.Context.TargetProperty,
+            StructuredType = selectExpandQueryOption.Context.TargetStructuredType,
+            CurrentDepth = 0
+        };
+
+        try
+        {
+            ValidateSelectExpand(selectExpandQueryOption.SelectExpandClause, validatorContext);
+
+            if (validationSettings.MaxExpansionDepth > 0)
+            {
+                if (selectExpandQueryOption.LevelsMaxLiteralExpansionDepth < 0)
+                {
+                    selectExpandQueryOption.LevelsMaxLiteralExpansionDepth = validationSettings.MaxExpansionDepth;
+                }
+                else if (selectExpandQueryOption.LevelsMaxLiteralExpansionDepth > validationSettings.MaxExpansionDepth)
+                {
+                    throw new ODataException(Error.Format(
+                        SRResources.InvalidExpansionDepthValue,
+                        "LevelsMaxLiteralExpansionDepth",
+                        "MaxExpansionDepth"));
+                }
+
+                ValidateDepth(selectExpandQueryOption.SelectExpandClause, validationSettings.MaxExpansionDepth);
+            }
+        }
+        catch (Exception ex)
+        {
+            errors.Add(new ODataException(ex.Message));
+        }
+
+        // If there are any errors, return false
+        validationErrors = errors;
+        return errors.Count == 0;
+    }
+
+    /// <summary>
     /// Validates all select and expand items in $select and $expand.
     /// For example, ~/Customers?$expand=Nav($expand=subNav;$select=Prop;$top=2)&amp;$select=Addresses($select=City;$top=1)
     /// </summary>

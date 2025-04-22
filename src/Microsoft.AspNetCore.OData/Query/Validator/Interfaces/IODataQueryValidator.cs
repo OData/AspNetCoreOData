@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Microsoft.OData;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -14,9 +17,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator;
 public interface IODataQueryValidator
 {
     /// <summary>
-    /// Validates the OData query.
+    /// Validates the <see cref="ODataQueryOptions" />.
     /// </summary>
     /// <param name="options">The OData query options to validate.</param>
     /// <param name="validationSettings">The validation settings.</param>
     void Validate(ODataQueryOptions options, ODataValidationSettings validationSettings);
+
+    /// <summary>
+    /// Attempts to validate the <see cref="ODataQueryOptions" />.
+    /// </summary>
+    /// <param name="options">The OData query options to validate.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">The collection of validation errors.</param>
+    /// <returns>True if the validation succeeded; otherwise, false.</returns>
+    bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors);
 }

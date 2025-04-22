@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Microsoft.OData;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -14,9 +17,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator;
 public interface ISearchQueryValidator
 {
     /// <summary>
-    /// Validates the OData $search query.
+    /// Validates the <see cref="SearchQueryOption" />.
     /// </summary>
     /// <param name="searchQueryOption">The $search query.</param>
     /// <param name="validationSettings">The validation settings.</param>
     void Validate(SearchQueryOption searchQueryOption, ODataValidationSettings validationSettings);
+
+    /// <summary>
+    /// Attempts to validate the <see cref="SearchQueryOption" />.
+    /// </summary>
+    /// <param name="searchQueryOption"></param>
+    /// <param name="validationSettings"></param>
+    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    bool TryValidate(SearchQueryOption searchQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors);
 }

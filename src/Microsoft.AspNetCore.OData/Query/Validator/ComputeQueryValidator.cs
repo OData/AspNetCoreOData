@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using Microsoft.OData;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -35,4 +38,37 @@ public class ComputeQueryValidator : IComputeQueryValidator
         // however, developer can override this method add his own rules
         _ = computeQueryOption.ComputeClause;
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="ComputeQueryOption" />.
+    /// </summary>
+    /// <param name="computeQueryOption">The $compute query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        List<ODataException> errors = new List<ODataException>();
+
+        if (computeQueryOption == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(computeQueryOption)).Message));
+        }
+
+        if (validationSettings == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+        }
+
+        // so far, we don't have validation rules here for $compute
+        // because 'DefaultQuerySetting' doesn't have configuration for $compute
+        // we can only let ODL to parse and verify the compute clause,
+        // however, developer can override this method add his own rules
+        _ = computeQueryOption.ComputeClause;
+
+        validationErrors = errors;
+        return errors.Count == 0;
+    }
+
 }

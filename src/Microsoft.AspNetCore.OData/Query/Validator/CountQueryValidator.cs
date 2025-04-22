@@ -6,7 +6,9 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -56,5 +58,57 @@ public class CountQueryValidator : ICountQueryValidator
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="CountQueryOption" />.
+    /// </summary>
+    /// <param name="countQueryOption"></param>
+    /// <param name="validationSettings"></param>
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(CountQueryOption countQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    {
+        List<ODataException> errors = new List<ODataException>();
+
+        if (countQueryOption == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(countQueryOption)).Message));
+        }
+
+        if (validationSettings == null)
+        {
+            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+        }
+
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
+        ODataPath path = countQueryOption.Context.Path;
+
+        if (path != null && path.Count > 0)
+        {
+            IEdmProperty property = countQueryOption.Context.TargetProperty;
+            IEdmStructuredType structuredType = countQueryOption.Context.TargetStructuredType;
+            string name = countQueryOption.Context.TargetName;
+            if (EdmHelpers.IsNotCountable(property, structuredType,
+                countQueryOption.Context.Model,
+                countQueryOption.Context.DefaultQueryConfigurations.EnableCount))
+            {
+                string errorMessage = property == null
+                    ? Error.Format(SRResources.NotCountableEntitySetUsedForCount, name)
+                    : Error.Format(SRResources.NotCountablePropertyUsedForCount, name);
+
+                errors.Add(new ODataException(errorMessage));
+            }
+        }
+
+        validationErrors = errors;
+        return errors.Count == 0;
     }
 }
