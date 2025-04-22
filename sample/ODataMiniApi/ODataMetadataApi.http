@@ -27,12 +27,12 @@ GET {{ODataMiniApi_HostAddress}}/v1/$document
 //}
 
 ###
-GET {{ODataMiniApi_HostAddress}}/v1/$document1
+GET {{ODataMiniApi_HostAddress}}/v2/$document
 
 ##
 // The above request gets the following result (has customized context URL)
 //{
-//  "@odata.context": "http://localhost:5177/v1/$metadata",
+//  "@odata.context": "http://localhost:5177/v2/$metadata",
 //  "value": [
 //    {
 //      "name": "Schools",

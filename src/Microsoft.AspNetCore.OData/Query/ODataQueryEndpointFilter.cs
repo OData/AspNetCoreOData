@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
@@ -225,19 +226,17 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
             // response is not a collection; we only support $select and $expand on single entities.
             ValidateSelectExpandOnly(queryOptions);
 
-            //if (singleResultCollection == null)
-            //{
-            //    // response is a single entity.
-            //    return ApplyQuery(entity: responseValue, queryOptions: queryOptions);
-            //}
-            //else
-            //{
-            //    IQueryable queryable = singleResultCollection as IQueryable;
-            //    queryable = ApplyQuery(queryable, queryOptions);
-            //    return SingleOrDefault(queryable, actionDescriptor);
-            //}
-
-            return responseValue;
+            if (singleResultCollection == null)
+            {
+                // response is a single entity.
+                return ApplyQuery(entity: responseValue, queryOptions: queryOptions, querySettings);
+            }
+            else
+            {
+                IQueryable queryable = singleResultCollection as IQueryable;
+                queryable = ApplyQuery(queryable, queryOptions, querySettings);
+                return SingleOrDefault(queryable, context);
+            }
         }
         else
         {
@@ -259,6 +258,42 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
             || queryOptions.Skip != null || queryOptions.Top != null)
         {
             throw new ODataException(Error.Format(SRResources.NonSelectExpandOnSingleEntity));
+        }
+    }
+
+    /// <summary>
+    /// Get a single or default value from a collection.
+    /// </summary>
+    /// <param name="queryable">The response value as <see cref="IQueryable"/>.</param>
+    /// <param name="context">The context.</param>
+    /// <returns></returns>
+    internal static object SingleOrDefault(IQueryable queryable, ODataQueryFilterInvocationContext context)
+    {
+        var enumerator = queryable.GetEnumerator();
+        try
+        {
+            var result = enumerator.MoveNext() ? enumerator.Current : null;
+
+            if (enumerator.MoveNext())
+            {
+                throw new InvalidOperationException(Error.Format(
+                    SRResources.SingleResultHasMoreThanOneEntity,
+                    context.MethodInfo.Name,
+                    "MinimalAPI",
+                    "SingleResult"));
+            }
+
+            return result;
+        }
+        finally
+        {
+            // Ensure any active/open database objects that were created
+            // iterating over the IQueryable object are properly closed.
+            var disposable = enumerator as IDisposable;
+            if (disposable != null)
+            {
+                disposable.Dispose();
+            }
         }
     }
 

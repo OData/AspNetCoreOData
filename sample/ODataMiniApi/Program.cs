@@ -95,8 +95,10 @@ app.MapGet("/", () =>
 //app.MapODataMetadata("/customized/$odata", model, new CustomizedMetadataHandler());
 
 app.MapODataServiceDocument("v1/$document", model);
-app.MapODataServiceDocument("v1/$document1", model)
-    .WithODataBaseAddressFactory(c => new Uri("http://localhost:5177/v1"));
+
+app.MapODataServiceDocument("v2/$document", model)
+    .WithODataBaseAddressFactory(c => new Uri("http://localhost:5177/v2"));
+
 app.MapODataMetadata("v1/$metadata", model);
 
 #endregion
@@ -162,3 +164,8 @@ app.MapStudentEndpoints();
 
 app.Run();
 
+/// <summary>
+/// This is required in E2E test to identify the assembly.
+/// </summary>
+public partial class Program
+{ }

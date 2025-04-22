@@ -2465,22 +2465,6 @@
             <param name="operation">The operation for which the operation link is to be generated.</param>
             <param name="operationLinkBuilder">The <see cref="T:Microsoft.AspNetCore.OData.Edm.OperationLinkBuilder"/> to set.</param>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata">
-            <summary>
-            Represents Edm model metadata used during OData query.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata.#ctor(Microsoft.OData.Edm.IEdmModel)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata" /> class.
-            </summary>
-            <param name="model">The Edm model.</param>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Edm.EdmModelMetadata.Model">
-            <summary>
-            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
-            </summary>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EntitySelfLinks">
             <summary>
             EntitySelfLinks contains the Id, Edit and Read links for an entity.
@@ -2530,16 +2514,6 @@
         <member name="P:Microsoft.AspNetCore.OData.Edm.ExpandModelPath.ExpandPath">
             <summary>
             Gets the whole expand path.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.Edm.IEdmModelMetadata">
-            <summary>
-            Represents the Edm model metadata used during OData query.
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Edm.IEdmModelMetadata.Model">
-            <summary>
-            Gets the <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration">
@@ -6693,7 +6667,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryConfigurations">
             <summary>
-            Gets the query configurations. for example enable '$select' or not.
+            Gets the query configurations. for example, enable '$select' or not.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.Version">
@@ -6716,71 +6690,71 @@
             Config whether or not no '$' sign query option.
             </summary>
             <param name="enableNoDollarQueryOptions">Case insensitive or not.</param>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetCaseInsensitive(System.Boolean)">
             <summary>
             Config the case insensitive.
             </summary>
             <param name="enableCaseInsensitive">Case insensitive or not.</param>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetVersion(Microsoft.OData.ODataVersion)">
             <summary>
             Config the OData version.
             </summary>
             <param name="version">The OData version.</param>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableAll(System.Nullable{System.Int32})">
             <summary>
             Enables all OData query options.
             </summary>
             <param name="maxTopValue"></param>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Expand">
             <summary>
             Enable $expand query options.
             </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Select">
             <summary>
             Enable $select query options.
             </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Filter">
             <summary>
             Enable $filter query options.
             </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.OrderBy">
             <summary>
             Enable $orderby query options.
             </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Count">
             <summary>
             Enable $count query options.
             </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SkipToken">
             <summary>
             Enable $skiptoken query option.
             </summary>
-            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(System.Nullable{System.Int32})">
              <summary>
             Sets the maximum value of $top that a client can request.
              </summary>
              <param name="maxTopValue">The maximum value of $top that a client can request.</param>
-             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable further configuration.</returns>
+             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions">
             <summary>
@@ -8812,12 +8786,6 @@
             <summary>
             This class describes the default configurations to use during query composition.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.EnableAll">
-            <summary>
-            Enable all query options.
-            </summary>
-            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute">
             <summary>
@@ -10992,6 +10960,14 @@
             </summary>
             <param name="queryOptions">The query options.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.SingleOrDefault(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Get a single or default value from a collection.
+            </summary>
+            <param name="queryable">The response value as <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">The context.</param>
+            <returns></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Object,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
             <summary>
             Applies the query to the given entity based on incoming query from uri and query settings.
@@ -11012,6 +10988,7 @@
             <param name="queryOptions">
             The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
             </param>
+            <param name="querySettings">The settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetODataQueryContext(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
             <summary>
