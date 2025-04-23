@@ -57,21 +57,26 @@ internal class PageResultConverter<TEntity> : JsonConverter<PageResult<TEntity>>
     public override void Write(Utf8JsonWriter writer, PageResult<TEntity> value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        writer.WritePropertyName("items");
+        writer.WritePropertyName(ConvertName(options, "items"));
         JsonSerializer.Serialize(writer, value.Items, options);
 
         if (value.NextPageLink != null)
         {
-            writer.WritePropertyName("nextpagelink");
+            writer.WritePropertyName(ConvertName(options, "nextpagelink"));
             writer.WriteStringValue(value.NextPageLink.OriginalString);
         }
 
         if (value.Count != null)
         {
-            writer.WritePropertyName("count");
+            writer.WritePropertyName(ConvertName(options, "count"));
             writer.WriteNumberValue(value.Count.Value);
         }
 
         writer.WriteEndObject();
     }
+
+    private static string ConvertName(JsonSerializerOptions options, string name)
+        => options != null && options.PropertyNamingPolicy != null
+        ? options.PropertyNamingPolicy.ConvertName(name)
+        : name;
 }
