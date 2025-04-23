@@ -145,7 +145,7 @@ public static class ODataEndpointConventionBuilderExtensions
             object result = await next(invocationContext);
 
             // If it's null or if it's already the ODataResult, simply do nothing
-            if (result is null || result is ODataResult)
+            if (result is null || result is ODataResult || result is ODataMetadataResult || result is ODataServiceDocumentResult)
             {
                 return result;
             }
