@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
@@ -116,7 +117,7 @@ internal class ODataResult : IODataResult, IResult
         ODataVersion version = GetODataVersion(request, metadata);
 
         // Add version header.
-        response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(version);
+        WriteResponseHeaders(httpContext, metadata, version);
 
         await ODataOutputFormatterHelper.WriteToStreamAsync(
             type,
@@ -128,6 +129,12 @@ internal class ODataResult : IODataResult, IResult
             request,
             request.Headers,
             serializerProvider).ConfigureAwait(false);
+    }
+
+    private void WriteResponseHeaders(HttpContext context, ODataMiniMetadata metadata, ODataVersion version)
+    {
+        context.Response.Headers[HeaderNames.ContentType] = "application/json";
+        context.Response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(version);
     }
 
     private Uri GetBaseAddress(HttpContext httpContext, ODataMiniMetadata options)
