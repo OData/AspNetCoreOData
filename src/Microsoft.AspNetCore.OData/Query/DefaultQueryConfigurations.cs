@@ -16,4 +16,16 @@ public class DefaultQueryConfigurations : DefaultQuerySettings
 {
     // We will add other query settings, for example, $compute, $search here
     // In the next major release, we should remove the inheritance from 'DefaultQuerySettings'.
+
+    internal DefaultQueryConfigurations UpdateAll(DefaultQueryConfigurations options)
+    {
+        EnableExpand = options.EnableExpand;
+        EnableSelect = options.EnableSelect;
+        EnableFilter = options.EnableFilter;
+        EnableOrderBy = options.EnableOrderBy;
+        EnableCount = options.EnableCount;
+        EnableSkipToken = options.EnableSkipToken;
+        MaxTop = options.MaxTop;
+        return this;
+    }
 }
