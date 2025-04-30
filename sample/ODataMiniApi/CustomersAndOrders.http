@@ -52,3 +52,13 @@ GET {{ODataMiniApi_HostAddress}}/v0/?$filter=amount%20gt%2015
 GET {{ODataMiniApi_HostAddress}}/v1/orders?$filter=amount%20gt%2015
 ###
 GET {{ODataMiniApi_HostAddress}}/v2/orders?$filter=amount%20gt%2015
+
+
+###
+
+PATCH {{ODataMiniApi_HostAddress}}/v1/customers/1
+Content-Type: application/json 
+
+{ 
+  "name": "kerry"
+} 

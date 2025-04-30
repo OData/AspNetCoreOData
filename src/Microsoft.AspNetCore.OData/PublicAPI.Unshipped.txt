@@ -67,6 +67,7 @@ static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapOD
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataBaseAddressFactory<TBuilder>(this TBuilder builder, System.Func<Microsoft.AspNetCore.Http.HttpContext, System.Uri> baseAddressFactory) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataModel<TBuilder>(this TBuilder builder, Microsoft.OData.Edm.IEdmModel model) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataOptions<TBuilder>(this TBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataMiniOptions> setupAction) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataPathFactory<TBuilder>(this TBuilder builder, System.Func<Microsoft.AspNetCore.Http.HttpContext, System.Type, Microsoft.OData.UriParser.ODataPath> pathFactory) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataResult<TBuilder>(this TBuilder builder) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices<TBuilder>(this TBuilder builder, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> services) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion<TBuilder>(this TBuilder builder, Microsoft.OData.ODataVersion version) -> TBuilder

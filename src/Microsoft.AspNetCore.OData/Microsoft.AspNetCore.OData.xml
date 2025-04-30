@@ -1776,6 +1776,14 @@
             </summary>
             <param name="original">The entity to be updated.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
             <summary>
             Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
@@ -6654,6 +6662,14 @@
             </summary>
             <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
             <param name="baseAddressFactory">The base address factory which is used to calculate the base address for OData payload.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataPathFactory``1(``0,System.Func{Microsoft.AspNetCore.Http.HttpContext,System.Type,Microsoft.OData.UriParser.ODataPath})">
+            <summary>
+            Adds the path factory to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="pathFactory">The path factory which is used to calculate the OData path associated with current endpoint.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion``1(``0,Microsoft.OData.ODataVersion)">
