@@ -6,11 +6,12 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace ODataMiniApi.Students;
 
@@ -73,7 +74,7 @@ public static class CustomersEndpoints
         //    return Results.Extensions.AsOData(db.Customers.Include(s => s.Orders));
         //})
         //    .AddODataQueryEndpointFilter()
-            
+
         //    //.WithODataModel(model)
         //    ;
 
@@ -84,6 +85,32 @@ public static class CustomersEndpoints
         //    db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         //    return db.Customers.Include(s => s.Orders);
         //});
+
+        app.MapPatch("v1/customers/{id}", (AppDb db, int id, Delta<Customer> delta) =>
+        {
+            Customer customer = db.Customers.FirstOrDefault(s => s.Id == id);
+            if (customer == null)
+            {
+                return null; // should return Results.NotFound();
+            };
+
+            delta.Patch(customer);
+
+            return customer;
+        })
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataPathFactory(
+                (h, t) =>
+                {
+                    string idStr = h.GetRouteValue("id") as string;
+                    int id = int.Parse(idStr);
+                    IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
+
+                    IDictionary<string, object> keysValues = new Dictionary<string, object>();
+                    keysValues["Id"] = id;
+                    return new ODataPath(new EntitySetSegment(customers), new KeySegment(keysValues, customers.EntityType, customers));
+                });
         return app;
     }
 

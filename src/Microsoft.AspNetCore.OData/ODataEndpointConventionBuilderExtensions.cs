@@ -8,21 +8,17 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Batch;
-using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData;
 
@@ -237,6 +233,20 @@ public static class ODataEndpointConventionBuilderExtensions
         ArgumentNullException.ThrowIfNull(baseAddressFactory, nameof(baseAddressFactory));
 
         builder.Add(b => ConfigureODataMetadata(b, m => m.BaseAddressFactory = baseAddressFactory));
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds the path factory to <see cref="Endpoint.Metadata" /> associated with the current endpoint.
+    /// </summary>
+    /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
+    /// <param name="pathFactory">The path factory which is used to calculate the OData path associated with current endpoint.</param>
+    /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+    public static TBuilder WithODataPathFactory<TBuilder>(this TBuilder builder, Func<HttpContext, Type, ODataPath> pathFactory) where TBuilder : IEndpointConventionBuilder
+    {
+        ArgumentNullException.ThrowIfNull(pathFactory, nameof(pathFactory));
+
+        builder.Add(b => ConfigureODataMetadata(b, m => m.PathFactory = pathFactory));
         return builder;
     }
 
