@@ -13,6 +13,7 @@ public class DollarSearchDataSource
 {
     private static IList<SearchProduct> _products;
     private static IList<SearchCategory> _categories;
+    private static IList<SearchTag> _tags;
 
     static DollarSearchDataSource()
     {
@@ -22,6 +23,8 @@ public class DollarSearchDataSource
     public static IList<SearchProduct> Products => _products;
 
     public static IList<SearchCategory> Category => _categories;
+
+    public static IList<SearchTag> Tags => _tags;
 
     private static void GenerateProducts()
     {
@@ -42,13 +45,29 @@ public class DollarSearchDataSource
             new SearchCategory { Id = 3, Name = "Device" },
         };
 
+        _tags = [
+            new SearchTag { Id = 1, Name = "Telemetry", Description ="Data collected from product usage" },
+            new SearchTag { Id = 2, Name = "Privacy", Description ="Indicates privacy-sensitive content" },
+            new SearchTag { Id = 3, Name = "SDK", Description ="Related to software development kits" },
+            new SearchTag { Id = 4, Name = "Deprecated", Description ="No longer in use" },
+        ];
+
         _products[0].Category = _categories[0];
+        _products[0].Tags = [_tags[0], _tags[2], _tags[3]];
+
         _products[2].Category = _categories[0];
+        _products[2].Tags = [_tags[1], _tags[2], _tags[3]];
 
         _products[1].Category = _categories[1];
+        _products[1].Tags = [_tags[1], _tags[2]];
+
         _products[4].Category = _categories[1];
+        _products[4].Tags = [_tags[0], _tags[1]];
 
         _products[3].Category = _categories[2];
+        _products[3].Tags = [_tags[2], _tags[3]];
+
         _products[5].Category = _categories[2];
+        _products[5].Tags = [_tags[0], _tags[2]];
     }
 }

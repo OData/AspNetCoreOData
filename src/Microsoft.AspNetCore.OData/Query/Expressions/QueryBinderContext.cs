@@ -121,6 +121,8 @@ public class QueryBinderContext
 
         IsNested = true;
         EnableSkipToken = context.EnableSkipToken;
+        AssembliesResolver = context.AssembliesResolver;
+        SearchBinder = context.SearchBinder;
     }
 
     /// <summary>
@@ -142,6 +144,11 @@ public class QueryBinderContext
     /// Gets or sets the assembly resolver.
     /// </summary>
     public IAssemblyResolver AssembliesResolver { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="ISearchBinder"/>.
+    /// </summary>
+    public ISearchBinder SearchBinder { get; set; }
 
     /// <summary>
     /// Gets the compute expressions.

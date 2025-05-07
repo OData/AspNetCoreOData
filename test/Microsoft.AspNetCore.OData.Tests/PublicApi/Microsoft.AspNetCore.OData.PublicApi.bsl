@@ -2917,6 +2917,11 @@ public sealed class Microsoft.AspNetCore.OData.Query.Expressions.BinderExtension
 	[
 	ExtensionAttribute(),
 	]
+	public static System.Linq.Expressions.Expression ApplyBind (Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder binder, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.SearchClause searchClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static System.Linq.IQueryable ApplyBind (Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder binder, System.Linq.IQueryable source, Microsoft.OData.UriParser.SearchClause searchClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 
 	[
@@ -3005,6 +3010,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext {
 	Microsoft.OData.Edm.IEdmModel Model  { public get; }
 	Microsoft.OData.Edm.IEdmNavigationSource NavigationSource  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.ODataQuerySettings QuerySettings  { public get; }
+	Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder SearchBinder  { public get; public set; }
 	System.Linq.Expressions.Expression Source  { public get; public set; }
 	System.Type TransformationElementType  { public get; }
 
@@ -3023,7 +3029,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 	public virtual System.Linq.Expressions.Expression BindSelectExpand (Microsoft.OData.UriParser.SelectExpandClause selectExpandClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual void BuildDynamicProperty (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType structuredType, System.Collections.Generic.IList`1[[Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression]] includedProperties)
 	public virtual System.Linq.Expressions.Expression CreatePropertyNameExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source)
-	public virtual System.Linq.Expressions.Expression CreatePropertyValueExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause, params Microsoft.OData.UriParser.ComputeClause computeClause)
+	public virtual System.Linq.Expressions.Expression CreatePropertyValueExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmProperty edmProperty, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.FilterClause filterClause, params Microsoft.OData.UriParser.ComputeClause computeClause, params Microsoft.OData.UriParser.SearchClause search)
 	public virtual System.Linq.Expressions.Expression CreateTotalCountExpression (Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context, System.Linq.Expressions.Expression source, System.Nullable`1[[System.Boolean]] countOption)
 	public virtual System.Linq.Expressions.Expression CreateTypeNameExpression (System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmModel model)
 }

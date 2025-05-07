@@ -191,9 +191,58 @@ public class DollarSearchTests : WebApiTestBase<DollarSearchTests>
           "]}", payloadBody);
     }
 
-    private static int[] GetIds(JObject payload)
+    [Fact]
+    public async Task QueryForProductsForNestedNavigationProperty_WithoutDollarSearchBinder()
     {
-        JArray value = payload["value"] as JArray;
+        // Arrange
+        string queryUrl = $"odata/Products/1?$expand=Tags($select=Name)&$select=Id";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+        HttpClient client = CreateClient();
+        HttpResponseMessage response;
+
+        // Act
+        response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        string payloadBody = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal("{\"Id\":1,\"Tags\":[{\"Name\":\"Telemetry\"},{\"Name\":\"SDK\"},{\"Name\":\"Deprecated\"}]}", payloadBody);
+    }
+
+    [Theory]
+    [InlineData("$expand=Tags($search=SDK)", new[] { 3 })]
+    [InlineData("$expand=Tags($search=NOT SDK)", new[] { 1, 4 })]
+    public async Task QueryForProducts_IncludesDollarSearchOnNavigation_OnName(string query, int[] ids)
+    {
+        // Arrange
+        string queryUrl = $"odata/Products/1?{query}";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+        HttpClient client = CreateClient();
+        HttpResponseMessage response;
+
+        // Act
+        response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        JObject payloadBody = await response.Content.ReadAsObject<JObject>();
+
+        int[] actualIds = GetIds(payloadBody, "Tags");
+        Assert.True(ids.SequenceEqual(actualIds));
+    }
+
+    private static int[] GetIds(JObject payload, string propertyName = "value")
+    {
+        JArray value = payload[propertyName] as JArray;
         Assert.NotNull(value);
 
         int[] ids = new int[value.Count()];

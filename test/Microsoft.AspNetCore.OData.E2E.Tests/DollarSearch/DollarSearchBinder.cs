@@ -37,6 +37,11 @@ public class DollarSearchBinder : QueryBinder, ISearchBinder
         "white", "red", "green", "blue", "brown"
     };
 
+    private static ISet<string> _tagNames = new HashSet<string>
+    {
+        "telemetry", "privacy", "sdk", "deprecated"
+    };
+
     public Expression BindSearch(SearchClause searchClause, QueryBinderContext context)
     {
         Expression exp = BindSingleValueNode(searchClause.Expression, context);
@@ -78,6 +83,19 @@ public class DollarSearchBinder : QueryBinder, ISearchBinder
         Expression source = context.CurrentParameter;
 
         string text = node.Text.ToLowerInvariant();
+        if (context.ElementClrType == typeof(SearchTag))
+        {
+            if (_tagNames.Contains(text))
+            {
+                // $it.name
+                Expression nameProperty = Expression.Property(source, "Name");
+
+                // string.Equals($it.Name, text, StringComparison.OrdinalIgnoreCase);
+                return Expression.Call(null, StringEqualsMethodInfo,
+                    nameProperty, Expression.Constant(text, typeof(string)), Expression.Constant(StringComparison.OrdinalIgnoreCase, typeof(StringComparison)));
+            }
+        }
+
         if (_categories.Contains(text))
         {
             // $it.Category

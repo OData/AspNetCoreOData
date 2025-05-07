@@ -1,0 +1,3 @@
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.SearchBinder.get -> Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder
+Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.SearchBinder.set -> void
+static Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(this Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder binder, System.Linq.Expressions.Expression source, Microsoft.OData.UriParser.SearchClause searchClause, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
