@@ -217,7 +217,7 @@ public class DollarSearchTests : WebApiTestBase<DollarSearchTests>
     [Theory]
     [InlineData("$expand=Tags($search=SDK)", new[] { 3 })]
     [InlineData("$expand=Tags($search=NOT SDK)", new[] { 1, 4 })]
-    public async Task QueryForProducts_IncludesDollarSearchOnNavigation_OnName(string query, int[] ids)
+    public async Task QueryForSingleProduct_IncludesDollarSearchOnNavigation_OnName(string query, int[] ids)
     {
         // Arrange
         string queryUrl = $"odata/Products/1?{query}";
@@ -238,6 +238,36 @@ public class DollarSearchTests : WebApiTestBase<DollarSearchTests>
 
         int[] actualIds = GetIds(payloadBody, "Tags");
         Assert.True(ids.SequenceEqual(actualIds));
+    }
+
+    [Fact]
+    public async Task QueryForProducts_IncludesDollarSearchOnNavigation_OnName()
+    {
+        // Arrange
+        string queryUrl = $"odata/Products?$expand=Tags($search=Deprecated;$select=Id,Name)&$select=Id";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+        HttpClient client = CreateClient();
+        HttpResponseMessage response;
+
+        // Act
+        response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        string payloadBody = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal("{\"value\":[" +
+            "{\"Id\":1,\"Tags\":[{\"Id\":4,\"Name\":\"Deprecated\"}]}," +
+            "{\"Id\":2,\"Tags\":[]}," +
+            "{\"Id\":3,\"Tags\":[{\"Id\":4,\"Name\":\"Deprecated\"}]}," +
+            "{\"Id\":4,\"Tags\":[{\"Id\":4,\"Name\":\"Deprecated\"}]}," +
+            "{\"Id\":5,\"Tags\":[]}," +
+            "{\"Id\":6,\"Tags\":[]}" +
+          "]}", payloadBody);
     }
 
     private static int[] GetIds(JObject payload, string propertyName = "value")

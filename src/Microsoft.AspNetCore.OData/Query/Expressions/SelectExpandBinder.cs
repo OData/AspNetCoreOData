@@ -290,7 +290,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
                 LambdaExpression filterLambdaExpression = FilterBinder.BindFilter(filterClause, subContext) as LambdaExpression;
                 if (filterLambdaExpression == null)
                 {
-                    throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, edmProperty.Name, "LambdaExpression"));
+                    throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, edmProperty.Name, nameof(LambdaExpression)));
                 }
 
                 ParameterExpression filterParameter = filterLambdaExpression.Parameters.First();
