@@ -61,14 +61,27 @@ public class ComputeQueryValidator : IComputeQueryValidator
             errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
         }
 
-        // so far, we don't have validation rules here for $compute
-        // because 'DefaultQuerySetting' doesn't have configuration for $compute
-        // we can only let ODL to parse and verify the compute clause,
-        // however, developer can override this method add his own rules
-        _ = computeQueryOption.ComputeClause;
+        // If there are parameter errors, return early
+        if (errors.Count > 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
+        try
+        {
+            // so far, we don't have validation rules here for $compute
+            // because 'DefaultQuerySetting' doesn't have configuration for $compute
+            // we can only let ODL to parse and verify the compute clause,
+            // however, developer can override this method add his own rules
+            _ = computeQueryOption.ComputeClause;
+        }
+        catch (ODataException ex)
+        {
+            errors.Add(ex);
+        }
 
         validationErrors = errors;
         return errors.Count == 0;
     }
-
 }

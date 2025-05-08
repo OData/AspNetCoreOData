@@ -43,10 +43,33 @@ public class FilterQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateFilterQueryValidator_ReturnsFalseOnNullOption()
+    {
+        //  Arrange & Act
+        bool result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.NotNull(validationErrors);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'filterQueryOption')", validationErrors.First().Message);
+    }
+
+    [Fact]
     public void ValidateFilterQueryValidator_ThrowsOnNullSettings()
     {
         // Arrange & Act & Assert
         ExceptionAssert.ThrowsArgumentNull(() => _validator.Validate(new FilterQueryOption("Name eq 'abc'", _context), null), "settings");
+    }
+
+    [Fact]
+    public void TryValidateFilterQueryValidator_ReturnsFalseOnNullSettings()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(new FilterQueryOption("Name eq 'abc'", _context), null, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First().Message);
     }
 
     // want to test if all the virtual methods are being invoked correctly
@@ -62,6 +85,28 @@ public class FilterQueryValidatorTests
         // Assert
         Assert.Equal(7, _validator.Times.Keys.Count);
         Assert.Equal(1, _validator.Times["Validate"]); // entry
+        Assert.Equal(1, _validator.Times["ValidateAllQueryNode"]); // all
+        Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateCollectionPropertyAccessNode"]); // Tags
+        Assert.Equal(1, _validator.Times["ValidateConstantQueryNode"]); // 42
+        Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // eq
+        Assert.Equal(2, _validator.Times["ValidateParameterQueryNode"]); // $it, t
+    }
+
+    [Fact]
+    public void TryValidateFilterQueryValidator_VisitAll()
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption("Tags/all(t: t eq '42')", _context);
+
+        // Act
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        Assert.Equal(7, _validator.Times.Keys.Count);
+        Assert.Equal(1, _validator.Times["TryValidate"]); // entry
         Assert.Equal(1, _validator.Times["ValidateAllQueryNode"]); // all
         Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
         Assert.Equal(1, _validator.Times["ValidateCollectionPropertyAccessNode"]); // Tags
@@ -90,6 +135,28 @@ public class FilterQueryValidatorTests
         Assert.Equal(2, _validator.Times["ValidateParameterQueryNode"]); // $it, t
     }
 
+    [Fact]
+    public void TryValidateFilterQueryValidator_VisitAny()
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption("Tags/any(t: t eq '42')", _context);
+
+        // Act
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        Assert.Equal(7, _validator.Times.Keys.Count);
+        Assert.Equal(1, _validator.Times["TryValidate"]); // entry
+        Assert.Equal(1, _validator.Times["ValidateAnyQueryNode"]); // any
+        Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateCollectionPropertyAccessNode"]); // Tags
+        Assert.Equal(1, _validator.Times["ValidateConstantQueryNode"]); // 42
+        Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // eq
+        Assert.Equal(2, _validator.Times["ValidateParameterQueryNode"]); // $it, t
+    }
+
     [Theory]
     [InlineData("NotFilterableProperty")]
     [InlineData("NonFilterableProperty")]
@@ -101,6 +168,21 @@ public class FilterQueryValidatorTests
                 new FilterQueryOption(string.Format("{0} eq 'David'", property), _context),
                 new ODataValidationSettings()),
             string.Format("The property '{0}' cannot be used in the $filter query option.", property));
+    }
+
+    [Theory]
+    [InlineData("NotFilterableProperty")]
+    [InlineData("NonFilterableProperty")]
+    public void TryValidateFilterQueryValidator_ReturnsFalseIfNotFilterableProperty(string property)
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new FilterQueryOption(string.Format("{0} eq 'David'", property), _context),
+            new ODataValidationSettings(),
+            out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First().Message);
     }
 
     [Theory]
@@ -117,6 +199,22 @@ public class FilterQueryValidatorTests
     }
 
     [Theory]
+    [InlineData("NotFilterableNavigationProperty")]
+    [InlineData("NonFilterableNavigationProperty")]
+    public void TryValidateFilterQueryValidator_ReturnsFalseIfNotFilterableNavigationProperty(string property)
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new FilterQueryOption(string.Format("{0}/Name eq 'Seattle'", property), _context),
+            new ODataValidationSettings(),
+            out IEnumerable<ODataException> validationErrors);
+
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First().Message);
+    }
+
+    [Theory]
     [InlineData("NotFilterableProperty")]
     [InlineData("NonFilterableProperty")]
     public void ValidateFilterQueryValidator_ThrowsIfNavigationHasNotFilterableProperty(string property)
@@ -127,6 +225,22 @@ public class FilterQueryValidatorTests
                 new FilterQueryOption(string.Format("NavigationWithNotFilterableProperty/{0} eq 'David'", property), _context),
                 new ODataValidationSettings()),
             string.Format("The property '{0}' cannot be used in the $filter query option.", property));
+    }
+
+    [Theory]
+    [InlineData("NotFilterableProperty")]
+    [InlineData("NonFilterableProperty")]
+    public void TryValidateFilterQueryValidator_ReturnsFalseIfNavigationHasNotFilterableProperty(string property)
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new FilterQueryOption(string.Format("NavigationWithNotFilterableProperty/{0} eq 'David'", property), _context),
+            new ODataValidationSettings(),
+            out IEnumerable<ODataException> validationErrors);
+
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First().Message);
     }
 
     public static TheoryDataSet<string> NestedAnyAllInputs
@@ -159,6 +273,21 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(NestedAnyAllInputs))]
+    public void MaxAnyAllExpressionDepthLimitExceeded_WithTryValidate(string filter)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings();
+        settings.MaxAnyAllExpressionDepth = 1;
+
+        // Act & Assert
+        var result = _validator.TryValidate(new FilterQueryOption(filter, _productContext), settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("The Any/All nesting limit of '1' has been exceeded. 'MaxAnyAllExpressionDepth' can be configured on ODataQuerySettings or EnableQueryAttribute.", validationErrors.First().Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(NestedAnyAllInputs))]
     public void IncreaseMaxAnyAllExpressionDepthWillAllowNestedAnyAllInputs(string filter)
     {
         // Arrange
@@ -167,6 +296,20 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(new FilterQueryOption(filter, _productContext), settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(NestedAnyAllInputs))]
+    public void IncreaseMaxAnyAllExpressionDepthWillAllowNestedAnyAllInputs_WithTryValidate(string filter)
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.MaxAnyAllExpressionDepth = 2;
+
+        // Act & Assert
+        var result = _validator.TryValidate(new FilterQueryOption(filter, _productContext), settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     public static TheoryDataSet<string> LongInputs
@@ -196,6 +339,25 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(LongInputs))]
+    public void LongInputs_CauseMaxNodeCountExceededException_WithTryValidate(string filter)
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings
+        {
+            MaxAnyAllExpressionDepth = Int32.MaxValue
+        };
+
+        FilterQueryOption option = new FilterQueryOption(filter, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("The node count limit of '100' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.", validationErrors.First().Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(LongInputs))]
     public void IncreaseMaxNodeCountWillAllowLongInputs(string filter)
     {
         // Arrange
@@ -209,6 +371,25 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(LongInputs))]
+    public void IncreaseMaxNodeCountWillAllowLongInputs_WithTryValidate(string filter)
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings
+        {
+            MaxAnyAllExpressionDepth = Int32.MaxValue,
+            MaxNodeCount = 105,
+        };
+
+        FilterQueryOption option = new FilterQueryOption(filter, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     public static TheoryDataSet<string> CloseToLongInputs
@@ -233,6 +414,24 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(CloseToLongInputs))]
+    public void AlmostLongInputs_DonotCauseMaxNodeCountExceededExceptionOrTimeoutDuringCompilation_WithTryValidate(string filter)
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings
+        {
+            MaxAnyAllExpressionDepth = Int32.MaxValue
+        };
+
+        FilterQueryOption option = new FilterQueryOption(filter, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     public static TheoryDataSet<AllowedArithmeticOperators, string, string> ArithmeticOperators
@@ -299,6 +498,24 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(ArithmeticOperators))]
+    public void AllowedArithmeticOperators_WithTryValidate_SucceedIfAllowed(AllowedArithmeticOperators allow, string query, string unused)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedArithmeticOperators = allow,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotNull(unused);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Theory]
+    [MemberData(nameof(ArithmeticOperators))]
     public void AllowedArithmeticOperators_ThrowIfNotAllowed(AllowedArithmeticOperators exclude, string query, string operatorName)
     {
         // Arrange
@@ -314,6 +531,29 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(ArithmeticOperators))]
+    public void AllowedArithmeticOperators_WithTryValidate_ReturnsFalseIfNotAllowed(AllowedArithmeticOperators exclude, string query, string operatorName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~exclude,
+        };
+
+        var expectedMessage = string.Format(
+            "Arithmetic operator '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.",
+            operatorName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     [Theory]
@@ -334,6 +574,29 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedArithmeticOperators);
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(ArithmeticOperators))]
+    public void AllowedArithmeticOperators_WithTryValidate_ReturnsFalseIfNoneAllowed(AllowedArithmeticOperators unused, string query, string operatorName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedArithmeticOperators = AllowedArithmeticOperators.None,
+        };
+        var expectedMessage = string.Format(
+            "Arithmetic operator '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.",
+            operatorName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(unused, settings.AllowedArithmeticOperators);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     public static TheoryDataSet<string> ArithmeticOperators_CheckArguments
@@ -373,6 +636,23 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(ArithmeticOperators_CheckArguments))]
+    public void ArithmeticOperators_CheckArguments_WithTryValidate_SucceedIfAllowed(string query)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.Day,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Theory]
+    [MemberData(nameof(ArithmeticOperators_CheckArguments))]
     public void ArithmeticOperators_CheckArguments_ThrowIfNotAllowed(string query)
     {
         // Arrange
@@ -387,6 +667,27 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(ArithmeticOperators_CheckArguments))]
+    public void ArithmeticOperators_CheckArguments_WithTryValidate_ReturnsFalseIfNotAllowed(string query)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.Day,
+        };
+        var expectedMessage = string.Format(
+            "Function 'day' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.");
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     // No support for OData v4 functions:
@@ -647,6 +948,27 @@ public class FilterQueryValidatorTests
     [MemberData(nameof(MathFunctions))]
     [MemberData(nameof(OtherFunctions))]
     [MemberData(nameof(StringFunctions))]
+    public void AllowedFunctions_WithTryValidate_SucceedIfAllowed(AllowedFunctions allow, string query, string unused)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = allow,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotNull(unused);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeFunctions))]
+    [MemberData(nameof(MathFunctions))]
+    [MemberData(nameof(OtherFunctions))]
+    [MemberData(nameof(StringFunctions))]
     public void AllowedFunctions_ThrowIfNotAllowed(AllowedFunctions exclude, string query, string functionName)
     {
         // Arrange
@@ -662,6 +984,31 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeFunctions))]
+    [MemberData(nameof(MathFunctions))]
+    [MemberData(nameof(OtherFunctions))]
+    [MemberData(nameof(StringFunctions))]
+    public void AllowedFunctions_WithTryValidate_ReturnsFalseIfNotAllowed(AllowedFunctions exclude, string query, string functionName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions & ~exclude,
+        };
+        var expectedMessage = string.Format(
+            "Function '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.",
+            functionName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     [Theory]
@@ -689,6 +1036,32 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(DateTimeFunctions))]
+    [MemberData(nameof(MathFunctions))]
+    [MemberData(nameof(OtherFunctions))]
+    [MemberData(nameof(StringFunctions))]
+    public void AllowedFunctions_WithTryValidate_ReturnsFalseIfNoneAllowed(AllowedFunctions unused, string query, string functionName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.None,
+        };
+        var expectedMessage = string.Format(
+            "Function '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.",
+            functionName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeFunctions))]
     public void DateTimeFunctions_SucceedIfGroupAllowed(AllowedFunctions unused, string query, string unusedName)
     {
         // Arrange
@@ -702,6 +1075,25 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(DateTimeFunctions))]
+    public void DateTimeFunctions_WithTryValidate_SucceedIfGroupAllowed(AllowedFunctions unused, string query, string unusedName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllDateTimeFunctions,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+        Assert.NotNull(unusedName);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     [Theory]
@@ -725,6 +1117,30 @@ public class FilterQueryValidatorTests
     }
 
     [Theory]
+    [MemberData(nameof(DateTimeFunctions))]
+    public void DateTimeFunctions_WithTryValidate_ReturnsFalseIfGroupNotAllowed(AllowedFunctions unused, string query, string functionName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.AllDateTimeFunctions,
+        };
+        var expectedMessage = string.Format(
+            "Function '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.",
+            functionName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
+    }
+
+    [Theory]
     [MemberData(nameof(MathFunctions))]
     public void MathFunctions_SucceedIfGroupAllowed(AllowedFunctions unused, string query, string unusedName)
     {
@@ -739,6 +1155,26 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(MathFunctions))]
+    public void MathFunctions_WithTryValidate_SucceedIfGroupAllowed(AllowedFunctions unused, string query, string unusedName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllMathFunctions,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+        Assert.NotNull(unusedName);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     [Theory]
@@ -762,6 +1198,30 @@ public class FilterQueryValidatorTests
     }
 
     [Theory]
+    [MemberData(nameof(MathFunctions))]
+    public void MathFunctions_WithTryValidate_ReturnsFalseIfGroupNotAllowed(AllowedFunctions unused, string query, string functionName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.AllMathFunctions,
+        };
+        var expectedMessage = string.Format(
+            "Function '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.",
+            functionName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
+    }
+
+    [Theory]
     [MemberData(nameof(StringFunctions))]
     public void StringFunctions_SucceedIfGroupAllowed(AllowedFunctions unused, string query, string unusedName)
     {
@@ -776,6 +1236,26 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Theory]
+    [MemberData(nameof(StringFunctions))]
+    public void StringFunctions_WithTryValidate_SucceedIfGroupAllowed(AllowedFunctions unused, string query, string unusedName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllStringFunctions,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+        Assert.NotNull(unusedName);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     [Theory]
@@ -796,6 +1276,30 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, unused);
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(StringFunctions))]
+    public void StringFunctions_WithTryValidate_ReturnsFalseIfGroupNotAllowed(AllowedFunctions unused, string query, string functionName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.AllStringFunctions,
+        };
+        var expectedMessage = string.Format(
+            "Function '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.",
+            functionName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     public static TheoryDataSet<AllowedFunctions, string, string> OtherFunctions_SomeSingleParameterCasts
@@ -827,6 +1331,28 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(OtherFunctions_SomeSingleParameterCasts))]
+    public void OtherFunctions_SomeSingleParameterCasts_WithTryValidate_ReturnsFalseODataException(AllowedFunctions unused, string query, string unusedName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.None,
+        };
+        var expectedMessage = "Cast or IsOf Function must have a type in its arguments.";
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+        Assert.NotNull(unusedName);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     public static TheoryDataSet<AllowedFunctions, string, string> OtherFunctions_SomeTwoParameterCasts
@@ -901,6 +1427,26 @@ public class FilterQueryValidatorTests
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
     }
 
+    [Theory]
+    [MemberData(nameof(OtherFunctions_SomeQuotedTwoParameterCasts))]
+    public void OtherFunctions_SomeQuotedTwoParameterCasts_WithTryValidate_ReturnsTrue_NoValidationError(AllowedFunctions unused, string query, string unusedName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, unused);
+        Assert.NotNull(unusedName);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
     public static TheoryDataSet<AllowedFunctions, AllowedFunctions, string, string> Functions_CheckArguments
     {
         get
@@ -957,6 +1503,25 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(Functions_CheckArguments))]
+    public void Functions_CheckArguments_WithTryValidate_SucceedIfAllowed(AllowedFunctions outer, AllowedFunctions inner, string query, string unused)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = outer | inner,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotNull(unused);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Theory]
+    [MemberData(nameof(Functions_CheckArguments))]
     public void Functions_CheckArguments_ThrowIfNotAllowed(AllowedFunctions outer, AllowedFunctions inner, string query, string functionName)
     {
         // Arrange
@@ -973,6 +1538,29 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, inner);
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(Functions_CheckArguments))]
+    public void Functions_CheckArguments_WithTryValidate_ReturnsFalseIfNotAllowed(AllowedFunctions outer, AllowedFunctions inner, string query, string functionName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = outer,
+        };
+        var expectedMessage = string.Format(
+            "Function '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.",
+            functionName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(AllowedFunctions.None, inner);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors, e => e.Message == expectedMessage);
     }
 
     public static TheoryDataSet<string, string> Functions_CheckNotFilterable
@@ -1014,6 +1602,27 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(Functions_CheckNotFilterable))]
+    public void Functions_CheckNotFilterable_WithTryValidate_ReturnsFalseODataException(string query, string propertyName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedFunctions = AllowedFunctions.AllFunctions,
+        };
+        var expectedMessage = string.Format(
+            "The property '{0}' cannot be used in the $filter query option.",
+            propertyName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     public static TheoryDataSet<AllowedLogicalOperators, string, string> LogicalOperators
@@ -1085,6 +1694,25 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(LogicalOperators))]
+    public void AllowedLogicalOperators_WithTryValidate_SucceedIfAllowed(AllowedLogicalOperators allow, string query, string unused)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedLogicalOperators = allow,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotNull(unused);
+
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Theory]
+    [MemberData(nameof(LogicalOperators))]
     public void AllowedLogicalOperators_ThrowIfNotAllowed(AllowedLogicalOperators exclude, string query, string operatorName)
     {
         // Arrange
@@ -1100,6 +1728,28 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(LogicalOperators))]
+    public void AllowedLogicalOperators_WithTryValidate_ReturnsFalseIfNotAllowed(AllowedLogicalOperators exclude, string query, string operatorName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedLogicalOperators = AllowedLogicalOperators.All & ~exclude,
+        };
+        var expectedMessage = string.Format(
+            "Logical operator '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.",
+            operatorName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     [Theory]
@@ -1120,6 +1770,29 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedLogicalOperators);
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Theory]
+    [MemberData(nameof(LogicalOperators))]
+    public void AllowedLogicalOperators_WithTryValidate_ReturnsFalseIfNoneAllowed(AllowedLogicalOperators unused, string query, string operatorName)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedLogicalOperators = AllowedLogicalOperators.None,
+        };
+        var expectedMessage = string.Format(
+            "Logical operator '{0}' is not allowed. " +
+            "To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.",
+            operatorName);
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        Assert.NotEqual(unused, settings.AllowedLogicalOperators);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     public static TheoryDataSet<string> LogicalOperators_CheckArguments
@@ -1167,6 +1840,23 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(LogicalOperators_CheckArguments))]
+    public void LogicalOperators_CheckArguments_WithTryValidate_SucceedIfAllowed(string query)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedArithmeticOperators = AllowedArithmeticOperators.Add,
+        };
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Theory]
+    [MemberData(nameof(LogicalOperators_CheckArguments))]
     public void LogicalOperators_CheckArguments_ThrowIfNotAllowed(string query)
     {
         // Arrange
@@ -1183,6 +1873,27 @@ public class FilterQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
     }
 
+    [Theory]
+    [MemberData(nameof(LogicalOperators_CheckArguments))]
+    public void LogicalOperators_CheckArguments_WithTryValidate_ReturnsFalseIfNotAllowed(string query)
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~AllowedArithmeticOperators.Add,
+        };
+        var expectedMessage = string.Format(
+            "Arithmetic operator 'Add' is not allowed. " +
+            "To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+        var option = new FilterQueryOption(query, _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
+    }
+
     [Fact]
     public void ArithmeticNegation_SucceedsIfLogicalNotIsAllowed()
     {
@@ -1195,6 +1906,22 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Fact]
+    public void ArithmeticNegation_WithTryValidate_SucceedsIfLogicalNotIsAllowed()
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedLogicalOperators = AllowedLogicalOperators.LessThan | AllowedLogicalOperators.Not,
+        };
+        var option = new FilterQueryOption("-UnitPrice lt 0", _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     // Note Negate is _not_ a logical operator.
@@ -1213,6 +1940,26 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
+    }
+
+    [Fact]
+    public void ArithmeticNegation_WithTryValidate_ReturnsFalseIfLogicalNotIsNotAllowed()
+    {
+        // Arrange
+        var settings = new ODataValidationSettings
+        {
+            AllowedLogicalOperators = AllowedLogicalOperators.LessThan,
+        };
+        var expectedMessage = string.Format(
+            "Logical operator 'Negate' is not allowed. " +
+            "To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+        var option = new FilterQueryOption("-UnitPrice lt 0", _productContext);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(expectedMessage, validationErrors.First().Message);
     }
 
     [Fact]
@@ -1235,6 +1982,27 @@ public class FilterQueryValidatorTests
     }
 
     [Fact]
+    public void ValidateVisitLogicalOperatorEqual_WithTryValidate()
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption("Id eq 1", _context);
+
+        // Act
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        Assert.Equal(6, _validator.Times.Keys.Count);
+        Assert.Equal(1, _validator.Times["TryValidate"]); // entry
+        Assert.Equal(1, _validator.Times["ValidateSingleValuePropertyAccessNode"]); // Id
+        Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateConstantQueryNode"]); // 1
+        Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateParameterQueryNode"]); // $it
+    }
+
+    [Fact]
     public void ValidateVisitLogicalOperatorHas()
     {
         // Arrange
@@ -1246,6 +2014,26 @@ public class FilterQueryValidatorTests
         // Assert
         Assert.Equal(6, _validator.Times.Keys.Count);
         Assert.Equal(1, _validator.Times["Validate"]); // entry
+        Assert.Equal(1, _validator.Times["ValidateSingleValuePropertyAccessNode"]); // FavouriteColor
+        Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // has
+        Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // has
+        Assert.Equal(1, _validator.Times["ValidateParameterQueryNode"]); // $it
+    }
+
+    [Fact]
+    public void ValidateVisitLogicalOperatorHas_WithTryValidate()
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption("FavoriteColor has Microsoft.AspNetCore.OData.Tests.Models.Color'Red'", _context);
+
+        // Act
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        Assert.Equal(6, _validator.Times.Keys.Count);
+        Assert.Equal(1, _validator.Times["TryValidate"]); // entry
         Assert.Equal(1, _validator.Times["ValidateSingleValuePropertyAccessNode"]); // FavouriteColor
         Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // has
         Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // has
@@ -1297,6 +2085,53 @@ public class FilterQueryValidatorTests
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, _settings));
     }
 
+    [Theory]
+    [InlineData("Id eq 1")]
+    [InlineData("Id ne 1")]
+    [InlineData("Id gt 1")]
+    [InlineData("Id lt 1")]
+    [InlineData("Id ge 1")]
+    [InlineData("Id le 1")]
+    [InlineData("Id eq Id add 1")]
+    [InlineData("Id eq Id sub 1")]
+    [InlineData("Id eq Id mul 1")]
+    [InlineData("Id eq Id div 1")]
+    [InlineData("Id eq Id mod 1")]
+    [InlineData("startswith(Name, 'Microsoft')")]
+    [InlineData("endswith(Name, 'Microsoft')")]
+    [InlineData("contains(Name, 'Microsoft')")]
+    [InlineData("substring(Name, 1) eq 'Name'")]
+    [InlineData("substring(Name, 1, 2) eq 'Name'")]
+    [InlineData("length(Name) eq 1")]
+    [InlineData("tolower(Name) eq 'Name'")]
+    [InlineData("toupper(Name) eq 'Name'")]
+    [InlineData("trim(Name) eq 'Name'")]
+    [InlineData("indexof(Name, 'Microsoft') eq 1")]
+    [InlineData("concat(Name, 'Microsoft') eq 'Microsoft'")]
+    [InlineData("year(Birthday) eq 2000")]
+    [InlineData("month(Birthday) eq 2000")]
+    [InlineData("day(Birthday) eq 2000")]
+    [InlineData("hour(Birthday) eq 2000")]
+    [InlineData("minute(Birthday) eq 2000")]
+    [InlineData("round(AmountSpent) eq 0")]
+    [InlineData("floor(AmountSpent) eq 0")]
+    [InlineData("ceiling(AmountSpent) eq 0")]
+    [InlineData("Tags/any()")]
+    [InlineData("Tags/all(t : t eq '1')")]
+    [InlineData("Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomerBase/Id eq 1")]
+    [InlineData("Contacts/Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomerBase/any()")]
+    [InlineData("FavoriteColor has Microsoft.AspNetCore.OData.Tests.Models.Color'Red'")]
+    public void Validator_WithTryValidate_ReturnsTrueWithNoError_For_ValidQueries(string filter)
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption(filter, _context);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
     [Fact]
     public void Validator_Doesnot_Throw_For_ParameterAlias()
     {
@@ -1314,6 +2149,32 @@ public class FilterQueryValidatorTests
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, _settings));
         Assert.Equal(6, _validator.Times.Keys.Count);
         Assert.Equal(1, _validator.Times["Validate"]); // entry
+        Assert.Equal(1, _validator.Times["ValidateParameterQueryNode"]); // $it
+        Assert.Equal(1, _validator.Times["ValidateSingleValuePropertyAccessNode"]); // Id
+        Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateConstantQueryNode"]); // 1
+    }
+
+    [Fact]
+    public void Validator__WithTryValidate_ReturnsTrueWithNoError_For_ParameterAlias()
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption(
+            "Id eq @p",
+            _context,
+            new ODataQueryOptionParser(
+                _context.Model,
+                _context.ElementType,
+                _context.NavigationSource,
+                new Dictionary<string, string> { { "$filter", "Id eq @p" }, { "@p", "1" } }));
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        Assert.Equal(6, _validator.Times.Keys.Count);
+        Assert.Equal(1, _validator.Times["TryValidate"]); // entry
         Assert.Equal(1, _validator.Times["ValidateParameterQueryNode"]); // $it
         Assert.Equal(1, _validator.Times["ValidateSingleValuePropertyAccessNode"]); // Id
         Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // eq
@@ -1351,6 +2212,12 @@ public class FilterQueryValidatorTests
         {
             IncrementCount("Validate");
             base.Validate(filterQueryOption, settings);
+        }
+
+        public override bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+        {
+            IncrementCount("TryValidate");
+            return base.TryValidate(filterQueryOption, validationSettings, out validationErrors);
         }
 
         protected override void ValidateAllNode(AllNode allQueryNode, FilterValidatorContext context)

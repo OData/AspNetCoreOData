@@ -7,10 +7,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -35,6 +37,16 @@ public class CountQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateCountQueryValidator_ReturnsFalseAndValidationError_NullOption()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'countQueryOption')", validationErrors.First().Message);
+    }
+
+    [Fact]
     public void ValidateCountQueryValidator_Throws_NullSettings()
     {
         // Arrange
@@ -43,6 +55,20 @@ public class CountQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.ThrowsArgumentNull(() => _validator.Validate(option, null), "validationSettings");
+    }
+
+    [Fact]
+    public void TryValidateCountQueryValidator_ReturnsFalseAndValidationError_NullSettings()
+    {
+        // Arrange
+        ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+        CountQueryOption option = new CountQueryOption("true", context);
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, null, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First().Message);
     }
 
     [Theory]
@@ -71,6 +97,37 @@ public class CountQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.Throws<InvalidOperationException>(() => _validator.Validate(option, settings), message);
+    }
+
+    [Theory]
+    [InlineData("LimitedEntities(1)/Integers", "The property 'Integers' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/ComplexCollectionProperty", "The property 'ComplexCollectionProperty' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/EntityCollectionProperty", "The property 'EntityCollectionProperty' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/ComplexProperty/Strings", "The property 'Strings' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/ComplexProperty/SimpleEnums", "The property 'SimpleEnums' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/EntityCollectionProperty(1)/ComplexCollectionProperty", "The property 'ComplexCollectionProperty' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/Integers/$count", "The property 'Integers' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/ComplexCollectionProperty/$count", "The property 'ComplexCollectionProperty' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/EntityCollectionProperty/$count", "The property 'EntityCollectionProperty' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/ComplexProperty/Strings/$count", "The property 'Strings' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/ComplexProperty/SimpleEnums/$count", "The property 'SimpleEnums' cannot be used for $count.")]
+    [InlineData("LimitedEntities(1)/EntityCollectionProperty(1)/ComplexCollectionProperty/$count", "The property 'ComplexCollectionProperty' cannot be used for $count.")]
+    public void TryValidate_ReturnsFalseAndValidationError_DollarCountAppliedOnNotCountableCollection(string uri, string message)
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel();
+        string serviceRoot = "http://localhost/";
+        ODataUriParser pathHandler = new ODataUriParser(model, new Uri(serviceRoot), new Uri(uri, UriKind.RelativeOrAbsolute));
+        ODataPath path = pathHandler.ParsePath();
+        ODataQueryContext context = new ODataQueryContext(model, EdmCoreModel.Instance.GetInt32(false).Definition, path);
+        CountQueryOption option = new CountQueryOption("true", context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(message, validationErrors.First().Message);
     }
 
     private static IEdmModel GetEdmModel()
