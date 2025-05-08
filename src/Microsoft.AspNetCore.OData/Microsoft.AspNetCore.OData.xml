@@ -9286,6 +9286,16 @@
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $search represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to <see cref="T:System.Linq.Expressions.Expression"/> and apply to <see cref="T:System.Linq.Expressions.Expression" />.
+            </summary>
+            <param name="binder">The given search binder.</param>
+            <param name="source">The given source.</param>
+            <param name="searchClause">The search clause.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The applied result.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Translate an OData $search parse tree represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to
@@ -10368,6 +10378,11 @@
             Gets or sets the assembly resolver.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.SearchBinder">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperties">
             <summary>
             Gets the compute expressions.
@@ -10499,7 +10514,7 @@
             <param name="source">The source <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.FilterClause,Microsoft.OData.UriParser.ComputeClause)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.FilterClause,Microsoft.OData.UriParser.ComputeClause,Microsoft.OData.UriParser.SearchClause)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> name.
             </summary>
@@ -10507,8 +10522,9 @@
             <param name="elementType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that contains the edmProperty.</param>
             <param name="edmProperty">The <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> from which we are creating an <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <param name="source">The source <see cref="T:System.Linq.Expressions.Expression"/>.</param>
-            <param name="filterClause">The $filter query represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.</param>
-            <param name="computeClause">The $compute query represented by <see cref="T:Microsoft.OData.UriParser.ComputeClause"/>.</param>
+            <param name="filterClause">The nested $filter query represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.</param>
+            <param name="computeClause">The nested $compute query represented by <see cref="T:Microsoft.OData.UriParser.ComputeClause"/>.</param>
+            <param name="search">The nested $search query represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/>.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetSelectExpandProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.UriParser.SelectExpandClause,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem}@,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.UriParser.ExpandedReferenceSelectItem}@,System.Collections.Generic.ISet{Microsoft.OData.Edm.IEdmStructuralProperty}@)">
