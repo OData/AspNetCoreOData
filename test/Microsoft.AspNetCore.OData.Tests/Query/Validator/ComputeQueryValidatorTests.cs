@@ -104,4 +104,15 @@ public class ComputeQueryValidatorTests
         Assert.Single(validationErrors);
         Assert.Equal("Could not find a property named 'test' on type 'Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomer'.", validationErrors.First().Message);
     }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_DoesNotThrow()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context),
+            new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
 }
