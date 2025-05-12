@@ -77,6 +77,13 @@ public class TopQueryValidator : ITopQueryValidator
             errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
         }
 
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
         if (topQueryOption != null && validationSettings != null && topQueryOption.Value > validationSettings.MaxTop)
         {
             errors.Add(new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxTop, AllowedQueryOptions.Top, topQueryOption.Value)));

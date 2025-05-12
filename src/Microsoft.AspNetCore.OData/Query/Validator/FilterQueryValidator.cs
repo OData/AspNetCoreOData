@@ -80,20 +80,20 @@ public class FilterQueryValidator : IFilterQueryValidator
             return false;
         }
 
-        // Create a validation context
-        var validatorContext = new FilterValidatorContext
-        {
-            Filter = filterQueryOption,
-            Context = filterQueryOption.Context,
-            ValidationSettings = validationSettings,
-            Property = filterQueryOption.Context.TargetProperty,
-            StructuredType = filterQueryOption.Context.TargetStructuredType,
-            CurrentDepth = 0
-        };
-
         // Validate the filter clause
         try
         {
+            // Create a validation context
+            var validatorContext = new FilterValidatorContext
+            {
+                Filter = filterQueryOption,
+                Context = filterQueryOption.Context,
+                ValidationSettings = validationSettings,
+                Property = filterQueryOption.Context.TargetProperty,
+                StructuredType = filterQueryOption.Context.TargetStructuredType,
+                CurrentDepth = 0
+            };
+
             ValidateFilter(filterQueryOption.FilterClause, validatorContext);
         }
         catch (Exception ex)

@@ -38,10 +38,30 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_OnNullOption()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'orderByOption')", errors.First().Message);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_ThrowsOnNullSettings()
     {
         // Arrange & Act & Assert
         ExceptionAssert.Throws<ArgumentNullException>(() => _validator.Validate(new OrderByQueryOption("Name eq 'abc'", _context), null));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_OnNullSettings()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption("Name eq 'abc'", _context), null, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
     }
 
     [Theory]
@@ -61,6 +81,21 @@ public class OrderByQueryValidatorTests
     [Theory]
     [InlineData("NotSortableProperty")]
     [InlineData("UnsortableProperty")]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_ForNotSortableProperty_OnEmptyAllowedPropertiesList(string property)
+    {
+        // Arrange : empty allowed orderby list
+        ODataValidationSettings settings = new ODataValidationSettings();
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal($"The property '{property}' cannot be used in the $orderby query option.", errors.First().Message);
+    }
+
+    [Theory]
+    [InlineData("NotSortableProperty")]
+    [InlineData("UnsortableProperty")]
     public void ValidateOrderByQueryValidator_DoesntThrowNotSortableException_ForNotSortableProperty_OnNonEmptyAllowedPropertiesList(string property)
     {
         // Arrange : nonempty allowed orderby list
@@ -69,6 +104,21 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         _validator.Validate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings);
+    }
+
+    [Theory]
+    [InlineData("NotSortableProperty")]
+    [InlineData("UnsortableProperty")]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForNotSortableProperty_OnNonEmptyAllowedPropertiesList(string property)
+    {
+        // Arrange : nonempty allowed orderby list
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add(property);
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
     }
 
     [Fact]
@@ -82,6 +132,18 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForAllowedAndSortableUnlimitedProperty_OnEmptyAllowedPropertiesList()
+    {
+        // Arrange: empty allowed orderby list
+        ODataValidationSettings settings = new ODataValidationSettings();
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_NoException_ForAllowedAndSortableUnlimitedProperty_OnNonEmptyAllowedPropertiesList()
     {
         // Arrange: nonempty allowed orbderby list
@@ -90,6 +152,19 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(new OrderByQueryOption("Name asc", _context), settings));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForAllowedAndSortableUnlimitedProperty_OnNonEmptyAllowedPropertiesList()
+    {
+        // Arrange: nonempty allowed orderby list
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Name");
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
     }
 
     [Theory]
@@ -107,6 +182,23 @@ public class OrderByQueryValidatorTests
             string.Format("Order by '{0}' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.", property));
     }
 
+    [Theory]
+    [InlineData("NotSortableProperty")]
+    [InlineData("UnsortableProperty")]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_ForNotAllowedAndSortableLimitedProperty(string property)
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Name");
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal($"Order by '{property}' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+            errors.First().Message);
+    }
+
     [Fact]
     public void ValidateOrderByQueryValidator_ThrowsNotAllowedException_ForNotAllowedAndSortableUnlimitedProperty()
     {
@@ -120,6 +212,22 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_ForNotAllowedAndSortableUnlimitedProperty()
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Address");
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Order by 'Name' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+            errors.First().Message);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_WillNotAllowName()
     {
         // Arrange
@@ -130,6 +238,23 @@ public class OrderByQueryValidatorTests
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings),
             "Order by 'Name' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_WillNotAllowName()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("Name", _context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Id");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Order by 'Name' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+            errors.First().Message);
     }
 
     [Fact]
@@ -149,6 +274,24 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_ForNotAllowedMultipleProperties()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("Name desc, Id asc", _context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Address");
+        settings.AllowedOrderByProperties.Add("Name");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Order by 'Id' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+            errors.First().Message);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_WillAllowId()
     {
         // Arrange
@@ -158,6 +301,20 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForAllowedId()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("Id", _context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Id");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
     }
 
     [Fact]
@@ -172,6 +329,19 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForOrderByIt()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("$it", new ODataQueryContext(EdmCoreModel.Instance, typeof(int)));
+        ODataValidationSettings settings = new ODataValidationSettings();
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_AllowsOrderByIt_IfExplicitlySpecified()
     {
         // Arrange
@@ -180,6 +350,19 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForExplicitlyAllowedOrderByIt()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("$it", new ODataQueryContext(EdmCoreModel.Instance, typeof(int)));
+        ODataValidationSettings settings = new ODataValidationSettings { AllowedOrderByProperties = { "$it" } };
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
     }
 
     [Fact]
@@ -198,6 +381,24 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_ForDisallowedOrderByIt()
+    {
+        // Arrange
+        _context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+        OrderByQueryOption option = new OrderByQueryOption("$it", _context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("dummy");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Order by '$it' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+            errors.First().Message);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator__ThrowsCountExceeded()
     {
         // Arrange
@@ -208,6 +409,22 @@ public class OrderByQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(
             () => _validator.Validate(option, settings),
             "The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is 1.");
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_WhenCountExceeded()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("Name desc, Id asc", _context);
+        ODataValidationSettings settings = new ODataValidationSettings { MaxOrderByNodeCount = 1 };
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is 1.",
+            errors.First().Message);
     }
 
     [Theory]
@@ -245,6 +462,44 @@ public class OrderByQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(() => validator.Validate(option, settings), message);
     }
 
+    [Theory]
+    // Works with complex properties
+    [InlineData("ComplexProperty/Value", "LimitedEntity",
+        "The property 'ComplexProperty' cannot be used in the $orderby query option.")]
+    // Works with simple properties
+    [InlineData("RelatedEntity/RelatedComplexProperty/NotSortableValue", "LimitedEntity",
+        "The property 'NotSortableValue' cannot be used in the $orderby query option.")]
+    [InlineData("RelatedEntity/RelatedComplexProperty/UnsortableValue", "LimitedEntity",
+        "The property 'UnsortableValue' cannot be used in the $orderby query option.")]
+    // Works with navigation properties
+    [InlineData("RelatedEntity/BackReference/Id", "LimitedEntity",
+        "The property 'BackReference' cannot be used in the $orderby query option.")]
+    // Works with inheritance
+    [InlineData("RelatedEntity/NS.LimitedSpecializedEntity/SpecializedComplexProperty/Value", "LimitedEntity",
+        "The property 'SpecializedComplexProperty' cannot be used in the $orderby query option.")]
+    // Works with multiple clauses
+    [InlineData("Id, ComplexProperty/NotSortableValue", "LimitedEntity",
+        "The property 'NotSortableValue' cannot be used in the $orderby query option.")]
+    [InlineData("Id, ComplexProperty/UnsortableValue", "LimitedEntity",
+        "The property 'UnsortableValue' cannot be used in the $orderby query option.")]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_IfTryingToValidateALimitedProperty(string query, string edmTypeName, string message)
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel();
+        IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == edmTypeName);
+        ODataQueryContext context = new ODataQueryContext(model, edmType);
+        context.DefaultQueryConfigurations.EnableOrderBy = true;
+        OrderByQueryOption option = new OrderByQueryOption(query, context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+
+        // Act & Assert
+        OrderByQueryValidator validator = new OrderByQueryValidator();
+        var result = validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(message, errors.First().Message);
+    }
+
     [Fact]
     public void ValidateOrderByQueryValidator_DoesntThrowIfTheLeafOfThePathIsWithinTheAllowedProperties()
     {
@@ -263,6 +518,24 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_IfTheLeafOfThePathIsWithinTheAllowedProperties()
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel();
+        IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == "LimitedEntity");
+        ODataQueryContext context = new ODataQueryContext(model, edmType);
+        OrderByQueryOption option = new OrderByQueryOption("ComplexProperty/Value", context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("ComplexProperty");
+        settings.AllowedOrderByProperties.Add("Value");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_ThrowsIfTheLeafOfThePathIsntWithinTheAllowedProperties()
     {
         // Arrange
@@ -278,6 +551,26 @@ public class OrderByQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(() =>
             validator.Validate(option, settings),
             "Order by 'Value' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_IfTheLeafOfThePathIsntWithinTheAllowedProperties()
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel();
+        IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == "LimitedEntity");
+        ODataQueryContext context = new ODataQueryContext(model, edmType);
+        OrderByQueryOption option = new OrderByQueryOption("ComplexProperty/Value", context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("NotSortableProperty");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Order by 'Value' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+            errors.First().Message);
     }
 
     [Fact]
@@ -304,6 +597,34 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForParameterAlias()
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel();
+        IEdmEntityType edmType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == "LimitedEntity");
+        IEdmEntitySet entitySet = model.FindDeclaredEntitySet("LimitedEntities");
+        Assert.NotNull(entitySet);
+        ODataQueryContext context = new ODataQueryContext(model, edmType);
+        context.DefaultQueryConfigurations.EnableOrderBy = true;
+
+        OrderByQueryOption option = new OrderByQueryOption(
+            "@p,@q desc",
+            context,
+            new ODataQueryOptionParser(
+                model,
+                edmType,
+                entitySet,
+                new Dictionary<string, string> { { "$orderby", "@p,@q desc" }, { "@p", "Id" }, { "@q", "RelatedEntity/Id" } }));
+
+        ODataValidationSettings settings = new ODataValidationSettings();
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
     }
 
     private static IEdmModel GetEdmModel()

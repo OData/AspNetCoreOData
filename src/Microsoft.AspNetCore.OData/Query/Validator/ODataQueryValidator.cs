@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
@@ -153,13 +154,20 @@ public class ODataQueryValidator : IODataQueryValidator
             return false;
         }
 
-        // Helper function to aggregate errors
+        // To prevent duplicates in the `errors` list, ensure that each error is unique before adding it.
+        // Modify the `AddValidationErrors` helper function to check for duplicates.
+
         void AddValidationErrors(IEnumerable<ODataException> queryOptionErrors)
         {
-            if (queryOptionErrors != null)
+            if (queryOptionErrors == null)
             {
-                errors.AddRange(queryOptionErrors);
+                return;
             }
+
+            var uniqueErrors = queryOptionErrors
+                .Where(error => !errors.Any(e => e.Message == error.Message));
+
+            errors.AddRange(uniqueErrors);
         }
 
         // Validate each query option

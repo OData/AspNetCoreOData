@@ -63,12 +63,19 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
             errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
         }
 
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
         if (skipToken?.Context != null)
         {
             DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
             if (!defaultConfigs.EnableSkipToken)
             {
-                errors.Add(new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions")));
+                errors.Add(new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, nameof(AllowedQueryOptions))));
             }
         }
 

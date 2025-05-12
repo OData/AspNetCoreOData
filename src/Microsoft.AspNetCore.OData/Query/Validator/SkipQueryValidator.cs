@@ -59,6 +59,13 @@ public class SkipQueryValidator : ISkipQueryValidator
             errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
         }
 
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
+            validationErrors = errors;
+            return false;
+        }
+
         if (skipQueryOption.Value > validationSettings.MaxSkip)
         {
             errors.Add(new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value)));
