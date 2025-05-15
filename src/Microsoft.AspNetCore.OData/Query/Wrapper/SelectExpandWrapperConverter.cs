@@ -16,8 +16,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 /// <summary>
 /// Supports converting <see cref="SelectExpandWrapper{T}"/> types by using a factory pattern.
 /// </summary>
-internal class SelectExpandWrapperConverter : JsonConverterFactory
+public class SelectExpandWrapperConverter : JsonConverterFactory
 {
+    /// <summary>
+    /// The mapper provider.
+    /// </summary>
     public static readonly Func<IEdmModel, IEdmStructuredType, IPropertyMapper> MapperProvider =
         (IEdmModel model, IEdmStructuredType type) => new JsonPropertyNameMapper(model, type);
 

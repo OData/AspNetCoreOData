@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -14,6 +15,7 @@ using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 
+[JsonConverter(typeof(SelectExpandWrapperConverter))]
 internal abstract class SelectExpandWrapper : IEdmEntityObject, ISelectExpandWrapper
 {
     private static readonly IPropertyMapper DefaultPropertyMapper = new IdentityPropertyMapper();
