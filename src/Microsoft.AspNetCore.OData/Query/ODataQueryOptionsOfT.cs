@@ -5,11 +5,18 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -18,7 +25,7 @@ namespace Microsoft.AspNetCore.OData.Query;
 /// Currently this only supports $filter, $orderby, $top, $skip.
 /// </summary>
 [ODataQueryParameterBinding]
-public class ODataQueryOptions<TEntity> : ODataQueryOptions
+public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterMetadataProvider
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
@@ -94,6 +101,41 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions
         ValidateQuery(query);
         return base.ApplyTo(query, querySettings);
     }
+
+    /// <summary>
+    /// Binds the <see cref="HttpContext"/> and <see cref="ParameterInfo"/> to generate the <see cref="ODataQueryOptions{TEntity}"/>.
+    /// </summary>
+    /// <param name="context">The HttpContext.</param>
+    /// <param name="parameter">The parameter info.</param>
+    /// <returns>The built <see cref="ODataQueryOptions{TEntity}"/></returns>
+    public static async ValueTask<ODataQueryOptions<TEntity>> BindAsync(HttpContext context, ParameterInfo parameter)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
+        Type entityClrType = typeof(TEntity);
+        IEdmModel model = context.GetOrCreateEdmModel(entityClrType, parameter);
+        ODataPath path = context.GetOrCreateODataPath(entityClrType);
+        context.ODataFeature().Services = context.GetOrCreateServiceProvider();
+
+        ODataQueryContext entitySetContext = new ODataQueryContext(model, entityClrType, path);
+        var result = new ODataQueryOptions<TEntity>(entitySetContext, context.Request);
+
+        return await ValueTask.FromResult(result);
+    }
+
+    /// <summary>
+    /// Populates metadata for the related <see cref="Endpoint"/> and <see cref="ParameterInfo"/>.
+    /// </summary>
+    /// <param name="parameter" >The parameter info.</param>
+    /// <param name="builder">The endpoint builder that we can add metadata into.</param>
+    public static void PopulateMetadata(ParameterInfo parameter, EndpointBuilder builder)
+    {
+        // Make sure we have the metadata added into the endpoint.
+        // Shall we build the 'EdmModel' here? ==> Emm...No, because the 'convention' runs after this population.
+        // If developer calls 'WithODataModel()', then any model created here will be replaced. So, no need/required to create model here.
+        ODataEndpointConventionBuilderExtensions.ConfigureODataMetadata(builder, null);
+   }
 
     private static void ValidateQuery(IQueryable query)
     {

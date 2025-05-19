@@ -5,10 +5,17 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Extensions;
 
@@ -74,5 +81,154 @@ public static class HttpContextExtensions
         }
 
         return httpContext.RequestServices?.GetService<IOptions<ODataOptions>>()?.Value;
+    }
+
+    internal static IEdmModel GetOrCreateEdmModel(this HttpContext httpContext, Type clrType, ParameterInfo parameter = null)
+    {
+        if (httpContext == null)
+        {
+            throw Error.ArgumentNull(nameof(httpContext));
+        }
+
+        // P1. Get model from the request if it's configured/cached, used it.
+        IODataFeature odataFeature = httpContext.ODataFeature();
+        IEdmModel model = odataFeature.Model;
+        if (model is not null)
+        {
+            return model;
+        }
+
+        // P2. Retrieve it from metadata if 'WithODataModel(model)' called/cached.
+        var endpoint = httpContext.GetEndpoint();
+        var odataMiniMetadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        model = odataMiniMetadata?.Model;
+        if (model is not null)
+        {
+            odataFeature.Model = model;
+            return model;
+        }
+
+        // 3.Ok, we don't have the model configured, let's build the model on the fly
+        bool isQueryCompositionMode = parameter != null ? true : false;
+
+        IAssemblyResolver resolver = httpContext.RequestServices.GetService<IAssemblyResolver>() ?? new DefaultAssemblyResolver();
+        ODataModelBuilder builder = new ODataConventionModelBuilder(resolver, isQueryCompositionMode);
+
+        EntityTypeConfiguration entityTypeConfiguration = builder.AddEntityType(clrType);
+        builder.AddEntitySet(clrType.Name, entityTypeConfiguration);
+
+        // Do the model configuration if the configuration service is registered.
+        // First, let's check the configuration on the parameter as attribute (provided using parameterInfo)
+        var modelConfig = parameter?.GetCustomAttributes()
+            .FirstOrDefault(c => c is IODataModelConfiguration) as IODataModelConfiguration;
+
+        // Then, check the configuration on the globle
+        modelConfig = modelConfig ?? httpContext.RequestServices.GetService<IODataModelConfiguration>();
+        if (modelConfig is not null)
+        {
+            builder = modelConfig.Apply(httpContext, builder, clrType);
+        }
+
+        model = builder.GetEdmModel();
+
+        // Add the model into the cache
+        if (odataMiniMetadata is not null)
+        {
+            // make sure the 'ServiceProvider' is built after the model configuration.
+            odataMiniMetadata.Model = model;
+        }
+
+        // Cached it into the ODataFeature()
+        odataFeature.Model = model;
+        return model;
+    }
+
+    internal static ODataPath GetOrCreateODataPath(this HttpContext httpContext, Type clrType)
+    {
+        if (httpContext == null)
+        {
+            throw Error.ArgumentNull(nameof(httpContext));
+        }
+
+        // 1. Get model for the request if it's configured/cached, used it.
+        IODataFeature odataFeature = httpContext.ODataFeature();
+        if (odataFeature.Path is not null)
+        {
+            return odataFeature.Path;
+        }
+
+        IEdmModel model = httpContext.GetOrCreateEdmModel(clrType);
+
+        // 2. Retrieve it from metadata?
+        var endpoint = httpContext.GetEndpoint();
+        var odataMiniMetadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        var pathFactory = odataMiniMetadata?.PathFactory ?? ODataMiniMetadata.DefaultPathFactory;
+
+        var path = pathFactory.Invoke(httpContext, clrType);
+        odataFeature.Path = path;
+
+        return path;
+    }
+
+    internal static IServiceProvider GetOrCreateServiceProvider(this HttpContext httpContext)
+    {
+        if (httpContext == null)
+        {
+            throw Error.ArgumentNull(nameof(httpContext));
+        }
+
+        // 1. Get service provider for the request if it's configured/cached, used it.
+        IODataFeature odataFeature = httpContext.ODataFeature();
+        if (odataFeature.Services is not null)
+        {
+            return odataFeature.Services;
+        }
+
+        // 2. Retrieve it from metadata?
+        var endpoint = httpContext.GetEndpoint();
+        var odataMiniMetadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        if (odataMiniMetadata is not null)
+        {
+            odataFeature.Services = odataMiniMetadata.ServiceProvider;
+            return odataFeature.Services;
+        }
+
+        return null;
+    }
+
+    internal static IServiceProvider BuildDefaultServiceProvider(this HttpContext httpContext, IEdmModel model)
+    {
+        ArgumentNullException.ThrowIfNull(httpContext);
+        ArgumentNullException.ThrowIfNull(model);
+
+        ODataMiniOptions miniOptions = httpContext.RequestServices.GetService<IOptions<ODataMiniOptions>>()?.Value
+            ?? new ODataMiniOptions();
+
+        IServiceCollection services = new ServiceCollection();
+
+        // Inject the core odata services.
+        services.AddDefaultODataServices(miniOptions.Version);
+
+        // Inject the default query configuration from this options.
+        services.AddSingleton(sp => miniOptions.QueryConfigurations);
+
+        // Inject the default Web API OData services.
+        services.AddDefaultWebApiServices();
+
+        // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
+        services.AddSingleton<ODataUriResolver>(sp =>
+            new UnqualifiedODataUriResolver
+            {
+                EnableCaseInsensitive = miniOptions.EnableCaseInsensitive, // by default to enable case insensitive
+                EnableNoDollarQueryOptions = miniOptions.EnableNoDollarQueryOptions // retrieve it from global setting
+            });
+
+        // Inject the Edm model.
+        // From Current ODL implement, such injection only be used in reader and writer if the input
+        // model is null.
+        // How about the model is null?
+        services.AddSingleton(sp => model);
+
+        return services.BuildServiceProvider();
     }
 }

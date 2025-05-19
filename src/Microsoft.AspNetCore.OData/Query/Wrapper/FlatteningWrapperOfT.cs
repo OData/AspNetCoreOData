@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.OData.Query.Container;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 
+[JsonConverter(typeof(DynamicTypeWrapperConverter))]
 internal class FlatteningWrapper<T> : GroupByWrapper, IGroupByWrapper<AggregationPropertyContainer, GroupByWrapper>, IFlatteningWrapper<T>
 {
     public T Source { get; set; }

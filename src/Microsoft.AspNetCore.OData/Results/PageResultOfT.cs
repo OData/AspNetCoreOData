@@ -10,6 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Results;
 
@@ -23,6 +24,7 @@ namespace Microsoft.AspNetCore.OData.Results;
 /// </remarks>
 [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "Collection suffix not appropriate")]
 [DataContract]
+[JsonConverter(typeof(PageResultValueConverter))]
 public class PageResult<T> : PageResult, IEnumerable<T>
 {
     /// <summary>

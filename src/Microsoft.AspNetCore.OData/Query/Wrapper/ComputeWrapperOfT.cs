@@ -19,6 +19,7 @@ using Microsoft.OData.Edm;
 namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 
 /// <inheritdoc/>
+[JsonConverter(typeof(DynamicTypeWrapperConverter))]
 internal class ComputeWrapper<T> : GroupByWrapper, IGroupByWrapper<AggregationPropertyContainer, GroupByWrapper>, IComputeWrapper<T>, IEdmEntityObject
 {
     /// <summary>
