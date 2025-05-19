@@ -23,7 +23,7 @@ using Microsoft.OData.UriParser;
 namespace Microsoft.AspNetCore.OData;
 
 /// <summary>
-/// Extension methods for adding <see cref="IODataQueryEndpointFilter"/> to a route handler.
+/// Extension methods for adding <see cref="IODataQueryEndpointFilter"/> and metadata to a route handler.
 /// </summary>
 public static class ODataEndpointConventionBuilderExtensions
 {
@@ -141,7 +141,7 @@ public static class ODataEndpointConventionBuilderExtensions
             object result = await next(invocationContext);
 
             // If it's null or if it's already the ODataResult, simply do nothing
-            if (result is null || result is ODataResult || result is ODataMetadataResult || result is ODataServiceDocumentResult)
+            if (result is null || typeof(IResult).IsAssignableFrom(result.GetType()))
             {
                 return result;
             }

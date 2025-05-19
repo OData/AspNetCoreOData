@@ -33,11 +33,13 @@ public class ODataMiniOptions
 
     /// <summary>
     /// Gets whether or not the OData system query options should be prefixed with '$'.
+    /// Please call 'SetNoDollarQueryOptions()' to config.
     /// </summary>
     public bool EnableNoDollarQueryOptions { get => _enableNoDollarQueryOptions; }
 
     /// <summary>
     /// Ges whether or not case insensitive.
+    /// Please call 'SetCaseInsensitive()' to config.
     /// </summary>
     public bool EnableCaseInsensitive { get => _enableCaseInsensitive; }
 

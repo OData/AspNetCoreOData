@@ -85,6 +85,11 @@ public sealed class Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExt
 	[
 	ExtensionAttribute(),
 	]
+	public static TBuilder WithODataPathFactory (TBuilder builder, System.Func`3[[Microsoft.AspNetCore.Http.HttpContext],[System.Type],[Microsoft.OData.UriParser.ODataPath]] pathFactory)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static TBuilder WithODataResult (TBuilder builder)
 
 	[
@@ -635,6 +640,11 @@ public class Microsoft.AspNetCore.OData.Deltas.Delta`1 : Microsoft.AspNetCore.OD
 	Microsoft.AspNetCore.OData.Deltas.DeltaItemKind Kind  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
 	System.Collections.Generic.IList`1[[System.String]] UpdatableProperties  { public get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public static ValueTask`1 BindAsync (Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter)
 
 	public virtual void Clear ()
 	public void CopyChangedValues (T original)

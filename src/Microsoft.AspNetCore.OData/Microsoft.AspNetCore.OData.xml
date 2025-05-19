@@ -6553,7 +6553,7 @@
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions">
             <summary>
-            Extension methods for adding <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to a route handler.
+            Extension methods for adding <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> and metadata to a route handler.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataServiceDocument(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
@@ -6756,11 +6756,13 @@
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions">
             <summary>
             Gets whether or not the OData system query options should be prefixed with '$'.
+            Please call 'SetNoDollarQueryOptions()' to config.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableCaseInsensitive">
             <summary>
             Ges whether or not case insensitive.
+            Please call 'SetCaseInsensitive()' to config.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
