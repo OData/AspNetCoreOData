@@ -5094,14 +5094,6 @@
             <param name="writeContext">The serializer context.</param>
             <returns>The created operation or null if the operation should not be written.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSetSerializer.IsAsyncEnumerableType(System.Type)">
-            <summary>
-            Determines whether the specified <see cref="T:System.Type"/> represents an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> type.
-            </summary>
-            <param name="type">The <see cref="T:System.Type"/> to evaluate.</param>
-            <returns><see langword="true"/> if the specified <paramref name="type"/> is an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> type;
-            otherwise, <see langword="false"/>.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer">
             <summary>
             Base class for <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.IODataSerializer"/> implementations.
