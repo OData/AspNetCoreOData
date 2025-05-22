@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Attributes;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.IAsyncEnumerableTests;
@@ -41,7 +42,8 @@ public class CustomersController : ODataController
 
     [EnableQuery]
     [HttpGet("odata/Customers")]
-    public IAsyncEnumerable<Customer> CustomersForODataRoute()
+    [ODataRouteComponent]
+    public IAsyncEnumerable<Customer> Get()
     {
         return _context.Customers.AsAsyncEnumerable();
     }

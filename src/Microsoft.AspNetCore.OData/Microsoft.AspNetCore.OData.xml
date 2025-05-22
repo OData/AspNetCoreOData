@@ -1151,6 +1151,13 @@
             <param name="elementType">out: the element type of the collection.</param>
             <returns>True if the type is an enumeration; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsAsyncEnumerableType(System.Type)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Type"/> represents an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> type.
+            </summary>
+            <param name="clrType">The <see cref="T:System.Type"/> to evaluate.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>
             Returns type of T if the type implements IEnumerable of T, otherwise, return null.
