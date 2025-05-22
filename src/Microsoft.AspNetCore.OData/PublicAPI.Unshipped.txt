@@ -1,0 +1,88 @@
+Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration
+Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration.Apply(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.OData.ModelBuilder.ODataModelBuilder builder, System.Type clrType) -> Microsoft.OData.ModelBuilder.ODataModelBuilder
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.HttpContext.get -> Microsoft.AspNetCore.Http.HttpContext
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.InvocationContext.get -> Microsoft.AspNetCore.Http.EndpointFilterInvocationContext
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.InvocationContext.init -> void
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.MethodInfo.get -> System.Reflection.MethodInfo
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.MethodInfo.init -> void
+Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.ODataQueryFilterInvocationContext() -> void
+Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions
+Microsoft.AspNetCore.OData.ODataMiniMetadata
+Microsoft.AspNetCore.OData.ODataMiniMetadata.BaseAddressFactory.get -> System.Func<Microsoft.AspNetCore.Http.HttpContext, System.Uri>
+Microsoft.AspNetCore.OData.ODataMiniMetadata.BaseAddressFactory.set -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.IsODataFormat.get -> bool
+Microsoft.AspNetCore.OData.ODataMiniMetadata.IsODataFormat.set -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Model.get -> Microsoft.OData.Edm.IEdmModel
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Model.set -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.ODataMiniMetadata() -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Options.get -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniMetadata.PathFactory.get -> System.Func<Microsoft.AspNetCore.Http.HttpContext, System.Type, Microsoft.OData.UriParser.ODataPath>
+Microsoft.AspNetCore.OData.ODataMiniMetadata.PathFactory.set -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.ServiceProvider.get -> System.IServiceProvider
+Microsoft.AspNetCore.OData.ODataMiniMetadata.ServiceProvider.set -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Services.get -> System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection>
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Services.set -> void
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Version.get -> Microsoft.OData.ODataVersion
+Microsoft.AspNetCore.OData.ODataMiniMetadata.Version.set -> void
+Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.Count() -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.EnableAll(int? maxTopValue = null) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.EnableCaseInsensitive.get -> bool
+Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions.get -> bool
+Microsoft.AspNetCore.OData.ODataMiniOptions.Expand() -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.Filter() -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.ODataMiniOptions() -> void
+Microsoft.AspNetCore.OData.ODataMiniOptions.OrderBy() -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.QueryConfigurations.get -> Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
+Microsoft.AspNetCore.OData.ODataMiniOptions.Select() -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetCaseInsensitive(bool enableCaseInsensitive) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(bool enableNoDollarQueryOptions) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetVersion(Microsoft.OData.ODataVersion version) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SkipToken() -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.Version.get -> Microsoft.OData.ODataVersion
+Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter
+Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutedAsync(object responseValue, Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask<object>
+Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask
+Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter
+Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ODataQueryEndpointFilter() -> void
+Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.ODataQuerySettings
+Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidationSettings.get -> Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
+Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter
+Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.SelectExpandWrapperConverter() -> void
+Microsoft.AspNetCore.OData.Results.IODataResult
+Microsoft.AspNetCore.OData.Results.IODataResult.ExpectedType.get -> System.Type
+Microsoft.AspNetCore.OData.Results.IODataResult.Value.get -> object
+override Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CanConvert(System.Type typeToConvert) -> bool
+override Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CreateConverter(System.Type type, System.Text.Json.JsonSerializerOptions options) -> System.Text.Json.Serialization.JsonConverter
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Builder.RouteHandlerBuilder builder, Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter queryFilter) -> Microsoft.AspNetCore.Builder.RouteHandlerBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Builder.RouteHandlerBuilder builder, System.Action<Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings> validationSetup = null, System.Action<Microsoft.AspNetCore.OData.Query.ODataQuerySettings> querySetup = null) -> Microsoft.AspNetCore.Builder.RouteHandlerBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Routing.RouteGroupBuilder builder, Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter queryFilter) -> Microsoft.AspNetCore.Routing.RouteGroupBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Routing.RouteGroupBuilder builder, System.Action<Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings> validationSetup = null, System.Action<Microsoft.AspNetCore.OData.Query.ODataQuerySettings> querySetup = null) -> Microsoft.AspNetCore.Routing.RouteGroupBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter<TFilterType>(this Microsoft.AspNetCore.Builder.RouteHandlerBuilder builder) -> Microsoft.AspNetCore.Builder.RouteHandlerBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter<TFilterType>(this Microsoft.AspNetCore.Routing.RouteGroupBuilder builder) -> Microsoft.AspNetCore.Routing.RouteGroupBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata(this Microsoft.AspNetCore.Routing.IEndpointRouteBuilder endpoints, string pattern, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.Builder.IEndpointConventionBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataServiceDocument(this Microsoft.AspNetCore.Routing.IEndpointRouteBuilder endpoints, string pattern, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.Builder.IEndpointConventionBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataBaseAddressFactory<TBuilder>(this TBuilder builder, System.Func<Microsoft.AspNetCore.Http.HttpContext, System.Uri> baseAddressFactory) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataModel<TBuilder>(this TBuilder builder, Microsoft.OData.Edm.IEdmModel model) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataOptions<TBuilder>(this TBuilder builder, System.Action<Microsoft.AspNetCore.OData.ODataMiniOptions> setupAction) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataPathFactory<TBuilder>(this TBuilder builder, System.Func<Microsoft.AspNetCore.Http.HttpContext, System.Type, Microsoft.OData.UriParser.ODataPath> pathFactory) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataResult<TBuilder>(this TBuilder builder) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices<TBuilder>(this TBuilder builder, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> services) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion<TBuilder>(this TBuilder builder, Microsoft.OData.ODataVersion version) -> TBuilder
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataMiniOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>>
+static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.PopulateMetadata(System.Reflection.ParameterInfo parameter, Microsoft.AspNetCore.Builder.EndpointBuilder builder) -> void
+static readonly Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.MapperProvider -> System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper>
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(object entity, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> object
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateAndValidateQueryOptions(Microsoft.AspNetCore.Http.HttpContext httpContext, Microsoft.AspNetCore.OData.Query.ODataQueryContext queryContext) -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ExecuteQuery(object responseValue, System.Linq.IQueryable singleResultCollection, Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> object
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetModel(System.Type elementClrType, Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> Microsoft.OData.Edm.IEdmModel
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.InvokeAsync(Microsoft.AspNetCore.Http.EndpointFilterInvocationContext invocationContext, Microsoft.AspNetCore.Http.EndpointFilterDelegate next) -> System.Threading.Tasks.ValueTask<object>
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutedAsync(object responseValue, Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask<object>
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask
+virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateQuery(Microsoft.AspNetCore.Http.HttpContext httpContext, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> void

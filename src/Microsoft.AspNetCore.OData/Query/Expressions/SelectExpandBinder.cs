@@ -12,6 +12,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Query.Container;
@@ -190,10 +191,12 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
     /// <param name="elementType">The <see cref="IEdmStructuredType"/> that contains the edmProperty.</param>
     /// <param name="edmProperty">The <see cref="IEdmProperty"/> from which we are creating an <see cref="Expression"/>.</param>
     /// <param name="source">The source <see cref="Expression"/>.</param>
-    /// <param name="filterClause">The $filter query represented by <see cref="FilterClause"/>.</param>
-    /// <param name="computeClause">The $compute query represented by <see cref="ComputeClause"/>.</param>
+    /// <param name="filterClause">The nested $filter query represented by <see cref="FilterClause"/>.</param>
+    /// <param name="computeClause">The nested $compute query represented by <see cref="ComputeClause"/>.</param>
+    /// <param name="search">The nested $search query represented by <see cref="SearchClause"/>.</param>
     /// <returns>The created <see cref="Expression"/>.</returns>
-    public virtual Expression CreatePropertyValueExpression(QueryBinderContext context, IEdmStructuredType elementType, IEdmProperty edmProperty, Expression source, FilterClause filterClause, ComputeClause computeClause = null)
+    public virtual Expression CreatePropertyValueExpression(QueryBinderContext context, IEdmStructuredType elementType,
+        IEdmProperty edmProperty, Expression source, FilterClause filterClause, ComputeClause computeClause = null, SearchClause search = null)
     {
         if (context == null)
         {
@@ -270,15 +273,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
             }
 
             Expression filterResult = nullablePropertyValue;
-
-            ODataQuerySettings newSettings = new ODataQuerySettings();
-            newSettings.CopyFrom(context.QuerySettings);
-            newSettings.HandleNullPropagation = HandleNullPropagationOption.True;
-            QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, clrElementType);
-            if (computeClause != null)
-            {
-                binderContext.AddComputedProperties(computeClause.ComputedItems);
-            }
+            QueryBinderContext subContext = CreateSubContext(context, computeClause, clrElementType);
 
             if (isCollection)
             {
@@ -286,16 +281,16 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
 
                 // TODO: Implement proper support for $select/$expand after $apply
                 // Expression filterPredicate = FilterBinder.Bind(null, filterClause, clrElementType, queryContext, querySettings);
-                filterResult = FilterBinder.ApplyBind(filterSource, filterClause, binderContext);
+                filterResult = FilterBinder.ApplyBind(filterSource, filterClause, subContext);
 
                 nullablePropertyType = filterResult.Type;
             }
             else if (settings.HandleReferenceNavigationPropertyExpandFilter)
             {
-                LambdaExpression filterLambdaExpression = FilterBinder.BindFilter(filterClause, binderContext) as LambdaExpression;
+                LambdaExpression filterLambdaExpression = FilterBinder.BindFilter(filterClause, subContext) as LambdaExpression;
                 if (filterLambdaExpression == null)
                 {
-                    throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, edmProperty.Name, "LambdaExpression"));
+                    throw new ODataException(Error.Format(SRResources.ExpandFilterExpressionNotLambdaExpression, edmProperty.Name, nameof(LambdaExpression)));
                 }
 
                 ParameterExpression filterParameter = filterLambdaExpression.Parameters.First();
@@ -319,6 +314,39 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
             else
             {
                 nullablePropertyValue = filterResult;
+            }
+        }
+
+        // If both $search and $filter are specified in the same request, only those items satisfying both criteria are returned
+        // apply $search
+        if (search != null && context.SearchBinder != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.Search))
+        {
+            bool isCollection = edmProperty.Type.IsCollection();
+            if (isCollection)
+            {
+                // only apply $search on collection
+                IEdmTypeReference edmElementType = edmProperty.Type.AsCollection().ElementType();
+                Type clrElementType = model.GetClrType(edmElementType);
+                if (clrElementType == null)
+                {
+                    throw new ODataException(Error.Format(SRResources.MappingDoesNotContainResourceType, edmElementType.FullName()));
+                }
+
+                QueryBinderContext subContext = CreateSubContext(context, computeClause, clrElementType);
+                Expression searchResult = context.SearchBinder.ApplyBind(nullablePropertyValue, search, subContext);
+                nullablePropertyType = searchResult.Type;
+                if (settings.HandleNullPropagation == HandleNullPropagationOption.True)
+                {
+                    // create expression similar to: 'nullablePropertyValue == null ? null : filterResult'
+                    nullablePropertyValue = Expression.Condition(
+                        test: Expression.Equal(nullablePropertyValue, Expression.Constant(value: null)),
+                        ifTrue: Expression.Constant(value: null, type: nullablePropertyType),
+                        ifFalse: searchResult);
+                }
+                else
+                {
+                    nullablePropertyValue = searchResult;
+                }
             }
         }
 
@@ -808,7 +836,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
             foreach (IEdmStructuralProperty propertyToInclude in autoSelectedProperties)
             {
                 Expression propertyName = CreatePropertyNameExpression(context, structuredType, propertyToInclude, source);
-                Expression propertyValue = CreatePropertyValueExpression(context, structuredType, propertyToInclude, source, filterClause: null, computeClause: null);
+                Expression propertyValue = CreatePropertyValueExpression(context, structuredType, propertyToInclude, source, filterClause: null, computeClause: null, search: null);
                 includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue)
                 {
                     AutoSelected = true
@@ -864,7 +892,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
 
         // Expression:
         //        source.NavigationProperty
-        Expression propertyValue = CreatePropertyValueExpression(context, structuredType, navigationProperty, source, expandedItem.FilterOption, expandedItem.ComputeOption);
+        Expression propertyValue = CreatePropertyValueExpression(context, structuredType, navigationProperty, source, expandedItem.FilterOption, expandedItem.ComputeOption, expandedItem.SearchOption);
 
         // Sub select and expand could be null if the expanded navigation property is not further projected or expanded.
         SelectExpandClause subSelectExpandClause = GetOrCreateSelectExpandClause(navigationProperty, expandedItem);
@@ -940,7 +968,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
         Expression propertyValue;
         if (pathSelectItem == null)
         {
-            propertyValue = CreatePropertyValueExpression(context, structuredType, structuralProperty, source, filterClause: null, computeClause: null);
+            propertyValue = CreatePropertyValueExpression(context, structuredType, structuralProperty, source, filterClause: null, computeClause: null, search: null);
             includedProperties.Add(new NamedPropertyExpression(propertyName, propertyValue));
             return;
         }
@@ -950,7 +978,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
         // TODO: Process $compute in the $select ahead.
         // $compute=...
 
-        propertyValue = CreatePropertyValueExpression(context, structuredType, structuralProperty, source, pathSelectItem.FilterOption, pathSelectItem.ComputeOption);
+        propertyValue = CreatePropertyValueExpression(context, structuredType, structuralProperty, source, pathSelectItem.FilterOption, pathSelectItem.ComputeOption, pathSelectItem.SearchOption);
         Type propertyValueType = propertyValue.Type;
         if (propertyValueType == typeof(char[]) || propertyValueType == typeof(byte[]))
         {
@@ -1191,15 +1219,27 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
         if (orderbyClause != null && IsAvailableODataQueryOption(context.QuerySettings, AllowedQueryOptions.OrderBy))
         {
             // TODO: Implement proper support for $select/$expand after $apply
-            ODataQuerySettings newSettings = new ODataQuerySettings();
-            newSettings.CopyFrom(context.QuerySettings);
-            newSettings.HandleNullPropagation = HandleNullPropagationOption.True;
-            QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, elementType);
+            QueryBinderContext binderContext = CreateSubContext(context, null, elementType);
 
             source = OrderByBinder.ApplyBind(source, orderbyClause, binderContext, false);
         }
 
         return source;
+    }
+
+    private QueryBinderContext CreateSubContext(QueryBinderContext context, ComputeClause computeClause, Type clrElementType,
+        HandleNullPropagationOption option = HandleNullPropagationOption.True)
+    {
+        ODataQuerySettings newSettings = new ODataQuerySettings();
+        newSettings.CopyFrom(context.QuerySettings);
+        newSettings.HandleNullPropagation = option;
+        QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, clrElementType);
+        if (computeClause != null)
+        {
+            binderContext.AddComputedProperties(computeClause.ComputedItems);
+        }
+
+        return binderContext;
     }
 
     private static Expression GetNullCheckExpression(IEdmStructuralProperty propertyToInclude, Expression propertyValue,
@@ -1235,7 +1275,7 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
         Expression keysNullCheckExpression = null;
         foreach (var key in propertyToExpand.ToEntityType().Key())
         {
-            var propertyValueExpression = CreatePropertyValueExpression(context, propertyToExpand.ToEntityType(), key, propertyValue, filterClause: null);
+            var propertyValueExpression = CreatePropertyValueExpression(context, propertyToExpand.ToEntityType(), key, propertyValue, filterClause: null, search: null);
             var keyExpression = Expression.Equal(
                 propertyValueExpression,
                 Expression.Constant(null, propertyValueExpression.Type));

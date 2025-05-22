@@ -16,8 +16,11 @@ namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 /// <summary>
 /// Supports converting <see cref="SelectExpandWrapper{T}"/> types by using a factory pattern.
 /// </summary>
-internal class SelectExpandWrapperConverter : JsonConverterFactory
+public class SelectExpandWrapperConverter : JsonConverterFactory
 {
+    /// <summary>
+    /// The mapper provider.
+    /// </summary>
     public static readonly Func<IEdmModel, IEdmStructuredType, IPropertyMapper> MapperProvider =
         (IEdmModel model, IEdmStructuredType type) => new JsonPropertyNameMapper(model, type);
 
@@ -37,12 +40,12 @@ internal class SelectExpandWrapperConverter : JsonConverterFactory
 
         /* We can use the following codes to limit the compare.
          * But, use the above ISelectExpandWrapper can unblock the new type later.
-        Type generaticType = typeToConvert.GetGenericTypeDefinition();
-        if (generaticType == typeof(SelectSome<>) ||
-            generaticType == typeof(SelectSomeAndInheritance<>) ||
-            generaticType == typeof(SelectAllAndExpand<>) ||
-            generaticType == typeof(SelectAll<>) ||
-            generaticType == typeof(SelectExpandWrapper<>))
+        Type genericType = typeToConvert.GetGenericTypeDefinition();
+        if (genericType == typeof(SelectSome<>) ||
+            genericType == typeof(SelectSomeAndInheritance<>) ||
+            genericType == typeof(SelectAllAndExpand<>) ||
+            genericType == typeof(SelectAll<>) ||
+            genericType == typeof(SelectExpandWrapper<>))
         {
             return true;
         }
@@ -65,30 +68,30 @@ internal class SelectExpandWrapperConverter : JsonConverterFactory
         }
 
         // Since 'type' is tested in 'CanConvert()', it must be a generic type
-        Type generaticType = type.GetGenericTypeDefinition();
+        Type genericType = type.GetGenericTypeDefinition();
         Type entityType = type.GetGenericArguments()[0];
 
-        if (generaticType == typeof(SelectSome<>))
+        if (genericType == typeof(SelectSome<>))
         {
             return (JsonConverter)Activator.CreateInstance(typeof(SelectSomeConverter<>).MakeGenericType(new Type[] { entityType }));
         }
 
-        if (generaticType == typeof(SelectSomeAndInheritance<>))
+        if (genericType == typeof(SelectSomeAndInheritance<>))
         {
             return (JsonConverter)Activator.CreateInstance(typeof(SelectSomeAndInheritanceConverter<>).MakeGenericType(new Type[] { entityType }));
         }
 
-        if (generaticType == typeof(SelectAll<>))
+        if (genericType == typeof(SelectAll<>))
         {
             return (JsonConverter)Activator.CreateInstance(typeof(SelectAllConverter<>).MakeGenericType(new Type[] { entityType }));
         }
 
-        if (generaticType == typeof(SelectAllAndExpand<>))
+        if (genericType == typeof(SelectAllAndExpand<>))
         {
             return (JsonConverter)Activator.CreateInstance(typeof(SelectAllAndExpandConverter<>).MakeGenericType(new Type[] { entityType }));
         }
 
-        if (generaticType == typeof(SelectExpandWrapper<>))
+        if (genericType == typeof(SelectExpandWrapper<>))
         {
             return (JsonConverter)Activator.CreateInstance(typeof(SelectExpandWrapperConverter<>).MakeGenericType(new Type[] { entityType }));
         }

@@ -41,7 +41,7 @@ public class CustomersController : ControllerBase
 
     // For example: http://localhost:5000/v1/customers?$apply=groupby((Name), aggregate($count as count))&$orderby=name desc
     [HttpGet]
-    [EnableQuery]
+    [EnableQuery(PageSize = 2)]
     public IActionResult Get()
     {
         return Ok(GetCustomers());

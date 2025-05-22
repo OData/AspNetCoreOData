@@ -19,7 +19,7 @@ internal static class ODataQueryContextExtensions
     public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
     {
         ODataQuerySettings returnSettings = new ODataQuerySettings();
-        ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+        ODataQuerySettings settings = context?.RequestContainer?.GetService<ODataQuerySettings>();
         if (settings != null)
         {
             returnSettings.CopyFrom(settings);
@@ -31,7 +31,7 @@ internal static class ODataQueryContextExtensions
     public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
     {
         ODataQuerySettings updatedSettings = new ODataQuerySettings();
-        ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+        ODataQuerySettings settings = context?.RequestContainer?.GetService<ODataQuerySettings>();
         if (settings != null)
         {
             updatedSettings.CopyFrom(settings);
