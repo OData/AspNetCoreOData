@@ -805,6 +805,10 @@ public class ODataQueryOptions
         TruncatedCollection<T> truncatedCollection = new TruncatedCollection<T>(queryable, limit, parameterize);
         resultsLimited = truncatedCollection.IsTruncated;
         return truncatedCollection.AsQueryable();
+
+        //TruncatedCollectionOfTOpt<T> truncatedCollection = new TruncatedCollectionOfTOpt<T>(queryable, limit, parameterize);
+        //resultsLimited = truncatedCollection.IsTruncated;
+        //return truncatedCollection.AsQueryable();
     }
 
     internal void AddAutoSelectExpandProperties()

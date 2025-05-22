@@ -32,5 +32,14 @@ internal class CollectionExpandedProperty<T> : NamedProperty<T>
         {
             return new TruncatedCollection<T>(Collection, PageSize, TotalCount);
         }
+
+        //if (TotalCount == null)
+        //{
+        //    return new TruncatedCollectionOfTOpt<T>(Collection, PageSize);
+        //}
+        //else
+        //{
+        //    return new TruncatedCollectionOfTOpt<T>(Collection, PageSize, TotalCount);
+        //}
     }
 }
