@@ -258,6 +258,22 @@ public class TypeHelperTest
     [InlineData(typeof(IEnumerable<CustomInternalClass>))]
     [InlineData(typeof(IEnumerable<CustomGenericAsyncEnumerable<CustomInternalClass>>))]
     [InlineData(typeof(IEnumerable<CustomGenericAsyncEnumerable<int>>))]
+    [InlineData(typeof(string))]
+    [InlineData(typeof(int))]
+    [InlineData(typeof(CustomBoolCollection))]
+    [InlineData(typeof(CustomIntCollection))]
+    [InlineData(typeof(CustomAbstractClass))]
+    [InlineData(typeof(CustomConcreteClass))]
+    [InlineData(typeof(Task<int>))]
+    [InlineData(typeof(Task<string>))]
+    [InlineData(typeof(Task<IEnumerable<bool>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomInternalClass>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomGenericAsyncEnumerable<CustomInternalClass>>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomGenericAsyncEnumerable<int>>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomAsyncEnumerable>>))]
+    [InlineData(typeof(Task<IAsyncEnumerator<int>>))]
+    [InlineData(typeof(Task<IAsyncEnumerable<int>>))]
+    [InlineData(typeof(CustomInternalClass[]))]
     public void IsAsyncEnumerableType_ReturnsFalse_ForNonAsyncEnumerableType(Type type)
     {
         // Arrange & Act

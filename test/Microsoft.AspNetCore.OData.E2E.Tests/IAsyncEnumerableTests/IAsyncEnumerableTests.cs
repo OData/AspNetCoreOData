@@ -132,7 +132,7 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
         // Act
-       HttpResponseMessage response = await Client.SendAsync(request);
+        HttpResponseMessage response = await Client.SendAsync(request);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
