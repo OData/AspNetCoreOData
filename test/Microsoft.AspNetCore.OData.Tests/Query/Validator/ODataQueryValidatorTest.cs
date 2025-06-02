@@ -570,7 +570,6 @@ public class ODataQueryValidatorTest
         var settings = new ODataValidationSettings();
         var expectedMessage = "'select' and 'expand' cannot be empty or whitespace. Omit the parameter from the query if it is not used.";
 
-
         // Act
         var result = _validator.TryValidate(options, settings, out IEnumerable<string> errors);
 
