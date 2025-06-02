@@ -665,28 +665,20 @@ public class ODataQueryOptions
     /// langword="false"/> if validation failed.</returns>
     public virtual bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
-        if (validationSettings == null)
+        if(validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
-
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
-            validationErrors = errors;
+            validationErrors = new[] { Error.ArgumentNull(nameof(validationSettings)).Message };
             return false;
         }
 
         this.Context.ValidationSettings = validationSettings;
 
-        if (Validator != null)
+        if (Validator != null && !Validator.TryValidate(this, validationSettings, out validationErrors))
         {
-            return Validator.TryValidate(this, validationSettings, out validationErrors);
+            return false;
         }
 
-        validationErrors = null;
+        validationErrors = Array.Empty<string>();
         return true;
     }
 

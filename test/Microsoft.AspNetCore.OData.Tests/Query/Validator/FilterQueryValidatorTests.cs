@@ -19,6 +19,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator;
 
+[CollectionDefinition("FilterQueryValidatorTests", DisableParallelization = false)]
 public class FilterQueryValidatorTests
 {
     private MyFilterValidator _validator;

@@ -29,12 +29,12 @@ public class OrderByQueryValidator : IOrderByQueryValidator
     {
         if (orderByOption == null)
         {
-            throw Error.ArgumentNull(nameof(orderByOption));
+            throw Error.ArgumentNull("orderByOption");
         }
 
         if (validationSettings == null)
         {
-            throw Error.ArgumentNull(nameof(validationSettings));
+            throw Error.ArgumentNull("validationSettings");
         }
 
         OrderByValidatorContext validatorContext = new OrderByValidatorContext

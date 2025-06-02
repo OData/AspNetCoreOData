@@ -62,6 +62,9 @@ public class SkipQueryValidator : ISkipQueryValidator
             {
                 errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
             }
+
+            validationErrors = errors;
+            return false;
         }
 
         if (skipQueryOption.Value > validationSettings.MaxSkip)

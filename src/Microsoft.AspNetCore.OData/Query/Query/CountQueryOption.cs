@@ -123,7 +123,7 @@ public class CountQueryOption
     {
         if (validationSettings == null)
         {
-            throw Error.ArgumentNull(nameof(validationSettings));
+            throw Error.ArgumentNull("validationSettings");
         }
 
         if (Validator != null)

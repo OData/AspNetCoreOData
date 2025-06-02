@@ -77,7 +77,7 @@ public class ComputeQueryValidator : IComputeQueryValidator
         }
         catch (ODataException ex)
         {
-            validationErrors = new List<string> { ex.Message };
+            validationErrors = new[] { ex.Message };
             return false;
         }
 
