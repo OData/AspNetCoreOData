@@ -56,13 +56,13 @@ public class FilterQueryValidator : IFilterQueryValidator
     /// </summary>
     /// <param name="filterQueryOption">The $filter query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
         if(filterQueryOption == null || validationSettings == null)
         {
-            // Preallocate with a reasonable default capacity.
+            // Pre-allocate with a reasonable default capacity.
             List<string> errors = new List<string>(2);
 
             // Validate input parameters

@@ -143,8 +143,7 @@ public class ComputeQueryOption
     /// Attempts to validate the $compute query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
     /// </summary>
     /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
-    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="string"/> instances describing any
-    /// validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {

@@ -63,7 +63,7 @@ public class OrderByQueryValidator : IOrderByQueryValidator
     /// </summary>
     /// <param name="orderByOption">The $orderby query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
@@ -71,7 +71,7 @@ public class OrderByQueryValidator : IOrderByQueryValidator
 
         if (orderByOption == null || validationSettings == null)
         {
-            // Preallocate with a reasonable default capacity.
+            // Pre-allocate with a reasonable default capacity.
             errors = new List<string>(2);
 
             if (orderByOption == null)
@@ -109,7 +109,7 @@ public class OrderByQueryValidator : IOrderByQueryValidator
             }
             catch(Exception ex)
             {
-                // Preallocate with a reasonable default capacity.
+                // Pre-allocate with a reasonable default capacity.
                 errors ??= new List<string>(4);
                 errors.Add(ex.Message);
             }

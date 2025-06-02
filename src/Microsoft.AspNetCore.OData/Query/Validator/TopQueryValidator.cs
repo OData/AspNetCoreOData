@@ -62,13 +62,13 @@ public class TopQueryValidator : ITopQueryValidator
     /// </summary>
     /// <param name="topQueryOption">The $top query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(TopQueryOption topQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
         if (topQueryOption == null || validationSettings == null)
         {
-            // Preallocate with a reasonable default capacity.
+            // Pre-allocate with a reasonable default capacity.
             List<string> errors = new List<string>(2);
 
             if (topQueryOption == null)

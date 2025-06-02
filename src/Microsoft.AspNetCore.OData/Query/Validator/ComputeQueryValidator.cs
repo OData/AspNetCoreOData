@@ -40,20 +40,19 @@ public class ComputeQueryValidator : IComputeQueryValidator
         _ = computeQueryOption.ComputeClause;
     }
 
-    /// <summary>
-    /// Attempts to validate the <see cref="ComputeQueryOption" />.
-    /// </summary>
-    /// <param name="computeQueryOption">The $compute query.</param>
-    /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="string"/> instances describing any
-    /// validation errors encountered, or an empty collection if validation succeeds.</param>
-    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+	/// <summary>
+	/// Attempts to validate the <see cref="ComputeQueryOption" />.
+	/// </summary>
+	/// <param name="computeQueryOption">The $compute query.</param>
+	/// <param name="validationSettings">The validation settings.</param>
+	/// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+	/// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+	public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
         if (computeQueryOption == null || validationSettings == null)
         {
             // Use a single allocation for the error list only when needed
-            // Preallocate with a reasonable default capacity.
+            // Pre-allocate with a reasonable default capacity.
             List<string> errors = new List<string>(2);
 
             if (computeQueryOption == null)

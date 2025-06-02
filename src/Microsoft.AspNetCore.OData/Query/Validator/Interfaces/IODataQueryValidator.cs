@@ -27,7 +27,7 @@ public interface IODataQueryValidator
     /// </summary>
     /// <param name="options">The OData query options to validate.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">The collection of validation errors.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns>True if the validation succeeded; otherwise, false.</returns>
     bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors);
 }

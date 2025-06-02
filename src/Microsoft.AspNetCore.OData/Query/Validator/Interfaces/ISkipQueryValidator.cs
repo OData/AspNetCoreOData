@@ -27,7 +27,7 @@ public interface ISkipQueryValidator
     /// </summary>
     /// <param name="skipQueryOption">The $skip query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     bool TryValidate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors);
 }

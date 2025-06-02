@@ -130,7 +130,7 @@ public class ODataQueryValidator : IODataQueryValidator
     /// </summary>
     /// <param name="options">The OData query to validate.</param>
     /// <param name="validationSettings">The settings used for validation.</param>
-    /// <param name="validationErrors">The collection of validation errors.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns>True if validation is successful; otherwise, false.</returns>
     public virtual bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
@@ -138,7 +138,7 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options == null || validationSettings == null)
         {
-            // Preallocate with a reasonable default capacity.
+            // Pre-allocate with a reasonable default capacity.
             errors = new List<string>(2);
 
             // Validate input parameters
@@ -165,7 +165,7 @@ public class ODataQueryValidator : IODataQueryValidator
                 return;
             }
 
-            // Preallocate with a reasonable default capacity.
+            // Pre-allocate with a reasonable default capacity.
             errors ??= new List<string>(4);
 
             // If errors list is not empty, we need to ensure uniqueness.

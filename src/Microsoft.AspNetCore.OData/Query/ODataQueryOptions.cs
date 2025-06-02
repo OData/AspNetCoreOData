@@ -658,9 +658,7 @@ public class ODataQueryOptions
     /// Attempts to validate all OData queries, including $skip, $top, $orderby and $filter, based on the given <paramref name="validationSettings"/>.
     /// </summary>
     /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
-    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="string"/> instances describing validation
-    /// errors, if any occurred; otherwise, <see langword="null"/> if validation was successful or no validator is
-    /// configured.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation was successful or no validator is configured; otherwise, <see
     /// langword="false"/> if validation failed.</returns>
     public virtual bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
