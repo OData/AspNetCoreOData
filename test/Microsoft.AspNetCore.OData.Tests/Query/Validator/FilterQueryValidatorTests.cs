@@ -46,13 +46,13 @@ public class FilterQueryValidatorTests
     public void TryValidateFilterQueryValidator_ReturnsFalseOnNullOption()
     {
         //  Arrange & Act
-        bool result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+        bool result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
 
         // Assert
         Assert.False(result);
         Assert.NotNull(validationErrors);
         Assert.Single(validationErrors);
-        Assert.Equal("Value cannot be null. (Parameter 'filterQueryOption')", validationErrors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'filterQueryOption')", validationErrors.First());
     }
 
     [Fact]
@@ -66,10 +66,10 @@ public class FilterQueryValidatorTests
     public void TryValidateFilterQueryValidator_ReturnsFalseOnNullSettings()
     {
         // Arrange & Act & Assert
-        var result = _validator.TryValidate(new FilterQueryOption("Name eq 'abc'", _context), null, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(new FilterQueryOption("Name eq 'abc'", _context), null, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First());
     }
 
     // want to test if all the virtual methods are being invoked correctly
@@ -100,7 +100,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption("Tags/all(t: t eq '42')", _context);
 
         // Act
-        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
 
         // Assert
         Assert.True(result);
@@ -142,7 +142,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption("Tags/any(t: t eq '42')", _context);
 
         // Act
-        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
 
         // Assert
         Assert.True(result);
@@ -179,10 +179,10 @@ public class FilterQueryValidatorTests
         var result = _validator.TryValidate(
             new FilterQueryOption(string.Format("{0} eq 'David'", property), _context),
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> validationErrors);
+            out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First().Message);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First());
     }
 
     [Theory]
@@ -207,11 +207,11 @@ public class FilterQueryValidatorTests
         var result = _validator.TryValidate(
             new FilterQueryOption(string.Format("{0}/Name eq 'Seattle'", property), _context),
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> validationErrors);
+            out IEnumerable<string> validationErrors);
 
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First().Message);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First());
     }
 
     [Theory]
@@ -236,11 +236,11 @@ public class FilterQueryValidatorTests
         var result = _validator.TryValidate(
             new FilterQueryOption(string.Format("NavigationWithNotFilterableProperty/{0} eq 'David'", property), _context),
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> validationErrors);
+            out IEnumerable<string> validationErrors);
 
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First().Message);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First());
     }
 
     public static TheoryDataSet<string> NestedAnyAllInputs
@@ -280,10 +280,10 @@ public class FilterQueryValidatorTests
         settings.MaxAnyAllExpressionDepth = 1;
 
         // Act & Assert
-        var result = _validator.TryValidate(new FilterQueryOption(filter, _productContext), settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(new FilterQueryOption(filter, _productContext), settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("The Any/All nesting limit of '1' has been exceeded. 'MaxAnyAllExpressionDepth' can be configured on ODataQuerySettings or EnableQueryAttribute.", validationErrors.First().Message);
+        Assert.Equal("The Any/All nesting limit of '1' has been exceeded. 'MaxAnyAllExpressionDepth' can be configured on ODataQuerySettings or EnableQueryAttribute.", validationErrors.First());
     }
 
     [Theory]
@@ -307,7 +307,7 @@ public class FilterQueryValidatorTests
         settings.MaxAnyAllExpressionDepth = 2;
 
         // Act & Assert
-        var result = _validator.TryValidate(new FilterQueryOption(filter, _productContext), settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(new FilterQueryOption(filter, _productContext), settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -350,10 +350,10 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption(filter, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("The node count limit of '100' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.", validationErrors.First().Message);
+        Assert.Equal("The node count limit of '100' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.", validationErrors.First());
     }
 
     [Theory]
@@ -387,7 +387,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption(filter, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -418,7 +418,7 @@ public class FilterQueryValidatorTests
 
     [Theory]
     [MemberData(nameof(CloseToLongInputs))]
-    public void AlmostLongInputs_DonotCauseMaxNodeCountExceededExceptionOrTimeoutDuringCompilation_WithTryValidate(string filter)
+    public void AlmostLongInputs_DoNotCauseMaxNodeCountExceededExceptionOrTimeoutDuringCompilation_WithTryValidate(string filter)
     {
         // Arrange
         ODataValidationSettings settings = new ODataValidationSettings
@@ -429,7 +429,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption(filter, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -509,7 +509,7 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         Assert.NotNull(unused);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -550,10 +550,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Theory]
@@ -593,10 +593,10 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedArithmeticOperators);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     public static TheoryDataSet<string> ArithmeticOperators_CheckArguments
@@ -646,7 +646,7 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -684,10 +684,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     // No support for OData v4 functions:
@@ -959,7 +959,7 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         Assert.NotNull(unused);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1005,10 +1005,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Theory]
@@ -1054,10 +1054,10 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, unused);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Theory]
@@ -1091,7 +1091,7 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1134,10 +1134,10 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, unused);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Theory]
@@ -1172,7 +1172,7 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1215,10 +1215,10 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, unused);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Theory]
@@ -1253,7 +1253,7 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1296,10 +1296,10 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, unused);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     public static TheoryDataSet<AllowedFunctions, string, string> OtherFunctions_SomeSingleParameterCasts
@@ -1349,10 +1349,10 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     public static TheoryDataSet<AllowedFunctions, string, string> OtherFunctions_SomeTwoParameterCasts
@@ -1442,7 +1442,7 @@ public class FilterQueryValidatorTests
         Assert.NotEqual(AllowedFunctions.None, unused);
         Assert.NotNull(unusedName);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1515,7 +1515,7 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotNull(unused);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1558,9 +1558,9 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotEqual(AllowedFunctions.None, inner);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
-        Assert.Single(validationErrors, e => e.Message == expectedMessage);
+        Assert.Single(validationErrors, e => e == expectedMessage);
     }
 
     public static TheoryDataSet<string, string> Functions_CheckNotFilterable
@@ -1619,10 +1619,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     public static TheoryDataSet<AllowedLogicalOperators, string, string> LogicalOperators
@@ -1706,7 +1706,7 @@ public class FilterQueryValidatorTests
         // Act & Assert
         Assert.NotNull(unused);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1746,10 +1746,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Theory]
@@ -1789,10 +1789,10 @@ public class FilterQueryValidatorTests
 
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedLogicalOperators);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     public static TheoryDataSet<string> LogicalOperators_CheckArguments
@@ -1850,7 +1850,7 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1888,10 +1888,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Fact]
@@ -1919,7 +1919,7 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption("-UnitPrice lt 0", _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -1956,10 +1956,10 @@ public class FilterQueryValidatorTests
         var option = new FilterQueryOption("-UnitPrice lt 0", _productContext);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(expectedMessage, validationErrors.First().Message);
+        Assert.Equal(expectedMessage, validationErrors.First());
     }
 
     [Fact]
@@ -1988,7 +1988,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption("Id eq 1", _context);
 
         // Act
-        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
 
         // Assert
         Assert.True(result);
@@ -2027,7 +2027,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption("FavoriteColor has Microsoft.AspNetCore.OData.Tests.Models.Color'Red'", _context);
 
         // Act
-        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
 
         // Assert
         Assert.True(result);
@@ -2127,7 +2127,7 @@ public class FilterQueryValidatorTests
         FilterQueryOption option = new FilterQueryOption(filter, _context);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }
@@ -2170,7 +2170,7 @@ public class FilterQueryValidatorTests
                 new Dictionary<string, string> { { "$filter", "Id eq @p" }, { "@p", "1" } }));
 
         // Act & Assert
-        var result = _validator.TryValidate(option, _settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
         Assert.Equal(6, _validator.Times.Keys.Count);
@@ -2214,7 +2214,7 @@ public class FilterQueryValidatorTests
             base.Validate(filterQueryOption, settings);
         }
 
-        public override bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+        public override bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
         {
             IncrementCount("TryValidate");
             return base.TryValidate(filterQueryOption, validationSettings, out validationErrors);

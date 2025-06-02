@@ -47,20 +47,20 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
     /// </summary>
     /// <param name="skipToken">The $skiptoken query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         if (skipToken == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(skipToken)).Message));
+            errors.Add(Error.ArgumentNull(nameof(skipToken)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -75,7 +75,7 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
             DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
             if (!defaultConfigs.EnableSkipToken)
             {
-                errors.Add(new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, nameof(AllowedQueryOptions))));
+                errors.Add(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, nameof(AllowedQueryOptions)));
             }
         }
 

@@ -43,12 +43,12 @@ public class SkipQueryValidatorTest
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act
-        var result = _validator.TryValidate(null, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(null, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'skipQueryOption')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'skipQueryOption')",errors.First());
     }
 
     [Fact]
@@ -65,12 +65,12 @@ public class SkipQueryValidatorTest
         SkipQueryOption option = new SkipQueryOption("2", _context);
 
         // Act
-        var result = _validator.TryValidate(option, null, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, null, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Fact]
@@ -98,12 +98,12 @@ public class SkipQueryValidatorTest
         SkipQueryOption option = new SkipQueryOption("11", _context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The limit of '10' for Skip query has been exceeded. The value from the incoming request is '11'.", errors.First().Message);
+        Assert.Equal("The limit of '10' for Skip query has been exceeded. The value from the incoming request is '11'.",errors.First());
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class SkipQueryValidatorTest
         SkipQueryOption option = new SkipQueryOption("10", _context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -161,7 +161,7 @@ public class SkipQueryValidatorTest
         SkipQueryOption option = new SkipQueryOption("9", _context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);

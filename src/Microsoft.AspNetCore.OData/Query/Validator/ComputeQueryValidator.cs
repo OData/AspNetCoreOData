@@ -44,21 +44,21 @@ public class ComputeQueryValidator : IComputeQueryValidator
     /// </summary>
     /// <param name="computeQueryOption">The $compute query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="string"/> instances describing any
     /// validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         if (computeQueryOption == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(computeQueryOption)).Message));
+            errors.Add(Error.ArgumentNull(nameof(computeQueryOption)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -78,7 +78,7 @@ public class ComputeQueryValidator : IComputeQueryValidator
         }
         catch (ODataException ex)
         {
-            errors.Add(ex);
+            errors.Add(ex.Message);
         }
 
         validationErrors = errors;

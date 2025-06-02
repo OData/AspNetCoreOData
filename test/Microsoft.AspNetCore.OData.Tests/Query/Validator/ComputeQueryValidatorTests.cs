@@ -32,10 +32,10 @@ public class ComputeQueryValidatorTests
     public void TryValidateComputeQueryValidator_ReturnsValidationErrorOnNullOption()
     {
         // Arrange & Act & Assert
-        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("Value cannot be null. (Parameter 'computeQueryOption')", validationErrors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'computeQueryOption')", validationErrors.First());
     }
 
     [Fact]
@@ -50,10 +50,10 @@ public class ComputeQueryValidatorTests
     public void TryValidateComputeQueryValidator_ReturnsValidationErrorOnNullSettings()
     {
         // Arrange & Act & Assert
-        var result = _validator.TryValidate(new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context), null, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context), null, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First());
     }
 
     [Fact]
@@ -74,11 +74,11 @@ public class ComputeQueryValidatorTests
         var result = _validator.TryValidate(
             new ComputeQueryOption("test add p12m", _context),
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> validationErrors);
+            out IEnumerable<string> validationErrors);
 
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("'as' expected at position 13 in 'test add p12m'.", validationErrors.First().Message);
+        Assert.Equal("'as' expected at position 13 in 'test add p12m'.", validationErrors.First());
     }
 
     [Fact]
@@ -99,10 +99,10 @@ public class ComputeQueryValidatorTests
         var result = _validator.TryValidate(
             new ComputeQueryOption("test add p12m as Any", _context),
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> validationErrors);
+            out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("Could not find a property named 'test' on type 'Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomer'.", validationErrors.First().Message);
+        Assert.Equal("Could not find a property named 'test' on type 'Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomer'.", validationErrors.First());
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class ComputeQueryValidatorTests
         // Arrange & Act & Assert
         var result = _validator.TryValidate(
             new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context),
-            new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+            new ODataValidationSettings(), out IEnumerable<string> validationErrors);
         Assert.True(result);
         Assert.Empty(validationErrors);
     }

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Edm;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -65,21 +64,21 @@ public class CountQueryValidator : ICountQueryValidator
     /// </summary>
     /// <param name="countQueryOption"></param>
     /// <param name="validationSettings"></param>
-    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="string"/> instances describing any
     /// validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(CountQueryOption countQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(CountQueryOption countQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         if (countQueryOption == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(countQueryOption)).Message));
+            errors.Add(Error.ArgumentNull(nameof(countQueryOption)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -104,7 +103,7 @@ public class CountQueryValidator : ICountQueryValidator
                     ? Error.Format(SRResources.NotCountableEntitySetUsedForCount, name)
                     : Error.Format(SRResources.NotCountablePropertyUsedForCount, name);
 
-                errors.Add(new ODataException(errorMessage));
+                errors.Add(errorMessage);
             }
         }
 

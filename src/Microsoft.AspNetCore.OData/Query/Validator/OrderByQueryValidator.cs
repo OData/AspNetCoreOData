@@ -62,20 +62,20 @@ public class OrderByQueryValidator : IOrderByQueryValidator
     /// </summary>
     /// <param name="orderByOption">The $orderby query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         if (orderByOption == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(orderByOption)).Message));
+            errors.Add(Error.ArgumentNull(nameof(orderByOption)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -106,7 +106,7 @@ public class OrderByQueryValidator : IOrderByQueryValidator
             }
             catch(Exception ex)
             {
-                errors.Add(new ODataException(ex.Message));
+                errors.Add(ex.Message);
             }
 
             clause = clause.ThenBy;

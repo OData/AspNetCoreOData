@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Validator;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 
 namespace Microsoft.AspNetCore.OData.Query;
@@ -107,19 +106,26 @@ public class SkipTokenQueryOption
     /// Attempts to validate the skiptoken query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
     /// </summary>
     /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
-    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="ODataException"/> instances describing any
+    /// <param name="validationErrors">When this method returns, contains a collection of <see cref="string"/> instances describing any
     /// validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
+        List<string> errors = new List<string>();
+
         if (validationSettings == null)
         {
-            List<ODataException> errors = new List<ODataException> { new(Error.ArgumentNull(nameof(validationSettings)).Message) };
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+        }
+
+        // If there are parameter errors, return early
+        if (errors.Count != 0)
+        {
             validationErrors = errors;
             return false;
         }
 
-        validationErrors = Enumerable.Empty<ODataException>();
+        validationErrors = errors;
         if (Validator != null)
         {
             Validator.TryValidate(this, validationSettings, out validationErrors);

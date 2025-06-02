@@ -74,12 +74,12 @@ public class ODataQueryValidatorTest
     public void TryValidate_ReturnsFalseAndErrors_WhenOptionsIsNull()
     {
         // Arrange & Act
-        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.NotNull(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'options')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'options')", errors.First());
     }
 
     [Fact]
@@ -98,12 +98,12 @@ public class ODataQueryValidatorTest
         var message = RequestFactory.Create();
 
         // Act
-        var result = _validator.TryValidate(new ODataQueryOptions(_context, message), null, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new ODataQueryOptions(_context, message), null, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.NotNull(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First());
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public class ODataQueryValidatorTest
         // Act & Assert
         Assert.NotNull(unused);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -218,11 +218,11 @@ public class ODataQueryValidatorTest
         };
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
-        Assert.Equal(expectedMessage, errors?.First().Message);
+        Assert.Equal(expectedMessage, errors?.First());
     }
 
     [Theory]
@@ -265,14 +265,14 @@ public class ODataQueryValidatorTest
         };
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.NotEqual(unused, settings.AllowedQueryOptions);
 
         Assert.False(result);
         Assert.NotEmpty(errors);
-        Assert.Equal(expectedMessage, errors.First().Message);
+        Assert.Equal(expectedMessage, errors.First());
     }
 
     [Theory]
@@ -290,15 +290,15 @@ public class ODataQueryValidatorTest
         };
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.NotEqual(unused, settings.AllowedQueryOptions);
 
         Assert.False(result);
         Assert.Equal(2, errors.Count());
-        Assert.Equal($"Query option '{optionName}' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.", errors.First().Message);
-        Assert.Equal($"The property '{propertyName}' cannot be used in the ${optionName.ToLower()} query option.", errors.Last().Message);
+        Assert.Equal($"Query option '{optionName}' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.", errors.First());
+        Assert.Equal($"The property '{propertyName}' cannot be used in the ${optionName.ToLower()} query option.", errors.Last());
     }
 
     [Theory]
@@ -331,7 +331,7 @@ public class ODataQueryValidatorTest
             AllowedQueryOptions = AllowedQueryOptions.Supported,
         };
 
-        IEnumerable<ODataException> errors;
+        IEnumerable<string> errors;
 
         // Act
         var result = _validator.TryValidate(option, settings, out errors);
@@ -383,9 +383,9 @@ public class ODataQueryValidatorTest
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedQueryOptions);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
-        Assert.Equal(expectedMessage, errors?.First().Message);
+        Assert.Equal(expectedMessage, errors?.First());
     }
 
     [Theory]
@@ -405,11 +405,11 @@ public class ODataQueryValidatorTest
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedQueryOptions);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Equal(2, errors.Count());
-        Assert.Equal($"Query option '{optionName}' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.", errors.First().Message);
-        Assert.Equal($"The property '{propertyName}' cannot be used in the ${optionName.ToLower()} query option.", errors.Last().Message);
+        Assert.Equal($"Query option '{optionName}' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.", errors.First());
+        Assert.Equal($"The property '{propertyName}' cannot be used in the ${optionName.ToLower()} query option.", errors.Last());
     }
 
     [Theory]
@@ -445,7 +445,7 @@ public class ODataQueryValidatorTest
         // Act & Assert
         Assert.Equal(unused, settings.AllowedQueryOptions); //Equal because only Delta token is unsupported.
         Assert.NotNull(unusedName);
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -490,10 +490,10 @@ public class ODataQueryValidatorTest
         // Act & Assert
         Assert.NotEqual(unused, settings.AllowedQueryOptions);
 
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal(expectedMessage, errors.First().Message);
+        Assert.Equal(expectedMessage, errors.First());
     }
 
     [Fact]
@@ -526,7 +526,7 @@ public class ODataQueryValidatorTest
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
 
@@ -572,11 +572,11 @@ public class ODataQueryValidatorTest
 
 
         // Act
-        var result = _validator.TryValidate(options, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(options, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.NotNull(errors);
-        Assert.Equal(expectedMessage, errors.First().Message);
+        Assert.Equal(expectedMessage, errors.First());
     }
 }

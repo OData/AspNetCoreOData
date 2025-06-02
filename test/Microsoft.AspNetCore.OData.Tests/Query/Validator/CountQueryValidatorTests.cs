@@ -40,10 +40,10 @@ public class CountQueryValidatorTests
     public void TryValidateCountQueryValidator_ReturnsFalseAndValidationError_NullOption()
     {
         // Arrange & Act & Assert
-        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("Value cannot be null. (Parameter 'countQueryOption')", validationErrors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'countQueryOption')", validationErrors.First());
     }
 
     [Fact]
@@ -65,10 +65,10 @@ public class CountQueryValidatorTests
         CountQueryOption option = new CountQueryOption("true", context);
 
         // Act & Assert
-        var result = _validator.TryValidate(option, null, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, null, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First());
     }
 
     [Theory]
@@ -124,10 +124,10 @@ public class CountQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> validationErrors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> validationErrors);
         Assert.False(result);
         Assert.Single(validationErrors);
-        Assert.Equal(message, validationErrors.First().Message);
+        Assert.Equal(message, validationErrors.First());
     }
 
     private static IEdmModel GetEdmModel()

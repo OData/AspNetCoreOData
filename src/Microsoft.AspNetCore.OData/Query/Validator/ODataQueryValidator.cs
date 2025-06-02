@@ -132,19 +132,19 @@ public class ODataQueryValidator : IODataQueryValidator
     /// <param name="validationSettings">The settings used for validation.</param>
     /// <param name="validationErrors">The collection of validation errors.</param>
     /// <returns>True if validation is successful; otherwise, false.</returns>
-    public virtual bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         // Validate input parameters
         if (options == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(options)).Message));
+            errors.Add(Error.ArgumentNull(nameof(options)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -157,7 +157,7 @@ public class ODataQueryValidator : IODataQueryValidator
         // To prevent duplicates in the `errors` list, ensure that each error is unique before adding it.
         // Modify the `AddValidationErrors` helper function to check for duplicates.
 
-        void AddValidationErrors(IEnumerable<ODataException> queryOptionErrors)
+        void AddValidationErrors(IEnumerable<string> queryOptionErrors)
         {
             if (queryOptionErrors == null)
             {
@@ -165,7 +165,7 @@ public class ODataQueryValidator : IODataQueryValidator
             }
 
             var uniqueErrors = queryOptionErrors
-                .Where(error => !errors.Any(e => e.Message == error.Message));
+                .Where(error => !errors.Any(e => e == error));
 
             errors.AddRange(uniqueErrors);
         }
@@ -173,10 +173,10 @@ public class ODataQueryValidator : IODataQueryValidator
         // Validate each query option
         if (options.Compute != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> computeErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions, out IEnumerable<string> computeErrors);
             AddValidationErrors(computeErrors);
 
-            if (!options.Compute.TryValidate(validationSettings, out IEnumerable<ODataException> computeValidationErrors))
+            if (!options.Compute.TryValidate(validationSettings, out IEnumerable<string> computeValidationErrors))
             {
                 AddValidationErrors(computeValidationErrors);
             }
@@ -184,16 +184,16 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.Apply?.ApplyClause != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> applyErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions, out IEnumerable<string> applyErrors);
             AddValidationErrors(applyErrors);
         }
 
         if (options.Skip != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Skip, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> skipErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Skip, validationSettings.AllowedQueryOptions, out IEnumerable<string> skipErrors);
             AddValidationErrors(skipErrors);
 
-            if (!options.Skip.TryValidate(validationSettings, out IEnumerable<ODataException> skipValidationErrors))
+            if (!options.Skip.TryValidate(validationSettings, out IEnumerable<string> skipValidationErrors))
             {
                 AddValidationErrors(skipValidationErrors);
             }
@@ -201,10 +201,10 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.Top != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Top, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> topErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Top, validationSettings.AllowedQueryOptions, out IEnumerable<string> topErrors);
             AddValidationErrors(topErrors);
 
-            if (!options.Top.TryValidate(validationSettings, out IEnumerable<ODataException> topValidationErrors))
+            if (!options.Top.TryValidate(validationSettings, out IEnumerable<string> topValidationErrors))
             {
                 AddValidationErrors(topValidationErrors);
             }
@@ -212,10 +212,10 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.OrderBy != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.OrderBy, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> orderByErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.OrderBy, validationSettings.AllowedQueryOptions, out IEnumerable<string> orderByErrors);
             AddValidationErrors(orderByErrors);
 
-            if (!options.OrderBy.TryValidate(validationSettings, out IEnumerable<ODataException> orderByValidationErrors))
+            if (!options.OrderBy.TryValidate(validationSettings, out IEnumerable<string> orderByValidationErrors))
             {
                 AddValidationErrors(orderByValidationErrors);
             }
@@ -223,10 +223,10 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.Filter != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Filter, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> filterErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Filter, validationSettings.AllowedQueryOptions, out IEnumerable<string> filterErrors);
             AddValidationErrors(filterErrors);
 
-            if (!options.Filter.TryValidate(validationSettings, out IEnumerable<ODataException> filterValidationErrors))
+            if (!options.Filter.TryValidate(validationSettings, out IEnumerable<string> filterValidationErrors))
             {
                 AddValidationErrors(filterValidationErrors);
             }
@@ -234,10 +234,10 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.Search != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> searchErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions, out IEnumerable<string> searchErrors);
             AddValidationErrors(searchErrors);
 
-            if (!options.Search.TryValidate(validationSettings, out IEnumerable<ODataException> searchValidationErrors))
+            if (!options.Search.TryValidate(validationSettings, out IEnumerable<string> searchValidationErrors))
             {
                 AddValidationErrors(searchValidationErrors);
             }
@@ -245,10 +245,10 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.Count != null || options.Request.IsCountRequest())
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> countErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions, out IEnumerable<string> countErrors);
             AddValidationErrors(countErrors);
 
-            if (options.Count?.TryValidate(validationSettings, out IEnumerable<ODataException> countValidationErrors) == false)
+            if (options.Count?.TryValidate(validationSettings, out IEnumerable<string> countValidationErrors) == false)
             {
                 AddValidationErrors(countValidationErrors);
             }
@@ -256,10 +256,10 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.SkipToken != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> skipTokenErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions, out IEnumerable<string> skipTokenErrors);
             AddValidationErrors(skipTokenErrors);
 
-            if (!options.SkipToken.TryValidate(validationSettings, out IEnumerable<ODataException> skipTokenValidationErrors))
+            if (!options.SkipToken.TryValidate(validationSettings, out IEnumerable<string> skipTokenValidationErrors))
             {
                 AddValidationErrors(skipTokenValidationErrors);
             }
@@ -268,20 +268,20 @@ public class ODataQueryValidator : IODataQueryValidator
         if (options.RawValues.Expand != null)
         {
             TryValidateNotEmptyOrWhitespace(options.RawValues.Expand, errors);
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> expandErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions, out IEnumerable<string> expandErrors);
             AddValidationErrors(expandErrors);
         }
 
         if (options.RawValues.Select != null)
         {
             TryValidateNotEmptyOrWhitespace(options.RawValues.Select, errors);
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> selectErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions, out IEnumerable<string> selectErrors);
             AddValidationErrors(selectErrors);
         }
 
         if (options.SelectExpand != null)
         {
-            if (!options.SelectExpand.TryValidate(validationSettings, out IEnumerable<ODataException> selectExpandValidationErrors))
+            if (!options.SelectExpand.TryValidate(validationSettings, out IEnumerable<string> selectExpandValidationErrors))
             {
                 AddValidationErrors(selectExpandValidationErrors);
             }
@@ -289,13 +289,13 @@ public class ODataQueryValidator : IODataQueryValidator
 
         if (options.RawValues.Format != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.Format, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> formatErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Format, validationSettings.AllowedQueryOptions, out IEnumerable<string> formatErrors);
             AddValidationErrors(formatErrors);
         }
 
         if (options.RawValues.DeltaToken != null)
         {
-            TryValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions, out IEnumerable<ODataException> deltaTokenErrors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions, out IEnumerable<string> deltaTokenErrors);
             AddValidationErrors(deltaTokenErrors);
         }
 
@@ -312,12 +312,12 @@ public class ODataQueryValidator : IODataQueryValidator
         }
     }
 
-    private static void TryValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed, out IEnumerable<ODataException> validationErrors)
+    private static void TryValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
         if ((queryOption & allowed) == AllowedQueryOptions.None)
         {
-            errors.Add(new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, nameof(AllowedQueryOptions))));
+            errors.Add(Error.Format(SRResources.NotAllowedQueryOption, queryOption, nameof(AllowedQueryOptions)));
         }
 
         validationErrors = errors;
@@ -331,11 +331,11 @@ public class ODataQueryValidator : IODataQueryValidator
         }
     }
 
-    private static void TryValidateNotEmptyOrWhitespace(string rawValue, List<ODataException> validationErrors)
+    private static void TryValidateNotEmptyOrWhitespace(string rawValue, List<string> validationErrors)
     {
         if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
         {
-            validationErrors.Add(new ODataException(SRResources.SelectExpandEmptyOrWhitespace));
+            validationErrors.Add(SRResources.SelectExpandEmptyOrWhitespace);
         }
     }
 }

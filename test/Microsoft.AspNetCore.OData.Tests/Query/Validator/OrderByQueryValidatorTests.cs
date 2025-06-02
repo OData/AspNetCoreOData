@@ -41,10 +41,10 @@ public class OrderByQueryValidatorTests
     public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_OnNullOption()
     {
         // Arrange & Act & Assert
-        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'orderByOption')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'orderByOption')", errors.First());
     }
 
     [Fact]
@@ -58,10 +58,10 @@ public class OrderByQueryValidatorTests
     public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_OnNullSettings()
     {
         // Arrange & Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption("Name eq 'abc'", _context), null, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption("Name eq 'abc'", _context), null, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Theory]
@@ -87,10 +87,10 @@ public class OrderByQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal($"The property '{property}' cannot be used in the $orderby query option.", errors.First().Message);
+        Assert.Equal($"The property '{property}' cannot be used in the $orderby query option.",errors.First());
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add(property);
 
         // Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -138,7 +138,7 @@ public class OrderByQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -162,7 +162,7 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Name");
 
         // Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -192,11 +192,11 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Name");
 
         // Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption(string.Format("{0} asc", property), _context), settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal($"Order by '{property}' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -219,12 +219,12 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Address");
 
         // Act & Assert
-        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "Order by 'Name' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -249,12 +249,12 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Id");
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "Order by 'Name' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -283,12 +283,12 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Name");
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "Order by 'Id' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -312,7 +312,7 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Id");
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -336,7 +336,7 @@ public class OrderByQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -360,7 +360,7 @@ public class OrderByQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings { AllowedOrderByProperties = { "$it" } };
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -390,12 +390,12 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("dummy");
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "Order by '$it' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -419,12 +419,12 @@ public class OrderByQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings { MaxOrderByNodeCount = 1 };
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is 1.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Theory]
@@ -494,10 +494,10 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         OrderByQueryValidator validator = new OrderByQueryValidator();
-        var result = validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal(message, errors.First().Message);
+        Assert.Equal(message,errors.First());
     }
 
     [Fact]
@@ -530,7 +530,7 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("Value");
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }
@@ -565,12 +565,12 @@ public class OrderByQueryValidatorTests
         settings.AllowedOrderByProperties.Add("NotSortableProperty");
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "Order by 'Value' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -622,7 +622,7 @@ public class OrderByQueryValidatorTests
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act & Assert
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
         Assert.True(result);
         Assert.Empty(errors);
     }

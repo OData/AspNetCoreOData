@@ -56,21 +56,21 @@ public class FilterQueryValidator : IFilterQueryValidator
     /// </summary>
     /// <param name="filterQueryOption">The $filter query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         // Validate input parameters
         if (filterQueryOption == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(filterQueryOption)).Message));
+            errors.Add(Error.ArgumentNull(nameof(filterQueryOption)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -98,7 +98,7 @@ public class FilterQueryValidator : IFilterQueryValidator
         }
         catch (Exception ex)
         {
-            errors.Add(new ODataException(ex.Message));
+            errors.Add(ex.Message);
         }
 
         // Set the output parameter

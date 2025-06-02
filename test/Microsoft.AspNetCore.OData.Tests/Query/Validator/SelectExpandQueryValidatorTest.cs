@@ -56,12 +56,12 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
 
         // Act
-        var result = validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'selectExpandQueryOption')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'selectExpandQueryOption')",errors.First());
     }
 
     [Fact]
@@ -85,12 +85,12 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption option = new SelectExpandQueryOption("any", null, _queryContext);
 
         // Act
-        var result = validator.TryValidate(option, null, out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(option, null, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Theory]
@@ -132,12 +132,12 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal(string.Format(CultureInfo.CurrentCulture, MaxExpandDepthExceededErrorString, maxExpansionDepth), errors.First().Message);
+        Assert.Equal(string.Format(CultureInfo.CurrentCulture, MaxExpandDepthExceededErrorString, maxExpansionDepth),errors.First());
 
         result = validator.TryValidate(
             selectExpandQueryOption,
@@ -211,14 +211,14 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth + 1 },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             string.Format(CultureInfo.CurrentCulture, MaxExpandDepthExceededErrorString, maxExpansionDepth),
-            errors.First().Message);
+           errors.First());
     }
 
     [Theory]
@@ -281,12 +281,12 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal(string.Format(CultureInfo.CurrentCulture, MaxExpandDepthExceededErrorString, maxExpansionDepth), errors.First().Message);
+        Assert.Equal(string.Format(CultureInfo.CurrentCulture, MaxExpandDepthExceededErrorString, maxExpansionDepth),errors.First());
 
         result = validator.TryValidate(
             selectExpandQueryOption,
@@ -335,7 +335,7 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = 0 },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -384,12 +384,12 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = 3 },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("'LevelsMaxLiteralExpansionDepth' should be less than or equal to 'MaxExpansionDepth'.", errors.First().Message);
+        Assert.Equal("'LevelsMaxLiteralExpansionDepth' should be less than or equal to 'MaxExpansionDepth'.",errors.First());
     }
 
     [Theory]
@@ -437,7 +437,7 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -486,7 +486,7 @@ public class SelectExpandQueryValidatorTest
             () => validator.TryValidate(
                     selectExpandQueryOption,
                     new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth },
-                    out IEnumerable<ODataException> errors),
+                    out IEnumerable<string> errors),
             "Value must be greater than or equal to 0. (Parameter 'value')\r\nActual value was -1.");
     }
 
@@ -541,7 +541,7 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = maxExpansionDepth },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -575,12 +575,12 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The limit of '2' for Top query has been exceeded. The value from the incoming request is '4'.", errors.First().Message);
+        Assert.Equal("The limit of '2' for Top query has been exceeded. The value from the incoming request is '4'.",errors.First());
     }
 
     [Fact]
@@ -610,12 +610,12 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The property 'Orders' cannot be used for $count.", errors.First().Message);
+        Assert.Equal("The property 'Orders' cannot be used for $count.",errors.First());
     }
 
     [Fact]
@@ -648,12 +648,12 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The property 'Amount' cannot be used in the $orderby query option.", errors.First().Message);
+        Assert.Equal("The property 'Amount' cannot be used in the $orderby query option.",errors.First());
     }
 
     [Fact]
@@ -686,12 +686,12 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings(),
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The property 'Amount' cannot be used in the $filter query option.", errors.First().Message);
+        Assert.Equal("The property 'Amount' cannot be used in the $filter query option.",errors.First());
     }
 
     [Fact]
@@ -721,7 +721,7 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = 0 },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -782,7 +782,7 @@ public class SelectExpandQueryValidatorTest
         var result = validator.TryValidate(
             selectExpandQueryOption,
             new ODataValidationSettings { MaxExpansionDepth = 0 },
-            out IEnumerable<ODataException> errors);
+            out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -825,12 +825,12 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(select, null, queryContext);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The property 'Orders' cannot be used for navigation.", errors.First().Message);
+        Assert.Equal("The property 'Orders' cannot be used for navigation.",errors.First());
     }
 
     [Theory]
@@ -871,14 +871,14 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(select, null, queryContext);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             string.Format(CultureInfo.InvariantCulture, "The property '{0}' cannot be used for navigation.", propertyName),
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]
@@ -913,12 +913,12 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The property 'Orders' cannot be used in the $expand query option.", errors.First().Message);
+        Assert.Equal("The property 'Orders' cannot be used in the $expand query option.",errors.First());
     }
 
     [Fact]
@@ -968,12 +968,12 @@ public class SelectExpandQueryValidatorTest
         model.Model.SetAnnotationValue(customerType, querySettings);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The property 'Orders' cannot be used in the $expand query option.", errors.First().Message);
+        Assert.Equal("The property 'Orders' cannot be used in the $expand query option.",errors.First());
     }
 
     [Theory]
@@ -1014,14 +1014,14 @@ public class SelectExpandQueryValidatorTest
         SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
 
         // Act
-        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             string.Format(CultureInfo.InvariantCulture, "The property '{0}' cannot be used in the $expand query option.", propertyName),
-            errors.First().Message);
+           errors.First());
     }
 
     [Fact]

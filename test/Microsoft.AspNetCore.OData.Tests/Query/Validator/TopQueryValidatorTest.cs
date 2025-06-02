@@ -44,12 +44,12 @@ public class TopQueryValidatorTest
         ODataValidationSettings settings = new ODataValidationSettings();
 
         // Act
-        var result = _validator.TryValidate(null, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(null, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'topQueryOption')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'topQueryOption')",errors.First());
     }
 
     [Fact]
@@ -66,12 +66,12 @@ public class TopQueryValidatorTest
         TopQueryOption option = new TopQueryOption("2", _context);
 
         // Act
-        var result = _validator.TryValidate(option, null, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, null, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Fact]
@@ -99,12 +99,12 @@ public class TopQueryValidatorTest
         TopQueryOption option = new TopQueryOption("11", _context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The limit of '10' for Top query has been exceeded. The value from the incoming request is '11'.", errors.First().Message);
+        Assert.Equal("The limit of '10' for Top query has been exceeded. The value from the incoming request is '11'.",errors.First());
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class TopQueryValidatorTest
         TopQueryOption option = new TopQueryOption("10", _context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -162,7 +162,7 @@ public class TopQueryValidatorTest
         TopQueryOption option = new TopQueryOption("9", _context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -203,7 +203,7 @@ public class TopQueryValidatorTest
         TopQueryOption option = new TopQueryOption("20", context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.True(result);
@@ -245,12 +245,12 @@ public class TopQueryValidatorTest
         TopQueryOption option = new TopQueryOption("11", context);
 
         // Act
-        var result = _validator.TryValidate(option, settings, out IEnumerable<ODataException> errors);
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("The limit of '10' for Top query has been exceeded. The value from the incoming request is '11'.", errors.First().Message);
+        Assert.Equal("The limit of '10' for Top query has been exceeded. The value from the incoming request is '11'.",errors.First());
     }
 
 

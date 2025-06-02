@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
@@ -30,5 +29,5 @@ public interface IODataQueryValidator
     /// <param name="validationSettings">The validation settings.</param>
     /// <param name="validationErrors">The collection of validation errors.</param>
     /// <returns>True if the validation succeeded; otherwise, false.</returns>
-    bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors);
+    bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors);
 }

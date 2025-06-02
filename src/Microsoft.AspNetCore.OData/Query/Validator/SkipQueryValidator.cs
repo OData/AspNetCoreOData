@@ -43,20 +43,20 @@ public class SkipQueryValidator : ISkipQueryValidator
     /// </summary>
     /// <param name="skipQueryOption">The $skip query.</param>
     /// <param name="validationSettings">The validation settings.</param>
-    /// <param name="validationErrors">Contains a collection of <see cref="ODataException"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <param name="validationErrors">Contains a collection of <see cref="string"/> describing any validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
-    public virtual bool TryValidate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+    public virtual bool TryValidate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<ODataException> errors = new List<ODataException>();
+        List<string> errors = new List<string>();
 
         if (skipQueryOption == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(skipQueryOption)).Message));
+            errors.Add(Error.ArgumentNull(nameof(skipQueryOption)).Message);
         }
 
         if (validationSettings == null)
         {
-            errors.Add(new ODataException(Error.ArgumentNull(nameof(validationSettings)).Message));
+            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
         }
 
         // If there are parameter errors, return early
@@ -68,7 +68,7 @@ public class SkipQueryValidator : ISkipQueryValidator
 
         if (skipQueryOption.Value > validationSettings.MaxSkip)
         {
-            errors.Add(new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value)));
+            errors.Add(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value));
         }
 
         // If there are any errors, return false

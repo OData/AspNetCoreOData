@@ -35,12 +35,12 @@ public class SkipTokenQueryValidatorTests
         SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
 
         // Act
-        var result = validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'skipToken')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'skipToken')",errors.First());
     }
 
     [Fact]
@@ -65,12 +65,12 @@ public class SkipTokenQueryValidatorTests
         SkipTokenQueryOption query = new SkipTokenQueryOption("abc", context);
 
         // Act
-        var result = validator.TryValidate(query, null, out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(query, null, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
-        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", errors.First().Message);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Fact]
@@ -101,13 +101,13 @@ public class SkipTokenQueryValidatorTests
         SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
 
         // Act
-        var result = validator.TryValidate(query, settings, out IEnumerable<ODataException> errors);
+        var result = validator.TryValidate(query, settings, out IEnumerable<string> errors);
 
         // Assert
         Assert.False(result);
         Assert.Single(errors);
         Assert.Equal(
             "Query option 'SkipToken' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.",
-            errors.First().Message);
+           errors.First());
     }
 }

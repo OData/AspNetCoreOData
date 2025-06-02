@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Xunit;
 
@@ -69,7 +68,7 @@ public class SearchQueryValidatorTest
             Verify?.Invoke();
         }
 
-        public bool TryValidate(SearchQueryOption searchQueryOption, ODataValidationSettings validationSettings, out IEnumerable<ODataException> validationErrors)
+        public bool TryValidate(SearchQueryOption searchQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
         {
             Verify?.Invoke();
             validationErrors = null;
