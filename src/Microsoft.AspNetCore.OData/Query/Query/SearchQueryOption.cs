@@ -182,29 +182,21 @@ public class SearchQueryOption
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
         if (validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
-
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
-            validationErrors = errors;
+            validationErrors = new[] { Error.ArgumentNull(nameof(validationSettings)).Message };
             return false;
         }
 
-        validationErrors = errors;
-
         ISearchQueryValidator validator = Context.GetSearchQueryValidator();
-        if (validator != null)
+
+        // If the developer doesn't provide the search validator, let's ignore the $search validation.
+        if (validator != null && !validator.TryValidate(this, validationSettings, out validationErrors))
         {
-            // If the developer doesn't provide the search validator, let's ignore the $search validation.
-            validator.TryValidate(this, validationSettings, out validationErrors);
+            return false;
         }
 
-        return !validationErrors.Any();
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }

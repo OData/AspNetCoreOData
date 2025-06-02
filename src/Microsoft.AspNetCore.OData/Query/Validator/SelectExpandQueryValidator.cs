@@ -80,21 +80,21 @@ public class SelectExpandQueryValidator : ISelectExpandQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-        
-        if (selectExpandQueryOption == null)
+        if (selectExpandQueryOption == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(selectExpandQueryOption)).Message);
-        }
+            // Preallocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            if (selectExpandQueryOption == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(selectExpandQueryOption)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
             validationErrors = errors;
             return false;
         }
@@ -121,8 +121,7 @@ public class SelectExpandQueryValidator : ISelectExpandQueryValidator
                 }
                 else if (selectExpandQueryOption.LevelsMaxLiteralExpansionDepth > validationSettings.MaxExpansionDepth)
                 {
-                    errors.Add(Error.Format(SRResources.InvalidExpansionDepthValue, "LevelsMaxLiteralExpansionDepth", "MaxExpansionDepth"));
-                    validationErrors = errors;
+                    validationErrors = new[] { Error.Format(SRResources.InvalidExpansionDepthValue, "LevelsMaxLiteralExpansionDepth", "MaxExpansionDepth") };
                     return false;
                 }
 
@@ -131,12 +130,13 @@ public class SelectExpandQueryValidator : ISelectExpandQueryValidator
         }
         catch (Exception ex)
         {
-            errors.Add(ex.Message);
+            validationErrors = new[] { ex.Message };
+            return false;
         }
 
         // If there are any errors, return false
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 
     /// <summary>

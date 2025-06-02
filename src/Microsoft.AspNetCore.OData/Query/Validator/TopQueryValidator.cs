@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
@@ -65,34 +66,28 @@ public class TopQueryValidator : ITopQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(TopQueryOption topQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
-        if (topQueryOption == null)
+        if (topQueryOption == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(topQueryOption)).Message);
-        }
+            // Preallocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            if (topQueryOption == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(topQueryOption)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
             validationErrors = errors;
             return false;
         }
 
-        if (topQueryOption != null && validationSettings != null && topQueryOption.Value > validationSettings.MaxTop)
+        if (topQueryOption.Value > validationSettings.MaxTop)
         {
-            errors.Add(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxTop, AllowedQueryOptions.Top, topQueryOption.Value));
-        }
-
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
-            validationErrors = errors;
+            validationErrors = new[] { Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxTop, AllowedQueryOptions.Top, topQueryOption.Value) };
             return false;
         }
 
@@ -107,11 +102,12 @@ public class TopQueryValidator : ITopQueryValidator
             topQueryOption.Value, topQueryOption.Context.DefaultQueryConfigurations,
             out maxTop))
         {
-            errors.Add(Error.Format(SRResources.SkipTopLimitExceeded, maxTop, AllowedQueryOptions.Top, topQueryOption.Value));
+            validationErrors = new[] { Error.Format(SRResources.SkipTopLimitExceeded, maxTop, AllowedQueryOptions.Top, topQueryOption.Value) };
+            return false;
         }
 
         // If there are any errors, return false
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }

@@ -60,22 +60,22 @@ public class FilterQueryValidator : IFilterQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
-        // Validate input parameters
-        if (filterQueryOption == null)
+        if(filterQueryOption == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(filterQueryOption)).Message);
-        }
+            // Preallocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            // Validate input parameters
+            if (filterQueryOption == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(filterQueryOption)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
             validationErrors = errors;
             return false;
         }
@@ -98,12 +98,13 @@ public class FilterQueryValidator : IFilterQueryValidator
         }
         catch (Exception ex)
         {
-            errors.Add(ex.Message);
+            validationErrors = new[] { ex.Message };
+            return false;
         }
 
         // Set the output parameter
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 
     /// <summary>

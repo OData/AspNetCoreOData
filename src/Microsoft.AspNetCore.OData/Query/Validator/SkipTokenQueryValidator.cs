@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Microsoft.OData;
 
@@ -51,21 +52,21 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
-        if (skipToken == null)
+        if(skipToken == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(skipToken)).Message);
-        }
+            // Preallocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            if (skipToken == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(skipToken)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
             validationErrors = errors;
             return false;
         }
@@ -75,12 +76,13 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
             DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
             if (!defaultConfigs.EnableSkipToken)
             {
-                errors.Add(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, nameof(AllowedQueryOptions)));
+                validationErrors = new[] { Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, nameof(AllowedQueryOptions)) };
+                return false;
             }
         }
 
         // If there are any errors, return false
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }

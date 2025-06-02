@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -111,26 +112,18 @@ public class SkipTokenQueryOption
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
         if (validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
-
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
-            validationErrors = errors;
+            validationErrors = new[] { Error.ArgumentNull(nameof(validationSettings)).Message };
             return false;
         }
 
-        validationErrors = errors;
-        if (Validator != null)
+        if (Validator != null && !Validator.TryValidate(this, validationSettings, out validationErrors))
         {
-            Validator.TryValidate(this, validationSettings, out validationErrors);
+            return false;
         }
 
-        return !validationErrors.Any();
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }

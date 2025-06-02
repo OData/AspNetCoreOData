@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -66,21 +67,23 @@ public class OrderByQueryValidator : IOrderByQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
+        List<string> errors = null;
 
-        if (orderByOption == null)
+        if (orderByOption == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(orderByOption)).Message);
-        }
+            // Preallocate with a reasonable default capacity.
+            errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            if (orderByOption == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(orderByOption)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
             validationErrors = errors;
             return false;
         }
@@ -106,6 +109,8 @@ public class OrderByQueryValidator : IOrderByQueryValidator
             }
             catch(Exception ex)
             {
+                // Preallocate with a reasonable default capacity.
+                errors ??= new List<string>(4);
                 errors.Add(ex.Message);
             }
 
@@ -113,8 +118,8 @@ public class OrderByQueryValidator : IOrderByQueryValidator
         }
 
         // If there are any errors, return false
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = errors ?? Enumerable.Empty<string>();
+        return errors == null;
     }
 
     /// <summary>

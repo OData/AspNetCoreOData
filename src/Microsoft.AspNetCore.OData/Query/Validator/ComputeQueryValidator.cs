@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Microsoft.OData;
 
@@ -49,39 +50,38 @@ public class ComputeQueryValidator : IComputeQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
-        if (computeQueryOption == null)
+        if (computeQueryOption == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(computeQueryOption)).Message);
-        }
+            // Use a single allocation for the error list only when needed
+            // Preallocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            if (computeQueryOption == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(computeQueryOption)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count > 0)
-        {
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
             validationErrors = errors;
             return false;
         }
 
         try
         {
-            // so far, we don't have validation rules here for $compute
-            // because 'DefaultQuerySetting' doesn't have configuration for $compute
-            // we can only let ODL to parse and verify the compute clause,
-            // however, developer can override this method add his own rules
+            // Let ODL parse and verify the compute clause
             _ = computeQueryOption.ComputeClause;
         }
         catch (ODataException ex)
         {
-            errors.Add(ex.Message);
+            validationErrors = new List<string> { ex.Message };
+            return false;
         }
 
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }

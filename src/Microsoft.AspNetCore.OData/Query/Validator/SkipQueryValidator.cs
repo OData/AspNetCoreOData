@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using Microsoft.OData;
 
@@ -47,32 +48,30 @@ public class SkipQueryValidator : ISkipQueryValidator
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
     {
-        List<string> errors = new List<string>();
-
-        if (skipQueryOption == null)
+        if(skipQueryOption == null || validationSettings == null)
         {
-            errors.Add(Error.ArgumentNull(nameof(skipQueryOption)).Message);
-        }
+            // Preallocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
 
-        if (validationSettings == null)
-        {
-            errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-        }
+            if (skipQueryOption == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(skipQueryOption)).Message);
+            }
 
-        // If there are parameter errors, return early
-        if (errors.Count != 0)
-        {
-            validationErrors = errors;
-            return false;
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
         }
 
         if (skipQueryOption.Value > validationSettings.MaxSkip)
         {
-            errors.Add(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value));
+            validationErrors = new[] { Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value) };
+            return false;
         }
 
         // If there are any errors, return false
-        validationErrors = errors;
-        return errors.Count == 0;
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }
