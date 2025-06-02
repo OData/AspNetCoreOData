@@ -214,6 +214,7 @@ public class SelectExpandQueryOption
         QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
         {
             NavigationSource = Context.NavigationSource,
+            SearchBinder = Context.GetSearchBinder(),
         };
 
         if (Compute != null)
@@ -256,6 +257,7 @@ public class SelectExpandQueryOption
         QueryBinderContext binderContext = new QueryBinderContext(Context.Model, settings, Context.ElementClrType)
         {
             NavigationSource = Context.NavigationSource,
+            SearchBinder = Context.GetSearchBinder()
         };
 
         if (Compute != null)

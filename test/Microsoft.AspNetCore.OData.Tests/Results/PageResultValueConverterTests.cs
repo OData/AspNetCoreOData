@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Xunit;
 
@@ -48,8 +49,23 @@ public class PageResultValueConverterTests
         Assert.Null(typeConverter);
     }
 
-    [Fact]
-    public void PageResultValueConverter_CanSerializePageResultOfT()
+    public static TheoryDataSet<string, JsonNamingPolicy> PageResultValueConverterData
+    {
+        get
+        {
+            return new TheoryDataSet<string, JsonNamingPolicy>
+            {
+                { "{\"items\":[{\"Id\":1,\"Name\":\"abc\"},{\"Id\":2,\"Name\":\"efg\"}],\"nextpagelink\":\"http://any\",\"count\":2}", null },
+                { "{\"items\":[{\"id\":1,\"name\":\"abc\"},{\"id\":2,\"name\":\"efg\"}],\"nextpagelink\":\"http://any\",\"count\":2}", JsonNamingPolicy.CamelCase },
+                { "{\"ITEMS\":[{\"ID\":1,\"NAME\":\"abc\"},{\"ID\":2,\"NAME\":\"efg\"}],\"NEXTPAGELINK\":\"http://any\",\"COUNT\":2}", JsonNamingPolicy.SnakeCaseUpper },
+                { "{\"values\":[{\"Id\":1,\"Name\":\"abc\"},{\"Id\":2,\"Name\":\"efg\"}],\"next_page_link\":\"http://any\",\"count\":2}", new MyNamingPolicy() }
+            };
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(PageResultValueConverterData))]
+    public void PageResultValueConverter_CanSerializePageResultOfT_WithNamingPolicy(string expected, JsonNamingPolicy policy)
     {
         // Arrange & Act & Assert
         IEnumerable<Customer> customers = new Customer[]
@@ -61,7 +77,11 @@ public class PageResultValueConverterTests
         long? count = 2;
         PageResult<Customer> result = new PageResult<Customer>(customers, nextPageLink, count);
 
-        JsonSerializerOptions options = new JsonSerializerOptions();
+        JsonSerializerOptions options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = policy
+        };
+
         PageResultValueConverter converterFactory = new PageResultValueConverter();
         Type type = typeof(PageResult<Customer>);
         PageResultConverter<Customer> typeConverter = converterFactory.CreateConverter(type, options) as PageResultConverter<Customer>;
@@ -70,7 +90,25 @@ public class PageResultValueConverterTests
         string json = SerializeUtils.SerializeAsJson(jsonWriter => typeConverter.Write(jsonWriter, result, options));
 
         // Assert
-        Assert.Equal("{\"items\":[{\"Id\":1,\"Name\":\"abc\"},{\"Id\":2,\"Name\":\"efg\"}],\"nextpagelink\":\"http://any\",\"count\":2}", json);
+        Assert.Equal(expected, json);
+    }
+
+    private class MyNamingPolicy : JsonNamingPolicy
+    {
+        public override string ConvertName(string name)
+        {
+            if (name == "nextpagelink")
+            {
+                return "next_page_link";
+            }
+
+            if (name == "items")
+            {
+                return "values";
+            }
+
+            return name;
+        }
     }
 
     private class Customer

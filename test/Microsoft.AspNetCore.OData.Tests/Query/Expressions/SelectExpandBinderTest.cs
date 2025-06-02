@@ -1758,6 +1758,85 @@ public class SelectExpandBinderTest
         Assert.Equal(1, order.Id);
     }
 
+    [Theory]
+    [InlineData(HandleNullPropagationOption.True)]
+    [InlineData(HandleNullPropagationOption.False)]
+    public void CreatePropertyValueExpression_Collection_WorksWithSearchBinder_HandleNullPropagationOption(HandleNullPropagationOption nullOption)
+    {
+        // Arrange
+        _settings.HandleNullPropagation = nullOption;
+        var source = Expression.Constant(new QueryCustomer
+        {
+            Orders = new[]
+            {
+                new QueryOrder { Id = 12, Title = "Compute" },
+                new QueryOrder { Id = 45, Title = "Food" }
+            }
+        });
+
+        SelectExpandBinder binder = GetBinder<QueryCustomer>(_model);
+
+        var ordersProperty = _customer.NavigationProperties().Single(p => p.Name == "Orders");
+
+        SelectExpandClause selectExpand = ParseSelectExpand(null, "Orders($search=food)", _model, _customer, _customers);
+        ExpandedNavigationSelectItem expandItem = Assert.Single(selectExpand.SelectedItems) as ExpandedNavigationSelectItem;
+        Assert.NotNull(expandItem);
+        Assert.NotNull(expandItem.SearchOption);
+        _queryBinderContext.SearchBinder = new MySearchBinder();
+
+        // Act
+        var searchInExpand = binder.CreatePropertyValueExpression(_queryBinderContext, _customer, ordersProperty, source, expandItem.FilterOption, expandItem.ComputeOption, expandItem.SearchOption);
+
+        // Assert
+        if (nullOption == HandleNullPropagationOption.True)
+        {
+            Assert.Equal(
+                string.Format(
+                    "IIF((value({0}) == null), null, IIF((value({0}).Orders == null), null, " +
+                    "value({0}).Orders.Where($it => Equals($it.Title, \"food\", OrdinalIgnoreCase))))",
+                    source.Type),
+                searchInExpand.ToString());
+        }
+        else
+        {
+            Assert.Equal(
+                string.Format(
+                    "value({0}).Orders.Where($it => Equals($it.Title, \"food\", OrdinalIgnoreCase))",
+                    source.Type),
+                searchInExpand.ToString());
+        }
+
+        var orders = Expression.Lambda(searchInExpand).Compile().DynamicInvoke() as IEnumerable<QueryOrder>;
+        QueryOrder order = Assert.Single(orders);
+        Assert.Equal(45, order.Id);
+    }
+
+    private class MySearchBinder : ISearchBinder
+    {
+        internal static readonly MethodInfo StringEqualsMethodInfo = typeof(string).GetMethod("Equals",
+            [
+                typeof(string),
+                typeof(string),
+                typeof(StringComparison)
+            ]);
+
+        public Expression BindSearch(SearchClause searchClause, QueryBinderContext context)
+        {
+            SearchTermNode searchTerm = searchClause.Expression as SearchTermNode;
+
+            Expression source = context.CurrentParameter;
+
+            Expression titleProperty = Expression.Property(source, "Title");
+
+            Expression exp = Expression.Call(null, StringEqualsMethodInfo,
+                    titleProperty,
+                    Expression.Constant(searchTerm.Text, typeof(string)),
+                    Expression.Constant(StringComparison.OrdinalIgnoreCase, typeof(StringComparison)));
+
+            return Expression.Lambda(exp, context.CurrentParameter);
+        }
+    }
+
     // OData.ModelBuilder 1.0.4 make the ClrTypeAnnotation ctor throws argument null exception
     // 1.0.5 will allow null. So, please enable this when update to 1.0.5 model builder.
     /*

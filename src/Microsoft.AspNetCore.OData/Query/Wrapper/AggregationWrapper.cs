@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace Microsoft.AspNetCore.OData.Query.Wrapper;
 
+[JsonConverter(typeof(DynamicTypeWrapperConverter))]
 internal class AggregationWrapper : GroupByWrapper
 {
 }

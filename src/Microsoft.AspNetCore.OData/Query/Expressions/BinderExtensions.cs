@@ -324,6 +324,53 @@ public static class BinderExtensions
     }
 
     /// <summary>
+    /// Translates an OData $search represented by <see cref="SearchClause"/> to <see cref="Expression"/> and apply to <see cref="Expression" />.
+    /// </summary>
+    /// <param name="binder">The given search binder.</param>
+    /// <param name="source">The given source.</param>
+    /// <param name="searchClause">The search clause.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The applied result.</returns>
+    public static Expression ApplyBind(this ISearchBinder binder, Expression source, SearchClause searchClause, QueryBinderContext context)
+    {
+        if (binder == null)
+        {
+            throw Error.ArgumentNull(nameof(binder));
+        }
+
+        if (source == null)
+        {
+            throw Error.ArgumentNull(nameof(source));
+        }
+
+        if (searchClause == null)
+        {
+            throw Error.ArgumentNull(nameof(searchClause));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        Expression filterExp = binder.BindSearch(searchClause, context);
+
+        Type elementType = context.ElementClrType;
+
+        MethodInfo whereMethod;
+        if (typeof(IQueryable).IsAssignableFrom(source.Type))
+        {
+            whereMethod = ExpressionHelperMethods.QueryableWhereGeneric.MakeGenericMethod(elementType);
+        }
+        else
+        {
+            whereMethod = ExpressionHelperMethods.EnumerableWhereGeneric.MakeGenericMethod(elementType);
+        }
+
+        return Expression.Call(whereMethod, source, filterExp);
+    }
+
+    /// <summary>
     /// Translate an OData $search parse tree represented by <see cref="SearchClause"/> to
     /// an <see cref="Expression"/> and applies it to an <see cref="IQueryable"/>.
     /// </summary>

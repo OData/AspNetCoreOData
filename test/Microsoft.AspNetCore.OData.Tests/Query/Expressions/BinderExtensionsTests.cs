@@ -201,6 +201,27 @@ public class BinderExtensionsTests
     }
 
     [Fact]
+    public void ApplyBind_OnISearchBinder_WithExpression_ThrowsArgumentNull_ForInputs()
+    {
+        // Arrange & Act & Assert
+        ISearchBinder binder = null;
+        Expression source = null;
+        ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "binder");
+
+        // Arrange & Act & Assert
+        binder = new Mock<ISearchBinder>().Object;
+        ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "source");
+
+        // Arrange & Act & Assert
+        source = new Mock<Expression>().Object;
+        ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, null, null), "searchClause");
+
+        // Arrange & Act & Assert
+        SearchClause searchClause = new SearchClause(new Mock<SingleValueNode>().Object);
+        ExceptionAssert.ThrowsArgumentNull(() => binder.ApplyBind(source, searchClause, null), "context");
+    }
+
+    [Fact]
     public void ApplyBind_OnISearchBinder_WithQueryable_ThrowsArgumentNull_ForInputs()
     {
         // Arrange & Act & Assert
@@ -222,6 +243,30 @@ public class BinderExtensionsTests
     }
 
     [Fact]
+    public void SearchBinder_ApplyBind_WorksForQueryable()
+    {
+        // Arrange
+        IQueryable<Product> products = new List<Product>().AsQueryable();
+        QueryBinderContext context = new QueryBinderContext(_model, _defaultSettings, typeof(Product));
+
+        // Act & Assert
+        Mock<ISearchBinder> binder = new Mock<ISearchBinder>();
+        SearchClause searchClause = new SearchClause(new Mock<SingleValueNode>().Object);
+        Expression body = Expression.Constant(true);
+        ParameterExpression searchParameter = context.CurrentParameter;
+        LambdaExpression searchExpr = Expression.Lambda(body, searchParameter);
+
+        binder.Setup(b => b.BindSearch(searchClause, context)).Returns(searchExpr);
+
+        // Act
+        Expression result = binder.Object.ApplyBind(Expression.Constant(products), searchClause, context);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("System.Collections.Generic.List`1[Microsoft.AspNetCore.OData.Tests.Models.Product].Where($it => True)", result.ToString());
+    }
+
+    [Fact]
     public void FilterBinder_ApplyBind_WorksForQueryable()
     {
         // Arrange
@@ -231,7 +276,7 @@ public class BinderExtensionsTests
         // Act & Assert
         Mock<IFilterBinder> binder = new Mock<IFilterBinder>();
         FilterClause filterClause = new FilterClause(new Mock<SingleValueNode>().Object, new Mock<RangeVariable>().Object);
-        Expression body = Expression.Constant(true);;
+        Expression body = Expression.Constant(true);
         ParameterExpression filterParameter = context.CurrentParameter;
         LambdaExpression filterExpr = Expression.Lambda(body, filterParameter);
 
