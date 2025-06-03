@@ -697,7 +697,7 @@ public class ODataQueryOptions
         if (applySortOptions != null)
         {
             orderByRaw = String.Join(",", applySortOptions);
-            return new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
+            return new OrderByQueryOption(orderByRaw, context, Apply.RawValue, Compute?.RawValue);
         }
         else
         {
@@ -749,7 +749,7 @@ public class ODataQueryOptions
             if (propertyPathsToAdd.Any())
             {
                 var orderByRaw = orderBy.RawValue + "," + String.Join(",", propertyPathsToAdd);
-                orderBy = new OrderByQueryOption(orderByRaw, context, Apply.RawValue);
+                orderBy = new OrderByQueryOption(orderByRaw, context, Apply.RawValue, Compute?.RawValue);
             }
         }
         else
@@ -762,7 +762,7 @@ public class ODataQueryOptions
                 // the sort stable but preserving the user's original intent for the major
                 // sort order.
                 var orderByRaw = orderBy.RawValue + "," + string.Join(",", propertiesToAdd.Select(p => p.Name));
-                orderBy = new OrderByQueryOption(orderByRaw, context);
+                orderBy = new OrderByQueryOption(orderByRaw, context, null, Compute?.RawValue);
             }
         }
 
