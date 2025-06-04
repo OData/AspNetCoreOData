@@ -8874,6 +8874,13 @@
             <param name="source">The collection to be truncated.</param>
             <param name="pageSize">The page size.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.CreateAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class asynchronously.
+            </summary>
+            <param name="source">The asynchronous collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
@@ -8889,11 +8896,27 @@
             <param name="pageSize">The page size.</param>
             <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.CreateAsync(System.Linq.IQueryable{`0},System.Int32,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class asynchronously.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Nullable{System.Int64})">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
             </summary>
             <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.CreateAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Int32,System.Nullable{System.Int64})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class asynchronously.
+            </summary>
+            <param name="source">The asynchronous collection to be truncated.</param>
             <param name="pageSize">The page size.</param>
             <param name="totalCount">The total count.</param>
         </member>

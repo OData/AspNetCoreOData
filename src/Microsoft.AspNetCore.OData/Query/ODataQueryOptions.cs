@@ -802,7 +802,7 @@ public class ODataQueryOptions
     /// <returns>The limited query results.</returns>
     public static IQueryable<T> LimitResults<T>(IQueryable<T> queryable, int limit, bool parameterize, out bool resultsLimited)
     {
-        TruncatedCollection<T> truncatedCollection = new TruncatedCollection<T>(queryable, limit, parameterize);
+        TruncatedCollection<T> truncatedCollection = TruncatedCollection<T>.CreateAsync(queryable, limit, parameterize).ConfigureAwait(false).GetAwaiter().GetResult();
         resultsLimited = truncatedCollection.IsTruncated;
         return truncatedCollection.AsQueryable();
     }

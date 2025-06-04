@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.OData.Query.Container;
 
@@ -40,6 +41,24 @@ public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class asynchronously.
+    /// </summary>
+    /// <param name="source">The asynchronous collection to be truncated.</param>
+    /// <param name="pageSize">The page size.</param>
+    public static async Task<TruncatedCollection<T>> CreateAsync(IAsyncEnumerable<T> source, int pageSize)
+    {
+        if (source == null)
+        {
+            throw Error.ArgumentNull("source");
+        }
+
+        var collection = new TruncatedCollection<T>(pageSize);
+        await collection.AddRangeAsync(source, pageSize);
+        collection.Initialize(pageSize);
+        return collection;
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
     /// </summary>
     /// <param name="source">The queryable collection to be truncated.</param>
@@ -64,6 +83,21 @@ public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable
         var items = Take(source, pageSize, parameterize);
         AddRange(items);
         Initialize(pageSize);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class asynchronously.
+    /// </summary>
+    /// <param name="source">The queryable collection to be truncated.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+    public static async Task<TruncatedCollection<T>> CreateAsync(IQueryable<T> source, int pageSize, bool parameterize)
+    {
+        var items = Take(source, pageSize, parameterize);
+        var collection = new TruncatedCollection<T>(pageSize);
+        await collection.AddRangeAsync(items);
+        collection.Initialize(pageSize);
+        return collection;
     }
 
     /// <summary>
@@ -92,6 +126,43 @@ public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable
         }
 
         _totalCount = totalCount;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class asynchronously.
+    /// </summary>
+    /// <param name="source">The asynchronous collection to be truncated.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalCount">The total count.</param>
+    public static async Task<TruncatedCollection<T>> CreateAsync(IAsyncEnumerable<T> source, int pageSize, long? totalCount)
+    {
+        if (source == null)
+        {
+            throw Error.ArgumentNull("source");
+        }
+
+        int capacity = pageSize > 0
+            ? checked(pageSize + 1)
+            : (totalCount > 0 ? (totalCount < int.MaxValue ? (int)totalCount : int.MaxValue) : DefaultCapacity);
+
+        var collection = new TruncatedCollection<T>(capacity);
+
+        if (pageSize > 0)
+        {
+            await collection.AddRangeAsync(source, capacity);
+        }
+        else
+        {
+            await collection.AddRangeAsync(source);
+        }
+
+        if (pageSize > 0)
+        {
+            collection.Initialize(pageSize);
+        }
+
+        collection._totalCount = totalCount;
+        return collection;
     }
 
     /// <summary>
@@ -127,6 +198,42 @@ public class TruncatedCollection<T> : List<T>, ITruncatedCollection, IEnumerable
         }
 
         _totalCount = totalCount;
+    }
+
+    private TruncatedCollection(int pageSize)
+        : base(checked(pageSize + 1))
+    {
+    }
+
+    private async Task AddRangeAsync(IAsyncEnumerable<T> source, int pageSize)
+    {
+        int count = 0;
+        await foreach (var item in source)
+        {
+            if (count >= pageSize + 1)
+            {
+                break;
+            }
+
+            Add(item);
+            count++;
+        }
+    }
+
+    private async Task AddRangeAsync(IAsyncEnumerable<T> items)
+    {
+        await foreach (var item in items)
+        {
+            Add(item);
+        }
+    }
+
+    private async Task AddRangeAsync(IQueryable<T> items)
+    {
+        foreach (var item in items)
+        {
+            Add(item);
+        }
     }
 
     private void Initialize(int pageSize)
