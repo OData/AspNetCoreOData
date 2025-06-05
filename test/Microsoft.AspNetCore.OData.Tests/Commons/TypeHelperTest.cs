@@ -232,6 +232,92 @@ public class TypeHelperTest
         Assert.DoesNotContain(typeof(TypeHelperTest), foundTypes);
     }
 
+    [Theory]
+    [InlineData(typeof(IAsyncEnumerable<int>))]
+    [InlineData(typeof(IAsyncEnumerable<List<bool>>))]
+    [InlineData(typeof(CustomGenericAsyncEnumerable<int>))]
+    [InlineData(typeof(CustomGenericAsyncEnumerable<CustomInternalClass>))]
+    [InlineData(typeof(CustomAsyncEnumerable))]
+    public void IsAsyncEnumerableType_ReturnsTrue_ForIAsyncEnumerable(Type type)
+    {
+        // Arrange & Act
+        var result = TypeHelper.IsAsyncEnumerableType(type);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData(typeof(List<int>))]
+    [InlineData(typeof(IList<int>))]
+    [InlineData(typeof(ICollection<int>))]
+    [InlineData(typeof(IEnumerable<int>))]
+    [InlineData(typeof(IQueryable<int>))]
+    [InlineData(typeof(IAsyncEnumerator<int>))]
+    [InlineData(typeof(IEnumerable<CustomAsyncEnumerable>))]
+    [InlineData(typeof(IEnumerable<CustomInternalClass>))]
+    [InlineData(typeof(IEnumerable<CustomGenericAsyncEnumerable<CustomInternalClass>>))]
+    [InlineData(typeof(IEnumerable<CustomGenericAsyncEnumerable<int>>))]
+    [InlineData(typeof(string))]
+    [InlineData(typeof(int))]
+    [InlineData(typeof(CustomBoolCollection))]
+    [InlineData(typeof(CustomIntCollection))]
+    [InlineData(typeof(CustomAbstractClass))]
+    [InlineData(typeof(CustomConcreteClass))]
+    [InlineData(typeof(Task<int>))]
+    [InlineData(typeof(Task<string>))]
+    [InlineData(typeof(Task<IEnumerable<bool>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomInternalClass>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomGenericAsyncEnumerable<CustomInternalClass>>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomGenericAsyncEnumerable<int>>>))]
+    [InlineData(typeof(Task<IEnumerable<CustomAsyncEnumerable>>))]
+    [InlineData(typeof(Task<IAsyncEnumerator<int>>))]
+    [InlineData(typeof(Task<IAsyncEnumerable<int>>))]
+    [InlineData(typeof(CustomInternalClass[]))]
+    public void IsAsyncEnumerableType_ReturnsFalse_ForNonAsyncEnumerableType(Type type)
+    {
+        // Arrange & Act
+        var result = TypeHelper.IsAsyncEnumerableType(type);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void IsAsyncEnumerableType_ReturnsTrue_ForGenericAsyncEnumerable()
+    {
+        // Arrange
+        var asyncNumbers = ToAsyncEnumerable(Enumerable.Range(1, 10));
+        var asyncEnumerable = GenericAsyncEnumerableWithDelay(asyncNumbers, TimeSpan.FromSeconds(1));
+
+        // Act
+        var result = TypeHelper.IsAsyncEnumerableType(asyncEnumerable.GetType());
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsAsyncEnumerableType_ReturnsTrue_ForTypedAsyncEnumerable()
+    {
+        // Arrange
+        var asyncNumbers = ToAsyncEnumerable(Enumerable.Range(1, 5).Select(i => new CustomInternalClass()));
+        var asyncEnumerable = TypedAsyncEnumerableWithDelay(asyncNumbers, TimeSpan.FromSeconds(1));
+
+        // Act
+        var result = TypeHelper.IsAsyncEnumerableType(asyncEnumerable.GetType());
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void IsAsyncEnumerableType_ThrowsArgumentNullException_ForNullType()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => TypeHelper.IsAsyncEnumerableType(null));
+    }
+
     /// <summary>
     /// Custom internal class
     /// </summary>
@@ -268,4 +354,53 @@ public class TypeHelperTest
     {
         public override int Area() { return 42; }
     }
+
+    public IAsyncEnumerator<int> GetAsyncEnumerator(System.Threading.CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async IAsyncEnumerable<TEntity> GenericAsyncEnumerableWithDelay<TEntity>(IAsyncEnumerable<TEntity> asyncEnumerable, TimeSpan delay)
+    {
+        await foreach (var entity in asyncEnumerable)
+        {
+            await Task.Delay(delay);
+            yield return entity;
+        }
+    }
+
+    private async IAsyncEnumerable<CustomInternalClass> TypedAsyncEnumerableWithDelay(IAsyncEnumerable<CustomInternalClass> asyncEnumerable, TimeSpan delay)
+    {
+        await foreach (var entity in asyncEnumerable)
+        {
+            await Task.Delay(delay);
+            yield return entity;
+        }
+    }
+
+    private class CustomGenericAsyncEnumerable<TEntity> : IAsyncEnumerable<TEntity>
+    {
+        public IAsyncEnumerator<TEntity> GetAsyncEnumerator(System.Threading.CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    private class CustomAsyncEnumerable : IAsyncEnumerable<List<int>>
+    {
+        public IAsyncEnumerator<List<int>> GetAsyncEnumerator(System.Threading.CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    private static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(IEnumerable<T> source)
+    {
+        foreach (var item in source)
+        {
+            yield return item;
+            await Task.Yield();
+        }
+    }
+
 }
