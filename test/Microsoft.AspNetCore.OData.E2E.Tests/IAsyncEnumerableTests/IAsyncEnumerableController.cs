@@ -52,6 +52,13 @@ public class CustomersController : ODataController
         return Ok(_context.Customers.AsAsyncEnumerable());
     }
 
+    [EnableQuery]
+    [HttpGet("v3/Customers")]
+    public IActionResult CustomersDataNoInferred()
+    {
+        return Ok(_context.Customers.AsAsyncEnumerable());
+    }
+
     public async IAsyncEnumerable<Customer> CreateCollectionAsync<T>()
     {
         await Task.Delay(5);

@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -98,8 +99,15 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         }
 
         if (writeContext.Type != null &&
-            writeContext.Type.IsGenericType &&
-            writeContext.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>) && 
+            (
+                //Handles the case where the write context is set to IAsyncEnumerable<T>
+                (writeContext.Type.IsGenericType &&
+                    writeContext.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)) ||
+                //Handles the case where the write context is set to a generic iterator class
+                writeContext.Type.GetInterfaces().Any(i =>
+                    i.IsGenericType &&
+                    i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+            ) &&
             graph is IAsyncEnumerable<object> asyncEnumerable)
         {
             await WriteResourceSetAsync(asyncEnumerable, expectedType, writer, writeContext).ConfigureAwait(false);
