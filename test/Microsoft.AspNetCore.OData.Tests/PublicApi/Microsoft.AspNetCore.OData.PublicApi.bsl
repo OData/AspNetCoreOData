@@ -1411,6 +1411,7 @@ public class Microsoft.AspNetCore.OData.Query.ComputeQueryOption {
 	System.Type ResultClrType  { public get; }
 	Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator Validator  { public get; public set; }
 
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1423,6 +1424,7 @@ public class Microsoft.AspNetCore.OData.Query.CountQueryOption {
 	bool Value  { public get; }
 
 	public System.Nullable`1[[System.Int64]] GetEntityCount (System.Linq.IQueryable query)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1517,6 +1519,7 @@ public class Microsoft.AspNetCore.OData.Query.FilterQueryOption {
 	Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator Validator  { public get; public set; }
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1600,6 +1603,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions {
 	public static bool IsSystemQueryOption (string queryOptionName, bool isDollarSignOptional)
 	public static IQueryable`1 LimitResults (IQueryable`1 queryable, int limit, out System.Boolean& resultsLimited)
 	public static IQueryable`1 LimitResults (IQueryable`1 queryable, int limit, bool parameterize, out System.Boolean& resultsLimited)
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1712,6 +1716,7 @@ public class Microsoft.AspNetCore.OData.Query.OrderByQueryOption {
 	public System.Linq.IOrderedQueryable ApplyTo (System.Linq.IQueryable query)
 	public IOrderedQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public System.Linq.IOrderedQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1734,6 +1739,7 @@ public class Microsoft.AspNetCore.OData.Query.SearchQueryOption {
 	Microsoft.OData.UriParser.SearchClause SearchClause  { public get; }
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1750,6 +1756,7 @@ public class Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption {
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings)
 	public object ApplyTo (object entity, Microsoft.AspNetCore.OData.Query.ODataQuerySettings settings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1763,6 +1770,7 @@ public class Microsoft.AspNetCore.OData.Query.SkipQueryOption {
 
 	public IQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1776,6 +1784,7 @@ public class Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption {
 
 	public virtual IQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
 	public virtual System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -1789,6 +1798,7 @@ public class Microsoft.AspNetCore.OData.Query.TopQueryOption {
 
 	public IOrderedQueryable`1 ApplyTo (IQueryable`1 query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -3226,42 +3236,52 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.ICountQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.SearchQueryOption searchQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.SearchQueryOption searchQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.ISkipQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.ISkipTokenQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.ITopQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -3279,18 +3299,21 @@ public abstract class Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorC
 public class Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator : IComputeQueryValidator {
 	public ComputeQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.CountQueryValidator : ICountQueryValidator {
 	public CountQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.CountQueryOption countQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator : IFilterQueryValidator {
 	public FilterQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.FilterQueryOption filterQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings settings)
 	protected virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext)
 	protected virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext)
@@ -3333,6 +3356,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext :
 public class Microsoft.AspNetCore.OData.Query.Validator.ODataQueryValidator : IODataQueryValidator {
 	public ODataQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.ODataQueryOptions options, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -3355,6 +3379,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 public class Microsoft.AspNetCore.OData.Query.Validator.OrderByQueryValidator : IOrderByQueryValidator {
 	public OrderByQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.OrderByQueryOption orderByOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 	protected virtual void ValidateAllNode (Microsoft.OData.UriParser.AllNode allNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
 	protected virtual void ValidateAnyNode (Microsoft.OData.UriParser.AnyNode anyNode, Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext validatorContext)
@@ -3394,6 +3419,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.OrderByValidatorContext 
 public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandQueryValidator : ISelectExpandQueryValidator {
 	public SelectExpandQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption selectExpandQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 	protected virtual void ValidateExpandedCountSelectItem (Microsoft.OData.UriParser.ExpandedCountSelectItem expandCountItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
 	protected virtual void ValidateExpandedNavigationSelectItem (Microsoft.OData.UriParser.ExpandedNavigationSelectItem expandItem, Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorContext validatorContext)
@@ -3425,18 +3451,21 @@ public class Microsoft.AspNetCore.OData.Query.Validator.SelectExpandValidatorCon
 public class Microsoft.AspNetCore.OData.Query.Validator.SkipQueryValidator : ISkipQueryValidator {
 	public SkipQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SkipQueryOption skipQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.SkipTokenQueryValidator : ISkipTokenQueryValidator {
 	public SkipTokenQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.SkipTokenQueryOption skipToken, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.TopQueryValidator : ITopQueryValidator {
 	public TopQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.TopQueryOption topQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
