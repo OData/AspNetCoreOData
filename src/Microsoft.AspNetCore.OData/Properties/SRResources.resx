@@ -667,7 +667,7 @@
     <value>Cannot Get the Enum Clr member using '{0}'.</value>
   </data>
   <data name="InvalidTemplateLiteral" xml:space="preserve">
-    <value>The template string '{0}' of '{1}' is not a valid template literal. And a template literal should wrapper with '{' and '}'.</value>
+    <value>The template string '{0}' of '{1}' is not a valid template literal. And a template literal should wrapper with '{{' and '}}'.</value>
   </data>
   <data name="MissingParameterAlias" xml:space="preserve">
     <value>Missing the parameter alias '{0}' in the request query string.</value>

@@ -889,7 +889,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{&apos; and &apos;}&apos;..
+        ///   Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{{&apos; and &apos;}}&apos;..
         /// </summary>
         internal static string InvalidTemplateLiteral {
             get {
@@ -1841,7 +1841,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeRelated", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
         /// </summary>
@@ -1850,7 +1850,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeResourceSet", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not implement &apos;{1}&apos; interface..
         /// </summary>
@@ -1859,7 +1859,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustImplementInterface", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from &apos;{1}&apos;..
         /// </summary>
@@ -1868,7 +1868,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustInheritFromType", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; of dynamic property &apos;{1}&apos; is not supported..
         /// </summary>
