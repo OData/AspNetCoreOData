@@ -10,6 +10,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
+using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Extensions;
 
 namespace Microsoft.AspNetCore.OData.Formatter;
 
@@ -34,4 +39,15 @@ public class ODataUntypedActionParameters : Dictionary<string, object>
     /// Gets the OData action of this parameters.
     /// </summary>
     public IEdmAction Action { get; }
+
+    /// <summary>
+    /// Binds the <see cref="HttpContext"/> and <see cref="ParameterInfo"/> to generate the <see cref="Delta{T}"/>.
+    /// </summary>
+    /// <param name="context">The HttpContext.</param>
+    /// <param name="parameter">The parameter info.</param>
+    /// <returns>The built <see cref="ODataUntypedActionParameters"/></returns>
+    public static async ValueTask<ODataUntypedActionParameters> BindAsync(HttpContext context, ParameterInfo parameter)
+    {
+        return await context.BindODataParameterAsync<ODataUntypedActionParameters>(parameter);
+    }
 }
