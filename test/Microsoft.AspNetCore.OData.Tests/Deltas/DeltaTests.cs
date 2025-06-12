@@ -5,6 +5,13 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.TestCommon;
+using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.OData.Edm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,11 +19,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Microsoft.AspNetCore.OData.Deltas;
-using Microsoft.AspNetCore.OData.TestCommon;
-using Microsoft.AspNetCore.OData.Tests.Commons;
-using Microsoft.AspNetCore.OData.Tests.Models;
-using Microsoft.OData.Edm;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Deltas;
@@ -58,6 +61,19 @@ public class DeltaTest
                 new object[] { "CollectionProperty", new Collection<int> { 1, 2, 3 }}
             });
         }
+    }
+
+    [Fact]
+    public async ValueTask BindAsync_ThrowsArgumentNull_ForInputs()
+    {
+        // Arrange & Act & Assert
+        ArgumentNullException exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await Delta<Base>.BindAsync(null, null), "httpContext", false, true);
+        Assert.Equal("The parameter cannot be null. (Parameter 'httpContext')", exception.Message);
+
+        // Arrange & Act & Assert
+        HttpContext httpContext = new DefaultHttpContext();
+        await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await Delta<Base>.BindAsync(httpContext, null));
+        Assert.Equal("The parameter cannot be null. (Parameter 'parameter')", exception.Message);
     }
 
     [Fact]

@@ -4092,6 +4092,14 @@
             to invoke a particular Action. The Parameter values are stored in the dictionary keyed using the Parameter name.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataActionParameters.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataActionParameters"/></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataBodyModelBinder">
             <summary>
             A model binder for ODataParameterValue values.
@@ -4333,6 +4341,14 @@
             <summary>
             Gets the OData action of this parameters.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext">
             <summary>
@@ -6751,6 +6767,7 @@
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.Version">
             <summary>
             Gets the OData version.
+            Please call 'SetVersion()' to config.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions">
@@ -6765,6 +6782,12 @@
             Please call 'SetCaseInsensitive()' to config.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.TimeZone">
+            <summary>
+            Gets TimeZoneInfo for the <see cref="T:System.DateTime"/> serialization and deserialization.
+            Please call 'SetTimeZoneInfo()' to config.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
             <summary>
             Config whether or not no '$' sign query option.
@@ -6777,6 +6800,13 @@
             Config the case insensitive.
             </summary>
             <param name="enableCaseInsensitive">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetTimeZoneInfo(System.TimeZoneInfo)">
+            <summary>
+            Config the time zone information.
+            </summary>
+            <param name="tzi">Case insensitive or not.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetVersion(Microsoft.OData.ODataVersion)">

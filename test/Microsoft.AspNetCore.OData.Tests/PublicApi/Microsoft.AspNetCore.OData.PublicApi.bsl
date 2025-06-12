@@ -198,6 +198,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	bool EnableCaseInsensitive  { public get; }
 	bool EnableNoDollarQueryOptions  { public get; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
+	System.TimeZoneInfo TimeZone  { public get; }
 	Microsoft.OData.ODataVersion Version  { public get; }
 
 	public Microsoft.AspNetCore.OData.ODataMiniOptions Count ()
@@ -209,6 +210,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetCaseInsensitive (bool enableCaseInsensitive)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetNoDollarQueryOptions (bool enableNoDollarQueryOptions)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetTimeZoneInfo (System.TimeZoneInfo tzi)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetVersion (Microsoft.OData.ODataVersion version)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SkipToken ()
 }
@@ -1157,6 +1159,11 @@ NonValidatingParameterBindingAttribute(),
 ]
 public class Microsoft.AspNetCore.OData.Formatter.ODataActionParameters : System.Collections.Generic.Dictionary`2[[System.String],[System.Object]], ICollection, IDictionary, IEnumerable, IDeserializationCallback, ISerializable, IDictionary`2, IReadOnlyDictionary`2, ICollection`1, IEnumerable`1, IReadOnlyCollection`1 {
 	public ODataActionParameters ()
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public static System.Threading.Tasks.ValueTask`1[[Microsoft.AspNetCore.OData.Formatter.ODataActionParameters]] BindAsync (Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter)
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter : Microsoft.AspNetCore.Mvc.Formatters.TextInputFormatter, IApiRequestFormatMetadataProvider, IInputFormatter {
@@ -1206,6 +1213,11 @@ public class Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters :
 	public ODataUntypedActionParameters (Microsoft.OData.Edm.IEdmAction action)
 
 	Microsoft.OData.Edm.IEdmAction Action  { public get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public static System.Threading.Tasks.ValueTask`1[[Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters]] BindAsync (Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter)
 }
 
 public class Microsoft.AspNetCore.OData.Formatter.ResourceContext {

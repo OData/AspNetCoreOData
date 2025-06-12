@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
@@ -19,6 +20,7 @@ public class ODataMiniOptions
     private DefaultQueryConfigurations _queryConfigurations = new DefaultQueryConfigurations();
     private bool _enableNoDollarQueryOptions = true;
     private bool _enableCaseInsensitive = true;
+    private TimeZoneInfo _timeZone = TimeZoneInfo.Local;
     private ODataVersion _version = ODataVersionConstraint.DefaultODataVersion;
 
     /// <summary>
@@ -28,6 +30,7 @@ public class ODataMiniOptions
 
     /// <summary>
     /// Gets the OData version.
+    /// Please call 'SetVersion()' to config.
     /// </summary>
     public ODataVersion Version { get => _version; }
 
@@ -42,6 +45,12 @@ public class ODataMiniOptions
     /// Please call 'SetCaseInsensitive()' to config.
     /// </summary>
     public bool EnableCaseInsensitive { get => _enableCaseInsensitive; }
+
+    /// <summary>
+    /// Gets TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
+    /// Please call 'SetTimeZoneInfo()' to config.
+    /// </summary>
+    public TimeZoneInfo TimeZone { get => _timeZone; }
 
     /// <summary>
     /// Config whether or not no '$' sign query option.
@@ -62,6 +71,17 @@ public class ODataMiniOptions
     public ODataMiniOptions SetCaseInsensitive(bool enableCaseInsensitive)
     {
         _enableCaseInsensitive = enableCaseInsensitive;
+        return this;
+    }
+
+    /// <summary>
+    /// Config the time zone information.
+    /// </summary>
+    /// <param name="tzi">Case insensitive or not.</param>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
+    public ODataMiniOptions SetTimeZoneInfo(TimeZoneInfo tzi)
+    {
+        _timeZone = tzi;
         return this;
     }
 
@@ -175,5 +195,6 @@ public class ODataMiniOptions
         this._version = otherOptions.Version;
         this._enableNoDollarQueryOptions = otherOptions.EnableNoDollarQueryOptions;
         this._enableCaseInsensitive = otherOptions.EnableCaseInsensitive;
+        this._timeZone = otherOptions.TimeZone;
     }
 }

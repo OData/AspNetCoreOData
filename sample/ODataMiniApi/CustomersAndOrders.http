@@ -62,3 +62,31 @@ Content-Type: application/json
 { 
   "name": "kerry"
 } 
+
+###
+
+POST {{ODataMiniApi_HostAddress}}/v1/customers/1/rateByName
+Content-Type: application/json 
+
+{ 
+  "name": "kerry",
+  "age":16
+}
+
+###
+
+# You will get the following response:
+#
+#{
+#  "@odata.context": "http://localhost:5177/$metadata#Edm.String",
+#  "value": "EdmActionName: 'Rating': rate based on '8'"
+#}
+
+POST {{ODataMiniApi_HostAddress}}/v1/customers/rating
+Content-Type: application/json 
+
+{ 
+  "p": 8
+}
+
+###

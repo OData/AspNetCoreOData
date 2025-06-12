@@ -6,13 +6,18 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
+using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -81,6 +86,18 @@ public static class HttpContextExtensions
         }
 
         return httpContext.RequestServices?.GetService<IOptions<ODataOptions>>()?.Value;
+    }
+
+    internal static bool IsMinimalEndpoint(this HttpContext httpContext)
+    {
+        if (httpContext == null)
+        {
+            throw Error.ArgumentNull(nameof(httpContext));
+        }
+
+        // Check if the endpoint is a minimal endpoint.
+        var endpoint = httpContext.GetEndpoint();
+        return endpoint?.Metadata.GetMetadata<ODataMiniMetadata>() != null;
     }
 
     internal static IEdmModel GetOrCreateEdmModel(this HttpContext httpContext, Type clrType, ParameterInfo parameter = null)
@@ -194,6 +211,74 @@ public static class HttpContextExtensions
         }
 
         return null;
+    }
+
+    internal static async ValueTask<T> BindODataParameterAsync<T>(this HttpContext httpContext, ParameterInfo parameter)
+        where T : class
+    {
+        ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
+        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
+
+        var endpoint = httpContext.GetEndpoint();
+        ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        if (metadata is null || metadata.Model is null || metadata.PathFactory is null)
+        {
+            throw new ODataException($"Please call WithODataModel() and WithODataPathFactory() for the endpoint");
+        }
+
+        Type parameterType = parameter.ParameterType;
+
+        IEdmModel model = metadata.Model;
+
+        IODataFeature oDataFeature = httpContext.ODataFeature();
+        oDataFeature.Model = model;
+        oDataFeature.Services = httpContext.GetOrCreateServiceProvider();
+        oDataFeature.Path = metadata.PathFactory(httpContext, parameterType);
+        HttpRequest request = httpContext.Request;
+        IList<IDisposable> toDispose = new List<IDisposable>();
+        Uri baseAddress = httpContext.GetInputBaseAddress(metadata);
+
+        ODataVersion version = ODataResult.GetODataVersion(request, metadata);
+
+        object result = null;
+        try
+        {
+            result = await ODataInputFormatter.ReadFromStreamAsync(
+                parameterType,
+                defaultValue: null,
+                baseAddress,
+                version,
+                request,
+                toDispose).ConfigureAwait(false);
+
+            foreach (IDisposable obj in toDispose)
+            {
+                obj.Dispose();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new ODataException($"Cannot bind parameter '{parameter.Name}'. the error is: {ex.Message}");
+        }
+
+        return result as T;
+    }
+
+    internal static Uri GetInputBaseAddress(this HttpContext httpContext, ODataMiniMetadata options)
+    {
+        if (httpContext == null)
+        {
+            throw Error.ArgumentNull(nameof(httpContext));
+        }
+
+        if (options.BaseAddressFactory is not null)
+        {
+            return options.BaseAddressFactory(httpContext);
+        }
+        else
+        {
+            return ODataInputFormatter.GetDefaultBaseAddress(httpContext.Request);
+        }
     }
 
     internal static IServiceProvider BuildDefaultServiceProvider(this HttpContext httpContext, IEdmModel model)

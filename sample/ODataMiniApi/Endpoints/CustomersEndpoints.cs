@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
@@ -110,6 +111,53 @@ public static class CustomersEndpoints
                     IDictionary<string, object> keysValues = new Dictionary<string, object>();
                     keysValues["Id"] = id;
                     return new ODataPath(new EntitySetSegment(customers), new KeySegment(keysValues, customers.EntityType, customers));
+                });
+
+        app.MapPost("v1/customers/{id}/rateByName", (AppDb db, int id, ODataActionParameters parameters) =>
+        {
+            Customer customer = db.Customers.FirstOrDefault(s => s.Id == id);
+            if (customer == null)
+            {
+                return null; // should return Results.NotFound();
+            };
+
+            return $"{customer.Name}: {System.Text.Json.JsonSerializer.Serialize(parameters)}";
+        })
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataPathFactory(
+                (h, t) =>
+                {
+                    string idStr = h.GetRouteValue("id") as string;
+                    int id = int.Parse(idStr);
+                    IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
+
+                    IDictionary<string, object> keysValues = new Dictionary<string, object>();
+                    keysValues["Id"] = id;
+
+                    IEdmAction action = model.SchemaElements.OfType<IEdmAction>().First(a => a.Name == "RateByName");
+
+                    return new ODataPath(new EntitySetSegment(customers),
+                        new KeySegment(keysValues, customers.EntityType, customers),
+                        new OperationSegment(action, null)
+                        );
+                });
+
+        app.MapPost("v1/customers/rating", (AppDb db, ODataUntypedActionParameters parameters) =>
+        {
+            return $"EdmActionName: '{parameters.Action.Name}': rate based on '{parameters["p"]}'";
+        })
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataPathFactory(
+                (h, t) =>
+                {
+                    IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
+                    IEdmAction action = model.SchemaElements.OfType<IEdmAction>().First(a => a.Name == "Rating");
+
+                    return new ODataPath(new EntitySetSegment(customers),
+                        new OperationSegment(action, null)
+                        );
                 });
         return app;
     }

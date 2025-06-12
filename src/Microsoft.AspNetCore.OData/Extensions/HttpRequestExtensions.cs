@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -98,6 +99,19 @@ public static class HttpRequestExtensions
             throw Error.ArgumentNull(nameof(request));
         }
 
+        bool isMinimalApi = request.HttpContext.IsMinimalEndpoint();
+        if (isMinimalApi)
+        {
+            // In minimal API, we don't have ODataOptions, so we check the ODataMiniOptions directly.
+            ODataMiniOptions miniOptions = request.HttpContext.RequestServices?.GetService<IOptions<ODataMiniOptions>>()?.Value;
+            if (miniOptions is not null)
+            {
+                return miniOptions.TimeZone;
+            }
+
+            return null;
+        }
+
         return request.ODataOptions()?.TimeZone;
     }
 
@@ -111,6 +125,19 @@ public static class HttpRequestExtensions
         if (request == null)
         {
             throw Error.ArgumentNull(nameof(request));
+        }
+
+        bool isMinimalApi = request.HttpContext.IsMinimalEndpoint();
+        if (isMinimalApi)
+        {
+            // In minimal API, we don't have ODataOptions, so we check the ODataMiniOptions directly.
+            ODataMiniOptions miniOptions = request.HttpContext.RequestServices?.GetService<IOptions<ODataMiniOptions>>()?.Value;
+            if (miniOptions is not null)
+            {
+                return miniOptions.EnableNoDollarQueryOptions;
+            }
+
+            return false;
         }
 
         return request.ODataOptions()?.EnableNoDollarQueryOptions ?? false;

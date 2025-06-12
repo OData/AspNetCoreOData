@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="ODataUntypedActionParametersTests.cs" company=".NET Foundation">
+// <copyright file="ODataActionParametersTests.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -22,38 +22,31 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter;
 
-public class ODataUntypedActionParametersTests
+public class ODataActionParametersTests
 {
-    [Fact]
-    public void Ctor_ThrowsArgumentNull_Action()
-    {
-        // Arrange & Act & Assert
-        ExceptionAssert.ThrowsArgumentNull(() => new ODataUntypedActionParameters(null), "action");
-    }
-
     [Fact]
     public async ValueTask BindAsync_ThrowsArgumentNull_ForInputs()
     {
         // Arrange & Act & Assert
-        ArgumentNullException exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataUntypedActionParameters.BindAsync(null, null), "httpContext", false, true);
+        ArgumentNullException exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataActionParameters.BindAsync(null, null), "httpContext", false, true);
         Assert.Equal("The parameter cannot be null. (Parameter 'httpContext')", exception.Message);
 
         // Arrange & Act & Assert
         HttpContext httpContext = new DefaultHttpContext();
-        await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataUntypedActionParameters.BindAsync(httpContext, null));
+        await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataActionParameters.BindAsync(httpContext, null));
         Assert.Equal("The parameter cannot be null. (Parameter 'parameter')", exception.Message);
     }
 
     [Fact]
-    public async ValueTask BindAsync_Returns_ValidODataUntypedActionParameter()
+    public async ValueTask BindAsync_Returns_ValidODataActionParameter()
     {
         // Arrange
         Mock<IODataDeserializerProvider> deserializerProviderMock = new Mock<IODataDeserializerProvider>();
         Mock<ODataActionPayloadDeserializer> mock = new Mock<ODataActionPayloadDeserializer>(deserializerProviderMock.Object);
 
-        ODataUntypedActionParameters expectedParameters = new ODataUntypedActionParameters(new Mock<IEdmAction>().Object);
+        ODataActionParameters expectedParameters = new ODataActionParameters();
 
-        mock.Setup(m => m.ReadAsync(It.IsAny<ODataMessageReader>(), typeof(ODataUntypedActionParameters), It.IsAny<ODataDeserializerContext>()))
+        mock.Setup(m => m.ReadAsync(It.IsAny<ODataMessageReader>(), typeof(ODataActionParameters), It.IsAny<ODataDeserializerContext>()))
             .ReturnsAsync(expectedParameters);
 
         HttpContext httpContext = new DefaultHttpContext();
@@ -72,12 +65,12 @@ public class ODataUntypedActionParametersTests
         httpContext.SetEndpoint(endpoint);
         ParameterInfo parameter = typeof(ODataActionParametersTests).GetMethod("TestMethod", BindingFlags.NonPublic | BindingFlags.Static).GetParameters().First();
 
-        ODataUntypedActionParameters actualParameter = await ODataUntypedActionParameters.BindAsync(httpContext, parameter);
+        ODataActionParameters actualParameter = await ODataActionParameters.BindAsync(httpContext, parameter);
 
         // Act & Assert
         Assert.Same(expectedParameters, actualParameter);
     }
 
     // This empty method is used to provide a parameter for the BindAsync test.
-    private static void TestMethod(ODataUntypedActionParameters parameters) { }
+    private static void TestMethod(ODataActionParameters parameters) { }
 }
