@@ -19,14 +19,6 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
-using Microsoft.AspNetCore.OData.Query;
-using Microsoft.OData.Edm;
-using Microsoft.OData.UriParser;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.OData.Formatter;
-using Microsoft.AspNetCore.OData.Results;
-using Microsoft.OData;
-using System.Net.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 
 namespace Microsoft.AspNetCore.OData.Deltas;
@@ -445,54 +437,7 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
     /// <returns>The built <see cref="Delta{T}"/></returns>
     public static async ValueTask<Delta<T>> BindAsync(HttpContext context, ParameterInfo parameter)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(parameter, nameof(parameter));
-
-        var endpoint = context.GetEndpoint();
-        ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
-        if (metadata is null || metadata.Model is null || metadata.PathFactory is null)
-        {
-            throw new ODataException($"Please call WithODataModel and WithODataPathFactory for the endpoint");
-        }
-
-        IEdmModel model = metadata.Model;
-
-        context.ODataFeature().Model = model;
-        context.ODataFeature().Services = context.GetOrCreateServiceProvider();
-        context.ODataFeature().Path = metadata.PathFactory(context, typeof(T));
-        HttpRequest request = context.Request;
-        Type type = typeof(Delta<T>);
-        IList<IDisposable> toDispose = new List<IDisposable>();
-        Uri baseAddress = GetBaseAddress(context, metadata);
-
-        ODataVersion version = ODataResult.GetODataVersion(request, metadata);
-
-        object result = await ODataInputFormatter.ReadFromStreamAsync(
-                type,
-                defaultValue: null,
-                baseAddress,
-                version,
-                request,
-                toDispose).ConfigureAwait(false);
-
-        foreach (IDisposable obj in toDispose)
-        {
-            obj.Dispose();
-        }
-
-        return await ValueTask.FromResult(result as Delta<T>);
-    }
-
-    private static Uri GetBaseAddress(HttpContext httpContext, ODataMiniMetadata options)
-    {
-        if (options.BaseAddressFactory is not null)
-        {
-            return options.BaseAddressFactory(httpContext);
-        }
-        else
-        {
-            return ODataInputFormatter.GetDefaultBaseAddress(httpContext.Request);
-        }
+        return await context.BindODataParameterAsync<Delta<T>>(parameter);
     }
 
     /// <summary>
