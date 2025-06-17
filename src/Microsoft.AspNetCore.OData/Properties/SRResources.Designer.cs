@@ -259,6 +259,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot bind parameter &apos;{0}&apos;. the error is: {1}..
+        /// </summary>
+        internal static string BindParameterFailedOnMinimalAPIEndpoint {
+            get {
+                return ResourceManager.GetString("BindParameterFailedOnMinimalAPIEndpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The property &apos;{0}&apos; on type &apos;{1}&apos; returned a null value. The input stream contains collection items which cannot be added if the instance is null..
         /// </summary>
         internal static string CannotAddToNullCollection {
@@ -1294,6 +1303,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The OData configuration is missing for the minimal API. Please call WithODataModel() and WithODataPathFactory() for the endpoint..
+        /// </summary>
+        internal static string ODataMustBeSetOnMinimalAPIEndpoint {
+            get {
+                return ResourceManager.GetString("ODataMustBeSetOnMinimalAPIEndpoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The operation cannot be completed because no ODataPath is available for the request..
         /// </summary>
         internal static string ODataPathMissing {
@@ -1841,7 +1859,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeRelated", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
         /// </summary>
@@ -1850,7 +1868,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustBeResourceSet", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not implement &apos;{1}&apos; interface..
         /// </summary>
@@ -1859,7 +1877,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustImplementInterface", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from &apos;{1}&apos;..
         /// </summary>
@@ -1868,7 +1886,7 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("TypeMustInheritFromType", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; of dynamic property &apos;{1}&apos; is not supported..
         /// </summary>

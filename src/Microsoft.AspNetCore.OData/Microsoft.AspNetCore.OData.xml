@@ -7346,6 +7346,11 @@
               Looks up a localized string similar to A binary operator with incompatible types was detected. Found operand types &apos;{0}&apos; and &apos;{1}&apos; for operator kind &apos;{2}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BindParameterFailedOnMinimalAPIEndpoint">
+            <summary>
+              Looks up a localized string similar to Cannot bind parameter &apos;{0}&apos;. the error is: {1}..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotAddToNullCollection">
             <summary>
               Looks up a localized string similar to The property &apos;{0}&apos; on type &apos;{1}&apos; returned a null value. The input stream contains collection items which cannot be added if the instance is null..
@@ -7919,6 +7924,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ODataFunctionNotSupported">
             <summary>
               Looks up a localized string similar to Unknown function &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ODataMustBeSetOnMinimalAPIEndpoint">
+            <summary>
+              Looks up a localized string similar to The OData configuration is missing for the minimal API. Please call WithODataModel() and WithODataPathFactory() for the endpoint..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ODataPathMissing">

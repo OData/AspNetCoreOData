@@ -223,7 +223,7 @@ public static class HttpContextExtensions
         ODataMiniMetadata metadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
         if (metadata is null || metadata.Model is null || metadata.PathFactory is null)
         {
-            throw new ODataException($"Please call WithODataModel() and WithODataPathFactory() for the endpoint");
+            throw new ODataException(SRResources.ODataMustBeSetOnMinimalAPIEndpoint);
         }
 
         Type parameterType = parameter.ParameterType;
@@ -258,7 +258,7 @@ public static class HttpContextExtensions
         }
         catch (Exception ex)
         {
-            throw new ODataException($"Cannot bind parameter '{parameter.Name}'. the error is: {ex.Message}");
+            throw new ODataException(Error.Format(SRResources.BindParameterFailedOnMinimalAPIEndpoint, parameter.Name, ex.Message));
         }
 
         return result as T;
