@@ -763,4 +763,10 @@
   <data name="PropertyMustBeSet" xml:space="preserve">
     <value>The '{0}' property must be set.</value>
   </data>
+  <data name="ODataMustBeSetOnMinimalAPIEndpoint" xml:space="preserve">
+    <value>The OData configuration is missing for the minimal API. Please call WithODataModel() and WithODataPathFactory() for the endpoint.</value>
+  </data>
+  <data name="BindParameterFailedOnMinimalAPIEndpoint" xml:space="preserve">
+    <value>Cannot bind parameter '{0}'. the error is: {1}.</value>
+  </data>
 </root>
