@@ -898,7 +898,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{&apos; and &apos;}&apos;..
+        ///   Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{{&apos; and &apos;}}&apos;..
         /// </summary>
         internal static string InvalidTemplateLiteral {
             get {
