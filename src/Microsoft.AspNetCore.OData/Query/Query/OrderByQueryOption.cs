@@ -56,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Query
             _queryOptionParser = queryOptionParser;
         }
 
-        internal OrderByQueryOption(string rawValue, ODataQueryContext context, string applyRaw)
+        internal OrderByQueryOption(string rawValue, ODataQueryContext context, string applyRaw, string computeRaw)
         {
             if (context == null)
             {
@@ -68,19 +68,27 @@ namespace Microsoft.AspNetCore.OData.Query
                 throw Error.ArgumentNullOrEmpty("rawValue");
             }
 
-            if (applyRaw == null)
-            {
-                throw Error.ArgumentNullOrEmpty("applyRaw");
-            }
-
             Context = context;
             RawValue = rawValue;
             Validator = context.GetOrderByQueryValidator();
+
+            Dictionary<string, string> queryOptions = new Dictionary<string, string>();
+            queryOptions["$orderby"] = rawValue;
+            if (applyRaw != null)
+            {
+                queryOptions["$apply"] = applyRaw;
+            }
+
+            if (computeRaw != null)
+            {
+                queryOptions["$compute"] = computeRaw;
+            }
+
             _queryOptionParser = new ODataQueryOptionParser(
                 context.Model,
                 context.ElementType,
                 context.NavigationSource,
-                new Dictionary<string, string> { { "$orderby", rawValue }, { "$apply", applyRaw } },
+                queryOptions,
                 context.RequestContainer);
 
             if (context.RequestContainer == null)
@@ -89,7 +97,15 @@ namespace Microsoft.AspNetCore.OData.Query
                 _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
             }
 
-            _queryOptionParser.ParseApply();
+            if (computeRaw != null)
+            {
+                _queryOptionParser.ParseCompute();
+            }
+
+            if (applyRaw != null)
+            {
+                _queryOptionParser.ParseApply();
+            }
         }
 
         // This constructor is intended for unit testing only.

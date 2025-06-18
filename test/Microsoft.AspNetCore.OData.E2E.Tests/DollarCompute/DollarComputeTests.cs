@@ -365,5 +365,58 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
                 "Query option 'Compute' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings", payload);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+        [Fact]
+        public async Task QueryShoppers_UsingQueryOptionsWithQuerySettings_IncludesDollarCompute_WorksWithDollarSelect()
+        {
+            // Arrange
+            string queryUrl = "odata/shoppers?$compute=age add 10 as agePlusTen&$select=id,name,agePlusTen";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+
+            // Assert
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            // It returns 3 entities because there's a `pagesize=3` setting in the controller/action
+            Assert.Equal("[{\"Id\":1,\"Name\":\"Peter\",\"agePlusTen\":29}," +
+                "{\"Id\":2,\"Name\":\"Sam\",\"agePlusTen\":50}," +
+                "{\"Id\":3,\"Name\":\"John\",\"agePlusTen\":44}]", payload);
+        }
+
+        [Fact]
+        public async Task QueryShoppers_UsingQueryOptionsWithQuerySettings_IncludesDollarCompute_WorksWithDollorOrderby()
+        {
+            // Arrange
+            string queryUrl = "odata/shoppers?$compute=age add 10 as agePlusTen&$orderby=agePlusTen desc&$select=id,name,agePlusTen&$filter=agePlusTen ge 21";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            HttpClient client = CreateClient();
+            HttpResponseMessage response;
+
+            // Act
+            response = await client.SendAsync(request);
+
+            // Assert
+            string payload = await response.Content.ReadAsStringAsync();
+
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(response.Content);
+
+            // It returns 3 entities because there's a `pagesize=3` setting in the controller/action
+            // But the payload returns the ordered list.
+            Assert.Equal("[" +
+                "{\"Id\":2,\"Name\":\"Sam\",\"agePlusTen\":50}," +
+                "{\"Id\":3,\"Name\":\"John\",\"agePlusTen\":44}," +
+                "{\"Id\":4,\"Name\":\"Kerry\",\"agePlusTen\":39}]",
+                payload);
+        }
     }
 }

@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -49,6 +50,18 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute
         public IActionResult GetSales()
         {
             return Ok();
+        }
+
+        [HttpGet("odata/Shoppers")]
+        public IQueryable Get(ODataQueryOptions<ComputeShopper> queryOptions)
+        {
+            var queryable = DollarComputeDataSource.Shoppers.AsQueryable();
+
+            return queryOptions.ApplyTo(queryable, new ODataQuerySettings
+            {
+                PageSize = 3,
+                TimeZone = TimeZoneInfo.Utc
+            });
         }
     }
 }
