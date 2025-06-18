@@ -385,6 +385,23 @@ internal static class TypeHelper
         return false;
     }
 
+    /// <summary>
+    /// Determines whether the specified <see cref="Type"/> represents an <see cref="IAsyncEnumerable{T}"/> type.
+    /// </summary>
+    /// <param name="clrType">The <see cref="Type"/> to evaluate.</param>
+    /// <returns>True if the type is an enumeration; false otherwise.</returns>
+    public static bool IsAsyncEnumerableType(Type clrType)
+    {
+        if (clrType == null)
+        {
+            throw Error.ArgumentNull(nameof(clrType));
+        }
+
+        return 
+            (clrType.IsGenericType && clrType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)) ||
+            (clrType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>)));
+    }
+
     internal static bool IsDictionary(Type clrType)
     {
         if (clrType == null)
