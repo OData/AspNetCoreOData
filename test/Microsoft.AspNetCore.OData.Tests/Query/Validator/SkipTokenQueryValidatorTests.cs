@@ -6,6 +6,9 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -26,6 +29,21 @@ public class SkipTokenQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateSkipTokenQueryValidator_ReturnsFalseWithError_OnNullOption()
+    {
+        // Arrange
+        SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
+
+        // Act
+        var result = validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'skipToken')",errors.First());
+    }
+
+    [Fact]
     public void ValidateSkipTokenQueryValidator_ThrowsOnNullSettings()
     {
         // Arrange & Act
@@ -36,6 +54,23 @@ public class SkipTokenQueryValidatorTests
 
         // Assert
         ExceptionAssert.Throws<ArgumentNullException>(() => validator.Validate(query, null));
+    }
+
+    [Fact]
+    public void TryValidateSkipTokenQueryValidator_ReturnsFalseWithError_OnNullSettings()
+    {
+        // Arrange
+        SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
+        ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int), null);
+        SkipTokenQueryOption query = new SkipTokenQueryOption("abc", context);
+
+        // Act
+        var result = validator.TryValidate(query, null, out IEnumerable<string> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Fact]
@@ -53,5 +88,26 @@ public class SkipTokenQueryValidatorTests
         // Act & Assert
         ExceptionAssert.Throws<ODataException>(() => validator.Validate(query, settings),
             "Query option 'SkipToken' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void TryValidateSkipTokenQueryValidator_ReturnsFalseWithError_NotAllowedQueryOption()
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings();
+        ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int), null);
+        context.DefaultQueryConfigurations.EnableSkipToken = false;
+        SkipTokenQueryOption query = new SkipTokenQueryOption("abc", context);
+        SkipTokenQueryValidator validator = new SkipTokenQueryValidator();
+
+        // Act
+        var result = validator.TryValidate(query, settings, out IEnumerable<string> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Query option 'SkipToken' is not allowed. To allow it, set the 'AllowedQueryOptions' property on EnableQueryAttribute or QueryValidationSettings.",
+           errors.First());
     }
 }
