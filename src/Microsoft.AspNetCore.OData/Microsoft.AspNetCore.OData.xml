@@ -8914,12 +8914,38 @@
             </summary>
             <typeparam name="T">The collection element type.</typeparam>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.List{`0},System.Int32,System.Nullable{System.Int64},System.Boolean)">
+            <summary>
+            Private constructor used by static Create methods and public constructors.
+            </summary>
+            <param name="items">The list of items in the collection.</param>
+            <param name="pageSize">The maximum number of items per page.</param>
+            <param name="totalCount">The total number of items in the source collection, if known.</param>
+            <param name="isTruncated">Indicates whether the collection is truncated.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.IAsyncEnumerable{`0},System.Int32,System.Nullable{System.Int64},System.Boolean)">
+            <summary>
+            Private constructor used by static Create methods and public constructors.
+            </summary>
+            <param name="asyncSource">The asynchronous source of items (pageSize + 1) in the collection.</param>
+            <param name="pageSize">The maximum number of items per page.</param>
+            <param name="totalCount">The total number of items in the source collection, if known.</param>
+            <param name="isTruncated">Indicates whether the collection is truncated.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32)">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
             </summary>
             <param name="source">The collection to be truncated.</param>
             <param name="pageSize">The page size.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Nullable{System.Int64})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
+            </summary>
+            <param name="source">The queryable collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32)">
             <summary>
@@ -8936,39 +8962,75 @@
             <param name="pageSize">The page size.</param>
             <param name="parameterize">Flag indicating whether constants should be parameterized</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Nullable{System.Int64})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection{`0})">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
+            Wrapper used internally by the backward-compatible constructors.
             </summary>
-            <param name="source">The queryable collection to be truncated.</param>
-            <param name="pageSize">The page size.</param>
-            <param name="totalCount">The total count.</param>
+            <param name="other">An instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/>.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64})">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Create(System.Collections.Generic.IEnumerable{`0},System.Int32)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
+            Create a truncated collection from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
             </summary>
-            <param name="source">The queryable collection to be truncated.</param>
+            <param name="source">The collection to be truncated.</param>
             <param name="pageSize">The page size.</param>
-            <param name="totalCount">The total count.</param>
+            <returns>An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"></see></returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.#ctor(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64},System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Create(System.Collections.Generic.IEnumerable{`0},System.Int32,System.Nullable{System.Int64})">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/> class.
+            Create a truncated collection from an <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
             </summary>
-            <param name="source">The queryable collection to be truncated.</param>
+            <param name="source">The collection to be truncated.</param>
             <param name="pageSize">The page size.</param>
             <param name="totalCount">The total count.</param>
-            <param name="parameterize">Flag indicating whether constants should be parameterized</param>
+            <returns>An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"></see></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Create(System.Linq.IQueryable{`0},System.Int32)">
+            <summary>
+            Create a truncated collection from an <see cref="T:System.Linq.IQueryable`1"/>.
+            </summary>
+            <param name="source">The collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <returns>An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"></see></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Create(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64})">
+            <summary>
+            Create a truncated collection from an <see cref="T:System.Linq.IQueryable`1"/>.
+            </summary>
+            <param name="source">The collection to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count.</param>
+            <returns>An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"></see></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Create(System.Linq.IQueryable{`0},System.Int32,System.Boolean)" -->
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Create(System.Linq.IQueryable{`0},System.Int32,System.Nullable{System.Int64},System.Boolean)" -->
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.CreateAsync(System.Collections.Generic.IAsyncEnumerable{`0},System.Int32,System.Nullable{System.Int64},System.Threading.CancellationToken)">
+            <summary>
+            Create an async truncated collection from an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/>.
+            </summary>
+            <param name="source">The AsyncEnumerable to be truncated.</param>
+            <param name="pageSize">The page size.</param>
+            <param name="totalCount">The total count. Default is null.</param>
+            <param name="cancellationToken">Cancellation token for async operations. Default is <see cref="!:default"/></param>
+            <returns>An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1"/></returns>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.PageSize">
-            <inheritdoc />
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.IsTruncated">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.TotalCount">
-            <inheritdoc />
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.IsTruncated">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.Count">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.GetEnumerator">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection`1.GetAsyncEnumerator(System.Threading.CancellationToken)">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser">
             <summary>
