@@ -135,7 +135,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// </summary>
     /// <param name="source">The collection to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"></see></returns>
     public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize)
     {
         return CreateInternal(source, pageSize, false, null);
@@ -147,8 +147,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// <param name="source">The collection to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="totalCount">The total count.</param>
-    /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
-    [Obsolete("should not be used, will be marked internal in the next major version")]
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"></see></returns>
     public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize, long? totalCount)
     {
         return CreateInternal(source, pageSize, false, totalCount);
@@ -160,7 +159,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// <param name="source">The collection to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
-    /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"></see></returns>
     public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize, bool parameterize)
     {
         return CreateInternal(source, pageSize, parameterize);
@@ -173,7 +172,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// <param name="pageSize">The page size.</param>
     /// <param name="totalCount">The total count. Default is null.</param>
     /// <param name="parameterize">Flag indicating whether constants should be parameterized</param>
-    /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"></see></returns>
     [Obsolete("should not be used, will be marked internal in the next major version")]
     public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize, long? totalCount, bool parameterize)
     {
@@ -186,7 +185,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// <param name="source">The AsyncEnumerable to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
     /// <param name="totalCount">The total count. Default is null.</param>
-    /// <param name="cancellationToken">Cancellation token for async operations. Default is <see cref="default"/></param>
+    /// <param name="cancellationToken">Cancellation token for async operations. Default.</param>
     /// <returns>An instance of the <see cref="TruncatedCollection{T}"/></returns>
     public static async Task<TruncatedCollection<T>> CreateAsync(IAsyncEnumerable<T> source, int pageSize, long? totalCount = null, CancellationToken cancellationToken = default)
     {
@@ -284,7 +283,9 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
         ArgumentNullException.ThrowIfNull(source);
 
         if (pageSize < MinPageSize)
-            throw new ArgumentOutOfRangeException(nameof(pageSize), $"Page size must be >= {MinPageSize}.");
+        {
+            throw Error.ArgumentMustBeGreaterThanOrEqualTo("pageSize", pageSize, MinPageSize);
+        }
     }
 
     #endregion
@@ -297,8 +298,42 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     public bool IsTruncated => _isTruncated;
 
     /// <inheritdoc/>
-    public int Count => _items != null ? _items.Count : 0;
+    public int Count
+    {
+        get
+        {
+            if (_items != null)
+            {
+                return _items.Count;
+            }
+            else if (_asyncSource != null)
+            {
+                throw new InvalidOperationException("Count cannot be accessed synchronously for an asynchronous source. Use CountAsync instead.");
+            }
+            return 0;
+        }
+    }
 
+    /// <inheritdoc/>
+    public async Task<int> CountAsync()
+    {
+        if (_items != null)
+        {
+            return await Task.FromResult(_items.Count);
+        }
+        else if (_asyncSource != null)
+        {
+            int count = 0;
+            await foreach (var _ in _asyncSource.ConfigureAwait(false))
+            {
+                count++;
+            }
+            return count;
+        }
+        return 0;
+    }
+
+    /// <inheritdoc/>
     public T this[int index] => _items[index];
 
     /// <inheritdoc/>
