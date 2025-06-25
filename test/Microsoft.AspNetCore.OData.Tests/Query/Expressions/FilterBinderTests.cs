@@ -2493,12 +2493,12 @@ public class FilterBinderTests
     #region 'isof' in query option
 
     [Theory]
-    [InlineData("isof(Edm.Int16)", "$it => IIF(($it Is System.Int16), True, False)")]
-    [InlineData("isof('Microsoft.AspNetCore.OData.Tests.Models.Product')", "$it => IIF(($it Is Microsoft.AspNetCore.OData.Tests.Models.Product), True, False)")]
-    [InlineData("isof(ProductName,Edm.String)", "$it => IIF(($it.ProductName Is System.String), True, False)")]
-    [InlineData("isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.Category')", "$it => IIF(($it.Category Is Microsoft.AspNetCore.OData.Tests.Models.Category), True, False)")]
-    [InlineData("isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')", "$it => IIF(($it.Category Is Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory), True, False)")]
-    [InlineData("isof(Ranking, 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum')", "$it => IIF(($it.Ranking Is Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum), True, False)")]
+    [InlineData("isof(Edm.Int16)", "$it => ($it Is System.Int16)")]
+    [InlineData("isof('Microsoft.AspNetCore.OData.Tests.Models.Product')", "$it => ($it Is Microsoft.AspNetCore.OData.Tests.Models.Product)")]
+    [InlineData("isof(ProductName,Edm.String)", "$it => ($it.ProductName Is System.String)")]
+    [InlineData("isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.Category')", "$it => ($it.Category Is Microsoft.AspNetCore.OData.Tests.Models.Category)")]
+    [InlineData("isof(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')", "$it => ($it.Category Is Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
+    [InlineData("isof(Ranking, 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum')", "$it => ($it.Ranking Is Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum)")]
     public void IsofMethod_Succeeds(string filter, string expectedResult)
     {
         // Arrange & Act & Assert

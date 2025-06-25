@@ -337,8 +337,8 @@ public abstract class ExpressionBinderBase
             }
         }
 
-        // Be caution: Type method of LINQ to Entities only supports entity type.
-        return Expression.Condition(Expression.TypeIs(source, clrType), TrueConstant, FalseConstant);
+        // Be caution: Type method of LINQ to Entities only supports entity types.
+        return Expression.TypeIs(source, clrType);
     }
 
     private Expression BindCeiling(SingleValueFunctionCallNode node)
