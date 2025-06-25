@@ -25,6 +25,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
 
     private readonly List<T> _items;
     private readonly IAsyncEnumerable<T> _asyncSource;
+
     private readonly bool _isTruncated;
 
     /// <summary>
@@ -61,6 +62,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TruncatedCollection{T}"/> class.
+    /// </summary>
     /// <param name="source">The collection to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
     public TruncatedCollection(IEnumerable<T> source, int pageSize)
@@ -110,9 +112,20 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// </summary>
     /// <param name="source">The collection to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <param name="totalCount">The total count. Default is null.</param>
-    /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
-    public static TruncatedCollection<T> Create(IEnumerable<T> source, int pageSize, long? totalCount = null)
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"></see></returns>
+    public static TruncatedCollection<T> Create(IEnumerable<T> source, int pageSize)
+    {
+        return CreateInternal(source, pageSize, null);
+    }
+
+    /// <summary>
+    /// Create a truncated collection from an <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    /// <param name="source">The collection to be truncated.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalCount">The total count.</param>
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"></see></returns>
+    public static TruncatedCollection<T> Create(IEnumerable<T> source, int pageSize, long? totalCount)
     {
         return CreateInternal(source, pageSize, totalCount);
     }
@@ -122,10 +135,21 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// </summary>
     /// <param name="source">The collection to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <param name="totalCount">The total count. Default is null.</param>
+    /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
+    public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize)
+    {
+        return CreateInternal(source, pageSize, false, null);
+    }
+
+    /// <summary>
+    /// Create a truncated collection from an <see cref="IQueryable{T}"/>.
+    /// </summary>
+    /// <param name="source">The collection to be truncated.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <param name="totalCount">The total count.</param>
     /// <returns>An instance of the <see cref="TruncatedCollection{T}"</returns>
     [Obsolete("should not be used, will be marked internal in the next major version")]
-    public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize, long? totalCount = null)
+    public static TruncatedCollection<T> Create(IQueryable<T> source, int pageSize, long? totalCount)
     {
         return CreateInternal(source, pageSize, false, totalCount);
     }
@@ -276,7 +300,6 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     public int Count => _items != null ? _items.Count : 0;
 
     public T this[int index] => _items[index];
-    //public List<T> AsList() => new List<T>(_items);
 
     /// <inheritdoc/>
     public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
