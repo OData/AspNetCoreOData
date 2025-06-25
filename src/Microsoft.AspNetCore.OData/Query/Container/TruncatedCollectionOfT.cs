@@ -308,8 +308,9 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
             }
             else if (_asyncSource != null)
             {
-                throw new InvalidOperationException("Count cannot be accessed synchronously for an asynchronous source. Use CountAsync instead.");
+                throw Error.InvalidOperation("Count cannot be accessed synchronously for an asynchronous source. Use CountAsync instead.");
             }
+
             return 0;
         }
     }
