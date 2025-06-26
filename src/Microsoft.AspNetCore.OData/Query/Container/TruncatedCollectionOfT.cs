@@ -314,6 +314,12 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     IEnumerator IEnumerable.GetEnumerator() => _items?.GetEnumerator();
 
     /// <inheritdoc/>
-    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) =>
-        _asyncSource?.GetAsyncEnumerator(cancellationToken);
+    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        if (_asyncSource == null)
+        {
+            throw new InvalidOperationException("Async enumeration is not supported for sync-only instances.");
+        }
+        return _asyncSource.GetAsyncEnumerator(cancellationToken);
+    }
 }
