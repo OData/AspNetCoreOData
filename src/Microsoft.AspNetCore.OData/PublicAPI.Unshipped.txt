@@ -44,11 +44,6 @@ Microsoft.AspNetCore.OData.ODataMiniOptions.SetVersion(Microsoft.OData.ODataVers
 Microsoft.AspNetCore.OData.ODataMiniOptions.SkipToken() -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.TimeZone.get -> System.TimeZoneInfo
 Microsoft.AspNetCore.OData.ODataMiniOptions.Version.get -> Microsoft.OData.ODataVersion
-Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Count.get -> int
-Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.CountAsync() -> System.Threading.Tasks.Task<int>
-Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.GetAsyncEnumerator(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerator<T>
-Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.GetEnumerator() -> System.Collections.Generic.IEnumerator<T>
-Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.this[int index].get -> T
 Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter
 Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutedAsync(object responseValue, Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask<object>
 Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask
@@ -83,13 +78,6 @@ static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithO
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion<TBuilder>(this TBuilder builder, Microsoft.OData.ODataVersion version) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataMiniOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Create(System.Collections.Generic.IEnumerable<T> source, int pageSize) -> Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Create(System.Collections.Generic.IEnumerable<T> source, int pageSize, long? totalCount) -> Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Create(System.Linq.IQueryable<T> source, int pageSize) -> Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Create(System.Linq.IQueryable<T> source, int pageSize, bool parameterize) -> Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Create(System.Linq.IQueryable<T> source, int pageSize, long? totalCount) -> Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.Create(System.Linq.IQueryable<T> source, int pageSize, long? totalCount, bool parameterize) -> Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>
-static Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>.CreateAsync(System.Collections.Generic.IAsyncEnumerable<T> source, int pageSize, long? totalCount = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.OData.Query.Container.TruncatedCollection<T>>
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>>
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.PopulateMetadata(System.Reflection.ParameterInfo parameter, Microsoft.AspNetCore.Builder.EndpointBuilder builder) -> void
 static readonly Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.MapperProvider -> System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper>

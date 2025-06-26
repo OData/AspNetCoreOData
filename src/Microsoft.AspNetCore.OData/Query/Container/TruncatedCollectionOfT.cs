@@ -28,6 +28,8 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
 
     private readonly bool _isTruncated;
 
+    private readonly TruncationState _isTruncatedState;
+
     /// <summary>
     /// Private constructor used by static Create methods and public constructors.
     /// </summary>
@@ -49,11 +51,11 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// <param name="asyncSource">The asynchronous source of items (pageSize + 1) in the collection.</param>
     /// <param name="pageSize">The maximum number of items per page.</param>
     /// <param name="totalCount">The total number of items in the source collection, if known.</param>
-    /// <param name="isTruncated">Indicates whether the collection is truncated.</param>
-    private TruncatedCollection(IAsyncEnumerable<T> asyncSource, int pageSize, long? totalCount, bool isTruncated)
+    /// <param name="isTruncatedState">State to indicate whether the collection is truncated.</param>
+    private TruncatedCollection(IAsyncEnumerable<T> asyncSource, int pageSize, long? totalCount, TruncationState isTruncatedState)
     {
         _asyncSource = asyncSource;
-        _isTruncated = isTruncated;
+        _isTruncatedState = isTruncatedState;
         PageSize = pageSize;
         TotalCount = totalCount;
     }
@@ -184,12 +186,12 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// </summary>
     /// <param name="source">The AsyncEnumerable to be truncated.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <param name="totalCount">The total count. Default is null.</param>
+    /// /// <param name="totalCount">The total count. Default null.</param>
     /// <param name="cancellationToken">Cancellation token for async operations. Default.</param>
     /// <returns>An instance of the <see cref="TruncatedCollection{T}"/></returns>
-    public static async Task<TruncatedCollection<T>> CreateAsync(IAsyncEnumerable<T> source, int pageSize, long? totalCount = null, CancellationToken cancellationToken = default)
+    public static TruncatedCollection<T> CreateForAsyncSource(IAsyncEnumerable<T> source, int pageSize, long? totalCount = null, CancellationToken cancellationToken = default)
     {
-        return await CreateInternalAsync(source, pageSize, totalCount, cancellationToken).ConfigureAwait(false);
+        return CreateInternal(source, pageSize, totalCount, cancellationToken);
     }
 
     #endregion
@@ -235,41 +237,15 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
         return new TruncatedCollection<T>(buffer, pageSize, totalCount, isTruncated: enumerator.MoveNext());
     }
 
-    private static async Task<TruncatedCollection<T>> CreateInternalAsync(IAsyncEnumerable<T> source, int pageSize, long? totalCount, CancellationToken cancellationToken)
+    private static TruncatedCollection<T> CreateInternal(IAsyncEnumerable<T> source, int pageSize, long? totalCount, CancellationToken cancellationToken = default)
     {
         ValidateArgs(source, pageSize);
 
         int capacity = pageSize > 0 ? pageSize : (totalCount > 0 ? (totalCount < int.MaxValue ? (int)totalCount : int.MaxValue) : DefaultCapacity);
-        var buffer = new List<T>(capacity);
 
-        bool isTruncated = false;
-        int count = 0;
-        await foreach (var item in source.Take(checked(capacity + 1)).WithCancellation(cancellationToken).ConfigureAwait(false))
-        {
-            if (count < pageSize)
-            {
-                buffer.Add(item);
-                count++;
-            }
-            else
-            {
-                isTruncated = true;
-                break;
-            }
-        }
-
-        // Create a new async enumerable from the buffer
-        IAsyncEnumerable<T> truncatedSource = GetAsyncEnumerable(buffer);
-
-        return new TruncatedCollection<T>(truncatedSource, pageSize, totalCount, isTruncated);
-
-        static async IAsyncEnumerable<T> GetAsyncEnumerable(IEnumerable<T> items)
-        {
-            foreach (var item in items)
-                yield return item;
-
-            await Task.CompletedTask;
-        }
+        var state = new TruncationState();
+        var truncatedSource = new TruncatedAsyncEnumerable<T>(source, capacity, state);
+        return new TruncatedCollection<T>(truncatedSource, pageSize, totalCount, state);
     }
 
     private static IQueryable<T> Take(IQueryable<T> source, int pageSize, bool parameterize)
@@ -295,7 +271,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// <inheritdoc/>
     public long? TotalCount { get; }
     /// <inheritdoc/>
-    public bool IsTruncated => _isTruncated;
+    public bool IsTruncated => _isTruncatedState?.IsTruncated ?? _isTruncated;
 
     /// <inheritdoc/>
     public int Count
@@ -324,13 +300,9 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
         }
         else if (_asyncSource != null)
         {
-            int count = 0;
-            await foreach (var _ in _asyncSource.ConfigureAwait(false))
-            {
-                count++;
-            }
-            return count;
+            return await _asyncSource.CountAsync().ConfigureAwait(false);
         }
+
         return 0;
     }
 
@@ -338,20 +310,10 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     public T this[int index] => _items[index];
 
     /// <inheritdoc/>
-    public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => _items?.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => _items?.GetEnumerator();
 
     /// <inheritdoc/>
-    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
-    {
-        return GetPagedAsyncEnumerator(cancellationToken);
-
-        async IAsyncEnumerator<T> GetPagedAsyncEnumerator(CancellationToken ct)
-        {
-            await foreach (var item in _asyncSource.WithCancellation(ct).ConfigureAwait(false))
-            {
-                yield return item;
-            }
-        }
-    }
+    public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) =>
+        _asyncSource?.GetAsyncEnumerator(cancellationToken);
 }
