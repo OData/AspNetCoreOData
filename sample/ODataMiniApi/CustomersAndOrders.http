@@ -90,3 +90,43 @@ Content-Type: application/json
 }
 
 ###
+
+# The following is the test case for patch deltaset (changes) to an entity set.
+# You will get the following response:
+#
+#{
+#  "@odata.context": "http://localhost:5177/$metadata#Edm.String",
+#  "value": "Patch : '4' to customers"
+#}
+
+PATCH {{ODataMiniApi_HostAddress}}/v1/customers
+Content-Type: application/json 
+
+{
+  "@odata.context":"http://localhost/v1/$metadata#Customers/$delta",
+  "value":[
+   {
+      "@odata.id":"Customers(42)",
+      "Name":"Microsoft"
+   },
+   {
+      "@odata.context":"http://localhost/v1/$metadata#Customers/$deletedLink",
+      "source":"Customers(32)",
+      "relationship":"Orders",
+      "target":"Orders(12)"
+   },
+   {
+      "@odata.context":"http://localhost/v1/$metadata#Customers/$link",
+      "source":"Customers(22)",
+      "relationship":"Orders",
+      "target":"Orders(2)"
+   },
+   {
+      "@odata.context":"http://localhost/v1/$metadata#Customers/$deletedEntity",
+      "id":"Customers(12)",
+      "reason":"deleted"
+   }
+  ]
+}
+
+###
