@@ -159,6 +159,20 @@ public static class CustomersEndpoints
                         new OperationSegment(action, null)
                         );
                 });
+
+        // DeltaSet<T>
+        app.MapPatch("v1/customers", (AppDb db, DeltaSet<Customer> changes) =>
+        {
+            return $"Patch : '{changes.Count}' to customers";
+        })
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataPathFactory(
+                (h, t) =>
+                {
+                    IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
+                    return new ODataPath(new EntitySetSegment(customers));
+                });
         return app;
     }
 

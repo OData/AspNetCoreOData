@@ -5,16 +5,19 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.MinimalApis;
@@ -64,6 +67,19 @@ public class MinimalAPITodoEndpointsTest : IClassFixture<MinimalTestFixture<Mini
             .WithODataVersion(Microsoft.OData.ODataVersion.V401)
             .WithODataBaseAddressFactory(h => new Uri("http://localhost/v2"))
             .WithODataOptions(opt => opt.EnableAll().SetCaseInsensitive(true));
+
+        // DeltaSet<T> endpoint
+        app.MapPatch("v2/todos", (IMiniTodoTaskRepository db, DeltaSet<MiniTodo> changes) => $"Patch : '{changes.Count}' to todos")
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataVersion(Microsoft.OData.ODataVersion.V401)
+            .WithODataBaseAddressFactory(h => new Uri("http://localhost/v2"))
+            .WithODataPathFactory(
+             (h, t) =>
+             {
+                 IEdmEntitySet todos = model.FindDeclaredEntitySet("Todos");
+                 return new ODataPath(new EntitySetSegment(todos));
+             });
     }
 
     [Fact]
@@ -150,5 +166,26 @@ public class MinimalAPITodoEndpointsTest : IClassFixture<MinimalTestFixture<Mini
             "\"Title\":\"Clean House\"," +
             "\"Tasks\":[{\"Description\":\"Clean bathroom\"},{\"Description\":\"Clean carpet\"}]}",
             content);
+    }
+
+    [Fact]
+    public async Task PatchChangesToTodos_WithODataResult_WithModel_WithPath_ReturnsODataJsonPayload()
+    {
+        // Arrange & Act
+        var payload = @"{
+            '@context':'http://localhost/v2/$metadata#Todos/$delta',
+            'value':[
+                { '@odata.id': 'Todos(42)','Title':'No 42 Todo'},
+                { '@odata.context': 'http://localhost/v2/$metadata#Todos/$deletedEntity', 'Id': 'Todos(12)', 'reason':'deleted'}
+            ]}";
+        
+        StringContent stringContent = new StringContent(payload, Encoding.UTF8, "application/json");
+
+        var result = await _client.PatchAsync("/v2/todos", stringContent);
+        var content = await result.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal("{\"@context\":\"http://localhost/v2/$metadata#Edm.String\",\"value\":\"Patch : '2' to todos\"}", content);
     }
 }

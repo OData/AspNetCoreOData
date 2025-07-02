@@ -682,6 +682,11 @@ public class Microsoft.AspNetCore.OData.Deltas.DeltaSet`1 : System.Collections.O
 
 	System.Type ExpectedClrType  { public virtual get; }
 	System.Type StructuredType  { public virtual get; }
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public static ValueTask`1 BindAsync (Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter)
 }
 
 public interface Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration {

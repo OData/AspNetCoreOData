@@ -1837,6 +1837,14 @@
             Gets the expected type of the entity for which the changes are tracked.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1"/></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelta">
             <summary>
             <see cref="T:Microsoft.AspNetCore.OData.Deltas.IDelta" /> allows and tracks changes to an object.
