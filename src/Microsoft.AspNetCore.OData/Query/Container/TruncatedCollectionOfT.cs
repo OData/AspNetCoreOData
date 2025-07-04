@@ -189,7 +189,7 @@ public class TruncatedCollection<T> : IReadOnlyList<T>, ITruncatedCollection, IC
     /// /// <param name="totalCount">The total count. Default null.</param>
     /// <param name="cancellationToken">Cancellation token for async operations. Default.</param>
     /// <returns>An instance of the <see cref="TruncatedCollection{T}"/></returns>
-    public static TruncatedCollection<T> CreateForAsyncSource(IAsyncEnumerable<T> source, int pageSize, long? totalCount = null, CancellationToken cancellationToken = default)
+    public static TruncatedCollection<T> CreateForAsync(IAsyncEnumerable<T> source, int pageSize, long? totalCount = null, CancellationToken cancellationToken = default)
     {
         return CreateInternal(source, pageSize, totalCount, cancellationToken);
     }

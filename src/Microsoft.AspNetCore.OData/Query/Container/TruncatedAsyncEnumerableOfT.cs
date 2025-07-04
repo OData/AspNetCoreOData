@@ -32,7 +32,7 @@ public class TruncatedAsyncEnumerable<T> : IAsyncEnumerable<T>
     }
 
     /// <summary>
-    /// Returns an asynchronous enumerator that iterates through the items in the source collection,  up to a specified page size.
+    /// Returns an asynchronous enumerator that iterates through the items in the source collection, up to a specified page size.
     /// </summary>
     /// <remarks>The enumerator yields items from the source collection until the specified page size is reached.  
     /// If the number of items exceeds the page size, the enumeration is truncated, and the state is updated to true. Otherwise, the state is updated to false.</remarks>
