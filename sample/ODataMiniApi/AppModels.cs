@@ -23,6 +23,14 @@ public class EdmModelBuilder
         builder.EntitySet<Customer>("Customers");
         builder.EntitySet<Order>("Orders");
         builder.ComplexType<Info>();
+
+        var action = builder.EntityType<Customer>().Action("RateByName");
+        action.Parameter<string>("name");
+        action.Parameter<int>("age");
+        action.Returns<string>();
+
+        builder.EntityType<Customer>().Collection.Action("Rating").Parameter<int>("p");
+
         return builder.GetEdmModel();
     }
 }

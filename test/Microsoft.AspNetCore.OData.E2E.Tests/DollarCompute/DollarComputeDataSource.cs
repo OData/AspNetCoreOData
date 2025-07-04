@@ -13,6 +13,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarCompute;
 public class DollarComputeDataSource
 {
     private static IList<ComputeCustomer> _customers;
+    private static IList<ComputeShopper> _shoppers;
 
     static DollarComputeDataSource()
     {
@@ -20,6 +21,8 @@ public class DollarComputeDataSource
     }
 
     public static IList<ComputeCustomer> Customers => _customers;
+
+    public static IList<ComputeShopper> Shoppers => _shoppers;
 
     private static void GenerateCustomers()
     {
@@ -43,6 +46,12 @@ public class DollarComputeDataSource
 
             _customers[i - 1].Sales = Enumerable.Range(0, i + 3)
                 .Select(idx => new ComputeSale { Id = 100 * i + idx, Amount = idx + i, Price = (3.1 + idx) * i, TaxRate = (0.1 + idx + i) / 10.0 }).ToList();
+        }
+
+        _shoppers = new List<ComputeShopper>(_customers.Count);
+        foreach (var c in _customers)
+        {
+            _shoppers.Add(new ComputeShopper { Id = c.Id, Name = c.Name, Age = c.Age });
         }
     }
 }
