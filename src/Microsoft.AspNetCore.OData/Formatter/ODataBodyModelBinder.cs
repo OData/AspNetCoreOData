@@ -101,7 +101,7 @@ internal class ODataBodyModelBinder : IModelBinder
         HttpRequest request = bindingContext.HttpContext.Request;
 
         IODataRequestMessage oDataRequestMessage =
-                ODataMessageWrapperHelper.Create(request.Body, request.Headers);
+                ODataMessageWrapperHelper.Create(request.Body, request.Headers, bindingContext.HttpContext.Request.GetRouteServices());
         IEdmModel model = request.GetModel();
         using (var messageReader = new ODataMessageReader(oDataRequestMessage, null, model))
         {

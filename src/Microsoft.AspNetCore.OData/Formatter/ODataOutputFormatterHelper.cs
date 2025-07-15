@@ -74,7 +74,7 @@ internal static class ODataOutputFormatterHelper
         string annotationFilter = null;
         if (!string.IsNullOrEmpty(preferHeader))
         {
-            ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(response.Body, response.Headers);
+            ODataMessageWrapper messageWrapper = ODataMessageWrapperHelper.Create(response.Body, response.Headers, request.GetRouteServices());
             messageWrapper.SetHeader(RequestPreferenceHelpers.PreferHeaderName, preferHeader);
             annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
         }
