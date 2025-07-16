@@ -1,0 +1,132 @@
+﻿@ODataMiniApi_HostAddress = http://localhost:5177
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/customers
+
+### [AutoExpand]
+### 4.01 Delta Payload Get "odata." prefix even in 4.01?
+### 
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/v0/customers
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/v00/customers?$select=name&$expand=info&$top=2&$orderby=id
+###
+
+GET {{ODataMiniApi_HostAddress}}/v1/customers?$select=name,info&$top=2&$orderby=id
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/customers?$select=name&$top=2&$orderby=id&$expand=info
+###
+GET {{ODataMiniApi_HostAddress}}/v1/customers?$select=name,info&$top=2&$orderby=id%20desc
+
+###
+
+GET {{ODataMiniApi_HostAddress}}/v2/customers?$select=name&$top=2&$orderby=id
+
+###
+GET {{ODataMiniApi_HostAddress}}/v2/customers?$select=name&$top=2&$orderby=id&$expand=orders($select=amount)
+###
+GET {{ODataMiniApi_HostAddress}}/v2/customers?$select=name,info&$top=2&$orderby=id%20desc
+
+###
+# GET {{ODataMiniApi_HostAddress}}/v11/customers?$select=name&$expand=info // throw exception because 'info' is not navigation property
+GET {{ODataMiniApi_HostAddress}}/v11/customers?$select=name,info
+
+###
+GET {{ODataMiniApi_HostAddress}}/v3/customers
+
+###
+GET {{ODataMiniApi_HostAddress}}/v5/customers
+// throw exception since the delegate needs parameters, but we cannot easily provide the parameters.
+
+
+### $filter=amount gt 15
+GET {{ODataMiniApi_HostAddress}}/v0/?$filter=amount%20gt%2015
+
+###
+GET {{ODataMiniApi_HostAddress}}/v1/orders?$filter=amount%20gt%2015
+###
+GET {{ODataMiniApi_HostAddress}}/v2/orders?$filter=amount%20gt%2015
+
+
+###
+
+PATCH {{ODataMiniApi_HostAddress}}/v1/customers/1
+Content-Type: application/json 
+
+{ 
+  "name": "kerry"
+} 
+
+###
+
+POST {{ODataMiniApi_HostAddress}}/v1/customers/1/rateByName
+Content-Type: application/json 
+
+{ 
+  "name": "kerry",
+  "age":16
+}
+
+###
+
+# You will get the following response:
+#
+#{
+#  "@odata.context": "http://localhost:5177/$metadata#Edm.String",
+#  "value": "EdmActionName: 'Rating': rate based on '8'"
+#}
+
+POST {{ODataMiniApi_HostAddress}}/v1/customers/rating
+Content-Type: application/json 
+
+{ 
+  "p": 8
+}
+
+###
+
+# The following is the test case for patch deltaset (changes) to an entity set.
+# You will get the following response:
+#
+#{
+#  "@odata.context": "http://localhost:5177/$metadata#Edm.String",
+#  "value": "Patch : '4' to customers"
+#}
+
+PATCH {{ODataMiniApi_HostAddress}}/v1/customers
+Content-Type: application/json 
+
+{
+  "@odata.context":"http://localhost/v1/$metadata#Customers/$delta",
+  "value":[
+   {
+      "@odata.id":"Customers(42)",
+      "Name":"Microsoft"
+   },
+   {
+      "@odata.context":"http://localhost/v1/$metadata#Customers/$deletedLink",
+      "source":"Customers(32)",
+      "relationship":"Orders",
+      "target":"Orders(12)"
+   },
+   {
+      "@odata.context":"http://localhost/v1/$metadata#Customers/$link",
+      "source":"Customers(22)",
+      "relationship":"Orders",
+      "target":"Orders(2)"
+   },
+   {
+      "@odata.context":"http://localhost/v1/$metadata#Customers/$deletedEntity",
+      "id":"Customers(12)",
+      "reason":"deleted"
+   }
+  ]
+}
+
+###

@@ -201,7 +201,7 @@ public class ODataEnumSerializer : ODataEdmTypeSerializer
             long flagValue = Convert.ToInt64(flag);
 
             // Using bitwise operations to check if a flag is set, which is more efficient than Enum.HasFlag
-            if ((graphValue & flagValue) != 0 && flagValue != 0)
+            if (flagValue != 0 && (graphValue & flagValue) == flagValue)
             {
                 IEdmEnumMember flagMember = memberMapAnnotation.GetEdmEnumMember(flag);
                 if (flagMember != null)

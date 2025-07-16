@@ -6,9 +6,10 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Net.Http.Headers;
-using System.Net.Http;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,13 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
                 .AddRouteComponents("v2", edmModel));
+
+            services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
+                .AddRouteComponents("v3", IAsyncEnumerableEdmModel.GetEdmModel()))
+                .AddJsonOptions(opt =>
+                {
+                    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
         }
    }
 
@@ -108,5 +116,32 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
         List<Customer> customers = JToken.Parse(await response.Content.ReadAsStringAsync())["value"].ToObject<List<Customer>>();
         Assert.Equal(3, customers.Count);
         Assert.Equal(2, customers[0].Orders.Count);
+    }
+
+    [Theory]
+    [InlineData("None")]
+    [InlineData("Generic")]
+    [InlineData("Typed")]
+    public async Task EnsureAsyncIteratorIsTreatedAsIAsyncEnumerable(string variant)
+    {
+        // Arrange
+        string queryUrl = $"v3/Customers?variant={variant}";
+        var expectedResult = "{\"@odata.context\":\"http://localhost/v3/$metadata#Customers\",\"value\":[{\"Id\":1,\"Name\":\"Customer0\",\"Address\":{\"Name\":\"City1\",\"Street\":\"Street1\"}},{\"Id\":2,\"Name\":\"Customer1\",\"Address\":{\"Name\":\"City0\",\"Street\":\"Street0\"}},{\"Id\":3,\"Name\":\"Customer0\",\"Address\":{\"Name\":\"City1\",\"Street\":\"Street1\"}}]}";
+        
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+        // Act
+        HttpResponseMessage response = await Client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var resultObject = await response.Content.ReadAsStringAsync();
+        Assert.Equal(expectedResult, resultObject);
+
+        var json = await response.Content.ReadAsStringAsync();
+        List<Customer> customers = JToken.Parse(json)["value"].ToObject<List<Customer>>();
+        Assert.Equal(3, customers.Count);
     }
 }

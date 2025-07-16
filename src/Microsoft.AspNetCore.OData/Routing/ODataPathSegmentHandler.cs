@@ -318,7 +318,7 @@ public class ODataPathSegmentHandler : PathSegmentHandler
                 return string.Join(
                     ",",
                     keyValuePairs.Select(keyValuePair =>
-                        TranslateNode(keyValuePair.Value).EscapeBackSlashUriString()).ToArray());
+                        TranslateNode(keyValuePair.Value)).ToArray());
             }
         }
 
@@ -328,7 +328,7 @@ public class ODataPathSegmentHandler : PathSegmentHandler
             keyValuePairs.Select(keyValuePair =>
                 (keyValuePair.Key +
                  "=" +
-                 TranslateNode(keyValuePair.Value).EscapeBackSlashUriString())).ToArray());
+                 TranslateNode(keyValuePair.Value))).ToArray());
     }
 
     internal static string TranslateNode(object node)
@@ -364,6 +364,17 @@ public class ODataPathSegmentHandler : PathSegmentHandler
             return parameterAliasNode.Alias;
         }
 
-        return ODataUriUtils.ConvertToUriLiteral(node, ODataVersion.V4);
+        string uriLiteral = ODataUriUtils.ConvertToUriLiteral(node, ODataVersion.V4);
+
+        if (node is string && uriLiteral.Length > 2)
+        {
+            // ODataUriUtils.ConvertToUriLiteral does not encoded the value.
+            // The result for keys to use on the wire (like odata.id, odata.readlink, odata.editLink and Location header) should be encoded,
+            // but still wrapped in unencoded '
+            // This to allign with how ODLs UriParser construct OData ID Uri's
+            return '\'' + Uri.EscapeDataString(uriLiteral.Substring(1, uriLiteral.Length - 2)) + '\'';
+        }
+
+        return uriLiteral;
     }
 }

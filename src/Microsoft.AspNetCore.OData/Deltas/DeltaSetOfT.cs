@@ -8,7 +8,11 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Extensions;
 
 namespace Microsoft.AspNetCore.OData.Deltas;
 
@@ -28,6 +32,17 @@ public class DeltaSet<T> : Collection<IDeltaSetItem>, IDeltaSet, ITypedDelta whe
     /// Gets the expected type of the entity for which the changes are tracked.
     /// </summary>
     public Type ExpectedClrType => typeof(T);
+
+    /// <summary>
+    /// Binds the <see cref="HttpContext"/> and <see cref="ParameterInfo"/> to generate the <see cref="DeltaSet{T}"/>.
+    /// </summary>
+    /// <param name="context">The HttpContext.</param>
+    /// <param name="parameter">The parameter info.</param>
+    /// <returns>The built <see cref="DeltaSet{T}"/></returns>
+    public static async ValueTask<DeltaSet<T>> BindAsync(HttpContext context, ParameterInfo parameter)
+    {
+        return await context.BindODataParameterAsync<DeltaSet<T>>(parameter);
+    }
 
     #region Exclude unfinished APIs
 #if false
@@ -100,5 +115,5 @@ public class DeltaSet<T> : Collection<IDeltaSetItem>, IDeltaSet, ITypedDelta whe
         return null;
     }
 #endif
-#endregion
+    #endregion
 }

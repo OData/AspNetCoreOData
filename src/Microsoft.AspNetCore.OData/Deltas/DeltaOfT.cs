@@ -15,8 +15,11 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Extensions;
 
 namespace Microsoft.AspNetCore.OData.Deltas;
 
@@ -424,6 +427,17 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
                 deltaNestedResource.CopyChangedValues(originalNestedResource);
             }
         }
+    }
+
+    /// <summary>
+    /// Binds the <see cref="HttpContext"/> and <see cref="ParameterInfo"/> to generate the <see cref="Delta{T}"/>.
+    /// </summary>
+    /// <param name="context">The HttpContext.</param>
+    /// <param name="parameter">The parameter info.</param>
+    /// <returns>The built <see cref="Delta{T}"/></returns>
+    public static async ValueTask<Delta<T>> BindAsync(HttpContext context, ParameterInfo parameter)
+    {
+        return await context.BindODataParameterAsync<Delta<T>>(parameter);
     }
 
     /// <summary>

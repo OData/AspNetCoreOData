@@ -40,7 +40,7 @@ public class ODataSerializerContextTest
 
         // Act & Assert
         ExceptionAssert.ThrowsArgumentNull(
-            () => new ODataSerializerContext(resource: null, selectExpandClause: selectExpand, edmProperty: navProp), "resource");
+            () => new ODataSerializerContext(resource: null, selectExpandClause: selectExpand, edmProperty: navProp), "resourceContext");
     }
 
     [Fact]

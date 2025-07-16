@@ -58,7 +58,7 @@ public class LocationHeaderTests : WebApiTestBase<LocationHeaderTests>
 
         string locationHeader = response.Headers.GetValues("Location").Single();
 
-        Assert.Equal("http://localhost/location/Customers('abc%2F$+%2F-8')", locationHeader);
+        Assert.Equal("http://localhost/location/Customers('abc%2F%24%2B%2F-8%27%27%20%26%2C%3F%22')", locationHeader);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class HandleController : ODataController
     [HttpPost("location/customers")]
     public IActionResult CreateCustomer([FromBody]LocCustomer customer)
     {
-        customer.Id = $"{customer.Name}/$+/-8"; // insert slash middle
+        customer.Id = $"{customer.Name}/$+/-8' &,?\""; // insert slash middle and other unsafe url chars
         return Created(customer);
     }
 

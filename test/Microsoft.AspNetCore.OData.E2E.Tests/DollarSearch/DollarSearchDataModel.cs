@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarSearch;
 
 public class SearchProduct
@@ -20,6 +22,8 @@ public class SearchProduct
     public int Qty { get; set; }
 
     public SearchCategory Category { get; set; }
+
+    public List<SearchTag> Tags { get; set; } // List of tags
 }
 
 public class SearchCategory
@@ -27,6 +31,15 @@ public class SearchCategory
     public int Id { get; set; }
 
     public string Name { get; set; }
+}
+
+public class SearchTag
+{
+    public int Id { get; set; }
+
+    public string Name { get; set; } // Tag name (e.g., "Telemetry", "Privacy", "Security")
+
+    public string Description { get; set; }
 }
 
 public enum SearchColor

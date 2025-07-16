@@ -71,6 +71,7 @@ public class ODataQueryValidator : IODataQueryValidator
         if (options.Search != null)
         {
             ValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions);
+            options.Search.Validate(validationSettings);
         }
 
         if (options.Count != null || options.Request.IsCountRequest())

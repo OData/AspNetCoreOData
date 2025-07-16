@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -116,9 +115,7 @@ public class ODataQueryContext
         {
             if (_defaultQueryConfigurations == null)
             {
-                _defaultQueryConfigurations = RequestContainer == null
-                    ? GetDefaultQuerySettings()
-                    : RequestContainer.GetRequiredService<DefaultQueryConfigurations>();
+                _defaultQueryConfigurations = GetDefaultQueryConfigurations();
             }
 
             return _defaultQueryConfigurations;
@@ -204,15 +201,24 @@ public class ODataQueryContext
         }
     }
 
-    private DefaultQueryConfigurations GetDefaultQuerySettings()
+    private DefaultQueryConfigurations GetDefaultQueryConfigurations()
     {
+        if (RequestContainer != null)
+        {
+            DefaultQueryConfigurations configurations = RequestContainer.GetService<DefaultQueryConfigurations>();
+            if (configurations is not null)
+            {
+                return configurations;
+            }
+        }
+
         if (Request is null)
         {
             return new DefaultQueryConfigurations();
         }
 
         IOptions<ODataOptions> odataOptions = Request.HttpContext?.RequestServices?.GetService<IOptions<ODataOptions>>();
-        if (odataOptions is  null || odataOptions.Value is null)
+        if (odataOptions is null || odataOptions.Value is null)
         {
             return new DefaultQueryConfigurations();
         }

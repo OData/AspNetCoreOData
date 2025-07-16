@@ -1058,6 +1058,42 @@
             <param name="type">The test type.</param>
             <returns>true/false</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsComputeWrapper(System.Type,System.Type@)">
+            <summary>
+            Determines whether the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1"/> or a custom implementation
+            that inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> and implements both <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/>
+            and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/>.
+            </summary>
+            <param name="typeToCheck">The type to check.</param>
+            <param name="entityType">The entity type if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1"/> or a custom implementation; otherwise, null.</param>
+            <returns>
+            <c>true</c> if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1"/> or a custom implementation
+            that meets the criteria; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsFlatteningWrapper(System.Type)">
+            <summary>
+            Determines whether the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.FlatteningWrapper`1"/> or a custom implementation
+            that inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> and implements both <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1"/>
+            and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/>.
+            </summary>
+            <param name="typeToCheck">The type to check.</param>
+            <returns>
+            <c>true</c> if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.FlatteningWrapper`1"/> or a custom implementation
+            that meets the criteria; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsGroupByWrapper(System.Type)">
+            <summary>
+            Determines whether the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper"/> or a custom implementation
+            that inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/> and implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/>.
+            </summary>
+            <param name="typeToCheck">The type to check.</param>
+            <returns>
+            <c>true</c> if the specified type is a <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper"/> or a custom implementation
+            that meets the criteria; otherwise, <c>false</c>.
+            </returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetInnerElementType(System.Type)">
             <summary>
             Return the collection element type.
@@ -1151,12 +1187,41 @@
             <param name="elementType">out: the element type of the collection.</param>
             <returns>True if the type is an enumeration; false otherwise.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsAsyncEnumerableType(System.Type)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Type"/> represents an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> type.
+            </summary>
+            <param name="clrType">The <see cref="T:System.Type"/> to evaluate.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>
             Returns type of T if the type implements IEnumerable of T, otherwise, return null.
             </summary>
             <param name="type"></param>
             <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.InheritsFromGenericBase(System.Type,System.Type)">
+            <summary>
+            Determines whether the specified type inherits from a given generic base type.
+            </summary>
+            <param name="typeToCheck">The type to examine.</param>
+            <param name="genericBaseType">The open generic type definition to check against (e.g., typeof(Base&lt;&gt;)).</param>
+            <returns><c>true</c> if <paramref name="typeToCheck"/> inherits from <paramref name="genericBaseType"/>; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.ImplementsInterface(System.Type,System.Type)">
+            <summary>
+            Determines whether the specified target type implements the given interface type.
+            </summary>
+            <param name="targetType">The type to check for implementation of the interface.</param>
+            <param name="interfaceType">The interface type to check against.</param>
+            <returns>
+            <c>true</c> if the target type implements the specified interface type; otherwise, <c>false</c>.
+            </returns>
+            <remarks>
+            This method supports both generic and non-generic interfaces. For generic interfaces, it checks if the target type
+            implements any interface that matches the generic type definition of the specified interface type.
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Error">
             <summary>
@@ -1718,6 +1783,14 @@
             </summary>
             <param name="original">The entity to be updated.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/></returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.CopyUnchangedValues(`0)">
             <summary>
             Copies the unchanged property values from the underlying entity (accessible via <see cref="M:Microsoft.AspNetCore.OData.Deltas.Delta`1.GetInstance" />)
@@ -1763,6 +1836,14 @@
             <summary>
             Gets the expected type of the entity for which the changes are tracked.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Deltas.DeltaSet`1"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Deltas.IDelta">
             <summary>
@@ -2516,6 +2597,20 @@
             Gets the whole expand path.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration">
+            <summary>
+            Defines a contract used to apply extra logic on the model builder.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration.Apply(Microsoft.AspNetCore.Http.HttpContext,Microsoft.OData.ModelBuilder.ODataModelBuilder,System.Type)">
+            <summary>
+            Applies model configurations using the provided builder.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="builder">The <see cref="T:Microsoft.OData.ModelBuilder.ODataModelBuilder">builder</see> used to apply configurations.</param>
+            <param name="clrType">The top CLR type.</param>
+            <returns>The model builder or a totally new builder to use.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.IODataTypeMapper">
             <summary>
             Provides the mapping between CLR type and Edm type.
@@ -3168,6 +3263,26 @@
             <param name="request">The Http request.</param>
             <param name="segments">The OData path segments.</param>
             <returns>The generated OData link.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext">
+            <summary>
+            Provides an abstraction for wrapping the <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/> and the <see cref="T:System.Reflection.MethodInfo"/> associated with a route handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.MethodInfo">
+            <summary>
+            The <see cref="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.MethodInfo"/> associated with the current route handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.InvocationContext">
+            <summary>
+            The <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/> associated with the current route filter.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.HttpContext">
+            <summary>
+            Gets the <see cref="P:Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext.HttpContext"/>.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.SerializableErrorExtensions">
             <summary>
@@ -3992,6 +4107,14 @@
             to invoke a particular Action. The Parameter values are stored in the dictionary keyed using the Parameter name.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataActionParameters.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataActionParameters"/></returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ODataBodyModelBinder">
             <summary>
             A model binder for ODataParameterValue values.
@@ -4233,6 +4356,14 @@
             <summary>
             Gets the OData action of this parameters.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Deltas.Delta`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters"/></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.ResourceContext">
             <summary>
@@ -4792,14 +4923,13 @@
             <param name="writer">The ODataWriter.</param>
             <returns>A task that represents the asynchronous write operation</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext,System.Boolean)">
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.WriteResourceContent(Microsoft.OData.ODataWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode,Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
             Writes the context of a Resource
             </summary>
             <param name="writer">The <see cref="T:Microsoft.OData.ODataWriter" /> to use to write the resource contents</param>
             <param name="selectExpandNode">The <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode"/> describing the response graph.</param>
             <param name="resourceContext">The context for the resource instance being written.</param>
-            <param name="isDelta">Whether to only write changed properties of the resource</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataResourceSerializer.CreateSelectExpandNode(Microsoft.AspNetCore.OData.Formatter.ResourceContext)">
             <summary>
@@ -5124,7 +5254,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/> class.
             </summary>
-            <param name="resource">The resource whose property is being nested.</param>
+            <param name="resource">The context for the resource instance being written</param>
             <param name="selectExpandClause">The <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause"/> for the property being nested.</param>
             <param name="edmProperty">The complex property being nested or the navigation property being expanded.
             If the resource property is the dynamic complex, the resource property is null.
@@ -5135,7 +5265,7 @@
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext"/> class for nested resources.
             </summary>
-            <param name="resource">The resource whose property is being nested.</param>
+            <param name="resourceContext">The context for the resource instance being written.</param>
             <param name="edmProperty">The complex property being nested or the navigation property being expanded.
             If the resource property is the dynamic complex, the resource property is null.
             </param>
@@ -5231,6 +5361,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause">
             <summary>
             Gets or sets the <see cref="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.SelectExpandClause"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.IsDelta">
+            <summary>
+            Gets or sets a value indicating whether a delta payload is being serialized.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext.CurrentExpandedSelectItem">
@@ -5757,27 +5892,6 @@
             Returning DeltaKind of the object within DeltaResourceSet payload
             </summary>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection">
-            <summary>
-            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject"/>s.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
-            </summary>
-            <param name="edmType">The edm type of the collection.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject})">
-            <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
-            </summary>
-            <param name="edmType">The edm type of the collection.</param>
-            <param name="list">The list that is wrapped by the new collection.</param>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.GetEdmType">
-            <inheritdoc/>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObject">
             <summary>
             Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject"/> with no backing CLR <see cref="T:System.Type"/>.
@@ -5801,6 +5915,27 @@
             </summary>
             <param name="edmType">The <see cref="T:Microsoft.OData.Edm.IEdmEntityType"/> of this object.</param>
             <param name="isNullable">true if this object can be nullable; otherwise, false.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmObject"/> that is a collection of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject"/>s.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.#ctor(Microsoft.OData.Edm.IEdmCollectionTypeReference,System.Collections.Generic.IList{Microsoft.AspNetCore.OData.Formatter.Value.IEdmEntityObject})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection"/> class.
+            </summary>
+            <param name="edmType">The edm type of the collection.</param>
+            <param name="list">The list that is wrapped by the new collection.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Value.EdmEntityObjectCollection.GetEdmType">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Value.EdmEnumObject">
             <summary>
@@ -6447,6 +6582,135 @@
             <param name="routePattern">The given route pattern.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions">
+            <summary>
+            Extension methods for adding <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> and metadata to a route handler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataServiceDocument(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData service document.
+            </summary>
+            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
+            <param name="pattern">The route pattern.</param>
+            <param name="model">The related Edm model used to generate the service document.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.MapODataMetadata(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Adds a <see cref="T:Microsoft.AspNetCore.Routing.RouteEndpoint"/> to the <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData metadata.
+            It uses the Request.Header.ContentType or $format to identify whether it's CSDL-XML or CSDL-JSON.
+            </summary>
+            <param name="endpoints">The <see cref="T:Microsoft.AspNetCore.Routing.IEndpointRouteBuilder"/> to add the route to.</param>
+            <param name="pattern">The route pattern.</param>
+            <param name="model">The related Edm model.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Builder.RouteHandlerBuilder,System.Action{Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings},System.Action{Microsoft.AspNetCore.OData.Query.ODataQuerySettings})">
+            <summary>
+            Registers the default OData query filter onto the route handler.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/>.</param>
+            <param name="validationSetup">The action to configure validataion settings.</param>
+            <param name="querySetup">The action to configure query settings.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Routing.RouteGroupBuilder,System.Action{Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings},System.Action{Microsoft.AspNetCore.OData.Query.ODataQuerySettings})">
+            <summary>
+            Registers the default OData query filter onto the route group.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
+            <param name="validationSetup">The action to configure validataion settings.</param>
+            <param name="querySetup">The action to configure query settings.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Builder.RouteHandlerBuilder,Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter)">
+            <summary>
+            Registers an OData query filter onto the route handler.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/>.</param>
+            <param name="queryFilter">The <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(Microsoft.AspNetCore.Routing.RouteGroupBuilder,Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter)">
+            <summary>
+            Registers an OData query filter onto the route group.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
+            <param name="queryFilter">The <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter``1(Microsoft.AspNetCore.Builder.RouteHandlerBuilder)">
+            <summary>
+            Registers an OData query filter of type <typeparamref name="TFilterType"/> onto the route handler.
+            </summary>
+            <typeparam name="TFilterType">The type of the <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to register.</typeparam>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.RouteHandlerBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter``1(Microsoft.AspNetCore.Routing.RouteGroupBuilder)">
+            <summary>
+            Registers an OData query filter of type <typeparamref name="TFilterType"/> onto the route group.
+            </summary>
+            <typeparam name="TFilterType">The type of the <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to register.</typeparam>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Routing.RouteGroupBuilder"/> that can be used to further customize the route handler.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataResult``1(``0)">
+            <summary>
+            Enables OData response annotation to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataOptions``1(``0,System.Action{Microsoft.AspNetCore.OData.ODataMiniOptions})">
+            <summary>
+            Enables OData options to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="setupAction">The OData minimal options setup.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices``1(``0,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Customizes the services used for OData to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="services">The services.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataModel``1(``0,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Adds the OData model to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="model">The Edm model.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataBaseAddressFactory``1(``0,System.Func{Microsoft.AspNetCore.Http.HttpContext,System.Uri})">
+            <summary>
+            Adds the base address factory to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="baseAddressFactory">The base address factory which is used to calculate the base address for OData payload.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataPathFactory``1(``0,System.Func{Microsoft.AspNetCore.Http.HttpContext,System.Type,Microsoft.OData.UriParser.ODataPath})">
+            <summary>
+            Adds the path factory to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="pathFactory">The path factory which is used to calculate the OData path associated with current endpoint.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion``1(``0,Microsoft.OData.ODataVersion)">
+            <summary>
+            Configures the OData version to <see cref="P:Microsoft.AspNetCore.Http.Endpoint.Metadata" /> associated with the current endpoint.
+            </summary>
+            <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
+            <param name="version">The OData version.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
             <summary>
             Sets up default OData options for <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>.
@@ -6457,6 +6721,165 @@
              Configure the default <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>
             </summary>
             <param name="options">The Json Options.</param>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMiniMetadata">
+            <summary>
+            Metadata that specifies the OData minimal API.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Model">
+            <summary>
+            Gets or sets the model
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.IsODataFormat">
+            <summary>
+            Gets or sets a boolean value indicating to generate OData response.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.PathFactory">
+            <summary>
+            Gets or sets the path factory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Version">
+            <summary>
+            Gets or sets the OData version.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.BaseAddressFactory">
+            <summary>
+            Gets or sets the base address factory.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Options">
+            <summary>
+            Gets or sets the minimal options.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.Services">
+            <summary>
+            Gets or sets the services
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniMetadata.ServiceProvider">
+            <summary>
+            Gets or sets the service provider associated to this metadata.
+            Be noted, it seems we build and cache the service provider per endpoint.
+            If it's over-built, let's figure out a better solution for this.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMiniOptions">
+            <summary>
+            The options for minimal API scenarios
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryConfigurations">
+            <summary>
+            Gets the query configurations. for example, enable '$select' or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.Version">
+            <summary>
+            Gets the OData version.
+            Please call 'SetVersion()' to config.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions">
+            <summary>
+            Gets whether or not the OData system query options should be prefixed with '$'.
+            Please call 'SetNoDollarQueryOptions()' to config.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableCaseInsensitive">
+            <summary>
+            Ges whether or not case insensitive.
+            Please call 'SetCaseInsensitive()' to config.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.TimeZone">
+            <summary>
+            Gets TimeZoneInfo for the <see cref="T:System.DateTime"/> serialization and deserialization.
+            Please call 'SetTimeZoneInfo()' to config.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
+            <summary>
+            Config whether or not no '$' sign query option.
+            </summary>
+            <param name="enableNoDollarQueryOptions">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetCaseInsensitive(System.Boolean)">
+            <summary>
+            Config the case insensitive.
+            </summary>
+            <param name="enableCaseInsensitive">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetTimeZoneInfo(System.TimeZoneInfo)">
+            <summary>
+            Config the time zone information.
+            </summary>
+            <param name="tzi">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetVersion(Microsoft.OData.ODataVersion)">
+            <summary>
+            Config the OData version.
+            </summary>
+            <param name="version">The OData version.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableAll(System.Nullable{System.Int32})">
+            <summary>
+            Enables all OData query options.
+            </summary>
+            <param name="maxTopValue"></param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Expand">
+            <summary>
+            Enable $expand query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Select">
+            <summary>
+            Enable $select query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Filter">
+            <summary>
+            Enable $filter query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.OrderBy">
+            <summary>
+            Enable $orderby query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.Count">
+            <summary>
+            Enable $count query options.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SkipToken">
+            <summary>
+            Enable $skiptoken query option.
+            </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(System.Nullable{System.Int32})">
+             <summary>
+            Sets the maximum value of $top that a client can request.
+             </summary>
+             <param name="maxTopValue">The maximum value of $top that a client can request.</param>
+             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMvcBuilderExtensions">
             <summary>
@@ -6739,6 +7162,22 @@
             Provides extension methods to add OData services.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Microsoft.AspNetCore.OData.ODataMiniOptions})">
+            <summary>
+            Adds essential OData services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />.
+            </summary>
+            <param name="services">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> to add services to.</param>
+            <param name="setupAction">The OData options to configure the services with,
+            including access to a service provider which you can resolve services from.</param>
+            <returns>A <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> that can be used to further configure the OData services.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddODataQueryFilter(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Enables query support for actions with an <see cref="T:System.Linq.IQueryable" /> or <see cref="T:System.Linq.IQueryable`1" /> return
@@ -6920,6 +7359,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.BinaryOperatorNotSupported">
             <summary>
               Looks up a localized string similar to A binary operator with incompatible types was detected. Found operand types &apos;{0}&apos; and &apos;{1}&apos; for operator kind &apos;{2}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BindParameterFailedOnMinimalAPIEndpoint">
+            <summary>
+              Looks up a localized string similar to Cannot bind parameter &apos;{0}&apos;. the error is: {1}..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.CannotAddToNullCollection">
@@ -7274,7 +7718,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.InvalidTemplateLiteral">
             <summary>
-              Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{&apos; and &apos;}&apos;..
+              Looks up a localized string similar to The template string &apos;{0}&apos; of &apos;{1}&apos; is not a valid template literal. And a template literal should wrapper with &apos;{{&apos; and &apos;}}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.JsonConverterDoesnotSupportRead">
@@ -7467,6 +7911,11 @@
               Looks up a localized string similar to The property &apos;{0}&apos; cannot be used in the $orderby query option..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.NotSupportedChildTransformationKind">
+            <summary>
+              Looks up a localized string similar to Transformation kind &apos;{0}&apos; is not supported as a child transformation of kind &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.NotSupportedTransformationKind">
             <summary>
               Looks up a localized string similar to Transformation kind {0} is not supported..
@@ -7490,6 +7939,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ODataFunctionNotSupported">
             <summary>
               Looks up a localized string similar to Unknown function &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ODataMustBeSetOnMinimalAPIEndpoint">
+            <summary>
+              Looks up a localized string similar to The OData configuration is missing for the minimal API. Please call WithODataModel() and WithODataPathFactory() for the endpoint..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ODataPathMissing">
@@ -7570,6 +8024,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeEnum">
             <summary>
               Looks up a localized string similar to The value with type &apos;{0}&apos; must have type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeSet">
+            <summary>
+              Looks up a localized string similar to The &apos;{0}&apos; property must be set..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeSetWhenAnotherPropertyIsSet">
+            <summary>
+              Looks up a localized string similar to The &apos;{0}&apos; property must be set when the &apos;{1}&apos; property is set..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeString">
@@ -7790,6 +8254,16 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustBeResourceSet">
             <summary>
               Looks up a localized string similar to &apos;{0}&apos; is not a resource set type. Only resource set are supported..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustImplementInterface">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; does not implement &apos;{1}&apos; interface..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeMustInheritFromType">
+            <summary>
+              Looks up a localized string similar to The type &apos;{0}&apos; does not inherit from &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.TypeOfDynamicPropertyNotSupported">
@@ -8227,7 +8701,7 @@
             <summary>
             Represent properties used in groupby and aggregate clauses to make them accessible in further clauses/transformations
             </summary>
-            <remakrs>
+            <remarks>
             When we have $apply=groupby((Prop1,Prop2, Prop3))&amp;$orderby=Prop1, Prop2
             We will have following expression in .GroupBy
             $it => new AggregationPropertyContainer() {
@@ -8243,10 +8717,10 @@
                 }
             }
             when in $orderby (see AggregationBinder CollectProperties method)
-            Prop1 could be referenced us $it => (string)$it.Value
-            Prop2 could be referenced us $it => (int)$it.Next.Value
-            Prop3 could be referenced us $it => (int)$it.Next.Next.Value
-            Generic type for Value is used to avoid type casts for on primitive types that not supported in EF
+            Prop1 could be referenced as $it => (string)$it.Value
+            Prop2 could be referenced as $it => (int)$it.Next.Value
+            Prop3 could be referenced as $it => (int)$it.Next.Next.Value
+            Generic type for Value is used to avoid type casts for primitive types that are not supported in EF
             
             Also we have 4 use cases and base type have all required properties to support no cast usage. 
             1. Primitive property with Next
@@ -8254,8 +8728,68 @@
             3. Nested property with Next
             4. Nested property without Next
             However, EF doesn't allow to set different properties for the same type in two places in an lambda-expression => using new type with just new name to workaround that issue
-            
-            </remakrs>
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2">
+            <summary>
+            Represent properties used in groupby and aggregate clauses of $apply query to make them accessible in further clauses/transformations.
+            </summary>
+            <typeparam name="TWrapper">The type of the group-by wrapper associated with this container.</typeparam>
+            <typeparam name="TContainer">The concrete type of the aggregation property container, enabling self-referencing.</typeparam>
+            <remarks>
+            When we have
+            <code>$apply=groupby((Prop1,Prop2,Prop3))&amp;$orderby=Prop1,Prop2</code>
+            where <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> implements <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2"/>,
+            we will have following expression in .GroupBy:
+            <code>
+            $it => new AggregationPropertyContainer() {
+                Name = "Prop1",
+                Value = $it.Prop1, /* string */
+                Next = new AggregationPropertyContainer() {
+                    Name = "Prop2",
+                    Value = $it.Prop2, /* int */
+                    Next = new LastInChain() {
+                        Name = "Prop3",
+                        Value = $it.Prop3 /* int */
+                    }
+                }
+            }
+            </code>
+            When in $orderby,
+            Prop1 could be referenced as $it => (string)$it.Value,
+            Prop2 could be referenced as $it => (int)$it.Next.Value,
+            Prop3 could be referenced as $it => (int)$it.Next.Next.Value.
+            Generic type for Value is used to avoid type casts for primitive types that are not supported in Entity Framework.
+            Also, we have 4 use cases and this interface declares all required properties to support no cast usage.
+            1). Primitive property with Next
+            2). Primitive property without Next
+            3). Nested property with Next
+            4). Nested property without Next.
+            However, Entity Framework doesn't allow to set different properties for the same type in two places in a lambda expression.
+            Using new type with just new name to workaround that issue.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Name">
+            <summary>Gets or sets the name of the property.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Value">
+            <summary>Gets or sets the value of the property.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.NestedValue">
+            <summary>Gets or sets the nested value of the property.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Next">
+            <summary>Gets or sets the next property container.</summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.ToDictionaryCore(System.Collections.Generic.Dictionary{System.String,System.Object},Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper,System.Boolean)">
+            <summary>
+            Adds the properties in this container to the given dictionary.
+            </summary>
+            <param name="dictionary">The dictionary to which the properties in this container should be added.</param>
+            <param name="propertyMapper">The property mapper to use for mapping
+            between the names of properties in this container and the names that
+            should be used when adding the properties to the given dictionary.</param>
+            <param name="includeAutoSelected">A value indicating whether auto-selected properties should be included.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper">
             <summary>
@@ -8800,12 +9334,12 @@
             <param name="actionDescriptor">The action descriptor for the action being queried on.</param>
             <returns>The EDM model for the given type and request.</returns>
         </member>
-        <member name="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData">
+        <member name="T:Microsoft.AspNetCore.OData.Query.RequestQueryData">
             <summary>
             Holds request level query information.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData.QueryValidationRunBeforeActionExecution">
+        <member name="P:Microsoft.AspNetCore.OData.Query.RequestQueryData.QueryValidationRunBeforeActionExecution">
             <summary>
             Gets or sets a value indicating whether query validation was run before action (controller method) is executed.
             </summary>
@@ -8814,7 +9348,7 @@
             For cases where the run failed before action execution. We will run validation on result.
             </remarks>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.RequestQueryData.ProcessedQueryOptions">
+        <member name="P:Microsoft.AspNetCore.OData.Query.RequestQueryData.ProcessedQueryOptions">
             <summary>
             Gets or sets the processed query options.
             </summary>
@@ -8897,27 +9431,168 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable`1"/>.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable`1"/> after the ETag has been applied.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(System.Linq.IQueryable)">
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder">
             <summary>
-            Pre flattens properties referenced in aggregate clause to avoid generation of nested queries by EF.
-            For query like groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2)) we need to generate 
-            .Select(
-                $it => new FlattenninWrapper () {
-                    Source = $it, // Will used in groupby stage
-                    Container = new {
-                        Value = $it.B.C
-                        Next = new {
-                            Value = $it.B.D
-                        }
+            The default implementation to bind an OData $apply represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ApplyClause"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreateAggregateExpression(System.Linq.Expressions.ParameterExpression,Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase,System.Type,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for an aggregate.
+            </summary>
+            <param name="groupingParameter">The parameter representing the group.</param>
+            <param name="aggregateExpression">The aggregate expression.</param>
+            <param name="baseType">The element type at the base of the transformation.</param>
+            <param name="context">The query binder context.</param>
+            <returns>An expression representing the aggregate.</returns>
+            <exception cref="T:Microsoft.OData.ODataException"></exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreateEntitySetAggregateExpression(System.Linq.Expressions.ParameterExpression,Microsoft.OData.UriParser.Aggregation.EntitySetAggregateExpression,System.Type,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for an entity set aggregate.
+            </summary>
+            <param name="groupingParameter">The parameter representing the group.</param>
+            <param name="entitySetAggregateExpression">The entity set aggregate expression.</param>
+            <param name="baseType">The element type at the base of the transformation.</param>
+            <param name="context">The query binder context.</param>
+            <returns>An expression for the entity set aggregate.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+             $it => $it.AsQueryable()
+                 .SelectMany($it => $it.SomeEntitySet)
+                 .GroupBy($gr => new Object())
+                 .Select($p => new DynamicTypeWrapper() {
+                     Container = new AggregationPropertyContainer() {
+                         Name = "Alias1",
+                         Value = $it.AsQueryable().AggregateMethod1($it => $it.SomePropertyOfSomeEntitySet),
+                         Next = new LastInChain() {
+                             Name = "Alias2",
+                             Value = $p.AsQueryable().AggregateMethod2($it => $it.AnotherPropertyOfSomeEntitySet)
+                         }
+                     }
+                 })
+            </code>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreatePropertyAggregateExpression(System.Linq.Expressions.ParameterExpression,Microsoft.OData.UriParser.Aggregation.AggregateExpression,System.Type,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates an expression for a property aggregate.
+            </summary>
+            <param name="groupingParameter">The parameter representing the group.</param>
+            <param name="aggregateExpression">The aggregate expression.</param>
+            <param name="baseType">The element type at the base of the transformation.</param>
+            <param name="context">The query binder context.</param>
+            <returns>An expression for a property aggregate.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+             $it => $it.AsQueryable().Select($it => $it.SomeProperty).AggregateMethod()
+            </code>
+            Example:
+            <code>
+            $it => $it.AsQueryable().Sum($it => $it.SomeProperty)
+            </code>
+            If the aggregation method is <see cref="F:Microsoft.OData.UriParser.Aggregation.AggregationMethod.Custom"/>, the method uses a custom aggregation function provided by the caller.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.CreateGroupByMemberAssignments(System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode},Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates a list of <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression"/> from a collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode"/>.
+            </summary>
+            <param name="groupByNodes">GroupBy nodes.</param>
+            <param name="context">The query binder context.</param>
+            <returns>A list of <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedPropertyExpression"/> representing properties in the GroupBy clause.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.GetGroupingProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode)">
+            <summary>
+            Gets a collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode"/> from a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.
+            </summary>
+            <param name="transformationNode">The transformation node.</param>
+            <returns>A collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.GroupByPropertyNode"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.GetAggregateExpressions(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets a collection of <see cref="T:Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase"/> from a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.
+            </summary>
+            <param name="context">The query binder context.</param>
+            <param name="transformationNode">The <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <returns>A collection of aggregate expressions.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FixCustomMethodReturnTypes(System.Collections.Generic.IEnumerable{Microsoft.OData.UriParser.Aggregation.AggregateExpressionBase},Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Fixes return types for custom aggregation methods.
+            </summary>
+            <param name="aggregateExpressions">The aggregation expressions.</param>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.FixCustomMethodReturnType(Microsoft.OData.UriParser.Aggregation.AggregateExpression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Fixes return type for custom aggregation method.
+            </summary>
+            <param name="aggregationExpression">The aggregation expression</param>
+            <param name="context">The query binder context.</param>
+            <returns>The </returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.AggregationBinder.GetCustomMethod(Microsoft.OData.UriParser.Aggregation.AggregateExpression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Gets a custom aggregation method for the aggregation expression.
+            </summary>
+            <param name="aggregationExpression">The aggregation expression.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The custom method.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult">
+            <summary>
+            Represents the result of flattening properties referenced in the aggregate clause.
+            </summary>
+            <remarks>
+            Flattening properties referenced in an aggregate clause helps prevent the generation of nested queries by Entity Framework.
+            For example, given a query like:
+            <c>groupby((A), aggregate(B/C with max as Alias1, B/D with max as Alias2))</c>
+            the expression is rewritten as:
+            <code>
+            .Select($it => new FlatteningWrapper&lt;T&gt; {
+                Source = $it,
+                Container = new {
+                    Value = $it.B.C,
+                    Next = new {
+                        Value = $it.B.D
                     }
                 }
-            )
-            Also we need to populate expressions to access B/C and B/D in aggregate stage. It will look like:
-            B/C : $it.Container.Value
-            B/D : $it.Container.Next.Value
+            })
+            </code>
+            A mapping is also maintained between the original properties and their flattened expressions:
+            B/C → $it.Container.Value
+            B/D → $it.Container.Next.Value
+            This mapping is used during the aggregation stage to generate aggregate expressions.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.RedefinedContextParameter">
+            <summary>
+            Gets or sets the context parameter that has been redefined during the flattening process.
             </summary>
-            <param name="query"></param>
-            <returns>Query with Select that flattens properties</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedExpression">
+            <summary>
+            Gets or sets the expression that has been rewritten as part of the flattening process.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedPropertiesMapping">
+            <summary>
+            Gets or sets the mapping of single-value nodes to their corresponding flattened expressions.
+            Example: { { $it.B.C, $it.Value }, { $it.B.D, $it.Next.Value } }
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions">
             <summary>
@@ -8998,6 +9673,16 @@
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
             <returns></returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $search represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to <see cref="T:System.Linq.Expressions.Expression"/> and apply to <see cref="T:System.Linq.Expressions.Expression" />.
+            </summary>
+            <param name="binder">The given search binder.</param>
+            <param name="source">The given source.</param>
+            <param name="searchClause">The search clause.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The applied result.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.SearchClause,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Translate an OData $search parse tree represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/> to
@@ -9008,6 +9693,38 @@
             <param name="searchClause">The OData $search parse tree.</param>
             <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
             <returns>The applied result.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type@)">
+            <summary>
+            Translate an OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="binder">An instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.</param>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="transformationNode">The OData $apply parse tree.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+            <returns>The applied result.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.BinderExtensions.ApplyBind(Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder,System.Linq.IQueryable,Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Type@)">
+            <summary>
+            Translate an OData parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/> and applies it to an <see cref="T:System.Linq.IQueryable"/>.
+            </summary>
+            <param name="binder">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder"/>.</param>
+            <param name="source">The original <see cref="T:System.Linq.IQueryable"/> source.</param>
+            <param name="computeTransformationNode">The <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> representing an OData parse tree.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <param name="resultClrType">The type of wrapper used to create an expression from the $apply parse tree.</param>
+            <returns>The modified <see cref="T:System.Linq.IQueryable"/> source.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder">
+            <summary>
+            The default implementation to bind an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <inheritdoc/>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderBase">
             <summary>
@@ -9117,6 +9834,96 @@
             <param name="context">The query binder context.</param>
             <returns>The filter binder result.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder">
+            <summary>
+            Exposes the ability to translate an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that performs a GroupBy operation.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context..</param>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> representing the GroupBy operation in LINQ.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+            $it => new DynamicTypeWrapper() {
+                GroupByContainer = new AggregationPropertyContainer() {
+                    Name = "Prop1",
+                    Value = $it.Prop1,
+                    Next = new AggregationPropertyContainer() {
+                        Name = "Prop2",
+                        Value = $it.Prop2,
+                        Next = new LastInChain() {
+                            Name = "Prop3",
+                            Value = $it.Prop3
+                        }
+                    }
+                }
+            }
+            </code>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/> to
+            a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that performs a Select operation.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <returns>A <see cref="T:System.Linq.Expressions.LambdaExpression"/> representing the Select operation in LINQ.</returns>
+            <remarks>
+            Generates an expression similar to:
+            <code>
+            $it => new DynamicTypeWrapper() {
+                GroupByContainer = $it.Key.GroupByContainer // If groupby clause present
+                Container = new AggregationPropertyContainer() {
+                    Name = "Alias1",
+                    Value = $it.AsQueryable().Sum(i => i.AggregatableProperty),
+                    Next = new LastInChain() {
+                        Name = "Alias2",
+                        Value = $it.AsQueryable().Sum(i => i.AggregatableProperty)
+                    }
+                }
+            }
+            </code>
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder">
+            <summary>
+            Exposes the ability to translate an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Translates an OData $apply parse tree represented by a <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/> to
+            an <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="computeTransformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <remarks>
+            Generates an expression structured similar to:
+            <code>
+            $it => new ComputeWrapper&lt;T&gt; {
+                Instance = $it,
+                Model = parameterized(IEdmModel),
+                Container => new AggregationPropertyContainer() {
+                    Name = "Z", 
+                    Value = $it.X + $it.Y, 
+                    Next = new LastInChain() {
+                        Name = "C",
+                        Value = $it.A * $it.B
+                    }
+                }
+            }
+            </code>
+            </remarks>
+            <returns>The generated LINQ expression representing the OData $apply parse tree.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFilterBinder">
             <summary>
             Exposes the ability to translate an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to the <see cref="T:System.Linq.Expressions.Expression"/>.
@@ -9132,6 +9939,50 @@
             <param name="context">The query binder context.</param>
             <returns>The filter binder result.</returns>
             <remarks>reconsider to return "LambdaExpression"? </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder">
+            <summary>
+            Provides an abstraction for flattening property access expressions within an OData $apply clause
+            to support efficient translation of aggregation pipelines in LINQ providers like Entity Framework.
+            </summary>
+            <remarks>
+            Entity Framework versions earlier than EF Core 6.0 may generate nested queries when accessing navigation properties
+            in aggregation clauses. Flattening these properties can help generate flatter, more efficient SQL queries.
+            This interface allows conditional support for flattening based on the capabilities of the underlying LINQ provider.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Flattens properties referenced in aggregate clause to avoid generation of nested queries by Entity Framework.
+            </summary>
+            <param name="transformationNode">The OData $apply parse tree represented by <see cref="T:Microsoft.OData.UriParser.Aggregation.TransformationNode"/>.</param>
+            <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/> containing the current query context.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> containing the modified query source and
+            additional metadata resulting from the flattening operation.
+            </returns>
+            <remarks>
+            This method generates a Select expression that flattens the properties referenced in the aggregate clause.
+            Flattening properties helps prevent the generation of nested queries by Entity Framework,
+            resulting in more efficient SQL generation.
+            For query like: <c>groupby((A),aggregate(B/C with max as Alias1,B/D with max as Alias2))</c>
+            generate an expression similar to:
+            <code>
+            $it => FlatteningWrapper&lt;T&gt; {
+                Source = $it,
+                Container = new {
+                    Value = $it.B.C
+                    Next = new {
+                        Value = $it.B.D
+                    }
+                }
+            }
+            </code>
+            Also populate expressions to access B/C and B/D in aggregate stage to look like:
+            B/C : $it.Container.Value
+            B/D : $it.Container.Next.Value
+            </remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder">
             <summary>
@@ -9468,6 +10319,23 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAccessExpression(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression)">
+            <summary>
+            Creates an <see cref="T:System.Linq.Expressions.Expression"/> from the <see cref="T:Microsoft.OData.UriParser.QueryNode"/>.
+            </summary>
+            <param name="node">The <see cref="T:Microsoft.OData.UriParser.QueryNode"/> to be bound.</param>
+            <param name="context">An instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext"/>.</param>
+            <param name="baseElement">The <see cref="T:System.Linq.Expressions.Expression"/> for the base element.</param>
+            <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.CreateOpenPropertyAccessExpression(Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Creates a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that represents the semantics of the <see cref="T:Microsoft.OData.UriParser.SingleValueOpenPropertyAccessNode"/>.
+            </summary>
+            <param name="openNode">They query node to create an expression from.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.IsFlatteningSource(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Recognize $it.Source where $it is FlatteningWrapper
@@ -9508,6 +10376,27 @@
             <param name="propertyPath">The property path.</param>
             <param name="context">The query binder context.</param>
             <returns>Returns null if no aggregations were used so far</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.WrapConvert(System.Linq.Expressions.Expression)">
+            <summary>
+            Wrap a value type with Expression.Convert.
+            </summary>
+            <param name="expression">The <see cref="T:System.Linq.Expressions.Expression"/> to be wrapped.</param>
+            <returns>The wrapped  <see cref="T:System.Linq.Expressions.Expression"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.ConvertToAggregationPropertyContainerIfNeeded(System.Linq.Expressions.Expression)">
+            <summary>
+            Wraps <paramref name="source"/> expression with a Convert expression to enforce type <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> if needed.
+            </summary>
+            <param name="source">The source expression.</param>
+            <returns>The wrapped expression, or the original <paramref name="source"/> expression, as the case may be.</returns>
+            <remarks>
+            Wrapping with a Convert expression is only needed when dealing with <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> (default implementation).
+            It's needed because <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedProperty`1"/> - meaning that
+            <see cref="T:Microsoft.AspNetCore.OData.Query.Container.AggregationPropertyContainer"/> implements <see cref="T:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2"/> "Name" and "Value" properties
+            indirectly via <see cref="T:Microsoft.AspNetCore.OData.Query.Container.NamedProperty`1"/>.
+            Without Convert({expression}, typeof(AggregationPropertyContainer)), the "Value" property cannot be resolved and translation fails.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindPropertyAccessExpression(Microsoft.OData.UriParser.SingleValueNode,System.Reflection.PropertyInfo,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
@@ -9876,6 +10765,11 @@
             Gets or sets the assembly resolver.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.SearchBinder">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.ISearchBinder"/>.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.ComputedProperties">
             <summary>
             Gets the compute expressions.
@@ -9931,6 +10825,35 @@
             </summary>
             <param name="name">The parameter name.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.SetParameter(System.String,System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Sets the specified parameter
+            </summary>
+            <param name="name">The parameter name.</param>
+            <param name="parameterExpr">The parameter expression.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.TransformationElementType">
+            <summary>
+            The type of the element in a transformation query.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedExpressionMapping">
+            <summary>
+            A mapping of flattened single value nodes and their values. For example { {$it.B.C, $it.Value}, {$it.B.D, $it.Next.Value} }
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.EnsureFlattenedProperties(System.Linq.Expressions.ParameterExpression,System.Linq.IQueryable)">
+            <summary>
+            Ensures that the flattened properties are populated for the given source and query.
+            </summary>
+            <param name="source">The source parameter expression representing the root of the query.</param>
+            <param name="query">The queryable object representing the current query context.</param>
+            <remarks>
+            This method populates the <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext.FlattenedProperties"/> dictionary with the flattened properties
+            from the base query. It is typically used when the binder is applied to an aggregated query to ensure
+            that the properties are correctly flattened.
+            </remarks>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder">
             <summary>
             Exposes the ability to translate an OData $select or $expand parse tree represented by <see cref="T:Microsoft.OData.UriParser.SelectExpandClause"/> to
@@ -9978,7 +10901,7 @@
             <param name="source">The source <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.FilterClause,Microsoft.OData.UriParser.ComputeClause)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.CreatePropertyValueExpression(Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmProperty,System.Linq.Expressions.Expression,Microsoft.OData.UriParser.FilterClause,Microsoft.OData.UriParser.ComputeClause,Microsoft.OData.UriParser.SearchClause)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from an <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> name.
             </summary>
@@ -9986,8 +10909,9 @@
             <param name="elementType">The <see cref="T:Microsoft.OData.Edm.IEdmStructuredType"/> that contains the edmProperty.</param>
             <param name="edmProperty">The <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> from which we are creating an <see cref="T:System.Linq.Expressions.Expression"/>.</param>
             <param name="source">The source <see cref="T:System.Linq.Expressions.Expression"/>.</param>
-            <param name="filterClause">The $filter query represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.</param>
-            <param name="computeClause">The $compute query represented by <see cref="T:Microsoft.OData.UriParser.ComputeClause"/>.</param>
+            <param name="filterClause">The nested $filter query represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/>.</param>
+            <param name="computeClause">The nested $compute query represented by <see cref="T:Microsoft.OData.UriParser.ComputeClause"/>.</param>
+            <param name="search">The nested $search query represented by <see cref="T:Microsoft.OData.UriParser.SearchClause"/>.</param>
             <returns>The created <see cref="T:System.Linq.Expressions.Expression"/>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder.GetSelectExpandProperties(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmNavigationSource,Microsoft.OData.UriParser.SelectExpandClause,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmStructuralProperty,Microsoft.OData.UriParser.PathSelectItem}@,System.Collections.Generic.IDictionary{Microsoft.OData.Edm.IEdmNavigationProperty,Microsoft.OData.UriParser.ExpandedReferenceSelectItem}@,System.Collections.Generic.ISet{Microsoft.OData.Edm.IEdmStructuralProperty}@)">
@@ -10094,18 +11018,6 @@
             <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/>.</param>
             <returns>The <see cref="T:System.Linq.Expressions.Expression"/> with derived types if any are present.</returns>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.ResultClrType">
-            <summary>
-            Gets CLR type returned from the query.
-            </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.TransformationBinderBase.IsClassicEF(System.Linq.IQueryable)">
-            <summary>
-            Checks IQueryable provider for need of EF6 optimization
-            </summary>
-            <param name="query"></param>
-            <returns>True if EF6 optimization are needed.</returns>
-        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.UriFunctionsBinder">
             <summary>
             This class helps to bind uri functions to CLR.
@@ -10201,6 +11113,26 @@
             <summary>
             Gets a value representing the total count of the collection.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter">
+            <summary>
+            Provides an interface for implementing a filter to run codes before and after a route handler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the OData query composition before route handler is executing.
+            </summary>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter.OnFilterExecutedAsync(System.Object,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the OData query composition after route handler is executed.
+            </summary>
+            <param name="responseValue">The response value from the route handler.</param>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.IODataQueryRequestParser">
             <summary>
@@ -10485,6 +11417,20 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IOrderByBinder"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAggregationBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetComputeBinder(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetAssemblyResolver(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.OData.ModelBuilder.IAssemblyResolver"/>.
@@ -10520,6 +11466,13 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetSearchQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetOrderByQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IOrderByQueryValidator"/>.
@@ -10554,6 +11507,151 @@
             </summary>
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter">
+            <summary>
+            The default implementation to <see cref="T:Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter"/> to run codes before and after a route handler.
+            This typically is used for minimal api scenario.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidationSettings">
+            <summary>
+            Gets the validation settings. Customers can use this to configure the validation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.QuerySettings">
+            <summary>
+            Gets the query settings. Customers can use this to configure each query executing.
+            </summary>
+            <remarks>
+            It could be confusing between DefaultQueryConfigurations and ODataQuerySettings.
+            DefaultQueryConfigurations is used to config the functionalities for query options. For example: is $filter enabled?
+            ODataQuerySettings is used to set options for each query executing.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.InvokeAsync(Microsoft.AspNetCore.Http.EndpointFilterInvocationContext,Microsoft.AspNetCore.Http.EndpointFilterDelegate)">
+            <summary>
+            Implements the core logic associated with the filter given a <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/>
+            and the next filter to call in the pipeline.
+            </summary>
+            <param name="invocationContext">The <see cref="T:Microsoft.AspNetCore.Http.EndpointFilterInvocationContext"/> associated with the current request/response.</param>
+            <param name="next">The next filter in the pipeline.</param>
+            <returns>An awaitable result of calling the handler and apply any modifications made by filters in the pipeline.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the query composition before route handler is executing.
+            </summary>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.ValueTask"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutedAsync(System.Object,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Performs the query composition after route handler is executed.
+            </summary>
+            <param name="responseValue">The response value from the route handler.</param>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.ValueTask"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ExecuteQuery(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Execute the query.
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="context">The action context, i.e. action and controller name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateSelectExpandOnly(Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Validate the select and expand options.
+            </summary>
+            <param name="queryOptions">The query options.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.SingleOrDefault(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Get a single or default value from a collection.
+            </summary>
+            <param name="queryable">The response value as <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="context">The context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Object,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Applies the query to the given entity based on incoming query from uri and query settings.
+            </summary>
+            <param name="entity">The original entity from the response message.</param>
+            <param name="queryOptions">
+            The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
+            </param>
+            <param name="querySettings">The query settings.</param>
+            <returns>The new entity after the $select and $expand query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQueryOptions,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
+            <summary>
+            Applies the query to the given IQueryable based on incoming query from uri and query settings. By default,
+            the implementation supports $top, $skip, $orderby and $filter. Override this method to perform additional
+            query composition of the query.
+            </summary>
+            <param name="queryable">The original queryable instance from the response message.</param>
+            <param name="queryOptions">
+            The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
+            </param>
+            <param name="querySettings">The settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetODataQueryContext(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Get the OData query context.
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="invocationContext">The action context, i.e. action and controller name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateAndValidateQueryOptions(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Create and validate a new instance of <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> from a query and context during action executed.
+            Developers can override this virtual method to provide its own <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.
+            </summary>
+            <param name="httpContext">The http context.</param>
+            <param name="queryContext">The query context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetElementType(System.Object,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Get the element type.
+            </summary>
+            <param name="responseValue">The response value.</param>
+            <param name="singleResultCollection">The content as SingleResult.Queryable.</param>
+            <param name="context">The context.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateQuery(Microsoft.AspNetCore.Http.HttpContext,Microsoft.AspNetCore.OData.Query.ODataQueryOptions)">
+            <summary>
+            Validates the OData query in the incoming request. By default, the implementation throws an exception if
+            the query contains unsupported query parameters. Override this method to perform additional validation of
+            the query.
+            </summary>
+            <param name="httpContext" />
+            <param name="queryOptions">
+            The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Creates the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> for action executing validation.
+            </summary>
+            <param name="context">The OData query filter invocation context.</param>
+            <returns>The created <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> or null if we can't create it during action executing.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.GetModel(System.Type,Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
+            <summary>
+            Gets the EDM model for the given type and request.Override this method to customize the EDM model used for
+            querying.
+            </summary>
+            <param name="elementClrType">The CLR type to retrieve a model for.</param>
+            <param name="context">The action descriptor for the action being queried on.</param>
+            <returns>The EDM model for the given type and request.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions">
             <summary>
@@ -10828,6 +11926,21 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="querySettings">The settings to use in query composition.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.BindAsync(Microsoft.AspNetCore.Http.HttpContext,System.Reflection.ParameterInfo)">
+            <summary>
+            Binds the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> and <see cref="T:System.Reflection.ParameterInfo"/> to generate the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/>.
+            </summary>
+            <param name="context">The HttpContext.</param>
+            <param name="parameter">The parameter info.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/></returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.PopulateMetadata(System.Reflection.ParameterInfo,Microsoft.AspNetCore.Builder.EndpointBuilder)">
+            <summary>
+            Populates metadata for the related <see cref="T:Microsoft.AspNetCore.Http.Endpoint"/> and <see cref="T:System.Reflection.ParameterInfo"/>.
+            </summary>
+            <param name="parameter" >The parameter info.</param>
+            <param name="builder">The endpoint builder that we can add metadata into.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ODataQueryParameterBindingAttribute">
             <summary>
@@ -11160,6 +12273,41 @@
             </summary> 
             <param name="nodeIn">The node to be translated.</param> 
             <returns>The translated node.</returns> 
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryConstants">
+            <summary>
+            Constant values used in aggregation operation.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.GroupByWrapperContainerProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.Container"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.GroupByWrapperGroupByContainerProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.GroupByContainer"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerNameProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Name"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerValueProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Value"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerNestedValueProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.NestedValue"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.AggregationPropertyContainerNextProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Container.IAggregationPropertyContainer`2.Next"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.FlatteningWrapperSourceProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1.Source"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.ComputeWrapperInstanceProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Instance"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.ComputeWrapperModelProperty">
+            <summary>Name for <see cref="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Model"/> property.</summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.QueryConstants.DollarThis">
+            <summary>Parameter name representing the current instance being evaluated in an OData expression.</summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.QueryFilterProvider">
             <summary>
@@ -11670,6 +12818,12 @@
             <param name="query">The original <see cref="T:System.Linq.IQueryable"/>.</param>
             <param name="querySettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings"/> that contains all the query application related settings.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the filter query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.SearchQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the $search query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption">
             <summary>
@@ -12421,6 +13575,19 @@
             <param name="orderByOption">The $orderby query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator">
+            <summary>
+            Provides the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SearchQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ISearchQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.SearchQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData $search query.
+            </summary>
+            <param name="searchQueryOption">The $search query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ISelectExpandQueryValidator">
             <summary>
             Provide the interface used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.SelectExpandQueryOption"/>
@@ -12780,6 +13947,68 @@
             </summary>
             <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator">
+            <summary>
+            Represents a validator used to validate the results of translating an OData parse tree into expressions.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateGroupByExpressionType(System.Type)">
+            <summary>
+            Validates that the type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>
+            implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and derives from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="groupByExpressionType">The type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindGroupBy(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="groupByExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateSelectExpressionType(System.Type)">
+            <summary>
+            Validates that the type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>
+            implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and derives from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="selectExpressionType">The type representing the expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IAggregationBinder.BindSelect(Microsoft.OData.UriParser.Aggregation.TransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="selectExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateFlatteningResult(Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult)">
+            <summary>
+            Validates the provided <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> instance to ensure all required properties are set.
+            </summary>
+            <param name="flatteningResult">The <see cref="T:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult"/> instance to validate.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="flatteningResult"/> is null.</exception>
+            <exception cref="T:System.ArgumentException">Thrown if <paramref name="flatteningResult"/> has a null or empty <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedExpression"/>,
+            <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.RedefinedContextParameter"/>, or <see cref="P:Microsoft.AspNetCore.OData.Query.Expressions.AggregationFlatteningResult.FlattenedPropertiesMapping"/>.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateFlattenedExpressionType(System.Type)">
+            <summary>
+            Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1"/>, and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="flattenedExpressionType">The type representing the flattened expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IFlatteningBinder.FlattenReferencedProperties(Microsoft.OData.UriParser.Aggregation.TransformationNode,System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="flattenedExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateComputeExpressionType(System.Type)">
+            <summary>
+            Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/>, and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="computeExpressionType">The type representing the flattened expression returned by
+            <see cref="M:Microsoft.AspNetCore.OData.Query.Expressions.IComputeBinder.BindCompute(Microsoft.OData.UriParser.Aggregation.ComputeTransformationNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="computeExpressionType"/>
+            does not implement the required interfaces or inherit from the required base class.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryBinderValidator.ValidateTransformationExpressionType(System.Type)">
+            <summary>
+            Validates that the provided type implements <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2"/> and inherits from <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper"/>.
+            </summary>
+            <param name="transformationExpressionType">The type to validate.</param>
+            <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="transformationExpressionType"/>
+            does not implement the required interface or inherit from the required base class.</exception>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
             <summary>
             The base for validator context.
@@ -13014,9 +14243,17 @@
             <param name="topQueryOption">The $top query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1">
+            <inheritdoc/>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.Instance">
+            <summary>
+            Gets or sets the source object that provides the values used in the compute expression.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.ComputeWrapper`1.Model">
             <summary>
-            The Edm Model associated with the wrapper.
+            Gets or sets the Edm model associated with the wrapper.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper">
@@ -13031,10 +14268,10 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapper.TryGetPropertyValue(System.String,System.Object@)">
             <summary>
-            Attempts to get the value of the Property called <paramref name="propertyName"/> from the underlying Entity.
+            Attempts to get the value of the property called <paramref name="propertyName"/> from the underlying entity.
             </summary>
-            <param name="propertyName">The name of the Property</param>
-            <param name="value">The new value of the Property</param>
+            <param name="propertyName">The name of the property</param>
+            <param name="value">The new value of the property</param>
             <returns>True if successful</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.DynamicTypeWrapperConverter">
@@ -13059,12 +14296,12 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.GroupByContainer">
             <summary>
-            Gets or sets the property container that contains the properties being expanded. 
+            Gets or sets the property container that contains the grouping properties.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.Container">
             <summary>
-            Gets or sets the property container that contains the properties being expanded. 
+            Gets or sets the property container that contains the aggregation properties.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.Equals(System.Object)">
@@ -13072,6 +14309,55 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.GroupByWrapper.GetHashCode">
             <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1">
+            <summary>
+            Represents a wrapper for a source object with computed values in an OData query.
+            </summary>
+            <typeparam name="T">The type of the source object.</typeparam>
+            <remarks>
+            The source object type can either be the type of the wrapped entity or another instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/>
+            when compute expressions are chained.
+            For example, in the OData query:
+            <code>
+            /Sales?$apply=compute(Amount mul Product/TaxRate as Tax)/compute(Amount add Tax as SalesPrice)
+            </code>
+            In the first compute expression, the source object will be the wrapped "Sale" entity.
+            In the second compute expression, the source object will be an instance of <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1"/> where T is "Sale".
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Instance">
+            <summary>
+            Gets or sets the source object that provides the values used in the compute expression.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IComputeWrapper`1.Model">
+            <summary>
+            Gets or sets the Edm model associated with the wrapper.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1">
+            <summary>
+            Represents the result of flattening properties referenced in aggregate clause of a $apply query.
+            </summary>
+            <typeparam name="T">The type of the source object that contains the properties to be flattened.</typeparam>
+            <remarks>Flattening is necessary to avoid generation of nested queries by Entity Framework.</remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IFlatteningWrapper`1.Source">
+            <summary>Gets or sets the source object that contains the properties to be flattened.</summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2">
+            <summary>
+            Represents the result of a $apply query operation.
+            </summary>
+            <typeparam name="TContainer">The type of the aggregation property container associated with this group.</typeparam>
+            <typeparam name="TWrapper">The type of the group-by wrapper itself, enforcing recursive typing.</typeparam>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.GroupByContainer">
+            <summary>Gets or sets the property container that contains the grouping properties.</summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Wrapper.IGroupByWrapper`2.Container">
+            <summary>Gets or sets the property container that contains the aggregation properties.</summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.ISelectExpandWrapper">
             <summary>
@@ -13135,6 +14421,11 @@
         <member name="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter">
             <summary>
             Supports converting <see cref="T:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapper`1"/> types by using a factory pattern.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.MapperProvider">
+            <summary>
+            The mapper provider.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.CanConvert(System.Type)">
@@ -13248,6 +14539,21 @@
             OData error.
             </summary>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.IODataResult">
+            <summary>
+            A contracts for OData result 
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.IODataResult.Value">
+            <summary>
+            Gets the real value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.IODataResult.ExpectedType">
+            <summary>
+            Gets the expected type.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.NotFoundODataResult">
             <summary>
             Represents a result that when executed will produce a Not Found (404) response.
@@ -13300,6 +14606,76 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Results.ODataErrorResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataMetadataResult">
+            <summary>
+            Defines a contract that represents the result of OData metadata.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Results.ODataMetadataResult.Instance">
+            <summary>
+            Gets the static instance since we don't need the instance of it.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataMetadataResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Write an HTTP response reflecting the result.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <returns>A task that represents the asynchronous execute operation.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataResult">
+            <summary>
+            Defines an implementation that represents the result of an OData format result.
+            It's used for minimal API.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.#ctor(System.Object)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class.
+            </summary>
+            <param name="value">The wrappered real value.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.#ctor(System.Object,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Results.ODataResult"/> class.
+            </summary>
+            <param name="value">The wrappered real value.</param>
+            <param name="expectedType">The expected type.</param>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.ODataResult.Value">
+            <summary>
+            Gets the value.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Results.ODataResult.ExpectedType">
+            <summary>
+            Gets the expected type.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Writes an HTTP response reflecting the result.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <returns>A task that represents the asynchronous execute operation.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Results.ODataServiceDocumentResult">
+            <summary>
+            Defines a contract that represents the result of OData service document.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Results.ODataServiceDocumentResult.Instance">
+            <summary>
+            Gets the static instance since we don't need the instance of it.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Results.ODataServiceDocumentResult.ExecuteAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Write an HTTP response reflecting the result.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <returns>A task that represents the asynchronous execute operation.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Results.PageResult">
             <summary>

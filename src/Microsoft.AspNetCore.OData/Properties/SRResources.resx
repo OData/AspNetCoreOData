@@ -667,7 +667,7 @@
     <value>Cannot Get the Enum Clr member using '{0}'.</value>
   </data>
   <data name="InvalidTemplateLiteral" xml:space="preserve">
-    <value>The template string '{0}' of '{1}' is not a valid template literal. And a template literal should wrapper with '{' and '}'.</value>
+    <value>The template string '{0}' of '{1}' is not a valid template literal. And a template literal should wrapper with '{{' and '}}'.</value>
   </data>
   <data name="MissingParameterAlias" xml:space="preserve">
     <value>Missing the parameter alias '{0}' in the request query string.</value>
@@ -747,5 +747,26 @@
   </data>
   <data name="TypeMustBeOpenType" xml:space="preserve">
     <value>The type '{0}' must be an open type. The dynamic properties container property is only expected on open types.</value>
+  </data>
+  <data name="NotSupportedChildTransformationKind" xml:space="preserve">
+    <value>Transformation kind '{0}' is not supported as a child transformation of kind '{1}'.</value>
+  </data>
+  <data name="TypeMustImplementInterface" xml:space="preserve">
+    <value>The type '{0}' does not implement '{1}' interface.</value>
+  </data>
+  <data name="TypeMustInheritFromType" xml:space="preserve">
+    <value>The type '{0}' does not inherit from '{1}'.</value>
+  </data>
+  <data name="PropertyMustBeSetWhenAnotherPropertyIsSet" xml:space="preserve">
+    <value>The '{0}' property must be set when the '{1}' property is set.</value>
+  </data>
+  <data name="PropertyMustBeSet" xml:space="preserve">
+    <value>The '{0}' property must be set.</value>
+  </data>
+  <data name="ODataMustBeSetOnMinimalAPIEndpoint" xml:space="preserve">
+    <value>The OData configuration is missing for the minimal API. Please call WithODataModel() and WithODataPathFactory() for the endpoint.</value>
+  </data>
+  <data name="BindParameterFailedOnMinimalAPIEndpoint" xml:space="preserve">
+    <value>Cannot bind parameter '{0}'. the error is: {1}.</value>
   </data>
 </root>

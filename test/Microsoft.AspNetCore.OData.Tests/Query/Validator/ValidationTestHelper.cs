@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.AspNetCore.OData.Tests.Query.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using System;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator;
 
@@ -31,6 +33,15 @@ internal static class ValidationTestHelper
 
         context.DefaultQueryConfigurations.EnableOrderBy = true;
         context.DefaultQueryConfigurations.MaxTop = null;
+        return context;
+    }
+
+    internal static ODataQueryContext CreateCustomerContext(Action<IServiceCollection> setupAction, Action<DefaultQueryConfigurations> config = null)
+    {
+        ODataQueryContext context = new ODataQueryContext(GetCustomersModel(), typeof(QueryCompositionCustomer), null);
+        context.RequestContainer = new MockServiceProvider(setupAction);
+
+        config?.Invoke(context.DefaultQueryConfigurations);
         return context;
     }
 

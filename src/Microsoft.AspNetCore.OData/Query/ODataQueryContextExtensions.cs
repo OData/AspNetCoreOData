@@ -19,7 +19,7 @@ internal static class ODataQueryContextExtensions
     public static ODataQuerySettings GetODataQuerySettings(this ODataQueryContext context)
     {
         ODataQuerySettings returnSettings = new ODataQuerySettings();
-        ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+        ODataQuerySettings settings = context?.RequestContainer?.GetService<ODataQuerySettings>();
         if (settings != null)
         {
             returnSettings.CopyFrom(settings);
@@ -31,7 +31,7 @@ internal static class ODataQueryContextExtensions
     public static ODataQuerySettings UpdateQuerySettings(this ODataQueryContext context, ODataQuerySettings querySettings, IQueryable query)
     {
         ODataQuerySettings updatedSettings = new ODataQuerySettings();
-        ODataQuerySettings settings = context?.RequestContainer?.GetRequiredService<ODataQuerySettings>();
+        ODataQuerySettings settings = context?.RequestContainer?.GetService<ODataQuerySettings>();
         if (settings != null)
         {
             updatedSettings.CopyFrom(settings);
@@ -122,6 +122,40 @@ internal static class ODataQueryContextExtensions
     }
 
     /// <summary>
+    /// Gets the <see cref="IAggregationBinder"/>.
+    /// </summary>
+    /// <param name="context">The query context.</param>
+    /// <returns>The built <see cref="IAggregationBinder"/>.</returns>
+    public static IAggregationBinder GetAggregationBinder(this ODataQueryContext context)
+    {
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        IAggregationBinder binder = context.RequestContainer?.GetService<IAggregationBinder>();
+
+        return binder ?? new AggregationBinder();
+    }
+
+    /// <summary>
+    /// Gets the <see cref="IComputeBinder"/>.
+    /// </summary>
+    /// <param name="context">The query context.</param>
+    /// <returns>The built <see cref="IComputeBinder"/>.</returns>
+    public static IComputeBinder GetComputeBinder(this ODataQueryContext context)
+    {
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        IComputeBinder binder = context.RequestContainer?.GetService<IComputeBinder>();
+
+        return binder ?? new ComputeBinder();
+    }
+
+    /// <summary>
     /// Gets the <see cref="IAssemblyResolver"/>.
     /// </summary>
     /// <param name="context">The query context.</param>
@@ -180,6 +214,18 @@ internal static class ODataQueryContextExtensions
     {
         return context?.RequestContainer?.GetService<IFilterQueryValidator>()
             ?? new FilterQueryValidator();
+    }
+
+    /// <summary>
+    /// Gets the <see cref="ISearchQueryValidator"/>.
+    /// </summary>
+    /// <param name="context">The query context.</param>
+    /// <returns>The built <see cref="ISearchQueryValidator"/>.</returns>
+    public static ISearchQueryValidator GetSearchQueryValidator(this ODataQueryContext context)
+    {
+        // By default, there's no default search query validator.
+        // Therefore, if the developer doesn't provide an implementation, we just return the null validator.
+        return context?.RequestContainer?.GetService<ISearchQueryValidator>();
     }
 
     /// <summary>

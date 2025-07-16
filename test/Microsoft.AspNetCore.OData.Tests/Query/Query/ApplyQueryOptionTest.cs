@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -167,7 +168,6 @@ public class ApplyQueryOptionTest
                         new Dictionary<string, object> { { "Name", "Lowest"} }
                     }
                 },
-                 /* TODO: Sam XU enable this test case when we refactor aggregationBinder with FilterBinder
                 {
                     "groupby((Name), aggregate(Id with sum as Total))/filter(Total eq 3)",
                     new List<Dictionary<string, object>>
@@ -182,7 +182,6 @@ public class ApplyQueryOptionTest
                         new Dictionary<string, object> { { "Name", "Lowest"} }
                     }
                 },
-                */
                 {
                     "groupby((Address/City))",
                     new List<Dictionary<string, object>>
@@ -332,7 +331,6 @@ public class ApplyQueryOptionTest
                         new Dictionary<string, object> {{ "Company/CEO/EmployeeName", "john"} }
                     }
                 },
-                /* TODO: Sam XU enable this test case when we refactor aggregationBinder with FilterBinder
                 {
                     "groupby((Company/CEO/EmployeeName))/filter(Company/CEO/EmployeeName eq 'john')",
                     new List<Dictionary<string, object>>
@@ -340,7 +338,6 @@ public class ApplyQueryOptionTest
                         new Dictionary<string, object> {{ "Company/CEO/EmployeeName", "john"} }
                     }
                 },
-                */
                 {
                     "groupby((Name, Company/CEO/EmployeeName))",
                     new List<Dictionary<string, object>>
@@ -521,7 +518,6 @@ public class ApplyQueryOptionTest
                         new Dictionary<string, object> { { "Count", 5L}, { "DoubleCount", 10L } }
                     }
                 },
-                /* TODO: Sam XU enable this test case when we refactor aggregationBinder with FilterBinder
                 {
                     "groupby((Name), aggregate(Id with sum as Total))/compute(Total add Total as DoubleTotal, length(Name) as NameLen)",
                     new List<Dictionary<string, object>>
@@ -531,7 +527,6 @@ public class ApplyQueryOptionTest
                         new Dictionary<string, object> { { "Name", "Middle"},  { "Total", 3 }, { "DoubleTotal", 6 }, { "NameLen", 6 }, }
                     }
                 },
-                */
                 {
                     "compute(length(Name) as NameLen)",
                     new List<Dictionary<string, object>>
@@ -1741,6 +1736,42 @@ public class ApplyQueryOptionTest
                 object value = GetValue(agg, key);
                 Assert.Equal(expected[key], value);
             }
+        }
+    }
+
+    [Fact]
+    public void DynamicTypeWrapperBindings_Must_Have_Correct_ReflectedType()
+    {
+        var filter = "groupby((Name), aggregate(CustomerId with sum as Total))";
+        // Arrange
+        var model = new ODataModelBuilder().Add_Customer_EntityType_With_Address().GetEdmModel();
+        var context = new ODataQueryContext(model, typeof(Customer)) { };
+        var queryOptionParser = new ODataQueryOptionParser(
+            context.Model,
+            context.ElementType,
+            context.NavigationSource,
+            new Dictionary<string, string> { { "$apply", filter } });
+        var applyOption = new ApplyQueryOption(filter, context, queryOptionParser);
+        IEnumerable<Customer> customers = CustomerApplyTestData;
+
+        // Act
+        IQueryable queryable = applyOption.ApplyTo(customers.AsQueryable(), new OData.Query.ODataQuerySettings());
+        new DynamicTypeWrapperExpressionVisitor().Visit(queryable.Expression);
+    }
+
+    private class DynamicTypeWrapperExpressionVisitor : ExpressionVisitor
+    {
+        protected override Expression VisitMemberInit(MemberInitExpression node)
+        {
+            if (typeof(DynamicTypeWrapper).IsAssignableFrom(node.Type))
+            {
+                foreach (var binding in node.Bindings)
+                {
+                    Assert.Equal(node.Type, binding.Member.ReflectedType);
+                }
+            }
+
+            return base.VisitMemberInit(node);
         }
     }
 

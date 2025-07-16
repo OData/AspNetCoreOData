@@ -30,6 +30,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions;
 /// <summary>
 /// The base class for all expression binders.
 /// </summary>
+[Obsolete("ExpressionBinderBase is obsolete and will be dropped in the 10.x release. Please use QueryBinder instead.")]
 public abstract class ExpressionBinderBase
 {
     #region Properties
@@ -793,7 +794,7 @@ public abstract class ExpressionBinderBase
     /// <returns></returns>
     private bool IsFlatteningSource(Expression source)
     {
-        var member = source as MemberExpression;
+        MemberExpression member = source as MemberExpression;
         return member != null
             && this.Parameter.Type.IsGenericType
             && this.Parameter.Type.GetGenericTypeDefinition() == typeof(FlatteningWrapper<>)
@@ -812,11 +813,17 @@ public abstract class ExpressionBinderBase
 
     private static void CollectContainerAssignments(Expression source, MethodCallExpression expression, Dictionary<string, Expression> result)
     {
-        CollectAssigments(result, Expression.Property(source, "GroupByContainer"), ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, "GroupByContainer"));
-        CollectAssigments(result, Expression.Property(source, "Container"), ExtractContainerExpression(expression, "Container"));
+        CollectAssignments(
+            result,
+            Expression.Property(source, QueryConstants.GroupByWrapperGroupByContainerProperty),
+            ExtractContainerExpression(expression.Arguments.FirstOrDefault() as MethodCallExpression, QueryConstants.GroupByWrapperGroupByContainerProperty));
+        CollectAssignments(
+            result,
+            Expression.Property(source, QueryConstants.GroupByWrapperContainerProperty),
+            ExtractContainerExpression(expression, QueryConstants.GroupByWrapperContainerProperty));
     }
 
-    private static void CollectAssigments(IDictionary<string, Expression> flattenPropertyContainer, Expression source, MemberInitExpression expression, string prefix = null)
+    private static void CollectAssignments(IDictionary<string, Expression> flattenPropertyContainer, Expression source, MemberInitExpression expression, string prefix = null)
     {
         if (expression == null)
         {
@@ -827,18 +834,18 @@ public abstract class ExpressionBinderBase
         Type resultType = null;
         MemberInitExpression nextExpression = null;
         Expression nestedExpression = null;
-        foreach (var expr in expression.Bindings.OfType<MemberAssignment>())
+        foreach (MemberAssignment expr in expression.Bindings.OfType<MemberAssignment>())
         {
-            var initExpr = expr.Expression as MemberInitExpression;
-            if (initExpr != null && expr.Member.Name == "Next")
+            MemberInitExpression initExpr = expr.Expression as MemberInitExpression;
+            if (initExpr != null && expr.Member.Name == QueryConstants.AggregationPropertyContainerNextProperty)
             {
                 nextExpression = initExpr;
             }
-            else if (expr.Member.Name == "Name")
+            else if (expr.Member.Name == QueryConstants.AggregationPropertyContainerNameProperty)
             {
                 nameToAdd = (expr.Expression as ConstantExpression).Value as string;
             }
-            else if (expr.Member.Name == "Value" || expr.Member.Name == "NestedValue")
+            else if (expr.Member.Name == QueryConstants.AggregationPropertyContainerValueProperty || expr.Member.Name == QueryConstants.AggregationPropertyContainerNestedValueProperty)
             {
                 resultType = expr.Expression.Type;
                 if (resultType == typeof(object) && expr.Expression.NodeType == ExpressionType.Convert)
@@ -860,23 +867,23 @@ public abstract class ExpressionBinderBase
 
         if (typeof(GroupByWrapper).IsAssignableFrom(resultType))
         {
-            flattenPropertyContainer.Add(nameToAdd, Expression.Property(source, "NestedValue"));
+            flattenPropertyContainer.Add(nameToAdd, Expression.Property(source, QueryConstants.AggregationPropertyContainerNestedValueProperty));
         }
         else
         {
-            flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, "Value"), resultType));
+            flattenPropertyContainer.Add(nameToAdd, Expression.Convert(Expression.Property(source, QueryConstants.AggregationPropertyContainerValueProperty), resultType));
         }
 
         if (nextExpression != null)
         {
-            CollectAssigments(flattenPropertyContainer, Expression.Property(source, "Next"), nextExpression, prefix);
+            CollectAssignments(flattenPropertyContainer, Expression.Property(source, QueryConstants.AggregationPropertyContainerNextProperty), nextExpression, prefix);
         }
 
         if (nestedExpression != null)
         {
-            var nestedAccessor = ((nestedExpression as MemberInitExpression).Bindings.First() as MemberAssignment).Expression as MemberInitExpression;
-            var newSource = Expression.Property(Expression.Property(source, "NestedValue"), "GroupByContainer");
-            CollectAssigments(flattenPropertyContainer, newSource, nestedAccessor, nameToAdd);
+            MemberInitExpression nestedAccessor = ((nestedExpression as MemberInitExpression).Bindings.First() as MemberAssignment).Expression as MemberInitExpression;
+            MemberExpression newSource = Expression.Property(Expression.Property(source, QueryConstants.AggregationPropertyContainerNestedValueProperty), QueryConstants.GroupByWrapperGroupByContainerProperty);
+            CollectAssignments(flattenPropertyContainer, newSource, nestedAccessor, nameToAdd);
         }
     }
 
@@ -887,13 +894,13 @@ public abstract class ExpressionBinderBase
             return null;
         }
 
-        var memberInitExpression = ((expression.Arguments[1] as UnaryExpression).Operand as LambdaExpression).Body as MemberInitExpression;
+        MemberInitExpression memberInitExpression = ((expression.Arguments[1] as UnaryExpression).Operand as LambdaExpression).Body as MemberInitExpression;
         if (memberInitExpression != null)
         {
-            var containerAssigment = memberInitExpression.Bindings.FirstOrDefault(m => m.Member.Name == containerName) as MemberAssignment;
-            if (containerAssigment != null)
+            MemberAssignment containerAssignment = memberInitExpression.Bindings.FirstOrDefault(m => m.Member.Name == containerName) as MemberAssignment;
+            if (containerAssignment != null)
             {
-                return containerAssigment.Expression as MemberInitExpression;
+                return containerAssignment.Expression as MemberInitExpression;
             }
         }
         return null;
@@ -991,17 +998,17 @@ public abstract class ExpressionBinderBase
         switch (node.Kind)
         {
             case QueryNodeKind.SingleComplexNode:
-                var complexNode = (SingleComplexNode)node;
+                SingleComplexNode complexNode = (SingleComplexNode)node;
                 path = complexNode.Property.Name;
                 parent = complexNode.Source;
                 break;
             case QueryNodeKind.SingleValuePropertyAccess:
-                var propertyNode = ((SingleValuePropertyAccessNode)node);
+                SingleValuePropertyAccessNode propertyNode = ((SingleValuePropertyAccessNode)node);
                 path = propertyNode.Property.Name;
                 parent = propertyNode.Source;
                 break;
             case QueryNodeKind.SingleNavigationNode:
-                var navNode = ((SingleNavigationNode)node);
+                SingleNavigationNode navNode = ((SingleNavigationNode)node);
                 path = navNode.NavigationProperty.Name;
                 parent = navNode.Source;
                 break;
@@ -1009,7 +1016,7 @@ public abstract class ExpressionBinderBase
 
         if (parent != null)
         {
-            var parentPath = GetFullPropertyPath(parent);
+            string parentPath = GetFullPropertyPath(parent);
             if (parentPath != null)
             {
                 path = parentPath + "\\" + path;
@@ -1052,7 +1059,7 @@ public abstract class ExpressionBinderBase
     {
         string[] propertyNameParts = propertyPath.Split('\\');
         Expression propertyValue = source;
-        foreach (var propertyName in propertyNameParts)
+        foreach (string propertyName in propertyNameParts)
         {
             propertyValue = Expression.Property(propertyValue, propertyName);
         }
@@ -1214,7 +1221,7 @@ public abstract class ExpressionBinderBase
             return null;
         }
 
-        var expression = BaseQuery.Expression as MethodCallExpression;
+        MethodCallExpression expression = BaseQuery.Expression as MethodCallExpression;
         if (expression == null)
         {
             return null;
@@ -1229,14 +1236,14 @@ public abstract class ExpressionBinderBase
             return null;
         }
 
-        var result = new Dictionary<string, Expression>();
+        Dictionary<string, Expression> result = new Dictionary<string, Expression>();
         CollectContainerAssignments(source, expression, result);
         if (this.HasInstancePropertyContainer)
         {
-            var instanceProperty = Expression.Property(source, "Instance");
+            MemberExpression instanceProperty = Expression.Property(source, "Instance");
             if (typeof(DynamicTypeWrapper).IsAssignableFrom(instanceProperty.Type))
             {
-                var computeExpression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
+                MethodCallExpression computeExpression = expression.Arguments.FirstOrDefault() as MethodCallExpression;
                 computeExpression = SkipFilters(computeExpression);
                 if (computeExpression != null)
                 {

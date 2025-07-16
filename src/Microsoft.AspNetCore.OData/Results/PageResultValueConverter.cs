@@ -21,8 +21,8 @@ internal class PageResultValueConverter : JsonConverterFactory
             return false;
         }
 
-        Type generaticType = typeToConvert.GetGenericTypeDefinition();
-        return generaticType == typeof(PageResult<>);
+        Type genericType = typeToConvert.GetGenericTypeDefinition();
+        return genericType == typeof(PageResult<>);
     }
 
     /// <summary>
@@ -34,10 +34,10 @@ internal class PageResultValueConverter : JsonConverterFactory
     public override JsonConverter CreateConverter(Type type, JsonSerializerOptions options)
     {
         // Since 'type' is tested in 'CanConvert()', it must be a generic type
-        Type generaticType = type.GetGenericTypeDefinition();
+        Type genericType = type.GetGenericTypeDefinition();
         Type entityType = type.GetGenericArguments()[0];
 
-        if (generaticType == typeof(PageResult<>))
+        if (genericType == typeof(PageResult<>))
         {
             return (JsonConverter)Activator.CreateInstance(typeof(PageResultConverter<>).MakeGenericType(new Type[] { entityType }));
         }
@@ -57,21 +57,26 @@ internal class PageResultConverter<TEntity> : JsonConverter<PageResult<TEntity>>
     public override void Write(Utf8JsonWriter writer, PageResult<TEntity> value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        writer.WritePropertyName("items");
+        writer.WritePropertyName(ConvertName(options, "items"));
         JsonSerializer.Serialize(writer, value.Items, options);
 
         if (value.NextPageLink != null)
         {
-            writer.WritePropertyName("nextpagelink");
+            writer.WritePropertyName(ConvertName(options, "nextpagelink"));
             writer.WriteStringValue(value.NextPageLink.OriginalString);
         }
 
         if (value.Count != null)
         {
-            writer.WritePropertyName("count");
+            writer.WritePropertyName(ConvertName(options, "count"));
             writer.WriteNumberValue(value.Count.Value);
         }
 
         writer.WriteEndObject();
     }
+
+    private static string ConvertName(JsonSerializerOptions options, string name)
+        => options != null && options.PropertyNamingPolicy != null
+        ? options.PropertyNamingPolicy.ConvertName(name)
+        : name;
 }

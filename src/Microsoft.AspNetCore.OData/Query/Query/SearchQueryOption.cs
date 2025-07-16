@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -151,5 +152,24 @@ public class SearchQueryOption
         QueryBinderContext binderContext = new QueryBinderContext(Context.Model, querySettings, Context.ElementClrType);
 
         return binder.ApplyBind(query, SearchClause, binderContext);
+    }
+
+    /// <summary>
+    /// Validate the $search query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+    /// </summary>
+    /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+    public void Validate(ODataValidationSettings validationSettings)
+    {
+        if (validationSettings == null)
+        {
+            throw Error.ArgumentNull(nameof(validationSettings));
+        }
+
+        ISearchQueryValidator validator = Context.GetSearchQueryValidator();
+        if (validator != null)
+        {
+            // If the developer doesn't provide the search validator, let's ignore the $search validation.
+            validator.Validate(this, validationSettings);
+        }
     }
 }
