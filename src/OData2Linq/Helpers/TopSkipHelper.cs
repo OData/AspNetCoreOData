@@ -6,7 +6,7 @@
     using OData2Linq.Settings;
     using System.Linq;
 
-    internal class TopSkipHelper
+    internal static class TopSkipHelper
     {
         public static IQueryable<T> ApplyTopWithValidation<T>(IQueryable<T> query, long? top, ODataSettings settings)
         {
@@ -22,9 +22,7 @@
                     throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, settings.ValidationSettings.MaxTop, AllowedQueryOptions.Top, top.Value));
                 }
 
-                IQueryable<T> result = ExpressionHelpers.Take(query, (int)top.Value, typeof(T), settings.QuerySettings.EnableConstantParameterization) as IQueryable<T>;
-
-                return result;
+                return (IQueryable<T>)ExpressionHelpers.Take(query, (int)top.Value, typeof(T), settings.QuerySettings.EnableConstantParameterization);
             }
 
             return query;
@@ -44,9 +42,7 @@
                     throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, settings.ValidationSettings.MaxSkip, AllowedQueryOptions.Skip, skip.Value));
                 }
 
-                IQueryable<T> result = ExpressionHelpers.Skip(query, (int)skip.Value, typeof(T), settings.QuerySettings.EnableConstantParameterization) as IQueryable<T>;
-
-                return result;
+                return (IQueryable<T>)ExpressionHelpers.Skip(query, (int)skip.Value, typeof(T), settings.QuerySettings.EnableConstantParameterization);
             }
 
             return query;

@@ -4,7 +4,6 @@
     using Microsoft.AspNetCore.OData.Query.Validator;
     using Microsoft.AspNetCore.OData.Query.Wrapper;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.OData;
     using Microsoft.OData.Edm;
     using Microsoft.OData.ModelBuilder;
     using Microsoft.OData.UriParser;
@@ -18,14 +17,9 @@
 
     public static class ODataLinqExtensions
     {
-        /// <summary>
-        /// The simplified options.
-        /// </summary>
-        private static readonly ODataSimplifiedOptions SimplifiedOptions = new ODataSimplifiedOptions();
+        private static readonly ConcurrentDictionary<Type, IEdmModel> Models = new();
 
-        private static readonly ConcurrentDictionary<Type, IEdmModel> Models = new ConcurrentDictionary<Type, IEdmModel>();
-
-        private static readonly ConcurrentDictionary<int, ServiceContainer> Containers = new ConcurrentDictionary<int, ServiceContainer>();
+        private static readonly ConcurrentDictionary<int, ServiceContainer> Containers = new();
 
         /// <summary>
         /// Enable applying OData specific functions to query
@@ -35,9 +29,9 @@
         /// <param name="edmModel">The edm model.</param>
         /// <typeparam name="T">The query type param</typeparam>
         /// <returns>The OData aware <see cref="ODataQuery{T}"/> query.</returns>
-        public static ODataQuery<T> OData<T>(this IQueryable<T> query, Action<ODataSettings> configuration = null, IEdmModel edmModel = null)
+        public static ODataQuery<T> OData<T>(this IQueryable<T> query, Action<ODataSettings>? configuration = null, IEdmModel? edmModel = null)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            ArgumentNullException.ThrowIfNull(query);
 
             var settings = new ODataSettings();
             configuration?.Invoke(settings);
@@ -54,7 +48,7 @@
             }
             else
             {
-                if (edmModel.SchemaElements.Count(e => e.SchemaElementKind == EdmSchemaElementKind.EntityContainer) == 0)
+                if (!edmModel.SchemaElements.Any(e => e.SchemaElementKind == EdmSchemaElementKind.EntityContainer))
                 {
                     throw new ArgumentException("Provided Entity Model have no IEdmEntityContainer", nameof(edmModel));
                 }
@@ -64,8 +58,7 @@
                 settings.QuerySettings,
                 settings.DefaultQueryConfigurations,
                 settings.ParserSettings.MaximumExpansionCount,
-                settings.ParserSettings.MaximumExpansionDepth,
-                settings.AllowRecursiveLoopOfComplexTypes);
+                settings.ParserSettings.MaximumExpansionDepth);
 
             var baseContainer = Containers.GetOrAdd(settingsHash, i =>
             {
@@ -73,7 +66,6 @@
 
                 c.AddService(typeof(ODataQuerySettings), settings.QuerySettings);
                 c.AddService(typeof(DefaultQueryConfigurations), settings.DefaultQueryConfigurations);
-                c.AddService(typeof(ODataSimplifiedOptions), SimplifiedOptions);
                 c.AddService(typeof(ODataUriParserSettings), settings.ParserSettings);
 
                 return c;
@@ -81,7 +73,7 @@
 
             var container = new ServiceContainer(baseContainer);
             container.AddService(typeof(IEdmModel), edmModel);
-            container.AddService(typeof(ODataUriResolver), settings.Resolver ?? ODataSettings.DefaultResolver);
+            container.AddService(typeof(ODataUriResolver), settings.Resolver);
             container.AddService(typeof(ODataSettings), settings);
 
             var dataQuery = new ODataQuery<T>(query, container);
@@ -97,11 +89,11 @@
         /// <typeparam name="T">The query type param</typeparam>
         /// <returns>The <see cref="IEnumerable{ISelectExpandWrapper}"/> selection result in specific format.</returns>
         public static IEnumerable<ISelectExpandWrapper> SelectExpand<T>(this ODataQuery<T> query,
-            string selectText = null, string expandText = null, string entitySetName = null)
+            string? selectText = null, string? expandText = null, string? entitySetName = null)
         {
             var result = SelectExpandInternal(query, selectText, expandText, entitySetName);
 
-            return Enumerate<ISelectExpandWrapper>(result);
+            return Enumerate(result);
         }
 
         /// <summary>
@@ -114,15 +106,15 @@
         /// <typeparam name="T">The query type param</typeparam>
         /// <returns>The <see cref="IQueryable{ISelectExpandWrapper}"/> selection result in specific format.</returns>
         public static IQueryable<ISelectExpandWrapper> SelectExpandAsQueryable<T>(this ODataQuery<T> query,
-            string selectText = null, string expandText = null, string entitySetName = null)
+            string? selectText = null, string? expandText = null, string? entitySetName = null)
         {
             IQueryable result = SelectExpandInternal(query, selectText, expandText, entitySetName);
             return query.Provider.CreateQuery<ISelectExpandWrapper>(result.Expression);
         }
 
-        private static IQueryable SelectExpandInternal<T>(ODataQuery<T> query, string selectText, string expandText, string entitySetName)
+        private static IQueryable<ISelectExpandWrapper> SelectExpandInternal<T>(ODataQuery<T> query, string? selectText, string? expandText, string? entitySetName)
         {
-            SelectExpandHelper<T> helper = new SelectExpandHelper<T>(
+            var helper = new SelectExpandHelper<T>(
                 new ODataRawQueryOptions { Select = selectText, Expand = expandText },
                 query,
                 entitySetName);
@@ -137,7 +129,7 @@
                 return SelectExpandInternal(query, "*", expandText, entitySetName);
             }
 
-            return result;
+            return (IQueryable<ISelectExpandWrapper>)result;
         }
 
         /// <summary>
@@ -149,13 +141,13 @@
         /// <param name="skipText">$skip parameter value</param>
         /// <param name="entitySetName">The entity set name.</param>
         /// <returns>The <see cref="ODataQuery{T}"/> query with applied $top and $skip parameters.</returns>
-        public static ODataQuery<T> TopSkip<T>(this ODataQuery<T> query, string topText = null, string skipText = null, string entitySetName = null)
+        public static ODataQuery<T> TopSkip<T>(this ODataQuery<T> query, string? topText = null, string? skipText = null, string? entitySetName = null)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
+            ArgumentNullException.ThrowIfNull(query);
 
-            ODataSettings settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
+            var settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
 
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            var dictionary = new Dictionary<string, string>();
 
             if (topText != null)
             {
@@ -177,7 +169,7 @@
 
             if (skip.HasValue || top.HasValue || settings.QuerySettings.PageSize.HasValue)
             {
-                IQueryable<T> result = TopSkipHelper.ApplySkipWithValidation(query, skip, settings);
+                var result = TopSkipHelper.ApplySkipWithValidation(query, skip, settings);
                 if (top.HasValue)
                 {
                     result = TopSkipHelper.ApplyTopWithValidation(result, top, settings);
@@ -204,7 +196,7 @@
         public static IQueryable<T> ApplyQueryOptionsWithoutSelectExpand<T>(
             this ODataQuery<T> query,
             ODataRawQueryOptions rawQueryOptions,
-            string entitySetName = null)
+            string? entitySetName = null)
         {
             return ApplyQueryOptionsInternal(query, rawQueryOptions, entitySetName);
         }
@@ -220,7 +212,7 @@
         public static IEnumerable<ISelectExpandWrapper> ApplyQueryOptions<T>(
             this ODataQuery<T> query,
             ODataRawQueryOptions rawQueryOptions,
-            string entitySetName = null)
+            string? entitySetName = null)
         {
             return ApplyQueryOptionsInternal(query, rawQueryOptions, entitySetName).SelectExpand(
                 rawQueryOptions.Select,
@@ -239,7 +231,7 @@
         public static IQueryable<ISelectExpandWrapper> ApplyQueryOptionsAsQueryable<T>(
             this ODataQuery<T> query,
             ODataRawQueryOptions rawQueryOptions,
-            string entitySetName = null)
+            string? entitySetName = null)
         {
             return ApplyQueryOptionsInternal(query, rawQueryOptions, entitySetName).SelectExpandAsQueryable(
                 rawQueryOptions.Select,
@@ -247,10 +239,10 @@
                 entitySetName);
         }
 
-        private static ODataQuery<T> ApplyQueryOptionsInternal<T>(ODataQuery<T> query, ODataRawQueryOptions rawQueryOptions, string entitySetName)
+        private static ODataQuery<T> ApplyQueryOptionsInternal<T>(ODataQuery<T> query, ODataRawQueryOptions rawQueryOptions, string? entitySetName)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
-            if (rawQueryOptions == null) throw new ArgumentNullException(nameof(rawQueryOptions));
+            ArgumentNullException.ThrowIfNull(query);
+            ArgumentNullException.ThrowIfNull(rawQueryOptions);
 
             if (rawQueryOptions.Filter != null)
             {
@@ -276,10 +268,10 @@
         /// <typeparam name="T"> The query type param </typeparam>
         /// <returns> The <see cref="ODataQuery{T}"/> query with applied filter parameter. </returns>
         /// <exception cref="ArgumentNullException">Argument Null Exception </exception>
-        public static ODataQuery<T> Filter<T>(this ODataQuery<T> query, string filterText, string entitySetName = null)
+        public static ODataQuery<T> Filter<T>(this ODataQuery<T> query, string filterText, string? entitySetName = null)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
-            if (filterText == null) throw new ArgumentNullException(nameof(filterText));
+            ArgumentNullException.ThrowIfNull(query);
+            ArgumentNullException.ThrowIfNull(filterText);
 
             IEdmModel edmModel = query.EdmModel;
 
@@ -288,7 +280,7 @@
                 entitySetName,
                 new Dictionary<string, string> { { "$filter", filterText } });
 
-            ODataSettings settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
+            var settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
 
             var queryContext = new ODataQueryContext(edmModel, query.ElementType)
             {
@@ -310,10 +302,10 @@
         /// <typeparam name="T">The query type param</typeparam>
         /// <returns>The <see cref="ODataQuery{T}"/>query with applied order by parameter.</returns>
         /// <exception cref="ArgumentNullException">Argument Null Exception</exception>
-        public static ODataQueryOrdered<T> OrderBy<T>(this ODataQuery<T> query, string orderbyText, string entitySetName = null)
+        public static ODataQueryOrdered<T> OrderBy<T>(this ODataQuery<T> query, string orderbyText, string? entitySetName = null)
         {
-            if (query == null) throw new ArgumentNullException(nameof(query));
-            if (orderbyText == null) throw new ArgumentNullException(nameof(orderbyText));
+            ArgumentNullException.ThrowIfNull(query);
+            ArgumentNullException.ThrowIfNull(orderbyText);
 
             IEdmModel edmModel = query.EdmModel;
 
@@ -322,7 +314,7 @@
                 entitySetName,
                 new Dictionary<string, string> { { "$orderby", orderbyText } });
 
-            ODataSettings settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
+            var settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
 
             var queryContext = new ODataQueryContext(edmModel, query.ElementType)
             {
@@ -332,34 +324,31 @@
             var validator = new OrderByQueryValidator();
             validator.Validate(option, settings.ValidationSettings);
 
-            var result = option.ApplyTo<T>(query, query.ServiceProvider.GetRequiredService<ODataQuerySettings>());
+            var result = option.ApplyTo(query, query.ServiceProvider.GetRequiredService<ODataQuerySettings>());
 
             return new ODataQueryOrdered<T>(result, query.ServiceProvider);
         }
 
-        private static IEnumerable<T> Enumerate<T>(IQueryable queryable) where T : class
+        private static IEnumerable<T> Enumerate<T>(IQueryable<T> queryable)
         {
             var enumerator = queryable.GetEnumerator();
 
             while (enumerator.MoveNext())
             {
-                yield return enumerator.Current as T;
+                yield return enumerator.Current;
             }
         }
 
-        public static ODataQueryOptionParser GetParser<T>(ODataQuery<T> query, string entitySetName, IDictionary<string, string> raws)
+        public static ODataQueryOptionParser GetParser<T>(ODataQuery<T> query, string? entitySetName, IDictionary<string, string> raws)
         {
             IEdmModel edmModel = query.EdmModel;
 
-            if (entitySetName == null)
-            {
-                entitySetName = typeof(T).Name;
-            }
+            entitySetName ??= typeof(T).Name;
 
             IEdmEntityContainer[] containers =
                 edmModel.SchemaElements.Where(
                         e => e.SchemaElementKind == EdmSchemaElementKind.EntityContainer &&
-                             (e as IEdmEntityContainer).FindEntitySet(entitySetName) != null)
+                             (e as IEdmEntityContainer)?.FindEntitySet(entitySetName) != null)
                     .OfType<IEdmEntityContainer>()
                     .ToArray();
 
@@ -377,21 +366,9 @@
 
             IEdmEntitySet entitySet = containers.Single().FindEntitySet(entitySetName);
 
-            if (entitySet == null)
-            {
+            var path = new ODataPath(new EntitySetSegment(entitySet));
 
-            }
-
-            ODataPath path = new ODataPath(new EntitySetSegment(entitySet));
-
-            ODataQueryOptionParser parser = new ODataQueryOptionParser(edmModel, path, raws, query.ServiceProvider);
-
-            ODataSettings settings = query.ServiceProvider.GetRequiredService<ODataSettings>();
-
-            // Workaround for strange behavior in QueryOptionsParserConfiguration constructor which set it to false always
-            parser.Resolver.EnableCaseInsensitive = settings.EnableCaseInsensitive;
-
-            return parser;
+            return new ODataQueryOptionParser(edmModel, path, raws, query.ServiceProvider);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.OData.Query;
-using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -12,8 +11,6 @@ namespace OData2Linq.Benchmark
 {
     public class InitQuery
     {
-        private static readonly ODataSimplifiedOptions SimplifiedOptions = new ODataSimplifiedOptions();
-
         private static ODataUriResolver DefaultResolver = new StringAsEnumResolver { EnableCaseInsensitive = true };
 
         private static readonly IEdmModel defaultEdmModel;
@@ -45,7 +42,6 @@ namespace OData2Linq.Benchmark
             container.AddService(typeof(ODataQuerySettings), settings.QuerySettings);
             container.AddService(typeof(ODataUriParserSettings), settings.ParserSettings);
             container.AddService(typeof(ODataUriResolver), settings.Resolver ?? DefaultResolver);
-            container.AddService(typeof(ODataSimplifiedOptions), SimplifiedOptions);
             container.AddService(typeof(ODataSettings), settings);
             container.AddService(typeof(DefaultQueryConfigurations), settings.DefaultQueryConfigurations);
 
@@ -69,7 +65,6 @@ namespace OData2Linq.Benchmark
             container.AddService(typeof(ODataQuerySettings), settings.QuerySettings);
             container.AddService(typeof(ODataUriParserSettings), settings.ParserSettings);
             container.AddService(typeof(ODataUriResolver), settings.Resolver ?? DefaultResolver);
-            container.AddService(typeof(ODataSimplifiedOptions), SimplifiedOptions);
             container.AddService(typeof(ODataSettings), settings);
             container.AddService(typeof(DefaultQueryConfigurations), settings.DefaultQueryConfigurations);
 

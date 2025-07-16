@@ -15,7 +15,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        dotnet-version: ['6.0.x']
+        dotnet-version: ['8.0.x']
 
     steps:
     - uses: actions/checkout@v4
@@ -28,4 +28,11 @@ jobs:
     - name: Build
       run: dotnet build ./AspNetCoreOData.sln --no-restore
     - name: Test
-      run: dotnet test ./AspNetCoreOData.sln --no-build --verbosity normal
+      run: dotnet test ./AspNetCoreOData.sln --no-build --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-results-${{ matrix.dotnet-version }}
+        path: TestResults-${{ matrix.dotnet-version }}
+      # Use always() to always run this step to publish test results when there are test failures
+      if: ${{ always() }}

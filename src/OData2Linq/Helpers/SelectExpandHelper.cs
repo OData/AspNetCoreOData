@@ -15,22 +15,25 @@
     {
         private readonly ODataQuery<T> query;
 
-        private readonly string entitySetName;
+        private readonly string? entitySetName;
 
         private ODataRawQueryOptions RawValues { get; }
         private ODataQueryContext Context { get; }
-        private SelectExpandQueryOption SelectExpand { get; set; }
+        private SelectExpandQueryOption? SelectExpand { get; set; }
 
-        public SelectExpandHelper(ODataRawQueryOptions rawQueryOptions, ODataQuery<T> query, string entitySetName)
+        public SelectExpandHelper(ODataRawQueryOptions rawQueryOptions, ODataQuery<T> query, string? entitySetName)
         {
+            ArgumentNullException.ThrowIfNull(rawQueryOptions);
+            ArgumentNullException.ThrowIfNull(query);
+
             Context = new ODataQueryContext(query.EdmModel, query.ElementType, null);
             Context.RequestContainer = query.ServiceProvider;
             this.query = query;
             this.entitySetName = entitySetName;
-            RawValues = rawQueryOptions ?? throw new ArgumentNullException(nameof(rawQueryOptions));
+            RawValues = rawQueryOptions;
             if (RawValues.Select != null || RawValues.Expand != null)
             {
-                Dictionary<string, string> raws = new Dictionary<string, string>();
+                var raws = new Dictionary<string, string>();
                 if (RawValues.Select != null)
                 {
                     raws["$select"] = RawValues.Select;
@@ -56,7 +59,7 @@
             var autoExpandRawValue = GetAutoExpandRawValue();
             var autoSelectRawValue = GetAutoSelectRawValue();
 
-            IDictionary<string, string> queryParameters = new Dictionary<string, string>();
+            var queryParameters = new Dictionary<string, string>();
 
             if (!string.IsNullOrEmpty(autoExpandRawValue) && !autoExpandRawValue.Equals(RawValues.Expand))
             {
@@ -110,7 +113,7 @@
             {
                 var tempResult = ApplySelectExpand(
                     result,
-                    (ODataQuerySettings)query.ServiceProvider.GetService(typeof(ODataQuerySettings)));
+                    query.ServiceProvider.GetRequiredService<ODataQuerySettings>());
                 if (tempResult != default(IQueryable))
                 {
                     result = tempResult;
@@ -120,18 +123,21 @@
             return result;
         }
 
-        private TSelect ApplySelectExpand<TSelect>(TSelect entity, ODataQuerySettings settings)
+        private TSelect? ApplySelectExpand<TSelect>(TSelect entity, ODataQuerySettings settings)
         {
             var result = default(TSelect);
 
-            SelectExpandClause processedClause = SelectExpand.ProcessLevels();
-            SelectExpandQueryOption newSelectExpand = new SelectExpandQueryOption(
+            if (SelectExpand == null)
+                return result;
+
+            var processedClause = SelectExpand.ProcessLevels();
+            var newSelectExpand = new SelectExpandQueryOption(
                 SelectExpand.RawSelect,
                 SelectExpand.RawExpand,
                 SelectExpand.Context,
                 processedClause);
 
-            ODataSettings qsettings = Context.RequestContainer.GetRequiredService<ODataSettings>();
+            var qsettings = Context.RequestContainer.GetRequiredService<ODataSettings>();
 
             newSelectExpand.Validate(qsettings.ValidationSettings);
 
@@ -152,10 +158,10 @@
         private string GetAutoSelectRawValue()
         {
             var selectRawValue = RawValues.Select;
-            IEdmEntityType baseEntityType = Context.TargetStructuredType as IEdmEntityType;
+
             if (string.IsNullOrEmpty(selectRawValue))
             {
-                IList<SelectModelPath> autoSelectProperties = null;
+                IList<SelectModelPath>? autoSelectProperties = null;
 
                 if (Context.TargetStructuredType != null && Context.TargetProperty != null)
                 {
@@ -166,7 +172,7 @@
                     autoSelectProperties = Context.Model.GetAutoSelectPaths(structuredType, null);
                 }
 
-                string autoSelectRawValue = autoSelectProperties == null ? null : string.Join(",", autoSelectProperties.Select(a => a.SelectPath));
+                string? autoSelectRawValue = autoSelectProperties == null ? null : string.Join(",", autoSelectProperties.Select(a => a.SelectPath));
 
                 if (!string.IsNullOrEmpty(autoSelectRawValue))
                 {
@@ -189,7 +195,7 @@
         {
             var expandRawValue = RawValues.Expand;
 
-            IList<ExpandModelPath> autoExpandNavigationProperties = null;
+            IList<ExpandModelPath>? autoExpandNavigationProperties = null;
             if (Context.TargetStructuredType != null && Context.TargetProperty != null)
             {
                 autoExpandNavigationProperties = Context.Model.GetAutoExpandPaths(Context.TargetStructuredType, Context.TargetProperty, !string.IsNullOrEmpty(RawValues.Select));
@@ -199,7 +205,7 @@
                 autoExpandNavigationProperties = Context.Model.GetAutoExpandPaths(elementType, null, !string.IsNullOrEmpty(RawValues.Select));
             }
 
-            string autoExpandRawValue = autoExpandNavigationProperties == null ? null : string.Join(",", autoExpandNavigationProperties.Select(c => c.ExpandPath));
+            string? autoExpandRawValue = autoExpandNavigationProperties == null ? null : string.Join(",", autoExpandNavigationProperties.Select(c => c.ExpandPath));
 
 
             if (!string.IsNullOrEmpty(autoExpandRawValue))
