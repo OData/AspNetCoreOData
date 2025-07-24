@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.Spatial;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Deserialization;
 
@@ -310,6 +311,12 @@ internal static class DeserializationHelpers
             oDataValue = ConvertPrimitiveValue(untypedValue.RawValue);
         }
 
+        if (oDataValue is ISpatial spatialValue)
+        {
+            typeKind = EdmTypeKind.Primitive;
+            return ConvertSpatialValue(spatialValue, ref propertyType, deserializerProvider, readContext);
+        }
+
         typeKind = EdmTypeKind.Primitive;
         return oDataValue;
     }
@@ -452,6 +459,18 @@ internal static class DeserializationHelpers
 
         IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmEnumType);
         return deserializer.ReadInline(enumValue, propertyType, readContext);
+    }
+
+    private static object ConvertSpatialValue(
+        ISpatial spatialValue,
+        ref IEdmTypeReference propertyType,
+        IODataDeserializerProvider deserializerProvider,
+        ODataDeserializerContext readContext)
+    {
+        IEdmSpatialTypeReference edmSpatialType = propertyType.AsSpatial();
+
+        IODataEdmTypeDeserializer deserializer = deserializerProvider.GetEdmTypeDeserializer(edmSpatialType);
+        return deserializer.ReadInline(spatialValue, propertyType, readContext);
     }
 
     // The same logic from ODL to get the element type name in a collection.

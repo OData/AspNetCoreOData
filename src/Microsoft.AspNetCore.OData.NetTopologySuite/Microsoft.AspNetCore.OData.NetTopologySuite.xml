@@ -1,0 +1,365 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.AspNetCore.OData.NetTopologySuite</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Attributes.GeographyAttribute">
+            <summary>
+            Marks a property or CLR type so that NetTopologySuite geometry values are modeled as Edm geography types.
+            </summary>
+            <remarks>
+            - When applied to a property whose CLR type derives from <see cref="T:NetTopologySuite.Geometries.Geometry"/>,
+              the property is mapped to the corresponding <see cref="T:Microsoft.OData.Edm.EdmPrimitiveTypeKind"/> in the Edm.Geography* family
+              (for example, Point → GeographyPoint).
+            - When applied to a class, all properties on the type whose CLR types derive from
+              <see cref="T:NetTopologySuite.Geometries.Geometry"/> are treated as Edm.Geography*.
+            The behavior is enforced by the conventions
+            <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmPropertyConvention"/> and
+            <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmTypeConvention"/>.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Common.Error.Format(System.String,System.Object[])">
+            <summary>
+            Formats the specified resource string using <see cref="P:System.Globalization.CultureInfo.CurrentCulture"/>.
+            </summary>
+            <param name="format">A composite format string.</param>
+            <param name="args">An object array that contains zero or more objects to format.</param>
+            <returns>The formatted string.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Common.Error.ArgumentNull(System.String)">
+            <summary>
+            Creates an <see cref="T:System.ArgumentNullException"/> with the provided properties.
+            </summary>
+            <param name="parameterName">The name of the parameter that caused the current exception.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Common.Error.InvalidOperation(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.InvalidOperationException"/>.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Common.Error.NotSupported(System.String,System.Object[])">
+            <summary>
+            Creates an <see cref="T:System.NotSupportedException"/>.
+            </summary>
+            <param name="messageFormat">A composite format string explaining the reason for the exception.</param>
+            <param name="messageArgs">An object array that contains zero or more objects to format.</param>
+            <returns>The logged <see cref="T:System.Exception"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmPropertyConvention">
+            <summary>
+            A convention that applies to individual properties decorated with the <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Attributes.GeographyAttribute"/>.
+            If the property’s CLR type is a NetTopologySuite spatial type, it is mapped to the corresponding
+            OData geography Edm type (for example, <c>Point</c> → <c>Edm.GeographyPoint</c>,
+            <c>LineString</c> → <c>Edm.GeographyLineString</c>).
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmPropertyConvention.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmPropertyConvention"/> class.
+            Configures the convention to match properties annotated with <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Attributes.GeographyAttribute"/> and
+            to map NetTopologySuite spatial CLR types to their Edm.Geography* primitive kinds.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmPropertyConvention.Apply(Microsoft.OData.ModelBuilder.PropertyConfiguration,Microsoft.OData.ModelBuilder.StructuralTypeConfiguration,System.Attribute,Microsoft.OData.ModelBuilder.ODataConventionModelBuilder)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmTypeConvention">
+            <summary>
+            A convention that applies to entity or complex types decorated with the <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Attributes.GeographyAttribute"/>.
+            When applied, all NetTopologySuite spatial properties on the type are mapped to the corresponding
+            OData geography Edm types (for example, <c>Point</c> → <c>Edm.GeographyPoint</c>,
+            <c>LineString</c> → <c>Edm.GeographyLineString</c>), rather than geometry types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmTypeConvention.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmTypeConvention"/> class.
+            Configures the convention to match types annotated with <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Attributes.GeographyAttribute"/> and
+            to map all NetTopologySuite spatial properties on those types to Edm.Geography* primitive kinds.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Conventions.GeographyAttributeEdmTypeConvention.Apply(Microsoft.OData.ModelBuilder.StructuralTypeConfiguration,Microsoft.OData.ModelBuilder.ODataConventionModelBuilder,System.Attribute)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Edm.EdmSpatialKindMapper">
+            <summary>
+            Maps NetTopologySuite geometry CLR types to their corresponding OData Edm geography primitive kinds.
+            </summary>
+            <remarks>
+            The mapping prefers the most specific known NTS shape (Point, LineString, Polygon, Multi*, GeometryCollection)
+            and falls back to <see cref="T:NetTopologySuite.Geometries.Geometry"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.Geography"/>.
+            Returns <c>null</c> if the supplied type is <c>null</c> or not an NTS geometry type.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Edm.EdmSpatialKindMapper.GetGeographyKindForClrType(System.Type)">
+            <summary>
+            Gets the Edm geography primitive kind that corresponds to the given NetTopologySuite CLR type.
+            </summary>
+            <param name="relatedClrType">The CLR type to evaluate (e.g., <c>Point</c>, <c>LineString</c>).</param>
+            <returns>
+            The matching <see cref="T:Microsoft.OData.Edm.EdmPrimitiveTypeKind"/> for geography shapes, or <c>null</c> if no mapping exists.
+            </returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Edm.ODataNetTopologySuiteTypeMapper">
+            <summary>
+            A type mapper that registers mappings between NetTopologySuite (NTS) geometry CLR types
+            and OData Edm spatial primitive kinds.
+            </summary>
+            <remarks>
+            - Maps NTS types to Edm.Geometry* kinds (e.g., <see cref="T:NetTopologySuite.Geometries.Point"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.GeometryPoint"/>).
+            - This mapper complements the default mapper by adding non-standard mappings for NTS reference types.
+            - This mapper is attached to an <see cref="T:Microsoft.OData.Edm.IEdmModel"/> as a direct-value annotation to scope it per model/route.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.NetTopologySuite.Edm.ODataNetTopologySuiteTypeMapper.Instance">
+            <summary>
+            Singleton instance of <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Edm.ODataNetTopologySuiteTypeMapper"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Edm.ODataNetTopologySuiteTypeMapper.RegisterSpatialMappings">
+            <summary>
+            Registers the NetTopologySuite geometry CLR types as Edm spatial primitive kinds.
+            </summary>
+            <remarks>
+            Mappings are registered as non-standard to avoid overriding the default primitive mappings and
+            to allow providers/conventions to influence the final Edm kind (e.g., switch to geography).
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Extensions.ODataNetTopologyServiceCollectionExtensions">
+            <summary>
+            Extension methods to register NetTopologySuite spatial formatters for ASP.NET Core OData.
+            </summary>
+            <remarks>
+            This replaces the default OData spatial serializer/deserializer with implementations that read and write
+            NetTopologySuite geometry types.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Extensions.ODataNetTopologyServiceCollectionExtensions.AddODataNetTopologySuite(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Registers NetTopologySuite spatial serializers and deserializers.
+            </summary>
+            <param name="services">The service collection.</param>
+            <returns>The same <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
+            <remarks>
+            This method is idempotent: it removes existing spatial formatter registrations and adds the NTS-based ones.
+            </remarks>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Extensions.ODataNetTopologySuiteEdmModelExtensions">
+            <summary>
+            Extensions to attach NetTopologySuite type mapping to an Edm model.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Extensions.ODataNetTopologySuiteEdmModelExtensions.UseNetTopologySuite(Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Attaches the NetTopologySuite type mapper to the given Edm model.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Extensions.ODataNetTopologySuiteODataConventionModelBuilderExtensions">
+            <summary>
+            Extension methods to configure NetTopologySuite integration on an <see cref="T:Microsoft.OData.ModelBuilder.ODataConventionModelBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Extensions.ODataNetTopologySuiteODataConventionModelBuilderExtensions.UseNetTopologySuite(Microsoft.OData.ModelBuilder.ODataConventionModelBuilder)">
+            <summary>
+            Adds the NetTopologySuite Edm type mapping provider and necessary spatial conventions.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Deserialization.ODataSpatialNetTopologySuiteDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData spatial types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Deserialization.ODataSpatialNetTopologySuiteDeserializer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Deserialization.ODataSpatialNetTopologySuiteDeserializer"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Deserialization.ODataSpatialNetTopologySuiteDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Serialization.ODataSpatialNetTopologySuiteSerializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for serializing spatial types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Serialization.ODataSpatialNetTopologySuiteSerializer.#ctor(Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Serialization.Converters.ISpatialConverterRegistry)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Serialization.ODataSpatialNetTopologySuiteSerializer"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Formatter.Serialization.ODataSpatialNetTopologySuiteSerializer.CreateODataPrimitiveValue(System.Object,Microsoft.OData.Edm.IEdmPrimitiveTypeReference,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
+            <summary>
+            Creates an <see cref="T:Microsoft.OData.ODataPrimitiveValue"/> for the object represented by <paramref name="graph"/>.
+            </summary>
+            <param name="graph">The primitive value.</param>
+            <param name="primitiveType">The EDM primitive type of the value.</param>
+            <param name="writeContext">The serializer write context.</param>
+            <returns>The created <see cref="T:Microsoft.OData.ODataPrimitiveValue"/>.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources.CannotWriteType">
+            <summary>
+              Looks up a localized string similar to {0} cannot write an object of type &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources.RootElementNameMissing">
+            <summary>
+              Looks up a localized string similar to The &apos;RootElementName&apos; property is required on &apos;{0}&apos;..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources.SpatialConverter_UnsupportedEdmType">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; does not support &apos;{0}&apos; Edm type..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.NetTopologySuite.SRResources.SpatialConverter_UnsupportedGeometryType">
+            <summary>
+              Looks up a localized string similar to &apos;{0}&apos; does not support &apos;{0}&apos; geometry type..
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.Providers.ODataNetTopologySuiteEdmTypeMappingProvider">
+            <summary>
+            Maps NetTopologySuite (NTS) spatial CLR types to OData Edm primitive spatial types and vice versa.
+            </summary>
+            <remarks>
+            - CLR to Edm: returns Edm.Geometry* kinds for NTS types (e.g., Point → Edm.GeometryPoint).
+              Per-property geography mapping can be enabled via conventions that set the target Edm kind.
+            - Edm to CLR: resolves both Edm.Geometry* and Edm.Geography* kinds to the corresponding NTS types,
+              since NTS represents both with the same CLR types.
+            - Nullability: when mapping Edm to CLR, the provider ensures the returned CLR type is compatible
+              with the Edm nullability (reference types are always nullable).
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Providers.ODataNetTopologySuiteEdmTypeMappingProvider.TryGetEdmType(System.Type,Microsoft.OData.Edm.IEdmPrimitiveType@)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.Providers.ODataNetTopologySuiteEdmTypeMappingProvider.TryGetClrType(Microsoft.OData.Edm.IEdmTypeReference,System.Type@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.NetTopologySuite.UriParser.Parsers.ODataNetTopologySuiteUriLiteralParser">
+            <summary>
+            Parses OData spatial literals (<c>geometry'…'</c> / <c>geography'…'</c>) into
+            NetTopologySuite <see cref="T:NetTopologySuite.Geometries.Geometry"/> instances.
+            </summary>
+            <remarks>
+            <para>
+            Supports the OData V4 spatial literal form:
+            <c>geometry'SRID=&lt;int&gt;;&lt;WKT&gt;'</c> or <c>geography'SRID=&lt;int&gt;;&lt;WKT&gt;'</c>.
+            The <c>SRID=…;</c> prefix is optional; when omitted, defaults are applied based on the
+            literal prefix:
+            </para>
+            <list type="bullet">
+              <item><description><c>geography</c> ⇒ default SRID <c>4326</c></description></item>
+              <item><description><c>geometry</c>  ⇒ default SRID <c>0</c></description></item>
+            </list>
+            <para>
+            The inner text (after removing the OData literal wrapper and optional SRID) is expected
+            to be a valid WKT string (e.g., <c>POINT(-122.35 47.65)</c>, <c>LINESTRING(…)</c>, etc.),
+            which is parsed by <see cref="T:NetTopologySuite.IO.WKTReader"/>.
+            </para>
+            <para>
+            If the incoming literal is the keyword <c>null</c>, this parser returns <c>null</c> and
+            does not set parsing exception.
+            </para>
+            </remarks>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.NetTopologySuite.UriParser.Parsers.ODataNetTopologySuiteUriLiteralParser.Instance">
+            <summary>
+            Singleton instance of the parser.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.UriParser.Parsers.ODataNetTopologySuiteUriLiteralParser.ParseUriStringToType(System.String,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.UriParser.UriLiteralParsingException@)">
+            <summary>
+            Attempts to parse an OData URI spatial literal into a NetTopologySuite <see cref="T:NetTopologySuite.Geometries.Geometry"/> value
+            when the requested Edm type is spatial (<c>Edm.Geometry*</c> or <c>Edm.Geography*</c>).
+            </summary>
+            <param name="text">The OData literal text, e.g., <c>geography'POINT(-122.35 47.65)'</c>.</param>
+            <param name="targetType">
+            The Edm type requested by the URI pipeline. Must be a primitive spatial type
+            (e.g., <c>Edm.GeometryPoint</c>, <c>Edm.GeographyPoint</c>).
+            </param>
+            <param name="parsingException">
+            Set to a <see cref="T:Microsoft.OData.UriParser.UriLiteralParsingException"/> describing the failure when this parser recognizes the literal
+            format but cannot parse it (e.g., invalid WKT). Set to <c>null</c> on success, or when the literal/type is
+            not recognized and the parser declines to handle it.
+            </param>
+            <returns>
+            The parsed <see cref="T:NetTopologySuite.Geometries.Geometry"/> on success, or <c>null</c> if the literal is the keyword <c>null</c>,
+            if the target type is not spatial, or if this parser chooses not to handle the input.
+            </returns>
+            <remarks>
+            Returning <c>null</c> with <paramref name="parsingException"/> also <c>null</c> indicates that another parser
+            may attempt to handle the literal. Returning <c>null</c> with a non-null <paramref name="parsingException"/>
+            signals that the parser recognized the target type/literal but parsing failed.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.UriParser.Parsers.ODataNetTopologySuiteUriLiteralParser.TryUriStringToGeometry(System.String,NetTopologySuite.Geometries.Geometry@,Microsoft.OData.UriParser.UriLiteralParsingException@)">
+            <summary>
+            Tries to parse an OData spatial literal into a NetTopologySuite <see cref="T:NetTopologySuite.Geometries.Geometry"/>.
+            </summary>
+            <param name="text">The literal text, e.g., <c>geometry'POINT(1 2)'</c> or <c>geography'SRID=4326;POINT(…)'</c>.</param>
+            <param name="targetValue">Receives the parsed <see cref="T:NetTopologySuite.Geometries.Geometry"/> on success.</param>
+            <param name="parsingException">
+            Receives a <see cref="T:Microsoft.OData.UriParser.UriLiteralParsingException"/> describing the failure if the input is recognized
+            as a spatial literal but cannot be parsed (e.g., invalid WKT or SRID section). Otherwise <c>null</c>.
+            </param>
+            <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
+            <remarks>
+            <para>
+            The method removes the <c>geometry</c>/<c>geography</c> OData literal prefix and surrounding single quotes.
+            If the remaining text does not start with <c>SRID=…;</c>, a default SRID is injected:
+            <c>4326</c> for <c>geography</c> and <c>0</c> for <c>geometry</c>.
+            </para>
+            <para>
+            The final string is parsed using <see cref="T:NetTopologySuite.IO.WKTReader"/> from <c>NetTopologySuite.IO</c>.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.UriParser.Parsers.ODataNetTopologySuiteUriLiteralParser.TryRemoveLiteralPrefix(System.String,System.String@)">
+            <summary>
+            Attempts to remove a literal <paramref name="prefix"/> (<c>geometry</c> or <c>geography</c>)
+            from the start of <paramref name="text"/> (case-insensitive).
+            </summary>
+            <param name="prefix">The expected literal prefix.</param>
+            <param name="text">The text to inspect; updated in-place if the prefix is removed.</param>
+            <returns>
+            <c>true</c> if the prefix was found and removed; otherwise <c>false</c>.
+            </returns>
+            <remarks>
+            This method is tolerant to case (e.g., <c>GeOgRaPhY'…'</c>), matching OData literal rules.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.NetTopologySuite.UriParser.Parsers.ODataNetTopologySuiteUriLiteralParser.TryRemoveQuotes(System.String@)">
+            <summary>
+            Removes the leading and trailing single quotes around a literal payload and unescapes doubled quotes.
+            </summary>
+            <param name="text">The quoted literal payload; updated in-place on success.</param>
+            <returns><c>true</c> if quotes were successfully removed and unescaped; otherwise <c>false</c>.</returns>
+            <remarks>
+            Validates that the string is at least two characters long, begins and ends with a single quote,
+            and that any internal quote characters are doubled (OData single-quote escaping). Returns <c>false</c>
+            if the quoted form is invalid.
+            </remarks>
+        </member>
+    </members>
+</doc>

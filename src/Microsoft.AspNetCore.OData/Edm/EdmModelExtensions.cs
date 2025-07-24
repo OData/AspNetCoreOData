@@ -483,11 +483,31 @@ internal static class EdmModelExtensions
     }
 
     /// <summary>
-    /// Tests type reference is enum or collection enum
+    /// Checks if type reference is a primitive or a collection of primitives.
     /// </summary>
-    /// <param name="edmType"></param>
-    /// <returns></returns>
-    public static bool IsEnumOrCollectionEnum(this IEdmTypeReference edmType)
+    /// <param name="edmType">The EDM type reference to check.</param>
+    /// <returns><c>true</c> if the EDM type reference is a primitive or a collection of primitives; otherwise, <c>false</c>.</returns>
+    public static bool IsPrimitiveOrCollectionOfPrimitive(this IEdmTypeReference edmType)
+    {
+        if (edmType.IsPrimitive())
+        {
+            return true;
+        }
+
+        if (edmType.IsCollection())
+        {
+            return IsPrimitiveOrCollectionOfPrimitive(edmType.AsCollection().ElementType());
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if type reference is an enum or a collection of enums.
+    /// </summary>
+    /// <param name="edmType">The EDM type reference to check.</param>
+    /// <returns><c>true</c> if the EDM type reference is an enum or a collection of enums; otherwise, <c>false</c>.</returns>
+    public static bool IsEnumOrCollectionOfEnum(this IEdmTypeReference edmType)
     {
         if (edmType.IsEnum())
         {
@@ -496,7 +516,7 @@ internal static class EdmModelExtensions
 
         if (edmType.IsCollection())
         {
-            return IsEnumOrCollectionEnum(edmType.AsCollection().ElementType());
+            return IsEnumOrCollectionOfEnum(edmType.AsCollection().ElementType());
         }
 
         return false;

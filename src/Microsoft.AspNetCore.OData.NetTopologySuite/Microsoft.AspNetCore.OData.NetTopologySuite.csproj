@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+    <!-- Let's generate our own assembly info -->
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <Import Project="..\..\tool\build.props" />
+
+  <ItemGroup>
+    <None Remove=".editorconfig" />
+    <AdditionalFiles Remove=".editorconfig" />
+    <None Remove="Microsoft.AspNetCore.OData.NetTopologySuite.xml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <ProjectReference Include="..\Microsoft.AspNetCore.OData\Microsoft.AspNetCore.OData.csproj" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\SRResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SRResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\SRResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SRResources.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>Microsoft.AspNetCore.OData.NetTopologySuite</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>ProductRoot=$(productBinPath);VersionNuGetSemantic=$(VersionNuGetSemantic)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ODataAspNetCorePackageDependency=$(ODataAspNetCorePackageDependency)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ODataModelBuilderPackageDependency=$(ODataModelBuilderPackageDependency)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ODataLibPackageDependency=$(ODataLibPackageDependency)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);NightlyBuildVersion=$(NightlyBuildVersion)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);SourcesRoot=$(SourcesRoot)</NuspecProperties>
+    </PropertyGroup>
+  </Target>
+
+</Project>

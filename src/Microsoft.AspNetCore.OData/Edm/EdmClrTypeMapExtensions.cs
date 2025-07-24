@@ -23,16 +23,6 @@ internal static class EdmClrTypeMapExtensions
     /// <summary>
     /// Gets the corresponding Edm primitive type <see cref="IEdmPrimitiveTypeReference"/> for a given <see cref="Type"/> type.
     /// </summary>
-    /// <param name="clrType">The given CLR type.</param>
-    /// <returns>Null or the Edm primitive type.</returns>
-    public static IEdmPrimitiveTypeReference GetEdmPrimitiveTypeReference(this Type clrType)
-    {
-        return DefaultODataTypeMapper.Default.GetEdmPrimitiveType(clrType);
-    }
-
-    /// <summary>
-    /// Gets the corresponding Edm primitive type <see cref="IEdmPrimitiveTypeReference"/> for a given <see cref="Type"/> type.
-    /// </summary>
     /// <param name="edmModel">The Edm model.</param>
     /// <param name="clrType">The given CLR type.</param>
     /// <returns>Null or the Edm primitive type.</returns>

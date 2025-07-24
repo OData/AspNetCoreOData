@@ -82,6 +82,7 @@ internal static class ODataServiceCollectionExtensions
         services.AddSingleton<ODataResourceDeserializer>();
         services.AddSingleton<ODataEnumDeserializer>();
         services.AddSingleton<ODataPrimitiveDeserializer>();
+        services.AddSingleton<ODataSpatialDeserializer, ODataSpatialDeserializer>();
         services.AddSingleton<ODataResourceSetDeserializer>();
         services.AddSingleton<ODataCollectionDeserializer>();
         services.AddSingleton<ODataEntityReferenceLinkDeserializer>();
@@ -91,6 +92,7 @@ internal static class ODataServiceCollectionExtensions
         // Serializers.
         services.AddSingleton<ODataEnumSerializer>();
         services.AddSingleton<ODataPrimitiveSerializer>();
+        services.AddSingleton<ODataSpatialSerializer, ODataSpatialSerializer>();
         services.AddSingleton<ODataDeltaResourceSetSerializer>();
         services.AddSingleton<ODataResourceSetSerializer>();
         services.AddSingleton<ODataCollectionSerializer>();

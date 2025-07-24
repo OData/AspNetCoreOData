@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>Microsoft.AspNetCore.OData.NetTopologySuite</id>
+    <title>ASP.NET Core OData NetTopologySuite Integration</title>
+    <version>$VersionFullSemantic$-Nightly$NightlyBuildVersion$</version>
+    <authors>Microsoft</authors>
+    <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
+    <description>Adds NetTopologySuite (NTS) spatial support to ASP.NET Core OData. Enables using NTS geometry types (Point, LineString, Polygon, Multi*, GeometryCollection) as Edm.Geometry, and opt-in Edm.Geography mapping via the [Geography] attribute and conventions. Includes an EDM type-mapping provider and spatial serializers/deserializers.</description>
+    <summary>NetTopologySuite spatial support for ASP.NET Core OData.</summary>
+    <language>en-US</language>
+    <projectUrl>http://github.com/OData/AspNetCoreOData</projectUrl>
+    <license type="expression">MIT</license>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <tags>Microsoft AspNetCore WebApi OData</tags>
+    <readme>docs\README.md</readme>
+    <icon>images\odata.png</icon>
+    <repository type="git" url="https://github.com/OData/AspNetCoreOData.git" branch="master" />
+    <dependencies>
+      <group targetFramework=".net10.0">
+        <dependency id="Microsoft.AspNetCore.OData" version="$ODataAspNetCorePackageDependency$" />
+        <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
+        <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
+        <dependency id="Microsoft.Spatial" version="$ODataLibPackageDependency$" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.NetTopologySuite.dll" target="lib\net10.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.NetTopologySuite.xml" target="lib\net10.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.NetTopologySuite.pdb" target="lib\net10.0" />
+    <file src="$SourcesRoot$\images\odata.png" target="images\" />
+
+    <!-- readme file -->
+    <file src="$SourcesRoot$\README.md" target="docs\" />
+  </files>
+</package>
