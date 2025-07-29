@@ -44,6 +44,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 switch (key)
                 {
                     case "$top":
+                    case "top":
                         int top;
                         if (Int32.TryParse(value, out top))
                         {
@@ -60,6 +61,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                         }
                         break;
                     case "$skip":
+                    case "skip":
                         if (useDefaultSkip)
                         {
                             //Need to increment skip only if we are not using skiptoken 
