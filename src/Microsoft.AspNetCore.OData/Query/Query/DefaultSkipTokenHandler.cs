@@ -55,6 +55,7 @@ public class DefaultSkipTokenHandler : SkipTokenHandler
         IEdmModel model = context.Model;
 
         DefaultQueryConfigurations queryConfigs = context.QueryContext.DefaultQueryConfigurations;
+        bool isNoDollarQueryEnable = context.Request.IsNoDollarQueryEnable();
         if (queryConfigs.EnableSkipToken)
         {
             if (expandedItem != null)
@@ -62,7 +63,7 @@ public class DefaultSkipTokenHandler : SkipTokenHandler
                 // Handle Delta resource; currently not value based.
                 if (DeltaHelper.IsDeltaOfT(context.ExpandedResource.GetType()))
                 {
-                    return GetNextPageHelper.GetNextPageLink(baseUri, pageSize);
+                    return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, null, null, isNoDollarQueryEnable);
                 }
 
                 if (expandedItem.OrderByOption != null)
@@ -75,7 +76,7 @@ public class DefaultSkipTokenHandler : SkipTokenHandler
                     return GenerateSkipTokenValue(obj, model, orderByClause, context);
                 };
 
-                return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator);
+                return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator, isNoDollarQueryEnable);
             }
 
             if (context.QueryOptions != null && context.QueryOptions.OrderBy != null)
@@ -89,7 +90,7 @@ public class DefaultSkipTokenHandler : SkipTokenHandler
             };
         }
 
-        return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator);
+        return GetNextPageHelper.GetNextPageLink(baseUri, pageSize, instance, skipTokenGenerator, isNoDollarQueryEnable);
     }
 
     /// <summary>
