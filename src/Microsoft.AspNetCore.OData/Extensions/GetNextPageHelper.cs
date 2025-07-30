@@ -23,7 +23,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
     internal static class GetNextPageHelper
     {
         [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "<Pending>")]
-        internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null)
+        internal static Uri GetNextPageLink(Uri requestUri, IEnumerable<KeyValuePair<string, string>> queryParameters, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null, bool isNoDollarQueryOptionsEnabled = true)
         {
             Contract.Assert(requestUri != null);
             Contract.Assert(queryParameters != null);
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                 switch (key)
                 {
                     case "$top":
-                    case "top":
+                    case "top" when isNoDollarQueryOptionsEnabled:
                         int top;
                         if (Int32.TryParse(value, out top))
                         {
@@ -61,7 +61,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
                         }
                         break;
                     case "$skip":
-                    case "skip":
+                    case "skip" when isNoDollarQueryOptionsEnabled:
                         if (useDefaultSkip)
                         {
                             //Need to increment skip only if we are not using skiptoken 
@@ -116,7 +116,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
         }
 
         /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
-        internal static Uri GetNextPageLink(Uri requestUri, int pageSize, object instance = null, Func<object, String> objectToSkipTokenValue = null)
+        internal static Uri GetNextPageLink(Uri requestUri, int pageSize, object instance = null, Func<object, string> objectToSkipTokenValue = null, bool isNoDollarQueryOptionsEnabled = true)
         {
             Contract.Assert(requestUri != null);
 
@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.OData.Extensions
             IEnumerable<KeyValuePair<string, string>> queryParameters = queryValues.SelectMany(
                 kvp => kvp.Value, (kvp, value) => new KeyValuePair<string, string>(kvp.Key, value));
 
-            return GetNextPageLink(requestUri, queryParameters, pageSize, instance, objectToSkipTokenValue);
+            return GetNextPageLink(requestUri, queryParameters, pageSize, instance, objectToSkipTokenValue, isNoDollarQueryOptionsEnabled);
         }
     }
 }
