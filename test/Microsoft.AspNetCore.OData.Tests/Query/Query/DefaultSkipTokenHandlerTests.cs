@@ -357,7 +357,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             ResourceContext resource = new ResourceContext();
             ODataSerializerContext context = new ODataSerializerContext(resource, edmProperty, queryContext, null)
             {
-                Model = model
+                Model = model,
+                Request = request
             };
 
             return context;
