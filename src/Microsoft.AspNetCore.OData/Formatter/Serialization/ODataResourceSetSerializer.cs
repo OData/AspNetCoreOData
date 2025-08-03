@@ -722,7 +722,8 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
                     return nextLinkGenerator.GenerateNextPageLink(nestedNextLink, pageSize, obj, writeContext);
                 }
 
-                return GetNextPageHelper.GetNextPageLink(nestedNextLink, pageSize);
+                bool isNoDollarQueryEnable = writeContext.Request.IsNoDollarQueryEnable();
+                return GetNextPageHelper.GetNextPageLink(nestedNextLink, pageSize, null, null, isNoDollarQueryEnable);
             }
 
             return null;
