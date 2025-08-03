@@ -357,7 +357,8 @@ public class DefaultSkipTokenHandlerTests
         ResourceContext resource = new ResourceContext();
         ODataSerializerContext context = new ODataSerializerContext(resource, edmProperty, queryContext, null)
         {
-            Model = model
+            Model = model,
+            Request = request
         };
 
         return context;

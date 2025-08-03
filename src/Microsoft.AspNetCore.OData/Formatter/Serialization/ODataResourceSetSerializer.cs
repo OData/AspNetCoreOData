@@ -722,7 +722,8 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
                     return nextLinkGenerator.GenerateNextPageLink(nestedNextLink, truncatedCollection.PageSize, obj, writeContext);
                 }
 
-                return GetNextPageHelper.GetNextPageLink(nestedNextLink, truncatedCollection.PageSize);
+                bool isNoDollarQueryEnable = writeContext.Request.IsNoDollarQueryEnable();
+                return GetNextPageHelper.GetNextPageLink(nestedNextLink, truncatedCollection.PageSize, null, null, isNoDollarQueryEnable);
             }
         }
 
