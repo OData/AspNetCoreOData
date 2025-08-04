@@ -761,7 +761,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             MethodInfo methodInfo;
             if (UriFunctionsBinder.TryGetMethodInfo(node.Name, methodArgumentsType, out methodInfo))
             {
-                return ExpressionBinderHelper.MakeFunctionCall(methodInfo, context.QuerySettings, arguments);
+                return ExpressionBinderHelper.MakeCustomFunctionCall(methodInfo, arguments);
             }
 
             return null;
