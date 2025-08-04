@@ -330,6 +330,30 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             Assert.Same(typeof(MyColor), clrType);
         }
 
+
+        [Fact]
+        public void GetClrType_WorksAsExpected_ForUntypedType()
+        {
+            // 1) Arrange : using primitive untyped
+            IEdmType untypedType = EdmCoreModel.Instance.GetUntypedType();
+
+            // 1) Act & Assert
+            Type clrType = _mapper.GetClrType(EdmModel, untypedType, true, null);
+            Assert.Same(typeof(object), clrType);
+
+            clrType = _mapper.GetClrType(EdmModel, untypedType, false, null);
+            Assert.Same(typeof(object), clrType);
+
+            // 2) Arrange : using structured untyped
+            untypedType = EdmUntypedStructuredType.Instance;
+
+            // 2) Act & Assert
+            clrType = _mapper.GetClrType(EdmModel, untypedType, true, null);
+            Assert.Same(typeof(object), clrType);
+            clrType = _mapper.GetClrType(EdmModel, untypedType, false, null);
+            Assert.Same(typeof(object), clrType);
+        }
+
         #endregion
 
         #region GetEdmType
@@ -408,6 +432,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
             colorType = _mapper.GetEdmTypeReference(EdmModel, typeof(MyColor?));
             Assert.Same(expectedType, colorType.Definition);
             Assert.True(colorType.IsNullable);
+        }
+
+        [Fact]
+        public void GetEdmTypeReference_WorksAsExpected_FoUntypedTpe()
+        {
+            // Arrange & Act & Assert
+            IEdmTypeReference untyped = _mapper.GetEdmTypeReference(EdmModel, typeof(object));
+            Assert.Same(EdmUntypedStructuredType.Instance, untyped.Definition);
         }
         #endregion
 
