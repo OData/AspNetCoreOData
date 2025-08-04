@@ -7,12 +7,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Formatter.Attributes;
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
@@ -232,9 +235,107 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
             ExceptionAssert.ThrowsArgumentNull(() => ODataOutputFormatter.TryGetContentHeader(null, null, out _), "type");
         }
 
+        [Fact]
+        public void SerializeIllegalUnannotatedObject_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            var illegalObject = new IllegalUnannotatedObject
+            {
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    { "Inv@l:d.", 1 }
+                }
+            };
+
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<IllegalUnannotatedObject>("IllegalUnannotatedObjects");
+            IEdmModel model = builder.GetEdmModel();
+            IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("IllegalUnannotatedObjects");
+            EntitySetSegment entitySetSeg = new EntitySetSegment(entitySet);
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
+            request.ODataFeature().Model = model;
+            request.ODataFeature().Path = new ODataPath(entitySetSeg);
+
+            OutputFormatterWriteContext context = new OutputFormatterWriteContext(
+                request.HttpContext,
+                (s, e) => null,
+                objectType: typeof(IllegalUnannotatedObject),
+                @object: illegalObject);
+
+            ODataOutputFormatter formatter = new ODataOutputFormatter(new[] { ODataPayloadKind.Resource });
+            formatter.SupportedMediaTypes.Add("application/json");
+
+            // Act & Assert
+            Assert.Throws<ODataException>(() => formatter.WriteResponseBodyAsync(context, Encoding.UTF8).GetAwaiter().GetResult());
+        }
+
+        // positive test as above
+        [Fact]
+        public void SerializeIllegalAnnotatedObject_ReturnsFixedValidObject()
+        {
+            // Arrange
+            var illegalObject = new IllegalAnnotatedObject
+            {
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    { "I#v@l:d.", 1 }
+                }
+            };
+
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<IllegalAnnotatedObject>("IllegalAnnotatedObject");
+            IEdmModel model = builder.GetEdmModel();
+            IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("IllegalAnnotatedObject");
+            EntitySetSegment entitySetSeg = new EntitySetSegment(entitySet);
+            HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents("odata", model));
+            request.ODataFeature().RoutePrefix = "odata";
+            request.ODataFeature().Model = model;
+            request.ODataFeature().Path = new ODataPath(entitySetSeg);
+
+            OutputFormatterWriteContext context = new OutputFormatterWriteContext(
+                request.HttpContext,
+                (s, e) => null,
+                objectType: typeof(IllegalAnnotatedObject),
+                @object: illegalObject);
+
+            ODataOutputFormatter formatter = new ODataOutputFormatter(new[] { ODataPayloadKind.Resource });
+            formatter.SupportedMediaTypes.Add("application/json");
+
+            // Set the Response.Body to a new MemoryStream to capture the response
+            var memoryStream = new MemoryStream();
+            context.HttpContext.Response.Body = memoryStream;
+
+            // Act
+            formatter.WriteResponseBodyAsync(context, Encoding.UTF8).GetAwaiter().GetResult();
+
+            memoryStream.Position = 0;
+            var content = new StreamReader(memoryStream).ReadToEnd();
+            var jd = System.Text.Json.JsonDocument.Parse(content);
+            var root = jd.RootElement;
+
+            // Assert
+            // check that the JSON response contains the fixed property name and its value is 1
+            Assert.Equal(1, root.GetProperty("I_v_l_d_").GetInt32());
+        }
+
         private class Customer
         {
             public int Id { get; set; }
         }
+
+        private class IllegalUnannotatedObject
+        {
+            [Key]
+            public int Id { get; set; }
+            public IDictionary<string, object> DynamicProperties { get; set; }
+        }
+
+        [ReplaceIllegalFieldNameCharacters]
+        private class IllegalAnnotatedObject : IllegalUnannotatedObject
+        {
+
+        }
+
     }
 }
