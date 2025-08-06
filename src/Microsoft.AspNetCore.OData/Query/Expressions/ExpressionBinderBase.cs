@@ -307,7 +307,16 @@ public abstract class ExpressionBinderBase
             return FalseConstant;
         }
 
-        string typeName = (string)((ConstantNode)node.Parameters.Last()).Value;
+        string typeName = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
+        {
+            typeName = (string)constantNode.Value;
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            typeName = singleResourceCastNode.TypeReference.FullName();
+        }
 
         IEdmType edmType = Model.FindType(typeName);
         Type clrType = null;
