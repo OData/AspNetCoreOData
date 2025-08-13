@@ -38,6 +38,9 @@ me.Services = services =>
     services.AddSingleton<IFilterBinder, FilterBinder>();
 };
 
+// Be noted: should call UseODataMiniBatching() as early as possible to support OData batching.
+app.UseODataMiniBatching("v1/$batch", model);
+
 app.MapGet("test", () => "hello world").WithODataResult();
 
 // Group

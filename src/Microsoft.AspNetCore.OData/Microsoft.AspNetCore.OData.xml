@@ -489,6 +489,11 @@
             Gets or sets if the continue-on-error header is enable or not.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.MiniMetadata">
+            <summary>
+            Gets or sets the mini metadata for the OData batch handler.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Batch.ODataBatchHandler.SetContinueOnError(Microsoft.AspNetCore.Http.IHeaderDictionary,System.Boolean)">
             <summary>
             Set ContinueOnError based on the request and headers.
@@ -742,6 +747,29 @@
             Override Close() in order to hold the stream open until we are able to
             copy it to the batch response stream.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware">
+            <summary>
+            Defines the middleware for handling OData $batch requests in the minimal API scenarios.
+            This middleware essentially acts like branching middleware and redirects OData $batch
+            requests to the appropriate ODataBatchHandler.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware.#ctor(System.String,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler,Microsoft.AspNetCore.OData.ODataMiniMetadata,Microsoft.AspNetCore.Http.RequestDelegate)">
+            <summary>
+            Instantiates a new instance of <see cref="T:Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware"/>.
+            </summary>
+            <param name="routePattern">The route pattern for the OData $batch endpoint.</param>
+            <param name="handler">The handler for processing batch requests.</param>
+            <param name="metadata">the metadata for the OData $batch endpoint.</param>
+            <param name="next">The next middleware.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Invoke the OData $Batch middleware.
+            </summary>
+            <param name="context">The http context.</param>
+            <returns>A task that can be awaited.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Batch.OperationRequestItem">
             <summary>
@@ -6557,6 +6585,26 @@
             <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataMiniBatching(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Use OData batching minimal API middleware.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <param name="routePattern">The route pattern,</param>
+            <param name="model">The edm model.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataMiniBatching(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.String,Microsoft.OData.Edm.IEdmModel,Microsoft.AspNetCore.OData.Batch.ODataBatchHandler,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
+            <summary>
+            Use OData batching minimal API middleware.
+            </summary>
+            <param name="app">The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/> to use.</param>
+            <param name="routePattern">The route pattern,</param>
+            <param name="model">The edm model.</param>
+            <param name="handler">The batch handler.</param>
+            <param name="configAction">The services configuration.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Builder.IApplicationBuilder"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataQueryRequest(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
             <summary>
             Use OData query request middleware. An OData query request is a Http Post request ending with /$query.
@@ -6797,6 +6845,12 @@
             Please call 'SetCaseInsensitive()' to config.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableContinueOnErrorHeader">
+            <summary>
+            Gets whether or not continue on error.
+            Please call 'SetContinueOnErrorHeader()' to config.
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.TimeZone">
             <summary>
             Gets TimeZoneInfo for the <see cref="T:System.DateTime"/> serialization and deserialization.
@@ -6815,6 +6869,13 @@
             Config the case insensitive.
             </summary>
             <param name="enableCaseInsensitive">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetContinueOnErrorHeader(System.Boolean)">
+            <summary>
+            Config the value indicating if batch requests should continue on error.
+            </summary>
+            <param name="enableContinueOnErrorHeader">the value indicating if batch requests should continue on error.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetTimeZoneInfo(System.TimeZoneInfo)">

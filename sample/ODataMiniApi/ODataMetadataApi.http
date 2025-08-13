@@ -68,3 +68,41 @@ GET {{ODataMiniApi_HostAddress}}/v1/$metadata
 Accept: application/json
 
 # The above two requests get the CSDL-JSON file
+
+###
+
+POST {{ODataMiniApi_HostAddress}}/v1/$batch
+Content-Type: application/json 
+Accept: application/json
+
+{
+  "requests": [
+    {
+      "id": "1",
+      "atomicityGroup": "f7de7314-2f3d-4422-b840-ada6d6de0f18",
+      "method": "POST",
+      "url": "http://localhost:5177/v1/customers/rating",
+      "headers": {
+        "OData-Version": "4.0",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "body": {
+        "p": 8
+      }
+    },
+    {
+      "id": "2",
+      "atomicityGroup": "f7de7314-2f3d-4422-b840-ada6d6de0f18",
+      "method": "GET",
+      "url": "http://localhost:5177/v1/customers",
+      "headers": {
+             "OData-Version": "4.0",
+             "Content-Type": "application/json;odata.metadata=minimal",
+             "Accept": "application/json;odata.metadata=minimal"
+         }
+     }
+  ]
+}
+
+###

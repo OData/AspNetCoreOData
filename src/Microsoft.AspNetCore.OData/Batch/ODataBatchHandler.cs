@@ -99,6 +99,11 @@ public abstract class ODataBatchHandler
     internal bool ContinueOnError { get; private set; }
 
     /// <summary>
+    /// Gets or sets the mini metadata for the OData batch handler.
+    /// </summary>
+    internal ODataMiniMetadata MiniMetadata { get; private set; }
+
+    /// <summary>
     /// Set ContinueOnError based on the request and headers.
     /// </summary>
     /// <param name="header">The request header.</param>
@@ -117,5 +122,16 @@ public abstract class ODataBatchHandler
         {
             ContinueOnError = false;
         }
+    }
+
+    internal void SetMinimalApi(HttpContext context)
+    {
+        ODataMiniMetadata metadata = null;
+        if (context.Items.TryGetValue(ODataMiniBatchMiddleware.MinimalApiMetadataKey, out object value))
+        {
+            metadata = value as ODataMiniMetadata;
+        }
+
+        MiniMetadata = metadata;
     }
 }

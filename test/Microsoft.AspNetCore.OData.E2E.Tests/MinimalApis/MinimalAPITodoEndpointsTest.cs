@@ -7,15 +7,18 @@
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.E2E.Tests.Commons;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -40,6 +43,8 @@ public class MinimalAPITodoEndpointsTest : IClassFixture<MinimalTestFixture<Mini
 
     protected static void ConfigureAPIs(WebApplication app)
     {
+        app.UseODataMiniBatching("odata/$batch", MinimalEdmModel.GetEdmModel());
+
         app.MapGet("v0/todos", (IMiniTodoTaskRepository db) => db.GetTodos());
 
         app.MapGet("v1/todos", (IMiniTodoTaskRepository db) => db.GetTodos())
@@ -187,5 +192,92 @@ public class MinimalAPITodoEndpointsTest : IClassFixture<MinimalTestFixture<Mini
         // Assert
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         Assert.Equal("{\"@context\":\"http://localhost/v2/$metadata#Edm.String\",\"value\":\"Patch : '2' to todos\"}", content);
+    }
+
+    [Fact]
+    public async Task PostBatchRequest_WithMinimalBatchMiddleware_JsonBatch()
+    {
+        // Arrange & Act
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/$batch");
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+        HttpContent content = new StringContent(@"
+    {
+        ""requests"": [{
+                ""id"": ""1"",
+                ""atomicityGroup"": ""f7de7314-2f3d-4422-b840-ada6d6de0f18"",
+                ""method"": ""GET"",
+                ""url"": ""http://localhost/v2/todos/4?$select=title,Tasks($select=Description;$orderby=id desc)"",
+                ""headers"": {
+                    ""OData-Version"": ""4.0"",
+                    ""Content-Type"": ""application/json;odata.metadata=minimal"",
+                    ""Accept"": ""application/json;odata.metadata=minimal""
+                }
+            }, {
+                ""id"": ""2"",
+                ""atomicityGroup"": ""f7de7314-2f3d-4422-b840-ada6d6de0f18"",
+                ""method"": ""GET"",
+                ""url"": ""http://localhost/v1/todos/3"",
+                ""headers"": {
+                    ""OData-Version"": ""4.0"",
+                    ""Content-Type"": ""application/json;odata.metadata=minimal"",
+                    ""Accept"": ""application/json;odata.metadata=minimal""
+                }
+            }
+        ]
+    }");
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        request.Content = content;
+        HttpResponseMessage response = await _client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        // Please keep the below code commented out for reference.
+        // The response should be a JSON batch response with two sub-responses similar to the following:
+        // Since the atomicity group is random, Let's read the batch response payload using OData batch reader.
+
+        //string payload = await response.Content.ReadAsStringAsync();
+        //Assert.Equal("{\"responses\":" +
+        //  "[" +
+        //    "{" +
+        //      "\"id\":\"1\"," +
+        //      "\"atomicityGroup\":\"8dcc2af5-2c74-4ec9-8638-ea41c4f8d685\"," +
+        //      "\"status\":200," +
+        //      "\"headers\":{\"content-type\":\"application/json\",\"odata-version\":\"4.0\"}," +
+        //      "\"body\" :{\"@odata.context\":\"http://localhost/v2/$metadata#Todos(Title,Tasks/Description)/$entity\",\"Title\":\"Clean House\",\"Tasks\":[{\"Description\":\"Clean bathroom\"},{\"Description\":\"Clean carpet\"}]}" +
+        //    "}," +
+        //    "{" +
+        //      "\"id\":\"2\"," +
+        //      "\"atomicityGroup\":\"8dcc2af5-2c74-4ec9-8638-ea41c4f8d685\"," +
+        //      "\"status\":200," +
+        //      "\"headers\":{\"content-type\":\"application/json\",\"odata-version\":\"4.0\"}, " +
+        //      "\"body\" :{\"@odata.context\":\"http://localhost/$metadata#Todos/$entity\",\"Id\":3,\"Owner\":\"John\",\"Title\":\"Shopping\",\"IsDone\":true,\"Tasks\":[{\"Id\":31,\"Description\":\"Buy bread\",\"Created\":\"2022-02-11\",\"IsComplete\":false,\"Priority\":3},{\"Id\":32,\"Description\":\"Buy washing machine\",\"Created\":\"2023-12-14\",\"IsComplete\":true,\"Priority\":2}]}" +
+        //      "}" +
+        //  "]" +
+        //"}", payload);
+
+        var stream = await response.Content.ReadAsStreamAsync();
+        IODataResponseMessage odataResponseMessage = new ODataMessageWrapper(stream, response.Content.Headers);
+        int subResponseCount = 0;
+        using (var messageReader = new ODataMessageReader(odataResponseMessage, new ODataMessageReaderSettings(), MinimalEdmModel.GetEdmModel()))
+        {
+            var batchReader = messageReader.CreateODataBatchReader();
+            while (batchReader.Read())
+            {
+                switch (batchReader.State)
+                {
+                    case ODataBatchReaderState.Operation:
+                        var operationMessage = batchReader.CreateOperationResponseMessage();
+                        subResponseCount++;
+
+                        // Verfiy the status code of each sub-response.
+                        Assert.Equal(200, operationMessage.StatusCode);
+                        break;
+                }
+            }
+        }
+
+        // Verify that we have two sub-responses.
+        Assert.Equal(2, subResponseCount);
     }
 }

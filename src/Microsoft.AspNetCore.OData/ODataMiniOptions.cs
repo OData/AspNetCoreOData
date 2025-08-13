@@ -20,6 +20,7 @@ public class ODataMiniOptions
     private DefaultQueryConfigurations _queryConfigurations = new DefaultQueryConfigurations();
     private bool _enableNoDollarQueryOptions = true;
     private bool _enableCaseInsensitive = true;
+    private bool _enableContinueOnErrorHeader = false;
     private TimeZoneInfo _timeZone = TimeZoneInfo.Local;
     private ODataVersion _version = ODataVersionConstraint.DefaultODataVersion;
 
@@ -47,6 +48,12 @@ public class ODataMiniOptions
     public bool EnableCaseInsensitive { get => _enableCaseInsensitive; }
 
     /// <summary>
+    /// Gets whether or not continue on error.
+    /// Please call 'SetContinueOnErrorHeader()' to config.
+    /// </summary>
+    public bool EnableContinueOnErrorHeader { get => _enableContinueOnErrorHeader; }
+
+    /// <summary>
     /// Gets TimeZoneInfo for the <see cref="DateTime"/> serialization and deserialization.
     /// Please call 'SetTimeZoneInfo()' to config.
     /// </summary>
@@ -71,6 +78,17 @@ public class ODataMiniOptions
     public ODataMiniOptions SetCaseInsensitive(bool enableCaseInsensitive)
     {
         _enableCaseInsensitive = enableCaseInsensitive;
+        return this;
+    }
+
+    /// <summary>
+    /// Config the value indicating if batch requests should continue on error.
+    /// </summary>
+    /// <param name="enableContinueOnErrorHeader">the value indicating if batch requests should continue on error.</param>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
+    public ODataMiniOptions SetContinueOnErrorHeader(bool enableContinueOnErrorHeader)
+    {
+        _enableCaseInsensitive = enableContinueOnErrorHeader;
         return this;
     }
 

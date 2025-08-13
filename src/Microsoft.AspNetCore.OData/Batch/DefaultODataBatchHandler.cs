@@ -41,10 +41,20 @@ public class DefaultODataBatchHandler : ODataBatchHandler
             return;
         }
 
+        SetMinimalApi(context);
+
         IList<ODataBatchRequestItem> subRequests = await ParseBatchRequestsAsync(context).ConfigureAwait(false);
 
-        ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
-        bool enableContinueOnErrorHeader = (options != null) ? options.EnableContinueOnErrorHeader : false;
+        bool enableContinueOnErrorHeader = false;
+        if (MiniMetadata != null)
+        {
+            enableContinueOnErrorHeader = MiniMetadata.Options.EnableContinueOnErrorHeader;
+        }
+        else
+        {
+            ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
+            enableContinueOnErrorHeader = (options != null) ? options.EnableContinueOnErrorHeader : false;
+        }
 
         SetContinueOnError(context.Request.Headers, enableContinueOnErrorHeader);
 
@@ -100,7 +110,23 @@ public class DefaultODataBatchHandler : ODataBatchHandler
         }
 
         HttpRequest request = context.Request;
-        IServiceProvider requestContainer = request.CreateRouteServices(PrefixName);
+
+        IServiceProvider requestContainer = null;
+        if (MiniMetadata != null)
+        {
+            requestContainer = MiniMetadata.ServiceProvider;
+
+            // We should dispose the scope after the request is processed?
+            // In the case of batch request, we can leave the GC to clean up the scope?
+            IServiceScope scope = requestContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            request.ODataFeature().Services = scope.ServiceProvider;
+            request.ODataFeature().RequestScope = scope;
+        }
+        else
+        {
+            requestContainer = request.CreateRouteServices(PrefixName);
+        }
+
         requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
 
         using (ODataMessageReader reader = request.GetODataMessageReader(requestContainer))
@@ -135,7 +161,7 @@ public class DefaultODataBatchHandler : ODataBatchHandler
                 }
             }
 
-          return requests;
+            return requests;
         }
     }
 }
