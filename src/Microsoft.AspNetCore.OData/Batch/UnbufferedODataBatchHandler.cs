@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -41,21 +40,45 @@ public class UnbufferedODataBatchHandler : ODataBatchHandler
             return;
         }
 
+        SetMinimalApi(context);
+
         // This container is for the overall batch request.
         HttpRequest request = context.Request;
-        IServiceProvider requestContainer = request.CreateRouteServices(PrefixName);
+
+        IServiceProvider requestContainer = null;
+        if (MiniMetadata != null)
+        {
+            requestContainer = MiniMetadata.ServiceProvider;
+
+            // We should dispose the scope after the request is processed?
+            // In the case of batch request, we can leave the GC to clean up the scope?
+            IServiceScope scope = requestContainer.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            request.ODataFeature().Services = scope.ServiceProvider;
+            request.ODataFeature().RequestScope = scope;
+        }
+        else
+        {
+            requestContainer = request.CreateRouteServices(PrefixName);
+        }
+
         requestContainer.GetRequiredService<ODataMessageReaderSettings>().BaseUri = GetBaseUri(request);
         List<ODataBatchResponseItem> responses = new List<ODataBatchResponseItem>();
-            
+
         using (ODataMessageReader reader = request.GetODataMessageReader(requestContainer))
         {
             ODataBatchReader batchReader = await reader.CreateODataBatchReaderAsync().ConfigureAwait(false);
             Guid batchId = Guid.NewGuid();
 
-            ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
-            bool enableContinueOnErrorHeader = (options != null)
-                ? options.EnableContinueOnErrorHeader
-                : false;
+            bool enableContinueOnErrorHeader = false;
+            if (MiniMetadata != null)
+            {
+                enableContinueOnErrorHeader = MiniMetadata.Options.EnableContinueOnErrorHeader;
+            }
+            else
+            {
+                ODataOptions options = context.RequestServices.GetRequiredService<IOptions<ODataOptions>>().Value;
+                enableContinueOnErrorHeader = (options != null) ? options.EnableContinueOnErrorHeader : false;
+            }
 
             SetContinueOnError(request.Headers, enableContinueOnErrorHeader);
 

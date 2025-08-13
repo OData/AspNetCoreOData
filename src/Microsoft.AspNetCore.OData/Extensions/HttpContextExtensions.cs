@@ -203,10 +203,12 @@ public static class HttpContextExtensions
 
         // 2. Retrieve it from metadata?
         var endpoint = httpContext.GetEndpoint();
-        var odataMiniMetadata = endpoint.Metadata.GetMetadata<ODataMiniMetadata>();
+        var odataMiniMetadata = endpoint?.Metadata.GetMetadata<ODataMiniMetadata>();
         if (odataMiniMetadata is not null)
         {
-            odataFeature.Services = odataMiniMetadata.ServiceProvider;
+            IServiceScope scope = odataMiniMetadata.ServiceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            odataFeature.Services = scope.ServiceProvider;
+            odataFeature.RequestScope = scope;
             return odataFeature.Services;
         }
 

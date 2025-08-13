@@ -10,6 +10,16 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 	[
 	ExtensionAttribute(),
 	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataMiniBatching (Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern, Microsoft.OData.Edm.IEdmModel model)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataMiniBatching (Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler handler, params System.Action`1[[Microsoft.Extensions.DependencyInjection.IServiceCollection]] configAction)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataQueryRequest (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
 
 	[
@@ -196,6 +206,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public ODataMiniOptions ()
 
 	bool EnableCaseInsensitive  { public get; }
+	bool EnableContinueOnErrorHeader  { public get; }
 	bool EnableNoDollarQueryOptions  { public get; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; }
@@ -208,6 +219,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public Microsoft.AspNetCore.OData.ODataMiniOptions OrderBy ()
 	public Microsoft.AspNetCore.OData.ODataMiniOptions Select ()
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetCaseInsensitive (bool enableCaseInsensitive)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetContinueOnErrorHeader (bool enableContinueOnErrorHeader)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetNoDollarQueryOptions (bool enableNoDollarQueryOptions)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetTimeZoneInfo (System.TimeZoneInfo tzi)
@@ -530,6 +542,15 @@ public class Microsoft.AspNetCore.OData.Batch.ODataBatchContent {
 
 public class Microsoft.AspNetCore.OData.Batch.ODataBatchMiddleware {
 	public ODataBatchMiddleware (System.IServiceProvider serviceProvider, Microsoft.AspNetCore.Http.RequestDelegate next)
+
+	[
+	AsyncStateMachineAttribute(),
+	]
+	public System.Threading.Tasks.Task Invoke (Microsoft.AspNetCore.Http.HttpContext context)
+}
+
+public class Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware {
+	public ODataMiniBatchMiddleware (string routePattern, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler handler, Microsoft.AspNetCore.OData.ODataMiniMetadata metadata, Microsoft.AspNetCore.Http.RequestDelegate next)
 
 	[
 	AsyncStateMachineAttribute(),

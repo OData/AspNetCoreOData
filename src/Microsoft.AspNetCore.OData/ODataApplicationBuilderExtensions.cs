@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
+using System;
 
 namespace Microsoft.AspNetCore.OData;
 
@@ -32,6 +36,55 @@ public static class ODataApplicationBuilderExtensions
         }
 
         return app.UseMiddleware<ODataBatchMiddleware>();
+    }
+
+    /// <summary>
+    /// Use OData batching minimal API middleware.
+    /// </summary>
+    /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+    /// <param name="routePattern">The route pattern,</param>
+    /// <param name="model">The edm model.</param>
+    /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
+    public static IApplicationBuilder UseODataMiniBatching(this IApplicationBuilder app, string routePattern, IEdmModel model)
+     => app.UseODataMiniBatching(routePattern, model, new DefaultODataBatchHandler());
+
+    /// <summary>
+    /// Use OData batching minimal API middleware.
+    /// </summary>
+    /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
+    /// <param name="routePattern">The route pattern,</param>
+    /// <param name="model">The edm model.</param>
+    /// <param name="handler">The batch handler.</param>
+    /// <param name="configAction">The services configuration.</param>
+    /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
+    public static IApplicationBuilder UseODataMiniBatching(this IApplicationBuilder app, string routePattern, IEdmModel model,
+        ODataBatchHandler handler, Action<IServiceCollection> configAction = null)
+    {
+        if (app == null)
+        {
+            throw Error.ArgumentNull(nameof(app));
+        }
+
+        ODataMiniMetadata metadata = new ODataMiniMetadata();
+
+        // retrieve the global minimal API OData configuration
+        ODataMiniOptions options = app.ApplicationServices.GetService<IOptions<ODataMiniOptions>>()?.Value;
+        if (options is not null)
+        {
+            metadata.Options.UpdateFrom(options);
+        }
+
+        metadata.Model = model;
+        if (configAction != null)
+        {
+            metadata.Services = configAction;
+        }
+
+        app.UseMiddleware<ODataMiniBatchMiddleware>(routePattern, handler, metadata);
+
+        // This is required to enable the OData batch request.
+        // Otherwise, the sub requests will not be routed correctly.
+        return app.UseRouting();
     }
 
     /// <summary>

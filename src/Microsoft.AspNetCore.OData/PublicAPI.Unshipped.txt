@@ -1,3 +1,6 @@
+Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware
+Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext context) -> System.Threading.Tasks.Task
+Microsoft.AspNetCore.OData.Batch.ODataMiniBatchMiddleware.ODataMiniBatchMiddleware(string routePattern, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler handler, Microsoft.AspNetCore.OData.ODataMiniMetadata metadata, Microsoft.AspNetCore.Http.RequestDelegate next) -> void
 Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration
 Microsoft.AspNetCore.OData.Edm.IODataModelConfiguration.Apply(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.OData.ModelBuilder.ODataModelBuilder builder, System.Type clrType) -> Microsoft.OData.ModelBuilder.ODataModelBuilder
 Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext
@@ -29,6 +32,7 @@ Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.Count() -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.EnableAll(int? maxTopValue = null) -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.EnableCaseInsensitive.get -> bool
+Microsoft.AspNetCore.OData.ODataMiniOptions.EnableContinueOnErrorHeader.get -> bool
 Microsoft.AspNetCore.OData.ODataMiniOptions.EnableNoDollarQueryOptions.get -> bool
 Microsoft.AspNetCore.OData.ODataMiniOptions.Expand() -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.Filter() -> Microsoft.AspNetCore.OData.ODataMiniOptions
@@ -37,6 +41,7 @@ Microsoft.AspNetCore.OData.ODataMiniOptions.OrderBy() -> Microsoft.AspNetCore.OD
 Microsoft.AspNetCore.OData.ODataMiniOptions.QueryConfigurations.get -> Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations
 Microsoft.AspNetCore.OData.ODataMiniOptions.Select() -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.SetCaseInsensitive(bool enableCaseInsensitive) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetContinueOnErrorHeader(bool enableContinueOnErrorHeader) -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(int? maxTopValue) -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(bool enableNoDollarQueryOptions) -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataMiniOptions.SetTimeZoneInfo(System.TimeZoneInfo tzi) -> Microsoft.AspNetCore.OData.ODataMiniOptions
@@ -62,6 +67,8 @@ static Microsoft.AspNetCore.OData.Deltas.Delta<T>.BindAsync(Microsoft.AspNetCore
 static Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Deltas.DeltaSet<T>>
 static Microsoft.AspNetCore.OData.Formatter.ODataActionParameters.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Formatter.ODataActionParameters>
 static Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Formatter.ODataUntypedActionParameters>
+static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataMiniBatching(this Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern, Microsoft.OData.Edm.IEdmModel model) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
+static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataMiniBatching(this Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern, Microsoft.OData.Edm.IEdmModel model, Microsoft.AspNetCore.OData.Batch.ODataBatchHandler handler, System.Action<Microsoft.Extensions.DependencyInjection.IServiceCollection> configAction = null) -> Microsoft.AspNetCore.Builder.IApplicationBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Builder.RouteHandlerBuilder builder, Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter queryFilter) -> Microsoft.AspNetCore.Builder.RouteHandlerBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Builder.RouteHandlerBuilder builder, System.Action<Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings> validationSetup = null, System.Action<Microsoft.AspNetCore.OData.Query.ODataQuerySettings> querySetup = null) -> Microsoft.AspNetCore.Builder.RouteHandlerBuilder
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.AddODataQueryEndpointFilter(this Microsoft.AspNetCore.Routing.RouteGroupBuilder builder, Microsoft.AspNetCore.OData.Query.IODataQueryEndpointFilter queryFilter) -> Microsoft.AspNetCore.Routing.RouteGroupBuilder
