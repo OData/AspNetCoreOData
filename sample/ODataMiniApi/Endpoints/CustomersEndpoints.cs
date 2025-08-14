@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -173,6 +174,16 @@ public static class CustomersEndpoints
                     IEdmEntitySet customers = model.FindDeclaredEntitySet("Customers");
                     return new ODataPath(new EntitySetSegment(customers));
                 });
+
+        app.MapGet("page/customers", (AppDb db, ODataQueryOptions<Customer> queryOptions) =>
+        {
+            db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+
+            int skip = queryOptions.Skip?.Value ?? 0;
+            return new PageResult<Customer>(db.Customers, new Uri($"/page/customers?$skip={skip}", UriKind.Relative), count: db.Customers.Count());
+        })
+            .WithODataResult()
+            .WithODataModel(model);
         return app;
     }
 

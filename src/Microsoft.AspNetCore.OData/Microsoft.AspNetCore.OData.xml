@@ -3083,7 +3083,7 @@
             Helper to generate next page links.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Extensions.GetNextPageHelper.GetNextPageLink(System.Uri,System.Int32,System.Object,System.Func{System.Object,System.String})">
+        <member name="M:Microsoft.AspNetCore.OData.Extensions.GetNextPageHelper.GetNextPageLink(System.Uri,System.Int32,System.Object,System.Func{System.Object,System.String},System.Boolean)">
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Extensions.HttpContextExtensions">
