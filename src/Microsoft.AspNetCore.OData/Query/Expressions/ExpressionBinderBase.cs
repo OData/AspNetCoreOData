@@ -724,7 +724,18 @@ public abstract class ExpressionBinderBase
         Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
 
         Expression source = arguments.Length == 1 ? this.Parameter : arguments[0];
-        string targetTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
+
+        string targetTypeName = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
+        {
+            targetTypeName = (string)constantNode.Value;
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            targetTypeName = singleResourceCastNode.TypeReference.FullName();
+        }
+
         IEdmType targetEdmType = Model.FindType(targetTypeName);
         Type targetClrType = null;
 
