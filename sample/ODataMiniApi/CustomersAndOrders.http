@@ -135,8 +135,12 @@ Content-Type: application/json
 # You will get the following response:
 #
 #{
-#  "@odata.context": "http://localhost:5177/$metadata#Edm.String",
-#  "value": "EdmActionName: 'Rating': rate based on '8'"
+#  "@odata.context": "http://localhost:5177/$metadata#Customers",
+#  "@odata.count": 4,
+#  "value": [
+#  ......
+#  ]
+#  "@odata.nextLink": "/page/customers?$skip=0"
 #}
 
 GET {{ODataMiniApi_HostAddress}}/page/customers

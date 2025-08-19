@@ -24,6 +24,13 @@ public static class CustomersEndpoints
 {
     public static IEndpointRouteBuilder MapCustomersEndpoints(this IEndpointRouteBuilder app, IEdmModel model)
     {
+        ODataMessageWriterSettings settings = new ODataMessageWriterSettings
+        {
+            EnableMessageStreamDisposal = false,
+            MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+        };
+        settings.SetOmitODataPrefix(false);
+
         app.MapGet("/customers", (AppDb db) => db.Customers.Include(s => s.Orders))
            //.WithODa
             .WithODataResult() // default: built the complex type property by default?
@@ -31,7 +38,10 @@ public static class CustomersEndpoints
             // If no query, define them as complex type?
             .WithODataModel(model)
             .WithODataVersion(ODataVersion.V401)
-            .WithODataBaseAddressFactory(c => new Uri("http://abc.com"));
+            .WithODataBaseAddressFactory(c => new Uri("http://abc.com"))
+
+            .WithODataServices(s => s.AddScoped(sp => settings)) // Use this to inject the ODataMessageWriterSettings to get the 'odata' prefix in the response, in OData V4.01, 'odata' prefix is not added by default.
+            ;
         //.WithODataServices(c => c.AddSingleton<ODataMessageWriterSettings>;
 
         // app.MapGet("v0/customers", (AppDb db) => Results.Extensions.AsOData(db.Customers.Include(s => s.Orders)));
