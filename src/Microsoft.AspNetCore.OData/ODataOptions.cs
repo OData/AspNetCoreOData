@@ -320,7 +320,7 @@ public class ODataOptions
         services.AddSingleton(sp => this.QueryConfigurations);
 
         // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices();
+        services.AddDefaultWebApiServices(version);
 
         // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
         services.AddSingleton<ODataUriResolver>(sp =>

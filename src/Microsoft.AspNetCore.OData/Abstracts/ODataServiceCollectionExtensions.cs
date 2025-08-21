@@ -23,8 +23,9 @@ internal static class ODataServiceCollectionExtensions
     /// Injects the default Web API OData services.
     /// </summary>
     /// <param name="services">The service collection.</param>
+    /// <param name="version">An <see cref="ODataVersion" /> specifying which OData version to support. Defaults to <see cref="ODataVersion.V4" />.</param>
     /// <returns>The calling itself.</returns>
-    public static IServiceCollection AddDefaultWebApiServices(this IServiceCollection services)
+    public static IServiceCollection AddDefaultWebApiServices(this IServiceCollection services, ODataVersion version = ODataVersion.V4)
     {
         if (services == null)
         {
@@ -38,7 +39,7 @@ internal static class ODataServiceCollectionExtensions
         // ReaderSettings and WriterSettings are registered as prototype services.
         // There will be a copy (if it is accessed) of each prototype for each request.
 #pragma warning disable CS0618 // ReadUntypedAsString is obsolete in ODL 8.
-        services.AddScoped(sp => new ODataMessageReaderSettings
+        services.AddScoped(sp => new ODataMessageReaderSettings(version)
         {
             EnableMessageStreamDisposal = false,
             MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
@@ -53,7 +54,7 @@ internal static class ODataServiceCollectionExtensions
         });
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        services.AddScoped(sp => new ODataMessageWriterSettings
+        services.AddScoped(sp => new ODataMessageWriterSettings(version)
         {
             EnableMessageStreamDisposal = false,
             MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },

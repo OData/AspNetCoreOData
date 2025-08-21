@@ -282,11 +282,12 @@
             </summary>
             <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddDefaultWebApiServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddDefaultWebApiServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.OData.ODataVersion)">
             <summary>
             Injects the default Web API OData services.
             </summary>
             <param name="services">The service collection.</param>
+            <param name="version">An <see cref="T:Microsoft.OData.ODataVersion" /> specifying which OData version to support. Defaults to <see cref="F:Microsoft.OData.ODataVersion.V4" />.</param>
             <returns>The calling itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">

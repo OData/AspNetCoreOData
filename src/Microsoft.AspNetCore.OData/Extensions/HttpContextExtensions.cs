@@ -300,7 +300,7 @@ public static class HttpContextExtensions
         services.AddSingleton(sp => miniOptions.QueryConfigurations);
 
         // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices();
+        services.AddDefaultWebApiServices(miniOptions.Version);
 
         // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
         services.AddSingleton<ODataUriResolver>(sp =>
