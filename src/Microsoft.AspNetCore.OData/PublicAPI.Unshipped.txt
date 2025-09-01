@@ -86,9 +86,16 @@ static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithO
 static Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataVersion<TBuilder>(this TBuilder builder, Microsoft.OData.ODataVersion version) -> TBuilder
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
 static Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions.AddOData(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<Microsoft.AspNetCore.OData.ODataMiniOptions> setupAction) -> Microsoft.Extensions.DependencyInjection.IServiceCollection
+static Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(Microsoft.OData.Edm.IEdmModel model, string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo) -> void
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.BindAsync(Microsoft.AspNetCore.Http.HttpContext context, System.Reflection.ParameterInfo parameter) -> System.Threading.Tasks.ValueTask<Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>>
 static Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.PopulateMetadata(System.Reflection.ParameterInfo parameter, Microsoft.AspNetCore.Builder.EndpointBuilder builder) -> void
 static readonly Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.MapperProvider -> System.Func<Microsoft.OData.Edm.IEdmModel, Microsoft.OData.Edm.IEdmStructuredType, Microsoft.AspNetCore.OData.Query.Container.IPropertyMapper>
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildReferenceTypeMapping<T>(Microsoft.OData.Edm.EdmPrimitiveTypeKind primitiveKind, bool isStandard = true) -> void
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildTypeMapping<T>(Microsoft.OData.Edm.EdmPrimitiveTypeKind primitiveKind, bool isStandard) -> void
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildValueTypeMapping<T>(Microsoft.OData.Edm.EdmPrimitiveTypeKind primitiveKind, bool isStandard = true) -> void
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.RegisterDefaultMappings() -> void
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.RegisterNonStandardMappings() -> void
+virtual Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.RegisterSpatialMappings() -> void
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(object entity, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> object
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ApplyQuery(System.Linq.IQueryable queryable, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings) -> System.Linq.IQueryable
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateAndValidateQueryOptions(Microsoft.AspNetCore.Http.HttpContext httpContext, Microsoft.AspNetCore.OData.Query.ODataQueryContext queryContext) -> Microsoft.AspNetCore.OData.Query.ODataQueryOptions

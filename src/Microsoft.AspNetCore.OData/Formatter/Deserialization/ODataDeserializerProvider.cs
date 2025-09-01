@@ -52,6 +52,11 @@ public class ODataDeserializerProvider: IODataDeserializerProvider
                 return _serviceProvider.GetRequiredService<ODataEnumDeserializer>();
 
             case EdmTypeKind.Primitive:
+                if (edmType.IsSpatial())
+                {
+                    return _serviceProvider.GetRequiredService<ODataSpatialDeserializer>();
+                }
+
                 return _serviceProvider.GetRequiredService<ODataPrimitiveDeserializer>();
 
             case EdmTypeKind.Collection:

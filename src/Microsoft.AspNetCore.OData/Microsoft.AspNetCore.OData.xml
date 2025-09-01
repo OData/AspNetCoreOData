@@ -2095,7 +2095,7 @@
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.Default">
             <summary>
-            Creates a static instance for the Default type mapper.
+            Creates a static instance for the default type mapper.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.ClrPrimitiveTypes">
@@ -2109,6 +2109,58 @@
             Item1 --> non-nullable
             Item2 --> nullable
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper"/>.
+            </summary>
+            <remarks>
+            The constructor wires up three buckets of primitive mappings:
+            - Standard primitives: 1:1 CLR-to-Edm mappings that require no runtime conversion.
+            - Spatial primitives: Microsoft.Spatial geography/geometry types to Edm spatial kinds.
+            - Non-standard primitives: CLR types that do not have an Edm counterpart and are represented
+              by another Edm primitive (for example, <see cref="T:System.Char"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.String"/>,
+              <see cref="T:System.UInt32"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.Int64"/>).
+            Non-standard mappings are intentionally not added to reverse Edm → CLR lookup so they don't leak into the model
+            and are instead normalized at query-time.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.RegisterDefaultMappings">
+            <summary>
+            Registers the standard CLR-to-Edm primitive mappings.
+            </summary>
+            <remarks>
+            “Standard” means the CLR type has a direct Edm primitive equivalent and can round-trip without
+            normalization or provider-specific conversions during query translation.
+            Override to add/remove mappings or to change the defaults for a custom stack.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.RegisterNonStandardMappings">
+            <summary>
+            Registers non-standard CLR primitive mappings that are represented by another Edm primitive.
+            </summary>
+            <remarks>
+            Examples of non-standard CLR types and their Edm representations:
+            - <see cref="T:System.UInt16"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.Int32"/>
+            - <see cref="T:System.UInt32"/>, <see cref="T:System.UInt64"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.Int64"/>
+            - <see cref="T:System.Char"/>, <see cref="T:System.Char"/>[], <see cref="T:System.Xml.Linq.XElement"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.String"/>
+            - <see cref="T:System.DateTime"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.DateTimeOffset"/>
+            - <see cref="T:System.DateOnly"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.Date"/>
+            - <see cref="T:System.TimeOnly"/> → <see cref="F:Microsoft.OData.Edm.EdmPrimitiveTypeKind.TimeOfDay"/>
+            These mappings are used for CLR → Edm lookups. They are not registered in the reverse Edm → CLR table:
+            the query binder normalizes such values at runtime,
+            ensuring providers (e.g., EF Core) receive supported primitives.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.RegisterSpatialMappings">
+            <summary>
+            Registers geography/geometry CLR types to Edm spatial primitive kinds.
+            </summary>
+            <remarks>
+            This mapping assumes Microsoft.Spatial abstractions are used for Edm spatial types on the wire.
+            If your application introduces an alternate spatial stack, override this method to register the desired
+            CLR spatial types to Edm geography/geometry kinds.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.GetEdmPrimitiveType(System.Type)">
             <summary>
@@ -2157,17 +2209,48 @@
             <param name="assembliesResolver">The assembly resolver.</param>
             <returns>Null or the CLR type.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildTypeMapping``1(Microsoft.OData.Edm.EdmPrimitiveTypeKind,System.Boolean)">
+            <summary>
+            Adds a CLR-to-EDM primitive mapping entry.
+            </summary>
+            <typeparam name="T">The CLR type being mapped.</typeparam>
+            <param name="primitiveKind">The Edm primitive kind to map to.</param>
+            <param name="isStandard">
+            Whether this is a “standard” mapping (true) or a “non-standard” normalization mapping (false).
+            Standard mappings are also registered for reverse Edm → CLR lookup; non-standard mappings are not,
+            so the CLR non-standard type will not appear in Edm → CLR resolutions and will be normalized at bind-time.
+            </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildValueTypeMapping``1(Microsoft.OData.Edm.EdmPrimitiveTypeKind,System.Boolean)">
+            <summary>
+            Adds a value-type CLR → Edm mapping for both nullable and non-nullable variants.
+            </summary>
+            <typeparam name="T">The non-nullable CLR value type (struct).</typeparam>
+            <param name="primitiveKind">The Edm primitive kind to map to.</param>
+            <param name="isStandard">
+            Whether this is a “standard” mapping (true) or a “non-standard” normalization mapping (false).
+            See <see cref="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildTypeMapping``1(Microsoft.OData.Edm.EdmPrimitiveTypeKind,System.Boolean)"/> for behavior differences.
+            </param>
+            <remarks>
+            Ordering matters: nullable is registered first so the reverse Edm → CLR cache can correctly store both
+            nullable and non-nullable standard targets.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildReferenceTypeMapping``1(Microsoft.OData.Edm.EdmPrimitiveTypeKind,System.Boolean)">
+            <summary>
+            Adds a reference-type CLR → Edm mapping.
+            </summary>
+            <typeparam name="T">The CLR reference type (class).</typeparam>
+            <param name="primitiveKind">The Edm primitive kind to map to.</param>
+            <param name="isStandard">
+            Whether this is a “standard” mapping (true) or a “non-standard” normalization mapping (false).
+            See <see cref="M:Microsoft.AspNetCore.OData.Edm.DefaultODataTypeMapper.BuildTypeMapping``1(Microsoft.OData.Edm.EdmPrimitiveTypeKind,System.Boolean)"/> for behavior differences.
+            </param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions">
             <summary>
             The extensions used to map between C# types and Edm types.
             </summary>
-        </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveTypeReference(System.Type)">
-            <summary>
-            Gets the corresponding Edm primitive type <see cref="T:Microsoft.OData.Edm.IEdmPrimitiveTypeReference"/> for a given <see cref="T:System.Type"/> type.
-            </summary>
-            <param name="clrType">The given CLR type.</param>
-            <returns>Null or the Edm primitive type.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmClrTypeMapExtensions.GetEdmPrimitiveTypeReference(Microsoft.OData.Edm.IEdmModel,System.Type)">
             <summary>
@@ -2450,12 +2533,19 @@
             <param name="enableCaseInsensitive">Enable case insensitive</param>
             <returns>Null or the found navigation source.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.IsEnumOrCollectionEnum(Microsoft.OData.Edm.IEdmTypeReference)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.IsPrimitiveOrCollectionOfPrimitive(Microsoft.OData.Edm.IEdmTypeReference)">
             <summary>
-            Tests type reference is enum or collection enum
+            Checks if type reference is a primitive or a collection of primitives.
             </summary>
-            <param name="edmType"></param>
-            <returns></returns>
+            <param name="edmType">The EDM type reference to check.</param>
+            <returns><c>true</c> if the EDM type reference is a primitive or a collection of primitives; otherwise, <c>false</c>.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.IsEnumOrCollectionOfEnum(Microsoft.OData.Edm.IEdmTypeReference)">
+            <summary>
+            Checks if type reference is an enum or a collection of enums.
+            </summary>
+            <param name="edmType">The EDM type reference to check.</param>
+            <returns><c>true</c> if the EDM type reference is an enum or a collection of enums; otherwise, <c>false</c>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Edm.EdmModelExtensions.FindTypeInInheritance(Microsoft.OData.Edm.IEdmStructuredType,Microsoft.OData.Edm.IEdmModel,System.String,System.Boolean)">
             <summary>
@@ -3864,6 +3954,19 @@
             <param name="elementType">The element type of the parent resource set being read.</param>
             <param name="readContext">The deserializer context.</param>
             <returns>The deserialized resource set object.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataSpatialDeserializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializer"/> that can read OData spatial types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataSpatialDeserializer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataSpatialDeserializer"/> class.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataSpatialDeserializer.ReadInline(System.Object,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.AspNetCore.OData.Formatter.Deserialization.ODataDeserializerContext)">
+            <inheritdoc />
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.EdmLibHelper.GetExpectedPayloadType(System.Type,Microsoft.OData.UriParser.ODataPath,Microsoft.OData.Edm.IEdmModel)">
             <summary>
@@ -5448,6 +5551,16 @@
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataServiceDocumentSerializer.WriteObjectAsync(System.Object,System.Type,Microsoft.OData.ODataMessageWriter,Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializerContext)">
             <inheritdoc/>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSpatialSerializer">
+            <summary>
+            Represents an <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSerializer"/> for serializing spatial types.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSpatialSerializer.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.OData.Formatter.Serialization.ODataSpatialSerializer"/>.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Formatter.Serialization.SelectExpandNode">
             <summary>
@@ -7273,24 +7386,26 @@
             OData UriFunctions helper.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(System.String,Microsoft.OData.UriParser.FunctionSignatureWithReturnType,System.Reflection.MethodInfo)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataUriFunctions.AddCustomUriFunction(Microsoft.OData.Edm.IEdmModel,System.String,Microsoft.OData.UriParser.FunctionSignatureWithReturnType,System.Reflection.MethodInfo)">
             <summary>
             This is a shortcut of adding the custom FunctionSignature through 'CustomUriFunctions' class and
             binding the function name to it's MethodInfo through 'UriFunctionsBinder' class.
             See these classes documentations.
             In case of an exception, both operations(adding the signature and binding the function) will be undone.
             </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to which the function signature will be added.</param>
             <param name="functionName">The uri function name that appears in the OData request uri.</param>
             <param name="functionSignature">The new custom function signature.</param>
             <param name="methodInfo">The MethodInfo to bind the given function name.</param>
             <exception cref="T:System.Exception">Any exception thrown by 'CustomUriFunctions.AddCustomUriFunction' and 'UriFunctionBinder.BindUriFunctionName' methods.</exception>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(System.String,Microsoft.OData.UriParser.FunctionSignatureWithReturnType,System.Reflection.MethodInfo)">
+        <member name="M:Microsoft.AspNetCore.OData.ODataUriFunctions.RemoveCustomUriFunction(Microsoft.OData.Edm.IEdmModel,System.String,Microsoft.OData.UriParser.FunctionSignatureWithReturnType,System.Reflection.MethodInfo)">
             <summary>
             This is a shortcut of removing the FunctionSignature through 'CustomUriFunctions' class and
             unbinding the function name from it's MethodInfo through 'UriFunctionsBinder' class.
             See these classes documentations.
             </summary>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> to which the function signature will be removed.</param>
             <param name="functionName">The uri function name that appears in the OData request uri.</param>
             <param name="functionSignature">The new custom function signature.</param>
             <param name="methodInfo">The MethodInfo to bind the given function name.</param>

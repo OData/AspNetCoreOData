@@ -48,7 +48,7 @@ public class ODataPrimitiveDeserializer : ODataEdmTypeDeserializer
     }
 
     /// <inheritdoc />
-    public sealed override object ReadInline(object item, IEdmTypeReference edmType, ODataDeserializerContext readContext)
+    public override object ReadInline(object item, IEdmTypeReference edmType, ODataDeserializerContext readContext)
     {
         if (item == null)
         {

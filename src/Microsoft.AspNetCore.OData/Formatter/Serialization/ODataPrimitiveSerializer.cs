@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
 
@@ -47,7 +48,16 @@ public class ODataPrimitiveSerializer : ODataEdmTypeSerializer
             throw Error.Argument("writeContext", SRResources.RootElementNameMissing, typeof(ODataSerializerContext).Name);
         }
 
-        IEdmTypeReference edmType = writeContext.GetEdmType(graph, type);
+        IEdmTypeReference propertyType = null;
+        if (writeContext.Path != null && writeContext.Path.LastSegment is PropertySegment propertySegment)
+        {
+            propertyType = writeContext.Path.EdmType();
+        }
+
+        // TODO: What strategy can we use to map NTS spatial values to both Geometry and Geography EDM types?
+        // Or is it sufficient to rely on the property's EDM type in the case of spatial values?
+        // If the property type is spatial, we use it as the collection type.
+        IEdmTypeReference edmType = (propertyType != null && propertyType.IsSpatial()) ? propertyType : writeContext.GetEdmType(graph, type);
         Contract.Assert(edmType != null);
 
         await messageWriter.WritePropertyAsync(this.CreateProperty(graph, edmType, writeContext.RootElementName, writeContext)).ConfigureAwait(false);
@@ -83,7 +93,8 @@ public class ODataPrimitiveSerializer : ODataEdmTypeSerializer
         return CreatePrimitive(graph, primitiveType, writeContext);
     }
 
-    internal static void AddTypeNameAnnotationAsNeeded(ODataPrimitiveValue primitive, IEdmPrimitiveTypeReference primitiveType,
+    // TODO: Add method to public API and provide missing XML comments.
+    public static void AddTypeNameAnnotationAsNeeded(ODataPrimitiveValue primitive, IEdmPrimitiveTypeReference primitiveType,
         ODataMetadataLevel metadataLevel)
     {
         // ODataLib normally has the caller decide whether or not to serialize properties by leaving properties
