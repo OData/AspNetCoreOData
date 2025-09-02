@@ -26,9 +26,9 @@ Using .NET CLI:
 dotnet add package Microsoft.AspNetCore.OData
 ```
 
-### Minimal example (Program.cs)
+### Example - Configure OData
 
-This minimal example shows how to register OData and expose an entity set named `Products`.
+This simple example shows how to register OData and expose an entity set named `Products`.
 
 ```csharp
 using Microsoft.AspNetCore.Builder;
@@ -44,7 +44,7 @@ builder.Services
     .AddControllers()
     .AddOData(options =>
         options.AddRouteComponents("odata", GetEdmModel())
-               .EnableQueryFeatures(100)); // optional: sets maxTop for query features
+               .Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)); 
 
 var app = builder.Build();
 
