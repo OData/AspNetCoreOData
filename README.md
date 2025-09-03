@@ -7,168 +7,129 @@ ASP.NET Core OData|Rolling | [![Build Status](https://identitydivision.visualstu
 ASP.NET Core OData|Nightly | [![Build Status](https://identitydivision.visualstudio.com/OData/_apis/build/status%2FAspNetCoreOData%2FAspNetCoreOData-main-nightly-1ES?repoName=OData%2FAspNetCoreOData&branchName=main)](https://identitydivision.visualstudio.com/OData/_build/latest?definitionId=2404&repoName=OData%2FAspNetCoreOData&branchName=main)
 .NET Foundation|Release|[![Build status](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)](https://dev.azure.com/dotnet/OData/_apis/build/status/AspNetCoreOData/AspNetCoreOData-main-Yaml-release?branchName=main)
 
-## 1. Basic Usage
 
-### Microsoft.AspNetCore.OData Package Installation
+A server-side OData library for ASP.NET Core. Use this project to create OData services on top of ASP.NET Core and ODataLib. It provides routing, query handling, model building, formatters and more.
+
+Quick links
+- NuGet: https://www.nuget.org/packages/Microsoft.AspNetCore.OData/
+- Documentation: https://learn.microsoft.com/odata/webapi-8/
+- Samples: ./sample
+- Source: https://github.com/OData/AspNetCoreOData
+
+---
+
+## Quick start
+
 Using .NET CLI:
+
 ```bash
 dotnet add package Microsoft.AspNetCore.OData
 ```
 
-Using Package Manager:
-```bash
-Install-Package Microsoft.AspNetCore.OData
+### Example - Configure OData
+
+This simple example shows how to register OData and expose an entity set named `Products`.
+
+```csharp
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.OData;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Register controllers and OData
+builder.Services
+    .AddControllers()
+    .AddOData(options =>
+        options.AddRouteComponents("odata", GetEdmModel())
+               .Select().Filter().OrderBy().Expand().Count().SetMaxTop(null)); 
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    // Helpful only during development
+    app.UseODataRouteDebug();
+}
+
+app.UseRouting();
+app.MapControllers();
+app.Run();
+
+static IEdmModel GetEdmModel()
+{
+    var builder = new ODataConventionModelBuilder();
+    builder.EntitySet<Product>("Products");
+    return builder.GetEdmModel();
+}
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
 ```
 
-### Getting Started
+### Example controller (ODataController)
 
-#### Creating an OData Service
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.OData.Query;
 
-Here's a simple example of how to create an OData service using `Microsoft.AspNetCore.OData`:
-
-**I. Create an ASP.NET Core Application**:
-- Open Visual Studio and create a new ASP.NET Core Web API project.
-
-**II. Add the `Microsoft.AspNetCore.OData` Package**:
-- Install the package using the instructions above.
-
-**III. Define Your Models**:
-- Create your data models. For example:
-  ```cs
-    namespace MyODataApp.Models
+public class ProductsController : ODataController
+{
+    private static List<Product> products = new List<Product>
     {
-        public class Product
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public decimal Price { get; set; }
-        }
-    }
-  ```
+      new Product { Id = 1, Name = "Product 1", Price = 10.0M },
+      new Product { Id = 2, Name = "Product 2", Price = 20.0M }
+    };
 
-**IV. Add an OData Controller**:
-- Create a controller to handle OData requests:
-  ```cs
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.OData.Routing.Controllers;
-    using MyODataApp.Models;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    namespace MyODataApp.Controllers
+    [EnableQuery]
+    public IActionResult Get()
     {
-        public class ProductsController : ODataController
-        {
-            private static List<Product> products = new List<Product>
-            {
-                new Product { Id = 1, Name = "Product 1", Price = 10.0M },
-                new Product { Id = 2, Name = "Product 2", Price = 20.0M }
-            };
-
-            [EnableQuery]
-            public IActionResult Get()
-            {
-                return Ok(products);
-            }
-
-            [EnableQuery]
-            public IActionResult Get(int key)
-            {
-                var product = products.FirstOrDefault(p => p.Id == key);
-                if (product == null)
-                {
-                    return NotFound();
-                }
-                return Ok(product);
-            }
-        }
+      return Ok(products);
     }
-  ```
 
-**V. Configure OData in `Startup.cs`**:
-- Configure OData routes and services:
-
-- If you work with `Program.cs`, update as below. Refer to the [Getting Started Guide](https://learn.microsoft.com/odata/webapi-8/getting-started).
-
-  ```cs
-    // using statements
-    var builder = WebApplication.CreateBuilder(args);
-
-    var modelBuilder = new ODataConventionModelBuilder();
-    modelBuilder.EntityType<Order>();
-    modelBuilder.EntitySet<Customer>("Customers");
-
-    builder.Services.AddControllers().AddOData(
-        options => options.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null).AddRouteComponents(
-            "odata",
-            GetEdmModel()));
-
-    var app = builder.Build();
-
-    // Send "~/$odata" to debug routing if enable the following middleware
-    // app.UseODataRouteDebug();
-    app.UseRouting();
-
-    app.MapControllers();
-
-    app.Run();
-
-    static IEdmModel GetEdmModel()
+    [EnableQuery]
+    public IActionResult Get(int key)
     {
-        var builder = new ODataConventionModelBuilder();
-        builder.EntitySet<Product>("Products");
-        return builder.GetEdmModel();
+      var product = products.FirstOrDefault(p => p.Id == key);
+      if (product == null)
+      {
+          return NotFound();
+      }
+      return Ok(product);
     }
-  ```
+}
+```
 
-  ```cs
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Hosting;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.OData.Edm;
-    using Microsoft.OData.ModelBuilder;
+For more examples (including Minimal API samples) see the `sample` folder in this repository.
 
-    namespace MyODataApp
-    {
-        public class Startup
-        {
-            public void ConfigureServices(IServiceCollection services)
-            {
-                services.AddControllers();
-                services.AddOData(opt => opt.AddModel("odata", GetEdmModel()).Filter().Select().Expand().OrderBy().Count().SetMaxTop(100));
-            }
+---
 
-            public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-            {
-                // Send "~/$odata" to debug routing if enable the following middleware
-                // app.UseODataRouteDebug();
-                app.UseRouting();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                    endpoints.Select().Expand().Filter().OrderBy().Count().MaxTop(100);
-                    endpoints.MapODataRoute("odata", "odata", GetEdmModel());
-                });
-            }
+## Samples
 
-            private static IEdmModel GetEdmModel()
-            {
-                var builder = new ODataConventionModelBuilder();
-                builder.EntitySet<Product>("Products");
-                return builder.GetEdmModel();
-            }
-        }
-    }
-  ```
+This repository includes a set of example applications under the `sample` directory. Notable samples:
 
-**VI. Run Your Application**:
+- `sample/ODataRoutingSample` — a full Web API sample showing routing, $metadata and Swagger integration.
+- `sample/ODataMiniApi` — examples of Minimal API style OData endpoints.
 
-- Start your application and navigate to `/odata/Products` to see your OData service in action.
+Run a sample:
 
+```bash
+cd sample/ODataRoutingSample
+dotnet run
+```
 
-**That's it.**
+Then browse to `http://localhost:5000/odata/Products` (port may vary) to inspect the service.
 
-## 2. Github Repository
+---
+
+## Github Repository
 
 This is the official ASP.NET Core OData repository.
 [ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0) is a server side library built upon ODataLib and ASP.NET Core.
@@ -218,22 +179,24 @@ For comprehensive documentation, please refer to the following links:
  
    - Includes **Microsoft.AspNetCore.OData.NewtonsoftJson** project, Unit Test, E2E Test & Samples
 
-## 3. Building, Testing, Debugging and Release
+---
 
-### 3.1 Building and Testing in Visual Studio
+## Building, Testing, Debugging and Release
+
+### 1. Building and Testing in Visual Studio
 
 Visual Studio 2022 is required to build the source project in order to support the `DateOnly` and `TimeOnly` types, which were introduced in .NET 6.
 
-### 3.2 One-click build and test script in command line
+### 2. One-click build and test script in command line
 Coming soon.
 
-### 3.3 Debug
+### 3. Debug
 
 The symbol package is uploaded to nuget symbol server. 
 
 It supports source link debug. Remember to check `Enable Source Link support` if you debug using Visual Studio.
 
-### 3.4 Nightly Builds
+### 4. Nightly Builds
 
 The nightly build process will upload NuGet packages for ASP.NET Core OData to:
 
@@ -245,7 +208,9 @@ To connect to webapinightly feed, use this feed URL:
 
 * https://www.myget.org/F/webapinetcore/api/v2 Your NuGet V2 feed URL (Visual Studio 2012+)
 
-## 4. Documentation
+---
+
+## Documentation
 
 * [ODataRoutingSample](https://github.com/OData/AspNetCoreOData/tree/main/sample/ODataRoutingSample): ASP.NET Core OData sample project in this repo.
 
@@ -253,28 +218,34 @@ To connect to webapinightly feed, use this feed URL:
 
 * [Our docs folder](./docs): Our current documentation
 
-## 5. Community
+---
 
-### 5.1 Contribution
+## Community
+
+### 1. Contribution
 
 Any contributions, feature requests, bugs and issues are welcome.
 
-### 5.2 Reporting Security Issues
+### 2. Reporting Security Issues
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) <secure@microsoft.com>. You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message. Further information, including the MSRC PGP key, can be found in the [Security TechCenter](https://www.microsoft.com/msrc/faqs-report-an-issue). You can also find these instructions in this repo's [SECURITY.md](./SECURITY.md).
 
-### 5.3 Support
+### 3. Support
 
 - Issues: Report issues on [Github issues](https://github.com/OData/AspNetCoreOData/issues).
 - Questions: Ask questions on [Stack Overflow](http://stackoverflow.com/questions/ask?tags=odata).
 - Feedback: Please send mails to [odatafeedback@microsoft.com](mailto:odatafeedback@microsoft.com).
 - Team blog: Please visit [https://devblogs.microsoft.com/odata/](https://devblogs.microsoft.com/odata/) and [http://www.odata.org/blog/](http://www.odata.org/blog/).
 
-### Code of Conduct
+---
+
+## Code of Conduct
 
 This project has adopted the [.NET Foundation Contributor Covenant Code of Conduct](https://dotnetfoundation.org/about/policies/code-of-conduct). For more information see the [Code of Conduct FAQ](https://dotnetfoundation.org/about/faq).
 
-### .NET Foundation
+---
+
+## .NET Foundation
 
 This project is supported by the [.NET Foundation](https://dotnetfoundation.org).
 
