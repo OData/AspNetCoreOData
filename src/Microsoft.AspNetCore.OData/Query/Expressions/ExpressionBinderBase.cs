@@ -307,7 +307,16 @@ public abstract class ExpressionBinderBase
             return FalseConstant;
         }
 
-        string typeName = (string)((ConstantNode)node.Parameters.Last()).Value;
+        string typeName = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
+        {
+            typeName = (string)constantNode.Value;
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            typeName = singleResourceCastNode.TypeReference.FullName();
+        }
 
         IEdmType edmType = Model.FindType(typeName);
         Type clrType = null;
@@ -715,7 +724,18 @@ public abstract class ExpressionBinderBase
         Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
 
         Expression source = arguments.Length == 1 ? this.Parameter : arguments[0];
-        string targetTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
+
+        string targetTypeName = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
+        {
+            targetTypeName = (string)constantNode.Value;
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            targetTypeName = singleResourceCastNode.TypeReference.FullName();
+        }
+
         IEdmType targetEdmType = Model.FindType(targetTypeName);
         Type targetClrType = null;
 
