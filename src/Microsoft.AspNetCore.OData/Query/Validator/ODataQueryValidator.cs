@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
@@ -123,19 +126,223 @@ public class ODataQueryValidator : IODataQueryValidator
         }
     }
 
+    /// <summary>
+    /// Try validates the OData query.
+    /// </summary>
+    /// <param name="options">The OData query to validate.</param>
+    /// <param name="validationSettings">The settings used for validation.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns>True if validation is successful; otherwise, false.</returns>
+    public virtual bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+    {
+        List<string> errors = null;
+
+        if (options == null || validationSettings == null)
+        {
+            // Pre-allocate with a reasonable default capacity.
+            errors = new List<string>(2);
+
+            // Validate input parameters
+            if (options == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(options)).Message);
+            }
+
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
+            validationErrors = errors;
+            return false;
+        }
+
+        // To prevent duplicates in the `errors` list, ensure that each error is unique before adding it.
+        // Modify the `AddValidationErrors` helper function to check for duplicates.
+        void AddValidationErrors(IEnumerable<string> queryOptionErrors)
+        {
+            if (queryOptionErrors == null)
+            {
+                return;
+            }
+
+            // Pre-allocate with a reasonable default capacity.
+            errors ??= new List<string>(4);
+
+            // If errors list is not empty, we need to ensure uniqueness.
+            var uniqueErrors = queryOptionErrors
+                .Where(error => !errors.Any(e => e == error));
+
+            errors.AddRange(uniqueErrors);
+        }
+
+        // Validate each query option and add errors if any.
+        if (options.Compute != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Compute, validationSettings.AllowedQueryOptions, out IEnumerable<string> computeErrors);
+            AddValidationErrors(computeErrors);
+
+            if (!options.Compute.TryValidate(validationSettings, out IEnumerable<string> computeValidationErrors))
+            {
+                AddValidationErrors(computeValidationErrors);
+            }
+        }
+
+        if (options.Apply?.ApplyClause != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions, out IEnumerable<string> applyErrors);
+            AddValidationErrors(applyErrors);
+        }
+
+        if (options.Skip != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Skip, validationSettings.AllowedQueryOptions, out IEnumerable<string> skipErrors);
+            AddValidationErrors(skipErrors);
+
+            if (!options.Skip.TryValidate(validationSettings, out IEnumerable<string> skipValidationErrors))
+            {
+                AddValidationErrors(skipValidationErrors);
+            }
+        }
+
+        if (options.Top != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Top, validationSettings.AllowedQueryOptions, out IEnumerable<string> topErrors);
+            AddValidationErrors(topErrors);
+
+            if (!options.Top.TryValidate(validationSettings, out IEnumerable<string> topValidationErrors))
+            {
+                AddValidationErrors(topValidationErrors);
+            }
+        }
+
+        if (options.OrderBy != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.OrderBy, validationSettings.AllowedQueryOptions, out IEnumerable<string> orderByErrors);
+            AddValidationErrors(orderByErrors);
+
+            if (!options.OrderBy.TryValidate(validationSettings, out IEnumerable<string> orderByValidationErrors))
+            {
+                AddValidationErrors(orderByValidationErrors);
+            }
+        }
+
+        if (options.Filter != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Filter, validationSettings.AllowedQueryOptions, out IEnumerable<string> filterErrors);
+            AddValidationErrors(filterErrors);
+
+            if (!options.Filter.TryValidate(validationSettings, out IEnumerable<string> filterValidationErrors))
+            {
+                AddValidationErrors(filterValidationErrors);
+            }
+        }
+
+        if (options.Search != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Search, validationSettings.AllowedQueryOptions, out IEnumerable<string> searchErrors);
+            AddValidationErrors(searchErrors);
+
+            if (!options.Search.TryValidate(validationSettings, out IEnumerable<string> searchValidationErrors))
+            {
+                AddValidationErrors(searchValidationErrors);
+            }
+        }
+
+        if (options.Count != null || options.Request.IsCountRequest())
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Count, validationSettings.AllowedQueryOptions, out IEnumerable<string> countErrors);
+            AddValidationErrors(countErrors);
+
+            if (options.Count?.TryValidate(validationSettings, out IEnumerable<string> countValidationErrors) == false)
+            {
+                AddValidationErrors(countValidationErrors);
+            }
+        }
+
+        if (options.SkipToken != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.SkipToken, validationSettings.AllowedQueryOptions, out IEnumerable<string> skipTokenErrors);
+            AddValidationErrors(skipTokenErrors);
+
+            if (!options.SkipToken.TryValidate(validationSettings, out IEnumerable<string> skipTokenValidationErrors))
+            {
+                AddValidationErrors(skipTokenValidationErrors);
+            }
+        }
+
+        if (options.RawValues.Expand != null)
+        {
+            TryValidateNotEmptyOrWhitespace(options.RawValues.Expand, ref errors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Expand, validationSettings.AllowedQueryOptions, out IEnumerable<string> expandErrors);
+            AddValidationErrors(expandErrors);
+        }
+
+        if (options.RawValues.Select != null)
+        {
+            TryValidateNotEmptyOrWhitespace(options.RawValues.Select, ref errors);
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Select, validationSettings.AllowedQueryOptions, out IEnumerable<string> selectErrors);
+            AddValidationErrors(selectErrors);
+        }
+
+        if (options.SelectExpand != null)
+        {
+            if (!options.SelectExpand.TryValidate(validationSettings, out IEnumerable<string> selectExpandValidationErrors))
+            {
+                AddValidationErrors(selectExpandValidationErrors);
+            }
+        }
+
+        if (options.RawValues.Format != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.Format, validationSettings.AllowedQueryOptions, out IEnumerable<string> formatErrors);
+            AddValidationErrors(formatErrors);
+        }
+
+        if (options.RawValues.DeltaToken != null)
+        {
+            TryValidateQueryOptionAllowed(AllowedQueryOptions.DeltaToken, validationSettings.AllowedQueryOptions, out IEnumerable<string> deltaTokenErrors);
+            AddValidationErrors(deltaTokenErrors);
+        }
+
+        validationErrors = errors ?? Enumerable.Empty<string>(); // Avoid allocating a new empty list.
+        return errors == null || errors.Count == 0;
+    }
+
+
     private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)
     {
         if ((queryOption & allowed) == AllowedQueryOptions.None)
         {
-            throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, "AllowedQueryOptions"));
+            throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, nameof(AllowedQueryOptions)));
         }
     }
-        
+
+    private static void TryValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed, out IEnumerable<string> validationErrors)
+    {
+        validationErrors = Array.Empty<string>();
+        if ((queryOption & allowed) == AllowedQueryOptions.None)
+        {
+            validationErrors = new[] { Error.Format(SRResources.NotAllowedQueryOption, queryOption, nameof(AllowedQueryOptions)) };
+        }
+    }
+
     private static void ValidateNotEmptyOrWhitespace(string rawValue)
     {
         if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
         {
             throw new ODataException(SRResources.SelectExpandEmptyOrWhitespace);
+        }
+    }
+
+    private static void TryValidateNotEmptyOrWhitespace(string rawValue, ref List<string> validationErrors)
+    {
+        if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
+        {
+            // If validationErrors is null, initialize it with a new list.
+            // Pre-allocate with a reasonable default capacity.
+            validationErrors ??= new List<string>(1);
+            validationErrors.Add(SRResources.SelectExpandEmptyOrWhitespace);
         }
     }
 }

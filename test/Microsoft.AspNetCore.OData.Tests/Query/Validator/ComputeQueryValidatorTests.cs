@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -27,11 +29,31 @@ public class ComputeQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateComputeQueryValidator_ReturnsValidationErrorOnNullOption()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'computeQueryOption')", validationErrors.First());
+    }
+
+    [Fact]
     public void ValidateComputeQueryValidator_ThrowsOnNullSettings()
     {
         // Arrange & Act & Assert
         ExceptionAssert.ThrowsArgumentNull(
             () => _validator.Validate(new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context), null), "validationSettings");
+    }
+
+    [Fact]
+    public void TryValidateComputeQueryValidator_ReturnsValidationErrorOnNullSettings()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context), null, out IEnumerable<string> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First());
     }
 
     [Fact]
@@ -46,6 +68,20 @@ public class ComputeQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateComputeQueryValidator_ReturnsValidationErrorIfWithoutAsInComputeClause()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new ComputeQueryOption("test add p12m", _context),
+            new ODataValidationSettings(),
+            out IEnumerable<string> validationErrors);
+
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("'as' expected at position 13 in 'test add p12m'.", validationErrors.First());
+    }
+
+    [Fact]
     public void ValidateComputeQueryValidator_ThrowsIfUnknownPropertyInComputeClause()
     {
         // Arrange & Act & Assert
@@ -54,5 +90,29 @@ public class ComputeQueryValidatorTests
                 new ComputeQueryOption("test add p12m as Any", _context),
                 new ODataValidationSettings()),
             "Could not find a property named 'test' on type 'Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomer'.");
+    }
+
+    [Fact]
+    public void TryValidateComputeQueryValidator_ReturnsValidationErrorIfUnknownPropertyInComputeClause()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new ComputeQueryOption("test add p12m as Any", _context),
+            new ODataValidationSettings(),
+            out IEnumerable<string> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Could not find a property named 'test' on type 'Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomer'.", validationErrors.First());
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_DoesNotThrow()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new ComputeQueryOption("substring(Name, 0, 1) as FirstChar", _context),
+            new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 }

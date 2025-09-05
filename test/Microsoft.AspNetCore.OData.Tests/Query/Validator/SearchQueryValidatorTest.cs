@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +66,13 @@ public class SearchQueryValidatorTest
         public void Validate(SearchQueryOption searchQueryOption, ODataValidationSettings validationSettings)
         {
             Verify?.Invoke();
+        }
+
+        public bool TryValidate(SearchQueryOption searchQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        {
+            Verify?.Invoke();
+            validationErrors = null;
+            return true;
         }
     }
 }
