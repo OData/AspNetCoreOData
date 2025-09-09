@@ -2575,7 +2575,7 @@ public class DollarApplyTests : WebApiTestBase<DollarApplyTests>
         var queryExpression = queryResult.Expression;
         var queryToString = queryExpression.ToString();
 
-        var normalized = queryToString.Replace("System.Linq.EmptyPartition`1[" + typeof(T).FullName + "]", string.Empty);
+        var normalized = queryToString.Replace($"{typeof(T).FullName}[]", string.Empty);
 
         verifyAction(normalized);
     }

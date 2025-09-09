@@ -6,8 +6,10 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -32,20 +34,20 @@ public class ODataUntypedActionParametersTests
     }
 
     [Fact]
-    public async ValueTask BindAsync_ThrowsArgumentNull_ForInputs()
+    public async Task BindAsync_ThrowsArgumentNull_ForInputs()
     {
         // Arrange & Act & Assert
         ArgumentNullException exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataUntypedActionParameters.BindAsync(null, null), "httpContext", false, true);
-        Assert.Equal("The parameter cannot be null. (Parameter 'httpContext')", exception.Message);
+        Assert.Equal("Value cannot be null. (Parameter 'httpContext')", exception.Message);
 
         // Arrange & Act & Assert
         HttpContext httpContext = new DefaultHttpContext();
-        await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataUntypedActionParameters.BindAsync(httpContext, null));
-        Assert.Equal("The parameter cannot be null. (Parameter 'parameter')", exception.Message);
+        exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await ODataUntypedActionParameters.BindAsync(httpContext, null));
+        Assert.Equal("Value cannot be null. (Parameter 'parameter')", exception.Message);
     }
 
     [Fact]
-    public async ValueTask BindAsync_Returns_ValidODataUntypedActionParameter()
+    public async Task BindAsync_Returns_ValidODataUntypedActionParameter()
     {
         // Arrange
         Mock<IODataDeserializerProvider> deserializerProviderMock = new Mock<IODataDeserializerProvider>();
@@ -53,7 +55,7 @@ public class ODataUntypedActionParametersTests
 
         ODataUntypedActionParameters expectedParameters = new ODataUntypedActionParameters(new Mock<IEdmAction>().Object);
 
-        mock.Setup(m => m.ReadAsync(It.IsAny<ODataMessageReader>(), typeof(ODataUntypedActionParameters), It.IsAny<ODataDeserializerContext>()))
+        mock.Setup(m => m.ReadAsync(It.IsAny<ODataMessageReader>(), It.IsAny<Type>(), It.IsAny<ODataDeserializerContext>()))
             .ReturnsAsync(expectedParameters);
 
         HttpContext httpContext = new DefaultHttpContext();

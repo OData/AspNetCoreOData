@@ -66,7 +66,7 @@ public class CollectionDeserializationHelpersTest
     {
         // Arrange & Act & Assert
         IList<int> source = new List<int>();
-        IEnumerable newCollection = Enumerable.Empty<int>();
+        IEnumerable newCollection = new List<int>().AsReadOnly();
         Action test = () => source.AddToCollection(newCollection, typeof(int), typeof(CollectionDeserializationHelpersTest), "PropertyName", newCollection.GetType());
         SerializationException exception = Assert.Throws<SerializationException>(() => test());
         Assert.Contains("of the property 'PropertyName' on type 'Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.CollectionDeserializationHelpersTest' does not have an Add method. Consider using a collection type that does have an Add method - for example IList<T> or ICollection<T>.",
@@ -87,6 +87,33 @@ public class CollectionDeserializationHelpersTest
         ExceptionAssert.Throws<SerializationException>(test,
             "The value of the property 'PropertyName' on type 'Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization.CollectionDeserializationHelpersTest' is an array." +
             " Consider adding a setter for the property.");
+    }
+
+    [Fact]
+    public void AddToCollection_ThrowsSerializationException_IsEnumerableParameterWithoutAddMethod()
+    {
+        // Arrange & Act & Assert
+        IList<int> source = new List<int>();
+        IEnumerable newCollection = new List<int>().AsReadOnly();
+        Action test = () => source.AddToCollection(newCollection, typeof(int), "ParamName", newCollection.GetType());
+        SerializationException exception = Assert.Throws<SerializationException>(() => test());
+        Assert.Contains("The type 'System.Collections.ObjectModel.ReadOnlyCollection`1[System.Int32]' of the parameter 'ParamName' does not have an Add method. Consider using a collection type that does have an Add method - for example IList<T> or ICollection<T>.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void AddToCollection_ThrowsSerializationException_IsAnArrayParameter()
+    {
+        // Arrange
+        IList source = new List<SimpleEnum> { SimpleEnum.First, SimpleEnum.Second, SimpleEnum.Third };
+        IEnumerable newCollection = new string[] { };
+
+        // Act
+        Action test = () => source.AddToCollection(newCollection, typeof(SimpleEnum), "ParamName", newCollection.GetType());
+
+        // Assert
+        ExceptionAssert.Throws<SerializationException>(test,
+            "The type 'System.String[]' of the parameter 'ParamName' is an array. Consider using a collection type that supports adding elements, such as IList<T> or ICollection<T>.");
     }
 
     [Fact]

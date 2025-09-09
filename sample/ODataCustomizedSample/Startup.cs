@@ -57,7 +57,7 @@ public class Startup
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 8.x OpenAPI");
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "OData 10.x OpenAPI");
         });
 
         app.UseRouting();

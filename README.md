@@ -132,7 +132,7 @@ Then browse to `http://localhost:5000/odata/Products` (port may vary) to inspect
 ## Github Repository
 
 This is the official ASP.NET Core OData repository.
-[ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/8.0.0) is a server side library built upon ODataLib and ASP.NET Core.
+[ASP.NET Core OData](https://www.nuget.org/packages/Microsoft.AspNetCore.OData/10.0.0) is a server side library built upon ODataLib and ASP.NET Core.
 
 **Blogs**:
 

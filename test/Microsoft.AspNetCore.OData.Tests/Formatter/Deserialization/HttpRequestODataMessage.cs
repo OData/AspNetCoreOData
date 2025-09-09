@@ -23,20 +23,11 @@ class HttpRequestODataMessage : IODataRequestMessageAsync
 
     public Dictionary<string, string> _headers;
 
-    //public HttpRequestODataMessage(HttpRequestMessage request)
-    //{
-    //    _request = request;
-    //    _headers = Enumerable
-    //        .Concat<KeyValuePair<string, IEnumerable<string>>>(request.Headers, request.Content.Headers)
-    //        .Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value)))
-    //        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-    //}
-
     public HttpRequestODataMessage(HttpRequest request)
     {
         _httpRequest = request;
         _headers = request.Headers.
-            Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value)))
+            Select(kvp => new KeyValuePair<string, string>(kvp.Key, string.Join(";", kvp.Value.ToArray())))
             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
     }
 

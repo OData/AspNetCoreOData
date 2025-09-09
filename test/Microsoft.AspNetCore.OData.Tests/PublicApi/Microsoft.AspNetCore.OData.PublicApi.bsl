@@ -178,9 +178,19 @@ public sealed class Microsoft.AspNetCore.OData.ODataServiceCollectionExtensions 
 	public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddODataQueryFilter (Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.AspNetCore.Mvc.Filters.IActionFilter queryFilter)
 }
 
+[
+ExtensionAttribute(),
+]
 public sealed class Microsoft.AspNetCore.OData.ODataUriFunctions {
-	public static void AddCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
-	public static bool RemoveCustomUriFunction (string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
+	[
+	ExtensionAttribute(),
+	]
+	public static void AddCustomUriFunction (Microsoft.OData.Edm.IEdmModel model, string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
+
+	[
+	ExtensionAttribute(),
+	]
+	public static bool RemoveCustomUriFunction (Microsoft.OData.Edm.IEdmModel model, string functionName, Microsoft.OData.UriParser.FunctionSignatureWithReturnType functionSignature, System.Reflection.MethodInfo methodInfo)
 }
 
 public class Microsoft.AspNetCore.OData.ODataJsonOptionsSetup : IConfigureOptions`1 {

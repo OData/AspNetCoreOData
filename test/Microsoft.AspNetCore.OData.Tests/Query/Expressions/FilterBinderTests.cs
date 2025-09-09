@@ -1603,7 +1603,7 @@ public class FilterBinderTests
 
             // Add the custom function
             // Act & Assert
-            CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
+            GetModel<Product>().AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
             UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
             string filter = string.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
@@ -1613,7 +1613,7 @@ public class FilterBinderTests
         }
         finally
         {
-            Assert.True(CustomUriFunctions.RemoveCustomUriFunction(padrightMethodName));
+            Assert.True(GetModel<Product>().RemoveCustomUriFunction(padrightMethodName));
             Assert.True(UriFunctionsBinder.UnbindUriFunctionName(padrightMethodName, padRightStringMethodInfo));
         }
     }
@@ -1637,7 +1637,7 @@ public class FilterBinderTests
 
             // Add the custom function
             // Act & Assert
-            CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
+            GetModel<Product>().AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
             UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
             string filter = string.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
@@ -1647,7 +1647,7 @@ public class FilterBinderTests
         }
         finally
         {
-            Assert.True(CustomUriFunctions.RemoveCustomUriFunction(padrightMethodName));
+            Assert.True(GetModel<Product>().RemoveCustomUriFunction(padrightMethodName));
             Assert.True(UriFunctionsBinder.UnbindUriFunctionName(padrightMethodName, padRightStringMethodInfo));
         }
     }
@@ -1672,7 +1672,7 @@ public class FilterBinderTests
 
             // Add the custom function
             // Act & Assert
-            CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
+            GetModel<Product>().AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
             UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
             string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
@@ -1682,7 +1682,7 @@ public class FilterBinderTests
         }
         finally
         {
-            Assert.True(CustomUriFunctions.RemoveCustomUriFunction(padrightMethodName));
+            Assert.True(GetModel<Product>().RemoveCustomUriFunction(padrightMethodName));
             Assert.True(UriFunctionsBinder.UnbindUriFunctionName(padrightMethodName, padRightStringMethodInfo));
         }
     }
@@ -1707,7 +1707,7 @@ public class FilterBinderTests
 
             // Add the custom function
             // Act & Assert
-            CustomUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
+            GetModel<Product>().AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction);
             UriFunctionsBinder.BindUriFunctionName(padrightMethodName, padRightStringMethodInfo);
 
             string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
@@ -1717,7 +1717,7 @@ public class FilterBinderTests
         }
         finally
         {
-            Assert.True(CustomUriFunctions.RemoveCustomUriFunction(padrightMethodName));
+            Assert.True(GetModel<Product>().RemoveCustomUriFunction(padrightMethodName));
             Assert.True(UriFunctionsBinder.UnbindUriFunctionName(padrightMethodName, padRightStringMethodInfo));
         }
     }
@@ -1742,7 +1742,7 @@ public class FilterBinderTests
 
             // Add the custom function
             // Act & Assert
-            ODataUriFunctions.AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction, padRightStringMethodInfo);
+            GetModel<Product>().AddCustomUriFunction(padrightMethodName, padrightStringEdmFunction, padRightStringMethodInfo);
 
             string filter = String.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
             var filters = BindFilterAndVerify<Product>(filter);
@@ -1751,7 +1751,7 @@ public class FilterBinderTests
         }
         finally
         {
-            Assert.True(CustomUriFunctions.RemoveCustomUriFunction(padrightMethodName));
+            Assert.True(GetModel<Product>().RemoveCustomUriFunction(padrightMethodName));
             Assert.True(UriFunctionsBinder.UnbindUriFunctionName(padrightMethodName, padRightStringMethodInfo));
         }
     }

@@ -5,24 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.OData.Abstracts;
-using Microsoft.AspNetCore.OData.Extensions;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Tests.Commons;
-using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Net.Http.Headers;
-using Microsoft.OData.Edm;
-using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.UriParser;
 using Moq;
-using NuGet.Frameworks;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query;

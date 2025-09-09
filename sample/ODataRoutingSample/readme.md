@@ -1,13 +1,13 @@
-# ASP.NET Core OData (8.x) Sample
+# ASP.NET Core OData (10.x) Sample
 
 ---
-This is an ASP.NET Core OData 8.x sample project. From this sample, you can see a lot of ASP.NET Core OData 8.x usage.
+This is an ASP.NET Core OData 10.x sample project. From this sample, you can see a lot of ASP.NET Core OData 10.x usage.
 
 
 
 ## Static Routing table
 
-If you run the sample and send the following request in a Web brower:
+If you run the sample and send the following request in a Web browser:
 
 `~/$odata`, you will get the following (similar) routing table:
 
@@ -16,7 +16,7 @@ If you run the sample and send the following request in a Web brower:
 
 ## OpenAPI/Swagger
 
-If you run the sample and send the following request in a Web brower:
+If you run the sample and send the following request in a Web browser:
 
 `/swagger`, you will get the following (similar) swagger page:
 
@@ -24,7 +24,7 @@ If you run the sample and send the following request in a Web brower:
 
 ## Non-Edm model
 
-Non-Edm model means there's no "Edm Model" configed for a route.
+Non-Edm model means there's no "Edm Model" configured for a route.
 For example: the following routing doesn't have the Edm model associated.
 
 ```C#
@@ -58,7 +58,7 @@ Known issue: It seems there are some issues related to the complex property sele
 
 ## Raw OpenAPI/Swagger
 
-If you run the sample and send the following request in a Web brower:
+If you run the sample and send the following request in a Web browser:
 
 `/v1/$openapi`, you will get the following (similar) swagger page:
 

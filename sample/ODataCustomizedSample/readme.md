@@ -1,11 +1,11 @@
 # A customized routing Sample
 
 ---
-This is an ASP.NET Core OData 8.x customized routing sample project.
+This is an ASP.NET Core OData 10.x customized routing sample project.
 
 ## Static Routing table
 
-If you run the sample and send the following request in a Web brower:
+If you run the sample and send the following request in a Web browser:
 
 `~/$odata`, you will get the routing table
 

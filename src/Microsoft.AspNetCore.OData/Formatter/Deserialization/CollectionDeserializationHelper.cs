@@ -36,22 +36,24 @@ internal static class CollectionDeserializationHelpers
 
         MethodInfo addMethod = null;
         IList list = collection as IList;
-
-        if (list == null)
+        
+        // Arrays should always be rejected: fixed-size, no supported Add
+        if (list != null && list.GetType().IsArray)
         {
-            addMethod = collection.GetType().GetMethod("Add", new Type[] { elementType });
+            string message = Error.Format(SRResources.GetOnlyCollectionCannotBeArray, propertyName, resourceType.FullName);
+            throw new SerializationException(message);
+        }
+        else
+        {
+            addMethod = collection.GetType().GetMethod("Add", new[] { elementType });
+
             if (addMethod == null)
             {
                 string message = Error.Format(SRResources.CollectionShouldHaveAddMethod, propertyType.FullName, propertyName, resourceType.FullName);
                 throw new SerializationException(message);
             }
         }
-        else if (list.GetType().IsArray)
-        {
-            string message = Error.Format(SRResources.GetOnlyCollectionCannotBeArray, propertyName, resourceType.FullName);
-            throw new SerializationException(message);
-        }
-
+        
         items.AddToCollectionCore(collection, elementType, list, addMethod, context);
     }
 
@@ -65,9 +67,15 @@ internal static class CollectionDeserializationHelpers
         MethodInfo addMethod = null;
         IList list = collection as IList;
 
-        if (list == null)
+        if (list != null && list.GetType().IsArray)
+        {
+            string message = Error.Format(SRResources.CollectionParameterCannotBeArray, paramType, paramName);
+            throw new SerializationException(message);
+        }
+        else
         {
             addMethod = collection.GetType().GetMethod("Add", new Type[] { elementType });
+
             if (addMethod == null)
             {
                 string message = Error.Format(SRResources.CollectionParameterShouldHaveAddMethod, paramType, paramName);
