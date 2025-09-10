@@ -578,6 +578,10 @@ public abstract partial class QueryBinder
         {
             targetTypeName = singleResourceCastNode.TypeReference.FullName();
         }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, nameof(BindCastSingleValue));
+        }
 
         IEdmType targetEdmType = context.Model.FindType(targetTypeName);
         Type targetClrType = null;
@@ -670,6 +674,10 @@ public abstract partial class QueryBinder
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
             typeName = singleResourceCastNode.TypeReference.FullName();
+        }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, nameof(BindIsOf));
         }
 
         IEdmType edmType = context.Model.FindType(typeName);

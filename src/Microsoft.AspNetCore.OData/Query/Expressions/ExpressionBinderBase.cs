@@ -317,6 +317,10 @@ public abstract class ExpressionBinderBase
         {
             typeName = singleResourceCastNode.TypeReference.FullName();
         }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, nameof(BindIsOf));
+        }
 
         IEdmType edmType = Model.FindType(typeName);
         Type clrType = null;
@@ -734,6 +738,10 @@ public abstract class ExpressionBinderBase
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
             targetTypeName = singleResourceCastNode.TypeReference.FullName();
+        }
+        else
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, nameof(BindCastSingleValue));
         }
 
         IEdmType targetEdmType = Model.FindType(targetTypeName);
