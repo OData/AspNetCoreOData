@@ -664,27 +664,21 @@ public abstract partial class QueryBinder
 
         IEdmModel model = context.Model;
 
-        string targetEdmTypeName = null;
+        IEdmTypeReference targetEdmType = null;
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            targetEdmTypeName = constantNode.Value as string;
+            targetEdmType = model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
-            targetEdmTypeName = singleResourceCastNode.TypeReference.FullName();
-        }
-        else
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, "BindSingleResourceCastFunctionCall");
+            targetEdmType = singleResourceCastNode.TypeReference;
         }
 
-        IEdmType targetEdmType = model.FindType(targetEdmTypeName);
         Type targetClrType = null;
-
         if (targetEdmType != null)
         {
-            targetClrType = model.GetClrType(targetEdmType.ToEdmTypeReference(false));
+            targetClrType = model.GetClrType(targetEdmType);
         }
 
         if (arguments[0].Type == targetClrType)

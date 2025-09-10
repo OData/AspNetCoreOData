@@ -307,27 +307,20 @@ public abstract class ExpressionBinderBase
             return FalseConstant;
         }
 
-        string typeName = null;
+        IEdmTypeReference edmTypeReference = null;
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            typeName = (string)constantNode.Value;
+            edmTypeReference = Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
-            typeName = singleResourceCastNode.TypeReference.FullName();
-        }
-        else
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, nameof(BindIsOf));
+            edmTypeReference = singleResourceCastNode.TypeReference;
         }
 
-        IEdmType edmType = Model.FindType(typeName);
         Type clrType = null;
-        if (edmType != null)
+        if (edmTypeReference != null)
         {
-            // bool nullable = source.Type.IsNullable();
-            IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(false);
             clrType = Model.GetClrType(edmTypeReference);
         }
 
@@ -729,27 +722,20 @@ public abstract class ExpressionBinderBase
 
         Expression source = arguments.Length == 1 ? this.Parameter : arguments[0];
 
-        string targetTypeName = null;
+        IEdmTypeReference targetEdmTypeReference = null;
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            targetTypeName = (string)constantNode.Value;
+            targetEdmTypeReference = Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
-            targetTypeName = singleResourceCastNode.TypeReference.FullName();
-        }
-        else
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, nameof(BindCastSingleValue));
+            targetEdmTypeReference = singleResourceCastNode.TypeReference;
         }
 
-        IEdmType targetEdmType = Model.FindType(targetTypeName);
         Type targetClrType = null;
-
-        if (targetEdmType != null)
+        if (targetEdmTypeReference != null)
         {
-            IEdmTypeReference targetEdmTypeReference = targetEdmType.ToEdmTypeReference(false);
             targetClrType = Model.GetClrType(targetEdmTypeReference);
 
             if (source != NullConstant)
