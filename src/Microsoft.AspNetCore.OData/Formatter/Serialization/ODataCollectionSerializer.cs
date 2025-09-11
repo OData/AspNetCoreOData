@@ -13,10 +13,13 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization;
 
@@ -48,8 +51,16 @@ public class ODataCollectionSerializer : ODataEdmTypeSerializer
             throw Error.ArgumentNull(nameof(writeContext));
         }
 
-        IEdmTypeReference collectionType = writeContext.GetEdmType(graph, type);
-        Contract.Assert(collectionType != null);
+        IEdmTypeReference propertyType = null;
+        if (writeContext.Path != null && writeContext.Path.LastSegment is PropertySegment propertySegment)
+        {
+            propertyType = writeContext.Path.EdmType();
+        }
+
+        // TODO: What strategy can we use to map NTS spatial values to both Geometry and Geography EDM types?
+        // Or is it sufficient to rely on the property's EDM type in the case of spatial values?
+        // If the property type is spatial, we use it as the collection type.
+        IEdmTypeReference collectionType = (propertyType != null && propertyType.IsSpatial()) ? propertyType : writeContext.GetEdmType(graph, type);
 
         IEdmTypeReference elementType = GetElementType(collectionType);
         ODataCollectionWriter writer = await messageWriter.CreateODataCollectionWriterAsync(elementType)
@@ -173,8 +184,16 @@ public class ODataCollectionSerializer : ODataEdmTypeSerializer
                     throw new SerializationException(SRResources.NullElementInCollection);
                 }
 
-                IEdmTypeReference actualType = writeContext.GetEdmType(item, item.GetType());
-                Contract.Assert(actualType != null);
+                IEdmTypeReference actualType;
+                if (!elementType.IsPrimitiveOrCollectionOfPrimitive() && !elementType.IsEnumOrCollectionOfEnum())
+                {
+                    actualType = writeContext.GetEdmType(item, item.GetType());
+                    Contract.Assert(actualType != null);
+                }
+                else
+                {
+                    actualType = elementType;
+                }
 
                 itemSerializer = itemSerializer ?? SerializerProvider.GetEdmTypeSerializer(actualType);
                 if (itemSerializer == null)

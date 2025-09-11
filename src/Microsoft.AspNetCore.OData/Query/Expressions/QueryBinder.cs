@@ -24,6 +24,7 @@ using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
+using Microsoft.Spatial;
 
 namespace Microsoft.AspNetCore.OData.Query.Expressions;
 
@@ -1381,6 +1382,11 @@ public abstract partial class QueryBinder
                             convertedExpression = Expression.Call(source, "ToArray", typeArguments: null, arguments: null);
                         }
 #endif
+                        else if (typeof(Geometry).IsAssignableFrom(conversionType) || typeof(Geography).IsAssignableFrom(conversionType))
+                        {
+                            convertedExpression = source;
+                        }
+                            
                         break;
 
                     default:

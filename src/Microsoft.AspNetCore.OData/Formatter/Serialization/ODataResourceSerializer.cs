@@ -1645,7 +1645,7 @@ public class ODataResourceSerializer : ODataEdmTypeSerializer
         IEdmTypeReference propertyType = structuralProperty.Type;
         if (propertyValue != null)
         {
-            if (!propertyType.IsPrimitive() && !propertyType.IsEnum())
+            if (!propertyType.IsPrimitiveOrCollectionOfPrimitive() && !propertyType.IsEnumOrCollectionOfEnum())
             {
                 IEdmTypeReference actualType = writeContext.GetEdmType(propertyValue, propertyValue.GetType());
                 if (propertyType != null && propertyType != actualType)

@@ -109,6 +109,17 @@ public class ODataCollectionDeserializer : ODataEdmTypeDeserializer
             else
             {
                 Type elementClrType = readContext.Model.GetClrType(elementType);
+
+                if (elementType.IsSpatial())
+                {
+                    // TODO: A better way?
+                    foreach (object collectionItem in result)
+                    {
+                        elementClrType = collectionItem.GetType();
+                        break;
+                    }
+                }
+
                 IEnumerable castedResult = _castMethodInfo.MakeGenericMethod(elementClrType).Invoke(null, new object[] { result }) as IEnumerable;
                 return castedResult;
             }
@@ -145,7 +156,7 @@ public class ODataCollectionDeserializer : ODataEdmTypeDeserializer
 
         foreach (object item in collectionValue.Items)
         {
-            if (elementType.IsPrimitive())
+            if (elementType.IsPrimitive() && !elementType.IsSpatial())
             {
                 yield return item;
             }
