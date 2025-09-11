@@ -434,8 +434,9 @@ internal static class EdmHelpers
     /// </summary>
     /// <param name="edmModel">The Edm type.</param>
     /// <param name="queryNode">Query node to extract the EDM type reference from.</param>
+    /// <param name="errorMessageParameter">The error message parameter. If present, it will be included in the error message when <paramref name="queryNode"/> is not supported. Defaults to null.</param>
     /// <returns></returns>
-    public static IEdmTypeReference GetEdmTypeReferenceFromQueryNode(this IEdmModel edmModel, QueryNode queryNode)
+    public static IEdmTypeReference GetEdmTypeReferenceFromQueryNode(this IEdmModel edmModel, QueryNode queryNode, string errorMessageParameter = null)
     {
         IEdmTypeReference targetEdmTypeReference = null;
         if (queryNode is ConstantNode constantNode)
@@ -445,6 +446,10 @@ internal static class EdmHelpers
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
             targetEdmTypeReference = singleResourceCastNode.TypeReference;
+        }
+        else if (errorMessageParameter != null)
+        {
+            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, errorMessageParameter);
         }
 
         return targetEdmTypeReference;

@@ -2264,12 +2264,13 @@
             <param name="isNullable">Nullable value.</param>
             <returns>The Edm type reference.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetEdmTypeReferenceFromQueryNode(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.QueryNode)">
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.GetEdmTypeReferenceFromQueryNode(Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.QueryNode,System.String)">
             <summary>
             Gets the EDM type reference from the query node.
             </summary>
             <param name="edmModel">The Edm type.</param>
             <param name="queryNode">Query node to extract the EDM type reference from.</param>
+            <param name="errorMessageParameter">The error message parameter. If present, it will be included in the error message when <paramref name="queryNode"/> is not supported. Defaults to null.</param>
             <returns></returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions">
