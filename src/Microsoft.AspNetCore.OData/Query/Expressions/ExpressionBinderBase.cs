@@ -307,17 +307,8 @@ public abstract class ExpressionBinderBase
             return FalseConstant;
         }
 
-        IEdmTypeReference edmTypeReference = null;
-        QueryNode queryNode = node.Parameters.Last();
-        if (queryNode is ConstantNode constantNode)
-        {
-            edmTypeReference = Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
-        }
-        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
-        {
-            edmTypeReference = singleResourceCastNode.TypeReference;
-        }
-
+        IEdmTypeReference edmTypeReference = Model.GetEdmTypeReferenceFromQueryNode(node.Parameters.Last());
+        
         Type clrType = null;
         if (edmTypeReference != null)
         {
@@ -722,17 +713,8 @@ public abstract class ExpressionBinderBase
 
         Expression source = arguments.Length == 1 ? this.Parameter : arguments[0];
 
-        IEdmTypeReference targetEdmTypeReference = null;
-        QueryNode queryNode = node.Parameters.Last();
-        if (queryNode is ConstantNode constantNode)
-        {
-            targetEdmTypeReference = Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
-        }
-        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
-        {
-            targetEdmTypeReference = singleResourceCastNode.TypeReference;
-        }
-
+        IEdmTypeReference targetEdmTypeReference = Model.GetEdmTypeReferenceFromQueryNode(node.Parameters.Last());
+        
         Type targetClrType = null;
         if (targetEdmTypeReference != null)
         {

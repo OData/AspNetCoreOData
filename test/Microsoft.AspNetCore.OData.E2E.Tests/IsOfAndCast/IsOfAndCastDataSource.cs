@@ -92,7 +92,7 @@ public class IsOfAndCastDataSource
             new Order
             {
                 OrderID = 3,
-                Location = new Address { City = "City3" },
+                Location = new OfficeAddress { City = "City3", OfficeNo = "300NO" },
                 Products = new List<Product> { this.Products[0], this.Products[2], this.Products[3] }
             },
             new Order

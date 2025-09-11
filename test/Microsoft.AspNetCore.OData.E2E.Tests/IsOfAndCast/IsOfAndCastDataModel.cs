@@ -57,3 +57,8 @@ public class HomeAddress : Address
     public string HomeNo { get; set; }
 }
 
+public class OfficeAddress : Address
+{
+    public string OfficeNo { get; set; }
+}
+

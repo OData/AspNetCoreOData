@@ -664,16 +664,7 @@ public abstract partial class QueryBinder
 
         IEdmModel model = context.Model;
 
-        IEdmTypeReference targetEdmType = null;
-        QueryNode queryNode = node.Parameters.Last();
-        if (queryNode is ConstantNode constantNode)
-        {
-            targetEdmType = model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
-        }
-        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
-        {
-            targetEdmType = singleResourceCastNode.TypeReference;
-        }
+        IEdmTypeReference targetEdmType = context.Model.GetEdmTypeReferenceFromQueryNode(node.Parameters.Last());
 
         Type targetClrType = null;
         if (targetEdmType != null)

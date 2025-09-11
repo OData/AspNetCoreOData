@@ -2390,26 +2390,12 @@ public class FilterBinderTests
         InvokeFiltersAndVerify(filters, model, (true,true));
     }
 
-    //public static TheoryDataSet<string> CastToUnquotedComplexType
-    //{
-    //    get
-    //    {
-    //        return new TheoryDataSet<string>
-    //        {
-    //            { "cast(Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" },
-    //            { "cast(null, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "<null>" },
-    //            { "cast('', Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "'Edm.String'" },
-    //            { "cast(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null" },
-    //        };
-    //    }
-    //}
-
     [Theory]
     [InlineData("cast(Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "Microsoft.AspNetCore.OData.Tests.Models.Address", "Microsoft.AspNetCore.OData.Tests.Models.Product")]
     [InlineData("cast(null, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "Microsoft.AspNetCore.OData.Tests.Models.Address", "<null>")]
     [InlineData("cast('', Microsoft.AspNetCore.OData.Tests.Models.Address) eq null", "Microsoft.AspNetCore.OData.Tests.Models.Address", "Edm.String")]
     [InlineData("cast(null, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)/DerivedCategoryName eq null", "Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory", "<null>")]
-    public void CastToUnquotedComplexType_ThrowsODataException(string filter, string propertyFullQualifiedName, string assignableFrom)
+    public void CastToUnrelatedUnquotedTypeParameter_ThrowsEncounteredInvalidTypeCast(string filter, string propertyFullQualifiedName, string assignableFrom)
     {
         // Arrange
         var expectedMessage =
@@ -2453,7 +2439,7 @@ public class FilterBinderTests
     [InlineData("cast(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address) eq null")]
     [InlineData("cast(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)/DerivedProductName eq null")]
     [InlineData("cast(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)/DerivedCategoryName eq null")]
-    public void CastToUnquotedEntityType_DoNotThrowODataException(string filter)
+    public void CastToRelatedUnquotedEntityType_DoesNotThrowODataException(string filter)
     {
         // Arrange & Act & Assert
         var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));

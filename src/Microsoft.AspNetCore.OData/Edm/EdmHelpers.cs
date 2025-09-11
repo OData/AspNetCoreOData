@@ -11,6 +11,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.ModelBuilder.Annotations;
 using Microsoft.OData.ModelBuilder.Config;
+using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Edm;
 
@@ -426,6 +427,27 @@ internal static class EdmHelpers
             ModelBoundQuerySettings propertyQuerySettings = edmModel.GetModelBoundQuerySettings(property, defaultQueryConfigs);
             return GetMergedPropertyQuerySettings(propertyQuerySettings, querySettings);
         }
+    }
+
+    /// <summary>
+    /// Gets the EDM type reference from the query node.
+    /// </summary>
+    /// <param name="edmModel">The Edm type.</param>
+    /// <param name="queryNode">Query node to extract the EDM type reference from.</param>
+    /// <returns></returns>
+    public static IEdmTypeReference GetEdmTypeReferenceFromQueryNode(this IEdmModel edmModel, QueryNode queryNode)
+    {
+        IEdmTypeReference targetEdmTypeReference = null;
+        if (queryNode is ConstantNode constantNode)
+        {
+            targetEdmTypeReference = edmModel.FindType((string)constantNode.Value).ToEdmTypeReference(false);
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            targetEdmTypeReference = singleResourceCastNode.TypeReference;
+        }
+
+        return targetEdmTypeReference;
     }
 
     private static ModelBoundQuerySettings GetModelBoundQuerySettings<T>(this IEdmModel edmModel, T key, DefaultQueryConfigurations defaultQueryConfigs = null)
