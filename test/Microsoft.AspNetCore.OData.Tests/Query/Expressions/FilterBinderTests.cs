@@ -2622,7 +2622,7 @@ public class FilterBinderTests
     [Theory]
     [InlineData("isof(SupplierAddress,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
     [InlineData("isof(SupplierAddress, Microsoft.AspNetCore.OData.Tests.Models.Address)")]
-    public void IsOfUnquotedComplexType_DoesNotThrowODataException(string filter)
+    public void IsOfUnquotedTypeParameter_RelatedToComplexTypeProperty_DoNotThrowODataException(string filter)
     {
         // Arrange
         var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
@@ -2639,7 +2639,7 @@ public class FilterBinderTests
     [InlineData("isof(Category,  'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
     [InlineData("isof(Category, Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory)")]
     [InlineData("isof(Category, 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
-    public void IsOfUnquotedEntityType_DoesNotThrowODataException(string filter)
+    public void IsOfUnquotedTypeParameter_RelatedToEntityTypeProperty_DoNotThrowODataException(string filter)
     {
         // Arrange & Act & Assert
         var exception = Record.Exception(() => BindFilterAndVerify<Product>(filter));
@@ -2669,6 +2669,7 @@ public class FilterBinderTests
 
     [Theory]
     [InlineData("isof(null,'Microsoft.AspNetCore.OData.Tests.Models.Address')")]
+    [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
     [InlineData("isof(null, 'Microsoft.AspNetCore.OData.Tests.Models.Address')")]
     [InlineData("isof(null,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
     [InlineData("isof(null, 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
