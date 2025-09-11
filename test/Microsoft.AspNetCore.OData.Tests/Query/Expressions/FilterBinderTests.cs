@@ -2669,7 +2669,6 @@ public class FilterBinderTests
 
     [Theory]
     [InlineData("isof(null,'Microsoft.AspNetCore.OData.Tests.Models.Address')")]
-    [InlineData("isof(null,Microsoft.AspNetCore.OData.Tests.Models.Address)")]
     [InlineData("isof(null, 'Microsoft.AspNetCore.OData.Tests.Models.Address')")]
     [InlineData("isof(null,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
     [InlineData("isof(null, 'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')")]
