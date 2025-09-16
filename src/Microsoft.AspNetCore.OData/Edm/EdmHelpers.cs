@@ -429,32 +429,6 @@ internal static class EdmHelpers
         }
     }
 
-    /// <summary>
-    /// Gets the EDM type reference from the query node.
-    /// </summary>
-    /// <param name="edmModel">The Edm type.</param>
-    /// <param name="queryNode">Query node to extract the EDM type reference from.</param>
-    /// <param name="errorMessageParameter">The error message parameter. If present, it will be included in the error message when <paramref name="queryNode"/> is not supported. Defaults to null.</param>
-    /// <returns></returns>
-    public static IEdmTypeReference GetEdmTypeReferenceFromQueryNode(this IEdmModel edmModel, QueryNode queryNode, string errorMessageParameter = null)
-    {
-        IEdmTypeReference targetEdmTypeReference = null;
-        if (queryNode is ConstantNode constantNode)
-        {
-            targetEdmTypeReference = edmModel.FindType((string)constantNode.Value).ToEdmTypeReference(false);
-        }
-        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
-        {
-            targetEdmTypeReference = singleResourceCastNode.TypeReference;
-        }
-        else if (errorMessageParameter != null)
-        {
-            throw Error.NotSupported(SRResources.QueryNodeBindingNotSupported, queryNode.Kind, errorMessageParameter);
-        }
-
-        return targetEdmTypeReference;
-    }
-
     private static ModelBoundQuerySettings GetModelBoundQuerySettings<T>(this IEdmModel edmModel, T key, DefaultQueryConfigurations defaultQueryConfigs = null)
         where T : IEdmElement
     {
