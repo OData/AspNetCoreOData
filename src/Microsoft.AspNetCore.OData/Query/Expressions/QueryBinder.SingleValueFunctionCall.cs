@@ -567,13 +567,22 @@ public abstract partial class QueryBinder
         Contract.Assert(arguments.Length == 1 || arguments.Length == 2);
 
         Expression source = arguments.Length == 1 ? context.CurrentParameter : arguments[0];
-        string targetTypeName = (string)((ConstantNode)node.Parameters.Last()).Value;
-        IEdmType targetEdmType = context.Model.FindType(targetTypeName);
+
+        IEdmTypeReference targetEdmTypeReference = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
+        {
+            targetEdmTypeReference = context.Model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            targetEdmTypeReference = singleResourceCastNode.TypeReference;
+        }
+
         Type targetClrType = null;
 
-        if (targetEdmType != null)
+        if (targetEdmTypeReference != null)
         {
-            IEdmTypeReference targetEdmTypeReference = targetEdmType.ToEdmTypeReference(false);
             targetClrType = context.Model.GetClrType(targetEdmTypeReference);
 
             if (source != NullConstant)
@@ -650,14 +659,20 @@ public abstract partial class QueryBinder
             return FalseConstant;
         }
 
-        string typeName = (string)((ConstantNode)node.Parameters.Last()).Value;
-
-        IEdmType edmType = context.Model.FindType(typeName);
-        Type clrType = null;
-        if (edmType != null)
+        IEdmTypeReference edmTypeReference = null;
+        QueryNode queryNode = node.Parameters.Last();
+        if (queryNode is ConstantNode constantNode)
         {
-            // bool nullable = source.Type.IsNullable();
-            IEdmTypeReference edmTypeReference = edmType.ToEdmTypeReference(false);
+            edmTypeReference = context.Model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
+        }
+        else if (queryNode is SingleResourceCastNode singleResourceCastNode)
+        {
+            edmTypeReference = singleResourceCastNode.TypeReference;
+        }
+
+        Type clrType = null;
+        if (edmTypeReference != null)
+        {
             clrType = context.Model.GetClrType(edmTypeReference);
         }
 
