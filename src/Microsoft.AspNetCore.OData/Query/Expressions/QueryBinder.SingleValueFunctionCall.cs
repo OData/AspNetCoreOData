@@ -572,7 +572,7 @@ public abstract partial class QueryBinder
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            targetEdmTypeReference = context.Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
+            targetEdmTypeReference = context.Model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
@@ -663,7 +663,7 @@ public abstract partial class QueryBinder
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            edmTypeReference = context.Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
+            edmTypeReference = context.Model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {

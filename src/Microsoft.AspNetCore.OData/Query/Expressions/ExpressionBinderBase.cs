@@ -311,7 +311,7 @@ public abstract class ExpressionBinderBase
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            edmTypeReference = Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
+            edmTypeReference = Model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
@@ -726,7 +726,7 @@ public abstract class ExpressionBinderBase
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            targetEdmTypeReference = Model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
+            targetEdmTypeReference = Model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {

@@ -668,7 +668,7 @@ public abstract partial class QueryBinder
         QueryNode queryNode = node.Parameters.Last();
         if (queryNode is ConstantNode constantNode)
         {
-            targetEdmType = model.FindType((string)constantNode.Value).ToEdmTypeReference(false);
+            targetEdmType = model.FindType((string)constantNode.Value)?.ToEdmTypeReference(false);
         }
         else if (queryNode is SingleResourceCastNode singleResourceCastNode)
         {
