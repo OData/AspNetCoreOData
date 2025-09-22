@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -97,7 +98,8 @@ public static class HttpContextExtensions
 
         // Check if the endpoint is a minimal endpoint.
         var endpoint = httpContext.GetEndpoint();
-        return endpoint?.Metadata.GetMetadata<ODataMiniMetadata>() != null;
+        return endpoint?.Metadata.GetMetadata<HttpMethodAttribute>() == null
+               && endpoint?.Metadata.GetMetadata<ODataMiniMetadata>() != null;
     }
 
     internal static IEdmModel GetOrCreateEdmModel(this HttpContext httpContext, Type clrType, ParameterInfo parameter = null)
