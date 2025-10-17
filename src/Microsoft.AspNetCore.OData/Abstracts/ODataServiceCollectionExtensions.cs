@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Reflection;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -38,21 +39,30 @@ internal static class ODataServiceCollectionExtensions
 
         // ReaderSettings and WriterSettings are registered as prototype services.
         // There will be a copy (if it is accessed) of each prototype for each request.
-#pragma warning disable CS0618 // ReadUntypedAsString is obsolete in ODL 8.
-        services.AddScoped(sp => new ODataMessageReaderSettings(version)
+        services.AddScoped(sp =>
         {
-            EnableMessageStreamDisposal = false,
-            MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+            ODataMessageReaderSettings readerSetting = new ODataMessageReaderSettings(version)
+            {
+                EnableMessageStreamDisposal = false,
+                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+
+                // Enable read property name case-insensitive from payload.
+                EnablePropertyNameCaseInsensitive = true,
+                EnableReadingODataAnnotationWithoutPrefix = true
+            };
 
             // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
-            // In ODL 8.x, ReadUntypedAsString option will be deleted.
-            ReadUntypedAsString = false,
+            // In ODL 8.x, ReadUntypedAsString option is Obsoleted and will be removed in the next version.
+            // However, the ASP.NET Core OData library is used in OData.NET E2E test cases for ODL 8.x and ODL 9.x.
+            // To keep the existing behavior, we still need to set ReadUntypedAsString=false via reflection.
+            PropertyInfo propertyInfo = typeof(ODataMessageReaderSettings).GetProperty("ReadUntypedAsString");
+            if (propertyInfo != null)
+            {
+                propertyInfo.SetValue(readerSetting, false);
+            }
 
-            // Enable read property name case-insensitive from payload.
-            EnablePropertyNameCaseInsensitive = true,
-            EnableReadingODataAnnotationWithoutPrefix = true
+            return readerSetting;
         });
-#pragma warning restore CS0618 // Type or member is obsolete
 
         services.AddScoped(sp => new ODataMessageWriterSettings(version)
         {
