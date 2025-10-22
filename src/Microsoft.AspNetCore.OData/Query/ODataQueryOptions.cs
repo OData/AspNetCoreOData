@@ -84,6 +84,53 @@ public class ODataQueryOptions
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the given query parameters and context.
+    /// </summary>
+    /// <param name="queryParameters">The OData query parameters as a dictionary.</param>
+    /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and type information.</param>
+    public ODataQueryOptions(IDictionary<string, string> queryParameters, ODataQueryContext context)
+    {
+        if (queryParameters == null)
+        {
+            throw Error.ArgumentNull(nameof(queryParameters));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
+        Context = context;
+        Request = context.Request;
+
+        RawValues = new ODataRawQueryOptions();
+
+        // Use the provided dictionary directly
+        _queryOptionParser = new ODataQueryOptionParser(
+            context.Model,
+            context.ElementType,
+            context.NavigationSource,
+            queryParameters,
+            context.RequestContainer);
+
+        var uriResolver = context.RequestContainer?.GetService<ODataUriResolver>();
+        if (uriResolver != null)
+        {
+            _queryOptionParser.Resolver = uriResolver;
+            _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
+        }
+        else
+        {
+            _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
+            _enableNoDollarSignQueryOptions = false;
+        }
+
+        BuildQueryOptions(queryParameters);
+
+        Validator = context.GetODataQueryValidator();
+    }
+
+    /// <summary>
     /// Gets the request message associated with this instance.
     /// </summary>
     public HttpRequest Request { get; private set; }
