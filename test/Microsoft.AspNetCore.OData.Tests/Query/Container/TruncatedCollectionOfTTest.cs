@@ -6,10 +6,11 @@
 //------------------------------------------------------------------------------
 
 using System;
-using Microsoft.AspNetCore.OData.Query.Container;
-using Microsoft.AspNetCore.OData.Tests.Commons;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Query.Container;
+using Microsoft.AspNetCore.OData.Tests.Commons;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Container;
@@ -43,6 +44,51 @@ public class TruncatedCollectionTest
         TruncatedCollection<int> collection = new TruncatedCollection<int>(source, 3, 5);
 
         // Arrange
+        Assert.Equal(3, collection.PageSize);
+        Assert.Equal(5, collection.TotalCount);
+        Assert.True(collection.IsTruncated);
+        Assert.Equal(3, collection.Count);
+        Assert.Equal(new[] { 1, 2, 3 }, collection);
+    }
+
+    [Fact]
+    public void TruncatedCollectionCreateForIEnumerable_SetsProperties()
+    {
+        // Arrange & Act
+        IEnumerable<int> source = new[] { 1, 2, 3, 5, 7 };
+        var collection = TruncatedCollection<int>.Create(source, 3, 5);
+
+        // Assert
+        Assert.Equal(3, collection.PageSize);
+        Assert.Equal(5, collection.TotalCount);
+        Assert.True(collection.IsTruncated);
+        Assert.Equal(3, collection.Count);
+        Assert.Equal(new[] { 1, 2, 3 }, collection);
+    }
+
+    [Fact]
+    public async Task TruncatedCollectionCreateForIAsyncEnumerable_SetsProperties()
+    {
+        // Arrange & Act
+        IAsyncEnumerable<int> source = new[] { 1, 2, 3, 5, 7 }.ToAsyncEnumerable();
+        var collection = TruncatedCollection<int>.CreateForAsyncSource(source, 3, 5);
+
+        // Assert
+        Assert.Equal(3, collection.PageSize);
+        Assert.Equal(5, collection.TotalCount);
+        Assert.Equal(3, await collection.CountAsync());
+        Assert.Equal(new[] { 1, 2, 3 }, await collection.ToArrayAsync());
+        Assert.True(collection.IsTruncated);
+    }
+
+    [Fact]
+    public void TruncatedCollectionCreateForIQueryable_SetsProperties()
+    {
+        // Arrange & Act
+        IQueryable<int> source = new[] { 1, 2, 3, 5, 7 }.AsQueryable();
+        var collection = TruncatedCollection<int>.Create(source, 3, 5);
+
+        // Assert
         Assert.Equal(3, collection.PageSize);
         Assert.Equal(5, collection.TotalCount);
         Assert.True(collection.IsTruncated);
