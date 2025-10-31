@@ -58,15 +58,6 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
     public ODataQueryOptions(IDictionary<string, string> queryParameters, IEdmModel model = null, ODataPath path = null)
         : base(queryParameters, typeof(TEntity), model, path)
     {
-        //if (Context.ElementClrType == null)
-        //{
-        //    throw Error.Argument("context", SRResources.ElementClrTypeNull, typeof(ODataQueryContext).Name);
-        //}
-
-        //if (Context.ElementClrType != typeof(TEntity))
-        //{
-        //    throw Error.Argument("context", SRResources.EntityTypeMismatch, Context.ElementClrType.FullName, typeof(TEntity).FullName);
-        //}
     }
 
     /// <summary>

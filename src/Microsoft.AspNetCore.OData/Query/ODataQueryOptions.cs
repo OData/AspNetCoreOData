@@ -107,7 +107,7 @@ public class ODataQueryOptions
         {
             RawValues = new ODataRawQueryOptions();
 
-            BuildOnlyQueryOptions(queryParameters);
+            BuildQueryOptionsOnly(queryParameters);
             return;
         }
 
@@ -1126,7 +1126,7 @@ public class ODataQueryOptions
         }
     }
 
-    private void BuildOnlyQueryOptions(IDictionary<string, string> queryParameters)
+    private void BuildQueryOptionsOnly(IDictionary<string, string> queryParameters)
     {
         foreach (KeyValuePair<string, string> kvp in queryParameters)
         {
