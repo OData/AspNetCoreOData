@@ -56,7 +56,8 @@ Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter
 Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ODataQueryEndpointFilter() -> void
 Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.QuerySettings.get -> Microsoft.AspNetCore.OData.Query.ODataQuerySettings
 Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidationSettings.get -> Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings
-Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ODataQueryOptions(System.Collections.Generic.IDictionary<string, string> queryParameters, Microsoft.AspNetCore.OData.Query.ODataQueryContext context) -> void
+Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ODataQueryOptions(System.Collections.Generic.IDictionary<string, string> queryParameters, System.Type elementClrType, Microsoft.OData.Edm.IEdmModel model = null, Microsoft.OData.UriParser.ODataPath path = null) -> void
+Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ODataQueryOptions(System.Collections.Generic.IDictionary<string, string> queryParameters, Microsoft.OData.Edm.IEdmModel model = null, Microsoft.OData.UriParser.ODataPath path = null) -> void
 Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter
 Microsoft.AspNetCore.OData.Query.Wrapper.SelectExpandWrapperConverter.SelectExpandWrapperConverter() -> void
 Microsoft.AspNetCore.OData.Results.IODataResult
