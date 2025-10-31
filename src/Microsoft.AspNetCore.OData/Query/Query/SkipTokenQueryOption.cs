@@ -40,6 +40,16 @@ public class SkipTokenQueryOption
         Context = context;
     }
 
+    internal SkipTokenQueryOption(string rawValue)
+    {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     /// <summary>
     /// Gets the raw $skiptoken value.
     /// </summary>

@@ -54,6 +54,16 @@ public class ComputeQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    internal ComputeQueryOption(string rawValue)
+    {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // This constructor is intended for unit testing only.
     internal ComputeQueryOption(string rawValue, ODataQueryContext context)
     {

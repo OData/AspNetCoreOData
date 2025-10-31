@@ -84,7 +84,7 @@ public class ODataQueryOptionsOfTEntityTests
         };
 
         // Act
-        var options = new ODataQueryOptions<QCustomer>(_model, queryParams);
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
 
         // Assert
         Assert.NotNull(options);
@@ -115,7 +115,47 @@ public class ODataQueryOptionsOfTEntityTests
         };
 
         // Act
-        var options = new ODataQueryOptions<QCustomer>(_model, queryParams);
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Assert
+        Assert.Equal("Name eq 'Test'", options.RawValues.Filter);
+        Assert.Equal("Id desc", options.RawValues.OrderBy);
+        Assert.Equal("10", options.RawValues.Top);
+        Assert.Equal("2", options.RawValues.Skip);
+        Assert.Equal("Id,Name", options.RawValues.Select);
+        Assert.Equal("Orders", options.RawValues.Expand);
+        Assert.Equal("true", options.RawValues.Count);
+        Assert.Equal("json", options.RawValues.Format);
+        Assert.Equal("abc", options.RawValues.SkipToken);
+        Assert.Equal("def", options.RawValues.DeltaToken);
+        Assert.Equal("aggregate(Id with sum as TotalId)", options.RawValues.Apply);
+        Assert.Equal("Amount mul 2 as DoubleAmount", options.RawValues.Compute);
+        Assert.Equal("Test", options.RawValues.Search);
+    }
+
+    [Fact]
+    public void Constructor_SetsAllSupportedODataOptions_Where_EdmModel_IsNull()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Name eq 'Test'" },
+            { "$orderby", "Id desc" },
+            { "$top", "10" },
+            { "$skip", "2" },
+            { "$select", "Id,Name" },
+            { "$expand", "Orders" },
+            { "$count", "true" },
+            { "$format", "json" },
+            { "$skiptoken", "abc" },
+            { "$deltatoken", "def" },
+            { "$apply", "aggregate(Id with sum as TotalId)" },
+            { "$compute", "Amount mul 2 as DoubleAmount" },
+            { "$search", "Test" }
+        };
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams);
 
         // Assert
         Assert.Equal("Name eq 'Test'", options.RawValues.Filter);
@@ -140,7 +180,7 @@ public class ODataQueryOptionsOfTEntityTests
         var queryParams = new Dictionary<string, string>();
 
         // Act
-        var options = new ODataQueryOptions<QCustomer>(_model, queryParams);
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
 
         // Assert
         Assert.NotNull(options);
@@ -162,7 +202,7 @@ public class ODataQueryOptionsOfTEntityTests
         };
 
         // Act
-        var options = new ODataQueryOptions<QCustomer>(_model, queryParams);
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
 
         // Assert
         Assert.Equal("Id eq 1", options.RawValues.Filter);
@@ -181,7 +221,7 @@ public class ODataQueryOptionsOfTEntityTests
         var path = new ODataPath(new EntitySetSegment(entitySet));
 
         // Act
-        var options = new ODataQueryOptions<QCustomer>(_model, queryParams, path);
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model, path);
 
         // Assert
         Assert.NotNull(options);
@@ -219,7 +259,8 @@ public class ODataQueryOptionsOfTEntityTests
             { "$expand", "Orders" },
             { "$select", "Id,Name" }
         };
-        var odataOptions = new ODataQueryOptions<QCustomer>(_model, queryParams);
+
+        var odataOptions = new ODataQueryOptions<QCustomer>(queryParams, _model);
 
         var options = new JsonSerializerOptions
         {
@@ -235,18 +276,11 @@ public class ODataQueryOptionsOfTEntityTests
     }
 
     [Fact]
-    public void Constructor_Throws_OnNullModel()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new ODataQueryOptions<QCustomer>(null, new Dictionary<string, string>()));
-    }
-
-    [Fact]
     public void Constructor_Throws_OnNullDictionary()
     {
         var model = GetEdmModel();
         Assert.Throws<ArgumentNullException>(() =>
-            new ODataQueryOptions<QCustomer>(model, null));
+            new ODataQueryOptions<QCustomer>(null, model));
     }
 
     [Theory]
@@ -439,7 +473,7 @@ public class ODataQueryOptionsOfTEntityTests
         public override ODataQueryOptions<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(ref reader, options);
-            return new ODataQueryOptions<TEntity>(_edmModel, dict);
+            return new ODataQueryOptions<TEntity>(dict, _edmModel);
         }
 
         public override void Write(Utf8JsonWriter writer, ODataQueryOptions<TEntity> value, JsonSerializerOptions options)

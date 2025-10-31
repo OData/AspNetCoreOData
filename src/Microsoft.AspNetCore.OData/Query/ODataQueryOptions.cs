@@ -87,18 +87,31 @@ public class ODataQueryOptions
     /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the given query parameters and context.
     /// </summary>
     /// <param name="queryParameters">The OData query parameters as a dictionary.</param>
-    /// <param name="context">The <see cref="ODataQueryContext"/> which contains the <see cref="IEdmModel"/> and type information.</param>
-    public ODataQueryOptions(IDictionary<string, string> queryParameters, ODataQueryContext context)
+    /// <param name="model">The EdmModel that includes the <see cref="IEdmType"/> corresponding to
+    /// the given <paramref name="elementClrType"/>.</param>
+    /// <param name="elementClrType">The CLR type of the element of the collection being queried.</param>
+    /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
+    public ODataQueryOptions(IDictionary<string, string> queryParameters, Type elementClrType, IEdmModel model = null, ODataPath path = null)
     {
         if (queryParameters == null)
         {
             throw Error.ArgumentNull(nameof(queryParameters));
         }
 
-        if (context == null)
+        if (elementClrType == null)
         {
-            throw Error.ArgumentNull(nameof(context));
+            throw Error.ArgumentNull(nameof(elementClrType));
         }
+
+        if (model == null)
+        {
+            RawValues = new ODataRawQueryOptions();
+
+            BuildOnlyQueryOptions(queryParameters);
+            return;
+        }
+
+        ODataQueryContext context = new ODataQueryContext(model ?? EdmCoreModel.Instance, elementClrType, path);
 
         Context = context;
         Request = context.Request;
@@ -1110,6 +1123,80 @@ public class ODataQueryOptions
                     Context.NavigationSource,
                     new Dictionary<string, string> { { "$count", "true" } },
                     Context.RequestContainer));
+        }
+    }
+
+    private void BuildOnlyQueryOptions(IDictionary<string, string> queryParameters)
+    {
+        foreach (KeyValuePair<string, string> kvp in queryParameters)
+        {
+            switch (kvp.Key.ToLowerInvariant())
+            {
+                case "$filter":
+                    ThrowIfEmpty(kvp.Value, "$filter");
+                    RawValues.Filter = kvp.Value;
+                    Filter = new FilterQueryOption(kvp.Value);
+                    break;
+                case "$orderby":
+                    ThrowIfEmpty(kvp.Value, "$orderby");
+                    RawValues.OrderBy = kvp.Value;
+                    OrderBy = new OrderByQueryOption(kvp.Value);
+                    break;
+                case "$top":
+                    ThrowIfEmpty(kvp.Value, "$top");
+                    RawValues.Top = kvp.Value;
+                    Top = new TopQueryOption(kvp.Value);
+                    break;
+                case "$skip":
+                    ThrowIfEmpty(kvp.Value, "$skip");
+                    RawValues.Skip = kvp.Value;
+                    Skip = new SkipQueryOption(kvp.Value);
+                    break;
+                case "$select":
+                    RawValues.Select = kvp.Value;
+                    break;
+                case "$count":
+                    ThrowIfEmpty(kvp.Value, "$count");
+                    RawValues.Count = kvp.Value;
+                    Count = new CountQueryOption(kvp.Value);
+                    break;
+                case "$expand":
+                    RawValues.Expand = kvp.Value;
+                    break;
+                case "$format":
+                    RawValues.Format = kvp.Value;
+                    break;
+                case "$skiptoken":
+                    RawValues.SkipToken = kvp.Value;
+                    SkipToken = new SkipTokenQueryOption(kvp.Value);
+                    break;
+                case "$deltatoken":
+                    RawValues.DeltaToken = kvp.Value;
+                    break;
+                case "$apply":
+                    ThrowIfEmpty(kvp.Value, "$apply");
+                    RawValues.Apply = kvp.Value;
+                    Apply = new ApplyQueryOption(kvp.Value);
+                    break;
+                case "$compute":
+                    ThrowIfEmpty(kvp.Value, "$compute");
+                    RawValues.Compute = kvp.Value;
+                    Compute = new ComputeQueryOption(kvp.Value);
+                    break;
+                case "$search":
+                    ThrowIfEmpty(kvp.Value, "$search");
+                    RawValues.Search = kvp.Value;
+                    Search = new SearchQueryOption(kvp.Value);
+                    break;
+                default:
+                    // we don't throw if we can't recognize the query
+                    break;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(RawValues.Select) || !string.IsNullOrWhiteSpace(RawValues.Expand))
+        {
+            SelectExpand = new SelectExpandQueryOption(RawValues.Select, RawValues.Expand);
         }
     }
 

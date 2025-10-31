@@ -59,6 +59,16 @@ public class ApplyQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    internal ApplyQueryOption(string rawValue)
+    {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // for unit test only
     internal ApplyQueryOption(string rawValue, ODataQueryContext context)
     {

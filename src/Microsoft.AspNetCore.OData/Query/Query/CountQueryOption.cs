@@ -51,6 +51,16 @@ public class CountQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    internal CountQueryOption(string rawValue)
+    {
+        if (String.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty("rawValue");
+        }
+
+        RawValue = rawValue;
+    }
+
     // This constructor is intended for unit testing only.
     internal CountQueryOption(string rawValue, ODataQueryContext context)
     {
