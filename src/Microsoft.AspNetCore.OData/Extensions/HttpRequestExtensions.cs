@@ -151,7 +151,7 @@ public static class HttpRequestExtensions
     {
         if (request == null)
         {
-            return false;
+            throw Error.ArgumentNull(nameof(request));
         }
 
         ODataPath path = request.ODataFeature().Path;

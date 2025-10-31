@@ -54,6 +54,16 @@ public class TopQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    internal TopQueryOption(string rawValue)
+    {
+        if (String.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // This constructor is intended for unit testing only.
     internal TopQueryOption(string rawValue, ODataQueryContext context)
     {

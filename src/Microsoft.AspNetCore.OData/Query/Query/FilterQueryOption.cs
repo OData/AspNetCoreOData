@@ -33,25 +33,25 @@ public class FilterQueryOption
     /// <param name="queryOptionParser">The <see cref="ODataQueryOptionParser"/> which is used to parse the query option.</param>
     public FilterQueryOption(string rawValue, ODataQueryContext context, ODataQueryOptionParser queryOptionParser)
     {
-        if (context == null)
-        {
-            throw Error.ArgumentNull("context");
-        }
-
         if (String.IsNullOrEmpty(rawValue))
         {
             throw Error.ArgumentNullOrEmpty("rawValue");
-        }
-
-        if (queryOptionParser == null)
-        {
-            throw Error.ArgumentNull("queryOptionParser");
         }
 
         Context = context;
         RawValue = rawValue;
         Validator = context.GetFilterQueryValidator();
         _queryOptionParser = queryOptionParser;
+    }
+
+    internal FilterQueryOption(string rawValue)
+    {
+        if (String.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty("rawValue");
+        }
+
+        RawValue = rawValue;
     }
 
     internal FilterQueryOption(ODataQueryContext context, FilterClause filterClause)

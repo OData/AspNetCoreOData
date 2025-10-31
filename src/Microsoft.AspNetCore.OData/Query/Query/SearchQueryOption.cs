@@ -55,6 +55,16 @@ public class SearchQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    internal SearchQueryOption(string rawValue)
+    {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // This constructor is intended for unit testing only.
     internal SearchQueryOption(string rawValue, ODataQueryContext context)
     {
