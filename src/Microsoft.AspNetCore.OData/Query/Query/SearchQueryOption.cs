@@ -55,6 +55,7 @@ public class SearchQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    // Used when only the raw value is known.
     internal SearchQueryOption(string rawValue)
     {
         if (string.IsNullOrEmpty(rawValue))

@@ -54,6 +54,7 @@ public class FilterQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
     internal FilterQueryOption(string rawValue)
     {
         if (String.IsNullOrEmpty(rawValue))

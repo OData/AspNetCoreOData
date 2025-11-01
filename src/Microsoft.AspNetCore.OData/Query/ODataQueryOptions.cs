@@ -1112,7 +1112,8 @@ public class ODataQueryOptions
                 Context, _queryOptionParser);
         }
 
-        if (Request.IsCountRequest())
+        // Ensure Request is not null before checking for CountRequest
+        if (Request != null && Request.IsCountRequest())
         {
             Count = new CountQueryOption(
                 "true",

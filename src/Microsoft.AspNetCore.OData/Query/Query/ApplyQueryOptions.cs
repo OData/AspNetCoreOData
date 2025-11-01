@@ -59,6 +59,7 @@ public class ApplyQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    // Used when only the raw value is known.
     internal ApplyQueryOption(string rawValue)
     {
         if (string.IsNullOrEmpty(rawValue))

@@ -54,6 +54,7 @@ public class SkipQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
     internal SkipQueryOption(string rawValue)
     {
         if (String.IsNullOrEmpty(rawValue))
