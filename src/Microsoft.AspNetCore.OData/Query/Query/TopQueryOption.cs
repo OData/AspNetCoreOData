@@ -54,6 +54,7 @@ public class TopQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
     internal TopQueryOption(string rawValue)
     {
         if (String.IsNullOrEmpty(rawValue))

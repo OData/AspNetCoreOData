@@ -54,6 +54,7 @@ public class ComputeQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    // Used when only the raw value is known.
     internal ComputeQueryOption(string rawValue)
     {
         if (string.IsNullOrEmpty(rawValue))

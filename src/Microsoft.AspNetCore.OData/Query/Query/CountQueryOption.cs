@@ -51,6 +51,7 @@ public class CountQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
     internal CountQueryOption(string rawValue)
     {
         if (String.IsNullOrEmpty(rawValue))

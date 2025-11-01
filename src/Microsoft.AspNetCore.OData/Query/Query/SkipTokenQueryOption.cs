@@ -40,6 +40,7 @@ public class SkipTokenQueryOption
         Context = context;
     }
 
+    // Used when only the raw value is known.
     internal SkipTokenQueryOption(string rawValue)
     {
         if (string.IsNullOrEmpty(rawValue))
