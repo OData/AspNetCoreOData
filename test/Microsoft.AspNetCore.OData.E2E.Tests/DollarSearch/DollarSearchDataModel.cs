@@ -23,7 +23,7 @@ public class SearchProduct
 
     public SearchCategory Category { get; set; }
 
-    public List<SearchTag> Tags { get; set; } // List of tags
+    public List<SearchTag> Tags { get; set; } // List of tags
 }
 
 public class SearchCategory

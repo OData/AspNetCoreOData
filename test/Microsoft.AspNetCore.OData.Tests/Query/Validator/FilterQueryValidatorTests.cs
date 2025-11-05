@@ -798,21 +798,11 @@ public class FilterQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
     }
 
-    public static TheoryDataSet<AllowedFunctions, string, string> OtherFunctions_SomeSingleParameterCasts
-    {
-        get
-        {
-            return new TheoryDataSet<AllowedFunctions, string, string>
-            {
-                // Single-parameter casts without quotes around the type name.
-                { AllowedFunctions.Cast, "cast(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)/DerivedProductName eq 'Name'", "cast" },
-                { AllowedFunctions.IsOf, "isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)", "isof" },
-            };
-        }
-    }
-
     [Theory]
-    [MemberData(nameof(OtherFunctions_SomeSingleParameterCasts))]
+    [InlineData(AllowedFunctions.Cast, "cast(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)/DerivedProductName eq 'Name'", "cast")]
+    [InlineData(AllowedFunctions.Cast, "cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq 'Name'", "cast")]
+    [InlineData(AllowedFunctions.IsOf, "isof(Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct)", "isof")]
+    [InlineData(AllowedFunctions.IsOf, "isof('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')", "isof")]
     public void OtherFunctions_SomeSingleParameterCasts_ThrowODataException(AllowedFunctions unused, string query, string unusedName)
     {
         // Arrange
@@ -820,7 +810,7 @@ public class FilterQueryValidatorTests
         {
             AllowedFunctions = AllowedFunctions.None,
         };
-        var expectedMessage = "Cast or IsOf Function must have a type in its arguments.";
+        var expectedMessage = $"Function '{unusedName}' is not allowed. To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.";
         var option = new FilterQueryOption(query, _productContext);
 
         // Act & Assert
