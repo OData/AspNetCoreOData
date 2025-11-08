@@ -7,7 +7,6 @@
 
 using Microsoft.AspNetCore.OData.Formatter.Value;
 using Microsoft.OData.Edm;
-using NuGet.Frameworks;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Value;

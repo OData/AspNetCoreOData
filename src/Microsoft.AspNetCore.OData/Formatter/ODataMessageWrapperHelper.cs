@@ -37,7 +37,7 @@ internal static class ODataMessageWrapperHelper
     {
         return new ODataMessageWrapper(
             stream,
-            headers.ToDictionary(kvp => kvp.Key, kvp => string.Join(";", kvp.Value)),
+            headers.ToDictionary(kvp => kvp.Key, kvp => string.Join(";", kvp.Value.ToArray())),
             contentIdMapping);
     }
 }

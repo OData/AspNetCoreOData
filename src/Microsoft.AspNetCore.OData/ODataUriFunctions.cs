@@ -8,6 +8,7 @@
 using System;
 using System.Reflection;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData;
@@ -23,17 +24,18 @@ public static class ODataUriFunctions
     /// See these classes documentations.
     /// In case of an exception, both operations(adding the signature and binding the function) will be undone.
     /// </summary>
+    /// <param name="model">The <see cref="IEdmModel"/> to which the function signature will be added.</param>
     /// <param name="functionName">The uri function name that appears in the OData request uri.</param>
     /// <param name="functionSignature">The new custom function signature.</param>
     /// <param name="methodInfo">The MethodInfo to bind the given function name.</param>
     /// <exception cref="Exception">Any exception thrown by 'CustomUriFunctions.AddCustomUriFunction' and 'UriFunctionBinder.BindUriFunctionName' methods.</exception>
-    public static void AddCustomUriFunction(string functionName,
+    public static void AddCustomUriFunction(this IEdmModel model, string functionName,
         FunctionSignatureWithReturnType functionSignature, MethodInfo methodInfo)
     {
         try
         {
             // Add to OData.Libs function signature
-            CustomUriFunctions.AddCustomUriFunction(functionName, functionSignature);
+            model.AddCustomUriFunction(functionName, functionSignature);
 
             // Bind the method to it's MethoInfo 
             UriFunctionsBinder.BindUriFunctionName(functionName, methodInfo);
@@ -41,7 +43,7 @@ public static class ODataUriFunctions
         catch
         {
             // Clear in case of exception
-            RemoveCustomUriFunction(functionName, functionSignature, methodInfo);
+            model.RemoveCustomUriFunction(functionName, functionSignature, methodInfo);
             throw;
         }
     }
@@ -51,16 +53,17 @@ public static class ODataUriFunctions
     /// unbinding the function name from it's MethodInfo through 'UriFunctionsBinder' class.
     /// See these classes documentations.
     /// </summary>
+    /// <param name="model">The <see cref="IEdmModel"/> to which the function signature will be removed.</param>
     /// <param name="functionName">The uri function name that appears in the OData request uri.</param>
     /// <param name="functionSignature">The new custom function signature.</param>
     /// <param name="methodInfo">The MethodInfo to bind the given function name.</param>
     /// <exception cref="Exception">Any exception thrown by 'CustomUriFunctions.RemoveCustomUriFunction' and 'UriFunctionsBinder.UnbindUriFunctionName' methods.</exception>
     /// <returns>'True' if the function signature has successfully removed and unbounded. 'False' otherwise.</returns>
-    public static bool RemoveCustomUriFunction(string functionName,
+    public static bool RemoveCustomUriFunction(this IEdmModel model, string functionName,
         FunctionSignatureWithReturnType functionSignature, MethodInfo methodInfo)
     {
         return
-            CustomUriFunctions.RemoveCustomUriFunction(functionName, functionSignature) &&
+            model.RemoveCustomUriFunction(functionName, functionSignature) &&
             UriFunctionsBinder.UnbindUriFunctionName(functionName, methodInfo);
     }
 }

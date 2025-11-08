@@ -1,7 +1,7 @@
-# ASP.NET Core OData (8.x) Minimal API Sample
+# ASP.NET Core OData (10.x) Minimal API Sample
 
 ---
-This is an ASP.NET Core OData 8.x minimal API project. 
+This is an ASP.NET Core OData 10.x minimal API project. 
 
 Minimal APIs are a simplified approach for building fast HTTP APIs with ASP.NET Core. You can build fully functioning REST endpoints with minimal code and configuration. Skip traditional scaffolding and avoid unnecessary controllers by fluently declaring API routes and actions. 
 

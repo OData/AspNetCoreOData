@@ -16,15 +16,15 @@
     <icon>images\odata.png</icon>
     <repository type="git" url="https://github.com/OData/AspNetCoreOData.git" branch="master" />
     <dependencies>
-      <group targetFramework=".net8.0">
+      <group targetFramework=".net10.0">
         <dependency id="Microsoft.AspNetCore.OData" version="$VersionNuGetSemantic$" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.NewtonsoftJson.dll" target="lib\net8.0" />
-    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.NewtonsoftJson.xml" target="lib\net8.0" />
-    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.NewtonsoftJson.pdb" target="lib\net8.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.NewtonsoftJson.dll" target="lib\net10.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.NewtonsoftJson.xml" target="lib\net10.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.NewtonsoftJson.pdb" target="lib\net10.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
   </files>
 </package>

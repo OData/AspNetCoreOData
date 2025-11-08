@@ -64,16 +64,16 @@ public class DeltaTest
     }
 
     [Fact]
-    public async ValueTask BindAsync_ThrowsArgumentNull_ForInputs()
+    public async Task BindAsync_ThrowsArgumentNull_ForInputs()
     {
         // Arrange & Act & Assert
         ArgumentNullException exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await Delta<Base>.BindAsync(null, null), "httpContext", false, true);
-        Assert.Equal("The parameter cannot be null. (Parameter 'httpContext')", exception.Message);
+        Assert.Equal("Value cannot be null. (Parameter 'httpContext')", exception.Message);
 
         // Arrange & Act & Assert
         HttpContext httpContext = new DefaultHttpContext();
-        await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await Delta<Base>.BindAsync(httpContext, null));
-        Assert.Equal("The parameter cannot be null. (Parameter 'parameter')", exception.Message);
+        exception = await ExceptionAssert.ThrowsAsync<ArgumentNullException>(async () => await Delta<Base>.BindAsync(httpContext, null));
+        Assert.Equal("Value cannot be null. (Parameter 'parameter')", exception.Message);
     }
 
     [Fact]

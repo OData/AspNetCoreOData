@@ -769,4 +769,7 @@
   <data name="BindParameterFailedOnMinimalAPIEndpoint" xml:space="preserve">
     <value>Cannot bind parameter '{0}'. the error is: {1}.</value>
   </data>
+  <data name="CollectionParameterCannotBeArray" xml:space="preserve">
+    <value>The type '{0}' of the parameter '{1}' is an array. Consider using a collection type that supports adding elements, such as IList&lt;T&gt; or ICollection&lt;T&gt;.</value>
+  </data>
 </root>

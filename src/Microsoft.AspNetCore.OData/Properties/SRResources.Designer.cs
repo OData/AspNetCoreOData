@@ -412,6 +412,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; is an array. Consider using a collection type that supports adding elements, such as IList&lt;T&gt; or ICollection&lt;T&gt;..
+        /// </summary>
+        internal static string CollectionParameterCannotBeArray {
+            get {
+                return ResourceManager.GetString("CollectionParameterCannotBeArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &apos;{0}&apos; of the parameter &apos;{1}&apos; does not have an Add method. Consider using a collection type that does have an Add method - for example IList&lt;T&gt; or ICollection&lt;T&gt;..
         /// </summary>
         internal static string CollectionParameterShouldHaveAddMethod {

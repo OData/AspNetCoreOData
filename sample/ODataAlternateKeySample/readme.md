@@ -1,7 +1,7 @@
 # ODataAlternateKeySample
 -------------------------
 
-This sample illustrates how to use the Alternate key in ASP.NET Core OData 8.x.
+This sample illustrates how to use the Alternate key in ASP.NET Core OData 10.x.
 
 Alternate key is an 'alternate' key compared to the declared key.
 

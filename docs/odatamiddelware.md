@@ -1,7 +1,7 @@
 # ASP.NET Core OData Middleware
 
 Middleware is component that can be assembled into an app pipeline to handle requests and responses.
-ASP.NET Core OData 8.x has the following middlewares:
+ASP.NET Core OData 10.x has the following middlewares:
 
 * [ODataBatchMiddleware](https://github.com/OData/AspNetCoreOData/blob/master/src/Microsoft.AspNetCore.OData/Batch/ODataBatchMiddleware.cs)
 

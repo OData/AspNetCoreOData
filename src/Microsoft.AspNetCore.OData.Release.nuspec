@@ -2,11 +2,11 @@
 <package>
   <metadata>
     <id>Microsoft.AspNetCore.OData</id>
-    <title>Microsoft ASP.NET Core 8.x for OData v4.0</title>
+    <title>Microsoft ASP.NET Core 10.x for OData v4.0</title>
     <version>$VersionNuGetSemantic$</version>
     <authors>Microsoft</authors>
     <copyright>&#169; Microsoft Corporation. All rights reserved.</copyright>
-    <description>This package contains everything you need to create OData v4.0 endpoints using ASP.NET Core MVC Core 8.x to support OData query syntax for your Web APIs.</description>
+    <description>This package contains everything you need to create OData v4.0 endpoints using ASP.NET Core MVC Core 10.x to support OData query syntax for your Web APIs.</description>
     <summary>This package contains everything you need to create OData v4.0 endpoints using ASP.NET Core MVC.</summary>
     <language>en-US</language>
     <projectUrl>http://github.com/OData/AspNetCoreOData</projectUrl>
@@ -17,7 +17,7 @@
     <icon>images\odata.png</icon>
     <repository type="git" url="https://github.com/OData/AspNetCoreOData.git" branch="master" />
     <dependencies>
-      <group targetFramework=".net8.0">
+      <group targetFramework=".net10.0">
         <dependency id="Microsoft.OData.ModelBuilder" version="$ODataModelBuilderPackageDependency$" />
         <dependency id="Microsoft.OData.Core" version="$ODataLibPackageDependency$" />
         <dependency id="Microsoft.OData.Edm" version="$ODataLibPackageDependency$" />
@@ -26,9 +26,9 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.dll" target="lib\net8.0" />
-    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.xml" target="lib\net8.0" />
-    <file src="$ProductRoot$\net8.0\Microsoft.AspNetCore.OData.pdb" target="lib\net8.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.dll" target="lib\net10.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.xml" target="lib\net10.0" />
+    <file src="$ProductRoot$\net10.0\Microsoft.AspNetCore.OData.pdb" target="lib\net10.0" />
     <file src="$SourcesRoot$\images\odata.png" target="images\" />
 
     <!-- readme file -->

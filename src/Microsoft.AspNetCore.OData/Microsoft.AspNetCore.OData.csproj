@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>Microsoft.AspNetCore.OData</RootNamespace>
     <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
@@ -28,9 +28,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.OData.ModelBuilder" Version="2.0.0" />
-    <PackageReference Include="Microsoft.OData.Core" Version="8.4.0" />
-    <PackageReference Include="Microsoft.OData.Edm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Spatial" Version="8.4.0" />
+    <PackageReference Include="Microsoft.OData.Core" Version="9.0.0-preview.2" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="9.0.0-preview.2" />
+    <PackageReference Include="Microsoft.Spatial" Version="9.0.0-preview.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

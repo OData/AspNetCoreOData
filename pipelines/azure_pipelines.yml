@@ -2,11 +2,11 @@ trigger:
   branches:
     include:
     - main
-    - dev-9.x
+    - dev-10.x
 
 pr:
   - main
-  - dev-9.x
+  - dev-10.x
 
 resources:
   repositories:
@@ -53,9 +53,9 @@ extends:
             versionSpec: '>=5.2.0'
             checkLatest: true
         - task: UseDotNet@2
-          displayName: Use .NET Core sdk 8.x
+          displayName: Use .NET Core sdk 10.x
           inputs:
-            version: 8.x
+            version: 10.x
             includePreviewVersions: true
         - task: PowerShell@2
           displayName: Validate OData Package Versions

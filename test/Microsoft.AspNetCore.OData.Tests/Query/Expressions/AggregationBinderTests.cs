@@ -270,7 +270,7 @@ public class AggregationBinderTests
         // actual query operator
         string resultExpression = ExpressionStringBuilder.ToString(clause);
 
-        var replace = "System.Linq.EmptyPartition`1[" + typeof(T).FullName + "]";
+        var replace = $"{typeof(T).FullName}[]";
 
         resultExpression = resultExpression.Replace(replace, string.Empty);
         Assert.True(resultExpression == expectedExpression,
