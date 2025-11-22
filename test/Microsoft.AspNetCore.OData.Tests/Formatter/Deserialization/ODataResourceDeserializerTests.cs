@@ -634,8 +634,8 @@ public class ODataResourceDeserializerTests
             Properties = new[]
             {
                 new ODataProperty { Name = "Id", Value = 121 },
-                new ODataProperty { Name = "Birthday", Value = new Date(2015, 12, 12) },
-                new ODataProperty { Name = "ReleaseTime", Value = new TimeOfDay(1, 2, 3, 4) },
+                new ODataProperty { Name = "Birthday", Value = new DateOnly(2015, 12, 12) },
+                new ODataProperty { Name = "ReleaseTime", Value = new TimeOnly(1, 2, 3, 4) },
             },
             TypeName = "NS.MyCustomer"
         };
@@ -1467,7 +1467,7 @@ public class ODataResourceDeserializerTests
         Assert.Equal(4, product.Rating);
         Assert.Equal(2.5m, product.Price);
         Assert.Equal(product.ReleaseDate, new DateTimeOffset(new DateTime(1992, 1, 1, 0, 0, 0), TimeSpan.Zero));
-        Assert.Equal(product.PublishDate, new Date(1997, 7, 1));
+        Assert.Equal(product.PublishDate, new DateOnly(1997, 7, 1));
         Assert.Null(product.DiscontinuedDate);
     }
 
@@ -1580,7 +1580,7 @@ public class ODataResourceDeserializerTests
         Assert.Equal(0, product.ID);
         Assert.Equal(4, product.Rating);
         Assert.Equal(2.5m, product.Price);
-        Assert.Equal(product.PublishDate, new Date(1997, 7, 1));
+        Assert.Equal(product.PublishDate, new DateOnly(1997, 7, 1));
         Assert.Equal("Bread", product.Name);
         Assert.Equal("Whole grain bread", product.Description);
         Assert.Null(product.ReleaseDate);
@@ -1727,7 +1727,7 @@ xmlns:edmx=""http://docs.oasis-open.org/odata/ns/edmx"">
 
         public DateTimeOffset? DiscontinuedDate { get; set; }
 
-        public Date PublishDate { get; set; }
+        public DateOnly PublishDate { get; set; }
 
         public int Rating { get; set; }
 

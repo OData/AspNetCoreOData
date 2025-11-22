@@ -588,7 +588,6 @@ public partial class ODataReaderExtensionsTests
         {
             BaseUri = new Uri("http://localhost/$metadata"),
             EnableMessageStreamDisposal = true,
-            ReadUntypedAsString = readUntypedAsString,
             Version = version,
         };
 #pragma warning restore CS0618 // Type or member is obsolete

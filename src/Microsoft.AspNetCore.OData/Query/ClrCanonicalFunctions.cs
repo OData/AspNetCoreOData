@@ -45,6 +45,8 @@ internal class ClrCanonicalFunctions
     internal const string MinuteFunctionName = "minute";
     internal const string SecondFunctionName = "second";
     internal const string MillisecondFunctionName = "millisecond";
+    internal const string NanosecondFunctionName = "nanosecond";
+    internal const string MicrosecondFunctionName = "microsecond";
     internal const string FractionalSecondsFunctionName = "fractionalseconds";
     internal const string RoundFunctionName = "round";
     internal const string FloorFunctionName = "floor";
@@ -82,14 +84,6 @@ internal class ClrCanonicalFunctions
     // enum functions
     public static readonly MethodInfo HasFlag = MethodOf(_ => _defaultEnum.HasFlag(default(Enum)));
 
-    // Date properties
-    public static readonly Dictionary<string, PropertyInfo> DateProperties = new[]
-    {
-        new KeyValuePair<string, PropertyInfo>(YearFunctionName, typeof(Date).GetProperty("Year")),
-        new KeyValuePair<string, PropertyInfo>(MonthFunctionName, typeof(Date).GetProperty("Month")),
-        new KeyValuePair<string, PropertyInfo>(DayFunctionName, typeof(Date).GetProperty("Day")),
-    }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
     // DateTimeproperties
     public static readonly Dictionary<string, PropertyInfo> DateTimeProperties = new[]
     {
@@ -114,16 +108,6 @@ internal class ClrCanonicalFunctions
         new KeyValuePair<string, PropertyInfo>(MillisecondFunctionName, typeof(DateTimeOffset).GetProperty("Millisecond")),
     }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-    // TimeOfDay properties
-    // ODL uses the Hour(s), Minute(s), Second(s), It's the wrong property name. It should be Hour, Minute, Second.
-    public static readonly Dictionary<string, PropertyInfo> TimeOfDayProperties = new[]
-    {
-        new KeyValuePair<string, PropertyInfo>(HourFunctionName, typeof(TimeOfDay).GetProperty("Hours")),
-        new KeyValuePair<string, PropertyInfo>(MinuteFunctionName, typeof(TimeOfDay).GetProperty("Minutes")),
-        new KeyValuePair<string, PropertyInfo>(SecondFunctionName, typeof(TimeOfDay).GetProperty("Seconds")),
-        new KeyValuePair<string, PropertyInfo>(MillisecondFunctionName, typeof(TimeOfDay).GetProperty("Milliseconds")),
-    }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
     // DateOnly properties
     public static readonly Dictionary<string, PropertyInfo> DateOnlyProperties = new Dictionary<string, PropertyInfo>
     {
@@ -138,7 +122,9 @@ internal class ClrCanonicalFunctions
         { HourFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Hour)) },
         { MinuteFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Minute)) },
         { SecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Second)) },
-        { MillisecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Millisecond)) }
+        { MillisecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Millisecond)) },
+        { NanosecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Nanosecond)) },
+        { MicrosecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Microsecond)) }
     };
 
     // TimeSpan properties

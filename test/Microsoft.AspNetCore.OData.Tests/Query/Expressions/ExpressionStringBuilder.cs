@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Query.Container;
+using Microsoft.OData.Edm;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -96,8 +97,18 @@ public class ExpressionStringBuilder : ExpressionVisitor
                 }
                 else
                 {
-                    stringValue = String.Format(CultureInfo.InvariantCulture, "{0}", container.Property);
-                    Out(stringValue);
+                    if (container.Property is DateOnly dateOnly)
+                    {
+                        Out(dateOnly.ToODataString());
+                    }
+                    else if (container.Property is TimeOnly timeOnly)
+                    {
+                        Out(timeOnly.ToODataString());
+                    }
+                    else
+                    {
+                        Out(String.Format(CultureInfo.InvariantCulture, "{0}", container.Property));
+                    }
                 }
             }
             else

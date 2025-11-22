@@ -165,7 +165,7 @@ public class SRResourcesTests
     [InlineData("PropertyCannotBeConverted", new object[] { "arg1" })]
     [InlineData("PropertyIsNotCollection", new object[] { "arg1", "arg2", "arg3" })]
     [InlineData("PropertyMustBeBoolean", new object[] { })]
-    [InlineData("PropertyMustBeDateTimeOffsetOrDate", new object[] { })]
+    [InlineData("PropertyMustBeDateTimeOffsetOrDateOnly", new object[] { })]
     [InlineData("PropertyMustBeEnum", new object[] { "arg1", "arg2" })]
     [InlineData("PropertyMustBeSet", new object[] { "arg1" })]
     [InlineData("PropertyMustBeSetWhenAnotherPropertyIsSet", new object[] { "arg1", "arg2" })]

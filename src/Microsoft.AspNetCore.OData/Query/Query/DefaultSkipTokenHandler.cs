@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -409,7 +408,7 @@ public class DefaultSkipTokenHandler : SkipTokenHandler
             }
 
             if (DateTimeOffset.TryParse(trimmedPair, out _) ||
-                Date.TryParse(trimmedPair, out _) ||
+                DateOnly.TryParse(trimmedPair, out _) ||
                 Guid.TryParse(trimmedPair, out _))
             {
                 items[index] = trimmedPair;

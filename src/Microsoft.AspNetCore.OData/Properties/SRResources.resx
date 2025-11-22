@@ -174,8 +174,8 @@
   <data name="PropertyMustBeString" xml:space="preserve">
     <value>The value must be a string.</value>
   </data>
-  <data name="PropertyMustBeDateTimeOffsetOrDate" xml:space="preserve">
-    <value>The value must be a DateTimeOffset or Date.</value>
+  <data name="PropertyMustBeDateTimeOffsetOrDateOnly" xml:space="preserve">
+    <value>The value must be a DateTimeOffset or DateOnly.</value>
   </data>
   <data name="PropertyMustBeBoolean" xml:space="preserve">
     <value>The value must be a boolean.</value>

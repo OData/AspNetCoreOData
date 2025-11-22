@@ -179,7 +179,7 @@ public class ODataCountTests : WebApiTestBase<ODataCountTests>
 
         function = builder.Function("UnboundFunctionReturnsDateCollection");
         function.IsComposable = true;
-        function.ReturnsCollection<Date>();
+        function.ReturnsCollection<DateOnly>();
 
         function = builder.Function("UnboundFunctionReturnsComplexCollection");
         function.IsComposable = true;

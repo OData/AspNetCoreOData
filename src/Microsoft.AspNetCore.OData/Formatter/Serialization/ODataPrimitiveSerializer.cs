@@ -145,30 +145,24 @@ public class ODataPrimitiveSerializer : ODataEdmTypeSerializer
             return value;
         }
 
-        if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateTime(type))
+        if (primitiveType != null && primitiveType.IsDateOnly() && TypeHelper.IsDateTime(type))
         {
-            Date dt = (DateTime)value;
-            return dt;
+            return DateOnly.FromDateTime((DateTime)value);
         }
 
-        if (primitiveType != null && primitiveType.IsTimeOfDay() && TypeHelper.IsTimeSpan(type))
+        if (primitiveType != null && primitiveType.IsTimeOnly() && TypeHelper.IsTimeSpan(type))
         {
-            TimeOfDay tod = (TimeSpan)value;
-            return tod;
+            return TimeOnly.FromTimeSpan((TimeSpan)value);
         }
 
-        // Since ODL doesn't support "DateOnly", we have to use Date defined in ODL.
-        if (primitiveType != null && primitiveType.IsDate() && TypeHelper.IsDateOnly(type))
+        if (primitiveType != null && primitiveType.IsDateOnly() && TypeHelper.IsDateOnly(type))
         {
-            DateOnly dateOnly = (DateOnly)value;
-            return new Date(dateOnly.Year, dateOnly.Month, dateOnly.Day);
+            return (DateOnly)value;
         }
 
-        // Since ODL doesn't support "TimeOnly", we have to use TimeOfDay defined in ODL.
-        if (primitiveType != null && primitiveType.IsTimeOfDay() && TypeHelper.IsTimeOnly(type))
+        if (primitiveType != null && primitiveType.IsTimeOnly() && TypeHelper.IsTimeOnly(type))
         {
-            TimeOnly timeOnly = (TimeOnly)value;
-            return new TimeOfDay(timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond);
+            return (TimeOnly)value;
         }
 
         return ConvertUnsupportedPrimitives(value, timeZoneInfo);

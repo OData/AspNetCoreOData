@@ -52,10 +52,10 @@ public class DefaultODataTypeMapperTests
     [InlineData(typeof(DateTimeOffset?), "Edm.DateTimeOffset", true)]
     [InlineData(typeof(TimeSpan), "Edm.Duration", false)]
     [InlineData(typeof(TimeSpan?), "Edm.Duration", true)]
-    [InlineData(typeof(Date), "Edm.Date", false)]
-    [InlineData(typeof(Date?), "Edm.Date", true)]
-    [InlineData(typeof(TimeOfDay), "Edm.TimeOfDay", false)]
-    [InlineData(typeof(TimeOfDay?), "Edm.TimeOfDay", true)]
+    [InlineData(typeof(DateOnly), "Edm.Date", false)]
+    [InlineData(typeof(DateOnly?), "Edm.Date", true)]
+    [InlineData(typeof(TimeOnly), "Edm.TimeOfDay", false)]
+    [InlineData(typeof(TimeOnly?), "Edm.TimeOfDay", true)]
     [InlineData(typeof(byte[]), "Edm.Binary", true)]
     [InlineData(typeof(Stream), "Edm.Stream", true)]
     public void GetEdmPrimitiveType_ForClrType_WorksAsExpected_ForStandardPrimitive(Type clrType, string name, bool nullable)
@@ -135,8 +135,8 @@ public class DefaultODataTypeMapperTests
     [InlineData(EdmPrimitiveTypeKind.Single, typeof(float?), typeof(float))]
     [InlineData(EdmPrimitiveTypeKind.DateTimeOffset, typeof(DateTimeOffset?), typeof(DateTimeOffset))]
     [InlineData(EdmPrimitiveTypeKind.Duration, typeof(TimeSpan?), typeof(TimeSpan))]
-    [InlineData(EdmPrimitiveTypeKind.Date, typeof(Date?), typeof(Date))]
-    [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOfDay?), typeof(TimeOfDay))]
+    [InlineData(EdmPrimitiveTypeKind.Date, typeof(DateOnly?), typeof(DateOnly))]
+    [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOnly?), typeof(TimeOnly))]
     [InlineData(EdmPrimitiveTypeKind.Binary, typeof(byte[]), typeof(byte[]))]
     [InlineData(EdmPrimitiveTypeKind.Stream, typeof(Stream), typeof(Stream))]
     public void GetClrPrimitiveType_ForEdmType_WorksAsExpected_ForStandardPrimitive(EdmPrimitiveTypeKind kind, Type nullExpected, Type nonNullExpected)
@@ -241,8 +241,8 @@ public class DefaultODataTypeMapperTests
     [InlineData(EdmPrimitiveTypeKind.Stream, typeof(Stream))]
     [InlineData(EdmPrimitiveTypeKind.DateTimeOffset, typeof(DateTimeOffset))]
     [InlineData(EdmPrimitiveTypeKind.Duration, typeof(TimeSpan))]
-    [InlineData(EdmPrimitiveTypeKind.Date, typeof(Date))]
-    [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOfDay))]
+    [InlineData(EdmPrimitiveTypeKind.Date, typeof(DateOnly))]
+    [InlineData(EdmPrimitiveTypeKind.TimeOfDay, typeof(TimeOnly))]
     public void GetClrType_WorksAsExpected_ForStandardPrimitive(EdmPrimitiveTypeKind kind, Type expected)
     {
         // #1 Arrange & Act & Assert for nullable equals to false

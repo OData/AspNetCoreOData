@@ -63,8 +63,8 @@ public class ODataPrimitiveDeserializerTests
                 { new byte[] { 1 }, "Edm.Binary", "\"AQ==\"" },
                 { new TimeSpan(), "Edm.Duration", "\"PT0S\"" },
                 { new DateTimeOffset(), "Edm.DateTimeOffset", "\"0001-01-01T00:00:00Z\"" },
-                { new Date(2014, 10, 13), "Edm.Date", "\"2014-10-13\"" },
-                { new TimeOfDay(15, 38, 25, 109), "Edm.TimeOfDay", "\"15:38:25.1090000\"" },
+                { new DateOnly(2014, 10, 13), "Edm.Date", "\"2014-10-13\"" },
+                { new TimeOnly(15, 38, 25, 109), "Edm.TimeOfDay", "\"15:38:25.1090000\"" },
             };
         }
     }

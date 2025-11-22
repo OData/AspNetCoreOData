@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="DateAndTimeOfDayWithEfTest.cs" company=".NET Foundation">
+// <copyright file="DateOnlyAndTimeOnlyWithEfTest.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -27,36 +27,36 @@ using Microsoft.OData.ModelBuilder;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
-public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfTest>
+public class DateOnlyAndTimeOnlyWithEfTest : WebApiTestBase<DateOnlyAndTimeOnlyWithEfTest>
 {
-    public DateAndTimeOfDayWithEfTest(WebApiTestFixture<DateAndTimeOfDayWithEfTest> fixture)
+    public DateOnlyAndTimeOnlyWithEfTest(WebApiTestFixture<DateOnlyAndTimeOnlyWithEfTest> fixture)
         :base(fixture)
     {
     }
 
     protected static void UpdateConfigureServices(IServiceCollection services)
     {
-        string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=EfDateAndTimeOfDayModelContext8";
-        services.AddDbContext<EfDateAndTimeOfDayModelContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
+        string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=EfDateOnlyAndTimeOnlyModelContext8";
+        services.AddDbContext<EfDateOnlyAndTimeOnlyModelContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
-        services.ConfigureControllers(typeof(MetadataController), typeof(DateAndTimeOfDayModelsController));
+        services.ConfigureControllers(typeof(MetadataController), typeof(DateOnlyAndTimeOnlyModelsController));
 
         services.AddControllers().AddOData(opt => opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
             .AddRouteComponents("odata", BuildEdmModel()));
     }
 
     [Fact]
-    public async Task MetadataDocument_IncludesDateAndTimeOfDayProperties()
+    public async Task MetadataDocument_IncludesDateOnlyAndTimeOnlyProperties()
     {
         // Arrange
         string Uri = "odata/$metadata";
         string expected = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" +
 "<edmx:Edmx Version=\"4.0\" xmlns:edmx=\"http://docs.oasis-open.org/odata/ns/edmx\">\r\n" +
 "  <edmx:DataServices>\r\n" +
-"    <Schema Namespace=\"Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">\r\n" +
-"      <EntityType Name=\"DateAndTimeOfDayModel\">\r\n" +
+"    <Schema Namespace=\"Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">\r\n" +
+"      <EntityType Name=\"DateOnlyAndTimeOnlyModel\">\r\n" +
 "        <Key>\r\n" +
 "          <PropertyRef Name=\"Id\" />\r\n" +
 "        </Key>\r\n" +
@@ -72,7 +72,7 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
 "    </Schema>\r\n" +
 "    <Schema Namespace=\"Default\" xmlns=\"http://docs.oasis-open.org/odata/ns/edm\">\r\n" +
 "      <EntityContainer Name=\"Container\">\r\n" +
-"        <EntitySet Name=\"DateAndTimeOfDayModels\" EntityType=\"Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay.DateAndTimeOfDayModel\" />\r\n" +
+"        <EntitySet Name=\"DateOnlyAndTimeOnlyModels\" EntityType=\"Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly.DateOnlyAndTimeOnlyModel\" />\r\n" +
 "      </EntityContainer>\r\n" +
 "    </Schema>\r\n" +
 "  </edmx:DataServices>\r\n" +
@@ -93,10 +93,10 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     }
 
     [Fact]
-    public async Task CanQueryEntitySet_WithDateAndTimeOfDayProperties()
+    public async Task CanQueryEntitySet_WithDateOnlyAndTimeOnlyProperties()
     {
         // Arrange
-        string Uri = "odata/DateAndTimeOfDayModels";
+        string Uri = "odata/DateOnlyAndTimeOnlyModels";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
         HttpClient client = CreateClient();
 
@@ -118,16 +118,16 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     }
 
     [Fact]
-    public async Task CanQuerySingleEntity_WithDateAndTimeOfDayProperties()
+    public async Task CanQuerySingleEntity_WithDateOnlyAndTimeOnlyProperties()
     {
         // Arrange
-        string Uri = "odata/DateAndTimeOfDayModels(2)";
+        string Uri = "odata/DateOnlyAndTimeOnlyModels(2)";
 
         string expect = @"{
-  ""@odata.context"": ""{XXXX}/odata/$metadata#DateAndTimeOfDayModels/$entity"",
-  ""@odata.type"": ""#Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay.DateAndTimeOfDayModel"",
-  ""@odata.id"": ""{XXXX}/odata/DateAndTimeOfDayModels(2)"",
-  ""@odata.editLink"": ""DateAndTimeOfDayModels(2)"",
+  ""@odata.context"": ""{XXXX}/odata/$metadata#DateOnlyAndTimeOnlyModels/$entity"",
+  ""@odata.type"": ""#Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly.DateOnlyAndTimeOnlyModel"",
+  ""@odata.id"": ""{XXXX}/odata/DateOnlyAndTimeOnlyModels(2)"",
+  ""@odata.editLink"": ""DateOnlyAndTimeOnlyModels(2)"",
   ""EndDay@odata.type"": ""#Date"",
   ""EndDay"": ""2015-12-24"",
   ""DeliverDay"": null,
@@ -158,10 +158,10 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     }
 
     [Fact]
-    public async Task CanSelect_OnDateAndTimeOfDayProperties()
+    public async Task CanSelect_OnDateOnlyAndTimeOnlyProperties()
     {
         // Arrange
-        string Uri = "odata/DateAndTimeOfDayModels(3)?$select=Birthday,PublishDay,DeliverDay,CreatedTime,ResumeTime";
+        string Uri = "odata/DateOnlyAndTimeOnlyModels(3)?$select=Birthday,PublishDay,DeliverDay,CreatedTime,ResumeTime";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
         HttpClient client = CreateClient();
 
@@ -195,10 +195,10 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     // [InlineData("?$filter=second(EndTime) eq 10", "5")] // EFCore could not be translated.
     [InlineData("?$filter=EndTime eq null", "2,4")]
     // [InlineData("?$filter=EndTime ge 02:03:05.0790000", "1,3,5")] // EFCore could not be translated.
-    public async Task CanFilter_OnDateAndTimeOfDayProperties(string filter, string expect)
+    public async Task CanFilter_OnDateOnlyAndTimeOnlyProperties(string filter, string expect)
     {
         // Arrange
-        string Uri = "odata/DateAndTimeOfDayModels" + filter;
+        string Uri = "odata/DateOnlyAndTimeOnlyModels" + filter;
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Uri);
         HttpClient client = CreateClient();
 
@@ -219,10 +219,10 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     [InlineData("?$orderby=PublishDay desc", "2,4,5,3,1")]
     [InlineData("?$orderby=CreatedTime", "1,2,3,4,5")]
     [InlineData("?$orderby=CreatedTime desc", "5,4,3,2,1")]
-    public async Task CanOrderBy_OnDateAndTimeOfDayProperties(string orderby, string expect)
+    public async Task CanOrderBy_OnDateOnlyAndTimeOnlyProperties(string orderby, string expect)
     {
         // Arrange
-        string Uri = "odata/DateAndTimeOfDayModels" + orderby;
+        string Uri = "odata/DateOnlyAndTimeOnlyModels" + orderby;
         var request = new HttpRequestMessage(HttpMethod.Get, Uri);
         HttpClient client = CreateClient();
 
@@ -239,7 +239,7 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     }
 
     [Fact]
-    public async Task PostEntity_WithDateAndTimeOfDayTimeProperties()
+    public async Task PostEntity_WithDateOnlyAndTimeOnlyTimeProperties()
     {
         // Arrange
         const string Payload = "{" +
@@ -248,7 +248,7 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
             "\"CreatedTime\":\"14:13:15.1790000\"," +
             "\"EndDay\":\"1990-12-22\"}";
 
-        string Uri = "odata/DateAndTimeOfDayModels";
+        string Uri = "odata/DateOnlyAndTimeOnlyModels";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Uri);
 
         request.Content = new StringContent(Payload);
@@ -265,14 +265,14 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     }
 
     [Fact]
-    public async Task PutEntity_WithDateAndTimeOfDayProperties()
+    public async Task PutEntity_WithDateOnlyAndTimeOnlyProperties()
     {
         // Arrange
         const string Payload = "{" +
             "\"Birthday\":\"2199-01-02\"," +
             "\"CreatedTime\":\"14:13:15.1790000\"}";
 
-        string Uri = "odata/DateAndTimeOfDayModels(3)";
+        string Uri = "odata/DateOnlyAndTimeOnlyModels(3)";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Uri);
 
         request.Content = new StringContent(Payload);
@@ -291,9 +291,9 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     private static IEdmModel BuildEdmModel()
     {
         var builder = new ODataConventionModelBuilder();
-        builder.EntitySet<DateAndTimeOfDayModel>("DateAndTimeOfDayModels");
+        builder.EntitySet<DateOnlyAndTimeOnlyModel>("DateOnlyAndTimeOnlyModels");
 
-        var type = builder.EntityType<DateAndTimeOfDayModel>();
+        var type = builder.EntityType<DateOnlyAndTimeOnlyModel>();
         type.Property(c => c.EndDay).AsDate();
         type.Property(c => c.DeliverDay).AsDate();
         type.Property(c => c.ResumeTime).AsTimeOfDay();
@@ -302,19 +302,19 @@ public class DateAndTimeOfDayWithEfTest : WebApiTestBase<DateAndTimeOfDayWithEfT
     }
 }
 
-public class DateAndTimeOfDayModelsController : ODataController
+public class DateOnlyAndTimeOnlyModelsController : ODataController
 {
-    private EfDateAndTimeOfDayModelContext _db;
+    private EfDateOnlyAndTimeOnlyModelContext _db;
 
-    public DateAndTimeOfDayModelsController(EfDateAndTimeOfDayModelContext context)
+    public DateOnlyAndTimeOnlyModelsController(EfDateOnlyAndTimeOnlyModelContext context)
     {
         context.Database.EnsureCreated();
         if (!context.DateTimes.Any())
         {
             DateTime dt = new DateTime(2015, 12, 22);
 
-            IList<DateAndTimeOfDayModel> dateTimes = Enumerable.Range(1, 5).Select(i =>
-                new DateAndTimeOfDayModel
+            IList<DateOnlyAndTimeOnlyModel> dateTimes = Enumerable.Range(1, 5).Select(i =>
+                new DateOnlyAndTimeOnlyModel
                 {
                    // Id = i,
                     Birthday = dt.AddYears(i),
@@ -346,7 +346,7 @@ public class DateAndTimeOfDayModelsController : ODataController
     [EnableQuery]
     public IActionResult Get(int key)
     {
-        DateAndTimeOfDayModel dtm = _db.DateTimes.FirstOrDefault(e => e.Id == key);
+        DateOnlyAndTimeOnlyModel dtm = _db.DateTimes.FirstOrDefault(e => e.Id == key);
         if (dtm == null)
         {
             return NotFound();
@@ -355,7 +355,7 @@ public class DateAndTimeOfDayModelsController : ODataController
         return Ok(dtm);
     }
 
-    public IActionResult Post([FromBody]DateAndTimeOfDayModel dt)
+    public IActionResult Post([FromBody]DateOnlyAndTimeOnlyModel dt)
     {
         Assert.NotNull(dt);
 
@@ -367,7 +367,7 @@ public class DateAndTimeOfDayModelsController : ODataController
         return Created(dt);
     }
 
-    public IActionResult Put(int key, [FromBody]Delta<DateAndTimeOfDayModel> dt)
+    public IActionResult Put(int key, [FromBody]Delta<DateOnlyAndTimeOnlyModel> dt)
     {
         Assert.Equal(new[] { "Birthday", "CreatedTime" }, dt.GetChangedPropertyNames());
 
@@ -388,23 +388,23 @@ public class DateAndTimeOfDayModelsController : ODataController
     }
 }
 
-public class EfDateAndTimeOfDayModelContext : DbContext
+public class EfDateOnlyAndTimeOnlyModelContext : DbContext
 {
-    public EfDateAndTimeOfDayModelContext(DbContextOptions<EfDateAndTimeOfDayModelContext> options)
+    public EfDateOnlyAndTimeOnlyModelContext(DbContextOptions<EfDateOnlyAndTimeOnlyModelContext> options)
         : base(options)
     {
     }
 
-    public DbSet<DateAndTimeOfDayModel> DateTimes { get; set; }
+    public DbSet<DateOnlyAndTimeOnlyModel> DateTimes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.EndDay).HasColumnType("date");
-        modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.DeliverDay).HasColumnType("date");
+        modelBuilder.Entity<DateOnlyAndTimeOnlyModel>().Property(c => c.EndDay).HasColumnType("date");
+        modelBuilder.Entity<DateOnlyAndTimeOnlyModel>().Property(c => c.DeliverDay).HasColumnType("date");
     }
 }
 
-public class DateAndTimeOfDayModel
+public class DateOnlyAndTimeOnlyModel
 {
     public int Id { get; set; }
 

@@ -493,8 +493,8 @@ public class DateAndOnlyTimeOnlyModelContext : DbContext
 
     //protected override void OnModelCreating(ModelBuilder modelBuilder)
     //{
-    //    modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.EndDay).HasColumnType("date");
-    //    modelBuilder.Entity<DateAndTimeOfDayModel>().Property(c => c.DeliverDay).HasColumnType("date");
+    //    modelBuilder.Entity<DateOnlyAndTimeOnlyModel>().Property(c => c.EndDay).HasColumnType("date");
+    //    modelBuilder.Entity<DateOnlyAndTimeOnlyModel>().Property(c => c.DeliverDay).HasColumnType("date");
     //}
 }
 

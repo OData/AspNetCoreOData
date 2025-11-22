@@ -1413,17 +1413,17 @@ public abstract partial class QueryBinder
             // we handle null propagation ourselves. So, if converting from bool to Nullable<bool> ignore.
             return source;
         }
-        else if (conversionType == typeof(Date?) &&
+        else if (conversionType == typeof(DateOnly?) &&
             (source.Type == typeof(DateTimeOffset?) || source.Type == typeof(DateTime?)))
         {
             return source;
         }
-        if ((conversionType == typeof(TimeOfDay?) && source.Type == typeof(TimeOfDay)) ||
-            ((conversionType == typeof(Date?) && source.Type == typeof(Date))))
+        if ((conversionType == typeof(TimeOnly?) && source.Type == typeof(TimeOnly)) ||
+            ((conversionType == typeof(DateOnly?) && source.Type == typeof(DateOnly))))
         {
             return source;
         }
-        else if (conversionType == typeof(TimeOfDay?) &&
+        else if (conversionType == typeof(TimeOnly?) &&
             (source.Type == typeof(DateTimeOffset?) || source.Type == typeof(DateTime?) || source.Type == typeof(TimeSpan?)))
         {
             return source;
@@ -1511,7 +1511,7 @@ public abstract partial class QueryBinder
 
         if (edmTypeReference != null &&
             edmTypeReference.IsNullable &&
-            (edmTypeReference.IsDate() || edmTypeReference.IsTimeOfDay()))
+            (edmTypeReference.IsDateOnly() || edmTypeReference.IsTimeOnly()))
         {
             constantType = Nullable.GetUnderlyingType(constantType) ?? constantType;
         }

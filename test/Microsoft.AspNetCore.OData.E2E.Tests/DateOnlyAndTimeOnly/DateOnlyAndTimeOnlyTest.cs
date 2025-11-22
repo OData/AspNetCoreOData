@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="DateAndTimeOfDayTest.cs" company=".NET Foundation">
+// <copyright file="DateOnlyAndTimeOnlyTest.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -24,19 +24,19 @@ using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
-public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
+public class DateOnlyAndTimeOnlyTest : WebApiTestBase<DateOnlyAndTimeOnlyTest>
 {
-    public DateAndTimeOfDayTest(WebApiTestFixture<DateAndTimeOfDayTest> fixture)
+    public DateOnlyAndTimeOnlyTest(WebApiTestFixture<DateOnlyAndTimeOnlyTest> fixture)
         :base(fixture)
     {
     }
 
     protected static void UpdateConfigureServices(IServiceCollection services)
     {
-        string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=DateAndTimeOfDayEfDbContext8";
-        services.AddDbContext<DateAndTimeOfDayContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
+        string connectionString = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=True;Initial Catalog=DateOnlyAndTimeOnlyEfDbContext8";
+        services.AddDbContext<DateOnlyAndTimeOnlyContext>(opt => opt.UseLazyLoadingProxies().UseSqlServer(connectionString));
 
         services.ConfigureControllers(typeof(DCustomersController), typeof(MetadataController), typeof(EfCustomersController));
 
@@ -45,8 +45,8 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
         services.AddControllers().AddOData(opt =>
         {
             opt.Count().Filter().OrderBy().Expand().SetMaxTop(null)
-                .AddRouteComponents("convention", DateAndTimeOfDayEdmModel.GetConventionModel())
-                .AddRouteComponents("explicit", DateAndTimeOfDayEdmModel.GetExplicitModel());
+                .AddRouteComponents("convention", DateOnlyAndTimeOnlyEdmModel.GetConventionModel())
+                .AddRouteComponents("explicit", DateOnlyAndTimeOnlyEdmModel.GetExplicitModel());
             opt.TimeZone = timeZoneInfo;
         });
     }
@@ -156,12 +156,12 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
                 new object[] {"$filter=Offset ge cast(2015-05-01T01:02:03.004Z,Edm.DateTimeOffset)", new[] {4} },
                 new object[] {"$filter=Offset lt cast(2015-05-01T01:02:03.004Z,Edm.DateTimeOffset)", new int[] {1,2,3,5} },
 
-                // Date
+                // DateOnly
                 new object[] {"$filter=Date eq 2014-12-29", new[] {3} },
                 new object[] {"$filter=Date ge 2014-12-29", new[] {1,2,3,4} },
                 new object[] {"$filter=Date lt 2014-12-29", new int[] {5} },
 
-                // TimeOfDay
+                // TimeOnly
                 new object[] {"$filter=TimeOfDay eq 21:02:03.0140000", new[] {4} },
                 new object[] {"$filter=TimeOfDay ge 21:02:03.0040000", new[] {2,4} },
                 new object[] {"$filter=TimeOfDay lt 21:02:03.0040000", new int[] {1,3,5} },
@@ -176,12 +176,12 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
                 new object[] {"$filter=NullableOffset ne null", new[] {1,2,4,5} },
                 new object[] {"$filter=NullableOffset lt cast(2015-05-01T01:02:03.004Z,Edm.DateTimeOffset)", new [] {1,2} },
 
-                // Date?
+                // DateOnly?
                 new object[] {"$filter=NullableDate eq null", new[] {2,4} },
                 new object[] {"$filter=NullableDate ne null", new[] {1,3,5} },
                 new object[] {"$filter=NullableDate lt 2015-01-03", new [] {1} },
 
-                // TimeOfDay?
+                // TimeOnly?
                 new object[] {"$filter=NullableTimeOfDay eq null", new[] {3} },
                 new object[] {"$filter=NullableTimeOfDay ne null", new[] {1,2,4,5} },
                 new object[] {"$filter=NullableTimeOfDay gt 03:02:03.0040000", new [] {4,5} },
@@ -223,7 +223,7 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
     [Theory]
     [MemberData(nameof(FilterData))]
-    public async Task CanFilterDateAndTimeOfDayProperty(string mode, string filter, IList<int> expect)
+    public async Task CanFilterDateOnlyAndTimeOnlyProperty(string mode, string filter, IList<int> expect)
     {
         string requestUri = $"{mode}/DCustomers?{filter}";
         HttpClient client = CreateClient();
@@ -288,7 +288,7 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
     [Theory]
     [MemberData(nameof(OrderByData))]
-    public async Task CanOrderByDateAndTimeOfDayProperty(string mode, string orderby, string expect)
+    public async Task CanOrderByDateOnlyAndTimeOnlyProperty(string mode, string orderby, string expect)
     {
         string requestUri = $"{mode}/DCustomers?{orderby}";
         HttpClient client = CreateClient();
@@ -336,7 +336,7 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
     [Theory]
     [MemberData(nameof(FunctionData))]
-    public async Task CanCallFunctionWithDateAndTimeOfDayParameters(string mode, string function)
+    public async Task CanCallFunctionWithDateOnlyAndTimeOnlyParameters(string mode, string function)
     {
         string parameter =
             "modifiedDate=2015-02-28,modifiedTime=01:02:03.0040000,nullableModifiedDate=null,nullableModifiedTime=null";
@@ -378,7 +378,7 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
     [Theory]
     [MemberData(nameof(ActionData))]
-    public async Task CanCallActionWithDateAndTimeOfDayParameters(string mode, string action)
+    public async Task CanCallActionWithDateOnlyAndTimeOnlyParameters(string mode, string action)
     {
         string requestUri = $"{mode}/{action}";
         string content = "{'modifiedDate':'2015-03-01','modifiedTime':'01:05:06.0080000','nullableModifiedDate':null,'nullableModifiedTime':null,'dates':['2014-12-21','2015-03-01']}";
@@ -523,7 +523,7 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
     [Theory]
     [MemberData(nameof(FilterDataForEf))]
-    public async Task CanFilterDateAndTimeOfDayPropertyOnEf(string filter, IList<int> expect)
+    public async Task CanFilterDateOnlyAndTimeOnlyPropertyOnEf(string filter, IList<int> expect)
     {
         string requestUri = $"convention/EfCustomers?{filter}";
         HttpClient client = CreateClient();
@@ -571,7 +571,7 @@ public class DateAndTimeOfDayTest : WebApiTestBase<DateAndTimeOfDayTest>
 
     [Theory]
     [MemberData(nameof(OrderByDataEf))]
-    public async Task CanOrderByDateAndTimeOfDayPropertyOnEf(string orderby, string expect)
+    public async Task CanOrderByDateOnlyAndTimeOnlyPropertyOnEf(string orderby, string expect)
     {
         string requestUri = $"convention/EfCustomers?{orderby}";
         HttpClient client = CreateClient();
