@@ -45,8 +45,6 @@ internal class ClrCanonicalFunctions
     internal const string MinuteFunctionName = "minute";
     internal const string SecondFunctionName = "second";
     internal const string MillisecondFunctionName = "millisecond";
-    internal const string NanosecondFunctionName = "nanosecond";
-    internal const string MicrosecondFunctionName = "microsecond";
     internal const string FractionalSecondsFunctionName = "fractionalseconds";
     internal const string RoundFunctionName = "round";
     internal const string FloorFunctionName = "floor";
@@ -123,8 +121,7 @@ internal class ClrCanonicalFunctions
         { MinuteFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Minute)) },
         { SecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Second)) },
         { MillisecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Millisecond)) },
-        { NanosecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Nanosecond)) },
-        { MicrosecondFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Microsecond)) }
+        { FractionalSecondsFunctionName, typeof(TimeOnly).GetProperty(nameof(TimeOnly.Nanosecond)) }
     };
 
     // TimeSpan properties
