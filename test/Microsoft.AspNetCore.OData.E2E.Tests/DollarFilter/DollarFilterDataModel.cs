@@ -132,8 +132,8 @@ public class LiteralInfo
     public Guid DeclaredGuidProperty { get; set; }
     public string DeclaredStringProperty { get; set; }
     public TimeSpan DeclaredTimeSpanProperty { get; set; }
-    public TimeOnly DeclaredTimeOfDayProperty { get; set; }
-    public DateOnly DeclaredDateProperty { get; set; }
+    public TimeOnly DeclaredTimeOnlyProperty { get; set; }
+    public DateOnly DeclaredDateOnlyProperty { get; set; }
     public DateTimeOffset DeclaredDateTimeOffsetProperty { get; set; }
     public Color DeclaredEnumProperty { get; set; }
     public byte[] DeclaredByteArrayProperty { get; set; }

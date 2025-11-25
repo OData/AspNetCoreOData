@@ -96,19 +96,6 @@ internal static class ExpressionBinderHelper
             right = CreateTimeBinaryExpression(right, querySettings);
         }
 
-        if ((IsType<DateOnly>(leftUnderlyingType) && IsDateOnly(rightUnderlyingType)) ||
-            (IsDateOnly(leftUnderlyingType) && IsType<DateOnly>(rightUnderlyingType)))
-        {
-            left = CreateDateBinaryExpression(left, querySettings);
-            right = CreateDateBinaryExpression(right, querySettings);
-        }
-        else if ((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOnly(rightUnderlyingType)) ||
-            (IsTimeOnly(leftUnderlyingType) && IsType<TimeOnly>(rightUnderlyingType)))
-        {
-            left = CreateTimeBinaryExpression(left, querySettings);
-            right = CreateTimeBinaryExpression(right, querySettings);
-        }
-
         if (left.Type != right.Type)
         {
             // one of them must be nullable and the other is not.

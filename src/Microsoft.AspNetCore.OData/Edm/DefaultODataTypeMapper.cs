@@ -90,8 +90,6 @@ public class DefaultODataTypeMapper : IODataTypeMapper
         BuildReferenceTypeMapping<char[]>(EdmPrimitiveTypeKind.String, isStandard: false);
         BuildValueTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
         BuildValueTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
-        //BuildValueTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date, isStandard: false);
-        //BuildValueTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
     }
     #endregion
 

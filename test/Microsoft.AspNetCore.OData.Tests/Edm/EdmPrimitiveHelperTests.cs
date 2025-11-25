@@ -73,7 +73,7 @@ public class EdmPrimitiveHelperTests
                 { 9, typeof(char[]), "The value must be a string." },
                 { 9, typeof(XElement), "The value must be a string." },
                 { 9, typeof(TestEnum), "The value must be a string." },
-                { 9, typeof(DateTime), "The value must be a DateTimeOffset or Date." },
+                { 9, typeof(DateTime), "The value must be a DateTimeOffset or DateOnly." },
                 { 9, typeof(TimeSpan), "The value must be a Edm.TimeOfDay." },
                 { "", typeof(bool), "The value must be a boolean." },
                 { "0", typeof(bool), "The value must be a boolean." },
