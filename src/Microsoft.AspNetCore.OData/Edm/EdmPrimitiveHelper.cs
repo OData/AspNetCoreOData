@@ -127,7 +127,7 @@ internal static class EdmPrimitiveHelper
                     return timeOnly.ToTimeSpan();
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOnly));
             }
             else if (type == typeof(bool))
             {
@@ -155,7 +155,7 @@ internal static class EdmPrimitiveHelper
                     return timeOnly;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOnly));
             }
             else
             {

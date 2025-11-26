@@ -172,7 +172,7 @@ public class SRResourcesTests
     [InlineData("PropertyMustBeString", new object[] { })]
     [InlineData("PropertyMustBeStringLengthOne", new object[] { })]
     [InlineData("PropertyMustBeStringMaxLengthOne", new object[] { })]
-    [InlineData("PropertyMustBeTimeOfDay", new object[] { })]
+    [InlineData("PropertyMustBeTimeOnly", new object[] { })]
     [InlineData("PropertyMustHavePublicGetterAndSetter", new object[] { })]
     [InlineData("PropertyNotFound", new object[] { "arg1", "arg2" })]
     [InlineData("PropertyNotFoundOnPathExpression", new object[] { "arg1", "arg2" })]

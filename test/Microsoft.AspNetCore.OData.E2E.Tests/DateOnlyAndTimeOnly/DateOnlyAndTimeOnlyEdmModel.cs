@@ -21,23 +21,23 @@ public class DateOnlyAndTimeOnlyEdmModel
         var customerType = builder.EntityType<DCustomer>().HasKey(c => c.Id);
         customerType.Property(c => c.DateTime);
         customerType.Property(c => c.Offset);
-        customerType.Property(c => c.Date);
-        customerType.Property(c => c.TimeOfDay);
+        customerType.Property(c => c.DateOnly);
+        customerType.Property(c => c.TimeOnly);
 
         customerType.Property(c => c.NullableDateTime);
         customerType.Property(c => c.NullableOffset);
-        customerType.Property(c => c.NullableDate);
-        customerType.Property(c => c.NullableTimeOfDay);
+        customerType.Property(c => c.NullableDateOnly);
+        customerType.Property(c => c.NullableTimeOnly);
 
         customerType.CollectionProperty(c => c.DateTimes);
         customerType.CollectionProperty(c => c.Offsets);
-        customerType.CollectionProperty(c => c.Dates);
-        customerType.CollectionProperty(c => c.TimeOfDays);
+        customerType.CollectionProperty(c => c.DateOnlys);
+        customerType.CollectionProperty(c => c.TimeOnlys);
 
         customerType.CollectionProperty(c => c.NullableDateTimes);
         customerType.CollectionProperty(c => c.NullableOffsets);
-        customerType.CollectionProperty(c => c.NullableDates);
-        customerType.CollectionProperty(c => c.NullableTimeOfDays);
+        customerType.CollectionProperty(c => c.NullableDateOnlys);
+        customerType.CollectionProperty(c => c.NullableTimeOnlys);
 
         var customers = builder.EntitySet<DCustomer>("DCustomers");
        // customers.HasIdLink(link, true);

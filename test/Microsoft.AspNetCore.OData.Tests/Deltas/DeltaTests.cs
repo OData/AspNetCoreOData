@@ -895,10 +895,10 @@ public class DeltaTest
                 { "DateTimeOffsetProperty", "'1992-01-01'", new DateTimeOffset(new DateTime(1992, 1, 1)) },
                 { "NullableDateTimeOffsetProperty", "'1992-01-01'", new DateTimeOffset(new DateTime(1992, 1, 1)) },
                 { "NullableDateTimeOffsetProperty", "null", null },
-                { "DateProperty", "'1997-07-01'", new DateOnly(1997, 7, 1) },
-                { "NullableDateProperty", "null", null },
-                { "TimeOfDayProperty", "'10:11:12.0130000'", new TimeOnly(10, 11, 12, 13) },
-                { "NullableTimeOfDayProperty", "null", null },
+                { "DateOnlyProperty", "'1997-07-01'", new DateOnly(1997, 7, 1) },
+                { "NullableDateOnlyProperty", "null", null },
+                { "TimeOnlyProperty", "'10:11:12.0130000'", new TimeOnly(10, 11, 12, 13) },
+                { "NullableTimeOnlyProperty", "null", null },
                 { "StringProperty", "'42'", "42" },
                 { "ComplexModelProperty", "{ 'ComplexIntProperty' : 42 }", new ComplexModel { ComplexIntProperty = 42 } },
                 { "CollectionProperty", "[ 1, 2, 3 ]", new Collection<int> { 1, 2, 3} },
@@ -955,13 +955,13 @@ public class DeltaTest
 
         public DateTimeOffset? NullableDateTimeOffsetProperty { get; set; }
 
-        public DateOnly DateProperty { get; set; }
+        public DateOnly DateOnlyProperty { get; set; }
 
-        public DateOnly? NullableDateProperty { get; set; }
+        public DateOnly? NullableDateOnlyProperty { get; set; }
 
-        public TimeOnly TimeOfDayProperty { get; set; }
+        public TimeOnly TimeOnlyProperty { get; set; }
 
-        public TimeOnly? NullableTimeOfDayProperty { get; set; }
+        public TimeOnly? NullableTimeOnlyProperty { get; set; }
 
         public string StringProperty { get; set; }
 

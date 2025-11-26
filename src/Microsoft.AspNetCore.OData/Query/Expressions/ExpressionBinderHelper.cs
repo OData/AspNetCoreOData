@@ -517,12 +517,12 @@ internal static class ExpressionBinderHelper
 
     public static bool IsTimeOfDay(Type type)
     {
-        return IsType<TimeOnly>(type);
+        return type.IsTimeOnly();
     }
 
     public static bool IsDate(Type type)
     {
-        return IsType<DateOnly>(type);
+        return type.IsDateOnly();
     }
 
     public static bool IsDateOnly(this Type type)

@@ -454,7 +454,7 @@ public class TypedOpenTypeTest : WebApiTestBase<TypedOpenTypeTest>
             @"{
                     '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.OpenType.GlobalAddress',
                     'City':'NewCity',
-                    'OtherProperty@odata.type':'#Date',
+                    'OtherProperty@odata.type':'#DateOnly',
                     'OtherProperty':'2016-02-01'
               }");
         request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
@@ -501,7 +501,7 @@ public class TypedOpenTypeTest : WebApiTestBase<TypedOpenTypeTest>
             @"{
                     '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.OpenType.Address',
                     'City':'NewCity',
-                    'OtherProperty@odata.type':'#Date',
+                    'OtherProperty@odata.type':'#DateOnly',
                     'OtherProperty':'2016-02-01'
               }");
         request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
@@ -613,7 +613,7 @@ public class TypedOpenTypeTest : WebApiTestBase<TypedOpenTypeTest>
                     '@odata.type':'#Microsoft.AspNetCore.OData.E2E.Tests.OpenType.Address',
                     'City':'NewCity',
                     'Street':'NewStreet',
-                    'OtherProperty@odata.type':'#Date',
+                    'OtherProperty@odata.type':'#DateOnly',
                     'OtherProperty':'2016-02-01'
               }");
         request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");

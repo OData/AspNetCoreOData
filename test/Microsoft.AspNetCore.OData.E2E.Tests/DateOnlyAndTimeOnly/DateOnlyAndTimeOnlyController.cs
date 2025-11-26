@@ -33,23 +33,23 @@ public class DCustomersController : ODataController
                 Id = e,
                 DateTime = dto.AddYears(e).DateTime,
                 Offset = e % 2 == 0 ? dto.AddMonths(e) : dto.AddDays(e).AddMilliseconds(10),
-                Date = e % 2 == 0 ? DateOnly.FromDateTime(dto.AddDays(e).Date) : DateOnly.FromDateTime(dto.AddDays(-e).Date),
-                TimeOfDay = e % 3 == 0 ? TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay) : TimeOnly.FromTimeSpan(dto.AddHours(-e).AddMilliseconds(10).TimeOfDay),
+                DateOnly = e % 2 == 0 ? DateOnly.FromDateTime(dto.AddDays(e).Date) : DateOnly.FromDateTime(dto.AddDays(-e).Date),
+                TimeOnly = e % 3 == 0 ? TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay) : TimeOnly.FromTimeSpan(dto.AddHours(-e).AddMilliseconds(10).TimeOfDay),
 
                 NullableDateTime = e % 2 == 0 ? (DateTime?)null : dto.AddYears(e).DateTime,
                 NullableOffset = e % 3 == 0 ? (DateTimeOffset?)null : dto.AddMonths(e),
-                NullableDate = e % 2 == 0 ? (DateOnly?)null : DateOnly.FromDateTime(dto.AddDays(e).Date),
-                NullableTimeOfDay = e % 3 == 0 ? (TimeOnly?)null : TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay),
+                NullableDateOnly = e % 2 == 0 ? (DateOnly?)null : DateOnly.FromDateTime(dto.AddDays(e).Date),
+                NullableTimeOnly = e % 3 == 0 ? (TimeOnly?)null : TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay),
 
                 DateTimes = new[] { dto.AddYears(e).DateTime, dto.AddMonths(e).DateTime },
                 Offsets = new[] { dto.AddMonths(e), dto.AddDays(e) },
-                Dates = new[] { DateOnly.FromDateTime(dto.AddYears(e).Date), DateOnly.FromDateTime(dto.AddMonths(e).Date) },
-                TimeOfDays = new[] { TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay), TimeOnly.FromTimeSpan(dto.AddMinutes(e).TimeOfDay) },
+                DateOnlys = new[] { DateOnly.FromDateTime(dto.AddYears(e).Date), DateOnly.FromDateTime(dto.AddMonths(e).Date) },
+                TimeOnlys = new[] { TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay), TimeOnly.FromTimeSpan(dto.AddMinutes(e).TimeOfDay) },
 
                 NullableDateTimes = new[] { dto.AddYears(e).DateTime, (DateTime?)null, dto.AddMonths(e).DateTime },
                 NullableOffsets = new[] { dto.AddMonths(e), (DateTimeOffset?)null, dto.AddDays(e) },
-                NullableDates = new[] { DateOnly.FromDateTime(dto.AddYears(e).Date), (DateOnly?)null, DateOnly.FromDateTime(dto.AddMonths(e).Date) },
-                NullableTimeOfDays = new[] { TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay), (TimeOnly?)null, TimeOnly.FromTimeSpan(dto.AddMinutes(e).TimeOfDay) },
+                NullableDateOnlys = new[] { DateOnly.FromDateTime(dto.AddYears(e).Date), (DateOnly?)null, DateOnly.FromDateTime(dto.AddMonths(e).Date) },
+                NullableTimeOnlys = new[] { TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay), (TimeOnly?)null, TimeOnly.FromTimeSpan(dto.AddMinutes(e).TimeOfDay) },
 
             }).ToList();
     }
@@ -152,6 +152,8 @@ public class EfCustomersController : ODataController
         if (!context.Customers.Any())
         {
             DateTimeOffset dateTime = new DateTimeOffset(2014, 12, 24, 1, 2, 3, 4, new TimeSpan(-8, 0, 0));
+            DateOnly dateOnly = DateOnly.FromDateTime(dateTime.Date);
+            TimeOnly timeOnly = TimeOnly.FromTimeSpan(dateTime.TimeOfDay);
             IEnumerable<EfCustomer> customers = Enumerable.Range(1, 5).Select(e =>
                 new EfCustomer
                 {

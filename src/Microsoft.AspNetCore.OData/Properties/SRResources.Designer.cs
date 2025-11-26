@@ -1512,9 +1512,9 @@ namespace Microsoft.AspNetCore.OData {
         /// <summary>
         ///   Looks up a localized string similar to The value must be a Edm.TimeOfDay..
         /// </summary>
-        internal static string PropertyMustBeTimeOfDay {
+        internal static string PropertyMustBeTimeOnly {
             get {
-                return ResourceManager.GetString("PropertyMustBeTimeOfDay", resourceCulture);
+                return ResourceManager.GetString("PropertyMustBeTimeOnly", resourceCulture);
             }
         }
         

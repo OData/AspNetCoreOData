@@ -18,26 +18,26 @@ public class DCustomer
     // non-nullable
     public DateTime DateTime { get; set; }
     public DateTimeOffset Offset { get; set; }
-    public DateOnly Date { get; set; }
-    public TimeOnly TimeOfDay { get; set; }
+    public DateOnly DateOnly { get; set; }
+    public TimeOnly TimeOnly { get; set; }
 
     // nullable
     public DateTime? NullableDateTime { get; set; }
     public DateTimeOffset? NullableOffset { get; set; }
-    public DateOnly? NullableDate { get; set; }
-    public TimeOnly? NullableTimeOfDay { get; set; }
+    public DateOnly? NullableDateOnly { get; set; }
+    public TimeOnly? NullableTimeOnly { get; set; }
 
     // Collection
     public IList<DateTime> DateTimes { get; set; }
     public IList<DateTimeOffset> Offsets { get; set; }
-    public IList<DateOnly> Dates { get; set; }
-    public IList<TimeOnly> TimeOfDays { get; set; }
+    public IList<DateOnly> DateOnlys { get; set; }
+    public IList<TimeOnly> TimeOnlys { get; set; }
 
     // Collection of nullable
     public IList<DateTime?> NullableDateTimes { get; set; }
     public IList<DateTimeOffset?> NullableOffsets { get; set; }
-    public IList<DateOnly?> NullableDates { get; set; }
-    public IList<TimeOnly?> NullableTimeOfDays { get; set; }
+    public IList<DateOnly?> NullableDateOnlys { get; set; }
+    public IList<TimeOnly?> NullableTimeOnlys { get; set; }
 }
 
 public class EfCustomer
@@ -58,6 +58,6 @@ public class EfPerson
 {
     public int Id { get; set; }
 
-    [Column("Birthday", TypeName = "Date")]
+    [Column("Birthday", TypeName = "DateOnly")]
     public DateTime? Birthday { get; set; }
 }
