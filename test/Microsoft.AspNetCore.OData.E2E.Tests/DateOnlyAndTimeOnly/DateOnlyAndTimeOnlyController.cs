@@ -201,7 +201,12 @@ public class EfPeopleController : ODataController
 
     public EfPeopleController(EdmDateWithEfContext context)
     {
+        // EnsureDeleted and EnsureCreated are called to force the database schema to refresh on every test run.
+        // This is necessary because new properties (e.g., 'DateOnly') were added to the model, and EF Core migrations
+        // may not automatically update the schema in test scenarios.
+        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
+
         _db = context;
 
         if (_db.People.Any())
