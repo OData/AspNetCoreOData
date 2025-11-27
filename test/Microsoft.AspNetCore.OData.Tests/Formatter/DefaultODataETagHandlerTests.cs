@@ -52,9 +52,8 @@ public class DefaultODataETagHandlerTests
                 TimeSpan.FromSeconds(86456),
                 DateTimeOffset.FromFileTime(0).ToUniversalTime(),
 
-                // ODL has bug in ConvertFromUriLiteral, please uncomment it after fix https://github.com/OData/odata.net/issues/77.
-                // new Date(1997, 7, 1), 
-                new TimeOfDay(10, 11, 12, 13),
+                new DateOnly(1997, 7, 1),
+                new TimeOnly(10, 11, 12, 13),
             };
         }
     }

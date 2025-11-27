@@ -133,7 +133,7 @@ public class ODataModelBinderConverterTests
         Assert.Equal(Color.Red, ODataModelBinderConverter.ConvertTo("NS.Color'Red'", typeof(Color), null));
 
         // Arrange & Act & Assert
-        Assert.Equal(new Date(2021, 6, 17), ODataModelBinderConverter.ConvertTo("2021-06-17", typeof(Date?), null));
+        Assert.Equal(new DateOnly(2021, 6, 17), ODataModelBinderConverter.ConvertTo("2021-06-17", typeof(DateOnly?), null));
 
         // Arrange & Act & Assert
         Assert.Equal(42, ODataModelBinderConverter.ConvertTo("42", typeof(int), null));

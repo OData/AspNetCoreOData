@@ -22,7 +22,7 @@ using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
 public class DateTimeFilterTest : WebApiTestBase<DateTimeFilterTest>
 {

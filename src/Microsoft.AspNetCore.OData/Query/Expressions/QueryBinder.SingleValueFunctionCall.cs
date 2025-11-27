@@ -76,12 +76,12 @@ public abstract partial class QueryBinder
             case ClrCanonicalFunctions.YearFunctionName:
             case ClrCanonicalFunctions.MonthFunctionName:
             case ClrCanonicalFunctions.DayFunctionName:
-                return BindDateRelatedProperty(node, context); // Date & DateTime & DateTimeOffset
+                return BindDateRelatedProperty(node, context); // DateOnly & DateTime & DateTimeOffset
 
             case ClrCanonicalFunctions.HourFunctionName:
             case ClrCanonicalFunctions.MinuteFunctionName:
             case ClrCanonicalFunctions.SecondFunctionName:
-                return BindTimeRelatedProperty(node, context); // TimeOfDay & DateTime & DateTimeOffset
+                return BindTimeRelatedProperty(node, context); // TimeOnly & DateTime & DateTimeOffset
 
             case ClrCanonicalFunctions.FractionalSecondsFunctionName:
                 return BindFractionalSeconds(node, context);
@@ -380,10 +380,10 @@ public abstract partial class QueryBinder
         Expression parameter = arguments[0];
 
         PropertyInfo property;
-        if (ExpressionBinderHelper.IsDate(parameter.Type))
+        if (ExpressionBinderHelper.IsDateOnly(parameter.Type))
         {
-            Contract.Assert(ClrCanonicalFunctions.DateProperties.ContainsKey(node.Name));
-            property = ClrCanonicalFunctions.DateProperties[node.Name];
+            Contract.Assert(ClrCanonicalFunctions.DateOnlyProperties.ContainsKey(node.Name));
+            property = ClrCanonicalFunctions.DateOnlyProperties[node.Name];
         }
         else if (parameter.Type.IsDateOnly())
         {
@@ -422,10 +422,10 @@ public abstract partial class QueryBinder
         Expression parameter = arguments[0];
 
         PropertyInfo property;
-        if (ExpressionBinderHelper.IsTimeOfDay(parameter.Type))
+        if (ExpressionBinderHelper.IsTimeOnly(parameter.Type))
         {
-            Contract.Assert(ClrCanonicalFunctions.TimeOfDayProperties.ContainsKey(node.Name));
-            property = ClrCanonicalFunctions.TimeOfDayProperties[node.Name];
+            Contract.Assert(ClrCanonicalFunctions.TimeOnlyProperties.ContainsKey(node.Name));
+            property = ClrCanonicalFunctions.TimeOnlyProperties[node.Name];
         }
         else if (parameter.Type.IsTimeOnly())
         {
@@ -468,9 +468,9 @@ public abstract partial class QueryBinder
         Expression parameter = arguments[0];
 
         PropertyInfo property;
-        if (ExpressionBinderHelper.IsTimeOfDay(parameter.Type))
+        if (ExpressionBinderHelper.IsTimeOnly(parameter.Type))
         {
-            property = ClrCanonicalFunctions.TimeOfDayProperties[ClrCanonicalFunctions.MillisecondFunctionName];
+            property = ClrCanonicalFunctions.TimeOnlyProperties[ClrCanonicalFunctions.MillisecondFunctionName];
         }
         else if (ExpressionBinderHelper.IsDateTime(parameter.Type))
         {
@@ -734,7 +734,7 @@ public abstract partial class QueryBinder
         // We should support DateTime & DateTimeOffset even though DateTime is not part of OData v4 Spec.
         Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsDateOrOffset(arguments[0].Type));
 
-        // EF doesn't support new TimeOfDay(int, int, int, int), also doesn't support other property access, for example DateTimeOffset.DateTime.
+        // EF doesn't support new TimeOfDay(int, int, int), also doesn't support other property access, for example DateTime.Date.
         // Therefore, we just return the source (DateTime or DateTimeOffset).
         return arguments[0];
     }

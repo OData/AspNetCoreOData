@@ -240,7 +240,7 @@ public class ODataActionPayloadDeserializerTest
         Assert.Equal(ProductCode, payload["ProductCode"]);
 
         Assert.True(payload.ContainsKey("Birthday"));
-        Assert.Equal(new Date(2015, 2, 27), payload["Birthday"]);
+        Assert.Equal(new DateOnly(2015, 2, 27), payload["Birthday"]);
 
         Assert.True(payload.ContainsKey("BkgColor"));
         AColor bkgColor = Assert.IsType<AColor>(payload["BkgColor"]);
@@ -311,9 +311,9 @@ public class ODataActionPayloadDeserializerTest
         Assert.True(expectedRatings.Zip(ratings, (expected, actual) => expected - actual).All(diff => diff == 0));
 
         Assert.True(payload.ContainsKey("Time"));
-        IEnumerable<TimeOfDay> times = payload["Time"] as IEnumerable<TimeOfDay>;
+        IEnumerable<TimeOnly> times = payload["Time"] as IEnumerable<TimeOnly>;
         Assert.Equal(2, times.Count());
-        Assert.Equal(new[] { new TimeOfDay(1, 2, 3, 4), new TimeOfDay(12, 13, 14, 115) }, times.ToList());
+        Assert.Equal(new[] { new TimeOnly(1, 2, 3, 4), new TimeOnly(12, 13, 14, 115) }, times.ToList());
     }
 
     [Theory]
@@ -463,9 +463,9 @@ public class ODataActionPayloadDeserializerTest
         Assert.True(expectedRatings.Zip(ratings, (expected, actual) => expected - actual).All(diff => diff == 0));
 
         Assert.True(payload.ContainsKey("Time"));
-        IEnumerable<TimeOfDay> times = payload["Time"] as IEnumerable<TimeOfDay>;
+        IEnumerable<TimeOnly> times = payload["Time"] as IEnumerable<TimeOnly>;
         Assert.Equal(2, times.Count());
-        Assert.Equal(new[] { new TimeOfDay(1, 2, 3, 4), new TimeOfDay(12, 13, 14, 115) }, times.ToList());
+        Assert.Equal(new[] { new TimeOnly(1, 2, 3, 4), new TimeOnly(12, 13, 14, 115) }, times.ToList());
 
         Assert.True(payload.ContainsKey("Colors"));
         IEnumerable<AColor?> colors = payload["Colors"] as IEnumerable<AColor?>;
@@ -721,7 +721,7 @@ public class ODataActionPayloadDeserializerTest
         ActionConfiguration primitive = customer.Action("Primitive");
         primitive.Parameter<int>("Quantity");
         primitive.Parameter<string>("ProductCode");
-        primitive.Parameter<Date>("Birthday");
+        primitive.Parameter<DateOnly>("Birthday");
         primitive.Parameter<AColor>("BkgColor");
         primitive.Parameter<AColor?>("InnerColor");
 
@@ -735,7 +735,7 @@ public class ODataActionPayloadDeserializerTest
         ActionConfiguration primitiveCollection = customer.Action("PrimitiveCollection");
         primitiveCollection.Parameter<string>("Name");
         primitiveCollection.CollectionParameter<int>("Ratings");
-        primitiveCollection.CollectionParameter<TimeOfDay>("Time");
+        primitiveCollection.CollectionParameter<TimeOnly>("Time");
         primitiveCollection.CollectionParameter<AColor?>("Colors");
 
         ActionConfiguration complexCollection = customer.Action("ComplexCollection");
@@ -758,7 +758,7 @@ public class ODataActionPayloadDeserializerTest
         ActionConfiguration unboundPrimitive = builder.Action("UnboundPrimitive");
         unboundPrimitive.Parameter<int>("Quantity");
         unboundPrimitive.Parameter<string>("ProductCode");
-        unboundPrimitive.Parameter<Date>("Birthday");
+        unboundPrimitive.Parameter<DateOnly>("Birthday");
         unboundPrimitive.Parameter<AColor>("BkgColor");
         unboundPrimitive.Parameter<AColor?>("InnerColor");
 
@@ -772,7 +772,7 @@ public class ODataActionPayloadDeserializerTest
         ActionConfiguration unboundPrimitiveCollection = builder.Action("UnboundPrimitiveCollection");
         unboundPrimitiveCollection.Parameter<string>("Name");
         unboundPrimitiveCollection.CollectionParameter<int>("Ratings");
-        unboundPrimitiveCollection.CollectionParameter<TimeOfDay>("Time");
+        unboundPrimitiveCollection.CollectionParameter<TimeOnly>("Time");
         unboundPrimitiveCollection.CollectionParameter<AColor?>("Colors");
 
         ActionConfiguration unboundComplexCollection = builder.Action("UnboundComplexCollection");

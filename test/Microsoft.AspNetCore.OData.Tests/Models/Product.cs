@@ -38,14 +38,14 @@ public class Product
     public DateTimeOffset DiscontinuedOffset { get; set; }
     public TimeSpan DiscontinuedSince { get; set; }
 
-    public Date DateProperty { get; set; }
-    public Date? NullableDateProperty { get; set; }
+    public DateOnly DateOnlyProperty { get; set; }
+    public DateOnly? NullableDateOnlyProperty { get; set; }
 
     public Guid GuidProperty { get; set; }
     public Guid? NullableGuidProperty { get; set; }
 
-    public TimeOfDay TimeOfDayProperty { get; set; }
-    public TimeOfDay? NullableTimeOfDayProperty { get; set; }
+    public TimeOnly TimeOnlyProperty { get; set; }
+    public TimeOnly? NullableTimeOnlyProperty { get; set; }
 
     public ushort? UnsignedReorderLevel { get; set; }
 

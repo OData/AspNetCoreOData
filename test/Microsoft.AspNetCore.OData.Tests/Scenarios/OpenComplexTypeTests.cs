@@ -357,7 +357,7 @@ public class OpenCustomersController : ODataController
         // Add more dynamic properties
         address.DynamicProperties.Add("Place", "My Dynamic Place");
         address.DynamicProperties.Add("Token", new Guid("2C1F450A-A2A7-4FE1-A25D-4D9332FC0694"));
-        address.DynamicProperties.Add("Birthday", new Date(2015, 3, 2));
+        address.DynamicProperties.Add("Birthday", new DateOnly(2015, 3, 2));
         address.DynamicProperties.Add("Region", null);
         return Ok(address);
     }
@@ -389,8 +389,8 @@ public class OpenCustomersController : ODataController
         object timeOfDayValue;
         customer.Address.DynamicProperties.TryGetValue("BirthTime", out timeOfDayValue);
         Assert.NotNull(timeOfDayValue);
-        Assert.IsType<TimeOfDay>(timeOfDayValue);
-        Assert.Equal(new TimeOfDay(11, 12, 13, 14), timeOfDayValue);
+        Assert.IsType<TimeOnly>(timeOfDayValue);
+        Assert.Equal(new TimeOnly(11, 12, 13, 14), timeOfDayValue);
 
         return Ok(customer);
     }
@@ -417,7 +417,7 @@ public class OpenCustomersController : ODataController
         Assert.NotNull(origin.DynamicProperties);
         KeyValuePair<string, object> dynamicProperty = Assert.Single(origin.DynamicProperties); // only one
         Assert.Equal("Publish", dynamicProperty.Key);
-        Assert.Equal(new Date(2016, 2, 2), dynamicProperty.Value);
+        Assert.Equal(new DateOnly(2016, 2, 2), dynamicProperty.Value);
 
         return Updated(customer);
     }
@@ -445,7 +445,7 @@ public class OpenCustomersController : ODataController
         Assert.True(origin.DynamicProperties.Count >= 3); // Including the origin dynamic properties
 
         KeyValuePair<string, object> dynamicPropertyBirthDay = origin.DynamicProperties.FirstOrDefault(e => e.Key == "BirthDay");
-        Assert.Equal(new Date(2016, 1, 29), dynamicPropertyBirthDay.Value);
+        Assert.Equal(new DateOnly(2016, 1, 29), dynamicPropertyBirthDay.Value);
 
         string dynamicPropertyToken = origin.DynamicProperties.FirstOrDefault(e => e.Key == "Token")
             .Value.ToString().ToUpperInvariant();

@@ -19,7 +19,7 @@ using Microsoft.OData.Edm;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
 public class DateWithEfTest : WebApiTestBase<DateWithEfTest>
 {
@@ -35,7 +35,7 @@ public class DateWithEfTest : WebApiTestBase<DateWithEfTest>
 
         services.ConfigureControllers(typeof(EfPeopleController));
 
-        IEdmModel model = DateAndTimeOfDayEdmModel.BuildEfPersonEdmModel();
+        IEdmModel model = DateOnlyAndTimeOnlyEdmModel.BuildEfPersonEdmModel();
 
         // TODO: modify it after implement the DI in Web API.
         // model.SetPayloadValueConverter(new MyConverter());
@@ -67,7 +67,7 @@ public class DateWithEfTest : WebApiTestBase<DateWithEfTest>
         Assert.Equal(expect, string.Join(",", content["value"].Select(e => e["Id"].ToString())));
     }
 
-    [Fact(Skip = "TODO: Processing of the LINQ expression failed")]
+    [Fact]
     public async Task CanGroupByDatePropertyForDateTimePropertyOnEf()
     {
         // Arrange
@@ -104,12 +104,11 @@ public class MyConverter : ODataPayloadValueConverter
 {
     public override object ConvertToPayloadValue(object value, IEdmTypeReference edmTypeReference)
     {
-        if (edmTypeReference != null && edmTypeReference.IsDate())
+        if (edmTypeReference != null && edmTypeReference.IsDateOnly())
         {
-            if (value is DateTimeOffset)
+            if (value is DateTimeOffset dateTimeOffset)
             {
-                DateTimeOffset dto = (DateTimeOffset)value;
-                return new Date(dto.Year, dto.Month, dto.Day);
+                return DateOnly.FromDateTime(dateTimeOffset.DateTime);
             }
         }
 

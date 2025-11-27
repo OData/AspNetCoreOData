@@ -636,7 +636,7 @@ public class SimpleOpenCustomersController : ODataController
             CustomerProperties = new Dictionary<string, object>
             {
                 { "ListProp", IntValues },
-                { "DateList", new[] { Date.MinValue, Date.MaxValue } },
+                { "DateList", new[] { DateOnly.MinValue, DateOnly.MaxValue } },
                 { "Receipt", null }
             }
         };

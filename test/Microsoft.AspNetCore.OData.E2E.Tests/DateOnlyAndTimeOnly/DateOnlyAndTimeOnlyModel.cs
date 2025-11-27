@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="DateAndTimeOfDayModel.cs" company=".NET Foundation">
+// <copyright file="DateOnlyAndTimeOnlyModel.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -8,9 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.OData.Edm;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
 public class DCustomer
 {
@@ -19,26 +18,26 @@ public class DCustomer
     // non-nullable
     public DateTime DateTime { get; set; }
     public DateTimeOffset Offset { get; set; }
-    public Date Date { get; set; }
-    public TimeOfDay TimeOfDay { get; set; }
+    public DateOnly DateOnly { get; set; }
+    public TimeOnly TimeOnly { get; set; }
 
     // nullable
     public DateTime? NullableDateTime { get; set; }
     public DateTimeOffset? NullableOffset { get; set; }
-    public Date? NullableDate { get; set; }
-    public TimeOfDay? NullableTimeOfDay { get; set; }
+    public DateOnly? NullableDateOnly { get; set; }
+    public TimeOnly? NullableTimeOnly { get; set; }
 
     // Collection
     public IList<DateTime> DateTimes { get; set; }
     public IList<DateTimeOffset> Offsets { get; set; }
-    public IList<Date> Dates { get; set; }
-    public IList<TimeOfDay> TimeOfDays { get; set; }
+    public IList<DateOnly> DateOnlys { get; set; }
+    public IList<TimeOnly> TimeOnlys { get; set; }
 
     // Collection of nullable
     public IList<DateTime?> NullableDateTimes { get; set; }
     public IList<DateTimeOffset?> NullableOffsets { get; set; }
-    public IList<Date?> NullableDates { get; set; }
-    public IList<TimeOfDay?> NullableTimeOfDays { get; set; }
+    public IList<DateOnly?> NullableDateOnlys { get; set; }
+    public IList<TimeOnly?> NullableTimeOnlys { get; set; }
 }
 
 public class EfCustomer

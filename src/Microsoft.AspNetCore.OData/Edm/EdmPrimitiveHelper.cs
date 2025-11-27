@@ -113,23 +113,21 @@ internal static class EdmPrimitiveHelper
                     return DateTime.SpecifyKind(dateTimeOffsetValue.DateTime, dateTimeKind);
                 }
 
-                if (value is Date)
+                if (value is DateOnly dateOnly)
                 {
-                    Date dt = (Date)value;
-                    return (DateTime)dt;
+                    return dateOnly.ToDateTime(TimeOnly.MinValue);
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDateOnly));
             }
             else if (type == typeof(TimeSpan))
             {
-                if (value is TimeOfDay)
+                if (value is TimeOnly timeOnly)
                 {
-                    TimeOfDay tod = (TimeOfDay)value;
-                    return (TimeSpan)tod;
+                    return timeOnly.ToTimeSpan();
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOnly));
             }
             else if (type == typeof(bool))
             {
@@ -143,21 +141,21 @@ internal static class EdmPrimitiveHelper
             }
             else if (type == typeof(DateOnly))
             {
-                if (value is Date dt)
+                if (value is DateOnly dateOnly)
                 {
-                    return new DateOnly(dt.Year, dt.Month, dt.Day);
+                    return dateOnly;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDate));
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeDateTimeOffsetOrDateOnly));
             }
             else if (type == typeof(TimeOnly))
             {
-                if (value is TimeOfDay tod)
+                if (value is TimeOnly timeOnly)
                 {
-                    return new TimeOnly(tod.Hours, tod.Minutes, tod.Seconds, (int)tod.Milliseconds);
+                    return timeOnly;
                 }
 
-                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOfDay));
+                throw new ValidationException(Error.Format(SRResources.PropertyMustBeTimeOnly));
             }
             else
             {

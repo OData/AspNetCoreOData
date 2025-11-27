@@ -62,8 +62,8 @@ public class DefaultODataTypeMapper : IODataTypeMapper
         BuildReferenceTypeMapping<Stream>(EdmPrimitiveTypeKind.Stream);
         BuildValueTypeMapping<DateTimeOffset>(EdmPrimitiveTypeKind.DateTimeOffset);
         BuildValueTypeMapping<TimeSpan>(EdmPrimitiveTypeKind.Duration);
-        BuildValueTypeMapping<Date>(EdmPrimitiveTypeKind.Date);
-        BuildValueTypeMapping<TimeOfDay>(EdmPrimitiveTypeKind.TimeOfDay);
+        BuildValueTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date);
+        BuildValueTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay);
 
         BuildReferenceTypeMapping<Geography>(EdmPrimitiveTypeKind.Geography);
         BuildReferenceTypeMapping<GeographyPoint>(EdmPrimitiveTypeKind.GeographyPoint);
@@ -90,8 +90,6 @@ public class DefaultODataTypeMapper : IODataTypeMapper
         BuildReferenceTypeMapping<char[]>(EdmPrimitiveTypeKind.String, isStandard: false);
         BuildValueTypeMapping<char>(EdmPrimitiveTypeKind.String, isStandard: false);
         BuildValueTypeMapping<DateTime>(EdmPrimitiveTypeKind.DateTimeOffset, isStandard: false);
-        BuildValueTypeMapping<DateOnly>(EdmPrimitiveTypeKind.Date, isStandard: false);
-        BuildValueTypeMapping<TimeOnly>(EdmPrimitiveTypeKind.TimeOfDay, isStandard: false);
     }
     #endregion
 

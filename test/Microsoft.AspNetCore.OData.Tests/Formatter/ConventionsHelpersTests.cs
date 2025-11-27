@@ -35,8 +35,8 @@ public class ConventionsHelpersTests
                 { false, "false" },
                 { true, "true" },
                 { new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"), "dddddddd-dddd-dddd-dddd-dddddddddddd" },
-                { new Date(2014, 10, 14), "2014-10-14"},
-                { new TimeOfDay(15, 38, 25, 109), "15:38:25.1090000"},
+                { new DateOnly(2014, 10, 14), "2014-10-14"},
+                { new TimeOnly(15, 38, 25, 109), "15:38:25.1090000"},
             };
         }
     }
@@ -128,10 +128,10 @@ public class ConventionsHelpersTests
     }
 
     [Fact]
-    public void GetEntityKeyValue_MultipleKeys_ForDateAndTimeOfDay()
+    public void GetEntityKeyValue_MultipleKeys_ForDateOnlyAndTimeOnly()
     {
         // Arrange
-        var entityInstance = new { Key1 = new Date(2015, 12, 2), Key2 = new TimeOfDay(4, 3, 2, 1) };
+        var entityInstance = new { Key1 = new DateOnly(2015, 12, 2), Key2 = new TimeOnly(4, 3, 2, 1) };
         EdmEntityType entityType = new EdmEntityType("NS", "Name");
         entityType.AddKeys(entityType.AddStructuralProperty("Key1", EdmPrimitiveTypeKind.Date));
         entityType.AddKeys(entityType.AddStructuralProperty("Key2", EdmPrimitiveTypeKind.TimeOfDay));
@@ -219,10 +219,10 @@ public class ConventionsHelpersTests
     }
 
     [Fact]
-    public void GetEntityKeyValue_MultipleKeys_DerivedType_ForDateAndTimeOfDay()
+    public void GetEntityKeyValue_MultipleKeys_DerivedType_ForDateOnlyAndTimeOnly()
     {
         // Arrange
-        var entityInstance = new { Key1 = new Date(2015, 2, 26), Key2 = new TimeOfDay(1, 2, 3, 4) };
+        var entityInstance = new { Key1 = new DateOnly(2015, 2, 26), Key2 = new TimeOnly(1, 2, 3, 4) };
         EdmEntityType baseEntityType = new EdmEntityType("NS", "Name");
         baseEntityType.AddKeys(baseEntityType.AddStructuralProperty("Key1", EdmPrimitiveTypeKind.Date));
         baseEntityType.AddKeys(baseEntityType.AddStructuralProperty("Key2", EdmPrimitiveTypeKind.TimeOfDay));
@@ -284,8 +284,8 @@ public class ConventionsHelpersTests
                 { FlagsEnum.One | FlagsEnum.Two, "Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'One, Two'" },
                 { (SimpleEnum)123, "Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'123'" },
                 { (FlagsEnum)123, "Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum'123'" },
-                { new Date(2014, 10, 14), "2014-10-14"},
-                { new TimeOfDay(15, 38, 25, 109), "15:38:25.1090000"},
+                { new DateOnly(2014, 10, 14), "2014-10-14"},
+                { new TimeOnly(15, 38, 25, 109), "15:38:25.1090000"},
             };
         }
     }

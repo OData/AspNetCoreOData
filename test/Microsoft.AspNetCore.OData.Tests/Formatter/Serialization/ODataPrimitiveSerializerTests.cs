@@ -88,8 +88,8 @@ public class ODataPrimitiveSerializerTests
                 { new byte[] { 1 }, "Edm.Binary", "\"AQ==\"" },
                 { new TimeSpan(), "Edm.Duration", "\"PT0S\"" },
                 { new DateTimeOffset(), "Edm.DateTimeOffset", "\"0001-01-01T00:00:00Z\"" },
-                { new Date(2014, 10, 13), "Edm.Date", "\"2014-10-13\"" },
-                { new TimeOfDay(15, 38, 25, 109), "Edm.TimeOfDay", "\"15:38:25.1090000\"" },
+                { new DateOnly(2014, 10, 13), "Edm.Date", "\"2014-10-13\"" },
+                { new TimeOnly(15, 38, 25, 109), "Edm.TimeOfDay", "\"15:38:25.1090000\"" },
             };
         }
     }
@@ -270,7 +270,7 @@ public class ODataPrimitiveSerializerTests
     public void CreateODataValue_ReturnsDate_ForDateTime()
     {
         // Arrange
-        IEdmPrimitiveTypeReference edmPrimitiveType = typeof(Date).GetEdmPrimitiveTypeReference();
+        IEdmPrimitiveTypeReference edmPrimitiveType = typeof(DateOnly).GetEdmPrimitiveTypeReference();
         ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
         DateTime dt = new DateTime(2014, 10, 27);
 
@@ -279,15 +279,15 @@ public class ODataPrimitiveSerializerTests
 
         // Assert
         ODataPrimitiveValue primitiveValue = Assert.IsType<ODataPrimitiveValue>(odataValue);
-        Assert.IsType<Date>(primitiveValue.Value);
-        Assert.Equal(new Date(dt.Year, dt.Month, dt.Day), primitiveValue.Value);
+        Assert.IsType<DateOnly>(primitiveValue.Value);
+        Assert.Equal(new DateOnly(dt.Year, dt.Month, dt.Day), primitiveValue.Value);
     }
 
     [Fact]
     public void CreateODataValue_ReturnsTimeOfDay_ForTimeSpan()
     {
         // Arrange
-        IEdmPrimitiveTypeReference edmPrimitiveType = typeof(TimeOfDay).GetEdmPrimitiveTypeReference();
+        IEdmPrimitiveTypeReference edmPrimitiveType = typeof(TimeOnly).GetEdmPrimitiveTypeReference();
         ODataPrimitiveSerializer serializer = new ODataPrimitiveSerializer();
         TimeSpan ts = new TimeSpan(0, 10, 11, 12, 13);
 
@@ -296,8 +296,8 @@ public class ODataPrimitiveSerializerTests
 
         // Assert
         ODataPrimitiveValue primitiveValue = Assert.IsType<ODataPrimitiveValue>(odataValue);
-        Assert.IsType<TimeOfDay>(primitiveValue.Value);
-        Assert.Equal(new TimeOfDay(ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds), primitiveValue.Value);
+        Assert.IsType<TimeOnly>(primitiveValue.Value);
+        Assert.Equal(new TimeOnly(ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds), primitiveValue.Value);
     }
 
     [Theory]

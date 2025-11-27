@@ -80,30 +80,17 @@ internal static class ExpressionBinderHelper
             left = DateTimeOffsetToDateTime(left, querySettings.TimeZone, querySettings);
         }
 
-        if ((IsDateOrOffset(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
-            (IsDate(leftUnderlyingType) && IsDateOrOffset(rightUnderlyingType)))
+        if ((IsDateOrOffset(leftUnderlyingType) && IsDateOnly(rightUnderlyingType)) ||
+            (IsDateOnly(leftUnderlyingType) && IsDateOrOffset(rightUnderlyingType)))
         {
             left = CreateDateBinaryExpression(left, querySettings);
             right = CreateDateBinaryExpression(right, querySettings);
         }
 
-        if ((IsDateOrOffset(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
-            (IsTimeOfDay(leftUnderlyingType) && IsDateOrOffset(rightUnderlyingType)) ||
-            (IsTimeSpan(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
-            (IsTimeOfDay(leftUnderlyingType) && IsTimeSpan(rightUnderlyingType)))
-        {
-            left = CreateTimeBinaryExpression(left, querySettings);
-            right = CreateTimeBinaryExpression(right, querySettings);
-        }
-
-        if ((IsType<DateOnly>(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
-            (IsDate(leftUnderlyingType) && IsType<DateOnly>(rightUnderlyingType)))
-        {
-            left = CreateDateBinaryExpression(left, querySettings);
-            right = CreateDateBinaryExpression(right, querySettings);
-        }
-        else if ((IsType<TimeOnly>(leftUnderlyingType) && IsTimeOfDay(rightUnderlyingType)) ||
-            (IsTimeOfDay(leftUnderlyingType) && IsType<TimeOnly>(rightUnderlyingType)))
+        if ((IsDateOrOffset(leftUnderlyingType) && IsTimeOnly(rightUnderlyingType)) ||
+            (IsTimeOnly(leftUnderlyingType) && IsDateOrOffset(rightUnderlyingType)) ||
+            (IsTimeSpan(leftUnderlyingType) && IsTimeOnly(rightUnderlyingType)) ||
+            (IsTimeOnly(leftUnderlyingType) && IsTimeSpan(rightUnderlyingType)))
         {
             left = CreateTimeBinaryExpression(left, querySettings);
             right = CreateTimeBinaryExpression(right, querySettings);
@@ -398,14 +385,6 @@ internal static class ExpressionBinderHelper
                 return MakePropertyAccess(ClrCanonicalFunctions.DateTimeOffsetProperties[propertyName], source, querySettings);
             }
         }
-        else if (IsDate(source.Type))
-        {
-            return MakePropertyAccess(ClrCanonicalFunctions.DateProperties[propertyName], source, querySettings);
-        }
-        else if (IsTimeOfDay(source.Type))
-        {
-            return MakePropertyAccess(ClrCanonicalFunctions.TimeOfDayProperties[propertyName], source, querySettings);
-        }
         else if (IsTimeSpan(source.Type))
         {
             return MakePropertyAccess(ClrCanonicalFunctions.TimeSpanProperties[propertyName], source, querySettings);
@@ -477,18 +456,6 @@ internal static class ExpressionBinderHelper
                 return Expression.Constant(dateTime.Value, typeof(DateTime));
             }
 
-            var date = parameterizedConstantValue as Date?;
-            if (date != null)
-            {
-                return Expression.Constant(date.Value, typeof(Date));
-            }
-
-            var timeOfDay = parameterizedConstantValue as TimeOfDay?;
-            if (timeOfDay != null)
-            {
-                return Expression.Constant(timeOfDay.Value, typeof(TimeOfDay));
-            }
-
             if (parameterizedConstantValue is DateOnly dateOnly)
             {
                 return Expression.Constant(dateOnly, typeof(DateOnly));
@@ -515,10 +482,8 @@ internal static class ExpressionBinderHelper
 
     public static bool IsDateAndTimeRelated(Type type)
     {
-        return IsType<Date>(type)
-            || IsType<DateTime>(type)
+        return IsType<DateTime>(type)
             || IsType<DateTimeOffset>(type)
-            || IsType<TimeOfDay>(type)
             || IsType<TimeSpan>(type)
             || IsType<DateOnly>(type)
             || IsType<TimeOnly>(type)
@@ -527,12 +492,12 @@ internal static class ExpressionBinderHelper
 
     public static bool IsDateRelated(Type type)
     {
-        return IsType<Date>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<DateOnly>(type);
+        return IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<DateOnly>(type);
     }
 
     public static bool IsTimeRelated(Type type)
     {
-        return IsType<TimeOfDay>(type) || IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type) || IsType<TimeOnly>(type);
+        return IsType<DateTime>(type) || IsType<DateTimeOffset>(type) || IsType<TimeSpan>(type) || IsType<TimeOnly>(type);
     }
 
     public static bool IsDateOrOffset(Type type)
@@ -552,12 +517,12 @@ internal static class ExpressionBinderHelper
 
     public static bool IsTimeOfDay(Type type)
     {
-        return IsType<TimeOfDay>(type);
+        return type.IsTimeOnly();
     }
 
     public static bool IsDate(Type type)
     {
-        return IsType<Date>(type);
+        return type.IsDateOnly();
     }
 
     public static bool IsDateOnly(this Type type)

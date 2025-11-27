@@ -188,12 +188,12 @@ public abstract class ExpressionBinderBase
             case ClrCanonicalFunctions.YearFunctionName:
             case ClrCanonicalFunctions.MonthFunctionName:
             case ClrCanonicalFunctions.DayFunctionName:
-                return BindDateRelatedProperty(node); // Date & DateTime & DateTimeOffset
+                return BindDateRelatedProperty(node); // DateOnly & DateTime & DateTimeOffset
 
             case ClrCanonicalFunctions.HourFunctionName:
             case ClrCanonicalFunctions.MinuteFunctionName:
             case ClrCanonicalFunctions.SecondFunctionName:
-                return BindTimeRelatedProperty(node); // TimeOfDay & DateTime & DateTimeOffset
+                return BindTimeRelatedProperty(node); // TimeOnly & DateTime & DateTimeOffset
 
             case ClrCanonicalFunctions.FractionalSecondsFunctionName:
                 return BindFractionalSeconds(node);
@@ -439,9 +439,9 @@ public abstract class ExpressionBinderBase
         Expression parameter = arguments[0];
 
         PropertyInfo property;
-        if (ExpressionBinderHelper.IsTimeOfDay(parameter.Type))
+        if (ExpressionBinderHelper.IsTimeOnly(parameter.Type))
         {
-            property = ClrCanonicalFunctions.TimeOfDayProperties[ClrCanonicalFunctions.MillisecondFunctionName];
+            property = ClrCanonicalFunctions.TimeOnlyProperties[ClrCanonicalFunctions.MillisecondFunctionName];
         }
         else if (ExpressionBinderHelper.IsDateTime(parameter.Type))
         {
@@ -473,10 +473,10 @@ public abstract class ExpressionBinderBase
         Expression parameter = arguments[0];
 
         PropertyInfo property;
-        if (ExpressionBinderHelper.IsDate(parameter.Type))
+        if (ExpressionBinderHelper.IsDateOnly(parameter.Type))
         {
-            Contract.Assert(ClrCanonicalFunctions.DateProperties.ContainsKey(node.Name));
-            property = ClrCanonicalFunctions.DateProperties[node.Name];
+            Contract.Assert(ClrCanonicalFunctions.DateOnlyProperties.ContainsKey(node.Name));
+            property = ClrCanonicalFunctions.DateOnlyProperties[node.Name];
         }
         else if (ExpressionBinderHelper.IsDateTime(parameter.Type))
         {
@@ -501,10 +501,10 @@ public abstract class ExpressionBinderBase
         Expression parameter = arguments[0];
 
         PropertyInfo property;
-        if (ExpressionBinderHelper.IsTimeOfDay(parameter.Type))
+        if (ExpressionBinderHelper.IsTimeOnly(parameter.Type))
         {
-            Contract.Assert(ClrCanonicalFunctions.TimeOfDayProperties.ContainsKey(node.Name));
-            property = ClrCanonicalFunctions.TimeOfDayProperties[node.Name];
+            Contract.Assert(ClrCanonicalFunctions.TimeOnlyProperties.ContainsKey(node.Name));
+            property = ClrCanonicalFunctions.TimeOnlyProperties[node.Name];
         }
         else if (ExpressionBinderHelper.IsDateTime(parameter.Type))
         {
@@ -1172,17 +1172,17 @@ public abstract class ExpressionBinderBase
             // we handle null propagation ourselves. So, if converting from bool to Nullable<bool> ignore.
             return source;
         }
-        else if (conversionType == typeof(Date?) &&
+        else if (conversionType == typeof(DateOnly?) &&
             (source.Type == typeof(DateTimeOffset?) || source.Type == typeof(DateTime?)))
         {
             return source;
         }
-        if ((conversionType == typeof(TimeOfDay?) && source.Type == typeof(TimeOfDay)) ||
-            ((conversionType == typeof(Date?) && source.Type == typeof(Date))))
+        if ((conversionType == typeof(TimeOnly?) && source.Type == typeof(TimeOnly)) ||
+            ((conversionType == typeof(DateOnly?) && source.Type == typeof(DateOnly))))
         {
             return source;
         }
-        else if (conversionType == typeof(TimeOfDay?) &&
+        else if (conversionType == typeof(TimeOnly?) &&
             (source.Type == typeof(DateTimeOffset?) || source.Type == typeof(DateTime?) || source.Type == typeof(TimeSpan?)))
         {
             return source;
@@ -1316,7 +1316,7 @@ public abstract class ExpressionBinderBase
 
         if (edmTypeReference != null &&
             edmTypeReference.IsNullable &&
-            (edmTypeReference.IsDate() || edmTypeReference.IsTimeOfDay()))
+            (edmTypeReference.IsDateOnly() || edmTypeReference.IsTimeOnly()))
         {
             constantType = Nullable.GetUnderlyingType(constantType) ?? constantType;
         }

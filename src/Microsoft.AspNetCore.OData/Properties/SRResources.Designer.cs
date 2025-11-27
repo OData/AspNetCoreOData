@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.OData {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class SRResources {
@@ -1447,11 +1447,11 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The value must be a DateTimeOffset or Date..
+        ///   Looks up a localized string similar to The value must be a DateTimeOffset or DateOnly..
         /// </summary>
-        internal static string PropertyMustBeDateTimeOffsetOrDate {
+        internal static string PropertyMustBeDateTimeOffsetOrDateOnly {
             get {
-                return ResourceManager.GetString("PropertyMustBeDateTimeOffsetOrDate", resourceCulture);
+                return ResourceManager.GetString("PropertyMustBeDateTimeOffsetOrDateOnly", resourceCulture);
             }
         }
         
@@ -1512,9 +1512,9 @@ namespace Microsoft.AspNetCore.OData {
         /// <summary>
         ///   Looks up a localized string similar to The value must be a Edm.TimeOfDay..
         /// </summary>
-        internal static string PropertyMustBeTimeOfDay {
+        internal static string PropertyMustBeTimeOnly {
             get {
-                return ResourceManager.GetString("PropertyMustBeTimeOfDay", resourceCulture);
+                return ResourceManager.GetString("PropertyMustBeTimeOnly", resourceCulture);
             }
         }
         

@@ -162,7 +162,7 @@
   <data name="MultipleMatchingClrTypesForEdmType" xml:space="preserve">
     <value>More than one matching CLR type found for the EDM type {0}.\nThe matching CLR types are {1}.</value>
   </data>
-  <data name="PropertyMustBeTimeOfDay" xml:space="preserve">
+  <data name="PropertyMustBeTimeOnly" xml:space="preserve">
     <value>The value must be a Edm.TimeOfDay.</value>
   </data>
   <data name="PropertyMustBeStringLengthOne" xml:space="preserve">
@@ -174,8 +174,8 @@
   <data name="PropertyMustBeString" xml:space="preserve">
     <value>The value must be a string.</value>
   </data>
-  <data name="PropertyMustBeDateTimeOffsetOrDate" xml:space="preserve">
-    <value>The value must be a DateTimeOffset or Date.</value>
+  <data name="PropertyMustBeDateTimeOffsetOrDateOnly" xml:space="preserve">
+    <value>The value must be a DateTimeOffset or DateOnly.</value>
   </data>
   <data name="PropertyMustBeBoolean" xml:space="preserve">
     <value>The value must be a boolean.</value>

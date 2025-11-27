@@ -142,7 +142,7 @@ internal static class ODataModelBinderConverter
         // object. However, the logic of
         // "object ConvertFromUriLiteral(string value, ODataVersion version, IEdmModel model, IEdmTypeReference typeReference);"
         // can return the correct Date object.
-        if (type == typeof(Date) || type == typeof(Date?))
+        if (type == typeof(DateOnly) || type == typeof(DateOnly?))
         {
             IEdmModel model = edmModel ?? EdmCoreModel.Instance;
             IEdmPrimitiveTypeReference dateTypeReference = model.GetEdmPrimitiveTypeReference(type);

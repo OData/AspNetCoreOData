@@ -8085,9 +8085,9 @@
               Looks up a localized string similar to The value must be a boolean..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeDateTimeOffsetOrDate">
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeDateTimeOffsetOrDateOnly">
             <summary>
-              Looks up a localized string similar to The value must be a DateTimeOffset or Date..
+              Looks up a localized string similar to The value must be a DateTimeOffset or DateOnly..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeEnum">
@@ -8120,7 +8120,7 @@
               Looks up a localized string similar to The value must be a string with a maximum length of 1..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeTimeOfDay">
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.PropertyMustBeTimeOnly">
             <summary>
               Looks up a localized string similar to The value must be a Edm.TimeOfDay..
             </summary>

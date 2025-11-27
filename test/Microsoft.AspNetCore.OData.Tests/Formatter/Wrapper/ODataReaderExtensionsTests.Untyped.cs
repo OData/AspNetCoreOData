@@ -60,7 +60,7 @@ public partial class ODataReaderExtensionsTests
         {
             var data = new TheoryDataSet<string, object>
             {
-                { "42", (decimal)42 }, // why it's decimal? see https://github.com/OData/odata.net/issues/2657
+                { "42", 42 },
                 { "9.19", (decimal)9.19 },
                 { "3.1415926535897931", 3.1415926535897931m },
                 { "true", true },

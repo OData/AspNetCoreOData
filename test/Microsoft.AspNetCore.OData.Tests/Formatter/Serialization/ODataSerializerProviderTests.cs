@@ -46,8 +46,8 @@ public class ODataSerializerProviderTests
                 { typeof(byte), EdmPrimitiveTypeKind.Byte },
                 { typeof(DateTime), EdmPrimitiveTypeKind.DateTimeOffset },
                 { typeof(DateTimeOffset), EdmPrimitiveTypeKind.DateTimeOffset },
-                { typeof(Date), EdmPrimitiveTypeKind.Date },
-                { typeof(TimeOfDay), EdmPrimitiveTypeKind.TimeOfDay },
+                { typeof(DateOnly), EdmPrimitiveTypeKind.Date },
+                { typeof(TimeOnly), EdmPrimitiveTypeKind.TimeOfDay },
                 { typeof(decimal), EdmPrimitiveTypeKind.Decimal },
                 { typeof(double), EdmPrimitiveTypeKind.Double },
                 { typeof(Guid), EdmPrimitiveTypeKind.Guid },
@@ -169,7 +169,7 @@ public class ODataSerializerProviderTests
     [InlineData("UnboundFunctionReturnsPrimitveCollection()/$count", typeof(int))]
     [InlineData("UnboundFunctionReturnsEnumCollection()/$count", typeof(Color))]
     [InlineData("UnboundFunctionReturnsDateTimeOffsetCollection()/$count", typeof(DateTimeOffset))]
-    [InlineData("UnboundFunctionReturnsDateCollection()/$count", typeof(Date))]
+    [InlineData("UnboundFunctionReturnsDateCollection()/$count", typeof(DateOnly))]
     [InlineData("UnboundFunctionReturnsComplexCollection()/$count", typeof(DollarCountComplex))]
     [InlineData("UnboundFunctionReturnsEntityCollection()/$count", typeof(DollarCountEntity))]
     [InlineData("DollarCountEntities/Default.BoundFunctionReturnsPrimitveCollection()/$count", typeof(DateTimeOffset))]
@@ -218,7 +218,7 @@ public class ODataSerializerProviderTests
 
         function = builder.Function("UnboundFunctionReturnsDateCollection");
         function.IsComposable = true;
-        function.ReturnsCollection<Date>();
+        function.ReturnsCollection<DateOnly>();
 
         function = builder.Function("UnboundFunctionReturnsComplexCollection");
         function.IsComposable = true;

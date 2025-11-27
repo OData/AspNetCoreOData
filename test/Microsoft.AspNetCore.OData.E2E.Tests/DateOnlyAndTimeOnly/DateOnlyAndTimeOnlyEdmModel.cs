@@ -1,21 +1,19 @@
 //-----------------------------------------------------------------------------
-// <copyright file="DateAndTimeOfDayEdmModel.cs" company=".NET Foundation">
+// <copyright file="DateOnlyAndTimeOnlyEdmModel.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OData.UriParser;
 using EdmPrimitiveTypeKind = Microsoft.OData.Edm.EdmPrimitiveTypeKind;
 using IEdmModel = Microsoft.OData.Edm.IEdmModel;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
-public class DateAndTimeOfDayEdmModel
+public class DateOnlyAndTimeOnlyEdmModel
 {
     public static IEdmModel GetExplicitModel()
     {
@@ -23,23 +21,23 @@ public class DateAndTimeOfDayEdmModel
         var customerType = builder.EntityType<DCustomer>().HasKey(c => c.Id);
         customerType.Property(c => c.DateTime);
         customerType.Property(c => c.Offset);
-        customerType.Property(c => c.Date);
-        customerType.Property(c => c.TimeOfDay);
+        customerType.Property(c => c.DateOnly);
+        customerType.Property(c => c.TimeOnly);
 
         customerType.Property(c => c.NullableDateTime);
         customerType.Property(c => c.NullableOffset);
-        customerType.Property(c => c.NullableDate);
-        customerType.Property(c => c.NullableTimeOfDay);
+        customerType.Property(c => c.NullableDateOnly);
+        customerType.Property(c => c.NullableTimeOnly);
 
         customerType.CollectionProperty(c => c.DateTimes);
         customerType.CollectionProperty(c => c.Offsets);
-        customerType.CollectionProperty(c => c.Dates);
-        customerType.CollectionProperty(c => c.TimeOfDays);
+        customerType.CollectionProperty(c => c.DateOnlys);
+        customerType.CollectionProperty(c => c.TimeOnlys);
 
         customerType.CollectionProperty(c => c.NullableDateTimes);
         customerType.CollectionProperty(c => c.NullableOffsets);
-        customerType.CollectionProperty(c => c.NullableDates);
-        customerType.CollectionProperty(c => c.NullableTimeOfDays);
+        customerType.CollectionProperty(c => c.NullableDateOnlys);
+        customerType.CollectionProperty(c => c.NullableTimeOnlys);
 
         var customers = builder.EntitySet<DCustomer>("DCustomers");
        // customers.HasIdLink(link, true);
@@ -68,33 +66,33 @@ public class DateAndTimeOfDayEdmModel
     {
         FunctionConfiguration function = builder.EntityType<DCustomer>().Function("BoundFunction")
                 .ReturnsCollectionViaEntitySetPath<DCustomer>("bindingParameter");
-        function.Parameter<Date>("modifiedDate");
-        function.Parameter<TimeOfDay>("modifiedTime");
-        function.Parameter<Date?>("nullableModifiedDate");
-        function.Parameter<TimeOfDay?>("nullableModifiedTime");
+        function.Parameter<DateOnly>("modifiedDate");
+        function.Parameter<TimeOnly>("modifiedTime");
+        function.Parameter<DateOnly?>("nullableModifiedDate");
+        function.Parameter<TimeOnly?>("nullableModifiedTime");
 
         function = builder.Function("UnboundFunction").ReturnsCollectionFromEntitySet<DCustomer>("DCustomers");
-        function.Parameter<Date>("modifiedDate");
-        function.Parameter<TimeOfDay>("modifiedTime");
-        function.Parameter<Date?>("nullableModifiedDate");
-        function.Parameter<TimeOfDay?>("nullableModifiedTime");
+        function.Parameter<DateOnly>("modifiedDate");
+        function.Parameter<TimeOnly>("modifiedTime");
+        function.Parameter<DateOnly?>("nullableModifiedDate");
+        function.Parameter<TimeOnly?>("nullableModifiedTime");
     }
 
     private static void BuildActions(ODataModelBuilder builder)
     {
         ActionConfiguration action = builder.EntityType<DCustomer>().Action("BoundAction");
-        action.Parameter<Date>("modifiedDate");
-        action.Parameter<TimeOfDay>("modifiedTime");
-        action.Parameter<Date?>("nullableModifiedDate");
-        action.Parameter<TimeOfDay?>("nullableModifiedTime");
-        action.CollectionParameter<Date>("dates");
+        action.Parameter<DateOnly>("modifiedDate");
+        action.Parameter<TimeOnly>("modifiedTime");
+        action.Parameter<DateOnly?>("nullableModifiedDate");
+        action.Parameter<TimeOnly?>("nullableModifiedTime");
+        action.CollectionParameter<DateOnly>("dates");
 
         action = builder.Action("UnboundAction");
-        action.Parameter<Date>("modifiedDate");
-        action.Parameter<TimeOfDay>("modifiedTime");
-        action.Parameter<Date?>("nullableModifiedDate");
-        action.Parameter<TimeOfDay?>("nullableModifiedTime");
-        action.CollectionParameter<Date>("dates");
+        action.Parameter<DateOnly>("modifiedDate");
+        action.Parameter<TimeOnly>("modifiedTime");
+        action.Parameter<DateOnly?>("nullableModifiedDate");
+        action.Parameter<TimeOnly?>("nullableModifiedTime");
+        action.CollectionParameter<DateOnly>("dates");
 
         // just for reset the data source
         builder.Action("ResetDataSource");

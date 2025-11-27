@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// <copyright file="DateAndTimeOfDayController.cs" company=".NET Foundation">
+// <copyright file="DateOnlyAndTimeOnlyController.cs" company=".NET Foundation">
 //      Copyright (c) .NET Foundation and Contributors. All rights reserved.
 //      See License.txt in the project root for license information.
 // </copyright>
@@ -18,7 +18,7 @@ using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.OData.Edm;
 using Xunit;
 
-namespace Microsoft.AspNetCore.OData.E2E.Tests.DateAndTimeOfDay;
+namespace Microsoft.AspNetCore.OData.E2E.Tests.DateOnlyAndTimeOnly;
 
 public class DCustomersController : ODataController
 {
@@ -33,23 +33,23 @@ public class DCustomersController : ODataController
                 Id = e,
                 DateTime = dto.AddYears(e).DateTime,
                 Offset = e % 2 == 0 ? dto.AddMonths(e) : dto.AddDays(e).AddMilliseconds(10),
-                Date = e % 2 == 0 ? dto.AddDays(e).Date : dto.AddDays(-e).Date,
-                TimeOfDay = e % 3 == 0 ? dto.AddHours(e).TimeOfDay : dto.AddHours(-e).AddMilliseconds(10).TimeOfDay,
+                DateOnly = e % 2 == 0 ? DateOnly.FromDateTime(dto.AddDays(e).Date) : DateOnly.FromDateTime(dto.AddDays(-e).Date),
+                TimeOnly = e % 3 == 0 ? TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay) : TimeOnly.FromTimeSpan(dto.AddHours(-e).AddMilliseconds(10).TimeOfDay),
 
                 NullableDateTime = e % 2 == 0 ? (DateTime?)null : dto.AddYears(e).DateTime,
                 NullableOffset = e % 3 == 0 ? (DateTimeOffset?)null : dto.AddMonths(e),
-                NullableDate = e % 2 == 0 ? (Date?)null : dto.AddDays(e).Date,
-                NullableTimeOfDay = e % 3 == 0 ? (TimeOfDay?)null : dto.AddHours(e).TimeOfDay,
+                NullableDateOnly = e % 2 == 0 ? (DateOnly?)null : DateOnly.FromDateTime(dto.AddDays(e).Date),
+                NullableTimeOnly = e % 3 == 0 ? (TimeOnly?)null : TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay),
 
-                DateTimes = new [] { dto.AddYears(e).DateTime, dto.AddMonths(e).DateTime },
-                Offsets = new [] { dto.AddMonths(e), dto.AddDays(e) },
-                Dates = new [] { (Date)dto.AddYears(e).Date, (Date)dto.AddMonths(e).Date },
-                TimeOfDays = new [] { (TimeOfDay)dto.AddHours(e).TimeOfDay, (TimeOfDay)dto.AddMinutes(e).TimeOfDay },
+                DateTimes = new[] { dto.AddYears(e).DateTime, dto.AddMonths(e).DateTime },
+                Offsets = new[] { dto.AddMonths(e), dto.AddDays(e) },
+                DateOnlys = new[] { DateOnly.FromDateTime(dto.AddYears(e).Date), DateOnly.FromDateTime(dto.AddMonths(e).Date) },
+                TimeOnlys = new[] { TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay), TimeOnly.FromTimeSpan(dto.AddMinutes(e).TimeOfDay) },
 
-                NullableDateTimes = new [] { dto.AddYears(e).DateTime, (DateTime?)null, dto.AddMonths(e).DateTime },
-                NullableOffsets = new [] { dto.AddMonths(e), (DateTimeOffset?)null, dto.AddDays(e) },
-                NullableDates = new [] { (Date)dto.AddYears(e).Date, (Date?)null, (Date)dto.AddMonths(e).Date },
-                NullableTimeOfDays = new [] { (TimeOfDay)dto.AddHours(e).TimeOfDay, (TimeOfDay?)null, (TimeOfDay)dto.AddMinutes(e).TimeOfDay },
+                NullableDateTimes = new[] { dto.AddYears(e).DateTime, (DateTime?)null, dto.AddMonths(e).DateTime },
+                NullableOffsets = new[] { dto.AddMonths(e), (DateTimeOffset?)null, dto.AddDays(e) },
+                NullableDateOnlys = new[] { DateOnly.FromDateTime(dto.AddYears(e).Date), (DateOnly?)null, DateOnly.FromDateTime(dto.AddMonths(e).Date) },
+                NullableTimeOnlys = new[] { TimeOnly.FromTimeSpan(dto.AddHours(e).TimeOfDay), (TimeOnly?)null, TimeOnly.FromTimeSpan(dto.AddMinutes(e).TimeOfDay) },
 
             }).ToList();
     }
@@ -80,16 +80,16 @@ public class DCustomersController : ODataController
     }
 
     [HttpGet]
-    public IActionResult BoundFunction(int key, [FromODataUri]Date modifiedDate, [FromODataUri]TimeOfDay modifiedTime,
-        [FromODataUri]Date? nullableModifiedDate, [FromODataUri]TimeOfDay? nullableModifiedTime)
+    public IActionResult BoundFunction(int key, [FromODataUri] DateOnly modifiedDate, [FromODataUri] TimeOnly modifiedTime,
+        [FromODataUri] DateOnly? nullableModifiedDate, [FromODataUri] TimeOnly? nullableModifiedTime)
     {
         return Ok(BuildString(modifiedDate, modifiedTime, nullableModifiedDate, nullableModifiedTime));
     }
 
     [HttpGet("/convention/UnboundFunction(modifiedDate={p1},modifiedTime={p2},nullableModifiedDate={p3},nullableModifiedTime={p4})")]
     [HttpGet("/explicit/UnboundFunction(modifiedDate={p1},modifiedTime={p2},nullableModifiedDate={p3},nullableModifiedTime={p4})")]
-    public IActionResult UnboundFunction([FromODataUri]Date p1, [FromODataUri]TimeOfDay p2,
-        [FromODataUri]Date? p3, [FromODataUri]TimeOfDay? p4)
+    public IActionResult UnboundFunction([FromODataUri] DateOnly p1, [FromODataUri] TimeOnly p2,
+        [FromODataUri] DateOnly? p3, [FromODataUri] TimeOnly? p4)
     {
         return Ok(BuildString(p1,p2,p3,p4));
     }
@@ -117,34 +117,34 @@ public class DCustomersController : ODataController
         Assert.True(parameters.ContainsKey("nullableModifiedTime"));
         Assert.True(parameters.ContainsKey("dates"));
 
-        Assert.Equal(new Date(2015, 3, 1), parameters["modifiedDate"]);
-        Assert.Equal(new TimeOfDay(1, 5, 6, 8), parameters["modifiedTime"]);
+        Assert.Equal(new DateOnly(2015, 3, 1), parameters["modifiedDate"]);
+        Assert.Equal(new TimeOnly(1, 5, 6, 8), parameters["modifiedTime"]);
 
         Assert.Null(parameters["nullableModifiedDate"]);
         Assert.Null(parameters["nullableModifiedTime"]);
 
-        IEnumerable<Date> dates = parameters["dates"] as IEnumerable<Date>;
+        IEnumerable<DateOnly> dates = parameters["dates"] as IEnumerable<DateOnly>;
         Assert.NotNull(dates);
         Assert.Equal(2, dates.Count());
     }
 
-    private static string BuildString(Date modifiedDate, TimeOfDay modifiedTime,
-        Date? nullableModifiedDate, TimeOfDay? nullableModifiedTime)
+    private static string BuildString(DateOnly modifiedDate, TimeOnly modifiedTime,
+        DateOnly? nullableModifiedDate, TimeOnly? nullableModifiedTime)
     {
         StringBuilder sb = new StringBuilder();
-        sb.Append("modifiedDate:").Append(modifiedDate).Append(",");
-        sb.Append("modifiedTime:").Append(modifiedTime).Append(",");
-        sb.Append("nullableModifiedDate:").Append(nullableModifiedDate == null ? "null" : nullableModifiedDate.ToString()).Append(",");
-        sb.Append("nullableModifiedTime:").Append(nullableModifiedTime == null ? "null" : nullableModifiedTime.ToString());
+        sb.Append("modifiedDate:").Append(modifiedDate.ToODataString()).Append(",");
+        sb.Append("modifiedTime:").Append(modifiedTime.ToODataString()).Append(",");
+        sb.Append("nullableModifiedDate:").Append(nullableModifiedDate == null ? "null" : nullableModifiedDate?.ToODataString()).Append(",");
+        sb.Append("nullableModifiedTime:").Append(nullableModifiedTime == null ? "null" : nullableModifiedTime?.ToODataString());
         return sb.ToString();
     }
 }
 
 public class EfCustomersController : ODataController
 {
-    private readonly DateAndTimeOfDayContext _db;
+    private readonly DateOnlyAndTimeOnlyContext _db;
 
-    public EfCustomersController(DateAndTimeOfDayContext context)
+    public EfCustomersController(DateOnlyAndTimeOnlyContext context)
     {
         context.Database.EnsureCreated();
         _db = context;
@@ -152,6 +152,8 @@ public class EfCustomersController : ODataController
         if (!context.Customers.Any())
         {
             DateTimeOffset dateTime = new DateTimeOffset(2014, 12, 24, 1, 2, 3, 4, new TimeSpan(-8, 0, 0));
+            DateOnly dateOnly = DateOnly.FromDateTime(dateTime.Date);
+            TimeOnly timeOnly = TimeOnly.FromTimeSpan(dateTime.TimeOfDay);
             IEnumerable<EfCustomer> customers = Enumerable.Range(1, 5).Select(e =>
                 new EfCustomer
                 {
@@ -196,6 +198,7 @@ public class EfPeopleController : ODataController
     public EfPeopleController(EdmDateWithEfContext context)
     {
         context.Database.EnsureCreated();
+
         _db = context;
 
         if (_db.People.Any())

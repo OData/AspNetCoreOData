@@ -642,6 +642,6 @@ public class UntypedTests : WebApiTestBase<UntypedTests>
         string payloadBody = await response.Content.ReadAsStringAsync();
 
         Assert.Contains("\"coordinates\":[[1.0,1.0],[3.0,3.0],[4.0,4.0],[0.0,0.0]],\"cr", payloadBody);
-        Assert.Contains("\"k:3\":{\"a1@odata.type\":\"#Decimal\",\"a1\":2,\"b2\":null},\"k/4\":[null,42]}],\"dyna", payloadBody);
+        Assert.Contains("\"k:3\":{\"a1\":2,\"b2\":null},\"k/4\":[null,42]}],\"dyna", payloadBody);
     }
 }
