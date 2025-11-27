@@ -58,6 +58,6 @@ public class EfPerson
 {
     public int Id { get; set; }
 
-    [Column("Birthday", TypeName = "DateOnly")]
+    [Column("Birthday", TypeName = "Date")]
     public DateTime? Birthday { get; set; }
 }
