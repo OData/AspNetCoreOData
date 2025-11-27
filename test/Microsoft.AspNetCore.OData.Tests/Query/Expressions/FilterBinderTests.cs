@@ -1307,7 +1307,7 @@ public class FilterBinderTests
     [InlineData("year(DateOnlyProperty) eq 2015", "$it => ($it.DateOnlyProperty.Year == 2015)")]
     [InlineData("month(DateOnlyProperty) eq 12", "$it => ($it.DateOnlyProperty.Month == 12)")]
     [InlineData("day(DateOnlyProperty) eq 23", "$it => ($it.DateOnlyProperty.Day == 23)")]
-    public void DateFunctions_DateFunctions_NonNullable(string filter, string expression)
+    public void DateFunctions_DateOnlyFunctions_NonNullable(string filter, string expression)
     {
         // Arrange & Act & Assert
         BindFilterAndVerify<Product>(filter, expression);
@@ -1317,7 +1317,7 @@ public class FilterBinderTests
     [InlineData("hour(NullableTimeOnlyProperty) eq 10", "$it => ($it.NullableTimeOnlyProperty.Value.Hour == 10)")]
     [InlineData("minute(NullableTimeOnlyProperty) eq 20", "$it => ($it.NullableTimeOnlyProperty.Value.Minute == 20)")]
     [InlineData("second(NullableTimeOnlyProperty) eq 30", "$it => ($it.NullableTimeOnlyProperty.Value.Second == 30)")]
-    public void DateFunctions_TimeOfDayFunctions_Nullable(string filter, string expression)
+    public void DateFunctions_TimeOnlyFunctions_Nullable(string filter, string expression)
     {
         // Arrange & Act & Assert
         BindFilterAndVerify<Product>(filter, expression, NotTesting);
@@ -1327,7 +1327,7 @@ public class FilterBinderTests
     [InlineData("hour(TimeOnlyProperty) eq 10", "$it => ($it.TimeOnlyProperty.Hour == 10)")]
     [InlineData("minute(TimeOnlyProperty) eq 20", "$it => ($it.TimeOnlyProperty.Minute == 20)")]
     [InlineData("second(TimeOnlyProperty) eq 30", "$it => ($it.TimeOnlyProperty.Second == 30)")]
-    public void DateFunctions_TimeOfDayFunctions_NonNullable(string filter, string expression)
+    public void DateFunctions_TimeOnlyFunctions_NonNullable(string filter, string expression)
     {
         // Arrange & Act & Assert
         BindFilterAndVerify<Product>(filter, expression);
@@ -1360,7 +1360,7 @@ public class FilterBinderTests
         "$it => ((((2015-02-26.Year * 10000) + (2015-02-26.Month * 100)) + 2015-02-26.Day) >= ((($it.DiscontinuedDate.Value.Year * 10000) + ($it.DiscontinuedDate.Value.Month * 100)) + $it.DiscontinuedDate.Value.Day))")]
     [InlineData("null ne date(DiscontinuedDate)", "$it => (null != $it.DiscontinuedDate)")]
     [InlineData("date(DiscontinuedDate) eq null", "$it => ($it.DiscontinuedDate == null)")]
-    public void DateFunctions_DateFunction_Nullable(string filter, string expression)
+    public void DateFunctions_DateOnlyFunction_Nullable(string filter, string expression)
     {
         // Arrange & Act & Assert
         BindFilterAndVerify<Product>(filter, expression, NotTesting);
