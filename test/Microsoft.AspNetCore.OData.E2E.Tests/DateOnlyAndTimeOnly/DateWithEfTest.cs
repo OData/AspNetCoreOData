@@ -67,7 +67,7 @@ public class DateWithEfTest : WebApiTestBase<DateWithEfTest>
         Assert.Equal(expect, string.Join(",", content["value"].Select(e => e["Id"].ToString())));
     }
 
-    [Fact(Skip = "TODO: Processing of the LINQ expression failed")]
+    [Fact]
     public async Task CanGroupByDatePropertyForDateTimePropertyOnEf()
     {
         // Arrange

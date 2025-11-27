@@ -110,7 +110,7 @@ public class MetadataEndpointsTests : IClassFixture<MinimalTestFixture<MetadataE
                   "<ComplexType Name=\"MiniTask\">" +
                     "<Property Name=\"Id\" Type=\"Edm.Int32\" Nullable=\"false\" />" +
                     "<Property Name=\"Description\" Type=\"Edm.String\" />" +
-                    "<Property Name=\"Created\" Type=\"Edm.DateOnly\" Nullable=\"false\" />" +
+                    "<Property Name=\"Created\" Type=\"Edm.Date\" Nullable=\"false\" />" +
                     "<Property Name=\"IsComplete\" Type=\"Edm.Boolean\" Nullable=\"false\" />" +
                     "<Property Name=\"Priority\" Type=\"Edm.Int32\" Nullable=\"false\" />" +
                   "</ComplexType>" +
@@ -185,7 +185,7 @@ public class MetadataEndpointsTests : IClassFixture<MinimalTestFixture<MetadataE
         ""$Nullable"": true
       },
       ""Created"": {
-        ""$Type"": ""Edm.DateOnly""
+        ""$Type"": ""Edm.Date""
       },
       ""IsComplete"": {
         ""$Type"": ""Edm.Boolean""
