@@ -1280,6 +1280,27 @@ public class ODataQueryOptionTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("$top=10&$skip=0&%20")]
+    [InlineData("$top=10&%20=foo&$skip=0")]
+    [InlineData("$top=10&$skip=0&")]
+    [InlineData("$top=10&&$skip=0")]
+    [InlineData("%20")]
+    public void ODataQueryOptions_CtorDoesNotThrowOnEmptyQueryStringKeys(string oDataQuery)
+    {
+        // Arrange
+        IEdmModel model = GetEdmModelWithoutKey();
+
+        string url = "http://server/service/Customers?" + oDataQuery;
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, url, opt => opt.EnableNoDollarQueryOptions = true);
+
+        // Act
+        var exception = Record.Exception(() => new ODataQueryOptions(new ODataQueryContext(model, typeof(Customer)), request));
+
+        // Assert
+        Assert.Null(exception);
+    }
+
     private static HttpClient CreateClient()
     {
         var controllers = new[] { typeof(EntityModelsController), typeof(ProductsController) };

@@ -886,7 +886,7 @@ public class ODataQueryOptions
             }
             else
             {
-                if (IsSupportedQueryOption(key))
+                if (!string.IsNullOrEmpty(key) && IsSupportedQueryOption(key))
                 {
                     // Normalized the supported system query key by adding the $-prefix if needed.
                     result.Add(
