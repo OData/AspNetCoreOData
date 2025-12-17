@@ -55,6 +55,17 @@ public class SearchQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    // Used when only the raw value is known.
+    internal SearchQueryOption(string rawValue)
+    {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // This constructor is intended for unit testing only.
     internal SearchQueryOption(string rawValue, ODataQueryContext context)
     {

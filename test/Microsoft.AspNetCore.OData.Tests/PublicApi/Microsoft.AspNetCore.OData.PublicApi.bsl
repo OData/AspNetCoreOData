@@ -1607,6 +1607,7 @@ ODataQueryParameterBindingAttribute(),
 ]
 public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions {
 	public ODataQueryOptions (Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.AspNetCore.Http.HttpRequest request)
+	public ODataQueryOptions (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] queryParameters, System.Type elementClrType, params Microsoft.OData.Edm.IEdmModel model, params Microsoft.OData.UriParser.ODataPath path)
 
 	Microsoft.AspNetCore.OData.Query.ApplyQueryOption Apply  { public get; }
 	Microsoft.AspNetCore.OData.Query.ComputeQueryOption Compute  { public get; }
@@ -1646,6 +1647,7 @@ ODataQueryParameterBindingAttribute(),
 ]
 public class Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1 : Microsoft.AspNetCore.OData.Query.ODataQueryOptions, IEndpointParameterMetadataProvider {
 	public ODataQueryOptions`1 (Microsoft.AspNetCore.OData.Query.ODataQueryContext context, Microsoft.AspNetCore.Http.HttpRequest request)
+	public ODataQueryOptions`1 (System.Collections.Generic.IDictionary`2[[System.String],[System.String]] queryParameters, params Microsoft.OData.Edm.IEdmModel model, params Microsoft.OData.UriParser.ODataPath path)
 
 	ETag`1 IfMatch  { public get; }
 	ETag`1 IfNoneMatch  { public get; }

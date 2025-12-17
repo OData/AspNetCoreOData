@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -46,6 +47,17 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
         {
             throw Error.Argument("context", SRResources.EntityTypeMismatch, context.ElementClrType.FullName, typeof(TEntity).FullName);
         }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ODataQueryOptions{TEntity}"/> class based on the given query parameters and context.
+    /// </summary>
+    /// <param name="model">The EDM model (can be null for non-model scenarios).</param>
+    /// <param name="queryParameters">The OData query parameters as a dictionary.</param>
+    /// <param name="path">The ODataPath (optional, can be null).</param>
+    public ODataQueryOptions(IDictionary<string, string> queryParameters, IEdmModel model = null, ODataPath path = null)
+        : base(queryParameters, typeof(TEntity), model, path)
+    {
     }
 
     /// <summary>

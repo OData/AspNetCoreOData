@@ -59,6 +59,17 @@ public class ApplyQueryOption
         ResultClrType = Context.ElementClrType;
     }
 
+    // Used when only the raw value is known.
+    internal ApplyQueryOption(string rawValue)
+    {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // for unit test only
     internal ApplyQueryOption(string rawValue, ODataQueryContext context)
     {

@@ -54,6 +54,17 @@ public class SkipQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
+    internal SkipQueryOption(string rawValue)
+    {
+        if (String.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        RawValue = rawValue;
+    }
+
     // This constructor is intended for unit testing only.
     internal SkipQueryOption(string rawValue, ODataQueryContext context)
     {
