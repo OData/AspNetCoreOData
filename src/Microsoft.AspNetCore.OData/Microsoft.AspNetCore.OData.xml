@@ -11729,6 +11729,16 @@
             <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.</param>
             <param name="request">The incoming request message.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},System.Type,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> class based on the given query parameters and context.
+            </summary>
+            <param name="queryParameters">The OData query parameters as a dictionary.</param>
+            <param name="model">The EdmModel that includes the <see cref="T:Microsoft.OData.Edm.IEdmType"/> corresponding to
+            the given <paramref name="elementClrType"/>.</param>
+            <param name="elementClrType">The CLR type of the element of the collection being queried.</param>
+            <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.</param>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Request">
             <summary>
             Gets the request message associated with this instance.
@@ -11957,6 +11967,14 @@
             <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information</param>
             <param name="request">The incoming request message</param>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.ODataPath)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/> class based on the given query parameters and context.
+            </summary>
+            <param name="model">The EDM model (can be null for non-model scenarios).</param>
+            <param name="queryParameters">The OData query parameters as a dictionary.</param>
+            <param name="path">The ODataPath (optional, can be null).</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.IfMatch">
             <summary>

@@ -69,6 +69,17 @@ public class SelectExpandQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    internal SelectExpandQueryOption(string select, string expand)
+    {
+        if (string.IsNullOrWhiteSpace(select) && string.IsNullOrWhiteSpace(expand))
+        {
+            throw Error.Argument(SRResources.SelectExpandEmptyOrNull);
+        }
+
+        RawSelect = select;
+        RawExpand = expand;
+    }
+
     internal SelectExpandQueryOption(
         string select,
         string expand,
