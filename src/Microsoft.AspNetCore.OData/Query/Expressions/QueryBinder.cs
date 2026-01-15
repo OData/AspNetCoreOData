@@ -1303,7 +1303,7 @@ public abstract partial class QueryBinder
         Expression propertyValue = source;
         foreach (string propertyName in propertyNameParts)
         {
-            propertyValue = Expression.Property(propertyValue, propertyName);
+            propertyValue = Expression.Property(propertyValue, propertyValue.Type.GetProperty(propertyName));
 
             // Consider a scenario like:
             // Sales?$apply=compute(Amount mul Product/TaxRate as Tax)/compute(Amount add Tax as Total,Amount div 10 as Discount)/compute(Total sub Discount as SalePrice)
