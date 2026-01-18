@@ -666,7 +666,7 @@ public class ODataActionPayloadDeserializerTest
     {
         // Arrange
         const string Body = @"{ ""Quantity"": 1 , ""ProductCode"": ""PCode"", ""MissingParameter"": 1 }";
-        IODataRequestMessageAsync message = new ODataMessageWrapper(GetStringAsStreamAsync(Body).Result);
+        IODataRequestMessage message = new ODataMessageWrapper(GetStringAsStreamAsync(Body).Result);
         message.SetHeader("Content-Type", "application/json");
         ODataMessageReader reader = new ODataMessageReader(message, new ODataMessageReaderSettings(), _model);
         ODataDeserializerContext context = new ODataDeserializerContext { Path = path, Model = _model };

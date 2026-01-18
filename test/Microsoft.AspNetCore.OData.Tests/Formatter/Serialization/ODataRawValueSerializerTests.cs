@@ -36,9 +36,9 @@ public class ODataRawValueSerializerTests
     {
         // Arrange
         ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-        Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
+        Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
         Stream stream = new MemoryStream();
-        mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
+        mockRequest.Setup(r => r.GetStreamAsync(default)).ReturnsAsync(stream);
         ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
         // Act
@@ -57,9 +57,9 @@ public class ODataRawValueSerializerTests
         // Arrange
         int? value = 5;
         ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-        Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
+        Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
         Stream stream = new MemoryStream();
-        mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
+        mockRequest.Setup(r => r.GetStreamAsync(default)).ReturnsAsync(stream);
         ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
         // Act
@@ -98,9 +98,9 @@ public class ODataRawValueSerializerTests
     {
         // Arrange
         ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-        Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
+        Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
         Stream stream = new MemoryStream();
-        mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
+        mockRequest.Setup(r => r.GetStreamAsync(default)).ReturnsAsync(stream);
         ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
 
         // Act
@@ -117,9 +117,9 @@ public class ODataRawValueSerializerTests
     {
         // Arrange
         ODataRawValueSerializer serializer = new ODataRawValueSerializer();
-        Mock<IODataRequestMessageAsync> mockRequest = new Mock<IODataRequestMessageAsync>();
+        Mock<IODataRequestMessage> mockRequest = new Mock<IODataRequestMessage>();
         Stream stream = new MemoryStream();
-        mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
+        mockRequest.Setup(r => r.GetStreamAsync(default)).ReturnsAsync(stream);
         ODataMessageWriter messageWriter = new ODataMessageWriter(mockRequest.Object);
         object value = Color.Red | Color.Blue;
 
@@ -138,9 +138,9 @@ public class ODataRawValueSerializerTests
     {
         // Arrange
         var serializer = new ODataRawValueSerializer();
-        var mockRequest = new Mock<IODataRequestMessageAsync>();
+        var mockRequest = new Mock<IODataRequestMessage>();
         Stream stream = new MemoryStream();
-        mockRequest.Setup(r => r.GetStreamAsync()).ReturnsAsync(stream);
+        mockRequest.Setup(r => r.GetStreamAsync(default)).ReturnsAsync(stream);
         var messageWriter = new ODataMessageWriter(mockRequest.Object);
         HttpRequest request = RequestFactory.Create(opt => opt.AddRouteComponents(EdmCoreModel.Instance));
         request.ODataFeature().Path = new ODataPath(CountSegment.Instance);

@@ -39,12 +39,12 @@ internal static class ODataTestUtil
         return serializerProvider.Object;
     }
 
-    internal static ODataMessageReader GetODataMessageReader(IODataRequestMessageAsync oDataRequestMessage, IEdmModel edmModel)
+    internal static ODataMessageReader GetODataMessageReader(IODataRequestMessage oDataRequestMessage, IEdmModel edmModel)
     {
         return new ODataMessageReader(oDataRequestMessage, new ODataMessageReaderSettings(), edmModel);
     }
 
-    internal static IODataRequestMessageAsync GetODataMessage(this HttpRequest request, string content)
+    internal static IODataRequestMessage GetODataMessage(this HttpRequest request, string content)
     {
         // While NetCore does not use this for AspNet, it can be used here to create
         // an HttpRequestODataMessage, which is a Test type that implments IODataRequestMessage

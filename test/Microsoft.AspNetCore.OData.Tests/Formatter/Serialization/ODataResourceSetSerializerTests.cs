@@ -137,7 +137,7 @@ public class ODataResourceSetSerializerTests
         IODataSerializerProvider serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
         ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
         MemoryStream stream = new MemoryStream();
-        IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+        IODataResponseMessage message = new ODataMessageWrapper(stream);
 
         ODataMessageWriterSettings settings = new ODataMessageWriterSettings
         {
@@ -176,7 +176,7 @@ public class ODataResourceSetSerializerTests
         IODataSerializerProvider serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
         ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
         MemoryStream stream = new MemoryStream();
-        IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+        IODataResponseMessage message = new ODataMessageWrapper(stream);
 
         ODataMessageWriterSettings settings = new ODataMessageWriterSettings
         {
@@ -232,7 +232,7 @@ public class ODataResourceSetSerializerTests
         IODataSerializerProvider serializerProvider = GetServiceProvider().GetService<IODataSerializerProvider>();
         ODataResourceSetSerializer serializer = new ODataResourceSetSerializer(serializerProvider);
         MemoryStream stream = new MemoryStream();
-        IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+        IODataResponseMessage message = new ODataMessageWrapper(stream);
 
         ODataMessageWriterSettings settings = new ODataMessageWriterSettings
         {

@@ -8,12 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Commons;
 
-public class InMemoryMessage : IODataRequestMessageAsync, IODataResponseMessageAsync, IDisposable
+public class InMemoryMessage : IODataRequestMessage, IODataResponseMessage, IDisposable
 {
     private readonly Dictionary<string, string> headers;
 
@@ -63,7 +64,7 @@ public class InMemoryMessage : IODataRequestMessageAsync, IODataResponseMessageA
         }
     }
 
-    public Task<Stream> GetStreamAsync()
+    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken = default)
     {
         return Task.FromResult(this.Stream);
     }

@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.Commons;
@@ -100,6 +102,11 @@ internal class ODataMessageWrapper : IODataRequestMessage, IODataResponseMessage
     public Stream GetStream()
     {
         return _stream;
+    }
+
+    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(this._stream);
     }
 
     public void SetHeader(string headerName, string headerValue)

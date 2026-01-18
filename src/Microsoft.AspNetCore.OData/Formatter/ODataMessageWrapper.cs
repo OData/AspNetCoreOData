@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
@@ -17,7 +18,7 @@ namespace Microsoft.AspNetCore.OData.Formatter;
 /// <summary>
 /// Wrapper for IODataRequestMessage and IODataResponseMessage.
 /// </summary>
-internal class ODataMessageWrapper : IODataRequestMessageAsync, IODataResponseMessageAsync, IODataPayloadUriConverter, IServiceCollectionProvider,  IDisposable
+internal class ODataMessageWrapper : IODataRequestMessage, IODataResponseMessage, IODataPayloadUriConverter, IServiceCollectionProvider,  IDisposable
 {
     private Stream _stream;
     private Dictionary<string, string> _headers;
@@ -124,7 +125,7 @@ internal class ODataMessageWrapper : IODataRequestMessageAsync, IODataResponseMe
         return _stream;
     }
 
-    public Task<Stream> GetStreamAsync()
+    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken = default)
     {
         TaskCompletionSource<Stream> taskCompletionSource = new TaskCompletionSource<Stream>();
         taskCompletionSource.SetResult(_stream);
