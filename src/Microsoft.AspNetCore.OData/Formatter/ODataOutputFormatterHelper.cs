@@ -79,7 +79,7 @@ internal static class ODataOutputFormatterHelper
             annotationFilter = messageWrapper.PreferHeader().AnnotationFilter;
         }
 
-        IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetRouteServices());
+        IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(new StreamWrapper(response.Body), response.Headers, request.GetRouteServices());
         if (annotationFilter != null)
         {
             responseMessage.PreferenceAppliedHeader().AnnotationFilter = annotationFilter;

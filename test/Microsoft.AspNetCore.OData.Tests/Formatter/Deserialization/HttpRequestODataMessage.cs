@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -17,7 +17,7 @@ using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
 
-class HttpRequestODataMessage : IODataRequestMessageAsync
+class HttpRequestODataMessage : IODataRequestMessage
 {
     public HttpRequest _httpRequest;
 
@@ -64,7 +64,7 @@ class HttpRequestODataMessage : IODataRequestMessageAsync
         throw new NotImplementedException();
     }
 
-    public Task<Stream> GetStreamAsync()
+    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken = default)
     {
         return Task.FromResult(_httpRequest.Body);
     }

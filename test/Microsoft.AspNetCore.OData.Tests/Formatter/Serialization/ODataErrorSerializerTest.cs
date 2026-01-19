@@ -27,8 +27,8 @@ public class ODataErrorSerializerTest
         ODataErrorSerializer serializer = new ODataErrorSerializer();
         SerializableError error = new SerializableError();
 
-        Mock<IODataResponseMessageAsync> mockResponseMessage = new Mock<IODataResponseMessageAsync>();
-        mockResponseMessage.Setup(response => response.GetStreamAsync()).ReturnsAsync(new MemoryStream());
+        Mock<IODataResponseMessage> mockResponseMessage = new Mock<IODataResponseMessage>();
+        mockResponseMessage.Setup(response => response.GetStreamAsync(default)).ReturnsAsync(new MemoryStream());
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => serializer.WriteObjectAsync(error, typeof(ODataError), new ODataMessageWriter(mockResponseMessage.Object), new ODataSerializerContext())
@@ -77,7 +77,7 @@ public class ODataErrorSerializerTest
         // Arrange
         ODataErrorSerializer serializer = new ODataErrorSerializer();
         MemoryStream stream = new MemoryStream();
-        IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+        IODataResponseMessage message = new ODataMessageWrapper(stream);
         ODataError error = new ODataError { Message = "Error!!!" };
         ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
         settings.SetContentType(ODataFormat.Json);

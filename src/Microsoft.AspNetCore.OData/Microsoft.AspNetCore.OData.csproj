@@ -27,10 +27,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="Microsoft.OData.ModelBuilder" Version="3.0.0-preview.1" />
-    <PackageReference Include="Microsoft.OData.Core" Version="9.0.0-preview.3" />
-    <PackageReference Include="Microsoft.OData.Edm" Version="9.0.0-preview.3" />
-    <PackageReference Include="Microsoft.Spatial" Version="9.0.0-preview.3" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="3.0.0-preview.1" />
+    <PackageReference Include="Microsoft.OData.Core" Version="9.0.0-preview.4" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="9.0.0-preview.4" />
+    <PackageReference Include="Microsoft.Spatial" Version="9.0.0-preview.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

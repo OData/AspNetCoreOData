@@ -8,12 +8,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization;
 
-internal class MockODataRequestMessage : IODataRequestMessageAsync
+internal class MockODataRequestMessage : IODataRequestMessage
 {
     Dictionary<string, string> _headers;
     MemoryStream _body;
@@ -64,7 +65,7 @@ internal class MockODataRequestMessage : IODataRequestMessageAsync
         _headers[headerName] = headerValue;
     }
 
-    public Task<Stream> GetStreamAsync()
+    public Task<Stream> GetStreamAsync(CancellationToken cancellationToken = default)
     {
         return Task.FromResult<Stream>(_body);
     }

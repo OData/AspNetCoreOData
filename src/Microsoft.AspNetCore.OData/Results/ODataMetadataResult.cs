@@ -57,7 +57,7 @@ internal class ODataMetadataResult : IResult
 
         SetResponseHeader(httpContext, metadata);
 
-        IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, sp);
+        IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, sp);
 
         await using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
         {

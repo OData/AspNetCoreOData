@@ -138,7 +138,7 @@ public class ODataDeltaResourceSetSerializerTests
             .Returns(Task.CompletedTask)
             .Verifiable();
         MemoryStream stream = new MemoryStream();
-        IODataResponseMessageAsync message = new ODataMessageWrapper(stream);
+        IODataResponseMessage message = new ODataMessageWrapper(stream);
         ODataMessageWriterSettings settings = new ODataMessageWriterSettings()
         {
             ODataUri = new ODataUri { ServiceRoot = new Uri("http://any/") }

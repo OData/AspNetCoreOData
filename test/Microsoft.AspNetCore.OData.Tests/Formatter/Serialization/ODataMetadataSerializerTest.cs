@@ -115,7 +115,7 @@ public class ODataMetadataSerializerTest
         writerSettings.EnableMessageStreamDisposal = false;
         writerSettings.BaseUri = new Uri("http://www.example.com/");
 
-        using (var msgWriter = new ODataMessageWriter((IODataResponseMessageAsync)message, writerSettings, edmModel))
+        using (var msgWriter = new ODataMessageWriter((IODataResponseMessage)message, writerSettings, edmModel))
         {
             await test(msgWriter);
         }

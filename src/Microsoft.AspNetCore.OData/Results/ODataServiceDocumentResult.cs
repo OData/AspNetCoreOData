@@ -60,7 +60,7 @@ internal class ODataServiceDocumentResult : IResult
         // Add version header.
         httpContext.Response.Headers["OData-Version"] = ODataUtils.ODataVersionToString(version);
 
-        IODataResponseMessageAsync responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, sp);
+        IODataResponseMessage responseMessage = ODataMessageWrapperHelper.Create(response.Body, response.Headers, sp);
 
         await using (ODataMessageWriter messageWriter = new ODataMessageWriter(responseMessage, writerSettings, model))
         {

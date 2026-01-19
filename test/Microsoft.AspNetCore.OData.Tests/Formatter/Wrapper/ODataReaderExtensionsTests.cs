@@ -592,7 +592,7 @@ public partial class ODataReaderExtensionsTests
         };
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        using (var msgReader = new ODataMessageReader((IODataRequestMessageAsync)message, readerSettings, edmModel))
+        using (var msgReader = new ODataMessageReader((IODataRequestMessage)message, readerSettings, edmModel))
         {
             ODataReader reader = await createReader(msgReader);
             return await reader.ReadResourceOrResourceSetAsync();
