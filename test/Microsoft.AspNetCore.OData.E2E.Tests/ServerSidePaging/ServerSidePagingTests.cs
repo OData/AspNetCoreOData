@@ -652,20 +652,22 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
         // is intentional. The next-link in one response is used in the next request
         // so we need to control the execution order (unlike Theory attribute where order is random)
-        var skipTokenTestData = new List<(int, decimal?)>
+        var skipTokenTestData = new List<(int, decimal?, int, decimal?)>
         {
-            (6, 35),
-            (9, 25),
-            (2, 2),
-            (3, null)
+            (8, 50, 6, 35),
+            (4, 30, 9, 25),
+            (7, 5, 2, 2),
+            (5, null, 3, null)
         };
 
         string requestUri = "/prefix/SkipTokenPagingS1Customers?$orderby=CreditLimit desc";
 
         foreach (var testData in skipTokenTestData)
         {
-            int idAt1 = testData.Item1;
-            decimal? creditLimitAt1 = testData.Item2;
+            int idAt0 = testData.Item1;
+            decimal? creditLimitAt0 = testData.Item2;
+            int idAt1 = testData.Item3;
+            decimal? creditLimitAt1 = testData.Item4;
 
             // Arrange
             request = new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -681,6 +683,8 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
             pageResult = content["value"] as JArray;
             Assert.NotNull(pageResult);
             Assert.Equal(2, pageResult.Count);
+            Assert.Equal(idAt0, (pageResult[0] as JObject)["Id"].ToObject<int>());
+            Assert.Equal(creditLimitAt0, (pageResult[0] as JObject)["CreditLimit"].ToObject<decimal?>());
             Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
             Assert.Equal(creditLimitAt1, (pageResult[1] as JObject)["CreditLimit"].ToObject<decimal?>());
 
@@ -703,7 +707,7 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         pageResult = content["value"] as JArray;
         Assert.NotNull(pageResult);
         Assert.Single(pageResult);
-        Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(1, (pageResult[0] as JObject)["Id"].ToObject<int>());
         Assert.Null((pageResult[0] as JObject)["CreditLimit"].ToObject<decimal?>());
         Assert.Null(content.GetValue("@odata.nextLink"));
     }
@@ -936,20 +940,22 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         // NOTE: Using a loop in this test (as opposed to parameterized tests using xunit Theory attribute)
         // is intentional. The next-link in one response is used in the next request
         // so we need to control the execution order (unlike Theory attribute where order is random)
-        var skipTokenTestData = new List<(int, DateTime?)>
+        var skipTokenTestData = new List<(int, DateTime?, int, DateTime?)>
         {
-            (6, new DateTime(2023, 2, 4)),
-            (9, new DateTime(2023, 1, 25)),
-            (2, new DateTime(2023, 1, 2)),
-            (3, null)
+            (8, new DateTime(2023, 2, 19), 6, new DateTime(2023, 2, 4)),
+            (4, new DateTime(2023, 1, 30), 9, new DateTime(2023, 1, 25)),
+            (7, new DateTime(2023, 1, 5), 2, new DateTime(2023, 1, 2)),
+            (5, null, 3, null)
         };
 
         string requestUri = "/prefix/SkipTokenPagingS3Customers?$orderby=CustomerSince desc";
 
         foreach (var testData in skipTokenTestData)
         {
-            int idAt1 = testData.Item1;
-            DateTime? customerSinceAt1 = testData.Item2;
+            int idAt0 = testData.Item1;
+            DateTime? customerSinceAt0 = testData.Item2;
+            int idAt1 = testData.Item3;
+            DateTime? customerSinceAt1 = testData.Item4;
 
             // Arrange
             request = new HttpRequestMessage(HttpMethod.Get, requestUri);
@@ -968,6 +974,8 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
             pageResult = content["value"] as JArray;
             Assert.NotNull(pageResult);
             Assert.Equal(2, pageResult.Count);
+            Assert.Equal(idAt0, (pageResult[0] as JObject)["Id"].ToObject<int>());
+            Assert.Equal(customerSinceAt0, (pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
             Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
             Assert.Equal(customerSinceAt1, (pageResult[1] as JObject)["CustomerSince"].ToObject<DateTime?>());
 
@@ -991,7 +999,7 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         pageResult = content["value"] as JArray;
         Assert.NotNull(pageResult);
         Assert.Single(pageResult);
-        Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(1, (pageResult[0] as JObject)["Id"].ToObject<int>());
         Assert.Null((pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
         Assert.Null(content.GetValue("@odata.nextLink"));
     }

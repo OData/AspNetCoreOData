@@ -748,7 +748,8 @@ public class ODataQueryOptions
             var propertyPathsToAdd = applySortOptions.Where(p => !usedPropertyNames.Contains(p)).OrderBy(p => p);
             if (propertyPathsToAdd.Any())
             {
-                var orderByRaw = orderBy.RawValue + "," + String.Join(",", propertyPathsToAdd);
+                var suffix = ExtractDirectionSuffix(orderBy);
+                var orderByRaw = orderBy.RawValue + "," + String.Join(",", propertyPathsToAdd.Select(p => p + suffix));
                 orderBy = new OrderByQueryOption(orderByRaw, context, Apply.RawValue, Compute?.RawValue);
             }
         }
@@ -761,12 +762,19 @@ public class ODataQueryOptions
                 // Clone the given one and add the remaining properties to end, thereby making
                 // the sort stable but preserving the user's original intent for the major
                 // sort order.
-                var orderByRaw = orderBy.RawValue + "," + string.Join(",", propertiesToAdd.Select(p => p.Name));
+                var suffix = ExtractDirectionSuffix(orderBy);
+                var orderByRaw = orderBy.RawValue + "," + string.Join(",", propertiesToAdd.Select(p => p.Name + suffix));
                 orderBy = new OrderByQueryOption(orderByRaw, context, null, Compute?.RawValue);
             }
         }
 
         return orderBy;
+
+        static string ExtractDirectionSuffix(OrderByQueryOption orderBy)
+        {
+            // with Ascending being the default order, we just need to care about deviations from the default
+            return orderBy.OrderByNodes.LastOrDefault()?.Direction == OrderByDirection.Descending ? " desc" : string.Empty;
+        }
     }
 
     internal static IQueryable LimitResults(IQueryable queryable, int limit, bool parameterize, out bool resultsLimited)

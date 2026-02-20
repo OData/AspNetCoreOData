@@ -34,6 +34,8 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query;
 
+using Microsoft.OData.UriParser;
+
 public class ODataQueryOptionTests
 {
     internal static IQueryable Customers = new List<Customer>().AsQueryable();
@@ -221,7 +223,7 @@ public class ODataQueryOptionTests
                 { "$orderby=Name asc&$skip=1", true, "OrderBy($it => $it.Name).ThenBy($it => $it.CustomerId).Skip(1)" },
 
                 // Second key plus 'desc' suffix, adds 1st key and preserves suffix
-                { "$orderby=Name desc&$skip=1", true, "OrderByDescending($it => $it.Name).ThenBy($it => $it.CustomerId).Skip(1)" },
+                { "$orderby=Name desc&$skip=1", true, "OrderByDescending($it => $it.Name).ThenByDescending($it => $it.CustomerId).Skip(1)" },
 
                 // All keys present, no modification
                 { "$orderby=CustomerId,Name&$skip=1", true,  "OrderBy($it => $it.CustomerId).ThenBy($it => $it.Name).Skip(1)" },
@@ -283,6 +285,9 @@ public class ODataQueryOptionTests
 
                 // Single property present with $skip and $top, adds all remaining in alphabetic order
                 { "$orderby=CustomerId&$skip=1&$top=2", true,  "OrderBy($it => $it.CustomerId).ThenBy($it => $it.Name).ThenBy($it => $it.SharePrice).ThenBy($it => $it.ShareSymbol).ThenBy($it => $it.Website).Skip(1).Take(2)" },
+
+                // Single property present plus 'desc' suffix, with $skip and $top, adds all remaining in alphabetic order and preserves suffix
+                { "$orderby=CustomerId desc&$skip=1&$top=2", true,  "OrderByDescending($it => $it.CustomerId).ThenByDescending($it => $it.Name).ThenByDescending($it => $it.SharePrice).ThenByDescending($it => $it.ShareSymbol).ThenByDescending($it => $it.Website).Skip(1).Take(2)" },
 
                 // Single property present, no $skip or $top, no modification
                 { "$orderby=SharePrice", false,  "OrderBy($it => $it.SharePrice)" },
@@ -793,12 +798,15 @@ public class ODataQueryOptionTests
         ExceptionAssert.ThrowsArgumentNullOrEmpty(() => ODataQueryOptions.IsSystemQueryOption(string.Empty), "queryOptionName");
     }
 
-    [Fact]
-    public void GenerateStableOrder_Works_WithGroupbyApplyClause()
+    [Theory]
+    [InlineData(OrderByDirection.Ascending)]
+    [InlineData(OrderByDirection.Descending)]
+    public void GenerateStableOrder_Works_WithGroupbyApplyClause(OrderByDirection direction)
     {
         // Arrange
         IEdmModel model = GetEdmModel(c => c.CustomerId);
-        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers?$apply=groupby((CustomerId, Name))&$orderby=Name");
+        String directionSuffix = direction == OrderByDirection.Descending ? " desc" : String.Empty; // "asc" begin the default, so we omit it
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers?$apply=groupby((CustomerId, Name))&$orderby=Name" + directionSuffix);
 
         ODataQueryContext context = new ODataQueryContext(model, typeof(Customer));
         ODataQueryOptions option = new ODataQueryOptions(context, request);
@@ -814,11 +822,13 @@ public class ODataQueryOptionTests
             {
                 OrderByPropertyNode node = Assert.IsType<OrderByPropertyNode>(e);
                 Assert.Equal("Name", node.Property.Name);
+                Assert.Equal(direction, node.Direction);
             },
             e =>
             {
                 OrderByPropertyNode node = Assert.IsType<OrderByPropertyNode>(e);
                 Assert.Equal("CustomerId", node.Property.Name);
+                Assert.Equal(direction, node.Direction);
             });
     }
 
