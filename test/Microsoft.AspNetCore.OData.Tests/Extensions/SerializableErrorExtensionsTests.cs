@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.OData;
-using NuGet.Frameworks;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Extensions;
