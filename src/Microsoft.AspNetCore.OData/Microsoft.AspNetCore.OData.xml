@@ -2301,6 +2301,13 @@
             <param name="isNullable">Nullable value.</param>
             <returns>The Edm type reference.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Edm.EdmHelpers.IsNullableNavigationProperty(Microsoft.OData.Edm.IEdmProperty)">
+            <summary>
+            Tests whether a <see cref="T:Microsoft.OData.Edm.IEdmProperty"/> is a nullable navigation property.
+            </summary>
+            <param name="property">The property to test.</param>
+            <returns>True if the property is a nullable navigation property, false otherwise.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Edm.EdmModelAnnotationExtensions">
             <summary>
             The extensions for the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> for the annotations.

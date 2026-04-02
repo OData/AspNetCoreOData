@@ -520,4 +520,18 @@ internal static class EdmHelpers
         Contract.Assert(model != null);
         return model.GetAnnotationValue<OperationTitleAnnotation>(operation);
     }
+
+    /// <summary>
+    /// Tests whether a <see cref="IEdmProperty"/> is a nullable navigation property.
+    /// </summary>
+    /// <param name="property">The property to test.</param>
+    /// <returns>True if the property is a nullable navigation property, false otherwise.</returns>
+    internal static bool IsNullableNavigationProperty(this IEdmProperty property)
+    {
+        if (property is IEdmNavigationProperty navigationProperty)
+        {
+            return navigationProperty.Type.IsNullable;
+        }
+        return false;
+    }
 }

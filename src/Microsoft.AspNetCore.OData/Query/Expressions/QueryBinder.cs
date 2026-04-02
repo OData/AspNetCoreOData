@@ -1261,9 +1261,11 @@ public abstract partial class QueryBinder
     {
         string propertyName = context.Model.GetClrPropertyName(property);
         propertyPath = propertyPath ?? propertyName;
-        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True && ExpressionBinderHelper.IsNullable(source.Type) &&
+        if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True &&
             source != context.CurrentParameter &&
-            !IsFlatteningSource(source, context))
+            !IsFlatteningSource(source, context) &&
+            (ExpressionBinderHelper.IsNullable(source.Type) ||
+            property.IsNullableNavigationProperty()))
         {
             Expression cleanSource = ExpressionBinderHelper.RemoveInnerNullPropagation(source, context.QuerySettings);
             Expression propertyAccessExpression = null;
