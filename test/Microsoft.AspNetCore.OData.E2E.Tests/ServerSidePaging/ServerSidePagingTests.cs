@@ -38,6 +38,7 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         IEdmModel edmModel = GetEdmModel();
         services.ConfigureControllers(
             typeof(ServerSidePagingCustomersController),
+            typeof(ServerSidePagingCustomersWithoutPagesizeController),
             typeof(ServerSidePagingEmployeesController),
             typeof(ContainmentPagingCustomersController),
             typeof(ContainmentPagingCompanyController),
@@ -54,6 +55,7 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         ODataModelBuilder builder = new ODataConventionModelBuilder();
         builder.EntitySet<ServerSidePagingOrder>("ServerSidePagingOrders").EntityType.HasRequired(d => d.ServerSidePagingCustomer);
         builder.EntitySet<ServerSidePagingCustomer>("ServerSidePagingCustomers").EntityType.HasMany(d => d.ServerSidePagingOrders);
+        builder.EntitySet<ServerSidePagingCustomerWithoutPagesize>("ServerSidePagingCustomersWithoutPagesize");
         builder.EntitySet<ContainmentPagingCustomer>("ContainmentPagingCustomers");
         builder.Singleton<ContainmentPagingCustomer>("ContainmentPagingCompany");
         builder.EntitySet<NoContainmentPagingCustomer>("NoContainmentPagingCustomers");
@@ -117,6 +119,78 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
             bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
             Assert.True(nextLinkFound);
             Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$expand=ServerSidePagingOrders&$skip=5", nextLink.GetString());
+        }
+    }
+
+    [Fact]
+    public async Task ClientCanOwerwritePageSizeLowerThanPageSize()
+    {
+        // Arrange
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.Add("Prefer", "maxpagesize=1");
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=1", nextLink.GetString());
+        }
+    }
+
+    [Fact]
+    public async Task ClientCanNotOwerwritePageSizeGreaterThanPageSize()
+    {
+        // Arrange
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.Add("Prefer", "maxpagesize=8");
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=5", nextLink.GetString());
+        }
+    }
+
+    [Fact]
+    public async Task ClientCanSetMaxPageSizeIfNoPageSize()
+    {
+        // Arrange
+        string requestUri = "/prefix/ServerSidePagingCustomersWithoutPagesize";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.Add("Prefer", "maxpagesize=1");
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomersWithoutPagesize?$skip=1", nextLink.GetString());
         }
     }
 
@@ -254,7 +328,7 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         // Act
         var response = await client.SendAsync(request);
         var content = await response.Content.ReadAsStringAsync();
-         
+
         // Assert
         Assert.Contains("/prefix/UntypedPagingCustomerOrders/1/Orders?$skip=2", content);
         Assert.Contains("/prefix/UntypedPagingCustomerOrders/2/Orders?$skip=2", content);
