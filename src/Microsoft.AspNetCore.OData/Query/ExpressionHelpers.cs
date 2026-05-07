@@ -281,7 +281,7 @@ internal static class ExpressionHelpers
     public static LambdaExpression GetPropertyAccessLambda(Type type, string propertyName)
     {
         ParameterExpression odataItParameter = Expression.Parameter(type, "$it");
-        MemberExpression propertyAccess = Expression.Property(odataItParameter, propertyName);
+        MemberExpression propertyAccess = Expression.Property(odataItParameter, type.GetProperty(propertyName));
         return Expression.Lambda(propertyAccess, odataItParameter);
     }
 }
