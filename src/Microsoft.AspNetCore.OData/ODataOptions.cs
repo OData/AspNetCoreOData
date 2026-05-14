@@ -283,6 +283,25 @@ public class ODataOptions
     }
 
     /// <summary>
+    /// Gets or sets the maximum size, in bytes, of an OData request or response message body.
+    /// Default is 100 MB (104,857,600 bytes). Must be greater than or equal to 1.
+    /// </summary>
+    public long MaxReceivedMessageSize
+    {
+        get => _maxReceivedMessageSize;
+        set
+        {
+            if (value <= 0)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(value), value, 1);
+            }
+
+            _maxReceivedMessageSize = value;
+        }
+    }
+    private long _maxReceivedMessageSize = ODataBatchHandler.DefaultMaxReceivedMessageSize;
+
+    /// <summary>
     /// Gets or sets whether or not the OData system query options should be prefixed with '$'.
     /// </summary>
     public bool EnableNoDollarQueryOptions { get; set; } = true;
@@ -320,7 +339,7 @@ public class ODataOptions
         services.AddSingleton(sp => this.QueryConfigurations);
 
         // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices(version);
+        services.AddDefaultWebApiServices(version, this.MaxReceivedMessageSize);
 
         // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
         services.AddSingleton<ODataUriResolver>(sp =>
