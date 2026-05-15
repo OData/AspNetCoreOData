@@ -1408,6 +1408,13 @@ public abstract partial class QueryBinder
     {
         Type conversionType = context.Model.GetClrType(convertNode.TypeReference, context.AssembliesResolver);
 
+        // If the source type is the same as the conversion type, we can skip the conversion
+        // No sense to create a convert expression.
+        if (conversionType == source.Type)
+        {
+            return source;
+        }
+
         if (conversionType == typeof(bool?) && source.Type == typeof(bool))
         {
             // we handle null propagation ourselves. So, if converting from bool to Nullable<bool> ignore.
