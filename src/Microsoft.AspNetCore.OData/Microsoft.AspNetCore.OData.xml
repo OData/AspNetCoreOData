@@ -6772,6 +6772,20 @@
             </summary>
             <param name="options">The Json Options.</param>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMessageSizeMiddleware">
+            <summary>
+            Middleware that enforces MaxReceivedMessageSize for incoming POST/PUT/PATCH requests
+            by configuring Kestrel's <see cref="T:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature"/>.
+            For hosts without that feature, throws <see cref="T:Microsoft.OData.ODataException"/> when Content-Length exceeds the limit.
+            This works for both Content-Length and chunked transfer requests.
+            Registered automatically by AddOData via IStartupFilter.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.ODataMessageSizeStartupFilter">
+            <summary>
+            Startup filter that registers the <see cref="T:Microsoft.AspNetCore.OData.ODataMessageSizeMiddleware"/> early in the pipeline.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMiniMetadata">
             <summary>
             Metadata that specifies the OData minimal API.
@@ -8421,6 +8435,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.WriteToResponseAsyncMustHaveRequest">
             <summary>
               Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxReceivedMessageSizeExceeded">
+            <summary>
+              Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">

@@ -772,4 +772,7 @@
   <data name="SingleValueFunctionCallTooDeep" xml:space="preserve">
     <value>Current single value function call depth '{0}' exceeded the maximum allowed depth of '{1}'.</value>
   </data>
+  <data name="MaxReceivedMessageSizeExceeded" xml:space="preserve">
+    <value>The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed.</value>
+  </data>
 </root>

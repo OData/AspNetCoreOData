@@ -74,6 +74,9 @@ public static class ODataApplicationBuilderExtensions
             metadata.Options.UpdateFrom(options);
         }
 
+        // Sync the handler's message quotas with the configured MaxReceivedMessageSize.
+        handler.MessageQuotas.MaxReceivedMessageSize = metadata.Options.MaxReceivedMessageSize;
+
         metadata.Model = model;
         if (configAction != null)
         {

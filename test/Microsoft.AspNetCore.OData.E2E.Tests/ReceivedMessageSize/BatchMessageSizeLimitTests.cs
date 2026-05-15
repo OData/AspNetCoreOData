@@ -25,8 +25,6 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ReceivedMessageSize;
 /// </summary>
 public class BatchMessageSizeLimitConfiguredTests : WebApiTestBase<BatchMessageSizeLimitConfiguredTests>
 {
-    private const string BatchBoundary = "batch_36522ad7-fc75-4b56-8c71-56071383e77b";
-    private const string BatchContentType = "multipart/mixed; boundary=" + BatchBoundary;
     private const int ConfiguredMaxMessageSize = 4096; // 4 KB
 
     public BatchMessageSizeLimitConfiguredTests(WebApiTestFixture<BatchMessageSizeLimitConfiguredTests> fixture)
@@ -77,19 +75,33 @@ public class BatchMessageSizeLimitConfiguredTests : WebApiTestBase<BatchMessageS
         var id = 1;
         var payload = "A";
 
-        string batchBody = 
-$@"--{BatchBoundary}
+        var batchBoundary = "batch_36522ad7-fc75-4b56-8c71-56071383e77b";
+        var changesetBoundary = "changeset_36522ad7-fc75-4b56-8c71-56071383e77b";
+
+        var batchBody =
+$@"--{batchBoundary}
+Content-Type: multipart/mixed; boundary={changesetBoundary}
+
+--{changesetBoundary}
 Content-Type: application/http
 Content-Transfer-Encoding: binary
+Content-ID: 1
 
 POST MessageSizeItems HTTP/1.1
 Content-Type: application/json;odata.metadata=minimal
+Accept: application/json;odata.metadata=minimal
+Accept-Charset: UTF-8
 OData-Version: 4.0
 
 {{""{nameof(MessageSizeItem.Id)}"":{id},""{nameof(MessageSizeItem.Payload)}"":""{payload}""}}
---{BatchBoundary}--
+--{changesetBoundary}--
+--{batchBoundary}--
 ";
-        HttpRequestMessage request = CreateBatchRequest("odata", batchBody);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"odata/$batch");
+
+        var content = new StringContent(batchBody);
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse($"multipart/mixed; boundary={batchBoundary}");
+        request.Content = content;
 
         HttpClient client = CreateClient();
 
@@ -100,6 +112,9 @@ OData-Version: 4.0
         string responseBody = await response.Content.ReadAsStringAsync();
         Assert.True(response.IsSuccessStatusCode,
             $"Expected success for a small batch payload but got {response.StatusCode}: {responseBody}");
+        Assert.Contains("HTTP/1.1 201 Created", responseBody, StringComparison.Ordinal);
+        Assert.Contains($@"""{nameof(MessageSizeItem.Id)}"":{id}", responseBody, StringComparison.Ordinal);
+        Assert.Contains($@"""{nameof(MessageSizeItem.Payload)}"":""{payload}""", responseBody, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -107,20 +122,36 @@ OData-Version: 4.0
     {
         // Arrange — 8 KB payload exceeds the 4 KB batch handler limit.
         var id = 2;
-        string largePayload = new string('X', 8192);
-        string batchBody = 
-$@"--{BatchBoundary}
+        var largePayload = new string('X', 8192);
+
+        var batchBoundary = "batch_36522ad7-fc75-4b56-8c71-56071383e77b";
+        var changesetBoundary = "changeset_36522ad7-fc75-4b56-8c71-56071383e77b";
+
+        var batchBody =
+$@"--{batchBoundary}
+Content-Type: multipart/mixed; boundary={changesetBoundary}
+
+--{changesetBoundary}
 Content-Type: application/http
 Content-Transfer-Encoding: binary
+Content-ID: 1
 
 POST MessageSizeItems HTTP/1.1
 Content-Type: application/json;odata.metadata=minimal
+Accept: application/json;odata.metadata=minimal
+Accept-Charset: UTF-8
 OData-Version: 4.0
 
 {{""{nameof(MessageSizeItem.Id)}"":{id},""{nameof(MessageSizeItem.Payload)}"":""{largePayload}""}}
---{BatchBoundary}--
+--{changesetBoundary}--
+--{batchBoundary}--
 ";
-        HttpRequestMessage request = CreateBatchRequest("odata", batchBody);
+        var request = new HttpRequestMessage(HttpMethod.Post, $"odata/$batch");
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("multipart/mixed"));
+
+        var content = new StringContent(batchBody);
+        content.Headers.ContentType = MediaTypeHeaderValue.Parse($"multipart/mixed; boundary={batchBoundary}");
+        request.Content = content;
 
         HttpClient client = CreateClient();
 
@@ -128,33 +159,8 @@ OData-Version: 4.0
         // the OData reader throws ODataException which propagates through the pipeline.
         // Depending on the test host, this surfaces as either an exception from SendAsync
         // or a non-success response with no successful sub-request in the body.
-        try
-        {
-            HttpResponseMessage response = await client.SendAsync(request);
-
-            // If we get a response, it should not contain a successful sub-request.
-            string responseBody = await response.Content.ReadAsStringAsync();
-            Assert.True(!response.IsSuccessStatusCode || !responseBody.Contains("201"),
-                $"Expected the oversized batch to be rejected but got {response.StatusCode} with sub-request success: {responseBody}");
-        }
-        catch (Exception ex) when (ex.ToString().Contains("maximum number of bytes"))
-        {
-            // The ODataException about byte limit was thrown — enforcement confirmed.
-        }
-    }
-
-    /// <summary>
-    /// Creates an <see cref="HttpRequestMessage"/> for a batch POST to the given route prefix.
-    /// </summary>
-    private static HttpRequestMessage CreateBatchRequest(string routePrefix, string batchBody)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{routePrefix}/$batch");
-        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("multipart/mixed"));
-
-        var content = new StringContent(batchBody);
-        content.Headers.ContentType = MediaTypeHeaderValue.Parse(BatchContentType);
-        request.Content = content;
-
-        return request;
+        var exception = await Record.ExceptionAsync(async () => await client.SendAsync(request));
+        Assert.NotNull(exception);
+        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
     }
 }

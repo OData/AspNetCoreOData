@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -67,6 +68,8 @@ public static class ODataServiceCollectionExtensions
             options.SerializerOptions.Converters.Add(new DynamicTypeWrapperConverter());
             options.SerializerOptions.Converters.Add(new SingleResultValueConverter());
         });
+
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IStartupFilter, ODataMessageSizeStartupFilter>());
 
         return services;
     }
