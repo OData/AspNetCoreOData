@@ -227,14 +227,6 @@ internal static class ExpressionBinderHelper
             functionCallArguments = strippedArguments;
         }
 
-        //IEnumerable<Expression> functionCallArguments = arguments;
-        //if (querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
-        //{
-        //    // we don't have to check if the argument is null inside the function call as we do it already
-        //    // before calling the function. So remove the redundant null checks.
-        //    functionCallArguments = arguments.Select(a => RemoveInnerNullPropagation(a, querySettings));
-        //}
-
         // if the argument is of type Nullable<T>, then translate the argument to Nullable<T>.Value as none
         // of the canonical functions have overloads for Nullable<> arguments.
         functionCallArguments = ExtractValueFromNullableArguments(functionCallArguments);
