@@ -769,4 +769,7 @@
   <data name="BindParameterFailedOnMinimalAPIEndpoint" xml:space="preserve">
     <value>Cannot bind parameter '{0}'. the error is: {1}.</value>
   </data>
+  <data name="SingleValueFunctionCallTooDeep" xml:space="preserve">
+    <value>Current single value function call depth '{0}' exceeded the maximum allowed depth of '{1}'.</value>
+  </data>
 </root>
