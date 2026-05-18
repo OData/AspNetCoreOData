@@ -87,6 +87,10 @@ public static class ODataApplicationBuilderExtensions
         if (metadata.Options.MaxReceivedMessageSize != effectiveMaxReceivedMessageSize)
         {
             metadata.Options.SetMaxReceivedMessageSize(effectiveMaxReceivedMessageSize);
+        }
+
+        if (handler.MessageQuotas.MaxReceivedMessageSize != effectiveMaxReceivedMessageSize)
+        {
             handler.MessageQuotas.MaxReceivedMessageSize = effectiveMaxReceivedMessageSize;
         }
 

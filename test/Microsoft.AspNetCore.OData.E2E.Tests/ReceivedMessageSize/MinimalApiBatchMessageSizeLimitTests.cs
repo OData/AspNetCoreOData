@@ -285,8 +285,8 @@ OData-Version: 4.0
 /// </summary>
 public class MinimalApiBatchPerEndpointMessageSizeLimitTests : IClassFixture<MinimalTestFixture<MinimalApiBatchPerEndpointMessageSizeLimitTests>>
 {
-    private const long _globalMaxReceivedMessageSize = 10 * 1024 * 1024; // 10 MB
-    private const long _endpointMaxReceivedMessageSize = 1 * 1024 * 1024; // 1 MB
+    private const long GlobalMaxReceivedMessageSize = 10 * 1024 * 1024; // 10 MB
+    private const long EndpointMaxReceivedMessageSize = 1 * 1024 * 1024; // 1 MB
     private HttpClient _client;
 
     public MinimalApiBatchPerEndpointMessageSizeLimitTests(MinimalTestFixture<MinimalApiBatchPerEndpointMessageSizeLimitTests> factory)
@@ -296,7 +296,7 @@ public class MinimalApiBatchPerEndpointMessageSizeLimitTests : IClassFixture<Min
 
     protected static void ConfigureServices(IServiceCollection services)
     {
-        services.AddOData(opt => opt.SetMaxReceivedMessageSize(_globalMaxReceivedMessageSize));
+        services.AddOData(opt => opt.SetMaxReceivedMessageSize(GlobalMaxReceivedMessageSize));
     }
 
     protected static void ConfigureAPIs(WebApplication app)
@@ -304,7 +304,7 @@ public class MinimalApiBatchPerEndpointMessageSizeLimitTests : IClassFixture<Min
         IEdmModel model = GetEdmModel();
 
         var batchHandler = new DefaultODataBatchHandler();
-        batchHandler.MessageQuotas.MaxReceivedMessageSize = _endpointMaxReceivedMessageSize;
+        batchHandler.MessageQuotas.MaxReceivedMessageSize = EndpointMaxReceivedMessageSize;
         app.UseODataMiniBatching("odata/$batch", model, batchHandler);
 
         app.MapPost("odata/MessageSizeItems", ([FromBody] MessageSizeItem item) => Http.Results.Created($"http://localhost/odata/MessageSizeItems({item.Id})", item))

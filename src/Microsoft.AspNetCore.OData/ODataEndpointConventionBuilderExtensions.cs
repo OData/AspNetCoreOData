@@ -163,10 +163,15 @@ public static class ODataEndpointConventionBuilderExtensions
                 return result;
             }
 
-            var endpoint = invocationContext.HttpContext.GetEndpoint();
+            // Maybe we have a scenario like:
+            // First, enable OData result in app.MapGroup(...).WithODataResult(),
+            // Then, disable OData result for a certain Routehandler by customizing the metadata
+            Endpoint endpoint = invocationContext.HttpContext.GetEndpoint();
             ODataMiniMetadata odataMetadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
             if (odataMetadata is not null && odataMetadata.IsODataFormat)
             {
+                // Now, Let's focus on the POCO data result.
+                // We can figure out more types later, for example, TypedResult<T>, Results<T>, etc.
                 return new ODataResult(result/*, odataMetadata*/);
             }
 
@@ -316,7 +321,11 @@ public static class ODataEndpointConventionBuilderExtensions
         IHttpMaxRequestBodySizeFeature maxBodySizeFeature = httpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
         if (maxBodySizeFeature != null && !maxBodySizeFeature.IsReadOnly)
         {
-            maxBodySizeFeature.MaxRequestBodySize = limit;
+            long? currentLimit = maxBodySizeFeature.MaxRequestBodySize;
+            if (currentLimit == null || currentLimit > limit)
+            {
+                maxBodySizeFeature.MaxRequestBodySize = limit;
+            }
         }
         else if (httpContext.Request.ContentLength > limit)
         {

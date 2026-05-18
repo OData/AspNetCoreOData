@@ -23,13 +23,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.ReceivedMessageSize;
 /// Verifies that <c>SetMaxReceivedMessageSize(...)</c> enforces the message size limit
 /// on PUT, PATCH requests and does not block GET requests in a minimal API host.
 /// </summary>
-public class MinimalApiPutMessageSizeLimitTests : IClassFixture<MinimalTestFixture<MinimalApiPutMessageSizeLimitTests>>
+public class MinimalApiPutPatchMessageSizeLimitTests : IClassFixture<MinimalTestFixture<MinimalApiPutPatchMessageSizeLimitTests>>
 {
     private const int ConfiguredMaxMessageSize = 1 * 1024 * 1024; // 1 MB
 
     private HttpClient _client;
 
-    public MinimalApiPutMessageSizeLimitTests(MinimalTestFixture<MinimalApiPutMessageSizeLimitTests> factory)
+    public MinimalApiPutPatchMessageSizeLimitTests(MinimalTestFixture<MinimalApiPutPatchMessageSizeLimitTests> factory)
     {
         _client = factory.CreateClient();
     }

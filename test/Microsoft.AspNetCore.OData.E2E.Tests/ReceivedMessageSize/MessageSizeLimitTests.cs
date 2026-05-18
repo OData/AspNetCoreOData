@@ -85,9 +85,7 @@ public class MessageSizeLimitDefaultTests : WebApiTestBase<MessageSizeLimitDefau
         // Arrange — 105 MB exceeds the 100 MB default limit.
         // This allocation is large; if it causes OOM the configured-limit tests
         // cover the same logic with a 1 KB limit.
-        var payload = new string('X', 105 * 1024 * 1024);
-        var json = $"{{\"Id\":1,\"Payload\":\"{payload}\"}}";
-        var content = new StringContent(json, Encoding.UTF8);
+        var content = new StringContent($"{{\"Id\":1,\"Payload\":\"{new string('X', 105 * 1024 * 1024)}\"}}", Encoding.UTF8);
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         HttpClient client = CreateClient();
