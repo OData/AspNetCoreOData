@@ -1,0 +1,2 @@
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.set -> void

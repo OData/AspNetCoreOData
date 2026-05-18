@@ -1771,6 +1771,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current single value function call depth &apos;{0}&apos; exceeded the maximum allowed depth of &apos;{1}&apos;..
+        /// </summary>
+        internal static string SingleValueFunctionCallTooDeep {
+            get {
+                return ResourceManager.GetString("SingleValueFunctionCallTooDeep", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
         /// </summary>
         internal static string SkipTokenNotSupportedOrderByExpression {

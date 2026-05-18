@@ -8265,6 +8265,11 @@
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.SingleValueFunctionCallTooDeep">
+            <summary>
+              Looks up a localized string similar to Current single value function call depth &apos;{0}&apos; exceeded the maximum allowed depth of &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenNotSupportedOrderByExpression">
             <summary>
               Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
@@ -12110,6 +12115,11 @@
             by buffering results from the sub-query.
             </summary>
             <value>The default value is <c>false</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth">
+            <summary>
+            Gets or sets the maximum depth for function calls in a query.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions">
             <summary>
