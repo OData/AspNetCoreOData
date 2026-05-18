@@ -38,88 +38,117 @@ public abstract partial class QueryBinder
     {
         CheckArgumentNull(node, context);
 
+        context.EnterSingleFunctionCall();
+
+        Expression result = null;
         switch (node.Name)
         {
             case ClrCanonicalFunctions.StartswithFunctionName:
-                return BindStartsWith(node, context);
+                result = BindStartsWith(node, context);
+                break;
 
             case ClrCanonicalFunctions.EndswithFunctionName:
-                return BindEndsWith(node, context);
+                result = BindEndsWith(node, context);
+                break;
 
             case ClrCanonicalFunctions.ContainsFunctionName:
-                return BindContains(node, context);
+                result = BindContains(node, context);
+                break;
 
             case ClrCanonicalFunctions.SubstringFunctionName:
-                return BindSubstring(node, context);
+                result = BindSubstring(node, context);
+                break;
 
             case ClrCanonicalFunctions.LengthFunctionName:
-                return BindLength(node, context);
+                result = BindLength(node, context);
+                break;
 
             case ClrCanonicalFunctions.IndexofFunctionName:
-                return BindIndexOf(node, context);
+                result = BindIndexOf(node, context);
+                break;
 
             case ClrCanonicalFunctions.TolowerFunctionName:
-                return BindToLower(node, context);
+                result = BindToLower(node, context);
+                break;
 
             case ClrCanonicalFunctions.ToupperFunctionName:
-                return BindToUpper(node, context);
+                result = BindToUpper(node, context);
+                break;
 
             case ClrCanonicalFunctions.TrimFunctionName:
-                return BindTrim(node, context);
+                result = BindTrim(node, context);
+                break;
 
             case ClrCanonicalFunctions.ConcatFunctionName:
-                return BindConcat(node, context);
+                result = BindConcat(node, context);
+                break;
 
             case ClrCanonicalFunctions.MatchesPatternFunctionName:
-                return BindMatchesPattern(node, context);
+                result = BindMatchesPattern(node, context);
+                break;
 
             case ClrCanonicalFunctions.YearFunctionName:
             case ClrCanonicalFunctions.MonthFunctionName:
             case ClrCanonicalFunctions.DayFunctionName:
-                return BindDateRelatedProperty(node, context); // Date & DateTime & DateTimeOffset
+                result = BindDateRelatedProperty(node, context); // Date & DateTime & DateTimeOffset
+                break;
 
             case ClrCanonicalFunctions.HourFunctionName:
             case ClrCanonicalFunctions.MinuteFunctionName:
             case ClrCanonicalFunctions.SecondFunctionName:
-                return BindTimeRelatedProperty(node, context); // TimeOfDay & DateTime & DateTimeOffset
+                result = BindTimeRelatedProperty(node, context); // TimeOfDay & DateTime & DateTimeOffset
+                break;
 
             case ClrCanonicalFunctions.FractionalSecondsFunctionName:
-                return BindFractionalSeconds(node, context);
+                result = BindFractionalSeconds(node, context);
+                break;
 
             case ClrCanonicalFunctions.RoundFunctionName:
-                return BindRound(node, context);
+                result = BindRound(node, context);
+                break;
 
             case ClrCanonicalFunctions.FloorFunctionName:
-                return BindFloor(node, context);
+                result = BindFloor(node, context);
+                break;
 
             case ClrCanonicalFunctions.CeilingFunctionName:
-                return BindCeiling(node, context);
+                result = BindCeiling(node, context);
+                break;
 
             case ClrCanonicalFunctions.CastFunctionName:
-                return BindCastSingleValue(node, context);
+                result = BindCastSingleValue(node, context);
+                break;
 
             case ClrCanonicalFunctions.IsofFunctionName:
-                return BindIsOf(node, context);
+                result = BindIsOf(node, context);
+                break;
 
             case ClrCanonicalFunctions.DateFunctionName:
-                return BindDate(node, context);
+                result = BindDate(node, context);
+                break;
 
             case ClrCanonicalFunctions.TimeFunctionName:
-                return BindTime(node, context);
+                result = BindTime(node, context);
+                break;
 
             case ClrCanonicalFunctions.NowFunctionName:
-                return BindNow(node, context);
+                result = BindNow(node, context);
+                break;
 
             default:
                 // Get Expression of custom binded method.
                 Expression expression = BindCustomMethodExpressionOrNull(node, context);
                 if (expression != null)
                 {
-                    return expression;
+                    result = expression;
+                    break;
                 }
 
                 throw new NotImplementedException(Error.Format(SRResources.ODataFunctionNotSupported, node.Name));
         }
+
+        context.LeaveSingleFunctionCall();
+        return result;
     }
 
     /// <summary>

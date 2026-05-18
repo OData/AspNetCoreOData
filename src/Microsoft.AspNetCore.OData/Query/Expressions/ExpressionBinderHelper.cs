@@ -213,12 +213,18 @@ internal static class ExpressionBinderHelper
     {
         Contract.Assert(member.MemberType == MemberTypes.Property || member.MemberType == MemberTypes.Method);
 
+        // strippedArguments holds arguments after removing redundant inner null-propagation conditionals,
+        // but before extracting .Value from Nullable<T>. These are used for the outer null check so that
+        // nested function calls (e.g. contains inside contains) don't embed their entire Conditional
+        // expression into the parent null test, causing exponential expression growth.
+        Expression[] strippedArguments = arguments;
         IEnumerable<Expression> functionCallArguments = arguments;
         if (querySettings.HandleNullPropagation == HandleNullPropagationOption.True)
         {
             // we don't have to check if the argument is null inside the function call as we do it already
             // before calling the function. So remove the redundant null checks.
-            functionCallArguments = arguments.Select(a => RemoveInnerNullPropagation(a, querySettings));
+            strippedArguments = arguments.Select(a => RemoveInnerNullPropagation(a, querySettings)).ToArray();
+            functionCallArguments = strippedArguments;
         }
 
         // if the argument is of type Nullable<T>, then translate the argument to Nullable<T>.Value as none
@@ -323,6 +329,10 @@ internal static class ExpressionBinderHelper
                             expression = unaryExpression.Operand;
                         }
                     }
+
+                    // Recursively remove any further nested null-propagation conditionals,
+                    // e.g. when contains() is used as an argument to another function call.
+                    expression = RemoveInnerNullPropagation(expression, querySettings);
                 }
             }
         }
@@ -742,10 +752,12 @@ internal static class ExpressionBinderHelper
 
             // Entity Framework doesn't have ToString method for nullable numeric types.
             // Call ToString method on non-nullable numeric types.
+            // If source has no value (is null), return null; otherwise call ToString on the non-nullable value.
+            // Since the null propagation test the null, then return null if true, else return the value.
             return Expression.Condition(
-                Expression.Property(source, "HasValue"),
-                Expression.Call(sourceValue, "ToString", typeArguments: null, arguments: null),
-                Expression.Constant(null, typeof(string)));
+                Expression.Not(Expression.Property(source, "HasValue")),
+                Expression.Constant(null, typeof(string)),
+                Expression.Call(sourceValue, "ToString", typeArguments: null, arguments: null));
         }
         else
         {
