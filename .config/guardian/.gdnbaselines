@@ -1,0 +1,357 @@
+{
+  "properties": {
+    "helpUri": "https://eng.ms/docs/microsoft-security/security/azure-security/cloudai-security-fundamentals-engineering/security-integration/guardian-wiki/microsoft-guardian/general/baselines"
+  },
+  "version": "1.0.0",
+  "baselines": {
+    "default": {
+      "name": "default",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "lastUpdatedDate": "2026-05-18 20:17:36Z"
+    }
+  },
+  "results": {
+    "033b5b68a2bc386a541636e7785e3cff92ec3d971651f9989ee8c2521a33bb84": {
+      "signature": "033b5b68a2bc386a541636e7785e3cff92ec3d971651f9989ee8c2521a33bb84",
+      "alternativeSignatures": [
+        "4978cb63d5e004f72cf8a255fdd357948cb018060c4e177062f083b773accdf9",
+        "8d162485734c3e58783c9a1170ec0e84b2c2c0f7842a14a6c512f5dde06bd2e9",
+        "b891d765a13e25df58ab75efebfa6ee94f835d7d258cbf50e318d63cadc216f4"
+      ],
+      "target": "src/Microsoft.AspNetCore.OData/Edm/OrderByClauseHelpers.cs",
+      "line": 95,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "46e84fc9d26134fdf9695fc18de31bdde3e62fc465db4c15b077310eb00f7b7e": {
+      "signature": "46e84fc9d26134fdf9695fc18de31bdde3e62fc465db4c15b077310eb00f7b7e",
+      "alternativeSignatures": [
+        "6ed62eed27a5d8d6b4a02e048c2ac6630529f36c32f4872d26f7ee05ef7c88c1",
+        "d403c2ba317911445b7f79d53fb2561246ef5752cf93fdd65440640c106ce08c",
+        "f12bced16ce11cce2a7f0a34291bf4aca8fbb7b440c1c241f7ba61d6aea88f9e"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/Enums/EnumsTest.cs",
+      "line": 250,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "d02ea7f4768adbf8bbc593f2c5d895c3832569b4fe8916eff9d2bed7cd717bcd": {
+      "signature": "d02ea7f4768adbf8bbc593f2c5d895c3832569b4fe8916eff9d2bed7cd717bcd",
+      "alternativeSignatures": [
+        "c864f6abe2743a9297f71d0c6be19675cdc08988a9d82f185045f52c12ef1b73",
+        "bd2861a7416ce85c8180bcf2e0006c14201f597ac139a5a3b3c068cdfee0f8d5",
+        "43123f98c3cd731953b75266f859fc38e321bf82fffc2e909dd87c96b2ccf34e"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/Enums/EnumsTest.cs",
+      "line": 264,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "163ebe4acae30b6bc54e94eae8e6e926458fbdf7d4d2368f208baf597abac2d1": {
+      "signature": "163ebe4acae30b6bc54e94eae8e6e926458fbdf7d4d2368f208baf597abac2d1",
+      "alternativeSignatures": [
+        "813fa16696761de8364112904095f4ce610a759809d2bbe12f28da9e03b889a3",
+        "1f31afbbbac0d40feb948aed5e5d6af919ba263df9db9095564f14047abeb5b1",
+        "e56b2e3495ea06bd1ccb0b0c1e5746701d5af817c676f85804ecc33e56045bb0"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/Enums/EnumsTest.cs",
+      "line": 275,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "9ad9dc2674674a9275716746a3843b9d3e9ca58724bc773190344650de06bfe3": {
+      "signature": "9ad9dc2674674a9275716746a3843b9d3e9ca58724bc773190344650de06bfe3",
+      "alternativeSignatures": [
+        "f94a75cb8fe68effa1ba7dd5020a37742d8f1718d98dec4ea42a13131a935b7a",
+        "89106b7b96cd6fbaf9eb557e28f23860fa8b46ff5082c548ef55c6c75acf2a6b",
+        "e09df6a6b5ad4e4f703deb4b23b00e3246d818ba0302619ed405c9488aefa8e4"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/Enums/EnumsTest.cs",
+      "line": 327,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "9f1418979477d077be1b06813745e1c45f7712662ad14abffd437206df4747a5": {
+      "signature": "9f1418979477d077be1b06813745e1c45f7712662ad14abffd437206df4747a5",
+      "alternativeSignatures": [
+        "17a6fb5de14f4da3bb0d7204dc510f0155b3151e075efc132daa2b3a18cb0097",
+        "199aead4c9aacb86713e71256aaab93fcf6a5810f0a9ae528841e6ead48d0b46",
+        "a6920f9ef69846bf8b98b0f2acb6edd85c40fa25a1e370ccd49f08ee787bbfd4"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/Enums/EnumsTest.cs",
+      "line": 373,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "2933d2edc7c5154e6e2b3fc8d98c9b7703cfccf541a6f2963bf301b690edce00": {
+      "signature": "2933d2edc7c5154e6e2b3fc8d98c9b7703cfccf541a6f2963bf301b690edce00",
+      "alternativeSignatures": [
+        "b502823b44bdc7025f13d24af5d1cf1f4bf035dfc3a6fdb4a6ccc8187758a358",
+        "93c396daa5154c5c0d98a971b05d63d39a62b2ec588373b1dbf8a95c64813aae",
+        "aa973d0a714f5de59f6074ef20cc37d70c7f83b8f9e30046bbbadd7591b892d3"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/NavigationPropertyOnComplexType/SelectImprovementOnComplexTypeTests.cs",
+      "line": 528,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "008f0e1be60ed941d2f976d233a9eca51d79b79f9635613c465f86e03fa4b59d": {
+      "signature": "008f0e1be60ed941d2f976d233a9eca51d79b79f9635613c465f86e03fa4b59d",
+      "alternativeSignatures": [
+        "4dd9bfac1ff11bf3af7720d33b912ff512f330075611a4fbb1150f240bc63da1",
+        "62e89ace97bb0ba122426d02e7edfcb340f8c865cced43eb01eaac1fca179cec",
+        "49b1117c40e36b485d0938a960ccea6ac3828d39753b4edd0c84e87791390159"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.E2E.Tests/NavigationPropertyOnComplexType/SelectImprovementOnComplexTypeTests.cs",
+      "line": 529,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "b143fb121204870fa650efd2a2a529406d9decc81b9315ed69a9f870254053c0": {
+      "signature": "b143fb121204870fa650efd2a2a529406d9decc81b9315ed69a9f870254053c0",
+      "alternativeSignatures": [
+        "db5516b548158b05b805d41549f343731af9637acdd19a508e57562131b344f8",
+        "95f267fd6ffabe7ba7c8f041a6dcc4c8b991a40f0171cef3974e5ecd92f4da4c",
+        "2fe4ca5c230550981339971fe909404c7d8ac736a15ae65b876e6aaf12c0fdbe"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/Batch/ODataBatchContentTest.cs",
+      "line": 34,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "a570f7055173f454e96d224e2b07e88ee5fe97de49f4637ef24073084d970413": {
+      "signature": "a570f7055173f454e96d224e2b07e88ee5fe97de49f4637ef24073084d970413",
+      "alternativeSignatures": [
+        "0123accee1bfc8cc5f07b34f391279bcb95f6df9c7475c0b3426d8ec9ed5f7f8",
+        "8f6866085b70ac90dd6b9bea87467540162f9b793eeab927e13615b6ffc27d26",
+        "4a22f05704fb1d315c7fe63912d591a82f45da90931cf01d2586327a025ee007"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/PublicApi/PublicApiHelper.cs",
+      "line": 134,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "55a785033a502a1f205dfb5601d5e71d532bc3c8a8e093b6d11dd69cf00d3ff4": {
+      "signature": "55a785033a502a1f205dfb5601d5e71d532bc3c8a8e093b6d11dd69cf00d3ff4",
+      "alternativeSignatures": [
+        "996c5f4eb14df3b832c68a90417d9009078e1d02d4e6324c2f15a5bb7320c705",
+        "d2655a2aaffe858705f9517cd082b456da64b6f5eb9a6b303682a8b6a9b4468b",
+        "048c4497b252f77f5903f8a48ed25927fe5e8d6e5bf372c28dcf89c9a1877b2d"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/PublicApi/PublicApiHelper.cs",
+      "line": 691,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "d7c78670bb89ddd453aab6e8a6bd85e0541c46277f678c2eedaf3d2e82208f4f": {
+      "signature": "d7c78670bb89ddd453aab6e8a6bd85e0541c46277f678c2eedaf3d2e82208f4f",
+      "alternativeSignatures": [
+        "bd3d73672a0e0a29e22d7c1f98670379468fb35d85b1113fc4110fa40fa01d83",
+        "d106648a38f34a681c8beb94a2ebef1b8d093216b640a87fa4a1d223fa41e2e6",
+        "47ae8299ebe6a7f5d607ef32fef6c86c571fd9f49318002011fca06de905cc06"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/PublicApi/PublicApiHelper.cs",
+      "line": 700,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "51d0ea567cbbe40b0c580ca650dfab7f68379d5b408b6ee9dc23571c86e64ffc": {
+      "signature": "51d0ea567cbbe40b0c580ca650dfab7f68379d5b408b6ee9dc23571c86e64ffc",
+      "alternativeSignatures": [
+        "ee186c3c8a3da003ef772bc9b8b6f3c0338f5ef46fcac05c080e0e4536ebf01e",
+        "1fbb0d28c4ed9f19ed215c75a9fbab272252ee599dd3cce412b565d0273f9222",
+        "9c28ea44c8dda0dd093358ba399ddc886268e9c7e12eee8002c62ffb72c6c5b5"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/PublicApi/PublicApiHelper.cs",
+      "line": 711,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "8a8cdf8318ea480e599fb7d4322f92aacf84e3948b8d587a36b2c24d7aeb2a35": {
+      "signature": "8a8cdf8318ea480e599fb7d4322f92aacf84e3948b8d587a36b2c24d7aeb2a35",
+      "alternativeSignatures": [
+        "7f3295bfea3506e1a743834931271be71db2a26c60e2a26cba7deaeff1a3dc53",
+        "a7ad1cee7e437236f225c9956295c18aeacdfe6fa00a1f725a5111bbfe96c82e",
+        "4afed65ff5ee3870508b1fc1273f40d0f66529fe2a32a1fa61d3059ca92dc464"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/PublicApi/PublicApiHelper.cs",
+      "line": 724,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "0670a4d422d49a48c30234aec4c37ca05a813d41b08112f98f9db9fab0ab59bf": {
+      "signature": "0670a4d422d49a48c30234aec4c37ca05a813d41b08112f98f9db9fab0ab59bf",
+      "alternativeSignatures": [
+        "945d9f333bbc925ebad02e119b11a43f4b40d993438acfaa29bca86afe1a1b0b",
+        "0da2d321a70cc8a0d0c03d57860743b941abea4c9f688686a1628e7ce4bcd28c",
+        "2afb96401ac5e75844c753cbc16f01a81a65f1b21525f68cae10b89206a3326b"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/Query/Expressions/SelectExpandBinderTest.cs",
+      "line": 221,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "817cce6f0ca3fb3ad27b0d14d81f76ad6f539b8b93005a5c785cad6a76c58f5f": {
+      "signature": "817cce6f0ca3fb3ad27b0d14d81f76ad6f539b8b93005a5c785cad6a76c58f5f",
+      "alternativeSignatures": [
+        "179003dbeaf353e55235320cc228e6353ecf3809f0d261d2c458e6aeea6689b5",
+        "da251468878599def3c7ea80fc419e8c0f80265e4e5a9bc4f151f671b95f3018",
+        "08c811f4a60a5b0f86e44d6431b62f5c1d4b7b7aee469ea20964c004f106b1fd"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/Query/Expressions/SelectExpandBinderTest.cs",
+      "line": 1253,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "1dc2f2cce5a0165edb79b8666f1cdbcd2794ba126bd1233b3b5cec4ed7773805": {
+      "signature": "1dc2f2cce5a0165edb79b8666f1cdbcd2794ba126bd1233b3b5cec4ed7773805",
+      "alternativeSignatures": [
+        "7fefdee18ffc6cf19f9911f746f17f1d2d6adafbd9b0dc3f540d0b0124424179",
+        "9623b440e5285530b2c286ca7d4cabbbb682ed819d97fe7d7c1137b80bcc3dd1",
+        "5a4ab2cc42f5dd9b8fae438da1ba51a47a1081cadcce757d71ef77d601ab1217"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/Query/Query/ODataQueryOptionTests.cs",
+      "line": 618,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    },
+    "ca8e08b7b67866344faf7432a5980e9e2856d97ba3500774f7d23648b242395c": {
+      "signature": "ca8e08b7b67866344faf7432a5980e9e2856d97ba3500774f7d23648b242395c",
+      "alternativeSignatures": [
+        "b5a15b8171da1b0edc25050d4bd3d5f948e0a08689a736939e9eddfe48351b95",
+        "ba40ebe80123b7c2346f746fc468dc63dad6aec52a081e4587e8f8af7e7d62ae",
+        "7459a56ac1577c40f6e0ef63671692327ccdd2e86e28530553d886be5f812652"
+      ],
+      "target": "test/Microsoft.AspNetCore.OData.Tests/Query/Query/ODataQueryOptionTests.cs",
+      "line": 674,
+      "uriBaseId": "file:///D:/a/_work/1/s/",
+      "memberOf": [
+        "default"
+      ],
+      "tool": "roslynanalyzers",
+      "ruleId": "CA1310",
+      "createdDate": "2026-05-18 20:14:24Z",
+      "expirationDate": "2026-11-04 20:20:25Z",
+      "justification": "This error is baselined with an expiration date of 180 days from 2026-05-18 20:20:25Z"
+    }
+  }
+}
