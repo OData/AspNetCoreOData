@@ -753,7 +753,7 @@ internal static class ExpressionBinderHelper
             // Entity Framework doesn't have ToString method for nullable numeric types.
             // Call ToString method on non-nullable numeric types.
             // If source has no value (is null), return null; otherwise call ToString on the non-nullable value.
-            // Since the null propgation test the null, then return null if true, else return the value.
+            // Since the null propagation test the null, then return null if true, else return the value.
             return Expression.Condition(
                 Expression.Not(Expression.Property(source, "HasValue")),
                 Expression.Constant(null, typeof(string)),

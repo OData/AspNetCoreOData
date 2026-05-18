@@ -44,8 +44,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
 
             services.AddControllers().AddOData(opt =>
             opt.Count().Filter().OrderBy().Expand().SetMaxTop(null).Select()
-                .AddRouteComponents("nullpropgation", model)
-                .AddRouteComponents("nonnullpropgation", model)
+                .AddRouteComponents("nullpropagation", model)
+                .AddRouteComponents("nonnullpropagation", model)
                 .AddRouteComponents("maxfunctioncalldepth", model));
         }
 
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         [InlineData(8)]
         [InlineData(10)]
         [InlineData(12)]
-        public async Task UseNestedCastForDifferentDepthWorksFine_ForNullPropogation(int depth)
+        public async Task UseNestedCastForDifferentDepthWorksFine_ForNullPropagation(int depth)
         {
             // Arrange
             string expr = "Name eq 'x'";
@@ -64,10 +64,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
                 expr = $"cast({expr},Edm.String)";
             }
 
-            string filterStr = expr + " eq 'x'";
-            this.output.WriteLine("Filter string: {0}", filterStr);
-
-            string queryUrl = $"nullpropgation/Items?$filter={filterStr}";
+            string queryUrl = $"nullpropagation/Items?$filter={expr} eq 'x'";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -100,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
             string filterStr = expr + " eq 'x'";
             this.output.WriteLine("Filter string: {0}", filterStr);
 
-            string queryUrl = $"nonnullpropgation/Items?$filter={filterStr}";
+            string queryUrl = $"nonnullpropagation/Items?$filter={filterStr}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -124,13 +121,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         public async Task UseNestedCastWithNestedContainsForDifferentDepthWorksFine_ForNullPropogation(int depth)
         {
             // Arrange
-            string expr = "Name eq 'x'";
-            for (int i = 0; i < depth; i++)
-            {
-                expr = $"contains('a',cast({expr},Edm.String))";
-            }
+            string expr = BuildMixedExpression(depth);
 
-            string queryUrl = $"nullpropgation/Items?$filter={expr}";
+            string queryUrl = $"nullpropagation/Items?$filter={expr}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -151,16 +144,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         [InlineData(5)]
         [InlineData(6)]
         [InlineData(7)]
-        public async Task UseNestedCastWithNestedContainsForDifferentDepthWorksFine_ForNonNullPropogation(int depth)
+        public async Task UseNestedCastWithNestedContainsForDifferentDepthWorksFine_ForNonNullPropagation(int depth)
         {
             // Arrange
-            string expr = "Name eq 'x'";
-            for (int i = 0; i < depth; i++)
-            {
-                expr = $"contains('a',cast({expr},Edm.String))";
-            }
+            string expr = BuildMixedExpression(depth);
 
-            string queryUrl = $"nonnullpropgation/Items?$filter={expr}";
+            string queryUrl = $"nonnullpropagation/Items?$filter={expr}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
             HttpClient client = CreateClient();
@@ -176,16 +165,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         }
 
         [Theory]
-        [InlineData("nonnullpropgation")]
-        [InlineData("nullpropgation")]
+        [InlineData("nonnullpropagation")]
+        [InlineData("nullpropagation")]
         public async Task UseNestedCastWithNestedContainsThrowsExceedDefaultMaxFunctionCallDepth(string prefix)
         {
             // Arrange
-            string expr = "Name eq 'x'";
-            for (int i = 0; i < 8; i++)
-            {
-                expr = $"contains('a',cast({expr},Edm.String))";
-            }
+            string expr = BuildMixedExpression(8);
 
             string queryUrl = $"{prefix}/Items?$filter={expr}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
@@ -208,14 +193,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
         [InlineData(8)]
         [InlineData(10)]
         [InlineData(12)]
+        [InlineData(18)]
+        [InlineData(20)]
         public async Task UseNestedCastWithNestedContainsWithMaxFunctionCallDepthReconfigurationForDifferentDepthWorksFine(int depth)
         {
             // Arrange
-            string expr = "Name eq 'x'";
-            for (int i = 0; i < depth; i++)
-            {
-                expr = $"contains('a',cast({expr},Edm.String))";
-            }
+            string expr = BuildMixedExpression(depth);
 
             string queryUrl = $"maxfunctioncalldepth/Items?$filter={expr}";
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
@@ -231,6 +214,37 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.NotNull(response.Content);
         }
+
+        [Fact]
+        public async Task UseDeepDepthWithMaxFunctionCallDepthReconfigurationThrowsFromODataLibrary()
+        {
+            // Arrange
+            string expr = BuildMixedExpression(50);
+
+            string queryUrl = $"maxfunctioncalldepth/Items?$filter={expr}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+            request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=none"));
+            HttpClient client = CreateClient();
+
+            var exception = await Assert.ThrowsAsync<ODataException>(async () =>
+            {
+                await client.SendAsync(request);
+            });
+
+            Assert.NotNull(exception);
+            Assert.Equal("Recursion depth exceeded allowed limit.", exception.Message);
+        }
+
+        private static string BuildMixedExpression(int depth)
+        {
+            string expr = "Name eq 'x'";
+            for (int i = 0; i < depth; i++)
+            {
+                expr = $"contains('a',cast({expr},Edm.String))";
+            }
+
+            return expr;
+        }
     }
 
     [ODataAttributeRouting]
@@ -238,13 +252,13 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Cast
     {
         private static readonly List<Item> _items = Enumerable.Range(1, 10).Select(i => new Item { Id = i, Name = $"Item-{i}" }).ToList();
 
-        [HttpGet("nullpropgation/items")]
+        [HttpGet("nullpropagation/items")]
         public IActionResult GetItemsNullPropagation(ODataQueryOptions<Item> queryOptions)
         {
             return Ok(queryOptions.ApplyTo(_items.AsQueryable())); // the default is true for null propagation for LINQ-To-Object.
         }
 
-        [HttpGet("nonnullpropgation/items")]
+        [HttpGet("nonnullpropagation/items")]
         public IActionResult GetItemsNonNullPropagation(ODataQueryOptions<Item> queryOptions)
         {
             return Ok(queryOptions.ApplyTo(_items.AsQueryable(), new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False }));
