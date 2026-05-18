@@ -6720,6 +6720,13 @@
             <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
             <param name="setupAction">The OData minimal options setup.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+            <remarks>
+            When <see cref="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxReceivedMessageSize(System.Int64)"/> is called in <paramref name="setupAction"/>,
+            the per-endpoint limit overrides the global default set in <c>AddOData</c>. This allows both tightening
+            and raising the limit per endpoint. On hosts without <see cref="T:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature"/>
+            (non-Kestrel), the enforcement falls back to checking the Content-Length header; chunked requests
+            without Content-Length will not be enforced on those hosts.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices``1(``0,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
             <summary>
@@ -6761,6 +6768,11 @@
             <param name="version">The OData version.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.EnforceMaxReceivedMessageSize(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Enforces MaxReceivedMessageSize for the current request using the endpoint's OData metadata.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
             <summary>
             Sets up default OData options for <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>.
@@ -6771,20 +6783,6 @@
              Configure the default <see cref="T:Microsoft.AspNetCore.Mvc.JsonOptions"/>
             </summary>
             <param name="options">The Json Options.</param>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.ODataMessageSizeMiddleware">
-            <summary>
-            Middleware that enforces MaxReceivedMessageSize for incoming POST/PUT/PATCH requests
-            by configuring Kestrel's <see cref="T:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature"/>.
-            For hosts without that feature, throws <see cref="T:Microsoft.OData.ODataException"/> when Content-Length exceeds the limit.
-            This works for both Content-Length and chunked transfer requests.
-            Registered automatically by AddOData via IStartupFilter.
-            </summary>
-        </member>
-        <member name="T:Microsoft.AspNetCore.OData.ODataMessageSizeStartupFilter">
-            <summary>
-            Startup filter that registers the <see cref="T:Microsoft.AspNetCore.OData.ODataMessageSizeMiddleware"/> early in the pipeline.
-            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataMiniMetadata">
             <summary>
@@ -7203,6 +7201,12 @@
             Gets or sets the maximum size, in bytes, of an OData request or response message body.
             Default is 100 MB (104,857,600 bytes). Must be greater than or equal to 1.
             </summary>
+            <remarks>
+            For MVC controllers, this value is captured when <see cref="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel)"/> builds the route service provider.
+            Set this property <b>before</b> calling <see cref="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel)"/> to ensure the limit is applied
+            to the route's <see cref="T:Microsoft.OData.ODataMessageReaderSettings"/>.
+            For minimal APIs, the limit is enforced by endpoint filters registered via <c>WithODataResult</c> or <c>WithODataOptions</c>.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
             <summary>

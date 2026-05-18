@@ -295,12 +295,13 @@ public class ODataOptionsTests
     }
 
     [Fact]
-    public void MaxReceivedMessageSize_DefaultValue()
+    public void MaxReceivedMessageSize_DefaultIsOneHundredMB()
     {
         // Arrange & Act
         ODataOptions options = new ODataOptions();
 
-        // Assert
+        // Assert — CWE-770 fix: default must be 100 MB, not Int64.MaxValue.
+        Assert.Equal(100L * 1024 * 1024, ODataBatchHandler.DefaultMaxReceivedMessageSize);
         Assert.Equal(ODataBatchHandler.DefaultMaxReceivedMessageSize, options.MaxReceivedMessageSize);
     }
 

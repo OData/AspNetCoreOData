@@ -19,8 +19,10 @@ namespace Microsoft.AspNetCore.OData.Batch;
 /// </summary>
 public abstract class ODataBatchHandler
 {
-    // Default maximum received message size (100 MB). Provides defense-in-depth alongside hosting layer limits.
-    // Users can customize via handler.MessageQuotas.MaxReceivedMessageSize.
+    // Default maximum received message size (100 MB).
+    // For MVC, batch request parsing is enforced by the route container's ODataMessageReaderSettings (set via AddRouteComponents/MaxReceivedMessageSize).
+    // For minimal APIs, it's enforced by the batch handler's MessageQuotas (synced from options in UseODataMiniBatching).
+    // handler.MessageQuotas is also applied when creating the batch response writer.
     internal const long DefaultMaxReceivedMessageSize = 100 * 1024 * 1024;
 
     private readonly ODataMessageQuotas _messageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = DefaultMaxReceivedMessageSize };

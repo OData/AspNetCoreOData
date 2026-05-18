@@ -286,6 +286,12 @@ public class ODataOptions
     /// Gets or sets the maximum size, in bytes, of an OData request or response message body.
     /// Default is 100 MB (104,857,600 bytes). Must be greater than or equal to 1.
     /// </summary>
+    /// <remarks>
+    /// For MVC controllers, this value is captured when <see cref="AddRouteComponents"/> builds the route service provider.
+    /// Set this property <b>before</b> calling <see cref="AddRouteComponents"/> to ensure the limit is applied
+    /// to the route's <see cref="ODataMessageReaderSettings"/>.
+    /// For minimal APIs, the limit is enforced by endpoint filters registered via <c>WithODataResult</c> or <c>WithODataOptions</c>.
+    /// </remarks>
     public long MaxReceivedMessageSize
     {
         get => _maxReceivedMessageSize;

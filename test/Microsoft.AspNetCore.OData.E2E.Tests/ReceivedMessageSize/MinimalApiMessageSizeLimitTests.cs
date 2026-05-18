@@ -244,3 +244,188 @@ public class MinimalApiMessageSizeLimitDefaultTests : IClassFixture<MinimalTestF
         Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
     }
 }
+
+/// <summary>
+/// Verifies that <c>WithODataOptions(opt => opt.SetMaxReceivedMessageSize(...))</c> on a per-endpoint basis
+/// enforces a different limit than the global configuration on non-batch POST requests.
+/// </summary>
+public class MinimalApiPerEndpointMessageSizeLimitTests : IClassFixture<MinimalTestFixture<MinimalApiPerEndpointMessageSizeLimitTests>>
+{
+    // Global limit is large (10 MB); per-endpoint limit is small (1 MB).
+    private const long GlobalMaxReceivedMessageSize = 10 * 1024 * 1024; // 10 MB
+    private const long EndpointMaxReceivedMessageSize = 1 * 1024 * 1024; // 1 MB
+
+    private HttpClient _client;
+
+    public MinimalApiPerEndpointMessageSizeLimitTests(MinimalTestFixture<MinimalApiPerEndpointMessageSizeLimitTests> factory)
+    {
+        _client = factory.CreateClient();
+    }
+
+    protected static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddOData(opt => opt.SetMaxReceivedMessageSize(GlobalMaxReceivedMessageSize));
+    }
+
+    protected static void ConfigureAPIs(WebApplication app)
+    {
+        IEdmModel model = GetEdmModel();
+
+        app.MapPost("odata/MessageSizeItems", ([FromBody] MessageSizeItem item) => Http.Results.Created($"/odata/MessageSizeItems({item.Id})", item))
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataOptions(opt => opt.SetMaxReceivedMessageSize(EndpointMaxReceivedMessageSize));
+    }
+
+    private static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<MessageSizeItem>("MessageSizeItems");
+        return builder.GetEdmModel();
+    }
+
+    [Fact]
+    public async Task Post_SmallPayload_Succeeds()
+    {
+        // Arrange — a tiny payload well under both limits.
+        string json = "{\"Id\":1,\"Payload\":\"A\"}";
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "odata/MessageSizeItems")
+        {
+            Content = content
+        };
+
+        // Act
+        HttpResponseMessage response = await _client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+    }
+
+    [Fact]
+    public async Task Post_PayloadExceedingPerEndpointLimit_ButUnderGlobal_IsRejected()
+    {
+        // Arrange — 2 MB exceeds the 1 MB per-endpoint limit but is under the 10 MB global limit.
+        // This proves the per-endpoint WithODataOptions configuration takes effect.
+        var payload = new string('X', 2 * 1024 * 1024);
+        var json = $"{{\"Id\":1,\"Payload\":\"{payload}\"}}";
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "odata/MessageSizeItems")
+        {
+            Content = content
+        };
+
+        // Act & Assert
+        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
+        Assert.NotNull(exception);
+        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+    }
+}
+
+/// <summary>
+/// Verifies that <c>WithODataOptions(opt => opt.SetMaxReceivedMessageSize(...))</c> on a per-endpoint basis
+/// can RAISE the limit above the global configuration, allowing larger payloads through.
+/// This proves the opt-out path for the breaking change (lowered default).
+/// </summary>
+public class MinimalApiRaisedPerEndpointMessageSizeLimitTests : IClassFixture<MinimalTestFixture<MinimalApiRaisedPerEndpointMessageSizeLimitTests>>
+{
+    // Global limit is small (1 MB); per-endpoint limit is larger (5 MB).
+    private const long GlobalMaxReceivedMessageSize = 1 * 1024 * 1024; // 1 MB
+    private const long EndpointMaxReceivedMessageSize = 5 * 1024 * 1024; // 5 MB
+
+    private HttpClient _client;
+
+    public MinimalApiRaisedPerEndpointMessageSizeLimitTests(MinimalTestFixture<MinimalApiRaisedPerEndpointMessageSizeLimitTests> factory)
+    {
+        _client = factory.CreateClient();
+    }
+
+    protected static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddOData(opt => opt.SetMaxReceivedMessageSize(GlobalMaxReceivedMessageSize));
+    }
+
+    protected static void ConfigureAPIs(WebApplication app)
+    {
+        IEdmModel model = GetEdmModel();
+
+        app.MapPost("odata/MessageSizeItems", ([FromBody] MessageSizeItem item) => Http.Results.Created($"/odata/MessageSizeItems({item.Id})", item))
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataOptions(opt => opt.SetMaxReceivedMessageSize(EndpointMaxReceivedMessageSize));
+    }
+
+    private static IEdmModel GetEdmModel()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<MessageSizeItem>("MessageSizeItems");
+        return builder.GetEdmModel();
+    }
+
+    [Fact]
+    public async Task Post_PayloadUnderGlobalLimit_Succeeds()
+    {
+        // Arrange — 500 KB is under both the 1 MB global and 5 MB endpoint limits.
+        var payload = new string('X', 500 * 1024);
+        var json = $"{{\"Id\":1,\"Payload\":\"{payload}\"}}";
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "odata/MessageSizeItems")
+        {
+            Content = content
+        };
+
+        // Act
+        HttpResponseMessage response = await _client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+    }
+
+    [Fact]
+    public async Task Post_PayloadAboveGlobalButUnderEndpointLimit_Succeeds()
+    {
+        // Arrange — 3 MB exceeds the 1 MB global limit but is under the 5 MB per-endpoint limit.
+        // This proves that raising the per-endpoint limit opts out of the tighter global default.
+        var payload = new string('X', 3 * 1024 * 1024);
+        var json = $"{{\"Id\":1,\"Payload\":\"{payload}\"}}";
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "odata/MessageSizeItems")
+        {
+            Content = content
+        };
+
+        // Act
+        HttpResponseMessage response = await _client.SendAsync(request);
+
+        // Assert
+        Assert.True(response.IsSuccessStatusCode);
+    }
+
+    [Fact]
+    public async Task Post_PayloadExceedingEndpointLimit_IsRejected()
+    {
+        // Arrange — 6 MB exceeds the 5 MB per-endpoint limit.
+        var payload = new string('X', 6 * 1024 * 1024);
+        var json = $"{{\"Id\":1,\"Payload\":\"{payload}\"}}";
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "odata/MessageSizeItems")
+        {
+            Content = content
+        };
+
+        // Act & Assert
+        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
+        Assert.NotNull(exception);
+        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+    }
+}
