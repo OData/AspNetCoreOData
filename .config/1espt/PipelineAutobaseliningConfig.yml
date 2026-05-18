@@ -42,6 +42,7 @@ pipelines:
           lastModifiedDate: 2026-05-18
         armory:
           lastModifiedDate: 2026-05-18
+    usedNonDefaultBranch: true
   406078:
     retail:
       source:
