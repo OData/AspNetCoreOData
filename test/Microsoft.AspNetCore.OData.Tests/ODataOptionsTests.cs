@@ -34,6 +34,7 @@ public class ODataOptionsTests
         Assert.Equal(TimeZoneInfo.Local, options.TimeZone);
         Assert.True(options.RouteOptions.EnableKeyAsSegment);
         Assert.True(options.EnableNoDollarQueryOptions);
+        Assert.Equal(ODataBatchHandler.DefaultMaxReceivedMessageSize, options.MaxReceivedMessageSize);
 
         // Act
         options.UrlKeyDelimiter = ODataUrlKeyDelimiter.Parentheses;
@@ -291,6 +292,66 @@ public class ODataOptionsTests
 
         // Assert
         Assert.Equal(2, options.QueryConfigurations.MaxTop.Value);
+    }
+
+    [Fact]
+    public void MaxReceivedMessageSize_DefaultIsOneHundredMB()
+    {
+        // Arrange & Act
+        ODataOptions options = new ODataOptions();
+
+        // Assert — CWE-770 fix: default must be 100 MB, not Int64.MaxValue.
+        Assert.Equal(100L * 1024 * 1024, ODataBatchHandler.DefaultMaxReceivedMessageSize);
+        Assert.Equal(ODataBatchHandler.DefaultMaxReceivedMessageSize, options.MaxReceivedMessageSize);
+    }
+
+    [Fact]
+    public void MaxReceivedMessageSize_SetAndGet()
+    {
+        // Arrange
+        ODataOptions options = new ODataOptions();
+        long customSize = 50 * 1024 * 1024;
+
+        // Act
+        options.MaxReceivedMessageSize = customSize;
+
+        // Assert
+        Assert.Equal(customSize, options.MaxReceivedMessageSize);
+    }
+
+    [Fact]
+    public void MaxReceivedMessageSize_Throws_ForZero()
+    {
+        // Arrange
+        ODataOptions options = new ODataOptions();
+
+        // Act & Assert
+        ArgumentOutOfRangeException exception = ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => options.MaxReceivedMessageSize = 0);
+        Assert.Contains("Value must be greater than or equal to 1", exception.Message);
+    }
+
+    [Fact]
+    public void MaxReceivedMessageSize_Throws_ForNegative()
+    {
+        // Arrange
+        ODataOptions options = new ODataOptions();
+
+        // Act & Assert
+        ArgumentOutOfRangeException exception = ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => options.MaxReceivedMessageSize = -1);
+        Assert.Contains("Value must be greater than or equal to 1", exception.Message);
+    }
+
+    [Fact]
+    public void MaxReceivedMessageSize_AcceptsMinimumValue()
+    {
+        // Arrange
+        ODataOptions options = new ODataOptions();
+
+        // Act
+        options.MaxReceivedMessageSize = 1;
+
+        // Assert
+        Assert.Equal(1, options.MaxReceivedMessageSize);
     }
 
     [Fact]

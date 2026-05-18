@@ -2021,5 +2021,14 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("WriteToResponseAsyncMustHaveRequest", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
+        /// </summary>
+        internal static string MaxReceivedMessageSizeExceeded {
+            get {
+                return ResourceManager.GetString("MaxReceivedMessageSizeExceeded", resourceCulture);
+            }
+        }
     }
 }

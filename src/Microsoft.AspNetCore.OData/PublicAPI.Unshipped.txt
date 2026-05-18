@@ -101,3 +101,7 @@ virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.InvokeAsync(Mi
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutedAsync(object responseValue, Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask<object>
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.OnFilterExecutingAsync(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext context) -> System.Threading.Tasks.ValueTask
 virtual Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.ValidateQuery(Microsoft.AspNetCore.Http.HttpContext httpContext, Microsoft.AspNetCore.OData.Query.ODataQueryOptions queryOptions) -> void
+Microsoft.AspNetCore.OData.ODataMiniOptions.MaxReceivedMessageSize.get -> long
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxReceivedMessageSize(long maxReceivedMessageSize) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.get -> long
+Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.set -> void
