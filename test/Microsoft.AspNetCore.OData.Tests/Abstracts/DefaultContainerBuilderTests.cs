@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -197,6 +198,80 @@ public class DefaultContainerBuilderTests
         Assert.Equal(writer21, writer22);
 
         Assert.NotEqual(writer11, writer21);
+    }
+
+    [Fact]
+    public void MessageReaderUsesDefaultMaxReceivedMessageSize()
+    {
+        // Arrange
+        IServiceCollection services = new ServiceCollection();
+        services.AddDefaultWebApiServices();
+        IServiceProvider container = services.BuildServiceProvider();
+
+        // Act
+        IServiceProvider scoped = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageReaderSettings reader = scoped.GetService<ODataMessageReaderSettings>();
+
+        // Assert
+        Assert.NotNull(reader);
+        Assert.Equal(ODataBatchHandler.DefaultMaxReceivedMessageSize, reader.MessageQuotas.MaxReceivedMessageSize);
+    }
+
+    [Fact]
+    public void MessageWriterUsesDefaultMaxReceivedMessageSize()
+    {
+        // Arrange
+        IServiceCollection services = new ServiceCollection();
+        services.AddDefaultWebApiServices();
+        IServiceProvider container = services.BuildServiceProvider();
+
+        // Act
+        IServiceProvider scoped = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageWriterSettings writer = scoped.GetService<ODataMessageWriterSettings>();
+
+        // Assert
+        Assert.NotNull(writer);
+        Assert.Equal(ODataBatchHandler.DefaultMaxReceivedMessageSize, writer.MessageQuotas.MaxReceivedMessageSize);
+    }
+
+    [Fact]
+    public void MessageReaderUsesCustomMaxReceivedMessageSize()
+    {
+        // Arrange
+        long customSize = 50 * 1024 * 1024;
+        IServiceCollection services = new ServiceCollection();
+        services.AddDefaultWebApiServices(maxReceivedMessageSize: customSize);
+        IServiceProvider container = services.BuildServiceProvider();
+
+        // Act
+        IServiceProvider scoped = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageReaderSettings reader = scoped.GetService<ODataMessageReaderSettings>();
+
+        // Assert
+        Assert.NotNull(reader);
+        Assert.Equal(customSize, reader.MessageQuotas.MaxReceivedMessageSize);
+    }
+
+    [Fact]
+    public void MessageWriterUsesCustomMaxReceivedMessageSize()
+    {
+        // Arrange
+        long customSize = 50 * 1024 * 1024;
+        IServiceCollection services = new ServiceCollection();
+        services.AddDefaultWebApiServices(maxReceivedMessageSize: customSize);
+        IServiceProvider container = services.BuildServiceProvider();
+
+        // Act
+        IServiceProvider scoped = container.GetRequiredService<IServiceScopeFactory>()
+            .CreateScope().ServiceProvider;
+        ODataMessageWriterSettings writer = scoped.GetService<ODataMessageWriterSettings>();
+
+        // Assert
+        Assert.NotNull(writer);
+        Assert.Equal(customSize, writer.MessageQuotas.MaxReceivedMessageSize);
     }
 
     private interface ITestService { }

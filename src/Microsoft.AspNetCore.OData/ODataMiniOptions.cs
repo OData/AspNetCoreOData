@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.OData;
@@ -23,6 +24,7 @@ public class ODataMiniOptions
     private bool _enableContinueOnErrorHeader = false;
     private TimeZoneInfo _timeZone = TimeZoneInfo.Local;
     private ODataVersion _version = ODataVersionConstraint.DefaultODataVersion;
+    private long _maxReceivedMessageSize = ODataBatchHandler.DefaultMaxReceivedMessageSize;
 
     /// <summary>
     /// Gets the query configurations. for example, enable '$select' or not.
@@ -60,6 +62,12 @@ public class ODataMiniOptions
     public TimeZoneInfo TimeZone { get => _timeZone; }
 
     /// <summary>
+    /// Gets the maximum size, in bytes, of an OData request or response message body.
+    /// Default is 100 MB (104,857,600 bytes). Please call 'SetMaxReceivedMessageSize()' to config.
+    /// </summary>
+    public long MaxReceivedMessageSize { get => _maxReceivedMessageSize; }
+
+    /// <summary>
     /// Config whether or not no '$' sign query option.
     /// </summary>
     /// <param name="enableNoDollarQueryOptions">Case insensitive or not.</param>
@@ -88,7 +96,7 @@ public class ODataMiniOptions
     /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
     public ODataMiniOptions SetContinueOnErrorHeader(bool enableContinueOnErrorHeader)
     {
-        _enableCaseInsensitive = enableContinueOnErrorHeader;
+        _enableContinueOnErrorHeader = enableContinueOnErrorHeader;
         return this;
     }
 
@@ -192,6 +200,22 @@ public class ODataMiniOptions
     }
 
     /// <summary>
+    /// Config the maximum size, in bytes, of an OData request or response message body.
+    /// </summary>
+    /// <param name="maxReceivedMessageSize">The maximum size in bytes.</param>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
+    public ODataMiniOptions SetMaxReceivedMessageSize(long maxReceivedMessageSize)
+    {
+        if (maxReceivedMessageSize <= 0)
+        {
+            throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxReceivedMessageSize), maxReceivedMessageSize, 1);
+        }
+
+        _maxReceivedMessageSize = maxReceivedMessageSize;
+        return this;
+    }
+
+    /// <summary>
     ///Sets the maximum value of $top that a client can request.
     /// </summary>
     /// <param name="maxTopValue">The maximum value of $top that a client can request.</param>
@@ -213,6 +237,8 @@ public class ODataMiniOptions
         this._version = otherOptions.Version;
         this._enableNoDollarQueryOptions = otherOptions.EnableNoDollarQueryOptions;
         this._enableCaseInsensitive = otherOptions.EnableCaseInsensitive;
+        this._enableContinueOnErrorHeader = otherOptions.EnableContinueOnErrorHeader;
         this._timeZone = otherOptions.TimeZone;
+        this._maxReceivedMessageSize = otherOptions.MaxReceivedMessageSize;
     }
 }

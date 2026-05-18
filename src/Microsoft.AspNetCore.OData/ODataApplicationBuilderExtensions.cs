@@ -74,6 +74,26 @@ public static class ODataApplicationBuilderExtensions
             metadata.Options.UpdateFrom(options);
         }
 
+        // Sync the handler's message quotas with the configured MaxReceivedMessageSize.
+        long effectiveMaxReceivedMessageSize = metadata.Options.MaxReceivedMessageSize;
+
+        // If options weren't provided or handler has a non-default value, use handler's value
+        if (options is null || handler.MessageQuotas.MaxReceivedMessageSize != ODataBatchHandler.DefaultMaxReceivedMessageSize)
+        {
+            effectiveMaxReceivedMessageSize = handler.MessageQuotas.MaxReceivedMessageSize;
+        }
+
+        // Sync both metadata options and handler with the effective value
+        if (metadata.Options.MaxReceivedMessageSize != effectiveMaxReceivedMessageSize)
+        {
+            metadata.Options.SetMaxReceivedMessageSize(effectiveMaxReceivedMessageSize);
+        }
+
+        if (handler.MessageQuotas.MaxReceivedMessageSize != effectiveMaxReceivedMessageSize)
+        {
+            handler.MessageQuotas.MaxReceivedMessageSize = effectiveMaxReceivedMessageSize;
+        }
+
         metadata.Model = model;
         if (configAction != null)
         {

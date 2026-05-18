@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Results;
@@ -136,6 +137,22 @@ public static class ODataEndpointConventionBuilderExtensions
     /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataResult<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
     {
+        // Message size enforcement filter — runs before the handler reads the body.
+        builder.AddEndpointFilter(async (invocationContext, next) =>
+        {
+            HttpContext httpContext = invocationContext.HttpContext;
+
+            if (HttpMethods.IsPost(httpContext.Request.Method) ||
+                HttpMethods.IsPut(httpContext.Request.Method) ||
+                HttpMethods.IsPatch(httpContext.Request.Method))
+            {
+                EnforceMaxReceivedMessageSize(httpContext);
+            }
+
+            return await next(invocationContext);
+        });
+
+        // Result wrapping filter
         builder.AddEndpointFilter(async (invocationContext, next) =>
         {
             object result = await next(invocationContext);
@@ -148,8 +165,8 @@ public static class ODataEndpointConventionBuilderExtensions
 
             // Maybe we have a scenario like:
             // First, enable OData result in app.MapGroup(...).WithODataResult(),
-            // Then, disable OData result for a certain Routehandler by cusomizing the metadaga
-            var endpoint = invocationContext.HttpContext.GetEndpoint();
+            // Then, disable OData result for a certain Routehandler by customizing the metadata
+            Endpoint endpoint = invocationContext.HttpContext.GetEndpoint();
             ODataMiniMetadata odataMetadata = endpoint?.Metadata?.GetMetadata<ODataMiniMetadata>();
             if (odataMetadata is not null && odataMetadata.IsODataFormat)
             {
@@ -171,11 +188,36 @@ public static class ODataEndpointConventionBuilderExtensions
     /// <param name="builder">The <see cref="IEndpointConventionBuilder"/>.</param>
     /// <param name="setupAction">The OData minimal options setup.</param>
     /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+    /// <remarks>
+    /// When <see cref="ODataMiniOptions.SetMaxReceivedMessageSize"/> is called in <paramref name="setupAction"/>,
+    /// the per-endpoint limit overrides the global default set in <c>AddOData</c>. This allows both tightening
+    /// and raising the limit per endpoint. On hosts without <see cref="IHttpMaxRequestBodySizeFeature"/>
+    /// (non-Kestrel), the enforcement falls back to checking the Content-Length header; chunked requests
+    /// without Content-Length will not be enforced on those hosts.
+    /// </remarks>
     public static TBuilder WithODataOptions<TBuilder>(this TBuilder builder, Action<ODataMiniOptions> setupAction) where TBuilder : IEndpointConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(setupAction, nameof(setupAction));
 
         builder.Add(b => ConfigureODataMetadata(b, m => setupAction.Invoke(m.Options)));
+
+        // Endpoint filter to enforce per-endpoint MaxReceivedMessageSize override.
+        // This complements the enforcement in WithODataResult() for cases where
+        // WithODataOptions is used without WithODataResult.
+        builder.AddEndpointFilter(async (invocationContext, next) =>
+        {
+            HttpContext httpContext = invocationContext.HttpContext;
+
+            if (HttpMethods.IsPost(httpContext.Request.Method) ||
+                HttpMethods.IsPut(httpContext.Request.Method) ||
+                HttpMethods.IsPatch(httpContext.Request.Method))
+            {
+                EnforceMaxReceivedMessageSize(httpContext);
+            }
+
+            return await next(invocationContext);
+        });
+
         return builder;
     }
 
@@ -260,6 +302,38 @@ public static class ODataEndpointConventionBuilderExtensions
     {
         builder.Add(b => ConfigureODataMetadata(b, m => m.Version = version));
         return builder;
+    }
+
+    /// <summary>
+    /// Enforces MaxReceivedMessageSize for the current request using the endpoint's OData metadata.
+    /// </summary>
+    private static void EnforceMaxReceivedMessageSize(HttpContext httpContext)
+    {
+        Endpoint endpoint = httpContext.GetEndpoint();
+        ODataMiniMetadata metadata = endpoint?.Metadata.GetMetadata<ODataMiniMetadata>();
+        if (metadata == null)
+        {
+            return;
+        }
+
+        long limit = metadata.Options.MaxReceivedMessageSize;
+
+        IHttpMaxRequestBodySizeFeature maxBodySizeFeature = httpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (maxBodySizeFeature != null && !maxBodySizeFeature.IsReadOnly)
+        {
+            long? currentLimit = maxBodySizeFeature.MaxRequestBodySize;
+            if (currentLimit == null || currentLimit > limit)
+            {
+                maxBodySizeFeature.MaxRequestBodySize = limit;
+            }
+        }
+        else if (httpContext.Request.ContentLength > limit)
+        {
+            throw new ODataException(
+                Error.Format(SRResources.MaxReceivedMessageSizeExceeded,
+                    httpContext.Request.ContentLength.Value,
+                    limit));
+        }
     }
 
     // Will update the odata metadata if existed.

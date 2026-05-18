@@ -51,6 +51,7 @@ public class DefaultODataBatchHandlerTest
         // Act & Assert
         Assert.False(batchHandler.ContinueOnError);
         Assert.NotNull(batchHandler.MessageQuotas);
+        Assert.Equal(ODataBatchHandler.DefaultMaxReceivedMessageSize, batchHandler.MessageQuotas.MaxReceivedMessageSize);
         Assert.Null(batchHandler.PrefixName);
     }
 

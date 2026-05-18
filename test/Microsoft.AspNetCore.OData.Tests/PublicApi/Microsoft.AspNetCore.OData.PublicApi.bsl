@@ -218,6 +218,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	bool EnableCaseInsensitive  { public get; }
 	bool EnableContinueOnErrorHeader  { public get; }
 	bool EnableNoDollarQueryOptions  { public get; }
+	long MaxReceivedMessageSize  { public get; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; }
 	Microsoft.OData.ODataVersion Version  { public get; }
@@ -230,6 +231,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public Microsoft.AspNetCore.OData.ODataMiniOptions Select ()
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetCaseInsensitive (bool enableCaseInsensitive)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetContinueOnErrorHeader (bool enableContinueOnErrorHeader)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxReceivedMessageSize (long maxReceivedMessageSize)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetNoDollarQueryOptions (bool enableNoDollarQueryOptions)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetTimeZoneInfo (System.TimeZoneInfo tzi)
@@ -250,6 +252,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
+	long MaxReceivedMessageSize  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	[
 	ObsoleteAttribute(),
