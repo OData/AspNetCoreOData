@@ -156,6 +156,11 @@ public enum AllowedFunctions
     MatchesPattern = 0x20000000,
 
     /// <summary>
+    /// A value that corresponds to allowing 'TotalSeconds' function in $filter.
+    /// </summary>
+    TotalSeconds = 0x40000000,
+
+    /// <summary>
     /// A value that corresponds to allowing all string related functions in $filter.
     /// </summary>
     AllStringFunctions = StartsWith | EndsWith | Contains | Length | IndexOf | Concat | Substring | ToLower | ToUpper | Trim | MatchesPattern,
@@ -163,7 +168,7 @@ public enum AllowedFunctions
     /// <summary>
     /// A value that corresponds to allowing all datetime related functions in $filter.
     /// </summary>
-    AllDateTimeFunctions = Year | Month | Day | Hour | Minute | Second | FractionalSeconds | Date | Time,
+    AllDateTimeFunctions = Year | Month | Day | Hour | Minute | Second | FractionalSeconds | TotalSeconds | Date | Time,
 
     /// <summary>
     /// A value that corresponds to allowing math related functions in $filter.

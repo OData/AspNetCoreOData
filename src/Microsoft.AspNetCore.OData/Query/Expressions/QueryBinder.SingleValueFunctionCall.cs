@@ -103,6 +103,10 @@ public abstract partial class QueryBinder
                 result = BindFractionalSeconds(node, context);
                 break;
 
+            case ClrCanonicalFunctions.TotalSecondsFunctionName:
+                result = BindTotalSeconds(node, context);
+                break;
+
             case ClrCanonicalFunctions.RoundFunctionName:
                 result = BindRound(node, context);
                 break;
@@ -520,6 +524,31 @@ public abstract partial class QueryBinder
         Expression fractionalSeconds = Expression.Divide(decimalMilliSecond, Expression.Constant(1000m, typeof(decimal)));
 
         return ExpressionBinderHelper.CreateFunctionCallWithNullPropagation(fractionalSeconds, arguments, context.QuerySettings);
+    }
+
+    /// <summary>
+    /// Binds the OData V4 canonical 'totalseconds' function to a LINQ <see cref="Expression"/>.
+    /// Per the OData V4 spec, totalseconds(Edm.Duration) returns an Edm.Decimal with the duration
+    /// expressed as a fractional number of seconds. The CLR mapping is <see cref="TimeSpan.TotalSeconds"/>.
+    /// </summary>
+    /// <param name="node">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    protected virtual Expression BindTotalSeconds(SingleValueFunctionCallNode node, QueryBinderContext context)
+    {
+        CheckArgumentNull(node, context, ClrCanonicalFunctions.TotalSecondsFunctionName);
+
+        Expression[] arguments = BindArguments(node.Parameters, context);
+        Contract.Assert(arguments.Length == 1 && ExpressionBinderHelper.IsTimeSpan(arguments[0].Type));
+
+        Expression parameter = arguments[0];
+
+        // TimeSpan.TotalSeconds is a double; the spec mandates Edm.Decimal.
+        Expression totalSeconds = ExpressionBinderHelper.MakePropertyAccess(
+            ClrCanonicalFunctions.TimeSpanTotalSeconds, parameter, context.QuerySettings);
+        Expression decimalTotalSeconds = Expression.Convert(totalSeconds, typeof(decimal));
+
+        return ExpressionBinderHelper.CreateFunctionCallWithNullPropagation(decimalTotalSeconds, arguments, context.QuerySettings);
     }
 
     /// <summary>

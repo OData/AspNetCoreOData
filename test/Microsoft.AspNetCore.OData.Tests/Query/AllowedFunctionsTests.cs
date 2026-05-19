@@ -62,6 +62,7 @@ public class AllowedFunctionsTests
                 AllowedFunctions.Minute,
                 AllowedFunctions.Second,
                 AllowedFunctions.FractionalSeconds,
+                AllowedFunctions.TotalSeconds,
                 AllowedFunctions.Date,
                 AllowedFunctions.Time,
             };

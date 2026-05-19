@@ -1352,6 +1352,23 @@ public class FilterBinderTests
     }
 
     [Theory]
+    [InlineData("totalseconds(DiscontinuedSince) gt 60", "$it => (Convert($it.DiscontinuedSince.TotalSeconds) > 60)")]
+    public void DateFunctions_TotalSecondsFunction_NonNullable(string filter, string expression)
+    {
+        // Arrange & Act & Assert
+        BindFilterAndVerify<Product>(filter, expression);
+    }
+
+    [Theory]
+    [InlineData("totalseconds(NonNullableDiscontinuedDate sub NonNullableDiscontinuedDate) gt 0",
+        "$it => (Convert(($it.NonNullableDiscontinuedDate - $it.NonNullableDiscontinuedDate).TotalSeconds) > 0)")]
+    public void DateFunctions_TotalSecondsFunction_DateTimeOffsetSubtraction(string filter, string expression)
+    {
+        // Arrange & Act & Assert
+        BindFilterAndVerify<Product>(filter, expression);
+    }
+
+    [Theory]
     [InlineData("date(DiscontinuedDate) eq 2015-02-26",
         "$it => (((($it.DiscontinuedDate.Value.Year * 10000) + ($it.DiscontinuedDate.Value.Month * 100)) + $it.DiscontinuedDate.Value.Day) == (((2015-02-26.Year * 10000) + (2015-02-26.Month * 100)) + 2015-02-26.Day))")]
     [InlineData("date(DiscontinuedDate) lt 2016-02-26",

@@ -129,6 +129,9 @@ internal class QueryValidatorHelpers
             case ClrCanonicalFunctions.FractionalSecondsFunctionName:
                 result = AllowedFunctions.FractionalSeconds;
                 break;
+            case ClrCanonicalFunctions.TotalSecondsFunctionName:
+                result = AllowedFunctions.TotalSeconds;
+                break;
             default:
                 // Originally, we think it should never be here.
                 // But, ODL supports the customized function, if we are here, it might mean it's a customized function.

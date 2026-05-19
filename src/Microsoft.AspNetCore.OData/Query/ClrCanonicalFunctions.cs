@@ -46,6 +46,7 @@ internal class ClrCanonicalFunctions
     internal const string SecondFunctionName = "second";
     internal const string MillisecondFunctionName = "millisecond";
     internal const string FractionalSecondsFunctionName = "fractionalseconds";
+    internal const string TotalSecondsFunctionName = "totalseconds";
     internal const string RoundFunctionName = "round";
     internal const string FloorFunctionName = "floor";
     internal const string CeilingFunctionName = "ceiling";
@@ -149,6 +150,9 @@ internal class ClrCanonicalFunctions
         new KeyValuePair<string, PropertyInfo>(SecondFunctionName, typeof(TimeSpan).GetProperty("Seconds")),
         new KeyValuePair<string, PropertyInfo>(MillisecondFunctionName, typeof(TimeSpan).GetProperty("Milliseconds")),
     }.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+    // TimeSpan/Duration "total" property used by the OData V4 totalseconds() canonical function.
+    public static readonly PropertyInfo TimeSpanTotalSeconds = typeof(TimeSpan).GetProperty(nameof(TimeSpan.TotalSeconds));
 
     // String Properties
     public static readonly PropertyInfo Length = typeof(string).GetProperty("Length");
