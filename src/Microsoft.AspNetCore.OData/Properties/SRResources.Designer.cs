@@ -943,7 +943,7 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataQuerySettings or EnableQueryAttribute..
+        ///   Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings or EnableQueryAttribute..
         /// </summary>
         internal static string MaxAnyAllExpressionLimitExceeded {
             get {
@@ -961,11 +961,29 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The function call depth limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings, ODataQuerySettings or EnableQueryAttribute..
+        /// </summary>
+        internal static string MaxFunctionCallDepthExceeded {
+            get {
+                return ResourceManager.GetString("MaxFunctionCallDepthExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The node count limit of &apos;{0}&apos; has been exceeded. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings..
         /// </summary>
         internal static string MaxNodeLimitExceeded {
             get {
                 return ResourceManager.GetString("MaxNodeLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
+        /// </summary>
+        internal static string MaxReceivedMessageSizeExceeded {
+            get {
+                return ResourceManager.GetString("MaxReceivedMessageSizeExceeded", resourceCulture);
             }
         }
         
@@ -1762,15 +1780,6 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Current single value function call depth &apos;{0}&apos; exceeded the maximum allowed depth of &apos;{1}&apos;..
-        /// </summary>
-        internal static string SingleValueFunctionCallTooDeep {
-            get {
-                return ResourceManager.GetString("SingleValueFunctionCallTooDeep", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
         /// </summary>
         internal static string SkipTokenNotSupportedOrderByExpression {
@@ -2019,15 +2028,6 @@ namespace Microsoft.AspNetCore.OData {
         internal static string WriteToResponseAsyncMustHaveRequest {
             get {
                 return ResourceManager.GetString("WriteToResponseAsyncMustHaveRequest", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
-        /// </summary>
-        internal static string MaxReceivedMessageSizeExceeded {
-            get {
-                return ResourceManager.GetString("MaxReceivedMessageSizeExceeded", resourceCulture);
             }
         }
     }
