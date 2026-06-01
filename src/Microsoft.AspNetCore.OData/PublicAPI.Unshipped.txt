@@ -28,3 +28,10 @@ Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxReceivedMessageSize(long maxRe
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.get -> long
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.set -> void
 virtual Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterFunctionCall() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitFunctionCall() -> void
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.set -> void

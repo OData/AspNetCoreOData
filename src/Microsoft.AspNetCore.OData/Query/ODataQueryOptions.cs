@@ -298,6 +298,15 @@ public class ODataQueryOptions
     public virtual IQueryable ApplyTo(IQueryable query)
     {
         ODataQuerySettings querySettings = Context.GetODataQuerySettings();
+
+        // Only do the following in ApplyTo() without providing 'ODataQuerySettings'.
+        // Let's check whether 'Validate()' is called, if called, Let's use the 'MaxFunctionCallDepth' from the validation settings into the 'default generated querysettings'.
+        // Otherwise, let's use the default setting in the ODataQuerySettings.
+        if (Context.ValidationSettings != null)
+        {
+            querySettings.MaxFunctionCallDepth = Context.ValidationSettings.MaxFunctionCallDepth;
+        }
+
         return ApplyTo(query, querySettings);
     }
 
@@ -311,6 +320,14 @@ public class ODataQueryOptions
     {
         ODataQuerySettings querySettings = Context.GetODataQuerySettings();
         querySettings.IgnoredQueryOptions = ignoreQueryOptions;
+
+        // Only do the following in ApplyTo() without providing 'ODataQuerySettings'.
+        // Let's check whether 'Validate()' is called, if called, Let's use the 'MaxFunctionCallDepth' from the validation settings into the 'default generated querysettings'.
+        // Otherwise, let's use the default setting in the ODataQuerySettings.
+        if (Context.ValidationSettings != null)
+        {
+            querySettings.MaxFunctionCallDepth = Context.ValidationSettings.MaxFunctionCallDepth;
+        }
 
         return ApplyTo(query, querySettings);
     }

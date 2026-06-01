@@ -21,6 +21,7 @@ public class ODataValidationSettings
     private const int MinMaxNodeCount = 1;
     private const int MinMaxAnyAllExpressionDepth = 1;
     private const int MinMaxOrderByNodeCount = 1;
+    private const int MinMaxFunctionCallDepth = 1;
     internal const int DefaultMaxExpansionDepth = 2;
 
     private AllowedArithmeticOperators _allowedArithmeticOperators = AllowedArithmeticOperators.All;
@@ -34,6 +35,7 @@ public class ODataValidationSettings
     private int _maxNodeCount = 100;
     private int _maxExpansionDepth = DefaultMaxExpansionDepth;
     private int _maxOrderByNodeCount = 5;
+    private int _maxFunctionCallDepth = ODataQuerySettings.DefaultMaxFunctionCallDepth;
 
     /// <summary>
     /// Gets or sets a list of allowed arithmetic operators including 'add', 'sub', 'mul', 'div', 'mod'.
@@ -144,6 +146,23 @@ public class ODataValidationSettings
             }
 
             _maxOrderByNodeCount = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the maximum depth of function call expressions that can be present in the query.
+    /// </summary>
+    public int MaxFunctionCallDepth
+    {
+        get => _maxFunctionCallDepth;
+        set
+        {
+            if (value < MinMaxFunctionCallDepth)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, MinMaxFunctionCallDepth);
+            }
+
+            _maxFunctionCallDepth = value;
         }
     }
 

@@ -636,12 +636,21 @@ public abstract partial class QueryBinder
     {
         CheckArgumentNull(node, context);
 
-        switch (node.Name)
+        context.EnterFunctionCall();
+
+        try
         {
-            case ClrCanonicalFunctions.CastFunctionName:
-                return BindSingleResourceCastFunctionCall(node, context);
-            default:
-                throw Error.NotSupported(SRResources.ODataFunctionNotSupported, node.Name);
+            switch (node.Name)
+            {
+                case ClrCanonicalFunctions.CastFunctionName:
+                    return BindSingleResourceCastFunctionCall(node, context);
+                default:
+                    throw Error.NotSupported(SRResources.ODataFunctionNotSupported, node.Name);
+            }
+        }
+        finally
+        {
+            context.LeaveFunctionCall();
         }
     }
 

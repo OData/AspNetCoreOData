@@ -14,6 +14,8 @@ namespace Microsoft.AspNetCore.OData.Query;
 /// </summary>
 public class ODataQuerySettings
 {
+    internal const int DefaultMaxFunctionCallDepth = 15;// the depth of function call expressions recursively in a query, such as 'length(tolower(name)) eq 5', the depth is 2.
+
     /// <summary>
     /// The default time span applied to a single <c>matchesPattern</c> filter function evaluation
     /// when <see cref="MatchesPatternTimeout"/> is not explicitly configured.
@@ -31,6 +33,7 @@ public class ODataQuerySettings
     private int? _pageSize;
     private int? _modelBoundPageSize;
     private TimeSpan? _matchesPatternTimeout = DefaultMatchesPatternTimeout;
+    private int _maxFunctionCallDepth = DefaultMaxFunctionCallDepth;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQuerySettings" /> class.
@@ -119,9 +122,21 @@ public class ODataQuerySettings
     public bool EnableCorrelatedSubqueryBuffering { get; set; }
 
     /// <summary>
-    /// Gets or sets the maximum depth for function calls in a query.
+    /// Gets or sets the maximum depth for function calls in a query binding.
     /// </summary>
-    public int MaxFunctionCallDepth { get; set; } = 15;
+    public int MaxFunctionCallDepth
+    {
+        get => _maxFunctionCallDepth;
+        set
+        {
+            if (value < 1)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, 1);
+            }
+
+            _maxFunctionCallDepth = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating which query options should be ignored when applying queries.
