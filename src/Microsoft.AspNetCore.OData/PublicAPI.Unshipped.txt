@@ -1,0 +1,7 @@
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterFunctionCall() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitFunctionCall() -> void
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.set -> void

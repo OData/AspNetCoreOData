@@ -7843,7 +7843,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxAnyAllExpressionLimitExceeded">
             <summary>
-              Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataQuerySettings or EnableQueryAttribute..
+              Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings or EnableQueryAttribute..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxExpandDepthExceeded">
@@ -7851,9 +7851,19 @@
               Looks up a localized string similar to The request includes a $expand path which is too deep. The maximum depth allowed is {0}. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings, or set the &apos;MaxDepth&apos; property in ExpandAttribute..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxFunctionCallDepthExceeded">
+            <summary>
+              Looks up a localized string similar to The function call depth limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings, ODataQuerySettings or EnableQueryAttribute..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxNodeLimitExceeded">
             <summary>
               Looks up a localized string similar to The node count limit of &apos;{0}&apos; has been exceeded. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxReceivedMessageSizeExceeded">
+            <summary>
+              Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingNonODataContainer">
@@ -8296,11 +8306,6 @@
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.SingleValueFunctionCallTooDeep">
-            <summary>
-              Looks up a localized string similar to Current single value function call depth &apos;{0}&apos; exceeded the maximum allowed depth of &apos;{1}&apos;..
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenNotSupportedOrderByExpression">
             <summary>
               Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
@@ -8439,11 +8444,6 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.WriteToResponseAsyncMustHaveRequest">
             <summary>
               Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
-            </summary>
-        </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxReceivedMessageSizeExceeded">
-            <summary>
-              Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">
@@ -9157,6 +9157,12 @@
             by buffering results from the sub-query.
             </summary>
             <value>The default value is <c>false</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth">
+            <summary>
+            Gets or sets the maximum depth of function call expressions inside the query.
+            For example: 'length(tolower(name)) eq 5', the depth of function call expressions is 2.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxAnyAllExpressionDepth">
             <summary>
@@ -12154,7 +12160,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth">
             <summary>
-            Gets or sets the maximum depth for function calls in a query.
+            Gets or sets the maximum depth for function calls in a query binding.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions">
@@ -13602,6 +13608,11 @@
             Gets current any and all expression depth.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentFunctionCallDepth">
+            <summary>
+            This depth is for function call expressions recursively in a query, such as 'length(tolower(name)) eq 5', the depth is 2.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Clone">
             <summary>
             Clone the context.
@@ -13623,6 +13634,17 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitLambda">
             <summary>
             Exit lambda expression.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterFunctionCall">
+            <summary>
+            Enter function call.
+            </summary>
+            <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitFunctionCall">
+            <summary>
+            Exit function call.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator">
@@ -13822,6 +13844,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxOrderByNodeCount">
             <summary>
             Gets or sets the maximum number of expressions that can be present in the $orderby.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth">
+            <summary>
+            Gets or sets the maximum depth of function call expressions that can be present in the query.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxAnyAllExpressionDepth">
