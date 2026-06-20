@@ -111,7 +111,7 @@ extends:
         - task: CmdLine@2
           displayName: Install ReportGenerator tool for code coverage
           inputs:
-            script: dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.5.8
+            script: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.4
         - task: CmdLine@2
           displayName: Create code coverage report
           inputs:
