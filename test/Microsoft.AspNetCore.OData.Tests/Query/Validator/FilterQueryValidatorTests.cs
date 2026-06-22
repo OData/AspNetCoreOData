@@ -415,6 +415,7 @@ public class FilterQueryValidatorTests
                 { AllowedFunctions.Time, "time(DiscontinuedDate) eq 03:4:05.90100", "time" },
                 { AllowedFunctions.FractionalSeconds, "fractionalseconds(null) eq 0.05", "fractionalseconds" },
                 { AllowedFunctions.FractionalSeconds, "fractionalseconds(DiscontinuedDate) eq 0.050", "fractionalseconds" },
+                { AllowedFunctions.TotalSeconds, "totalseconds(DiscontinuedSince) gt 60", "totalseconds" },
             };
         }
     }

@@ -8631,6 +8631,11 @@
             A value that corresponds to allowing 'MatchesPattern' function in $filter.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.TotalSeconds">
+            <summary>
+            A value that corresponds to allowing 'TotalSeconds' function in $filter.
+            </summary>
+        </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions">
             <summary>
             A value that corresponds to allowing all string related functions in $filter.
@@ -10736,6 +10741,16 @@
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindFractionalSeconds(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Binds 'fractionalseconds' function to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="node">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindTotalSeconds(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds the OData V4 canonical 'totalseconds' function to a LINQ <see cref="T:System.Linq.Expressions.Expression"/>.
+            Per the OData V4 spec, totalseconds(Edm.Duration) returns an Edm.Decimal with the duration
+            expressed as a fractional number of seconds. The CLR mapping is <see cref="P:System.TimeSpan.TotalSeconds"/>.
             </summary>
             <param name="node">The query node to bind.</param>
             <param name="context">The query binder context.</param>

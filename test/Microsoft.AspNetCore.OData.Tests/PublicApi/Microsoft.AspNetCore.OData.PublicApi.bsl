@@ -1307,8 +1307,8 @@ FlagsAttribute(),
 ]
 public enum Microsoft.AspNetCore.OData.Query.AllowedFunctions : int {
 	All = 268435456
-	AllDateTimeFunctions = 7010304
-	AllFunctions = 1072365567
+	AllDateTimeFunctions = 1080752128
+	AllFunctions = 2146107391
 	AllMathFunctions = 58720256
 	AllStringFunctions = 536871935
 	Any = 134217728
@@ -1335,6 +1335,7 @@ public enum Microsoft.AspNetCore.OData.Query.AllowedFunctions : int {
 	Substring = 64
 	Time = 16384
 	ToLower = 128
+	TotalSeconds = 1073741824
 	ToUpper = 256
 	Trim = 512
 	Year = 2048
@@ -3118,6 +3119,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder {
 	protected virtual System.Linq.Expressions.Expression BindTime (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindTimeRelatedProperty (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindToLower (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
+	protected virtual System.Linq.Expressions.Expression BindTotalSeconds (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindToUpper (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	protected virtual System.Linq.Expressions.Expression BindTrim (Microsoft.OData.UriParser.SingleValueFunctionCallNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)
 	public virtual System.Linq.Expressions.Expression BindUnaryOperatorNode (Microsoft.OData.UriParser.UnaryOperatorNode unaryOperatorNode, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context)

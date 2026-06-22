@@ -831,6 +831,9 @@ public class FilterQueryValidator : IFilterQueryValidator
             case ClrCanonicalFunctions.FractionalSecondsFunctionName:
                 result = AllowedFunctions.FractionalSeconds;
                 break;
+            case ClrCanonicalFunctions.TotalSecondsFunctionName:
+                result = AllowedFunctions.TotalSeconds;
+                break;
             default:
                 // should never be here
                 Contract.Assert(true, "ToODataFunction should never be here.");
