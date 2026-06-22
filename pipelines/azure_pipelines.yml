@@ -29,6 +29,10 @@ variables:
   value: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
 - name: runCodesignValidationInjection
   value: false
+- group: OData-Shared
+- name: AZURE_ARTIFACTS_FEED 
+  value: $(ODataFeed)
+
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
@@ -47,11 +51,10 @@ extends:
         steps:
         - checkout: self
           fetchTags: false
-        - task: NuGetToolInstaller@1
-          displayName: Use NuGet >=5.2.0
-          inputs:
-            versionSpec: '>=5.2.0'
-            checkLatest: true
+
+        - task: NuGetAuthenticate@1
+          displayName: 'Authenticate to the feed'
+          
         - task: UseDotNet@2
           displayName: Use .NET Core sdk 8.x
           inputs:
@@ -108,7 +111,7 @@ extends:
         - task: CmdLine@2
           displayName: Install ReportGenerator tool for code coverage
           inputs:
-            script: dotnet tool install --global dotnet-reportgenerator-globaltool --version 4.5.8
+            script: dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.4.4
         - task: CmdLine@2
           displayName: Create code coverage report
           inputs:
