@@ -24,7 +24,9 @@ variables:
   value: anycpu
 - name: ProductBinPath
   value: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
-- group: OData-ESRP-CodeSigning
+- group: OData-Shared
+- name: AZURE_ARTIFACTS_FEED 
+  value: $(ODataFeed)
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
@@ -64,11 +66,10 @@ extends:
         steps:
         - checkout: self
           fetchTags: true
-        - task: NuGetToolInstaller@1
-          displayName: Use NuGet >=5.2.0
-          inputs:
-            versionSpec: '>=5.2.0'
-            checkLatest: true
+
+        - task: NuGetAuthenticate@1
+          displayName: 'Authenticate to the feed'
+          
         - task: UseDotNet@2
           displayName: Use .NET Core SDK 10.x
           inputs:
