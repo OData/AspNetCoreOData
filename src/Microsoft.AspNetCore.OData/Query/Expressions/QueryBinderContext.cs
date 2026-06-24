@@ -333,6 +333,14 @@ public class QueryBinderContext
     internal void EnterFunctionCall()
     {
         _functionCallDepth++;
+
+        // QuerySettings is only null for the internal test-only parameterless constructor.
+        // In that case there is no configured limit to enforce.
+        if (QuerySettings == null)
+        {
+            return;
+        }
+
         if (_functionCallDepth > QuerySettings.MaxFunctionCallDepth)
         {
             throw new ODataException(Error.Format(
