@@ -1507,6 +1507,7 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
 	int MaxAnyAllExpressionDepth  { public get; public set; }
 	int MaxExpansionDepth  { public get; public set; }
+	int MaxFunctionCallDepth  { public get; public set; }
 	int MaxNodeCount  { public get; public set; }
 	int MaxOrderByNodeCount  { public get; public set; }
 	int MaxSkip  { public get; public set; }
@@ -3363,11 +3364,14 @@ public class Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext :
 	public FilterValidatorContext ()
 
 	int CurrentAnyAllExpressionDepth  { public get; }
+	int CurrentFunctionCallDepth  { public get; }
 	int CurrentNodeCount  { public get; }
 	Microsoft.AspNetCore.OData.Query.FilterQueryOption Filter  { public get; public set; }
 
 	public Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext Clone ()
+	public void EnterFunctionCall ()
 	public void EnterLambda ()
+	public void ExitFunctionCall ()
 	public void ExitLambda ()
 	public void IncrementNodeCount ()
 }
@@ -3388,6 +3392,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions  { public get; public set; }
 	int MaxAnyAllExpressionDepth  { public get; public set; }
 	int MaxExpansionDepth  { public get; public set; }
+	int MaxFunctionCallDepth  { public get; public set; }
 	int MaxNodeCount  { public get; public set; }
 	int MaxOrderByNodeCount  { public get; public set; }
 	System.Nullable`1[[System.Int32]] MaxSkip  { public get; public set; }
