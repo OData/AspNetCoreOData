@@ -120,6 +120,120 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         }
     }
 
+    [Theory]
+    [InlineData("maxpagesize=0")]
+    [InlineData("odata.maxpagesize=0")]
+    public async Task PreferMaxPageSizeZero_DoesNotBypassServerDrivenPaging(string preferValue)
+    {
+        // Arrange
+        // A client must not be able to disable [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize=0.
+        // The response must remain paged (5 items + nextLink), not return the entire collection.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(5, value.GetArrayLength());
+
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=5", nextLink.GetString());
+        }
+    }
+
+    [Theory]
+    [InlineData("maxpagesize=2")]
+    [InlineData("odata.maxpagesize=2")]
+    public async Task PreferMaxPageSizeSmallerThanServerPageSizeButNotZero_DoesBypassServerDrivenPaging(string preferValue)
+    {
+        // Arrange
+        // A client can bypass [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize=2. Where 2 is smaller than the server page size of 5.
+        // The response must return only 2 item and a nextLink.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(2, value.GetArrayLength());
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=2", nextLink.GetString());
+        }
+    }
+
+    [Theory]
+    [InlineData("maxpagesize=6")]
+    [InlineData("odata.maxpagesize=6")]
+    public async Task PreferMaxPageSizeLargerThanServerPageSize_DoesNotBypassServerDrivenPaging(string preferValue)
+    {
+        // Arrange
+        // A client must not be able to bypass [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize=6. Where 6 is larger than the server page size of 5.
+        // The response must remain paged (5 items + nextLink), not return the entire collection.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(5, value.GetArrayLength());
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=5", nextLink.GetString());
+        }
+    }
+
+    [Theory]
+    [InlineData("maxpagesize")]
+    [InlineData("odata.maxpagesize")]
+    public async Task BareMaxPageSizePreference_DoesNotCause500_AndServerPagingApplies(string preferValue)
+    {
+        // Arrange
+        // A client must not be able to bypass [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize. Where no value is specified.
+        // It should not cause a 500 error, and the server page size of 5 should still apply.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(5, value.GetArrayLength());
+        }
+    }
+
     [Fact]
     public async Task VerifyParametersInNextPageLinkInEdmFunctionResponseBodyAreInSameCaseAsInRequestUrl()
     {

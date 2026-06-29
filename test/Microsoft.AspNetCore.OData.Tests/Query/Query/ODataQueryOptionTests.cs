@@ -708,6 +708,103 @@ public class ODataQueryOptionTests
         Assert.Equal(customers.OrderBy(c => c.CustomerId).First().CustomerId, results[0].CustomerId);
     }
 
+
+
+    [Theory]
+    [InlineData("maxpagesize=0")]
+    [InlineData("odata.maxpagesize=0")]
+    public void ApplyTo_StillAppliesServerPageSize_WhenClientPrefersMaxPageSizeZero(string preferValue)
+    {
+        // Arrange
+        // Security regression: a client cannot disable server-driven paging by sending
+        // Prefer: maxpagesize=0. The operator-configured PageSize must still limit the results.
+        IEdmModel model = GetEdmModel(c => c.CustomerId);
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers");
+        request.Headers["Prefer"] = preferValue;
+
+        var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Customer)), request);
+        ODataQuerySettings querySettings = new ODataQuerySettings { PageSize = 2 };
+
+        Customer[] customers = new[]
+        {
+            new Customer() { CustomerId = 4 },
+            new Customer() { CustomerId = 3 },
+            new Customer() { CustomerId = 1 },
+            new Customer() { CustomerId = 2 }
+        };
+
+        // Act
+        IQueryable query = options.ApplyTo(customers.AsQueryable(), querySettings);
+        Customer[] results = (query as IQueryable<Customer>).ToArray();
+
+        // Assert
+        Assert.Equal(2, results.Length);
+    }
+
+    [Theory]
+    [InlineData("maxpagesize=5")]
+    [InlineData("odata.maxpagesize=5")]
+    public void ApplyTo_StillAppliesServerPageSize_WhenClientPrefersMaxPageSizeLargerThanServerPageSize(string preferValue)
+    {
+        // Arrange
+        // Security regression: a client cannot disable server-driven paging by sending
+        // Prefer: maxpagesize=0. The operator-configured PageSize must still limit the results.
+        IEdmModel model = GetEdmModel(c => c.CustomerId);
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers");
+        request.Headers["Prefer"] = preferValue;
+
+        var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Customer)), request);
+        ODataQuerySettings querySettings = new ODataQuerySettings { PageSize = 2 };
+
+        Customer[] customers = new[]
+        {
+            new Customer() { CustomerId = 4 },
+            new Customer() { CustomerId = 3 },
+            new Customer() { CustomerId = 1 },
+            new Customer() { CustomerId = 2 }
+        };
+
+        // Act
+        IQueryable query = options.ApplyTo(customers.AsQueryable(), querySettings);
+        Customer[] results = (query as IQueryable<Customer>).ToArray();
+
+        // Assert
+        Assert.Equal(2, results.Length);
+    }
+
+    [Theory]
+    [InlineData("maxpagesize=")]
+    [InlineData("odata.maxpagesize=")]
+    [InlineData("maxpagesize")]
+    [InlineData("odata.maxpagesize")]
+    public void ApplyTo_StillAppliesServerPageSize_WhenClientPrefersPageSizeHasNoValue(string preferValue)
+    {
+        // Arrange
+        // Security regression: a client cannot disable server-driven paging by sending
+        // Prefer: maxpagesize=0. The operator-configured PageSize must still limit the results.
+        IEdmModel model = GetEdmModel(c => c.CustomerId);
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://localhost/Customers");
+        request.Headers["Prefer"] = preferValue;
+
+        var options = new ODataQueryOptions(new ODataQueryContext(model, typeof(Customer)), request);
+        ODataQuerySettings querySettings = new ODataQuerySettings { PageSize = 2 };
+
+        Customer[] customers = new[]
+        {
+            new Customer() { CustomerId = 4 },
+            new Customer() { CustomerId = 3 },
+            new Customer() { CustomerId = 1 },
+            new Customer() { CustomerId = 2 }
+        };
+
+        // Act
+        IQueryable query = options.ApplyTo(customers.AsQueryable(), querySettings);
+        Customer[] results = (query as IQueryable<Customer>).ToArray();
+
+        // Assert
+        Assert.Equal(2, results.Length);
+    }
+
     [Fact]
     public void Validate_ThrowsValidationErrors_ForOrderBy()
     {
