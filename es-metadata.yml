@@ -1,0 +1,12 @@
+schemaVersion: 1.0.0
+providers:
+- provider: InventoryAsCode
+  version: 1.0.0
+  metadata:
+    isProduction: false
+    accountableOwners:
+      service: c7a425eb-1c25-4d0e-b9b9-3b70ef942c89
+    routing:
+      defaultAreaPath:
+        org: identitydivision
+        path: Engineering\Graph\OData
