@@ -775,4 +775,10 @@
   <data name="MaxReceivedMessageSizeExceeded" xml:space="preserve">
     <value>The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed.</value>
   </data>
+  <data name="BatchRequestUriAuthorityMismatch" xml:space="preserve">
+    <value>The batch sub-request URI '{0}' has a different authority (scheme, host, or port) than the outer batch request '{1}'. Batch sub-requests must target the same service as the outer batch request.</value>
+  </data>
+  <data name="BatchSubRequestPathNotUnderServiceRoot" xml:space="preserve">
+    <value>The batch sub-request URI '{0}' targets a path that is not within the OData service root '{1}'. Batch sub-requests must address resources within the OData service.</value>
+  </data>
 </root>

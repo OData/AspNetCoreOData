@@ -8446,6 +8446,16 @@
               Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestUriAuthorityMismatch">
+            <summary>
+              Looks up a localized string similar to The batch sub-request URI '{0}' has a different authority (scheme, host, or port) than the outer batch request '{1}'. Batch sub-requests must target the same service as the outer batch request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchSubRequestPathNotUnderServiceRoot">
+            <summary>
+              Looks up a localized string similar to The batch sub-request URI '{0}' targets a path that is not within the OData service root '{1}'. Batch sub-requests must address resources within the OData service.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">
             <summary>
             Arithmetic operators to allow for querying using $filter.
