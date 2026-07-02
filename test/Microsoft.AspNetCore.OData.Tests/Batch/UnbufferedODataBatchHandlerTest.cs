@@ -91,7 +91,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1301336816
 
-GET / HTTP/1.1
+GET /odata/ HTTP/1.1
 Host: example.com
 
 
@@ -103,7 +103,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1557260198
 
-POST /values HTTP/1.1
+POST /odata/values HTTP/1.1
 Host: example.com
 Content-Type: text/plain; charset=utf-8
 
@@ -131,8 +131,8 @@ foo
         // Assert
         string responseBody = httpContext.Response.ReadBody();
 
-        Assert.Contains("http://example.com/", responseBody);
-        Assert.Contains("http://example.com/values,foo", responseBody);
+        Assert.Contains("http://example.com/odata/", responseBody);
+        Assert.Contains("http://example.com/odata/values,foo", responseBody);
     }
 
     [Fact]

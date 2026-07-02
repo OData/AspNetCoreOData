@@ -81,4 +81,47 @@ public class ODataBatchRequestItemTest
         // Assert
         Assert.Equal("/odata/Customers(42)/Orders", context.Request.Path.ToString());
     }
+
+    [Fact]
+    public async Task SendRequestAsync_SkipsContentIdResolution_WhenResolvedUriHasDifferentAuthority()
+    {
+        // Arrange — Content-ID mapping resolves to a different host.
+        // The resolved URI authority must be validated before updating the request URL;
+        // a mismatch means the mapping is not applied and the original URL is preserved.
+        DefaultHttpContext context = new DefaultHttpContext();
+        RequestDelegate handler = (c) => Task.CompletedTask;
+        Dictionary<string, string> contentIdLocationMappings = new Dictionary<string, string>
+        {
+            // Location resolves to a completely different host.
+            { "1", "http://other.example.com/odata/Customers(42)" }
+        };
+        Uri unresolvedUri = new Uri("http://localhost:12345/odata/$1/Orders");
+        context.Request.CopyAbsoluteUrl(unresolvedUri);
+
+        // Act
+        await ODataBatchRequestItem.SendRequestAsync(handler, context, contentIdLocationMappings);
+
+        // Assert — URL must remain unchanged; authority mismatch causes the mapping to be skipped.
+        Assert.Equal("/odata/$1/Orders", context.Request.Path.ToString());
+    }
+
+    [Fact]
+    public async Task SendRequestAsync_AppliesContentIdResolution_WhenResolvedUriHasSameAuthority()
+    {
+        // Arrange — normal Content-ID resolution where authority is unchanged.
+        DefaultHttpContext context = new DefaultHttpContext();
+        RequestDelegate handler = (c) => Task.CompletedTask;
+        Dictionary<string, string> contentIdLocationMappings = new Dictionary<string, string>
+        {
+            { "1", "http://localhost:12345/odata/Customers(42)" }
+        };
+        Uri unresolvedUri = new Uri("http://localhost:12345/odata/$1/Orders");
+        context.Request.CopyAbsoluteUrl(unresolvedUri);
+
+        // Act
+        await ODataBatchRequestItem.SendRequestAsync(handler, context, contentIdLocationMappings);
+
+        // Assert — URL should be updated to the resolved location.
+        Assert.Equal("/odata/Customers(42)/Orders", context.Request.Path.ToString());
+    }
 }

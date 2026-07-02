@@ -2030,5 +2030,23 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("WriteToResponseAsyncMustHaveRequest", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The batch sub-request URI '{0}' has a different authority (scheme, host, or port) than the outer batch request '{1}'. Batch sub-requests must target the same service as the outer batch request.
+        /// </summary>
+        internal static string BatchRequestUriAuthorityMismatch {
+            get {
+                return ResourceManager.GetString("BatchRequestUriAuthorityMismatch", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The batch sub-request URI '{0}' targets a path that is not within the OData service root '{1}'. Batch sub-requests must address resources within the OData service.
+        /// </summary>
+        internal static string BatchSubRequestPathNotUnderServiceRoot {
+            get {
+                return ResourceManager.GetString("BatchSubRequestPathNotUnderServiceRoot", resourceCulture);
+            }
+        }
     }
 }
