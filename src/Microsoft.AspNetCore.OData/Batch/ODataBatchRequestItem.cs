@@ -47,7 +47,8 @@ public abstract class ODataBatchRequestItem
             string resolvedRequestUrl = ContentIdHelpers.ResolveContentId(encodedUrl, contentIdToLocationMapping);
             Uri resolvedUri;
             if (!string.IsNullOrEmpty(resolvedRequestUrl)
-                && Uri.TryCreate(resolvedRequestUrl, UriKind.Absolute, out resolvedUri))
+                && Uri.TryCreate(resolvedRequestUrl, UriKind.Absolute, out resolvedUri)
+                && IsSameAuthority(resolvedUri, context.Request))
             {
                 context.Request.CopyAbsoluteUrl(resolvedUri);
             }
@@ -101,5 +102,16 @@ public abstract class ODataBatchRequestItem
         {
             contentIdToLocationMapping.Add(contentId, headers.Location.AbsoluteUri);
         }
+    }
+
+    // Returns true when the resolved Content-ID URI shares the same scheme, host, and port as
+    // the current sub-request context.  Content-ID references are resolved by string-
+    // concatenating a Location header value with the remainder of the relative reference; the
+    // Location header may point to a different origin (redirect, multi-tenant alias, etc.) so
+    // the authority must be re-validated after resolution before the URL is applied.
+    private static bool IsSameAuthority(Uri resolvedUri, HttpRequest request)
+    {
+        Uri requestBaseUri = new Uri($"{request.Scheme}://{request.Host}/");
+        return Uri.Compare(resolvedUri, requestBaseUri, UriComponents.SchemeAndServer, UriFormat.SafeUnescaped, StringComparison.OrdinalIgnoreCase) == 0;
     }
 }

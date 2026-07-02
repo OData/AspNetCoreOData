@@ -158,7 +158,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1948857409
 
-GET / HTTP/1.1
+GET /odata/ HTTP/1.1
 Host: example.com
 
 
@@ -170,7 +170,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1856004745
 
-POST /values HTTP/1.1
+POST /odata/values HTTP/1.1
 Host: example.com
 Content-Type: text/plain; charset=utf-8
 
@@ -182,7 +182,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: -2010824035
 
-POST /values HTTP/1.1
+POST /odata/values HTTP/1.1
 Host: example.com
 Content-Type: text/plain; charset=utf-8
 
@@ -216,20 +216,20 @@ bar
         Assert.NotNull(responseBody);
 
         // #1 response
-        Assert.Contains("http://example.com/", responseBody);
+        Assert.Contains("http://example.com/odata/", responseBody);
 
         // #2 bad response
         Assert.Contains("Bad Request", responseBody);
-        Assert.Contains("http://example.com/values,foo", responseBody);
+        Assert.Contains("http://example.com/odata/values,foo", responseBody);
 
         // #3 response
         if (hasThirdResponse)
         {
-            Assert.Contains("http://example.com/values,bar", responseBody);
+            Assert.Contains("http://example.com/odata/values,bar", responseBody);
         }
         else
         {
-            Assert.DoesNotContain("http://example.com/values,bar", responseBody);
+            Assert.DoesNotContain("http://example.com/odata/values,bar", responseBody);
         }
     }
 
@@ -243,7 +243,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 483818399
 
-GET / HTTP/1.1
+GET /odata/ HTTP/1.1
 Host: example.com
 
 
@@ -252,7 +252,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1035669256
 
-DELETE / HTTP/1.1
+DELETE /odata/ HTTP/1.1
 Host: example.com
 
 
@@ -261,7 +261,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 632310651
 
-POST /values HTTP/1.1
+POST /odata/values HTTP/1.1
 Host: example.com
 Content-Type: text/plain; charset=utf-8
 
@@ -383,7 +383,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1430195875
 
-GET / HTTP/1.1
+GET /odata/ HTTP/1.1
 Host: example.com
 
 
@@ -395,7 +395,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 675766617
 
-POST /values HTTP/1.1
+POST /odata/values HTTP/1.1
 Host: example.com
 
 
@@ -424,12 +424,12 @@ Host: example.com
 
         var operationContext = Assert.IsType<OperationRequestItem>(requests[0]).Context;
         Assert.Equal("GET", operationContext.Request.Method);
-        Assert.Equal("http://example.com/", operationContext.Request.GetDisplayUrl());
+        Assert.Equal("http://example.com/odata/", operationContext.Request.GetDisplayUrl());
 
         var changeSetContexts = Assert.IsType<ChangeSetRequestItem>(requests[1]).Contexts;
         var changeSetContext = Assert.Single(changeSetContexts);
         Assert.Equal("POST", changeSetContext.Request.Method);
-        Assert.Equal("http://example.com/values", changeSetContext.Request.GetDisplayUrl());
+        Assert.Equal("http://example.com/odata/values", changeSetContext.Request.GetDisplayUrl());
     }
 
     [Fact]
@@ -443,7 +443,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 1430195875
 
-GET / HTTP/1.1
+GET /odata/ HTTP/1.1
 Host: example.com
 
 
@@ -455,7 +455,7 @@ Content-Type: application/http
 Content-Transfer-Encoding: binary
 Content-ID: 675766617
 
-POST /values HTTP/1.1
+POST /odata/values HTTP/1.1
 Host: example.com
 
 
@@ -485,12 +485,12 @@ Host: example.com
 
         var operationContext = ((OperationRequestItem)requests[0]).Context;
         Assert.Equal("GET", operationContext.Request.Method);
-        Assert.Equal("http://example.com/", operationContext.Request.GetDisplayUrl());
+        Assert.Equal("http://example.com/odata/", operationContext.Request.GetDisplayUrl());
         Assert.Equal("bar", operationContext.Features[typeof(DefaultODataBatchHandlerTest)]);
 
         var changeSetContext = ((ChangeSetRequestItem)requests[1]).Contexts.First();
         Assert.Equal("POST", changeSetContext.Request.Method);
-        Assert.Equal("http://example.com/values", changeSetContext.Request.GetDisplayUrl());
+        Assert.Equal("http://example.com/odata/values", changeSetContext.Request.GetDisplayUrl());
         Assert.Equal("bar", operationContext.Features[typeof(DefaultODataBatchHandlerTest)]);
     }
 
@@ -967,6 +967,467 @@ Prefer: return=representation
         services.AddSingleton<ODataMessageInfo>();
 
         return services.BuildServiceProvider();
+    }
+
+    // ─── Security tests ──────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenSubRequestUriHasDifferentHost()
+    {
+        // Arrange — sub-request URI specifies a different host from the outer batch request.
+        // The batch handler must reject it; sub-request URIs must target the same service.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-auth-check
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET https://other.example.com/admin/diagnostics HTTP/1.1
+Host: other.example.com
+
+--batch-auth-check--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-auth-check";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act & Assert — authority mismatch must be rejected.
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "The batch sub-request URI 'https://other.example.com/admin/diagnostics' has a different authority",
+            partialMatch: true);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenSubRequestUriHasDifferentScheme()
+    {
+        // Arrange — sub-request downgrades from https to http (scheme mismatch).
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-scheme-check
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products HTTP/1.1
+Host: example.com
+
+--batch-scheme-check--
+";
+        // Outer request uses https; sub-request uses plain http.
+        HttpContext httpContext = HttpContextHelper.Create("Post", "https://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-scheme-check";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act & Assert
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "The batch sub-request URI 'http://example.com/odata/Products' has a different authority",
+            partialMatch: true);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenSubRequestUriHasDifferentPort()
+    {
+        // Arrange — sub-request specifies an explicit port that differs from the outer request.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-port-check
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com:9090/odata/Products HTTP/1.1
+Host: example.com:9090
+
+--batch-port-check--
+";
+        // Outer request uses default port 80 (no explicit port); sub-request uses 9090.
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-port-check";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act & Assert — port mismatch must be rejected.
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "has a different authority",
+            partialMatch: true);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenBothRequestsHaveDifferentExplicitPorts()
+    {
+        // Arrange — outer request is on port 8080; sub-request targets port 9090.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-port-mismatch
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com:9090/odata/Products HTTP/1.1
+Host: example.com:9090
+
+--batch-port-mismatch--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com:8080/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-port-mismatch";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act & Assert — different explicit ports must be rejected.
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "has a different authority",
+            partialMatch: true);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Succeeds_WhenSubRequestUriHasSameAuthority()
+    {
+        // Arrange — legitimate batch where sub-request shares the outer request authority.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-same-authority
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products HTTP/1.1
+Host: example.com
+
+
+--batch-same-authority--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-same-authority";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act
+        IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(httpContext);
+
+        // Assert
+        Assert.Single(requests);
+        var operationContext = Assert.IsType<OperationRequestItem>(requests[0]).Context;
+        Assert.Equal("GET", operationContext.Request.Method);
+        Assert.Equal("http://example.com/odata/Products", operationContext.Request.GetDisplayUrl());
+    }
+
+    [Fact]
+    public async Task ProcessBatchAsync_DoesNotCopyBlockedTrustHeadersFromSubRequest()
+    {
+        // Arrange — sub-request carries X-Forwarded-For and X-MS-Client-Principal-Id headers.
+        // Per the OData batch spec these headers must not be copied onto the synthetic sub-request;
+        // the sub-request must inherit the outer request's context for these values.
+        string capturedXForwardedFor = null;
+        string capturedPrincipalId = null;
+        string capturedAccept = null;
+
+        RequestDelegate handler = context =>
+        {
+            capturedXForwardedFor = context.Request.Headers["X-Forwarded-For"].ToString();
+            capturedPrincipalId = context.Request.Headers["X-MS-Client-Principal-Id"].ToString();
+            capturedAccept = context.Request.Headers["Accept"].ToString();
+            return Task.CompletedTask;
+        };
+
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-blocked-headers
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products HTTP/1.1
+Host: example.com
+Accept: application/json
+X-Forwarded-For: 10.0.0.1
+X-MS-Client-Principal-Id: test-user-id
+
+
+--batch-blocked-headers--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-blocked-headers";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act
+        await batchHandler.ProcessBatchAsync(httpContext, handler);
+
+        // Assert — trust headers must be absent; regular headers must pass through.
+        Assert.Empty(capturedXForwardedFor);
+        Assert.Empty(capturedPrincipalId);
+        Assert.Equal("application/json", capturedAccept);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenSubRequestTargetsPathOutsideODataServiceRoot()
+    {
+        // Arrange — sub-request path is not under the OData route prefix.
+        // Sub-request paths must fall within the OData service root.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-path-scope
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/admin/diagnostics HTTP/1.1
+Host: example.com
+
+--batch-path-scope--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-path-scope";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act & Assert — path does not start with /odata; must be rejected.
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "not within the OData service root",
+            partialMatch: true);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenContentIdTraversalEscapesODataServiceRoot()
+    {
+        // Arrange — Content-ID relative reference with dot-segment traversal inside a changeset.
+        // The URI $1/../../../admin/control is resolved by the .NET Uri constructor before
+        // CopyAbsoluteUrl is called: with base http://example.com/odata/ the path normalises to
+        // /admin/control, which is outside the /odata service root.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-cid-traversal
+Content-Type: multipart/mixed; boundary=""cid-inner""
+
+--cid-inner
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 1
+
+POST http://example.com/odata/Customers HTTP/1.1
+Host: example.com
+
+--cid-inner
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+Content-ID: 2
+
+POST $1/../../../admin/control HTTP/1.1
+Host: example.com
+
+--cid-inner--
+
+--batch-cid-traversal--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-cid-traversal";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act & Assert — traversal collapses to /admin/control; must be rejected.
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "not within the OData service root",
+            partialMatch: true);
+    }
+
+    [Fact]
+    public async Task ProcessBatchAsync_DoesNotCopyHostHeaderFromSubRequest()
+    {
+        // Arrange — sub-request carries a Host header that differs from the outer request's host.
+        // CopyAbsoluteUrl sets Request.Host from the validated URI; a Host header in the batch
+        // body must not override it.
+        string capturedHost = null;
+
+        RequestDelegate handler = context =>
+        {
+            capturedHost = context.Request.Host.Value;
+            return Task.CompletedTask;
+        };
+
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-host-header
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products HTTP/1.1
+Host: other.example.com
+
+--batch-host-header--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-host-header";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act
+        await batchHandler.ProcessBatchAsync(httpContext, handler);
+
+        // Assert — Host must reflect the outer request's host, not the batch body value.
+        Assert.Equal("example.com", capturedHost);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Succeeds_WhenSubRequestPathIsUnderServiceRoot()
+    {
+        // Arrange — legitimate sub-request whose path is a child of the /odata prefix.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-valid-scope
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products(1) HTTP/1.1
+Host: example.com
+
+--batch-valid-scope--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-valid-scope";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "odata";
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "odata";
+
+        // Act
+        IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(httpContext);
+
+        // Assert
+        Assert.Single(requests);
+        var operationContext = Assert.IsType<OperationRequestItem>(requests[0]).Context;
+        Assert.Equal("GET", operationContext.Request.Method);
+        Assert.Equal("http://example.com/odata/Products(1)", operationContext.Request.GetDisplayUrl());
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Succeeds_WhenRoutePrefixIsEmptyAndAnyPathAllowed()
+    {
+        // Arrange — OData service is registered at the root (empty route prefix).
+        // Path scope validation must be a no-op in this case: the service root IS the host root,
+        // so every path is by definition within scope.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-root-prefix
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/admin/diagnostics HTTP/1.1
+Host: example.com
+
+--batch-root-prefix--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-root-prefix";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "";  // root-level OData service
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "";
+
+        // Act — must not throw; all paths are within scope for a root-prefix service.
+        IList<ODataBatchRequestItem> requests = await batchHandler.ParseBatchRequestsAsync(httpContext);
+
+        // Assert
+        Assert.Single(requests);
+    }
+
+    [Fact]
+    public async Task ParseBatchRequestsAsync_Throws_WhenSubRequestPathEscapesPathBase()
+    {
+        // Arrange — OData service has no route prefix but the app is mounted under PathBase "/base".
+        // A sub-request targeting /admin (outside /base) must be rejected even though routePrefix
+        // is empty, because the service root is /base, not the host root.
+        DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+        string batchRequest = @"
+--batch-pathbase-escape
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/admin/diagnostics HTTP/1.1
+Host: example.com
+
+--batch-pathbase-escape--
+";
+        HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+        httpContext.Request.PathBase = new PathString("/base");
+        byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+        httpContext.Request.Body = new MemoryStream(requestBytes);
+        httpContext.Request.ContentType = "multipart/mixed;boundary=batch-pathbase-escape";
+        httpContext.Request.ContentLength = requestBytes.Length;
+        IEdmModel model = new EdmModel();
+        httpContext.ODataFeature().RoutePrefix = "";  // no OData prefix, but PathBase = /base
+        httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("", model));
+        httpContext.Response.Body = new MemoryStream();
+        batchHandler.PrefixName = "";
+
+        // Act & Assert — /admin/diagnostics is outside /base; must be rejected.
+        await ExceptionAssert.ThrowsAsync<InvalidOperationException>(
+            () => batchHandler.ParseBatchRequestsAsync(httpContext),
+            "not within the OData service root",
+            partialMatch: true);
     }
 }
 

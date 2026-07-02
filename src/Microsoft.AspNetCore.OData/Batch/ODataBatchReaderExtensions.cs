@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OData;
@@ -32,6 +33,30 @@ public static class ODataBatchReaderExtensions
 
     // do not inherit respond-async and continue-on-error (odata.continue-on-error in OData 4.0) from Prefer header
     private static readonly string[] nonInheritablePreferences = new string[] { "respond-async", "continue-on-error", "odata.continue-on-error" };
+
+    // Headers that must not be copied from the batch body onto the synthetic sub-request.
+    // The OData batch spec (§11.7) prohibits authentication and authorization headers in
+    // sub-requests.  Proxy and gateway headers that carry caller identity or origin signals
+    // are also excluded; the sub-request inherits these from the outer request instead.
+    //
+    // "Host" is included because CopyAbsoluteUrl already sets Request.Host from the validated
+    // sub-request URI, so a Host header in the batch body must not overwrite it.
+    private static readonly HashSet<string> blockedBatchSubRequestHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "Host",
+        "Forwarded",
+        "X-Forwarded-For",
+        "X-Forwarded-Host",
+        "X-Forwarded-Proto",
+        "X-Forwarded-Scheme",
+        "X-Original-Host",
+        "X-Real-IP",
+        "X-ARR-ClientCert",
+        "X-ARR-LOG-ID",
+        "X-MS-Client-Principal-Id",
+        "X-MS-Client-Principal-Name",
+        "X-MS-Client-Principal-IdP",
+    };
 
     /// <summary>
     /// Reads a ChangeSet request.
@@ -141,6 +166,33 @@ public static class ODataBatchReaderExtensions
         }
 
         request.Method = batchRequest.Method;
+
+        // Each sub-request URL must target the same service as the outer batch request.
+        // Sub-request URIs that specify a different scheme, host, or port are rejected.
+        string outerScheme = originalContext.Request.Scheme;
+        HostString outerHost = originalContext.Request.Host;
+        Uri outerBaseUri = new Uri($"{outerScheme}://{outerHost}/");
+        if (Uri.Compare(requestUri, outerBaseUri, UriComponents.SchemeAndServer, UriFormat.SafeUnescaped, StringComparison.OrdinalIgnoreCase) != 0)
+        {
+            throw Error.InvalidOperation(
+                SRResources.BatchRequestUriAuthorityMismatch,
+                requestUri.AbsoluteUri,
+                $"{outerScheme}://{outerHost}");
+        }
+
+        // Each sub-request path must fall within the OData service root.  Absolute URLs targeting
+        // other paths and Content-ID references that resolve outside the service root via
+        // dot-segment traversal (e.g. $1/../../../other) are both rejected here.
+        string routePrefix = originalContext.ODataFeature()?.RoutePrefix;
+        if (!IsPathWithinServiceRoot(requestUri.AbsolutePath, routePrefix, originalContext.Request.PathBase))
+        {
+            string serviceRoot = BuildServiceRootPath(routePrefix, originalContext.Request.PathBase);
+            throw Error.InvalidOperation(
+                SRResources.BatchSubRequestPathNotUnderServiceRoot,
+                requestUri.AbsoluteUri,
+                $"{outerScheme}://{outerHost}{serviceRoot}");
+        }
+
         request.CopyAbsoluteUrl(requestUri);
 
         // Not using bufferContentStream. Unlike AspNet, AspNetCore cannot guarantee the disposal
@@ -163,6 +215,15 @@ public static class ODataBatchReaderExtensions
         {
             string headerName = header.Key;
             string headerValue = header.Value;
+
+            // The OData batch spec requires sub-requests to omit authentication and authorization
+            // headers.  In addition, proxy/gateway headers that carry caller identity or origin
+            // signals are excluded so that the synthetic sub-request reflects the outer request's
+            // context rather than values supplied in the batch body.
+            if (blockedBatchSubRequestHeaders.Contains(headerName))
+            {
+                continue;
+            }
 
             if (headerName.Trim().ToUpperInvariant() == "PREFER")
             {
@@ -405,4 +466,40 @@ public static class ODataBatchReaderExtensions
             yield return preferences.Substring(preferenceStartIndex).Trim();
         }
     }
+
+    // Returns true when the sub-request's absolute path falls within the OData service root.
+    // Batch sub-requests are intended to address resources within the same OData service;
+    // this check prevents requests that pass the authority check from reaching unrelated
+    // in-process routes via a same-authority absolute URL or via dot-segment traversal in a
+    // Content-ID reference ($1/../../../other), which the .NET Uri constructor normalises.
+    //
+    // Only when both routePrefix and pathBase are absent (true host-root service) is every
+    // path in scope.  If the app is mounted under a PathBase (e.g. "/base") sub-requests
+    // must still fall under that base even when there is no OData route prefix.
+    private static bool IsPathWithinServiceRoot(string requestPath, string routePrefix, PathString pathBase)
+    {
+        if (string.IsNullOrEmpty(routePrefix) && !pathBase.HasValue)
+        {
+            return true;
+        }
+
+        string serviceRoot = BuildServiceRootPath(routePrefix, pathBase);
+
+        // The request path must equal the service root exactly OR begin with the service root
+        // followed by '/' (a child resource).  The trailing-slash requirement prevents a prefix
+        // like '/odata' from accidentally matching '/odata-admin'.
+        return string.Equals(requestPath, serviceRoot, StringComparison.OrdinalIgnoreCase)
+            || requestPath.StartsWith(serviceRoot + "/", StringComparison.OrdinalIgnoreCase);
+    }
+
+    // Builds the expected path prefix for the OData service root, combining the ASP.NET Core
+    // path base (for apps mounted under a sub-path) with the OData route prefix.
+    private static string BuildServiceRootPath(string routePrefix, PathString pathBase)
+    {
+        string basePart = pathBase.HasValue ? pathBase.Value.TrimEnd('/') : string.Empty;
+        return string.IsNullOrEmpty(routePrefix)
+            ? (string.IsNullOrEmpty(basePart) ? "/" : basePart)
+            : (basePart + "/" + routePrefix);
+    }
+
 }
