@@ -671,6 +671,92 @@ public class DefaultSkipTokenHandlerTests
             skipTokenCustomer.Name);
     }
 
+    // ---- Tests for properties excluded from the EDM model ----
+
+    private static IEdmModel _openModelWithIgnoredProp = GetOpenEdmModelWithIgnoredProp();
+
+    [Fact]
+    public void GenerateSkipTokenValue_DoesNotInclude_IgnoredCLRProperty_WhenOrderedByUndeclaredOpenProperty()
+    {
+        // Arrange: open entity type where ExcludedToken is omitted from the EDM model via .Ignore().
+        // Ordering by an undeclared open property name must not include its CLR value in the skip token.
+        IgnoredPropertyCustomer lastMember = new IgnoredPropertyCustomer
+        {
+            Id = 42,
+            Name = "Alice",
+            ExcludedToken = "clr-only-value",
+            DynamicProperties = new System.Collections.Generic.Dictionary<string, object>()
+        };
+
+        OrderByClause clause = BuildOpenPropertyOrderByClause(_openModelWithIgnoredProp, "ExcludedToken", "Customers");
+
+        // Act
+        string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _openModelWithIgnoredProp, clause);
+
+        // Assert: the CLR value of the excluded property must not appear in the skip token
+        Assert.NotNull(skipTokenValue);
+        Assert.DoesNotContain("clr-only-value", skipTokenValue, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void GenerateSkipTokenValue_StillWorks_ForDeclaredProperty_WhenUndeclaredPropertyIsIgnored()
+    {
+        // Regression guard: the fix must not break skip token generation for declared EDM properties.
+        IgnoredPropertyCustomer lastMember = new IgnoredPropertyCustomer { Id = 7, Name = "Bob" };
+
+        OrderByClause clause = BuildDeclaredPropertyOrderByClause(_openModelWithIgnoredProp, "Name", "Customers");
+
+        // Act
+        string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _openModelWithIgnoredProp, clause);
+
+        // Assert: skip token contains the declared Name value followed by the key
+        Assert.Equal("Name-%27Bob%27,Id-7", skipTokenValue);
+    }
+
+    private static OrderByClause BuildOpenPropertyOrderByClause(IEdmModel edmModel, string openPropertyName, string entitySetName)
+    {
+        IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+            .First(c => c.Name == "IgnoredPropertyCustomer");
+        IEdmNavigationSource entitySet = edmModel.FindDeclaredEntitySet(entitySetName);
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable(
+            "$it", new EdmEntityTypeReference(entityType, true), entitySet);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+        // This is the node the OData URI parser emits for an undeclared property name on an open type
+        SingleValueOpenPropertyAccessNode openNode = new SingleValueOpenPropertyAccessNode(source, openPropertyName);
+        return new OrderByClause(null, openNode, OrderByDirection.Ascending, rangeVariable);
+    }
+
+    private static OrderByClause BuildDeclaredPropertyOrderByClause(IEdmModel edmModel, string propertyName, string entitySetName)
+    {
+        IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+            .First(c => c.Name == "IgnoredPropertyCustomer");
+        IEdmProperty property = entityType.FindProperty(propertyName);
+        IEdmNavigationSource entitySet = edmModel.FindDeclaredEntitySet(entitySetName);
+        ResourceRangeVariable rangeVariable = new ResourceRangeVariable(
+            "$it", new EdmEntityTypeReference(entityType, true), entitySet);
+        ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+        SingleValuePropertyAccessNode node = new SingleValuePropertyAccessNode(source, property);
+        return new OrderByClause(null, node, OrderByDirection.Ascending, rangeVariable);
+    }
+
+    private static IEdmModel GetOpenEdmModelWithIgnoredProp()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder { ModelAliasingEnabled = false };
+        var entitySet = builder.EntitySet<IgnoredPropertyCustomer>("Customers");
+        entitySet.EntityType.Ignore(c => c.ExcludedToken); // omitted from the EDM model
+        return builder.GetEdmModel();
+    }
+
+    public class IgnoredPropertyCustomer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public IDictionary<string, object> DynamicProperties { get; set; }
+        // Omitted from the EDM model via .Ignore()
+        public string ExcludedToken { get; set; }
+    }
+
     [DataContract]
     public class SkipCustomer
     {
