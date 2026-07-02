@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter.Value;
@@ -92,6 +93,25 @@ internal abstract class SelectExpandWrapper : IEdmEntityObject, ISelectExpandWra
         {
             IEdmTypeReference edmTypeReference = GetEdmType();
             IEdmModel model = Model;
+
+            // Restrict the CLR fallback to properties that are declared in the EDM model or are
+            // the open-type dynamic-property container (IDictionary<string,object> bag).
+            // Property names not found in the container that are also not EDM-declared have no
+            // basis for CLR resolution and are returned as not found.
+            if (edmTypeReference is IEdmStructuredTypeReference structuredTypeRef && model != null)
+            {
+                if (structuredTypeRef.FindProperty(propertyName) == null)
+                {
+                    PropertyInfo dynamicContainerProp =
+                        model.GetDynamicPropertyDictionary(structuredTypeRef.StructuredDefinition());
+                    if (dynamicContainerProp == null || dynamicContainerProp.Name != propertyName)
+                    {
+                        value = null;
+                        return false;
+                    }
+                }
+            }
+
             if (edmTypeReference is IEdmComplexTypeReference)
             {
                 _typedEdmStructuredObject = _typedEdmStructuredObject ??
