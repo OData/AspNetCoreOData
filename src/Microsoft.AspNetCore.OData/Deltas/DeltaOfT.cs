@@ -40,7 +40,7 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
     private HashSet<string> _changedProperties;
 
     // Nested resources or structures changed at this level.
-    private IDictionary<string, object> _deltaNestedResources;
+    private Dictionary<string, object> _deltaNestedResources;
 
     private T _instance;
     private Type _structuredType;
@@ -324,7 +324,10 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
     /// </summary>
     public override IEnumerable<string> GetChangedPropertyNames()
     {
-        return _changedProperties.Intersect(_updatableProperties).Concat(_deltaNestedResources.Keys);
+        // Filter the changed structural properties and the changed nested resources by the updatable
+        // properties in a single pass, so a name removed from UpdatableProperties is excluded whether
+        // it is a structural property or a nested resource.
+        return _changedProperties.Concat(_deltaNestedResources.Keys).Intersect(_updatableProperties);
     }
 
     /// <summary>
@@ -343,7 +346,39 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
     /// </summary>
     public override IDictionary<string, object> GetDeltaNestedNavigationProperties()
     {
-        return _deltaNestedResources;
+        // Keep this consistent with GetChangedPropertyNames: only expose nested resources whose
+        // name is still in UpdatableProperties, so a nested resource removed from the list after
+        // deserialization is neither reported nor written.
+        if (_deltaNestedResources.Count == 0)
+        {
+            return _deltaNestedResources;
+        }
+
+        bool anyTrimmed = false;
+        foreach (string nestedResourceName in _deltaNestedResources.Keys)
+        {
+            if (!_updatableProperties.Contains(nestedResourceName))
+            {
+                anyTrimmed = true;
+                break;
+            }
+        }
+
+        if (!anyTrimmed)
+        {
+            return _deltaNestedResources;
+        }
+
+        Dictionary<string, object> updatableNestedResources = new Dictionary<string, object>(_deltaNestedResources.Count);
+        foreach (KeyValuePair<string, object> pair in _deltaNestedResources)
+        {
+            if (_updatableProperties.Contains(pair.Key))
+            {
+                updatableNestedResources.Add(pair.Key, pair.Value);
+            }
+        }
+
+        return updatableNestedResources;
     }
 
     /// <summary>
@@ -380,6 +415,13 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
         // For nested resources.
         foreach (string nestedResourceName in _deltaNestedResources.Keys)
         {
+            // Skip nested resources that are not in the updatable properties list,
+            // consistent with how the structural properties above are handled.
+            if (!_updatableProperties.Contains(nestedResourceName))
+            {
+                continue;
+            }
+
             // Patch for each nested resource changed under this T.
             dynamic deltaNestedResource = _deltaNestedResources[nestedResourceName];
 
