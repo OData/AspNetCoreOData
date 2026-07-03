@@ -668,7 +668,8 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         services.ConfigureControllers(
             typeof(SkipTokenPagingS1CustomersController),
             typeof(SkipTokenPagingS2CustomersController),
-            typeof(SkipTokenPagingS3CustomersController));
+            typeof(SkipTokenPagingS3CustomersController),
+            typeof(SkipTokenPagingS4CustomersController));
         services.AddControllers().AddOData(opt => opt.Expand().OrderBy().SkipToken().AddRouteComponents("{a}", model));
     }
 
@@ -678,6 +679,7 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS1Customers");
         builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS2Customers");
         builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS3Customers");
+        builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS4Customers");
 
         return builder.GetEdmModel();
     }
@@ -1107,6 +1109,106 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         Assert.Single(pageResult);
         Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
         Assert.Null((pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
+        Assert.Null(content.GetValue("@odata.nextLink"));
+    }
+
+    public static TheoryData<string, int, bool?, int, bool?> NullableBoolAscendingPageData =>
+        new TheoryData<string, int, bool?, int, bool?>
+        {
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified", 1, null, 3, null },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-null,Id-3", 5, null, 2, false },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-false,Id-2", 7, false, 4, true },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-true,Id-4", 6, true, 8, true },
+        };
+
+    [Theory]
+    [MemberData(nameof(NullableBoolAscendingPageData))]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolProperty(string requestUri, int idAt0, bool? isVerifiedAt0, int idAt1, bool? isVerifiedAt1)
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUri));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Equal(2, pageResult.Count);
+        Assert.Equal(idAt0, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(isVerifiedAt0, (pageResult[0] as JObject)["IsVerified"].ToObject<bool?>());
+        Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(isVerifiedAt1, (pageResult[1] as JObject)["IsVerified"].ToObject<bool?>());
+
+        string expectedSkipToken = "$skiptoken=IsVerified-" +
+            (isVerifiedAt1 != null ? isVerifiedAt1.Value.ToString().ToLowerInvariant() : "null") +
+            ",Id-" + idAt1;
+        string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+        Assert.NotNull(nextPageLink);
+        Assert.EndsWith("/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&" + expectedSkipToken, nextPageLink);
+    }
+
+    [Fact]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolProperty_LastPage()
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get,
+            "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-true,Id-8"));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Single(pageResult);
+        Assert.Equal(9, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.True((pageResult[0] as JObject)["IsVerified"].ToObject<bool?>());
+        Assert.Null(content.GetValue("@odata.nextLink"));
+    }
+
+    public static TheoryData<string, int, bool?> NullableBoolDescendingPageData =>
+        new TheoryData<string, int, bool?>
+        {
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc", 6, true },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-true,Id-6", 9, true },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-true,Id-9", 7, false },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-false,Id-7", 3, null },
+        };
+
+    [Theory]
+    [MemberData(nameof(NullableBoolDescendingPageData))]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolPropertyDescending(string requestUri, int idAt1, bool? isVerifiedAt1)
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUri));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Equal(2, pageResult.Count);
+        Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(isVerifiedAt1, (pageResult[1] as JObject)["IsVerified"].ToObject<bool?>());
+
+        string expectedSkipToken = "$skiptoken=IsVerified-" +
+            (isVerifiedAt1 != null ? isVerifiedAt1.Value.ToString().ToLowerInvariant() : "null") +
+            ",Id-" + idAt1;
+        string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+        Assert.NotNull(nextPageLink);
+        Assert.EndsWith("/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&" + expectedSkipToken, nextPageLink);
+    }
+
+    [Fact]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolPropertyDescending_LastPage()
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get,
+            "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-null,Id-3"));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Single(pageResult);
+        Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.Null((pageResult[0] as JObject)["IsVerified"].ToObject<bool?>());
         Assert.Null(content.GetValue("@odata.nextLink"));
     }
 }
