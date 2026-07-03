@@ -514,6 +514,394 @@ public class DeltaTest
     }
 
     [Fact]
+    public void Patch_DoesNotCopyNestedResource_WhenNestedPropertyRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+        dynamic originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        deltaCustomer.FirstName = "Alice";
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaAddress.StreetAddress = "23213 NE 15th Ct";
+        deltaCustomer.Address = deltaAddress;
+
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Act
+        deltaCustomer.Patch(originalCustomer);
+
+        // Assert - the nested resource is left exactly as it was
+        Assert.Same(originalAddress, originalCustomer.Address);
+        Assert.Equal(1, originalCustomer.Address.ID);
+        Assert.Equal("Redmond", originalCustomer.Address.City);
+        Assert.Equal("WA", originalCustomer.Address.State);
+        Assert.Equal("21110 NE 44th St", originalCustomer.Address.StreetAddress);
+        Assert.Equal(98074, originalCustomer.Address.ZipCode);
+
+        // Assert - properties still in the list are applied
+        Assert.Equal("Alice", originalCustomer.FirstName);
+        Assert.Equal("Smith", originalCustomer.LastName);
+    }
+
+    [Fact]
+    public void Patch_DoesNotSetNestedResource_WhenNestedPropertyRemovedFromUpdatableProperties_AndOriginalIsNull()
+    {
+        // Arrange
+        dynamic originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = null };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaAddress.StreetAddress = "23213 NE 15th Ct";
+        deltaCustomer.Address = deltaAddress;
+
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Act
+        deltaCustomer.Patch(originalCustomer);
+
+        // Assert - the nested resource is not created
+        Assert.Null(originalCustomer.Address);
+    }
+
+    [Fact]
+    public void Patch_DoesNotCopyNestedResource_WhenUpdatablePropertiesCleared()
+    {
+        // Arrange
+        dynamic originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+        dynamic originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        deltaCustomer.FirstName = "Alice";
+        deltaCustomer.LastName = "Johnson";
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        deltaCustomer.UpdatableProperties.Clear();
+
+        // Act
+        deltaCustomer.Patch(originalCustomer);
+
+        // Assert - nothing is copied
+        Assert.Same(originalAddress, originalCustomer.Address);
+        Assert.Equal("Redmond", originalCustomer.Address.City);
+        Assert.Equal("Bob", originalCustomer.FirstName);
+        Assert.Equal("Smith", originalCustomer.LastName);
+    }
+
+    [Fact]
+    public void Patch_CopiesNestedResource_WhenNestedPropertyReAddedToUpdatableProperties()
+    {
+        // Arrange
+        dynamic originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+        dynamic originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaAddress.StreetAddress = "23213 NE 15th Ct";
+        deltaCustomer.Address = deltaAddress;
+
+        deltaCustomer.UpdatableProperties.Remove("Address");
+        deltaCustomer.UpdatableProperties.Add("Address");
+
+        // Act
+        deltaCustomer.Patch(originalCustomer);
+
+        // Assert - changed nested values are copied
+        Assert.Equal("Sammamish", originalCustomer.Address.City);
+        Assert.Equal("23213 NE 15th Ct", originalCustomer.Address.StreetAddress);
+        // unchanged nested values stay
+        Assert.Equal("WA", originalCustomer.Address.State);
+        Assert.Equal(98074, originalCustomer.Address.ZipCode);
+    }
+
+    [Fact]
+    public void Patch_CopiesOnlyNestedResource_WhenUpdatablePropertiesLimitedToNestedProperty()
+    {
+        // Arrange
+        dynamic originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+        dynamic originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        deltaCustomer.FirstName = "Alice";
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        deltaCustomer.UpdatableProperties.Clear();
+        deltaCustomer.UpdatableProperties.Add("Address");
+
+        // Act
+        deltaCustomer.Patch(originalCustomer);
+
+        // Assert - the nested resource is copied
+        Assert.Equal("Sammamish", originalCustomer.Address.City);
+        // Assert - the scalar property left out of the list is not copied
+        Assert.Equal("Bob", originalCustomer.FirstName);
+    }
+
+    [Fact]
+    public void Put_DoesNotCopyNestedResource_WhenNestedPropertyRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+        dynamic originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaAddress.StreetAddress = "23213 NE 15th Ct";
+        deltaCustomer.Address = deltaAddress;
+
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Act
+        deltaCustomer.Put(originalCustomer);
+
+        // Assert - the nested resource is neither copied nor reset
+        Assert.Same(originalAddress, originalCustomer.Address);
+        Assert.Equal("Redmond", originalCustomer.Address.City);
+        Assert.Equal("WA", originalCustomer.Address.State);
+        Assert.Equal("21110 NE 44th St", originalCustomer.Address.StreetAddress);
+        Assert.Equal(98074, originalCustomer.Address.ZipCode);
+    }
+
+    [Fact]
+    public void Patch_CopiesOnlyAllowedNestedResource_WhenOneOfMultipleNestedPropertiesRemoved()
+    {
+        // Arrange
+        dynamic originalHome = new AddressEntity { ID = 1, City = "Redmond", StreetAddress = "21110 NE 44th St" };
+        dynamic originalWork = new AddressEntity { ID = 2, City = "Bellevue", StreetAddress = "15700 NE 39th St" };
+        dynamic originalCustomer = new MultiAddressCustomerEntity { ID = 7, HomeAddress = originalHome, WorkAddress = originalWork };
+
+        dynamic deltaCustomer = new Delta<MultiAddressCustomerEntity>();
+
+        dynamic deltaHome = new Delta<AddressEntity>();
+        deltaHome.City = "Sammamish";
+        deltaCustomer.HomeAddress = deltaHome;
+
+        dynamic deltaWork = new Delta<AddressEntity>();
+        deltaWork.City = "Kirkland";
+        deltaCustomer.WorkAddress = deltaWork;
+
+        // Only HomeAddress is removed from the updatable list; WorkAddress stays
+        deltaCustomer.UpdatableProperties.Remove("HomeAddress");
+
+        // Act
+        deltaCustomer.Patch(originalCustomer);
+
+        // Assert - the removed nested resource is left exactly as it was
+        Assert.Same(originalHome, originalCustomer.HomeAddress);
+        Assert.Equal("Redmond", originalCustomer.HomeAddress.City);
+        Assert.Equal("21110 NE 44th St", originalCustomer.HomeAddress.StreetAddress);
+
+        // Assert - the nested resource still in the list is updated
+        Assert.Equal("Kirkland", originalCustomer.WorkAddress.City);
+        Assert.Equal("15700 NE 39th St", originalCustomer.WorkAddress.StreetAddress);
+    }
+
+    [Fact]
+    public void GetChangedPropertyNames_ExcludesNestedResource_WhenNestedPropertyRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        deltaCustomer.FirstName = "Alice";
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        // both are reported as changed initially
+        var initialChangedPropertyNames = (IEnumerable<string>)deltaCustomer.GetChangedPropertyNames();
+        Assert.Contains("Address", initialChangedPropertyNames);
+        Assert.Contains("FirstName", initialChangedPropertyNames);
+
+        // Act
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Assert
+        var changedPropertyNames = (IEnumerable<string>)deltaCustomer.GetChangedPropertyNames();
+        Assert.DoesNotContain("Address", changedPropertyNames);
+        Assert.Contains("FirstName", changedPropertyNames);
+    }
+
+    [Fact]
+    public void GetUnchangedPropertyNames_ExcludesNestedResource_WhenNestedPropertyRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        // Act
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Assert - the removed nested resource is reported as neither changed nor unchanged
+        var changedPropertyNames = (IEnumerable<string>)deltaCustomer.GetChangedPropertyNames();
+        var unchangedPropertyNames = (IEnumerable<string>)deltaCustomer.GetUnchangedPropertyNames();
+        Assert.DoesNotContain("Address", changedPropertyNames);
+        Assert.DoesNotContain("Address", unchangedPropertyNames);
+    }
+
+    [Fact]
+    public void Put_CopiesNestedResource_WhenNestedPropertyInUpdatableProperties()
+    {
+        // Arrange
+        var originalAddress = new AddressEntity { ID = 1, City = "Redmond", State = "WA", StreetAddress = "21110 NE 44th St", ZipCode = 98074 };
+        var originalCustomer = new CustomerEntity { ID = 7, FirstName = "Bob", LastName = "Smith", Address = originalAddress };
+
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        // Act - Address is left in the updatable list
+        deltaCustomer.Put(originalCustomer);
+
+        // Assert - the nested change is applied
+        Assert.Equal("Sammamish", originalCustomer.Address.City);
+    }
+
+    [Fact]
+    public void TryGetPropertyValue_StillReturnsNestedDelta_AfterNestedPropertyRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        // Act - remove the nested resource from the updatable list
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Assert - the raw nested value is still retrievable (removal gates apply/enumeration, not Get)
+        Assert.True(ideltaCustomer.TryGetPropertyValue("Address", out object address));
+        Assert.IsAssignableFrom<Delta<AddressEntity>>(address);
+
+        // Assert - but it is excluded from the changed set
+        Assert.DoesNotContain("Address", ideltaCustomer.GetChangedPropertyNames());
+    }
+
+    [Fact]
+    public void GetDeltaNestedNavigationProperties_ReturnsNestedResource_WhenNothingRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        // Act - common case: nothing trimmed
+        var nested = ideltaCustomer.GetDeltaNestedNavigationProperties();
+
+        // Assert - the nested resource is exposed
+        Assert.True(nested.ContainsKey("Address"));
+    }
+
+    [Fact]
+    public void GetDeltaNestedNavigationProperties_ExcludesNestedResource_WhenNestedPropertyRemovedFromUpdatableProperties()
+    {
+        // Arrange
+        dynamic deltaCustomer = new Delta<CustomerEntity>();
+        IDelta ideltaCustomer = deltaCustomer as IDelta;
+
+        dynamic deltaAddress = new Delta<AddressEntity>();
+        deltaAddress.City = "Sammamish";
+        deltaCustomer.Address = deltaAddress;
+
+        // present before trimming
+        Assert.True(ideltaCustomer.GetDeltaNestedNavigationProperties().ContainsKey("Address"));
+
+        // Act - remove the nested resource from the updatable list
+        deltaCustomer.UpdatableProperties.Remove("Address");
+
+        // Assert - excluded from the nested-resource accessor, consistent with GetChangedPropertyNames
+        Assert.False(ideltaCustomer.GetDeltaNestedNavigationProperties().ContainsKey("Address"));
+        Assert.DoesNotContain("Address", ideltaCustomer.GetChangedPropertyNames());
+    }
+
+    [Fact]
+    public void Patch_HonorsInnerUpdatableProperties_WhenNestedResourceTrimmedAtInnerLevel()
+    {
+        // Arrange - two levels of nesting: Company -> Department -> Location
+        var originalLocation = new DeepLocationEntity { ID = 1, City = "Redmond", Building = "Building 1" };
+        var originalDepartment = new DeepDepartmentEntity { ID = 1, Name = "Engineering", Location = originalLocation };
+        var originalCompany = new DeepCompanyEntity { ID = 1, Name = "Contoso", Department = originalDepartment };
+
+        dynamic deltaCompany = new Delta<DeepCompanyEntity>();
+        deltaCompany.Name = "Contoso Ltd";
+
+        dynamic deltaDepartment = new Delta<DeepDepartmentEntity>();
+        deltaDepartment.Name = "Research";
+
+        dynamic deltaLocation = new Delta<DeepLocationEntity>();
+        deltaLocation.City = "Bellevue";
+        deltaLocation.Building = "Building 42";
+        deltaDepartment.Location = deltaLocation;
+
+        deltaCompany.Department = deltaDepartment;
+
+        // Trim the innermost nested resource on the INNER (Department) delta
+        deltaDepartment.UpdatableProperties.Remove("Location");
+
+        // Act
+        deltaCompany.Patch(originalCompany);
+
+        // Assert - outer and middle scalar changes are applied
+        Assert.Equal("Contoso Ltd", originalCompany.Name);
+        Assert.Equal("Research", originalCompany.Department.Name);
+
+        // Assert - the innermost nested resource is left unchanged (inner trim honored through recursion)
+        Assert.Same(originalLocation, originalCompany.Department.Location);
+        Assert.Equal("Redmond", originalCompany.Department.Location.City);
+        Assert.Equal("Building 1", originalCompany.Department.Location.Building);
+    }
+
+    [Fact]
+    public void Patch_AppliesDeeplyNestedChanges_WhenInnerUpdatablePropertiesUntrimmed()
+    {
+        // Arrange - two levels of nesting, nothing trimmed
+        var originalLocation = new DeepLocationEntity { ID = 1, City = "Redmond", Building = "Building 1" };
+        var originalDepartment = new DeepDepartmentEntity { ID = 1, Name = "Engineering", Location = originalLocation };
+        var originalCompany = new DeepCompanyEntity { ID = 1, Name = "Contoso", Department = originalDepartment };
+
+        dynamic deltaCompany = new Delta<DeepCompanyEntity>();
+
+        dynamic deltaDepartment = new Delta<DeepDepartmentEntity>();
+
+        dynamic deltaLocation = new Delta<DeepLocationEntity>();
+        deltaLocation.City = "Bellevue";
+        deltaDepartment.Location = deltaLocation;
+
+        deltaCompany.Department = deltaDepartment;
+
+        // Act
+        deltaCompany.Patch(originalCompany);
+
+        // Assert - the innermost change is applied through two levels of recursion
+        Assert.Equal("Bellevue", originalCompany.Department.Location.City);
+        // untouched innermost value stays
+        Assert.Equal("Building 1", originalCompany.Department.Location.Building);
+    }
+
+    [Fact]
     public void TestDelta_IgnoresUnmapped()
     {
         //Arrange
@@ -1104,6 +1492,15 @@ public class DeltaTest
         public AddressEntity Address { get; set; }
     }
 
+    public class MultiAddressCustomerEntity
+    {
+        public int ID { get; set; }
+
+        public AddressEntity HomeAddress { get; set; }
+
+        public AddressEntity WorkAddress { get; set; }
+    }
+
     public class AddressEntity : IEquatable<AddressEntity>
     {
         public int ID { get; set; }
@@ -1155,5 +1552,32 @@ public class DeltaTest
         public IDictionary<string, object> Dynamics { get; set; }
 
         public IDictionary<string, object> NonSetDynamics { get; }
+    }
+
+    public class DeepCompanyEntity
+    {
+        public int ID { get; set; }
+
+        public string Name { get; set; }
+
+        public DeepDepartmentEntity Department { get; set; }
+    }
+
+    public class DeepDepartmentEntity
+    {
+        public int ID { get; set; }
+
+        public string Name { get; set; }
+
+        public DeepLocationEntity Location { get; set; }
+    }
+
+    public class DeepLocationEntity
+    {
+        public int ID { get; set; }
+
+        public string City { get; set; }
+
+        public string Building { get; set; }
     }
 }
