@@ -11,6 +11,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.OData;
@@ -31,6 +32,8 @@ public class DefaultSkipTokenHandlerTests
     private static IEdmModel _modelLowerCamelCased = GetEdmModelLowerCamelCased();
 
     private static IEdmModel _modelAliased = GetEdmModelAliased();
+
+    private static IEdmModel _openModel = GetOpenEdmModel();
 
     [Fact]
     public void GenerateNextPageLink_ReturnsNull_NullContext()
@@ -204,7 +207,7 @@ public class DefaultSkipTokenHandlerTests
         GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
             _model,
             "Gender",
-            "Gender-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,Id-42");
+            "Gender-Microsoft.AspNetCore.OData.Tests.Query.Gender%27Male%27,Id-42");
     }
 
     [Fact]
@@ -213,7 +216,7 @@ public class DefaultSkipTokenHandlerTests
         GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
             _modelLowerCamelCased,
             "gender",
-            "gender-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,id-42");
+            "gender-Microsoft.AspNetCore.OData.Tests.Query.Gender%27Male%27,id-42");
     }
 
     [Fact]
@@ -222,7 +225,7 @@ public class DefaultSkipTokenHandlerTests
         GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
             _modelAliased,
             "MaleOrFemale",
-            "MaleOrFemale-Microsoft.AspNetCore.OData.Tests.Query.DefaultSkipTokenHandlerTests%2BGender%27Male%27,SkipCustomerId-42");
+            "MaleOrFemale-Microsoft.AspNetCore.OData.Tests.Query.Gender%27Male%27,SkipCustomerId-42");
     }
 
     [Fact]
@@ -343,6 +346,653 @@ public class DefaultSkipTokenHandlerTests
             "FirstAndLastName-'Alex',SkipCustomerId-3");
     }
 
+    [Theory]
+    [InlineData("Id-2) or (1 eq 1", 1)]    // sanitized: Id > 2 → only {Id:3}
+    [InlineData("Id-42) or (1 eq 1", 0)]   // sanitized: Id > 42 → nothing
+    [InlineData("Id-1) or (1 eq 1", 2)]    // sanitized: Id > 1 → {Id:2, Id:3}
+    public void ApplyTo_IgnoresTrailingCharacters_WhenIntegerKeyValueContainsMalformedSuffix(
+        string skipTokenRawValue, int expectedCount)
+    {
+        // ConvertFromUriLiteral parses only the leading integer; extra characters are discarded.
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenRawValue, context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Name = "Andy" },
+            new SkipCustomer { Id = 2, Name = "Aaron" },
+            new SkipCustomer { Id = 3, Name = "Alex" }
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = handler.ApplyTo(
+            customers,
+            skipTokenQuery,
+            new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False },
+            queryOptions).ToArray();
+
+        // Assert
+        Assert.Equal(expectedCount, results.Length);
+    }
+
+    [Theory]
+    [InlineData("Name-'ZX') or (1 eq 1,Id-42")]  // extra expression after closing quote
+    [InlineData("Name-'ZX' or 1 eq 1,Id-42")]     // extra expression after closing quote (no paren)
+    public void ApplyTo_IgnoresTrailingCharacters_WhenStringValueContainsMalformedSuffix(string skipTokenRawValue)
+    {
+        // ConvertFromUriLiteral reads only the string literal up to the closing quote; extra characters are discarded.
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            "http://server/Customers?$orderby=Name asc&$skiptoken=" + skipTokenRawValue);
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenRawValue, context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Name = "Andy" },
+            new SkipCustomer { Id = 2, Name = "Aaron" },
+            new SkipCustomer { Id = 3, Name = "Alex" }
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = handler.ApplyTo(
+            customers,
+            skipTokenQuery,
+            new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False },
+            queryOptions).ToArray();
+
+        // Assert
+        Assert.Empty(results);
+    }
+
+    [Fact]
+    public void ApplyTo_ThrowsInvalidOperationException_WhenSegmentCountMismatchesOrderByCount()
+    {
+        // Stable order yields 1 clause; a token with 2 segments must be rejected.
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create("Get", "http://localhost/");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+
+        // 2-segment token for an entity whose stable order yields 1 clause
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Id-1,Name-'Alex'", context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>().AsQueryable();
+
+        // Act & Assert
+        ExceptionAssert.Throws<InvalidOperationException>(
+            () => handler.ApplyTo(customers, skipTokenQuery, new ODataQuerySettings(), queryOptions),
+            "Unable to get property values from the skiptoken value, or the token value can not match the orderby clause.");
+    }
+
+    [Fact]
+    public void ApplyTo_StillWorks_WithLegitimateIntegerSkipToken()
+    {
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create("Get", "http://localhost/?$skiptoken=Id-2");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Id-2", context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Name = "Andy" },
+            new SkipCustomer { Id = 2, Name = "Aaron" },
+            new SkipCustomer { Id = 3, Name = "Alex" }
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = handler.ApplyTo(
+            customers,
+            skipTokenQuery,
+            new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False },
+            queryOptions).ToArray();
+
+        // Assert — only Id=3 (Alex) is after the token value of 2
+        SkipCustomer result = Assert.Single(results);
+        Assert.Equal(3, result.Id);
+    }
+
+    [Fact]
+    public void ApplyTo_StillWorks_WithLegitimateStringOrderBySkipToken()
+    {
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            "http://server/Customers?$orderby=Name asc&$skiptoken=Name-'Aaron',Id-2");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Name-'Aaron',Id-2", context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Name = "Andy" },
+            new SkipCustomer { Id = 2, Name = "Aaron" },
+            new SkipCustomer { Id = 3, Name = "Alex" }
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = handler.ApplyTo(
+            customers,
+            skipTokenQuery,
+            new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False },
+            queryOptions).ToArray();
+
+        // Assert — "Alex" (Id=3) and "Andy" (Id=1) come after "Aaron" alphabetically
+        Assert.Equal(2, results.Length);
+        Assert.Contains(results, c => c.Name == "Alex");
+        Assert.Contains(results, c => c.Name == "Andy");
+    }
+
+    [Fact]
+    public void ApplyTo_DoesNotValidateFilterSettings_ForSyntheticSkipTokenFilter()
+    {
+        // The synthetic skip-token filter must not be validated against ODataValidationSettings.
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            "http://server/Customers?$orderby=Name asc&$skiptoken=Name-'Aaron',Id-2");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+
+        context.ValidationSettings = new ODataValidationSettings
+        {
+            AllowedLogicalOperators = AllowedLogicalOperators.None
+        };
+
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Name-'Aaron',Id-2", context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 3, Name = "Bob" },
+            new SkipCustomer { Id = 4, Name = "Carol" },
+        }.AsQueryable();
+
+        // Act — must NOT throw even though AllowedLogicalOperators.None is set
+        IQueryable result = handler.ApplyTo(customers, skipTokenQuery, new ODataQuerySettings(), queryOptions);
+
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void ApplyTo_ThrowsNotSupportedException_ForTypelessODataQueryContext()
+    {
+        // ODataQueryContext built from an IEdmType leaves ElementClrType null.
+        IEdmEntitySet entitySet = _model.EntityContainer.FindEntitySet("Customers");
+        IEdmEntityType edmEntityType = entitySet.EntityType;
+
+        ODataQueryContext typelessContext = new ODataQueryContext(_model, (IEdmType)edmEntityType, null);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Id-1", typelessContext);
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+
+        // Act & Assert
+        ExceptionAssert.Throws<NotSupportedException>(
+            () => handler.ApplyTo(
+                new List<object>().AsQueryable(),
+                skipTokenQuery,
+                new ODataQuerySettings(),
+                null));
+    }
+
+    [Fact]
+    public void ApplyTo_Succeeds_ForOpenEntityType_StringDynamicPropertyComparison()
+    {
+        // Dynamic properties have TypeReference=null; the binder coerces the object-typed
+        // expression to the constant's CLR type so comparison works correctly at runtime.
+        ODataQueryContext context = new ODataQueryContext(_openModel, typeof(OpenSkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            "http://server/OpenCustomers?$orderby=DynamicProp asc&$skiptoken=DynamicProp-'abc',Id-1");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("DynamicProp-'abc',Id-1", context);
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+
+        IList<OpenSkipCustomer> customers = new List<OpenSkipCustomer>
+        {
+            new OpenSkipCustomer { Id = 1, DynamicProperties = new Dictionary<string, object> { { "DynamicProp", "abc" } } },
+            new OpenSkipCustomer { Id = 2, DynamicProperties = new Dictionary<string, object> { { "DynamicProp", "def" } } },
+            new OpenSkipCustomer { Id = 3, DynamicProperties = new Dictionary<string, object> { { "DynamicProp", "xyz" } } },
+        };
+
+        // Act — should succeed now that the binder coerces object-typed dynamic property expressions.
+        IQueryable result = handler.ApplyTo(
+            customers.AsQueryable(),
+            skipTokenQuery,
+            new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True },
+            queryOptions);
+
+        List<OpenSkipCustomer> resultList = result.Cast<OpenSkipCustomer>().ToList();
+        Assert.Equal(2, resultList.Count);
+        Assert.Contains(resultList, c => c.Id == 2);
+        Assert.Contains(resultList, c => c.Id == 3);
+    }
+
+    [Fact]
+    public void ApplyTo_Works_ForVanillaQueryContext_WithoutODataPath()
+    {
+        DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));  // no path
+        HttpRequest request = RequestFactory.Create("Get", "http://localhost/?$skiptoken=Id-2");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption("Id-2", context);
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Name = "Andy" },
+            new SkipCustomer { Id = 2, Name = "Aaron" },
+            new SkipCustomer { Id = 3, Name = "Alex" }
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = handler.ApplyTo(
+            customers,
+            skipTokenQuery,
+            new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False },
+            queryOptions).ToArray();
+
+        // Assert — skip token "Id-2" returns only Id=3 (Alex)
+        SkipCustomer result = Assert.Single(results);
+        Assert.Equal(3, result.Id);
+    }
+
+    [Theory]
+    [InlineData("IsVerified-false,Id-2", HandleNullPropagationOption.False, new[] { 3, 4 })]
+    [InlineData("IsVerified-false,Id-2", HandleNullPropagationOption.True,  new[] { 3, 4 })]
+    [InlineData("IsVerified-true,Id-4",  HandleNullPropagationOption.False, new int[0])]
+    [InlineData("IsVerified-true,Id-4",  HandleNullPropagationOption.True,  new int[0])]
+    public void ApplyTo_Works_WithNullableBoolOrderByAscending(
+        string skipTokenValue,
+        HandleNullPropagationOption nullPropagation,
+        int[] expectedIds)
+    {
+        ODataQueryContext context = new ODataQueryContext(_openModel, typeof(OpenSkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            $"http://server/OpenCustomers?$orderby=IsVerified asc,Id asc&$skiptoken={skipTokenValue}");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<OpenSkipCustomer> customers = new List<OpenSkipCustomer>
+        {
+            new OpenSkipCustomer { Id = 1, IsVerified = null },
+            new OpenSkipCustomer { Id = 2, IsVerified = false },
+            new OpenSkipCustomer { Id = 3, IsVerified = false },
+            new OpenSkipCustomer { Id = 4, IsVerified = true },
+        }.AsQueryable();
+
+        // Act
+        OpenSkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<OpenSkipCustomer>().ToArray();
+
+        // Assert
+        Assert.Equal(expectedIds.Length, results.Length);
+        foreach (int expectedId in expectedIds)
+        {
+            Assert.Contains(results, c => c.Id == expectedId);
+        }
+    }
+
+    [Theory]
+    // Ordered desc: [4:true, 3:false, 2:false, 1:null]
+    // After (true,4)  → {3:false, 2:false, 1:null}  = {1,2,3}
+    // After (false,2) → {1:null}                     = {1}
+    [InlineData("IsVerified-true,Id-4",  HandleNullPropagationOption.False, new[] { 1, 2, 3 })]
+    [InlineData("IsVerified-true,Id-4",  HandleNullPropagationOption.True,  new[] { 1, 2, 3 })]
+    [InlineData("IsVerified-false,Id-2", HandleNullPropagationOption.False, new[] { 1 })]
+    [InlineData("IsVerified-false,Id-2", HandleNullPropagationOption.True,  new[] { 1 })]
+    public void ApplyTo_Works_WithNullableBoolOrderByDescending(
+        string skipTokenValue,
+        HandleNullPropagationOption nullPropagation,
+        int[] expectedIds)
+    {
+        ODataQueryContext context = new ODataQueryContext(_openModel, typeof(OpenSkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            $"http://server/OpenCustomers?$orderby=IsVerified desc,Id desc&$skiptoken={skipTokenValue}");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<OpenSkipCustomer> customers = new List<OpenSkipCustomer>
+        {
+            new OpenSkipCustomer { Id = 1, IsVerified = null },
+            new OpenSkipCustomer { Id = 2, IsVerified = false },
+            new OpenSkipCustomer { Id = 3, IsVerified = false },
+            new OpenSkipCustomer { Id = 4, IsVerified = true },
+        }.AsQueryable();
+
+        // Act
+        OpenSkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<OpenSkipCustomer>().ToArray();
+
+        // Assert
+        Assert.Equal(expectedIds.Length, results.Length);
+        foreach (int expectedId in expectedIds)
+        {
+            Assert.Contains(results, c => c.Id == expectedId);
+        }
+    }
+
+    [Theory]
+    // Non-nullable bool descending: true > false.
+    // Ordered desc by IsActive, then asc by Id: [3:true, 4:true, 1:false, 2:false]
+    // After (true,4)  → {1:false, 2:false} = {1,2}
+    // After (false,1) → {2:false}           = {2}
+    [InlineData("IsActive-true,Id-4",  HandleNullPropagationOption.False, new[] { 1, 2 })]
+    [InlineData("IsActive-true,Id-4",  HandleNullPropagationOption.True,  new[] { 1, 2 })]
+    [InlineData("IsActive-false,Id-1", HandleNullPropagationOption.False, new[] { 2 })]
+    [InlineData("IsActive-false,Id-1", HandleNullPropagationOption.True,  new[] { 2 })]
+    public void ApplyTo_Works_WithNonNullableBoolOrderByDescending(
+        string skipTokenValue,
+        HandleNullPropagationOption nullPropagation,
+        int[] expectedIds)
+    {
+        ODataQueryContext context = new ODataQueryContext(_openModel, typeof(OpenSkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            $"http://server/OpenCustomers?$orderby=IsActive desc,Id asc&$skiptoken={skipTokenValue}");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<OpenSkipCustomer> customers = new List<OpenSkipCustomer>
+        {
+            new OpenSkipCustomer { Id = 1, IsActive = false },
+            new OpenSkipCustomer { Id = 2, IsActive = false },
+            new OpenSkipCustomer { Id = 3, IsActive = true },
+            new OpenSkipCustomer { Id = 4, IsActive = true },
+        }.AsQueryable();
+
+        // Act
+        OpenSkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<OpenSkipCustomer>().ToArray();
+
+        // Assert
+        Assert.Equal(expectedIds.Length, results.Length);
+        foreach (int expectedId in expectedIds)
+        {
+            Assert.Contains(results, c => c.Id == expectedId);
+        }
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_Works_WithDeclaredEnumPropertyOrderByAscending(HandleNullPropagationOption nullPropagation)
+    {
+        // Gender enum: Male=0, Female=1. Ascending: [2:Male, 4:Male, 1:Female, 3:Female]
+        string skipTokenValue = $"Gender-{typeof(Gender).FullName}'Male',Id-2";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            "http://server/Customers?$orderby=Gender asc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+            new SkipCustomer { Id = 2, Gender = Gender.Male },
+            new SkipCustomer { Id = 3, Gender = Gender.Female },
+            new SkipCustomer { Id = 4, Gender = Gender.Male },
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<SkipCustomer>().ToArray();
+
+        // Assert: items after (Male, 2): {4:Male, 1:Female, 3:Female}
+        Assert.Equal(3, results.Length);
+        Assert.Contains(results, c => c.Id == 1);
+        Assert.Contains(results, c => c.Id == 3);
+        Assert.Contains(results, c => c.Id == 4);
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_Works_WithDeclaredEnumPropertyOrderByDescending(HandleNullPropagationOption nullPropagation)
+    {
+        // Gender enum: Male=0, Female=1. Descending: [1:Female, 3:Female, 2:Male, 4:Male]
+        // "(Gender eq null)" on a non-nullable enum must not throw during expression tree construction.
+        string skipTokenValue = $"Gender-{typeof(Gender).FullName}'Female',Id-1";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(
+            HttpMethods.Get,
+            "http://server/Customers?$orderby=Gender desc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+            new SkipCustomer { Id = 2, Gender = Gender.Male },
+            new SkipCustomer { Id = 3, Gender = Gender.Female },
+            new SkipCustomer { Id = 4, Gender = Gender.Male },
+        }.AsQueryable();
+
+        // Act
+        SkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<SkipCustomer>().ToArray();
+
+        // Assert: items after (Female, 1): {3:Female, 2:Male, 4:Male}
+        Assert.Equal(3, results.Length);
+        Assert.Contains(results, c => c.Id == 3);
+        Assert.Contains(results, c => c.Id == 2);
+        Assert.Contains(results, c => c.Id == 4);
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_Throws_WhenSkipTokenContainsUnknownEnumMember_Quoted(HandleNullPropagationOption nullPropagation)
+    {
+        string skipTokenValue = $"Gender-{typeof(Gender).FullName}'Bogus',Id-1";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/Customers?$orderby=Gender asc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+        }.AsQueryable();
+
+        Assert.Throws<ODataException>(() =>
+            new DefaultSkipTokenHandler()
+                .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+                .Cast<SkipCustomer>().ToArray());
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_Throws_WhenSkipTokenContainsUnknownEnumMember_Unquoted(HandleNullPropagationOption nullPropagation)
+    {
+        // Raw value has no type-name prefix and no single quotes — treated as a plain member name.
+        string skipTokenValue = "Gender-Bogus,Id-1";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/Customers?$orderby=Gender asc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+        }.AsQueryable();
+
+        Assert.Throws<ODataException>(() =>
+            new DefaultSkipTokenHandler()
+                .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+                .Cast<SkipCustomer>().ToArray());
+    }
+
+    [Fact]
+    public void ApplyTo_Throws_WhenSkipTokenContainsEmptyEnumMember()
+    {
+        string skipTokenValue = $"Gender-{typeof(Gender).FullName}'',Id-1";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/Customers?$orderby=Gender asc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+        }.AsQueryable();
+
+        Assert.Throws<ODataException>(() =>
+            new DefaultSkipTokenHandler()
+                .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings(), queryOptions)
+                .Cast<SkipCustomer>().ToArray());
+    }
+
+    [Fact]
+    public void ApplyTo_Throws_WhenSkipTokenContainsUnterminatedQuoteInEnumValue()
+    {
+        // Gender segment has an opening quote with no closing quote.
+        // ParseValue consumes the rest of the string as quoted content, leaving
+        // BuildTypedConstantNode to detect the missing closing quote.
+        string skipTokenValue = $"Id-1,Gender-{typeof(Gender).FullName}'Male";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/Customers?$orderby=Id asc,Gender asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+        }.AsQueryable();
+
+        Assert.Throws<ODataException>(() =>
+            new DefaultSkipTokenHandler()
+                .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings(), queryOptions)
+                .Cast<SkipCustomer>().ToArray());
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_Works_WithNumericEnumValue(HandleNullPropagationOption nullPropagation)
+    {
+        // "1" is the numeric underlying value of Gender.Female. OData allows enum values
+        // to be specified by their underlying integer form.
+        string skipTokenValue = $"Gender-{typeof(Gender).FullName}'1',Id-1";
+        ODataQueryContext context = new ODataQueryContext(_model, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/Customers?$orderby=Gender asc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Gender = Gender.Female },
+            new SkipCustomer { Id = 2, Gender = Gender.Male },
+            new SkipCustomer { Id = 3, Gender = Gender.Female },
+        }.AsQueryable();
+
+        // Gender asc: Male(0) < Female(1). After (Female=1, Id=1): Id=3 (Female, Id>1)
+        SkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<SkipCustomer>().ToArray();
+
+        Assert.Single(results);
+        Assert.Equal(3, results[0].Id);
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_DoesNotThrow_WhenOpenTypeDynamicPropertyAbsentFromSomeEntities(HandleNullPropagationOption nullPropagation)
+    {
+        // Score is absent for customer 2 — its DynamicProperties dict has no "Score" key.
+        // Without nullable coercion in CreateBinaryExpression, the object→int conversion
+        // would throw NullReferenceException at query execution time.
+        string skipTokenValue = "Score-5,Id-1";
+        IEdmModel model = GetOpenEdmModel();
+        ODataQueryContext context = new ODataQueryContext(model, typeof(OpenSkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/OpenCustomers?$orderby=Score asc,Id asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        var customers = new List<OpenSkipCustomer>
+        {
+            new OpenSkipCustomer { Id = 1, DynamicProperties = new Dictionary<string, object> { ["Score"] = 5 } },
+            new OpenSkipCustomer { Id = 2, DynamicProperties = new Dictionary<string, object>() },
+            new OpenSkipCustomer { Id = 3, DynamicProperties = new Dictionary<string, object> { ["Score"] = 10 } },
+        }.AsQueryable();
+
+        // After (Score=5, Id=1): only customer 3 (Score=10) qualifies; customer 2 (null) does not
+        OpenSkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<OpenSkipCustomer>().ToArray();
+
+        Assert.Single(results);
+        Assert.Equal(3, results[0].Id);
+    }
+
+    [Fact]
+    public void GenerateSkipTokenValue_UsesEdmMemberName_ForAliasedEnum()
+    {
+        // Tier.Gold has [EnumMember(Value="Oro")], so the EDM member is named "Oro".
+        // GenerateSkipTokenValue must use the EDM name ("Oro"), not the CLR name ("Gold").
+        OrderByClause clause = BuildOrderByClause(_modelAliased, typeof(SkipCustomer), "Tier asc,SkipCustomerId asc");
+
+        string token = DefaultSkipTokenHandler.GenerateSkipTokenValue(
+            new SkipCustomer { Id = 1, Tier = Tier.Gold }, _modelAliased, clause);
+
+        // The token must contain the EDM alias "Oro", not the CLR name "Gold".
+        Assert.Contains("Oro", token);
+        Assert.DoesNotContain("Gold", token);
+    }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.False)]
+    [InlineData(HandleNullPropagationOption.True)]
+    public void ApplyTo_Works_WithAliasedEnumPropertyOrderByAscending(HandleNullPropagationOption nullPropagation)
+    {
+        // Tier: Gold(1) < Platinum(2). EDM aliases: Oro, Platino.
+        // Token uses EDM alias "Oro" for Tier.Gold.
+        string skipTokenValue = $"Tier-{GetTierEdmTypeName(_modelAliased)}'Oro',SkipCustomerId-1";
+        ODataQueryContext context = new ODataQueryContext(_modelAliased, typeof(SkipCustomer));
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get,
+            "http://server/Customers?$orderby=Tier asc,SkipCustomerId asc");
+        ODataQueryOptions queryOptions = new ODataQueryOptions(context, request);
+        SkipTokenQueryOption skipTokenQuery = new SkipTokenQueryOption(skipTokenValue, context);
+
+        IQueryable<SkipCustomer> customers = new List<SkipCustomer>
+        {
+            new SkipCustomer { Id = 1, Tier = Tier.Gold },
+            new SkipCustomer { Id = 2, Tier = Tier.Gold },
+            new SkipCustomer { Id = 3, Tier = Tier.Platinum },
+            new SkipCustomer { Id = 4, Tier = Tier.Platinum },
+        }.AsQueryable();
+
+        // After (Tier=Gold=Oro, Id=1): {2:Gold, 3:Platinum, 4:Platinum}
+        SkipCustomer[] results = new DefaultSkipTokenHandler()
+            .ApplyTo(customers, skipTokenQuery, new ODataQuerySettings { HandleNullPropagation = nullPropagation }, queryOptions)
+            .Cast<SkipCustomer>().ToArray();
+
+        Assert.Equal(3, results.Length);
+        Assert.Contains(results, c => c.Id == 2);
+        Assert.Contains(results, c => c.Id == 3);
+        Assert.Contains(results, c => c.Id == 4);
+    }
+
+    private static string GetTierEdmTypeName(IEdmModel model)
+    {
+        IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Customers");
+        IEdmStructuralProperty tierProp = entitySet.EntityType
+            .StructuralProperties().First(p => p.Name == "Tier");
+        return tierProp.Type.AsEnum().EnumDefinition().FullName();
+    }
+
+    private static OrderByClause BuildOrderByClause(IEdmModel model, Type clrType, string orderByRaw)
+    {
+        ODataQueryContext context = new ODataQueryContext(model, clrType);
+        return new OrderByQueryOption(orderByRaw, context).OrderByClause;
+    }
+
     private ODataSerializerContext GetSerializerContext(IEdmModel model, bool enableSkipToken = false)
     {
         IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Customers");
@@ -385,7 +1035,14 @@ public class DefaultSkipTokenHandlerTests
         var entitySetConfiguration = builder.EntitySet<SkipCustomer>("Customers");
         return builder.GetEdmModel();
     }
-        
+
+    private static IEdmModel GetOpenEdmModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<OpenSkipCustomer>("OpenCustomers");
+        return builder.GetEdmModel();
+    }
+
     private void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_Implementation(
         string baseUri,
         string expectedUri,
@@ -574,13 +1231,15 @@ public class DefaultSkipTokenHandlerTests
         IQueryable<SkipCustomer> customers = new List<SkipCustomer>().AsQueryable();
 
         // Act & Assert
+        // The value "abc" is not a valid typed literal for the key property (int32), so type
+        // validation now rejects it before the filter is even built.
         ExceptionAssert.Throws<ODataException>(
             () => handler.ApplyTo(
                 customers,
                 skipTokenQuery,
                 new ODataQuerySettings(),
                 queryOptions),
-            "Could not find a property named 'abc' on type 'Microsoft.AspNetCore.OData.Tests.Query.SkipCustomer'.");
+            "Unable to parse the skiptoken value 'abc'. Skiptoken value should always be server generated.");
     }
         
     private static void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
@@ -771,6 +1430,9 @@ public class DefaultSkipTokenHandlerTests
 
         [DataMember(Name = "MaleOrFemale")]
         public Gender Gender { get; set; }
+
+        [DataMember(Name = "Tier")]
+        public Tier Tier { get; set; }
     }
 
     public enum Gender
@@ -778,5 +1440,24 @@ public class DefaultSkipTokenHandlerTests
         Male,
 
         Female
+    }
+
+    // Enum whose member names differ from their [EnumMember] aliases.
+    [DataContract]
+    public enum Tier
+    {
+        [EnumMember(Value = "Oro")]
+        Gold = 1,
+
+        [EnumMember(Value = "Platino")]
+        Platinum = 2,
+    }
+
+    public class OpenSkipCustomer
+    {
+        public int Id { get; set; }
+        public bool IsActive { get; set; }
+        public bool? IsVerified { get; set; }
+        public IDictionary<string, object> DynamicProperties { get; set; }
     }
 }

@@ -9945,6 +9945,18 @@
             The helper class for all expression binders.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderHelper.BoolToIntExpression(System.Linq.Expressions.Expression)">
+            <summary>
+            Converts a <see cref="T:System.Boolean"/> or <see cref="T:System.Nullable`1"/> expression to a
+            <see cref="T:System.Nullable`1"/> expression using the mapping
+            <c>false → 0</c>, <c>true → 1</c> (and <c>null → null</c> for the nullable form).
+            Always returns <see cref="T:System.Nullable`1"/> so that mixed bool / bool? pairs produce
+            matching types and <see cref="M:System.Linq.Expressions.Expression.MakeBinary(System.Linq.Expressions.ExpressionType,System.Linq.Expressions.Expression,System.Linq.Expressions.Expression)"/> never receives mismatched operands.
+            This is needed because .NET expression trees do not define ordering operators
+            for <see cref="T:System.Boolean"/>, yet OData allows <c>$orderby</c> on boolean properties
+            with the conventional ordering <c>false &lt; true</c>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder">
             <summary>
             The default implementation to bind an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to a <see cref="T:System.Linq.Expressions.Expression"/>.
@@ -12678,6 +12690,44 @@
             <param name="querySettings">The query settings to use while applying this query option, not null.</param>
             <param name="queryOptions">Information about the other query options, could be null.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.BuildSkipTokenFilterExpression(System.Collections.Generic.IList{Microsoft.OData.UriParser.OrderByClause},System.Collections.Generic.IList{System.String},Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Builds the skip-token filter expression as an OData AST.
+            <para>
+            For a 2-column stable order (Prop1 asc, Prop2 asc) with token values (v1, v2), the
+            expression is: <c>(Prop1 gt v1) OR ((Prop1 eq v1) AND (Prop2 gt v2))</c>
+            </para>
+            <para>
+            For descending columns the comparison flips:
+            <c>((Prop1 lt v1) OR (Prop1 eq null)) OR ((Prop1 eq v1) AND ((Prop2 lt v2) OR (Prop2 eq null)))</c>
+            </para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.BuildTypedConstantNode(System.String,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Parses a raw skip-token string value into a typed <see cref="T:Microsoft.OData.UriParser.ConstantNode"/> for use in an AST.
+            </summary>
+            <remarks>
+            Three cases are handled:
+            <list type="bullet">
+              <item><description>
+                <b>Enum</b> — <c>ConvertFromUriLiteral</c> fails for CLR-formatted enum literals
+                (<c>'+'</c>-separated nested type names). The member name is extracted directly from
+                <c>"TypeName'MemberName'"</c> and validated against the EDM enum's declared members.
+                An <see cref="T:Microsoft.OData.ODataException"/> is thrown if the closing quote is missing, the member
+                name is not a declared member, or the member name is not a valid integer underlying value.
+              </description></item>
+              <item><description>
+                <b>Null <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> (open-type dynamic property)</b> — the value is
+                parsed without a type reference.
+              </description></item>
+              <item><description>
+                <b>All other primitives</b> — <c>ConvertFromUriLiteral</c> is called with the declared EDM type.
+                Any trailing characters beyond the valid literal are rejected by the parser.
+              </description></item>
+            </list>
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetOrderByClauses(System.Object,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.OrderByClause)">
             <summary>
