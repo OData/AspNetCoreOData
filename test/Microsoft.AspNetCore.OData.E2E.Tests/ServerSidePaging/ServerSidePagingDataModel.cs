@@ -42,6 +42,7 @@ public class SkipTokenPagingCustomer
     public string Grade { get; set; }
     public decimal? CreditLimit { get; set; }
     public DateTime? CustomerSince { get; set; }
+    public bool? IsVerified { get; set; }
 }
 
 public class SkipTokenPagingEdgeCase1Customer

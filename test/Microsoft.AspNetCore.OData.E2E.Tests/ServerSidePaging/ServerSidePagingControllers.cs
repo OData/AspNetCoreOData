@@ -141,6 +141,29 @@ public class SkipTokenPagingS3CustomersController : ODataController
     }
 }
 
+public class SkipTokenPagingS4CustomersController : ODataController
+{
+    // 3 null, 2 false, 4 true — spread across Ids to exercise mixed-page boundaries
+    private static readonly List<SkipTokenPagingCustomer> customers = new List<SkipTokenPagingCustomer>
+    {
+        new SkipTokenPagingCustomer { Id = 1, IsVerified = null },
+        new SkipTokenPagingCustomer { Id = 2, IsVerified = false },
+        new SkipTokenPagingCustomer { Id = 3, IsVerified = null },
+        new SkipTokenPagingCustomer { Id = 4, IsVerified = true },
+        new SkipTokenPagingCustomer { Id = 5, IsVerified = null },
+        new SkipTokenPagingCustomer { Id = 6, IsVerified = true },
+        new SkipTokenPagingCustomer { Id = 7, IsVerified = false },
+        new SkipTokenPagingCustomer { Id = 8, IsVerified = true },
+        new SkipTokenPagingCustomer { Id = 9, IsVerified = true },
+    };
+
+    [EnableQuery(PageSize = 2)]
+    public ActionResult<IEnumerable<SkipTokenPagingCustomer>> Get()
+    {
+        return customers;
+    }
+}
+
 public class SkipTokenPagingEdgeCase1CustomersController : ODataController
 {
     private static readonly List<SkipTokenPagingEdgeCase1Customer> customers = new List<SkipTokenPagingEdgeCase1Customer>
