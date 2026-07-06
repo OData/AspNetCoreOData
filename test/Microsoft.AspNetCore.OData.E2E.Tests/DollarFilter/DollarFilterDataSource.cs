@@ -21,6 +21,7 @@ public class DollarFilterDataSource
     private static List<Product> products;
     private static List<Basket> baskets;
     private static List<BasicType> basicTypes;
+    private static List<Catalog> catalogs;
 
     static DollarFilterDataSource()
     {
@@ -681,6 +682,181 @@ public class DollarFilterDataSource
         };
 
         #endregion Basic Types
+
+        #region Catalogs
+
+        catalogs = new List<Catalog>
+        {
+            new Catalog
+            {
+                Id = 1,
+                DeclaredName = "Visible One",
+                IgnoredName = "Hidden One",
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    { "DynamicName", "Dyn One" },
+                    {
+                        "DynamicInfo",
+                        new CatalogInfo
+                        {
+                            DeclaredCode = "DC1",
+                            RenamedCode = "AlphaRenamed",
+                            IgnoredCode = "ZCode1",
+                            DeclaredTags = new List<CatalogTag>
+                            {
+                                new CatalogTag { DeclaredLabel = "DeclaredTag1" }
+                            },
+                            IgnoredTags = new List<CatalogTag>
+                            {
+                                new CatalogTag { DeclaredLabel = "HiddenTag1" }
+                            },
+                            DynamicProperties = new Dictionary<string, object>
+                            {
+                                { "DynamicCode", "DynCode1" },
+                                { "IgnoredCode", "BravoDyn1" },
+                                {
+                                    "DynamicTags",
+                                    new List<CatalogTag>
+                                    {
+                                        new CatalogTag { DeclaredLabel = "DynTag1" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            new Catalog
+            {
+                Id = 2,
+                DeclaredName = "Visible Two",
+                IgnoredName = "Hidden Two",
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    { "DynamicName", "Dyn Two" },
+                    {
+                        "DynamicInfo",
+                        new CatalogInfo
+                        {
+                            DeclaredCode = "DC2",
+                            RenamedCode = "BetaRenamed",
+                            IgnoredCode = "ACode2",
+                            DeclaredTags = new List<CatalogTag>
+                            {
+                                new CatalogTag { DeclaredLabel = "DeclaredTag2" }
+                            },
+                            IgnoredTags = new List<CatalogTag>
+                            {
+                                new CatalogTag { DeclaredLabel = "HiddenTag2" }
+                            },
+                            DynamicProperties = new Dictionary<string, object>
+                            {
+                                { "DynamicCode", "DynCode2" },
+                                { "IgnoredCode", "RealDyn2" }
+                            }
+                        }
+                    }
+                }
+            },
+            // The dynamic-property container itself is null (no open properties at all).
+            new Catalog
+            {
+                Id = 3,
+                DeclaredName = "Visible Three",
+                IgnoredName = "Hidden Three",
+                DynamicProperties = null
+            },
+            // An empty (non-null) dynamic-property container and an empty declared string.
+            new Catalog
+            {
+                Id = 4,
+                DeclaredName = "",
+                IgnoredName = "Hidden Four",
+                DynamicProperties = new Dictionary<string, object>()
+            },
+            // Null values inside the nested dynamic complex, empty declared/dynamic
+            // collections, and a null ignored collection. The CLR IgnoredCode is set but, being
+            // excluded from the model, must remain unreachable.
+            new Catalog
+            {
+                Id = 5,
+                DeclaredName = "Visible Five",
+                IgnoredName = null,
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    { "DynamicName", null },
+                    {
+                        "DynamicInfo",
+                        new CatalogInfo
+                        {
+                            DeclaredCode = null,
+                            IgnoredCode = "ZCode5",
+                            DeclaredTags = new List<CatalogTag>(),
+                            IgnoredTags = null,
+                            DynamicProperties = new Dictionary<string, object>
+                            {
+                                { "DynamicCode", null },
+                                { "DynamicTags", new List<CatalogTag>() }
+                            }
+                        }
+                    }
+                }
+            },
+            // The nested dynamic complex value is itself null, and the dynamic name is empty.
+            new Catalog
+            {
+                Id = 6,
+                DeclaredName = "Visible Six",
+                IgnoredName = "Hidden Six",
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    { "DynamicName", "" },
+                    { "DynamicInfo", null }
+                }
+            },
+            // A dynamic property whose runtime value is a NON-OPEN modeled complex type carrying a
+            // [NotMapped] CLR member. The declared member (DeclaredSummaryCode) binds by its EDM
+            // name, while the excluded member (SecretSummaryCode) must never bind to the CLR member
+            // and expose its value ("TopSecret7").
+            new Catalog
+            {
+                Id = 7,
+                DeclaredName = "Visible Seven",
+                IgnoredName = null,
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    {
+                        "DynamicSummary",
+                        new CatalogSummary
+                        {
+                            DeclaredSummaryCode = "SumCode7",
+                            SecretSummaryCode = "TopSecret7"
+                        }
+                    }
+                }
+            },
+            // A second catalog carrying the non-open complex, so $orderby/$apply over the declared
+            // member can be proven against the CLR value ("SumCode7" < "SumCode8").
+            new Catalog
+            {
+                Id = 8,
+                DeclaredName = "Visible Eight",
+                IgnoredName = null,
+                DynamicProperties = new Dictionary<string, object>
+                {
+                    {
+                        "DynamicSummary",
+                        new CatalogSummary
+                        {
+                            DeclaredSummaryCode = "SumCode8",
+                            SecretSummaryCode = "TopSecret8"
+                        }
+                    }
+                }
+            }
+        };
+
+        #endregion Catalogs
     }
 
     public static IList<Person> People => people;
@@ -698,4 +874,6 @@ public class DollarFilterDataSource
     public static List<Basket> Baskets => baskets;
 
     public static List<BasicType> BasicTypes => basicTypes;
+
+    public static List<Catalog> Catalogs => catalogs;
 }

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarFilter;
 
@@ -144,4 +145,39 @@ public enum Color
 {
     Black,
     White
+}
+
+public class Catalog
+{
+    public int Id { get; set; }
+    public string DeclaredName { get; set; }
+    public string IgnoredName { get; set; }
+    public Dictionary<string, object> DynamicProperties { get; set; }
+}
+
+public class CatalogInfo
+{
+    public string DeclaredCode { get; set; }
+    public string RenamedCode { get; set; }
+    public string IgnoredCode { get; set; }
+    public List<CatalogTag> DeclaredTags { get; set; }
+    public List<CatalogTag> IgnoredTags { get; set; }
+    public Dictionary<string, object> DynamicProperties { get; set; }
+}
+
+public class CatalogTag
+{
+    public string DeclaredLabel { get; set; }
+    public Dictionary<string, object> DynamicProperties { get; set; }
+}
+
+// A non-open complex type (no dynamic-property container) whose SecretSummaryCode CLR member is
+// excluded from the EDM model via [NotMapped]. Used to prove that a property segment addressing an
+// excluded CLR member on a non-open modeled type is rejected rather than binding (and exposing) it.
+public class CatalogSummary
+{
+    public string DeclaredSummaryCode { get; set; }
+
+    [NotMapped]
+    public string SecretSummaryCode { get; set; }
 }

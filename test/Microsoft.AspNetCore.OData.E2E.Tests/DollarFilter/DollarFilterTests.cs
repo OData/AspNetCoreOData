@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -39,10 +40,11 @@ public class DollarFilterTests : WebApiTestBase<DollarFilterTests>
             typeof(BadCustomersController),
             typeof(ProductsController),
             typeof(BasketsController),
-            typeof(BasicTypesController));
+            typeof(BasicTypesController),
+            typeof(CatalogsController));
 
         services.AddControllers().AddOData(opt =>
-            opt.Filter().Select().AddRouteComponents("odata", model));
+            opt.Filter().OrderBy().Select().AddRouteComponents("odata", model));
     }
 
     [Theory]
@@ -1121,5 +1123,616 @@ public class DollarFilterTests : WebApiTestBase<DollarFilterTests>
         var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
         var resource = Assert.Single(result) as JObject;
         Assert.Equal(1, resource["Id"]);
+    }
+
+    // Verifies that a single-valued segment following an open/dynamic property resolves
+    // declared (modeled) and genuinely dynamic siblings, while a CLR property that is not
+    // declared in the EDM model (Ignore()'d) is treated as a dynamic name only.
+    [Theory]
+    [InlineData("DynamicInfo/DeclaredCode eq 'DC1'", 1)] // declared in the model
+    [InlineData("DynamicInfo/DeclaredCode eq 'DC2'", 2)] // declared in the model
+    [InlineData("DynamicInfo/DynamicCode eq 'DynCode1'", 1)] // genuinely dynamic
+    [InlineData("DynamicInfo/DynamicCode eq 'DynCode2'", 2)] // genuinely dynamic
+    [InlineData("DynamicInfo/IgnoredCode eq 'BravoDyn1'", 1)] // dynamic value, not the CLR member
+    [InlineData("DynamicInfo/IgnoredCode eq 'RealDyn2'", 2)] // dynamic value, not the CLR member
+    public async Task TestNestedDynamicSegmentResolvesDeclaredAndDynamicProperties(string filterExpr, int expectedId)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter={filterExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var resource = Assert.Single(result) as JObject;
+        Assert.Equal(expectedId, resource["Id"]);
+    }
+
+    // Verifies that a CLR property excluded from the EDM model is not bound from the CLR
+    // instance on a nested single-valued segment. The matching CLR values (BravoDyn1 -> 1,
+    // RealDyn2 -> 2 are the dynamic values; ZCode1/ACode2 are the CLR member values) never
+    // surface, so filtering on a CLR member value yields no resources.
+    [Theory]
+    [InlineData("DynamicInfo/IgnoredCode eq 'ZCode1'")]
+    [InlineData("DynamicInfo/IgnoredCode eq 'ACode2'")]
+    public async Task TestNestedDynamicSegmentDoesNotResolveUnmodeledClrProperty(string filterExpr)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter={filterExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Empty(result);
+    }
+
+    // A nested declared property whose EDM name (EdmRenamedCode) differs from its CLR name
+    // (RenamedCode) binds to the CLR member value when addressed by its EDM name.
+    [Fact]
+    public async Task TestNestedDynamicSegmentResolvesDeclaredPropertyWithRenamedEdmName()
+    {
+        // Arrange - EdmRenamedCode (EDM name) must bind to the RenamedCode CLR member.
+        var queryUrl = "odata/Catalogs?$filter=DynamicInfo/EdmRenamedCode eq 'AlphaRenamed'";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var resource = Assert.Single(result) as JObject;
+        Assert.Equal(1, resource["Id"]);
+    }
+
+    // Verifies that a nested CLR-member access on a dynamic property whose runtime value is a
+    // primitive resolves against that runtime type rather than being rejected at the model
+    // boundary. DynamicName carries the strings "Dyn One"/"Dyn Two" (both length 7) for catalogs
+    // 1 and 2, so DynamicName/Length reaches the nested single-valued open-access sink with a
+    // string value and string.Length is read, selectively returning exactly those two catalogs.
+    [Fact]
+    public async Task TestFilterNestedClrMemberAccessOnDynamicPrimitiveValueResolves()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$filter=DynamicName/Length eq 7";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var ids = result.Select(resource => (int)resource["Id"]).OrderBy(id => id).ToArray();
+        Assert.Equal(new[] { 1, 2 }, ids);
+    }
+
+    // Verifies $orderby over a nested dynamic segment uses the dynamic value (or absence)
+    // rather than the unmodeled CLR member. Scoped to the two fully-populated catalogs so the
+    // ordering proof is exact: ordering by the unmodeled name uses the dynamic values
+    // (BravoDyn1 < RealDyn2 => [1, 2]); ordering by declared/dynamic members descending yields [2, 1].
+    [Theory]
+    [InlineData("DynamicInfo/IgnoredCode", 1, 2)]
+    [InlineData("DynamicInfo/IgnoredCode desc", 2, 1)]
+    [InlineData("DynamicInfo/DeclaredCode desc", 2, 1)]
+    [InlineData("DynamicInfo/DynamicCode desc", 2, 1)]
+    public async Task TestOrderByOnNestedDynamicSegment(string orderByExpr, int firstId, int secondId)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter=Id le 2&$orderby={orderByExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Equal(2, result.Count);
+        Assert.Equal(firstId, (result[0] as JObject)["Id"]);
+        Assert.Equal(secondId, (result[1] as JObject)["Id"]);
+    }
+
+    // $orderby over the renamed nested property (EDM name EdmRenamedCode) orders by the CLR member
+    // value. Scoped to the two seeded catalogs: "AlphaRenamed" < "BetaRenamed" => asc [1, 2], desc [2, 1].
+    [Theory]
+    [InlineData("DynamicInfo/EdmRenamedCode", 1, 2)]
+    [InlineData("DynamicInfo/EdmRenamedCode desc", 2, 1)]
+    public async Task TestOrderByOnNestedDynamicSegmentWithRenamedEdmName(string orderByExpr, int firstId, int secondId)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter=Id le 2&$orderby={orderByExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Equal(2, result.Count);
+        Assert.Equal(firstId, (result[0] as JObject)["Id"]);
+        Assert.Equal(secondId, (result[1] as JObject)["Id"]);
+    }
+
+    // Verifies that a collection segment following an open/dynamic property resolves declared
+    // (modeled) and genuinely dynamic collections via any().
+    [Theory]
+    [InlineData("DynamicInfo/DeclaredTags/any(t:t/DeclaredLabel eq 'DeclaredTag1')", 1)] // declared in the model
+    [InlineData("DynamicInfo/DeclaredTags/any(t:t/DeclaredLabel eq 'DeclaredTag2')", 2)] // declared in the model
+    [InlineData("DynamicInfo/DynamicTags/any(t:t/DeclaredLabel eq 'DynTag1')", 1)] // genuinely dynamic
+    public async Task TestNestedDynamicCollectionSegmentResolvesDeclaredAndDynamicProperties(string filterExpr, int expectedId)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter={filterExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var resource = Assert.Single(result) as JObject;
+        Assert.Equal(expectedId, resource["Id"]);
+    }
+
+    // Verifies that a CLR collection property excluded from the EDM model is not bound from
+    // the CLR instance on a nested collection segment; any() over it matches nothing.
+    [Theory]
+    [InlineData("DynamicInfo/IgnoredTags/any(t:t/DeclaredLabel eq 'HiddenTag1')")]
+    [InlineData("DynamicInfo/IgnoredTags/any(t:t/DeclaredLabel eq 'HiddenTag2')")]
+    public async Task TestNestedDynamicCollectionSegmentDoesNotResolveUnmodeledClrProperty(string filterExpr)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter={filterExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Empty(result);
+    }
+
+    // Verifies $apply=groupby over a declared property of an open entity projects its values.
+    [Fact]
+    public async Task TestApplyGroupByResolvesDeclaredProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$apply=groupby((DeclaredName))";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Visible One", result);
+        Assert.Contains("Visible Two", result);
+    }
+
+    // Verifies $apply=groupby over a genuinely dynamic property of an open entity projects its values.
+    [Fact]
+    public async Task TestApplyGroupByResolvesDynamicProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$apply=groupby((DynamicName))";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Dyn One", result);
+        Assert.Contains("Dyn Two", result);
+    }
+
+    // Verifies $apply=groupby over a CLR property excluded from the EDM model does not project
+    // the CLR member values; the unmodeled name is treated as a dynamic name only.
+    [Fact]
+    public async Task TestApplyGroupByDoesNotResolveUnmodeledClrProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$apply=groupby((IgnoredName))";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Hidden One", result);
+        Assert.DoesNotContain("Hidden Two", result);
+    }
+
+    // Baseline (no query options): querying the entity set returns declared and dynamic
+    // properties, while CLR members excluded from the EDM model (Ignore()'d) are not
+    // serialized. A dynamic-container entry that shares a name with an unmodeled CLR member
+    // surfaces the dynamic value, consistent with the model.
+    [Fact]
+    public async Task TestQueryingCatalogsWithoutQueryOptionsReturnsDeclaredAndDynamicProperties()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var content = await response.Content.ReadAsStringAsync();
+        var value = JObject.Parse(content)["value"] as JArray;
+
+        // Catalog 1: declared and dynamic properties are present.
+        var catalog1 = value.Children<JObject>().Single(o => (int)o["Id"] == 1);
+        Assert.Equal("Visible One", (string)catalog1["DeclaredName"]);
+        Assert.Equal("Dyn One", (string)catalog1["DynamicName"]);
+
+        var info1 = catalog1["DynamicInfo"] as JObject;
+        Assert.Equal("DC1", (string)info1["DeclaredCode"]);
+        Assert.Equal("DynCode1", (string)info1["DynamicCode"]);
+        // The name "IgnoredCode" surfaces the dynamic-container value, not the CLR member value.
+        Assert.Equal("BravoDyn1", (string)info1["IgnoredCode"]);
+        Assert.Equal("DeclaredTag1", (string)((info1["DeclaredTags"] as JArray)[0] as JObject)["DeclaredLabel"]);
+        Assert.Equal("DynTag1", (string)((info1["DynamicTags"] as JArray)[0] as JObject)["DeclaredLabel"]);
+        // The Ignore()'d CLR collection is not serialized.
+        Assert.Null(info1["IgnoredTags"]);
+
+        // Catalog 2: declared and dynamic properties are present.
+        var catalog2 = value.Children<JObject>().Single(o => (int)o["Id"] == 2);
+        Assert.Equal("Visible Two", (string)catalog2["DeclaredName"]);
+        Assert.Equal("Dyn Two", (string)catalog2["DynamicName"]);
+
+        var info2 = catalog2["DynamicInfo"] as JObject;
+        Assert.Equal("DC2", (string)info2["DeclaredCode"]);
+        Assert.Equal("DynCode2", (string)info2["DynamicCode"]);
+        Assert.Equal("RealDyn2", (string)info2["IgnoredCode"]);
+
+        // CLR members excluded from the model never appear in the payload.
+        Assert.DoesNotContain("Hidden One", content);
+        Assert.DoesNotContain("Hidden Two", content);
+        Assert.DoesNotContain("ZCode1", content);
+        Assert.DoesNotContain("ACode2", content);
+        Assert.DoesNotContain("HiddenTag1", content);
+        Assert.DoesNotContain("HiddenTag2", content);
+    }
+
+    // Baseline with rows whose dynamic-property container is null or empty,
+    // whose nested dynamic complex is null, or which carry null dynamic values are serialized
+    // without error. Declared members (including an empty string) are present, while CLR members
+    // excluded from the model never surface.
+    [Fact]
+    public async Task TestQueryingCatalogsWithNullAndEmptyDynamicContainersIsConsistent()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var content = await response.Content.ReadAsStringAsync();
+        var value = JObject.Parse(content)["value"] as JArray;
+
+        // Null dynamic-property container: only declared members are serialized.
+        var catalog3 = value.Children<JObject>().Single(o => (int)o["Id"] == 3);
+        Assert.Equal("Visible Three", (string)catalog3["DeclaredName"]);
+        Assert.Null(catalog3["DynamicName"]);
+        Assert.Null(catalog3["DynamicInfo"]);
+
+        // Empty dynamic-property container and an empty declared string.
+        var catalog4 = value.Children<JObject>().Single(o => (int)o["Id"] == 4);
+        Assert.Equal("", (string)catalog4["DeclaredName"]);
+        Assert.Null(catalog4["DynamicName"]);
+        Assert.Null(catalog4["DynamicInfo"]);
+
+        // Null values within the nested dynamic complex and empty collections: the complex is
+        // still present, and the unmodeled CLR IgnoredCode value is never surfaced from it.
+        var catalog5 = value.Children<JObject>().Single(o => (int)o["Id"] == 5);
+        Assert.Equal("Visible Five", (string)catalog5["DeclaredName"]);
+        var info5 = catalog5["DynamicInfo"] as JObject;
+        Assert.NotNull(info5);
+        Assert.Null(info5["IgnoredCode"]);
+
+        // Null nested dynamic complex value: the declared members are still serialized.
+        var catalog6 = value.Children<JObject>().Single(o => (int)o["Id"] == 6);
+        Assert.Equal("Visible Six", (string)catalog6["DeclaredName"]);
+
+        // CLR members excluded from the model never appear in the payload.
+        Assert.DoesNotContain("Hidden Three", content);
+        Assert.DoesNotContain("Hidden Four", content);
+        Assert.DoesNotContain("Hidden Six", content);
+        Assert.DoesNotContain("ZCode5", content);
+    }
+
+    // Verifies $orderby over a nested dynamic segment remains stable when many rows have a null or
+    // absent dynamic value (null container, null nested complex, or a null dynamic entry): the
+    // request succeeds and the two rows that carry dynamic values keep their relative order
+    // (BravoDyn1 < RealDyn2 => catalog 1 before catalog 2).
+    [Fact]
+    public async Task TestOrderByOnNestedDynamicSegmentWithNullValuesIsStable()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$orderby=DynamicInfo/IgnoredCode";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var ids = result.Select(t => (int)t["Id"]).ToList();
+        Assert.Contains(1, ids);
+        Assert.Contains(2, ids);
+        Assert.True(ids.IndexOf(1) < ids.IndexOf(2));
+    }
+
+    // A dynamic property whose runtime value is a NON-OPEN modeled complex type: addressing a CLR
+    // member excluded from the model via [NotMapped] must not bind (and expose) the CLR member.
+    // Consistent with a dynamic segment on any non-open modeled type, it is rejected with
+    // TypeMustBeOpenType rather than leaking the SecretSummaryCode value ("TopSecret7").
+    [Fact]
+    public async Task TestNestedDynamicSegmentOnNonOpenModeledTypeDoesNotExposeNotMappedClrProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$filter=DynamicSummary/SecretSummaryCode eq 'TopSecret7'";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(async () =>
+        {
+            await client.SendAsync(request);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        var odataException = exception.InnerException?.InnerException;
+        Assert.NotNull(odataException);
+        Assert.Equal(string.Format(SRResources.TypeMustBeOpenType, typeof(CatalogSummary).FullName),
+            odataException.Message);
+    }
+
+    // Positive control for the model-boundary rejection above: the DECLARED member on the same
+    // NON-OPEN modeled complex type binds by its EDM name and returns the catalog, proving the
+    // rejection is specific to the excluded [NotMapped] member, not the non-open type as a whole.
+    [Fact]
+    public async Task TestNestedDynamicSegmentOnNonOpenModeledTypeResolvesDeclaredClrProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$filter=DynamicSummary/DeclaredSummaryCode eq 'SumCode7'";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var resource = Assert.Single(result) as JObject;
+        Assert.Equal(7, resource["Id"]);
+    }
+
+    // The [NotMapped] member is excluded from the model, so a plain projection of the catalog whose
+    // dynamic container holds the non-open complex serializes the declared member ("SumCode7") but
+    // never the SecretSummaryCode name or its value ("TopSecret7").
+    [Fact]
+    public async Task TestQueryingCatalogWithNonOpenDynamicComplexDoesNotSerializeNotMappedMember()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$filter=Id eq 7";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("SumCode7", content);
+        Assert.DoesNotContain("TopSecret7", content);
+        Assert.DoesNotContain("SecretSummaryCode", content);
+    }
+
+    // $orderby over a nested dynamic segment whose runtime value is a NON-OPEN modeled type must not
+    // bind the excluded [NotMapped] member; like $filter, the segment is rejected at the model
+    // boundary with TypeMustBeOpenType rather than exposing (ordering by) the CLR value.
+    [Fact]
+    public async Task TestOrderByNestedDynamicSegmentOnNonOpenModeledTypeDoesNotExposeNotMappedClrProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$filter=Id eq 7&$orderby=DynamicSummary/SecretSummaryCode";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(async () =>
+        {
+            await client.SendAsync(request);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        var odataException = exception.InnerException?.InnerException;
+        Assert.NotNull(odataException);
+        Assert.Equal(string.Format(SRResources.TypeMustBeOpenType, typeof(CatalogSummary).FullName),
+            odataException.Message);
+    }
+
+    // Positive control for the $orderby rejection above: ordering by the DECLARED member of the
+    // non-open modeled type uses the CLR value. Scoped to the two seeded catalogs so the ordering is
+    // exact: "SumCode7" < "SumCode8" => asc [7, 8], desc [8, 7].
+    [Theory]
+    [InlineData("DynamicSummary/DeclaredSummaryCode", 7, 8)]
+    [InlineData("DynamicSummary/DeclaredSummaryCode desc", 8, 7)]
+    public async Task TestOrderByNestedDynamicSegmentOnNonOpenModeledTypeResolvesDeclaredClrProperty(string orderByExpr, int firstId, int secondId)
+    {
+        // Arrange
+        var queryUrl = $"odata/Catalogs?$filter=Id ge 7&$orderby={orderByExpr}";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Equal(2, result.Count);
+        Assert.Equal(firstId, (result[0] as JObject)["Id"]);
+        Assert.Equal(secondId, (result[1] as JObject)["Id"]);
+    }
+
+    // $apply=filter reuses the filter binder: an excluded [NotMapped] member on a nested non-open
+    // modeled type is rejected with TypeMustBeOpenType rather than exposed.
+    [Fact]
+    public async Task TestApplyFilterNestedDynamicSegmentOnNonOpenModeledTypeDoesNotExposeNotMappedClrProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$apply=filter(DynamicSummary/SecretSummaryCode eq 'TopSecret7')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var exception = await Assert.ThrowsAsync<HttpRequestException>(async () =>
+        {
+            await client.SendAsync(request);
+        });
+
+        // Assert
+        Assert.NotNull(exception);
+        var odataException = exception.InnerException?.InnerException;
+        Assert.NotNull(odataException);
+        Assert.Equal(string.Format(SRResources.TypeMustBeOpenType, typeof(CatalogSummary).FullName),
+            odataException.Message);
+    }
+
+    // Positive control for the $apply=filter rejection above: filtering by the DECLARED member of the
+    // non-open modeled type resolves and returns the catalog.
+    [Fact]
+    public async Task TestApplyFilterNestedDynamicSegmentOnNonOpenModeledTypeResolvesDeclaredClrProperty()
+    {
+        // Arrange
+        var queryUrl = "odata/Catalogs?$apply=filter(DynamicSummary/DeclaredSummaryCode eq 'SumCode7')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(response.Content);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        var resource = Assert.Single(result) as JObject;
+        Assert.Equal(7, resource["Id"]);
     }
 }

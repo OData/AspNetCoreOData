@@ -83,3 +83,12 @@ public class BasicTypesController : ODataController
         return DollarFilterDataSource.BasicTypes;
     }
 }
+
+public class CatalogsController : ODataController
+{
+    [EnableQuery(MaxAnyAllExpressionDepth = 2)]
+    public ActionResult<IEnumerable<Catalog>> Get()
+    {
+        return DollarFilterDataSource.Catalogs;
+    }
+}
