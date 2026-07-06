@@ -10554,6 +10554,22 @@
             <param name="model">The Edm model.</param>
             <returns>Returns CLR property for dynamic properties container.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDeclaredClrProperty(System.Type,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Gets the CLR <see cref="T:System.Reflection.PropertyInfo"/> that a property segment binds to, mapping the
+            segment's EDM name to the CLR property name. Returns null for a dynamic (open) property, which
+            the caller then reads from the dynamic property container.
+            </summary>
+            <param name="instanceType">The runtime CLR type of the value being accessed.</param>
+            <param name="propertyName">The property name from the URI segment (the EDM name).</param>
+            <param name="model">The Edm model.</param>
+            <returns>
+            The <see cref="T:System.Reflection.PropertyInfo"/> to bind for a property declared in the model (resolved by its
+            CLR name), or null when the segment is an undeclared member of a type that is in the model
+            (whether open or not), so the caller resolves it from the dynamic container or treats it as
+            absent rather than binding a CLR member that is not part of the model.
+            </returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.ApplyNullPropagationForFilterBody(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
             Apply null propagation for filter body.
