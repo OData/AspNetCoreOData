@@ -74,6 +74,19 @@ public partial class EnableQueryAttribute
     }
 
     /// <summary>
+    /// Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
+    /// A single <c>matchesPattern</c> evaluation cannot run for longer than the configured duration. The default value is one second.
+    /// When the configured duration elapses, the request is completed as 400 (Bad Request) if the results are
+    /// materialized during query execution, for example when a page size is configured.
+    /// Set the value to <c>null</c> to apply no limit.
+    /// </summary>
+    public TimeSpan? MatchesPatternTimeout
+    {
+        get => _querySettings.MatchesPatternTimeout;
+        set => _querySettings.MatchesPatternTimeout = value;
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether queries with expanded navigations should be formulated
     /// to encourage correlated sub-query results to be buffered.
     /// Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2

@@ -71,6 +71,17 @@ public class EnableQueryAttributeTests
     }
 
     [Fact]
+    public void MatchesPatternTimeout_RoundTripsThroughQuerySettings()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromMilliseconds(100) };
+
+        // Assert
+        Assert.Equal(TimeSpan.FromMilliseconds(100), attribute.MatchesPatternTimeout);
+        Assert.Equal(ODataQuerySettings.DefaultMatchesPatternTimeout, new EnableQueryAttribute().MatchesPatternTimeout);
+    }
+
+    [Fact]
     public void EnsureStableOrdering_Property_RoundTrips()
     {
         ReflectionAssert.BooleanProperty<EnableQueryAttribute>(

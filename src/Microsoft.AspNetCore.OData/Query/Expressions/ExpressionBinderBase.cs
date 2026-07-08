@@ -546,7 +546,17 @@ public abstract class ExpressionBinderBase
 
         Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
 
-        //add argument that must be ECMAScript compatible regex
+        // Add the ECMAScript-compatible regex option. When a match time span is configured, bind to the
+        // Regex.IsMatch overload that also accepts a TimeSpan so the evaluation is bounded; otherwise keep
+        // the existing overload so the default behavior is unchanged.
+        TimeSpan? matchTimeout = QuerySettings.MatchesPatternTimeout;
+        if (matchTimeout.HasValue)
+        {
+            arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript), Expression.Constant(matchTimeout.Value) };
+
+            return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesPatternWithTimeout, QuerySettings, arguments);
+        }
+
         arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript) };
 
         return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesMattern, QuerySettings, arguments);

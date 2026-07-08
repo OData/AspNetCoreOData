@@ -294,6 +294,9 @@
   <data name="MappingDoesNotContainResourceType" xml:space="preserve">
     <value>The provided mapping does not contain a resource for the resource type '{0}'.</value>
   </data>
+  <data name="MatchesPatternTimeoutMustBePositive" xml:space="preserve">
+    <value>The value for the 'MatchesPatternTimeout' setting must be a positive time span.</value>
+  </data>
   <data name="ModelMissingFromReadContext" xml:space="preserve">
     <value>The EDM model is missing on the read context. The model is required on the read context to deserialize the payload.</value>
   </data>

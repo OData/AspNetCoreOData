@@ -7841,6 +7841,11 @@
               Looks up a localized string similar to The provided mapping does not contain a resource for the resource type &apos;{0}&apos;..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MatchesPatternTimeoutMustBePositive">
+            <summary>
+              Looks up a localized string similar to The value for the 'MatchesPatternTimeout' setting must be a positive time span..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxAnyAllExpressionLimitExceeded">
             <summary>
               Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings or EnableQueryAttribute..
@@ -9158,6 +9163,15 @@
             would result in better performance with Entity framework.
             </summary>
             <value>The default value is <c>true</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout">
+            <summary>
+            Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
+            A single <c>matchesPattern</c> evaluation cannot run for longer than the configured duration. The default value is one second.
+            When the configured duration elapses, the request is completed as 400 (Bad Request) if the results are
+            materialized during query execution, for example when a page size is configured.
+            Set the value to <c>null</c> to apply no limit.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableCorrelatedSubqueryBuffering">
             <summary>
@@ -12140,6 +12154,12 @@
             This class describes the settings to use during query composition.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.DefaultMatchesPatternTimeout">
+            <summary>
+            The default time span applied to a single <c>matchesPattern</c> filter function evaluation
+            when <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> is not explicitly configured.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings" /> class.
@@ -12225,6 +12245,16 @@
             The expanded property is only populated when the filter evaluates to true.
             This setting is false by default.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout">
+            <summary>
+            Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
+            A single <c>matchesPattern</c> evaluation cannot run for longer than the configured duration.
+            </summary>
+            <value>
+            The maximum time allowed for a single <c>matchesPattern</c> evaluation.
+            The default value is one second. Set the value to <c>null</c> to apply no limit.
+            </value>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator">
             <summary>

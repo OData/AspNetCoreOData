@@ -943,6 +943,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The value for the 'MatchesPatternTimeout' setting must be a positive time span..
+        /// </summary>
+        internal static string MatchesPatternTimeoutMustBePositive {
+            get {
+                return ResourceManager.GetString("MatchesPatternTimeoutMustBePositive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings or EnableQueryAttribute..
         /// </summary>
         internal static string MaxAnyAllExpressionLimitExceeded {

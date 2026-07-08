@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -88,7 +89,31 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         // calling into next filter or the route handler.
         var result = await next(invocationContext);
 
-        return await OnFilterExecutedAsync(result, odataFilterContext);
+        // Applying the query composes and, when a page size is configured, materializes the results.
+        // A bounded matchesPattern evaluation that reaches its configured time span completes the
+        // request as 400 (Bad Request), consistent with the controller pipeline.
+        try
+        {
+            return await OnFilterExecutedAsync(result, odataFilterContext).ConfigureAwait(false);
+        }
+        catch (RegexMatchTimeoutException e)
+        {
+            return CreateBadRequestResult(e.Message, e);
+        }
+        catch (TargetInvocationException e) when (e.InnerException is RegexMatchTimeoutException)
+        {
+            return CreateBadRequestResult(e.InnerException.Message, e.InnerException);
+        }
+    }
+
+    // Maps an elapsed matchesPattern evaluation to a 400 (Bad Request) using the same error payload
+    // as the controller pipeline (EnableQueryAttribute), so both request paths report it consistently.
+    private static IResult CreateBadRequestResult(string message, Exception exception)
+    {
+        Microsoft.AspNetCore.Mvc.SerializableError error = EnableQueryAttribute.CreateErrorResponse(
+            Error.Format(SRResources.UriQueryStringInvalid, message), exception);
+
+        return Microsoft.AspNetCore.Http.Results.BadRequest(error);
     }
 
     /// <summary>

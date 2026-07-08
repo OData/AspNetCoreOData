@@ -15,10 +15,18 @@ namespace Microsoft.AspNetCore.OData.Query;
 public class ODataQuerySettings
 {
     internal const int DefaultMaxFunctionCallDepth = 15;// the depth of function call expressions recursively in a query, such as 'length(tolower(name)) eq 5', the depth is 2.
+
+    /// <summary>
+    /// The default time span applied to a single <c>matchesPattern</c> filter function evaluation
+    /// when <see cref="MatchesPatternTimeout"/> is not explicitly configured.
+    /// </summary>
+    internal static readonly TimeSpan DefaultMatchesPatternTimeout = TimeSpan.FromSeconds(1);
+
     private HandleNullPropagationOption _handleNullPropagationOption = HandleNullPropagationOption.Default;
     private int? _pageSize;
     private int? _modelBoundPageSize;
     private int _maxFunctionCallDepth = DefaultMaxFunctionCallDepth;
+    private TimeSpan? _matchesPatternTimeout = DefaultMatchesPatternTimeout;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQuerySettings" /> class.
@@ -163,6 +171,28 @@ public class ODataQuerySettings
     /// </summary>
     public bool HandleReferenceNavigationPropertyExpandFilter { get; set; }
 
+    /// <summary>
+    /// Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
+    /// A single <c>matchesPattern</c> evaluation cannot run for longer than the configured duration.
+    /// </summary>
+    /// <value>
+    /// The maximum time allowed for a single <c>matchesPattern</c> evaluation.
+    /// The default value is one second. Set the value to <c>null</c> to apply no limit.
+    /// </value>
+    public TimeSpan? MatchesPatternTimeout
+    {
+        get => _matchesPatternTimeout;
+        set
+        {
+            if (value.HasValue && value.Value <= TimeSpan.Zero)
+            {
+                throw Error.ArgumentOutOfRange(nameof(value), value.Value, SRResources.MatchesPatternTimeoutMustBePositive);
+            }
+
+            _matchesPatternTimeout = value;
+        }
+    }
+
     internal void CopyFrom(ODataQuerySettings settings)
     {
         TimeZone = settings.TimeZone;
@@ -176,5 +206,6 @@ public class ODataQuerySettings
         IgnoredQueryOptions = settings.IgnoredQueryOptions;
         IgnoredNestedQueryOptions = settings.IgnoredNestedQueryOptions;
         MaxFunctionCallDepth = settings.MaxFunctionCallDepth;
+        MatchesPatternTimeout = settings.MatchesPatternTimeout;
     }
 }
