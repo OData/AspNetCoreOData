@@ -32,7 +32,8 @@ public class MatchesPatternTimeoutTests : WebApiTestBase<MatchesPatternTimeoutTe
         services.ConfigureControllers(
             typeof(ProductsController),
             typeof(BoundedProductsController),
-            typeof(DefaultBoundedProductsController));
+            typeof(DefaultBoundedProductsController),
+            typeof(AttributeBoundedProductsController));
 
         services.AddControllers().AddOData(opt =>
             opt.Filter().OrderBy().Select().Count().AddRouteComponents("odata", model));
@@ -173,5 +174,43 @@ public class MatchesPatternTimeoutTests : WebApiTestBase<MatchesPatternTimeoutTe
         var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
         var single = Assert.Single(result); // Beta
         Assert.Equal(2, (single as JObject)["Id"]);
+    }
+
+    [Fact]
+    public async Task AttributeConfiguredTimeout_MatchesPatternRequiringExtensiveBacktracking_IsBounded()
+    {
+        // Arrange - the set is configured through [EnableQuery(MatchesPatternTimeoutMilliseconds = 100)] on the
+        // attribute itself. The '+' characters are percent-encoded so they survive as literals in the query string.
+        var queryUrl = "odata/AttributeBoundedProducts?$filter=matchesPattern(Name,'(a%2B)%2B$')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert - the attribute-configured time span bounds the evaluation and completes as Bad Request.
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task AttributeConfiguredTimeout_MatchesPattern_ReturnsMatchingProducts()
+    {
+        // Arrange - a benign pattern returns the full result under the attribute-configured time span.
+        var queryUrl = "odata/AttributeBoundedProducts?$filter=matchesPattern(Name,'^Al')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Equal(2, result.Count); // Alpha and Alabama start with "Al"
+        Assert.Equal(1, (result[0] as JObject)["Id"]);
+        Assert.Equal(4, (result[1] as JObject)["Id"]);
     }
 }

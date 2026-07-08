@@ -82,6 +82,64 @@ public class EnableQueryAttributeTests
     }
 
     [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Default_IsOneThousand()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute();
+
+        // Assert - the default one second surfaces as 1000 milliseconds through the attribute-compatible property.
+        Assert.Equal(1000, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_RoundTripsThroughQuerySettings()
+    {
+        // Arrange & Act - assigning the millisecond companion mirrors the [EnableQuery(...)] attribute-argument path.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = 250 };
+
+        // Assert - both properties reflect the same underlying setting.
+        Assert.Equal(250, attribute.MatchesPatternTimeoutMilliseconds);
+        Assert.Equal(TimeSpan.FromMilliseconds(250), attribute.MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Zero_AppliesNoLimit()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = 0 };
+
+        // Assert - zero opts out, mirroring a null time span.
+        Assert.Null(attribute.MatchesPatternTimeout);
+        Assert.Equal(0, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Negative_AppliesNoLimit()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = -5 };
+
+        // Assert - any non-positive value opts out.
+        Assert.Null(attribute.MatchesPatternTimeout);
+        Assert.Equal(0, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeout_And_Milliseconds_ShareTheSameSetting()
+    {
+        // Arrange
+        var attribute = new EnableQueryAttribute();
+
+        // Act & Assert - setting the time span property surfaces through the millisecond property.
+        attribute.MatchesPatternTimeout = TimeSpan.FromMilliseconds(500);
+        Assert.Equal(500, attribute.MatchesPatternTimeoutMilliseconds);
+
+        // Act & Assert - clearing the time span property surfaces as zero milliseconds (no limit).
+        attribute.MatchesPatternTimeout = null;
+        Assert.Equal(0, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
     public void EnsureStableOrdering_Property_RoundTrips()
     {
         ReflectionAssert.BooleanProperty<EnableQueryAttribute>(

@@ -54,6 +54,19 @@ public class DefaultBoundedProductsController : ODataController
     }
 }
 
+public class AttributeBoundedProductsController : ODataController
+{
+    // Configures the matchesPattern bound directly through the attribute using the millisecond companion
+    // property. This is only expressible because MatchesPatternTimeoutMilliseconds is an attribute-argument
+    // type; the TimeSpan? property cannot be assigned in attribute usage. A page size is also set so the
+    // collection is materialized while the bounded evaluation runs.
+    [EnableQuery(MatchesPatternTimeoutMilliseconds = 100, PageSize = 100)]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
 /// <summary>
 /// Serves the collection with a configured matchesPattern time span. A page size is also set so the
 /// collection is truncated (and therefore materialized) while the bounded evaluation runs; the limit is

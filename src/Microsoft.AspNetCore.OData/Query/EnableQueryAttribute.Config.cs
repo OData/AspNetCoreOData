@@ -80,10 +80,39 @@ public partial class EnableQueryAttribute
     /// materialized during query execution, for example when a page size is configured.
     /// Set the value to <c>null</c> to apply no limit.
     /// </summary>
+    /// <remarks>
+    /// <see cref="TimeSpan"/> is not a valid attribute-argument type, so this property cannot be assigned directly
+    /// through <c>[EnableQuery(...)]</c> usage. To configure the bound on the attribute itself, use
+    /// <see cref="MatchesPatternTimeoutMilliseconds"/>.
+    /// </remarks>
     public TimeSpan? MatchesPatternTimeout
     {
         get => _querySettings.MatchesPatternTimeout;
         set => _querySettings.MatchesPatternTimeout = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the duration, in milliseconds, used to bound evaluation of the <c>matchesPattern</c> filter function.
+    /// This is the attribute-compatible companion of <see cref="MatchesPatternTimeout"/>; because an <see cref="int"/>
+    /// is a valid attribute-argument type, it can be assigned through <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c>
+    /// usage. Both properties are backed by the same setting. The default value is one second (1000 milliseconds).
+    /// Set the value to <c>0</c> (or any non-positive value) to apply no limit.
+    /// </summary>
+    public int MatchesPatternTimeoutMilliseconds
+    {
+        get
+        {
+            TimeSpan? timeout = _querySettings.MatchesPatternTimeout;
+            if (!timeout.HasValue)
+            {
+                return 0;
+            }
+
+            double milliseconds = timeout.Value.TotalMilliseconds;
+            return milliseconds >= int.MaxValue ? int.MaxValue : (int)milliseconds;
+        }
+
+        set => _querySettings.MatchesPatternTimeout = value <= 0 ? null : (TimeSpan?)TimeSpan.FromMilliseconds(value);
     }
 
     /// <summary>

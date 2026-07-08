@@ -9172,6 +9172,20 @@
             materialized during query execution, for example when a page size is configured.
             Set the value to <c>null</c> to apply no limit.
             </summary>
+            <remarks>
+            <see cref="T:System.TimeSpan"/> is not a valid attribute-argument type, so this property cannot be assigned directly
+            through <c>[EnableQuery(...)]</c> usage. To configure the bound on the attribute itself, use
+            <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds">
+            <summary>
+            Gets or sets the duration, in milliseconds, used to bound evaluation of the <c>matchesPattern</c> filter function.
+            This is the attribute-compatible companion of <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout"/>; because an <see cref="T:System.Int32"/>
+            is a valid attribute-argument type, it can be assigned through <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c>
+            usage. Both properties are backed by the same setting. The default value is one second (1000 milliseconds).
+            Set the value to <c>0</c> (or any non-positive value) to apply no limit.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableCorrelatedSubqueryBuffering">
             <summary>

@@ -1,5 +1,7 @@
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.get -> System.TimeSpan?
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.set -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.get -> int
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.get -> System.TimeSpan?

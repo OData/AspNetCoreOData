@@ -1506,6 +1506,7 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption HandleNullPropagation  { public get; public set; }
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
 	System.Nullable`1[[System.TimeSpan]] MatchesPatternTimeout  { public get; public set; }
+	int MatchesPatternTimeoutMilliseconds  { public get; public set; }
 	int MaxAnyAllExpressionDepth  { public get; public set; }
 	int MaxExpansionDepth  { public get; public set; }
 	int MaxFunctionCallDepth  { public get; public set; }
