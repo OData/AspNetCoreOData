@@ -559,7 +559,7 @@ public abstract class ExpressionBinderBase
 
         arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript) };
 
-        return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesMattern, QuerySettings, arguments);
+        return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesPattern, QuerySettings, arguments);
     }
 
     private Expression BindTrim(SingleValueFunctionCallNode node)

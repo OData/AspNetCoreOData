@@ -379,7 +379,7 @@ public abstract partial class QueryBinder
 
         arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript) };
 
-        return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesMattern, context.QuerySettings, arguments);
+        return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesPattern, context.QuerySettings, arguments);
     }
 
     /// <summary>

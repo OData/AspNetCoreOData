@@ -173,11 +173,30 @@ public class ODataQuerySettings
 
     /// <summary>
     /// Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
-    /// A single <c>matchesPattern</c> evaluation cannot run for longer than the configured duration.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The bound is applied <em>per evaluation</em>, not per request: it limits how long a single
+    /// <c>matchesPattern</c> evaluation against one collection element can run. When a <c>$filter</c> is applied
+    /// to a collection of <c>N</c> elements, up to <c>N</c> evaluations are performed, so the worst-case
+    /// processing time for the request is on the order of <c>N</c> times the configured duration.
+    /// </para>
+    /// <para>
+    /// When a degenerate pattern exceeds the configured duration, the evaluation always stops (bounding CPU),
+    /// but whether the request completes as <c>400 (Bad Request)</c> depends on <em>where</em> the evaluation runs.
+    /// The <c>400</c> mapping requires the results to be materialized during query execution - for example when a
+    /// page size or <c>$count</c> is configured, or when the action returns a <see cref="SingleResult"/>. If the
+    /// query is instead returned as an un-materialized <see cref="System.Linq.IQueryable"/> (the default
+    /// <c>[EnableQuery]</c> case with no page size), the predicate is only evaluated later during response
+    /// serialization; the evaluation is still bounded, but the timeout surfaces outside the request pipeline's
+    /// error handling and the request does not complete as <c>400</c>.
+    /// </para>
+    /// </remarks>
     /// <value>
     /// The maximum time allowed for a single <c>matchesPattern</c> evaluation.
-    /// The default value is one second. Set the value to <c>null</c> to apply no limit.
+    /// The default value is one second. Set the value to <c>null</c> to apply no limit. Assigning
+    /// <see cref="TimeSpan.Zero"/> or any negative value throws <see cref="ArgumentOutOfRangeException"/>; to opt
+    /// out of the bound, assign <c>null</c> instead.
     /// </value>
     public TimeSpan? MatchesPatternTimeout
     {

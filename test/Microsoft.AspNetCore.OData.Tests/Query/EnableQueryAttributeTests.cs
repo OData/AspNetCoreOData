@@ -140,6 +140,26 @@ public class EnableQueryAttributeTests
     }
 
     [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Getter_TruncatesSubMillisecondFractions()
+    {
+        // Arrange - a span carrying a sub-millisecond fraction that was not set through the millisecond companion.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * 250 + 5000) };
+
+        // Act & Assert - the getter truncates the fractional part, so the round-trip through milliseconds is lossy.
+        Assert.Equal(250, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Getter_ClampsLargeDurationsToIntMaxValue()
+    {
+        // Arrange - a span whose total milliseconds exceeds int.MaxValue.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromDays(30) };
+
+        // Act & Assert - the getter clamps to int.MaxValue rather than overflowing.
+        Assert.Equal(int.MaxValue, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
     public void EnsureStableOrdering_Property_RoundTrips()
     {
         ReflectionAssert.BooleanProperty<EnableQueryAttribute>(
