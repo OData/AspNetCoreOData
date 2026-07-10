@@ -173,6 +173,12 @@ internal static class QueryNodeRestrictionValidator
         // groupby/aggregate/compute walk selective: a property that is not explicitly restricted stays
         // available regardless of the global EnableFilter/EnableSelect switches, so enabling this
         // validation is a no-op for unconfigured properties.
+        //
+        // The two path arguments are passed as null so each property is evaluated against the
+        // restrictions declared on its own declaring type. That resolves the attribute-based
+        // restrictions and the type/property-level model-bound configurations this walk targets;
+        // a restriction scoped to a specific traversal path is intentionally not resolved here, so
+        // the outcome stays consistent regardless of how the property was reached.
         if (EdmHelpers.IsNotFilterable(property, null, null, model, enableFilter: true))
         {
             throw new ODataException(Error.Format(SRResources.NotFilterablePropertyUsedInFilter, property.Name));
