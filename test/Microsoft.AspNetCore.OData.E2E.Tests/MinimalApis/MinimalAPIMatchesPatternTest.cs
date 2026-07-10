@@ -57,6 +57,14 @@ public class MinimalAPIMatchesPatternTest : IClassFixture<MinimalTestFixture<Min
             .WithODataResult()
             .WithODataModel(model)
             .WithODataOptions(opt => opt.EnableAll().SetCaseInsensitive(true));
+
+        // A page-less endpoint (no page size) returns an un-materialized IQueryable, so the bounded
+        // matchesPattern evaluation runs during response serialization rather than during query execution.
+        app.MapGet("matchespattern/pageless/todos", (IMiniTodoTaskRepository db) => db.GetTodos())
+            .AddODataQueryEndpointFilter()
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataOptions(opt => opt.EnableAll().SetCaseInsensitive(true));
     }
 
     [Fact]
@@ -111,6 +119,36 @@ public class MinimalAPIMatchesPatternTest : IClassFixture<MinimalTestFixture<Min
     {
         // Arrange & Act - opting out keeps benign patterns working end to end.
         var response = await _client.GetAsync("/matchespattern/optout/todos?$filter=matchesPattern(Owner,'^Pe')");
+        var content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("\"Owner\":\"Peter\"", content);
+        Assert.DoesNotContain("\"Owner\":\"John\"", content);
+    }
+
+    [Fact]
+    public async Task DefaultTimeout_PagelessFilter_MatchesPatternRequiringExtensiveBacktracking_SurfacesDuringSerialization()
+    {
+        // Arrange - the page-less endpoint (no page size) returns an un-materialized IQueryable, so the bounded
+        // matchesPattern evaluation runs during response serialization. The evaluation is still bounded by the
+        // default time span, but because the response has already begun the aborted evaluation breaks the response
+        // stream instead of completing as 400 (Bad Request). This documents the current behavior of the page-less
+        // path. Both arguments are literals, so the evaluation is independent of the stored data; the '+'
+        // characters are percent-encoded so they survive as literals in the query string.
+        var haystack = new string('a', 40) + "X";
+        var queryUrl = $"/matchespattern/pageless/todos?$filter=matchesPattern('{haystack}','(a%2B)%2B$')";
+
+        // Act & Assert - reading the response surfaces the bounded, aborted evaluation as a broken stream.
+        await Assert.ThrowsAsync<HttpRequestException>(() => _client.GetAsync(queryUrl));
+    }
+
+    [Fact]
+    public async Task DefaultTimeout_PagelessFilter_MatchesPattern_ReturnsMatchingTodos()
+    {
+        // Arrange & Act - the same page-less endpoint returns the matching item for a benign pattern, confirming
+        // the streamed page-less path is healthy and only the degenerate pattern is affected.
+        var response = await _client.GetAsync("/matchespattern/pageless/todos?$filter=matchesPattern(Owner,'^Pe')");
         var content = await response.Content.ReadAsStringAsync();
 
         // Assert

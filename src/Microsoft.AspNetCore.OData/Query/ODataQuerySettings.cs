@@ -172,44 +172,28 @@ public class ODataQuerySettings
     public bool HandleReferenceNavigationPropertyExpandFilter { get; set; }
 
     /// <summary>
-    /// Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
+    /// Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation. The bound is per
+    /// evaluation, not per request, so a <c>$filter</c> over <c>N</c> elements may take up to <c>N</c> times this
+    /// duration.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// The bound is applied <em>per evaluation</em>, not per request: it limits how long a single
-    /// <c>matchesPattern</c> evaluation against one collection element can run. When a <c>$filter</c> is applied
-    /// to a collection of <c>N</c> elements, up to <c>N</c> evaluations are performed, so the worst-case
-    /// processing time for the request is on the order of <c>N</c> times the configured duration.
-    /// </para>
-    /// <para>
-    /// When a degenerate pattern exceeds the configured duration, the evaluation always stops (bounding CPU),
-    /// but whether the request completes as <c>400 (Bad Request)</c> depends on <em>where</em> the evaluation runs.
-    /// The <c>400</c> mapping requires the results to be materialized during query execution - for example when a
-    /// page size or <c>$count</c> is configured, or when the action returns a <see cref="SingleResult"/>. If the
-    /// query is instead returned as an un-materialized <see cref="System.Linq.IQueryable"/> (the default
-    /// <c>[EnableQuery]</c> case with no page size), the predicate is only evaluated later during response
-    /// serialization; the evaluation is still bounded, but the timeout surfaces outside the request pipeline's
-    /// error handling and the request does not complete as <c>400</c>.
-    /// </para>
+    /// The evaluation is always stopped when the bound elapses, but the request completes as
+    /// <c>400 (Bad Request)</c> only where the results are materialized during query execution (a configured page
+    /// size or <c>$count</c>, or a <c>SingleResult</c> action). For a page-less <c>[EnableQuery]</c> action the
+    /// predicate runs later, during response serialization, so the bound still applies but does not surface as
+    /// <c>400</c>.
     /// </remarks>
     /// <value>
-    /// The maximum time allowed for a single <c>matchesPattern</c> evaluation.
-    /// The default value is one second. Set the value to <c>null</c> to apply no limit. Assigning
-    /// <see cref="TimeSpan.Zero"/> or any negative value throws <see cref="ArgumentOutOfRangeException"/>; to opt
-    /// out of the bound, assign <c>null</c> instead.
+    /// The default is one second. A <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value applies no limit,
+    /// consistent with <see cref="EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>.
     /// </value>
     public TimeSpan? MatchesPatternTimeout
     {
         get => _matchesPatternTimeout;
-        set
-        {
-            if (value.HasValue && value.Value <= TimeSpan.Zero)
-            {
-                throw Error.ArgumentOutOfRange(nameof(value), value.Value, SRResources.MatchesPatternTimeoutMustBePositive);
-            }
 
-            _matchesPatternTimeout = value;
-        }
+        // A non-positive span opts out of the bound (no limit), consistent with
+        // EnableQueryAttribute.MatchesPatternTimeoutMilliseconds treating 0 (or any non-positive value) as opting out.
+        set => _matchesPatternTimeout = value.HasValue && value.Value <= TimeSpan.Zero ? null : value;
     }
 
     internal void CopyFrom(ODataQuerySettings settings)

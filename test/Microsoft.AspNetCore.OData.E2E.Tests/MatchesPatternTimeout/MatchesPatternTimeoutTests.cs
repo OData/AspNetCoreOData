@@ -61,6 +61,44 @@ public class MatchesPatternTimeoutTests : WebApiTestBase<MatchesPatternTimeoutTe
     }
 
     [Fact]
+    public async Task DefaultTimeout_PagelessEnableQuery_MatchesPatternRequiringExtensiveBacktracking_SurfacesDuringSerialization()
+    {
+        // Arrange - a plain [EnableQuery] action with no page size returns an un-materialized IQueryable, so the
+        // bounded matchesPattern evaluation runs during response serialization rather than during query execution.
+        // The evaluation is still bounded by the default time span, but because the response has already begun the
+        // aborted evaluation breaks the response stream instead of completing as 400 (Bad Request). This documents
+        // the current behavior of the page-less path; the paged, $count and single-result paths complete as 400.
+        // The '+' characters are percent-encoded so they survive as literals in the query string.
+        var queryUrl = "odata/Products?$filter=matchesPattern(Name,'(a%2B)%2B$')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act & Assert - reading the response surfaces the bounded, aborted evaluation as a broken stream.
+        await Assert.ThrowsAsync<HttpRequestException>(() => client.SendAsync(request));
+    }
+
+    [Fact]
+    public async Task DefaultSettings_PagelessEnableQueryWithoutMatchesPattern_ReturnsAllProducts()
+    {
+        // Arrange - the same page-less action returns the full collection when no matchesPattern predicate is
+        // used, confirming the streamed page-less path is healthy and only the degenerate pattern is affected.
+        var queryUrl = "odata/Products";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Equal(5, result.Count);
+    }
+
+    [Fact]
     public async Task ConfiguredTimeout_MatchesPattern_ReturnsSameMatchingProducts()
     {
         // Arrange

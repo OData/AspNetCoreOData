@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
+using HttpResults = Microsoft.AspNetCore.Http.Results;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -110,10 +112,10 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
     // as the controller pipeline (EnableQueryAttribute), so both request paths report it consistently.
     private static IResult CreateBadRequestResult(string message, Exception exception)
     {
-        Microsoft.AspNetCore.Mvc.SerializableError error = EnableQueryAttribute.CreateErrorResponse(
+        SerializableError error = EnableQueryAttribute.CreateErrorResponse(
             Error.Format(SRResources.UriQueryStringInvalid, message), exception);
 
-        return Microsoft.AspNetCore.Http.Results.BadRequest(error);
+        return HttpResults.BadRequest(error);
     }
 
     /// <summary>

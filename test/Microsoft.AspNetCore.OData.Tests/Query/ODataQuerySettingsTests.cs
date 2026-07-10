@@ -39,23 +39,46 @@ public class ODataQuerySettingsTests
     }
 
     [Fact]
-    public void MatchesPatternTimeout_SetToZero_Throws()
+    public void MatchesPatternTimeout_SetToZero_AppliesNoLimit()
     {
         // Arrange
         var settings = new ODataQuerySettings();
 
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => settings.MatchesPatternTimeout = TimeSpan.Zero);
+        // Act - a non-positive span opts out of the bound, consistent with the millisecond companion.
+        settings.MatchesPatternTimeout = TimeSpan.Zero;
+
+        // Assert
+        Assert.Null(settings.MatchesPatternTimeout);
     }
 
     [Fact]
-    public void MatchesPatternTimeout_SetToNegative_Throws()
+    public void MatchesPatternTimeout_SetToNegative_AppliesNoLimit()
     {
         // Arrange
         var settings = new ODataQuerySettings();
 
-        // Act & Assert
-        Assert.Throws<ArgumentOutOfRangeException>(() => settings.MatchesPatternTimeout = TimeSpan.FromMilliseconds(-1));
+        // Act - a negative span opts out of the bound, consistent with the millisecond companion.
+        settings.MatchesPatternTimeout = TimeSpan.FromMilliseconds(-1);
+
+        // Assert
+        Assert.Null(settings.MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeout_NonPositiveValue_OptsOutLikeMillisecondCompanion()
+    {
+        // Arrange & Act - a non-positive TimeSpan opts out exactly as the attribute's millisecond
+        // companion does for 0 / negative values, so both surfaces share one contract.
+        var zeroSpan = new ODataQuerySettings { MatchesPatternTimeout = TimeSpan.Zero };
+        var negativeSpan = new ODataQuerySettings { MatchesPatternTimeout = TimeSpan.FromSeconds(-5) };
+        var zeroMilliseconds = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = 0 };
+        var negativeMilliseconds = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = -5 };
+
+        // Assert - every non-positive assignment lands on the same "no limit" state.
+        Assert.Null(zeroSpan.MatchesPatternTimeout);
+        Assert.Null(negativeSpan.MatchesPatternTimeout);
+        Assert.Null(zeroMilliseconds.MatchesPatternTimeout);
+        Assert.Null(negativeMilliseconds.MatchesPatternTimeout);
     }
 
     [Fact]

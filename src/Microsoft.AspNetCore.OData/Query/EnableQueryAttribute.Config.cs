@@ -74,30 +74,13 @@ public partial class EnableQueryAttribute
     }
 
     /// <summary>
-    /// Gets or sets the time span used to bound evaluation of the <c>matchesPattern</c> filter function.
-    /// A single <c>matchesPattern</c> evaluation cannot run for longer than the configured duration. The default value is one second.
+    /// Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
+    /// not per request). The default is one second; a <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value
+    /// applies no limit.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// The bound is applied <em>per evaluation</em>, not per request: it limits a single evaluation against one
-    /// collection element, so a request over <c>N</c> elements may spend on the order of <c>N</c> times the
-    /// configured duration before it is aborted.
-    /// </para>
-    /// <para>
-    /// When the configured duration elapses, the request is completed as 400 (Bad Request) only if the results are
-    /// materialized during query execution, for example when a page size or <c>$count</c> is configured, or the
-    /// action returns a <see cref="SingleResult"/>. For a plain <c>[EnableQuery]</c> action with no page size the
-    /// result is returned as an un-materialized <see cref="System.Linq.IQueryable"/> and the predicate is evaluated
-    /// later during response serialization; the evaluation is still bounded, but it does not surface as 400.
-    /// </para>
-    /// <para>
-    /// <see cref="TimeSpan"/> is not a valid attribute-argument type, so this property cannot be assigned directly
-    /// through <c>[EnableQuery(...)]</c> usage. To configure the bound on the attribute itself, use
-    /// <see cref="MatchesPatternTimeoutMilliseconds"/>. Note the two companions differ for non-positive values:
-    /// assigning <see cref="TimeSpan.Zero"/> (or a negative span) to this property throws
-    /// <see cref="ArgumentOutOfRangeException"/>, whereas <see cref="MatchesPatternTimeoutMilliseconds"/> treats
-    /// <c>0</c> (or any non-positive value) as opting out. Set this property to <c>null</c> to apply no limit.
-    /// </para>
+    /// <see cref="TimeSpan"/> is not a valid attribute-argument type, so use <see cref="MatchesPatternTimeoutMilliseconds"/>
+    /// to configure the bound in <c>[EnableQuery(...)]</c> usage. Both are backed by the same setting.
     /// </remarks>
     public TimeSpan? MatchesPatternTimeout
     {
@@ -106,20 +89,15 @@ public partial class EnableQueryAttribute
     }
 
     /// <summary>
-    /// Gets or sets the duration, in milliseconds, used to bound evaluation of the <c>matchesPattern</c> filter function.
-    /// This is the attribute-compatible companion of <see cref="MatchesPatternTimeout"/>; because an <see cref="int"/>
-    /// is a valid attribute-argument type, it can be assigned through <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c>
-    /// usage. Both properties are backed by the same setting. The default value is one second (1000 milliseconds).
-    /// Set the value to <c>0</c> (or any non-positive value) to apply no limit.
+    /// Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
+    /// This is the attribute-compatible companion of <see cref="MatchesPatternTimeout"/> and shares the same
+    /// setting; because <see cref="int"/> is a valid attribute-argument type, it can be set in
+    /// <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 1000 (one second); a
+    /// value of <c>0</c> or less applies no limit.
     /// </summary>
     /// <remarks>
-    /// The non-positive contract differs from <see cref="MatchesPatternTimeout"/>: this property maps <c>0</c> and
-    /// any negative value to no limit (equivalent to a <c>null</c> time span), whereas assigning
-    /// <see cref="TimeSpan.Zero"/> or a negative span to <see cref="MatchesPatternTimeout"/> throws
-    /// <see cref="ArgumentOutOfRangeException"/>. The getter derives the value from the underlying
-    /// <see cref="TimeSpan"/>: sub-millisecond fractions are truncated and durations of
-    /// <see cref="int.MaxValue"/> milliseconds or more are clamped to <see cref="int.MaxValue"/>, so reading this
-    /// property after setting <see cref="MatchesPatternTimeout"/> to such a span is lossy.
+    /// The getter is lossy: sub-millisecond fractions are truncated and durations of <see cref="int.MaxValue"/>
+    /// milliseconds or more are clamped to <see cref="int.MaxValue"/>.
     /// </remarks>
     public int MatchesPatternTimeoutMilliseconds
     {
