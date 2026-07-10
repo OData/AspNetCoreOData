@@ -8,12 +8,12 @@ schedules:
 
 parameters:
   - name: PublishMode
-    displayName: Package publishing mode
+    displayName: Package publishing mode ('NightlyOnly' for nightly packages; 'ReleaseAndNightly' for both release and nightly packages)
     type: string
     default: NightlyOnly
     values:
     - NightlyOnly
-    - Release
+    - ReleaseAndNightly
 
 resources:
   repositories:
@@ -41,7 +41,7 @@ variables:
   - name: PackagesToPush
     value: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*nupkg
 
-- ${{ if eq(parameters.PublishMode, 'Release') }}: 
+- ${{ if eq(parameters.PublishMode, 'ReleaseAndNightly') }}: 
   - name: PackagesToPush
     value: '$(Build.ArtifactStagingDirectory)\Nuget\*.nupkg;$(Build.ArtifactStagingDirectory)\Nuget\*.snupkg'
 
