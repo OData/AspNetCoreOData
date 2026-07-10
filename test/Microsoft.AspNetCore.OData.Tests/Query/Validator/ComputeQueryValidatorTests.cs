@@ -55,4 +55,38 @@ public class ComputeQueryValidatorTests
                 new ODataValidationSettings()),
             "Could not find a property named 'test' on type 'Microsoft.AspNetCore.OData.Tests.Query.Models.QueryCompositionCustomer'.");
     }
+
+    [Theory]
+    [InlineData("NotFilterableProperty eq 'x' as Flag")]
+    [InlineData("length(NotFilterableProperty) as Length")]
+    [InlineData("Name eq 'a' or NotFilterableProperty eq 'b' as Flag")]
+    [InlineData("Address/NotFilterableProperty eq 'x' as Flag")]
+    [InlineData("Contacts/all(c: c/NotFilterableProperty ne null) as AllRestricted")]
+    [InlineData("Contacts/any(c: c/NotFilterableProperty ne null) as HasRestricted")]
+    public void ValidateComputeQueryValidator_ThrowsForRestrictedPropertyInComputeClause(string compute)
+    {
+        // Arrange & Act & Assert - a not-filterable property referenced through $compute is rejected
+        // the same way it is through $filter, regardless of the global enable switches.
+        ExceptionAssert.Throws<ODataException>(() =>
+            _validator.Validate(
+                new ComputeQueryOption(compute, _context),
+                new ODataValidationSettings()),
+            "The property 'NotFilterableProperty' cannot be used in the $filter query option.");
+    }
+
+    [Theory]
+    [InlineData("Name eq 'a' as Flag")]
+    [InlineData("AmountSpent mul 2 as Double")]
+    [InlineData("length(Name) as Length")]
+    [InlineData("Address/City eq 'a' as Flag")]
+    [InlineData("Contacts/any(c: c/Name ne null) as HasNamed")]
+    public void ValidateComputeQueryValidator_DoesNotThrowForUnrestrictedPropertyInComputeClause(string compute)
+    {
+        // Arrange & Act & Assert - an unrestricted property keeps validating even though the context
+        // leaves EnableFilter/EnableSelect at their framework defaults (false).
+        ExceptionAssert.DoesNotThrow(() =>
+            _validator.Validate(
+                new ComputeQueryOption(compute, _context),
+                new ODataValidationSettings()));
+    }
 }

@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using Microsoft.OData.UriParser;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -29,10 +31,17 @@ public class ComputeQueryValidator : IComputeQueryValidator
             throw Error.ArgumentNull(nameof(validationSettings));
         }
 
-        // so far, we don't have validation rules here for $compute
-        // because 'DefaultQuerySetting' doesn't have configuration for $compute
-        // we can only let ODL to parse and verify the compute clause,
-        // however, developer can override this method add his own rules
-        _ = computeQueryOption.ComputeClause;
+        // Reject any property referenced by a $compute expression that the model marks as not
+        // filterable or configures as not selectable, so those properties are enforced
+        // consistently with $filter and $select. Developers can override this method to add
+        // their own rules.
+        ComputeClause computeClause = computeQueryOption.ComputeClause;
+        if (computeClause != null)
+        {
+            foreach (ComputeExpression computeExpression in computeClause.ComputedItems)
+            {
+                QueryNodeRestrictionValidator.Validate(computeExpression.Expression, computeQueryOption.Context);
+            }
+        }
     }
 }

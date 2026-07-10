@@ -11623,6 +11623,13 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetApplyQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetComputeQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator"/>.
@@ -12605,6 +12612,17 @@
              Gets the raw $apply value.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator">
+            <summary>
+            Gets or sets the $apply Query Validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the $apply query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
             <summary>
             Apply the apply query to the given IQueryable.
@@ -13443,6 +13461,24 @@
             <param name="remainingSegments">The remaining segments after the first non type segment.</param>
             <returns>First non-type cast segment.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator">
+            <summary>
+            Represents a validator used to validate an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+            <remarks>
+            The <c>filter</c> transformation is validated with the same <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator"/> used by
+            <c>$filter</c>, so a property marked as not filterable is rejected consistently. The <c>groupby</c>,
+            <c>aggregate</c> and <c>compute</c> transformations reject any referenced property that the model marks as
+            not filterable or configures as not selectable, consistent with <c>$filter</c> and <c>$select</c>.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption" />.
+            </summary>
+            <param name="applyQueryOption">The $apply query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -13779,6 +13815,19 @@
             <summary>
             Exit function call.
             </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator">
+            <summary>
+            Provide the interface used to validate an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="applyQueryOption">The $apply query.</param>
+            <param name="validationSettings">The validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator">
             <summary>
@@ -14283,6 +14332,21 @@
             <param name="transformationExpressionType">The type to validate.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="transformationExpressionType"/>
             does not implement the required interface or inherit from the required base class.</exception>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryNodeRestrictionValidator">
+            <summary>
+            Walks the query nodes referenced by <c>$apply</c> (groupby/aggregate/compute) and top-level
+            <c>$compute</c> expressions and rejects any property that the model marks as not filterable or
+            configures as not selectable, so those properties are enforced consistently with how they are
+            enforced for <c>$filter</c> and <c>$select</c>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryNodeRestrictionValidator.Validate(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Validates a single <see cref="T:Microsoft.OData.UriParser.QueryNode"/> and its descendants.
+            </summary>
+            <param name="node">The query node to validate. A <c>null</c> node is a no-op.</param>
+            <param name="context">The query context used to resolve the model and query configurations.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
             <summary>
