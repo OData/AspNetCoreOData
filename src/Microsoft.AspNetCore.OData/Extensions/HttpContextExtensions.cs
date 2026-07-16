@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData;
@@ -98,6 +99,11 @@ public static class HttpContextExtensions
 
         // Check if the endpoint is a minimal endpoint.
         var endpoint = httpContext.GetEndpoint();
+        if (endpoint?.Metadata.GetMetadata<IODataRoutingMetadata>() != null)
+        {
+            return false;
+        }
+
         return endpoint?.Metadata.GetMetadata<HttpMethodAttribute>() == null
                && endpoint?.Metadata.GetMetadata<ODataMiniMetadata>() != null;
     }
@@ -302,7 +308,7 @@ public static class HttpContextExtensions
         services.AddSingleton(sp => miniOptions.QueryConfigurations);
 
         // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices(miniOptions.Version);
+        services.AddDefaultWebApiServices(miniOptions.Version, miniOptions.MaxReceivedMessageSize);
 
         // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
         services.AddSingleton<ODataUriResolver>(sp =>

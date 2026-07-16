@@ -95,7 +95,7 @@ public class ODataMiniMetadata
         services.AddSingleton(sp => this.Options.QueryConfigurations);
 
         // Inject the default Web API OData services.
-        services.AddDefaultWebApiServices(Version);
+        services.AddDefaultWebApiServices(Version, this.Options.MaxReceivedMessageSize);
 
         // Set Uri resolver to by default enabling unqualified functions/actions and case insensitive match.
         services.AddSingleton<ODataUriResolver>(sp =>

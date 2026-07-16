@@ -7,6 +7,7 @@
 
 using System;
 using System.Reflection;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -25,8 +26,9 @@ internal static class ODataServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="version">An <see cref="ODataVersion" /> specifying which OData version to support. Defaults to <see cref="ODataVersion.V4" />.</param>
+    /// <param name="maxReceivedMessageSize">The maximum size, in bytes, of a received message. Defaults to 100 MB.</param>
     /// <returns>The calling itself.</returns>
-    public static IServiceCollection AddDefaultWebApiServices(this IServiceCollection services, ODataVersion version = ODataVersion.V4)
+    public static IServiceCollection AddDefaultWebApiServices(this IServiceCollection services, ODataVersion version = ODataVersion.V4, long maxReceivedMessageSize = ODataBatchHandler.DefaultMaxReceivedMessageSize)
     {
         if (services == null)
         {
@@ -44,7 +46,7 @@ internal static class ODataServiceCollectionExtensions
             ODataMessageReaderSettings readerSetting = new ODataMessageReaderSettings(version)
             {
                 EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = maxReceivedMessageSize },
 
                 // Enable read property name case-insensitive from payload.
                 EnablePropertyNameCaseInsensitive = true,
@@ -67,7 +69,7 @@ internal static class ODataServiceCollectionExtensions
         services.AddScoped(sp => new ODataMessageWriterSettings(version)
         {
             EnableMessageStreamDisposal = false,
-            MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+            MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = maxReceivedMessageSize },
         });
 
         // QueryValidators.

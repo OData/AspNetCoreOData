@@ -282,12 +282,13 @@
             </summary>
             <value>Initially an empty <c>IDictionary&lt;string, object&gt;</c>.</value>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddDefaultWebApiServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.OData.ODataVersion)">
+        <member name="M:Microsoft.AspNetCore.OData.Abstracts.ODataServiceCollectionExtensions.AddDefaultWebApiServices(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.OData.ODataVersion,System.Int64)">
             <summary>
             Injects the default Web API OData services.
             </summary>
             <param name="services">The service collection.</param>
             <param name="version">An <see cref="T:Microsoft.OData.ODataVersion" /> specifying which OData version to support. Defaults to <see cref="F:Microsoft.OData.ODataVersion.V4" />.</param>
+            <param name="maxReceivedMessageSize">The maximum size, in bytes, of a received message. Defaults to 100 MB.</param>
             <returns>The calling itself.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Abstracts.NonValidatingParameterBindingAttribute">
@@ -6719,6 +6720,13 @@
             <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
             <param name="setupAction">The OData minimal options setup.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+            <remarks>
+            When <see cref="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxReceivedMessageSize(System.Int64)"/> is called in <paramref name="setupAction"/>,
+            the per-endpoint limit overrides the global default set in <c>AddOData</c>. This allows both tightening
+            and raising the limit per endpoint. On hosts without <see cref="T:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature"/>
+            (non-Kestrel), the enforcement falls back to checking the Content-Length header; chunked requests
+            without Content-Length will not be enforced on those hosts.
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.WithODataServices``1(``0,System.Action{Microsoft.Extensions.DependencyInjection.IServiceCollection})">
             <summary>
@@ -6759,6 +6767,11 @@
             <param name="builder">The <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/>.</param>
             <param name="version">The OData version.</param>
             <returns>A <see cref="T:Microsoft.AspNetCore.Builder.IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataEndpointConventionBuilderExtensions.EnforceMaxReceivedMessageSize(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Enforces MaxReceivedMessageSize for the current request using the endpoint's OData metadata.
+            </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.ODataJsonOptionsSetup">
             <summary>
@@ -6858,6 +6871,12 @@
             Please call 'SetTimeZoneInfo()' to config.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.MaxReceivedMessageSize">
+            <summary>
+            Gets the maximum size, in bytes, of an OData request or response message body.
+            Default is 100 MB (104,857,600 bytes). Please call 'SetMaxReceivedMessageSize()' to config.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
             <summary>
             Config whether or not no '$' sign query option.
@@ -6934,6 +6953,13 @@
             <summary>
             Enable $skiptoken query option.
             </summary>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxReceivedMessageSize(System.Int64)">
+            <summary>
+            Config the maximum size, in bytes, of an OData request or response message body.
+            </summary>
+            <param name="maxReceivedMessageSize">The maximum size in bytes.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxTop(System.Nullable{System.Int32})">
@@ -7169,6 +7195,18 @@
              </summary>
              <param name="maxTopValue">The maximum value of $top that a client can request.</param>
              <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataOptions"/> instance to enable fluent configuration.</returns>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize">
+            <summary>
+            Gets or sets the maximum size, in bytes, of an OData request or response message body.
+            Default is 100 MB (104,857,600 bytes). Must be greater than or equal to 1.
+            </summary>
+            <remarks>
+            For MVC controllers, this value is captured when <see cref="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel)"/> builds the route service provider.
+            Set this property <b>before</b> calling <see cref="M:Microsoft.AspNetCore.OData.ODataOptions.AddRouteComponents(Microsoft.OData.Edm.IEdmModel)"/> to ensure the limit is applied
+            to the route's <see cref="T:Microsoft.OData.ODataMessageReaderSettings"/>.
+            For minimal APIs, the limit is enforced by endpoint filters registered via <c>WithODataResult</c> or <c>WithODataOptions</c>.
+            </remarks>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
             <summary>
@@ -8265,6 +8303,11 @@
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.SingleValueFunctionCallTooDeep">
+            <summary>
+              Looks up a localized string similar to Current single value function call depth &apos;{0}&apos; exceeded the maximum allowed depth of &apos;{1}&apos;..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenNotSupportedOrderByExpression">
             <summary>
               Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
@@ -8403,6 +8446,11 @@
         <member name="P:Microsoft.AspNetCore.OData.SRResources.WriteToResponseAsyncMustHaveRequest">
             <summary>
               Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxReceivedMessageSizeExceeded">
+            <summary>
+              Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">
@@ -12110,6 +12158,11 @@
             by buffering results from the sub-query.
             </summary>
             <value>The default value is <c>false</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth">
+            <summary>
+            Gets or sets the maximum depth for function calls in a query.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions">
             <summary>
