@@ -27,6 +27,8 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
@@ -82,18 +84,21 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         catch (ArgumentOutOfRangeException e)
         {
             actionExecutingContext.Result = CreateBadRequestResult(
+                actionExecutingContext.HttpContext,
                 Error.Format(SRResources.QueryParameterNotSupported, e.Message),
                 e);
         }
         catch (NotImplementedException e)
         {
             actionExecutingContext.Result = CreateBadRequestResult(
+                actionExecutingContext.HttpContext,
                 Error.Format(SRResources.UriQueryStringInvalid, e.Message),
                 e);
         }
         catch (NotSupportedException e)
         {
             actionExecutingContext.Result = CreateBadRequestResult(
+                actionExecutingContext.HttpContext,
                 Error.Format(SRResources.UriQueryStringInvalid, e.Message),
                 e);
         }
@@ -101,6 +106,7 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         {
             // Will also catch ODataException here because ODataException derives from InvalidOperationException.
             actionExecutingContext.Result = CreateBadRequestResult(
+                actionExecutingContext.HttpContext,
                 Error.Format(SRResources.UriQueryStringInvalid, e.Message),
                 e);
         }
@@ -359,7 +365,7 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
             }
             catch (ArgumentOutOfRangeException e)
             {
-                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.QueryParameterNotSupported, e.Message), e);
+                actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.QueryParameterNotSupported, e.Message), e);
             }
             catch (RegexMatchTimeoutException e)
             {
@@ -371,16 +377,16 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
             }
             catch (NotImplementedException e)
             {
-                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+                actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
             }
             catch (NotSupportedException e)
             {
-                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+                actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
             }
             catch (InvalidOperationException e)
             {
                 // Will also catch ODataException here because ODataException derives from InvalidOperationException.
-                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+                actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
             }
         }
 
@@ -410,7 +416,7 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         }
         catch (InvalidOperationException e)
         {
-            actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+            actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
             return;
         }
 
@@ -425,13 +431,55 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
     /// <summary>
     /// Create a BadRequestObjectResult.
     /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <param name="message">The error message.</param>
     /// <param name="exception">The exception.</param>
     /// <returns>A BadRequestObjectResult.</returns>
-    private static BadRequestObjectResult CreateBadRequestResult(string message, Exception exception)
+    private BadRequestObjectResult CreateBadRequestResult(HttpContext httpContext, string message, Exception exception)
     {
+        LogQueryValidationError(httpContext, exception);
+
         SerializableError error = CreateErrorResponse(message, exception);
         return new BadRequestObjectResult(error);
+    }
+
+    /// <summary>
+    /// Records diagnostic details about a query that failed validation, using the request state that is
+    /// available even when the query options could not be fully parsed. Does nothing unless logging is
+    /// enabled for the action — either on the attribute or through the global
+    /// <see cref="ODataOptions.EnableQueryValidationErrorLogging"/> value — and a logger is available. The diagnostic
+    /// is written at the level from the global <see cref="ODataOptions.QueryValidationErrorLogLevel"/>
+    /// (default <see cref="LogLevel.Warning"/>). This never changes the response produced for
+    /// the failed query.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <param name="exception">The exception raised while validating the query.</param>
+    private void LogQueryValidationError(HttpContext httpContext, Exception exception)
+    {
+        if (httpContext == null)
+        {
+            return;
+        }
+
+        // When the attribute does not set the flag, fall back to the global value from ODataOptions so the
+        // behavior can be configured once for all actions. An explicit value on the attribute takes precedence.
+        ODataOptions odataOptions = httpContext.ODataOptions();
+        bool loggingEnabled = _enableQueryValidationErrorLogging ?? odataOptions?.EnableQueryValidationErrorLogging ?? false;
+        if (!loggingEnabled)
+        {
+            return;
+        }
+
+        ILogger logger = httpContext.RequestServices?.GetService<ILogger<EnableQueryAttribute>>();
+        if (logger == null)
+        {
+            return;
+        }
+
+        // The global level from ODataOptions applies, defaulting to Warning when it is not configured.
+        LogLevel logLevel = odataOptions?.QueryValidationErrorLogLevel ?? LogLevel.Warning;
+
+        QueryValidationErrorLogger.LogWarningOrError(logger, logLevel, httpContext, exception);
     }
 
     /// <summary>
@@ -607,6 +655,13 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         }
 
         ODataQueryOptions queryOptions = new ODataQueryOptions(queryContext, request);
+
+        if (requestQueryData != null)
+        {
+            // Capture the options so diagnostics on the post-action validation path can report the element
+            // type and the attempted query, consistent with the pre-action path.
+            requestQueryData.ProcessedQueryOptions = queryOptions;
+        }
 
         ValidateQuery(request, queryOptions);
 

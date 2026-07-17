@@ -6877,6 +6877,19 @@
             Default is 100 MB (104,857,600 bytes). Please call 'SetMaxReceivedMessageSize()' to config.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging">
+            <summary>
+            Gets a value indicating whether diagnostic details are recorded when an incoming query fails validation.
+            Please call 'SetQueryValidationErrorLogging()' to config. The default value is <c>false</c>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryValidationErrorLogLevel">
+            <summary>
+            Gets the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written when
+            <see cref="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging"/> is enabled. Please call 'SetQueryValidationErrorLogLevel()' to
+            config. The default value is <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
             <summary>
             Config whether or not no '$' sign query option.
@@ -6889,6 +6902,22 @@
             Config the case insensitive.
             </summary>
             <param name="enableCaseInsensitive">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetQueryValidationErrorLogging(System.Boolean)">
+            <summary>
+            Config whether or not diagnostic details are recorded when an incoming query fails validation. When
+            enabled, the endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the
+            failure reason are written.
+            </summary>
+            <param name="enableQueryValidationErrorLogging">Whether to record query validation diagnostics.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetQueryValidationErrorLogLevel(Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Config the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written.
+            </summary>
+            <param name="logLevel">The level at which query validation diagnostics are written.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetContinueOnErrorHeader(System.Boolean)">
@@ -7211,6 +7240,25 @@
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
             <summary>
             Gets or sets whether or not the OData system query options should be prefixed with '$'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging">
+            <summary>
+            Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+            fails validation for actions annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. When enabled, the
+            endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the failure
+            reason are written. This value provides
+            the default for every such action, allowing the behavior to be configured once instead of on each
+            attribute; an individual <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> overrides it by setting
+            <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging"/> explicitly. The default value is <c>false</c>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written for actions
+            annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> when <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is enabled.
+            This value applies to every such action, so the level can be configured once. The default value is
+            <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
@@ -9310,6 +9358,20 @@
             Gets or sets the maximum number of expressions that can be present in the $orderby.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging">
+            <summary>
+            Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+            fails validation. When enabled, the endpoint's route template, the queried type, the attempted
+            <c>$select</c> and <c>$expand</c> options, and the failure reason are written, together with the
+            validation exception, to an <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> resolved from the request services
+            and categorized for <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. This information is captured from the request
+            even when the query options cannot be fully parsed. When this property is not set on the attribute,
+            the value of <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is used, so the behavior can be
+            configured once for all actions; setting it here overrides that global value for this action. The
+            diagnostic is written at the level from <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel"/>
+            (default <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>). The default value is <c>false</c>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>
             Performs the query composition before action is executing.
@@ -9356,13 +9418,27 @@
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
             <param name="request">The request.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(Microsoft.AspNetCore.Http.HttpContext,System.String,System.Exception)">
             <summary>
             Create a BadRequestObjectResult.
             </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
             <param name="message">The error message.</param>
             <param name="exception">The exception.</param>
             <returns>A BadRequestObjectResult.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.LogQueryValidationError(Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+            <summary>
+            Records diagnostic details about a query that failed validation, using the request state that is
+            available even when the query options could not be fully parsed. Does nothing unless logging is
+            enabled for the action — either on the attribute or through the global
+            <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> value — and a logger is available. The diagnostic
+            is written at the level from the global <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel"/>
+            (default <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>). This never changes the response produced for
+            the failed query.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <param name="exception">The exception raised while validating the query.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateErrorResponse(System.String,System.Exception)">
             <summary>
@@ -11822,6 +11898,17 @@
             The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
             </param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.LogQueryValidationError(Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+            <summary>
+            Records diagnostic details about a query that failed validation, using the request state that is
+            available even when the query options could not be fully parsed. Does nothing unless logging is enabled
+            through <see cref="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging"/> and a logger is available. The diagnostic
+            is written at the level from <see cref="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryValidationErrorLogLevel"/>. This never
+            changes the response produced for the failed query.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <param name="exception">The exception raised while validating the query.</param>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
             <summary>
             Creates the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> for action executing validation.
@@ -12577,6 +12664,32 @@
             </summary>
             <param name="type">The type</param>
             <returns><c>true</c> if the type is IQueryable.</returns>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger">
+            <summary>
+            Writes structured diagnostics about a query that failed validation, using request state that is available
+            even when the query options could not be fully parsed. This is shared by the controller
+            (<see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>) and minimal API (<see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter"/>) paths so both
+            report the same information. It never changes the response produced for the failed query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.LogWarningOrError(Microsoft.Extensions.Logging.ILogger,Microsoft.Extensions.Logging.LogLevel,Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+            <summary>
+            Writes the diagnostic entry for a failed query validation at the specified level. Does nothing when no
+            logger is available or the level is not enabled.
+            </summary>
+            <param name="logger">The logger to write to, or <c>null</c> when none is available.</param>
+            <param name="logLevel">The level at which the diagnostic is written.</param>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <param name="exception">The exception raised while validating the query.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.FormatRequestedQueryOptions(Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions)">
+            <summary>
+            Builds a compact description of the requested query options that reference properties, including only
+            the options that were supplied so empty options are not reported.
+            </summary>
+            <param name="rawValues">The raw query option values, or <c>null</c> when unavailable.</param>
+            <returns>The requested query options, or an empty string when none apply.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption">
             <summary>
