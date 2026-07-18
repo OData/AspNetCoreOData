@@ -82,13 +82,13 @@ public class EnableQueryAttributeTests
     }
 
     [Fact]
-    public void MatchesPatternTimeoutMilliseconds_Default_IsOneThousand()
+    public void MatchesPatternTimeoutMilliseconds_Default_IsTwoHundredFifty()
     {
         // Arrange & Act
         var attribute = new EnableQueryAttribute();
 
-        // Assert - the default one second surfaces as 1000 milliseconds through the attribute-compatible property.
-        Assert.Equal(1000, attribute.MatchesPatternTimeoutMilliseconds);
+        // Assert - the default 250 milliseconds surfaces through the attribute-compatible property.
+        Assert.Equal(250, attribute.MatchesPatternTimeoutMilliseconds);
     }
 
     [Fact]
@@ -150,13 +150,15 @@ public class EnableQueryAttributeTests
     }
 
     [Fact]
-    public void MatchesPatternTimeoutMilliseconds_Getter_ClampsLargeDurationsToIntMaxValue()
+    public void MatchesPatternTimeoutMilliseconds_Getter_ReflectsSetTimeClampToRegexMaximum()
     {
-        // Arrange - a span whose total milliseconds exceeds int.MaxValue.
+        // Arrange - a span whose total milliseconds exceeds Regex's maximum match timeout.
         var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromDays(30) };
 
-        // Act & Assert - the getter clamps to int.MaxValue rather than overflowing.
-        Assert.Equal(int.MaxValue, attribute.MatchesPatternTimeoutMilliseconds);
+        // Act & Assert - the time span setter clamps to Regex's maximum (int.MaxValue - 1 milliseconds)
+        // so the value is always a valid regex timeout; the millisecond getter therefore reflects that
+        // clamped maximum rather than overflowing.
+        Assert.Equal(int.MaxValue - 1, attribute.MatchesPatternTimeoutMilliseconds);
     }
 
     [Fact]

@@ -9162,7 +9162,7 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout">
             <summary>
             Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
-            not per request). The default is one second; a <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value
+            not per request). The default is 250 milliseconds; a <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value
             applies no limit.
             </summary>
             <remarks>
@@ -9175,7 +9175,7 @@
             Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
             This is the attribute-compatible companion of <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout"/> and shares the same
             setting; because <see cref="T:System.Int32"/> is a valid attribute-argument type, it can be set in
-            <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 1000 (one second); a
+            <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 250 (a quarter second); a
             value of <c>0</c> or less applies no limit.
             </summary>
             <remarks>
@@ -12170,6 +12170,13 @@
             when <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> is not explicitly configured.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxMatchesPatternTimeout">
+            <summary>
+            The largest time span that <see cref="T:System.Text.RegularExpressions.Regex"/> accepts as a match
+            timeout. A configured <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> above this bound is clamped to it so it can
+            always be handed to <c>Regex.IsMatch</c> without throwing <see cref="T:System.ArgumentOutOfRangeException"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings" /> class.
@@ -12270,8 +12277,10 @@
             <c>400</c>.
             </remarks>
             <value>
-            The default is one second. A <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value applies no limit,
-            consistent with <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>.
+            The default is 250 milliseconds. A <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value applies no limit,
+            consistent with <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>. A value larger than
+            <see cref="T:System.Text.RegularExpressions.Regex"/>'s maximum match timeout (~24.86 days) is clamped to that
+            maximum so it is always a valid regex timeout.
             </value>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator">

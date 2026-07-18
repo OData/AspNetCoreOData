@@ -14,13 +14,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query;
 public class ODataQuerySettingsTests
 {
     [Fact]
-    public void MatchesPatternTimeout_Default_IsOneSecond()
+    public void MatchesPatternTimeout_Default_Is250Milliseconds()
     {
         // Arrange & Act
         var settings = new ODataQuerySettings();
 
         // Assert
-        Assert.Equal(TimeSpan.FromSeconds(1), settings.MatchesPatternTimeout);
+        Assert.Equal(TimeSpan.FromMilliseconds(250), settings.MatchesPatternTimeout);
         Assert.Equal(ODataQuerySettings.DefaultMatchesPatternTimeout, settings.MatchesPatternTimeout);
     }
 
@@ -101,5 +101,43 @@ public class ODataQuerySettingsTests
 
         // Assert
         Assert.Null(populatedTarget.MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeout_AboveRegexMaximum_IsClampedToMaximum()
+    {
+        // Arrange
+        var settings = new ODataQuerySettings();
+
+        // Act - a span larger than Regex's maximum match timeout is clamped so it can be handed to
+        // Regex.IsMatch without throwing ArgumentOutOfRangeException once per query at execution time.
+        settings.MatchesPatternTimeout = TimeSpan.FromDays(30);
+
+        // Assert
+        Assert.Equal(ODataQuerySettings.MaxMatchesPatternTimeout, settings.MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeout_AtRegexMaximum_IsPreserved()
+    {
+        // Arrange
+        var settings = new ODataQuerySettings();
+
+        // Act - the exact maximum is a valid Regex match timeout and must be preserved unchanged.
+        settings.MatchesPatternTimeout = ODataQuerySettings.MaxMatchesPatternTimeout;
+
+        // Assert
+        Assert.Equal(ODataQuerySettings.MaxMatchesPatternTimeout, settings.MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_AboveRegexMaximum_IsClamped()
+    {
+        // Arrange & Act - int.MaxValue milliseconds is one tick above Regex's maximum match timeout,
+        // which would otherwise be accepted here and then throw for every matchesPattern query.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = int.MaxValue };
+
+        // Assert
+        Assert.Equal(ODataQuerySettings.MaxMatchesPatternTimeout, attribute.MatchesPatternTimeout);
     }
 }

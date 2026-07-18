@@ -24,6 +24,7 @@ public class MatchesPatternTimeoutEdmModel
         builder.EntitySet<MatchesPatternProduct>("BoundedProducts");
         builder.EntitySet<MatchesPatternProduct>("DefaultBoundedProducts");
         builder.EntitySet<MatchesPatternProduct>("AttributeBoundedProducts");
+        builder.EntitySet<MatchesPatternProduct>("ClampedProducts");
 
         return builder.GetEdmModel();
     }

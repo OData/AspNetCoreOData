@@ -67,6 +67,15 @@ public class AttributeBoundedProductsController : ODataController
     }
 }
 
+public class ClampedProductsController : ODataController
+{
+    [ClampedEnableQuery]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
 /// <summary>
 /// Serves the collection with a configured matchesPattern time span. A page size is also set so the
 /// collection is truncated (and therefore materialized) while the bounded evaluation runs; the limit is
@@ -90,6 +99,21 @@ internal sealed class PagedEnableQueryAttribute : EnableQueryAttribute
 {
     public PagedEnableQueryAttribute()
     {
+        PageSize = 100;
+    }
+}
+
+/// <summary>
+/// Serves the collection with a matchesPattern time span larger than the maximum that <c>Regex</c> accepts.
+/// The setter clamps it to that maximum, so a benign matchesPattern query still executes (rather than
+/// throwing <see cref="System.ArgumentOutOfRangeException"/> once per query). A page size is also set so the
+/// collection is materialized during query execution.
+/// </summary>
+internal sealed class ClampedEnableQueryAttribute : EnableQueryAttribute
+{
+    public ClampedEnableQueryAttribute()
+    {
+        MatchesPatternTimeout = TimeSpan.FromDays(30);
         PageSize = 100;
     }
 }

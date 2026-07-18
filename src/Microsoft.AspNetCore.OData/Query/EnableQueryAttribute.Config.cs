@@ -75,7 +75,7 @@ public partial class EnableQueryAttribute
 
     /// <summary>
     /// Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
-    /// not per request). The default is one second; a <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value
+    /// not per request). The default is 250 milliseconds; a <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value
     /// applies no limit.
     /// </summary>
     /// <remarks>
@@ -92,7 +92,7 @@ public partial class EnableQueryAttribute
     /// Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
     /// This is the attribute-compatible companion of <see cref="MatchesPatternTimeout"/> and shares the same
     /// setting; because <see cref="int"/> is a valid attribute-argument type, it can be set in
-    /// <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 1000 (one second); a
+    /// <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 250 (a quarter second); a
     /// value of <c>0</c> or less applies no limit.
     /// </summary>
     /// <remarks>

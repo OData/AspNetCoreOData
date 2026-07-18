@@ -20,7 +20,14 @@ public class ODataQuerySettings
     /// The default time span applied to a single <c>matchesPattern</c> filter function evaluation
     /// when <see cref="MatchesPatternTimeout"/> is not explicitly configured.
     /// </summary>
-    internal static readonly TimeSpan DefaultMatchesPatternTimeout = TimeSpan.FromSeconds(1);
+    internal static readonly TimeSpan DefaultMatchesPatternTimeout = TimeSpan.FromMilliseconds(250);
+
+    /// <summary>
+    /// The largest time span that <see cref="System.Text.RegularExpressions.Regex"/> accepts as a match
+    /// timeout. A configured <see cref="MatchesPatternTimeout"/> above this bound is clamped to it so it can
+    /// always be handed to <c>Regex.IsMatch</c> without throwing <see cref="ArgumentOutOfRangeException"/>.
+    /// </summary>
+    internal static readonly TimeSpan MaxMatchesPatternTimeout = TimeSpan.FromMilliseconds(int.MaxValue - 1);
 
     private HandleNullPropagationOption _handleNullPropagationOption = HandleNullPropagationOption.Default;
     private int? _pageSize;
@@ -184,16 +191,30 @@ public class ODataQuerySettings
     /// <c>400</c>.
     /// </remarks>
     /// <value>
-    /// The default is one second. A <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value applies no limit,
-    /// consistent with <see cref="EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>.
+    /// The default is 250 milliseconds. A <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value applies no limit,
+    /// consistent with <see cref="EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>. A value larger than
+    /// <see cref="System.Text.RegularExpressions.Regex"/>'s maximum match timeout (~24.86 days) is clamped to that
+    /// maximum so it is always a valid regex timeout.
     /// </value>
     public TimeSpan? MatchesPatternTimeout
     {
         get => _matchesPatternTimeout;
 
-        // A non-positive span opts out of the bound (no limit), consistent with
-        // EnableQueryAttribute.MatchesPatternTimeoutMilliseconds treating 0 (or any non-positive value) as opting out.
-        set => _matchesPatternTimeout = value.HasValue && value.Value <= TimeSpan.Zero ? null : value;
+        set
+        {
+            if (!value.HasValue || value.Value <= TimeSpan.Zero)
+            {
+                // A null or non-positive span opts out of the bound (no limit), consistent with
+                // EnableQueryAttribute.MatchesPatternTimeoutMilliseconds treating 0 (or any non-positive value) as opting out.
+                _matchesPatternTimeout = null;
+            }
+            else
+            {
+                // Clamp to Regex's maximum accepted match timeout so the value can always be handed to
+                // Regex.IsMatch without throwing ArgumentOutOfRangeException once per query at execution time.
+                _matchesPatternTimeout = value.Value > MaxMatchesPatternTimeout ? MaxMatchesPatternTimeout : value.Value;
+            }
+        }
     }
 
     internal void CopyFrom(ODataQuerySettings settings)

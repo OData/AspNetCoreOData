@@ -1166,7 +1166,7 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         var filters = BindFilterAndVerify<Product>(
             "matchesPattern(ProductName, 'A\\wc')",
-            "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript, 00:00:01)",
+            "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript, 00:00:00.2500000)",
             NotTesting);
 
         // Arrange & Act & Assert

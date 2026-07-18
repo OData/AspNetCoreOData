@@ -33,7 +33,8 @@ public class MatchesPatternTimeoutTests : WebApiTestBase<MatchesPatternTimeoutTe
             typeof(ProductsController),
             typeof(BoundedProductsController),
             typeof(DefaultBoundedProductsController),
-            typeof(AttributeBoundedProductsController));
+            typeof(AttributeBoundedProductsController),
+            typeof(ClampedProductsController));
 
         services.AddControllers().AddOData(opt =>
             opt.Filter().OrderBy().Select().Count().AddRouteComponents("odata", model));
@@ -244,6 +245,30 @@ public class MatchesPatternTimeoutTests : WebApiTestBase<MatchesPatternTimeoutTe
         var response = await client.SendAsync(request);
 
         // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
+        Assert.Equal(2, result.Count); // Alpha and Alabama start with "Al"
+        Assert.Equal(1, (result[0] as JObject)["Id"]);
+        Assert.Equal(4, (result[1] as JObject)["Id"]);
+    }
+
+    [Fact]
+    public async Task TimeoutAboveRegexMaximum_MatchesPattern_IsClampedAndStillExecutes()
+    {
+        // Arrange - the set is configured with a matchesPattern time span (30 days) larger than the maximum
+        // Regex accepts. Without clamping, binding this constant into Regex.IsMatch throws
+        // ArgumentOutOfRangeException for every matchesPattern query (surfacing as 400 on the controller path).
+        // The setter clamps the span to Regex's maximum, so a benign pattern executes and returns results.
+        var queryUrl = "odata/ClampedProducts?$filter=matchesPattern(Name,'^Al')";
+        var request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json;odata.metadata=minimal"));
+        var client = CreateClient();
+
+        // Act
+        var response = await client.SendAsync(request);
+
+        // Assert - the clamped span is a valid Regex timeout, so the query succeeds instead of failing.
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var result = (await response.Content.ReadAsObject<JObject>())["value"] as JArray;
