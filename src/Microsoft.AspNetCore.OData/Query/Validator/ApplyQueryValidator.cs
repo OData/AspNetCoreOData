@@ -74,7 +74,7 @@ public class ApplyQueryValidator : IApplyQueryValidator
                 {
                     foreach (GroupByPropertyNode groupingProperty in groupByTransformation.GroupingProperties)
                     {
-                        ValidateGroupByPropertyNode(groupingProperty, context);
+                        ValidateGroupByPropertyNode(groupingProperty, context, validationSettings);
                     }
                 }
 
@@ -87,7 +87,7 @@ public class ApplyQueryValidator : IApplyQueryValidator
                 {
                     foreach (AggregateExpressionBase aggregateExpression in aggregateTransformation.AggregateExpressions)
                     {
-                        ValidateAggregateExpression(aggregateExpression, context);
+                        ValidateAggregateExpression(aggregateExpression, context, validationSettings);
                     }
                 }
                 break;
@@ -98,7 +98,7 @@ public class ApplyQueryValidator : IApplyQueryValidator
                 {
                     foreach (ComputeExpression computeExpression in computeTransformation.Expressions)
                     {
-                        QueryNodeRestrictionValidator.Validate(computeExpression.Expression, context);
+                        QueryNodeRestrictionValidator.Validate(computeExpression.Expression, context, validationSettings);
                     }
                 }
                 break;
@@ -112,7 +112,7 @@ public class ApplyQueryValidator : IApplyQueryValidator
         }
     }
 
-    private static void ValidateGroupByPropertyNode(GroupByPropertyNode groupingProperty, ODataQueryContext context)
+    private static void ValidateGroupByPropertyNode(GroupByPropertyNode groupingProperty, ODataQueryContext context, ODataValidationSettings validationSettings)
     {
         if (groupingProperty == null)
         {
@@ -121,19 +121,19 @@ public class ApplyQueryValidator : IApplyQueryValidator
 
         if (groupingProperty.Expression != null)
         {
-            QueryNodeRestrictionValidator.Validate(groupingProperty.Expression, context);
+            QueryNodeRestrictionValidator.Validate(groupingProperty.Expression, context, validationSettings);
         }
 
         if (groupingProperty.ChildTransformations != null)
         {
             foreach (GroupByPropertyNode childProperty in groupingProperty.ChildTransformations)
             {
-                ValidateGroupByPropertyNode(childProperty, context);
+                ValidateGroupByPropertyNode(childProperty, context, validationSettings);
             }
         }
     }
 
-    private static void ValidateAggregateExpression(AggregateExpressionBase aggregateExpression, ODataQueryContext context)
+    private static void ValidateAggregateExpression(AggregateExpressionBase aggregateExpression, ODataQueryContext context, ODataValidationSettings validationSettings)
     {
         if (aggregateExpression == null)
         {
@@ -142,17 +142,17 @@ public class ApplyQueryValidator : IApplyQueryValidator
 
         if (aggregateExpression is AggregateExpression singleAggregateExpression)
         {
-            QueryNodeRestrictionValidator.Validate(singleAggregateExpression.Expression, context);
+            QueryNodeRestrictionValidator.Validate(singleAggregateExpression.Expression, context, validationSettings);
         }
         else if (aggregateExpression is EntitySetAggregateExpression entitySetAggregateExpression)
         {
-            QueryNodeRestrictionValidator.Validate(entitySetAggregateExpression.Expression, context);
+            QueryNodeRestrictionValidator.Validate(entitySetAggregateExpression.Expression, context, validationSettings);
 
             if (entitySetAggregateExpression.Children != null)
             {
                 foreach (AggregateExpressionBase child in entitySetAggregateExpression.Children)
                 {
-                    ValidateAggregateExpression(child, context);
+                    ValidateAggregateExpression(child, context, validationSettings);
                 }
             }
         }

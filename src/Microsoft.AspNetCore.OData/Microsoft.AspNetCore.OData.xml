@@ -13757,6 +13757,41 @@
             <param name="node">The single value node.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateFunctionAllowed(System.String,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates that a function is allowed by the <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedFunctions"/> allow-list.
+            </summary>
+            <remarks>
+            Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+            transformations enforce the same function allow-list as <c>$filter</c>.
+            </remarks>
+            <param name="functionName">The function name.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorAllowed(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates that a binary operator is allowed by the <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedLogicalOperators"/>
+            or <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedArithmeticOperators"/> allow-lists.
+            </summary>
+            <remarks>
+            Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+            transformations enforce the same operator allow-lists as <c>$filter</c>.
+            </remarks>
+            <param name="binaryOperatorNode">The binary operator node.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateUnaryOperatorAllowed(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates that a unary operator ('not'/negate) is allowed by the
+            <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedLogicalOperators"/> allow-list.
+            </summary>
+            <remarks>
+            Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+            transformations enforce the same operator allow-list as <c>$filter</c>.
+            </remarks>
+            <param name="unaryOperatorNode">The unary operator node.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext">
             <summary>
             The metadata context for $filter validator.
@@ -14338,15 +14373,20 @@
             Walks the query nodes referenced by <c>$apply</c> (groupby/aggregate/compute) and top-level
             <c>$compute</c> expressions and rejects any property that the model marks as not filterable or
             configures as not selectable, so those properties are enforced consistently with how they are
-            enforced for <c>$filter</c> and <c>$select</c>.
+            enforced for <c>$filter</c> and <c>$select</c>. The same walk also enforces the operator and
+            function allow-lists and the node-count limit from <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>, so those
+            limits apply to the groupby/aggregate/compute/$compute expressions exactly as they do to <c>$filter</c>.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryNodeRestrictionValidator.Validate(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryNodeRestrictionValidator.Validate(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>
             Validates a single <see cref="T:Microsoft.OData.UriParser.QueryNode"/> and its descendants.
             </summary>
             <param name="node">The query node to validate. A <c>null</c> node is a no-op.</param>
             <param name="context">The query context used to resolve the model and query configurations.</param>
+            <param name="validationSettings">
+            The validation settings whose operator/function allow-lists and node-count/depth limits are enforced.
+            </param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
             <summary>

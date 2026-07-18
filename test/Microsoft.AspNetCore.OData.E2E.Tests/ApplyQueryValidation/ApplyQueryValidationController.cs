@@ -20,3 +20,17 @@ public class ApplyValidationItemsController : ODataController
         return Ok(ApplyValidationDataSource.Items);
     }
 }
+
+// Same data, but the endpoint restricts the function and arithmetic-operator allow-lists. This proves
+// end-to-end that those ODataValidationSettings limits are enforced for $apply (groupby/aggregate/
+// compute) and top-level $compute, not just for $filter.
+public class RestrictedLimitItemsController : ODataController
+{
+    [EnableQuery(
+        AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.Length,
+        AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~AllowedArithmeticOperators.Multiply)]
+    public ActionResult<IEnumerable<ApplyValidationItem>> Get()
+    {
+        return Ok(ApplyValidationDataSource.Items);
+    }
+}

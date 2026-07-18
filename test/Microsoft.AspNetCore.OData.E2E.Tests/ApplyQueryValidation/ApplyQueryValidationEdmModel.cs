@@ -22,6 +22,7 @@ public static class ApplyQueryValidationEdmModel
     {
         var builder = new ODataConventionModelBuilder();
         builder.EntitySet<ApplyValidationItem>("ApplyValidationItems");
+        builder.EntitySet<ApplyValidationItem>("RestrictedLimitItems");
         var model = builder.GetEdmModel();
 
         var entityType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == nameof(ApplyValidationItem));

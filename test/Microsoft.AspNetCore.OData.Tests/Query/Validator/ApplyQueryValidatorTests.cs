@@ -233,6 +233,96 @@ public class ApplyQueryValidatorTests
 
     #endregion
 
+    #region groupby / aggregate / compute enforce operator, function and node-count limits
+
+    // These cases prove that the operator / function allow-lists and the node-count limit from
+    // ODataValidationSettings are enforced for the groupby/aggregate/compute transformations, not just
+    // for filter(). The referenced properties (Name/AmountSpent) are unrestricted, so only the
+    // operator/function/complexity limit can be the cause of the rejection.
+
+    [Fact]
+    public void Validate_Throws_ForDisallowedFunctionInCompute()
+    {
+        // Arrange - length(...) is used but AllowedFunctions excludes Length.
+        var option = new ApplyQueryOption("compute(length(Name) as L)", CreateContext());
+        var settings = new ODataValidationSettings { AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.Length };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Function 'length' is not allowed. To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void Validate_Throws_ForDisallowedArithmeticOperatorInCompute()
+    {
+        // Arrange - 'mul' is used but AllowedArithmeticOperators excludes Multiply.
+        var option = new ApplyQueryOption("compute(AmountSpent mul 2 as Double)", CreateContext());
+        var settings = new ODataValidationSettings { AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~AllowedArithmeticOperators.Multiply };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Arithmetic operator 'Multiply' is not allowed. To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void Validate_Throws_ForDisallowedLogicalOperatorInCompute()
+    {
+        // Arrange - 'eq' is used but AllowedLogicalOperators excludes Equal.
+        var option = new ApplyQueryOption("compute(Name eq 'x' as Flag)", CreateContext());
+        var settings = new ODataValidationSettings { AllowedLogicalOperators = AllowedLogicalOperators.All & ~AllowedLogicalOperators.Equal };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Logical operator 'Equal' is not allowed. To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void Validate_Throws_ForDisallowedArithmeticOperatorInAggregate()
+    {
+        // Arrange - the aggregate expression itself contains 'mul', which is disallowed.
+        var option = new ApplyQueryOption("aggregate(AmountSpent mul 2 with sum as Total)", CreateContext());
+        var settings = new ODataValidationSettings { AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~AllowedArithmeticOperators.Multiply };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Arithmetic operator 'Multiply' is not allowed. To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void Validate_Throws_WhenNodeCountExceededInCompute()
+    {
+        // Arrange - a small MaxNodeCount is exceeded by the compute expression tree.
+        var option = new ApplyQueryOption("compute(AmountSpent mul 2 as Double)", CreateContext());
+        var settings = new ODataValidationSettings { MaxNodeCount = 1 };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "The node count limit of '1' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.");
+    }
+
+    [Theory]
+    [InlineData("compute(length(Name) as L)")]
+    [InlineData("compute(AmountSpent mul 2 as Double)")]
+    [InlineData("compute(Name eq 'x' as Flag)")]
+    [InlineData("aggregate(AmountSpent mul 2 with sum as Total)")]
+    public void Validate_DoesNotThrow_ForOperatorFunctionOrNodeCount_WhenLimitsPermit(string apply)
+    {
+        // Arrange - default settings allow every function/operator and set MaxNodeCount to 100, so the
+        // same expressions that the restrictive settings above reject validate cleanly here. This guards
+        // against the new enforcement producing false rejections under permissive limits.
+        var option = new ApplyQueryOption(apply, CreateContext());
+
+        // Act & Assert
+        ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, new ODataValidationSettings()));
+    }
+
+    #endregion
+
     #region Not-selectable (model-bound) properties in groupby
 
     [Fact]

@@ -40,7 +40,7 @@ public class ComputeQueryValidator : IComputeQueryValidator
         {
             foreach (ComputeExpression computeExpression in computeClause.ComputedItems)
             {
-                QueryNodeRestrictionValidator.Validate(computeExpression.Expression, computeQueryOption.Context);
+                QueryNodeRestrictionValidator.Validate(computeExpression.Expression, computeQueryOption.Context, validationSettings);
             }
         }
     }

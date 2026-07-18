@@ -35,7 +35,7 @@ public class ApplyQueryValidationTests : WebApiTestBase<ApplyQueryValidationTest
     {
         IEdmModel edmModel = ApplyQueryValidationEdmModel.GetEdmModel();
 
-        services.ConfigureControllers(typeof(ApplyValidationItemsController));
+        services.ConfigureControllers(typeof(ApplyValidationItemsController), typeof(RestrictedLimitItemsController));
 
         services.AddControllers().AddOData(options =>
             options.EnableQueryFeatures().AddRouteComponents("odata", edmModel));
@@ -77,10 +77,61 @@ public class ApplyQueryValidationTests : WebApiTestBase<ApplyQueryValidationTest
     [InlineData("$apply=aggregate($count as Total)")]
     [InlineData("$apply=compute(Amount mul 2 as DoubleAmount)")]
     [InlineData("$compute=Amount mul 2 as DoubleAmount")]
+    // A filter() that follows groupby/aggregate references the aggregation alias (a computed value,
+    // not a model property). The extended validation must not treat that alias as a restricted
+    // property and falsely reject an otherwise legitimate query.
+    [InlineData("$apply=groupby((Name),aggregate(Amount with sum as Total))/filter(Total gt 0)")]
     public async Task QueryAllowedProperty_ThroughApplyFilterOrCompute_ReturnsOk(string query)
     {
         // Arrange
         string queryUrl = $"odata/ApplyValidationItems?{query}";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    // The RestrictedLimitItems endpoint disallows the 'length' function and the 'mul' arithmetic
+    // operator. Each case uses an allowed property but a disallowed function/operator inside
+    // $apply (groupby/aggregate/compute) or top-level $compute, so the only possible cause of the
+    // 400 is the operator/function allow-list now being enforced for those transformations.
+    [Theory]
+    [InlineData("$compute=length(Name) as L")]
+    [InlineData("$apply=compute(length(Name) as L)")]
+    [InlineData("$compute=Amount mul 2 as D")]
+    [InlineData("$apply=compute(Amount mul 2 as D)")]
+    [InlineData("$apply=aggregate(Amount mul 2 with sum as D)")]
+    public async Task DisallowedFunctionOrOperator_ThroughApplyOrCompute_ReturnsBadRequest(string query)
+    {
+        // Arrange
+        string queryUrl = $"odata/RestrictedLimitItems?{query}";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    // The same endpoint still accepts functions/operators that remain allowed, proving the enforcement
+    // is selective (allow-list driven) rather than blocking every function/operator in $apply/$compute.
+    [Theory]
+    [InlineData("$compute=Name eq 'Alpha' as Flag")]
+    [InlineData("$apply=compute(Name eq 'Alpha' as Flag)")]
+    [InlineData("$apply=aggregate(Amount with sum as TotalAmount)")]
+    [InlineData("$apply=groupby((Name))")]
+    public async Task AllowedFunctionOrOperator_ThroughApplyOrCompute_ReturnsOk(string query)
+    {
+        // Arrange
+        string queryUrl = $"odata/RestrictedLimitItems?{query}";
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
         HttpClient client = CreateClient();
 

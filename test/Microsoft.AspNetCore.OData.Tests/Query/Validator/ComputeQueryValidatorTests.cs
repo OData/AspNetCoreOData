@@ -89,4 +89,54 @@ public class ComputeQueryValidatorTests
                 new ComputeQueryOption(compute, _context),
                 new ODataValidationSettings()));
     }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsForDisallowedFunction()
+    {
+        // Arrange - length(...) is used but AllowedFunctions excludes Length. The referenced property
+        // (Name) is unrestricted, so only the function allow-list can cause the rejection. This closes
+        // the $compute=<disallowed-function> bypass.
+        var settings = new ODataValidationSettings { AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.Length };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(new ComputeQueryOption("length(Name) as L", _context), settings),
+            "Function 'length' is not allowed. To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsForDisallowedArithmeticOperator()
+    {
+        // Arrange - 'mul' is used but AllowedArithmeticOperators excludes Multiply.
+        var settings = new ODataValidationSettings { AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~AllowedArithmeticOperators.Multiply };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(new ComputeQueryOption("AmountSpent mul 2 as D", _context), settings),
+            "Arithmetic operator 'Multiply' is not allowed. To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsForDisallowedLogicalOperator()
+    {
+        // Arrange - 'eq' is used but AllowedLogicalOperators excludes Equal.
+        var settings = new ODataValidationSettings { AllowedLogicalOperators = AllowedLogicalOperators.All & ~AllowedLogicalOperators.Equal };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(new ComputeQueryOption("Name eq 'x' as Flag", _context), settings),
+            "Logical operator 'Equal' is not allowed. To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsWhenNodeCountExceeded()
+    {
+        // Arrange - a small MaxNodeCount is exceeded by the compute expression tree.
+        var settings = new ODataValidationSettings { MaxNodeCount = 1 };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(new ComputeQueryOption("AmountSpent mul 2 as D", _context), settings),
+            "The node count limit of '1' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.");
+    }
 }
