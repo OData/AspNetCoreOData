@@ -866,7 +866,7 @@ public class EnableQueryAttributeTests
             context => Task.CompletedTask,
             RoutePatternFactory.Parse("Customers({key})"),
             order: 0,
-            metadata: null,
+            metadata: new EndpointMetadataCollection(Array.Empty<object>()),
             displayName: "Customers"));
 
         ActionContext actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
