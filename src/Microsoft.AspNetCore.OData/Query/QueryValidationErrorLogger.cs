@@ -32,7 +32,7 @@ internal static class QueryValidationErrorLogger
     /// <param name="logLevel">The level at which the diagnostic is written.</param>
     /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
     /// <param name="exception">The exception raised while validating the query.</param>
-    internal static void LogWarningOrError(ILogger logger, LogLevel logLevel, HttpContext httpContext, Exception exception)
+    internal static void LogQueryValidationFailure(ILogger logger, LogLevel logLevel, HttpContext httpContext, Exception exception)
     {
         if (logger == null || httpContext == null || !logger.IsEnabled(logLevel))
         {
@@ -93,7 +93,7 @@ internal static class QueryValidationErrorLogger
 
         if (hasSelect && hasExpand)
         {
-            return string.Concat("$select=", rawValues.Select, ", $expand=", rawValues.Expand);
+            return string.Concat("$select=", rawValues.Select, "&$expand=", rawValues.Expand);
         }
 
         if (hasSelect)

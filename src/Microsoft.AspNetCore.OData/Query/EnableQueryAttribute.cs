@@ -479,7 +479,7 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         // The global level from ODataOptions applies, defaulting to Warning when it is not configured.
         LogLevel logLevel = odataOptions?.QueryValidationErrorLogLevel ?? LogLevel.Warning;
 
-        QueryValidationErrorLogger.LogWarningOrError(logger, logLevel, httpContext, exception);
+        QueryValidationErrorLogger.LogQueryValidationFailure(logger, logLevel, httpContext, exception);
     }
 
     /// <summary>

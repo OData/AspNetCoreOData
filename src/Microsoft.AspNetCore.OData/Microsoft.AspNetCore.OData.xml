@@ -12673,7 +12673,7 @@
             report the same information. It never changes the response produced for the failed query.
             </summary>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.LogWarningOrError(Microsoft.Extensions.Logging.ILogger,Microsoft.Extensions.Logging.LogLevel,Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.LogQueryValidationFailure(Microsoft.Extensions.Logging.ILogger,Microsoft.Extensions.Logging.LogLevel,Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
             <summary>
             Writes the diagnostic entry for a failed query validation at the specified level. Does nothing when no
             logger is available or the level is not enabled.

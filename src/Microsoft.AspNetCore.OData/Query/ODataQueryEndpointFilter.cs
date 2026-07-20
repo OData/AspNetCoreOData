@@ -515,7 +515,7 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         }
 
         ILogger logger = httpContext.RequestServices?.GetService<ILogger<ODataQueryEndpointFilter>>();
-        QueryValidationErrorLogger.LogWarningOrError(logger, options.QueryValidationErrorLogLevel, httpContext, exception);
+        QueryValidationErrorLogger.LogQueryValidationFailure(logger, options.QueryValidationErrorLogLevel, httpContext, exception);
     }
 
     /// <summary>
