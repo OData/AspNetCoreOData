@@ -68,7 +68,8 @@ internal class ClrCanonicalFunctions
     public static readonly MethodInfo ToUpper = MethodOf(_ => _defaultString.ToUpper());
     public static readonly MethodInfo Trim = MethodOf(_ => _defaultString.Trim());
     public static readonly MethodInfo Concat = MethodOf(_ => String.Concat(default(string), default(string)));
-    public static readonly MethodInfo MatchesMattern = MethodOf(_ => Regex.IsMatch(default(string), default(string), default(RegexOptions)));
+    public static readonly MethodInfo MatchesPattern = MethodOf(_ => Regex.IsMatch(default(string), default(string), default(RegexOptions)));
+    public static readonly MethodInfo MatchesPatternWithTimeout = MethodOf(_ => Regex.IsMatch(default(string), default(string), default(RegexOptions), default(TimeSpan)));
 
     // math functions
     public static readonly MethodInfo CeilingOfDouble = MethodOf(_ => Math.Ceiling(default(double)));

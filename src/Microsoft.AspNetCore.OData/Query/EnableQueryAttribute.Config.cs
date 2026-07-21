@@ -74,6 +74,49 @@ public partial class EnableQueryAttribute
     }
 
     /// <summary>
+    /// Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
+    /// not per request). The default is 250 milliseconds; a <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value
+    /// applies no limit.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="TimeSpan"/> is not a valid attribute-argument type, so use <see cref="MatchesPatternTimeoutMilliseconds"/>
+    /// to configure the bound in <c>[EnableQuery(...)]</c> usage. Both are backed by the same setting.
+    /// </remarks>
+    public TimeSpan? MatchesPatternTimeout
+    {
+        get => _querySettings.MatchesPatternTimeout;
+        set => _querySettings.MatchesPatternTimeout = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
+    /// This is the attribute-compatible companion of <see cref="MatchesPatternTimeout"/> and shares the same
+    /// setting; because <see cref="int"/> is a valid attribute-argument type, it can be set in
+    /// <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 250 (a quarter second); a
+    /// value of <c>0</c> or less applies no limit.
+    /// </summary>
+    /// <remarks>
+    /// The getter is lossy: sub-millisecond fractions are truncated and durations of <see cref="int.MaxValue"/>
+    /// milliseconds or more are clamped to <see cref="int.MaxValue"/>.
+    /// </remarks>
+    public int MatchesPatternTimeoutMilliseconds
+    {
+        get
+        {
+            TimeSpan? timeout = _querySettings.MatchesPatternTimeout;
+            if (!timeout.HasValue)
+            {
+                return 0;
+            }
+
+            double milliseconds = timeout.Value.TotalMilliseconds;
+            return milliseconds >= int.MaxValue ? int.MaxValue : (int)milliseconds;
+        }
+
+        set => _querySettings.MatchesPatternTimeout = value <= 0 ? null : (TimeSpan?)TimeSpan.FromMilliseconds(value);
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether queries with expanded navigations should be formulated
     /// to encourage correlated sub-query results to be buffered.
     /// Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2
