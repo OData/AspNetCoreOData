@@ -9156,6 +9156,30 @@
             </summary>
             <value>The default value is <c>true</c>.</value>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout">
+            <summary>
+            Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
+            not per request). The default is 250 milliseconds; a <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value
+            applies no limit.
+            </summary>
+            <remarks>
+            <see cref="T:System.TimeSpan"/> is not a valid attribute-argument type, so use <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>
+            to configure the bound in <c>[EnableQuery(...)]</c> usage. Both are backed by the same setting.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds">
+            <summary>
+            Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
+            This is the attribute-compatible companion of <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout"/> and shares the same
+            setting; because <see cref="T:System.Int32"/> is a valid attribute-argument type, it can be set in
+            <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 250 (a quarter second); a
+            value of <c>0</c> or less applies no limit.
+            </summary>
+            <remarks>
+            The getter is lossy: sub-millisecond fractions are truncated and durations of <see cref="F:System.Int32.MaxValue"/>
+            milliseconds or more are clamped to <see cref="F:System.Int32.MaxValue"/>.
+            </remarks>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableCorrelatedSubqueryBuffering">
             <summary>
             Gets or sets a value indicating whether queries with expanded navigations should be formulated
@@ -12103,6 +12127,19 @@
             This class describes the settings to use during query composition.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.DefaultMatchesPatternTimeout">
+            <summary>
+            The default time span applied to a single <c>matchesPattern</c> filter function evaluation
+            when <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> is not explicitly configured.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxMatchesPatternTimeout">
+            <summary>
+            The largest time span that <see cref="T:System.Text.RegularExpressions.Regex"/> accepts as a match
+            timeout. A configured <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> above this bound is clamped to it so it can
+            always be handed to <c>Regex.IsMatch</c> without throwing <see cref="T:System.ArgumentOutOfRangeException"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings" /> class.
@@ -12188,6 +12225,26 @@
             The expanded property is only populated when the filter evaluates to true.
             This setting is false by default.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout">
+            <summary>
+            Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation. The bound is per
+            evaluation, not per request, so a <c>$filter</c> over <c>N</c> elements may take up to <c>N</c> times this
+            duration.
+            </summary>
+            <remarks>
+            The evaluation is always stopped when the bound elapses, but the request completes as
+            <c>400 (Bad Request)</c> only where the results are materialized during query execution (a configured page
+            size or <c>$count</c>, or a <c>SingleResult</c> action). For a page-less <c>[EnableQuery]</c> action the
+            predicate runs later, during response serialization, so the bound still applies but does not surface as
+            <c>400</c>.
+            </remarks>
+            <value>
+            The default is 250 milliseconds. A <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value applies no limit,
+            consistent with <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>. A value larger than
+            <see cref="T:System.Text.RegularExpressions.Regex"/>'s maximum match timeout (~24.86 days) is clamped to that
+            maximum so it is always a valid regex timeout.
+            </value>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator">
             <summary>

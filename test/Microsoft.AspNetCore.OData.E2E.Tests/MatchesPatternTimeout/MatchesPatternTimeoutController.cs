@@ -1,0 +1,119 @@
+//-----------------------------------------------------------------------------
+// <copyright file="MatchesPatternTimeoutController.cs" company=".NET Foundation">
+//      Copyright (c) .NET Foundation and Contributors. All rights reserved.
+//      See License.txt in the project root for license information.
+// </copyright>
+//------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
+
+namespace Microsoft.AspNetCore.OData.E2E.Tests.MatchesPatternTimeout;
+
+internal static class MatchesPatternTimeoutDataSource
+{
+    private static readonly MatchesPatternProduct[] products = new[]
+    {
+        new MatchesPatternProduct { Id = 1, Name = "Alpha" },
+        new MatchesPatternProduct { Id = 2, Name = "Beta" },
+        new MatchesPatternProduct { Id = 3, Name = "Gamma" },
+        new MatchesPatternProduct { Id = 4, Name = "Alabama" },
+        new MatchesPatternProduct { Id = 5, Name = new string('a', 40) + "!" }, // requires extensive backtracking for the '(a+)+$' pattern
+    };
+
+    public static IEnumerable<MatchesPatternProduct> Products => products;
+}
+
+public class ProductsController : ODataController
+{
+    [EnableQuery]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
+public class BoundedProductsController : ODataController
+{
+    [BoundedEnableQuery]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
+public class DefaultBoundedProductsController : ODataController
+{
+    [PagedEnableQuery]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
+public class AttributeBoundedProductsController : ODataController
+{
+    // Configures the matchesPattern bound directly through the attribute using the millisecond companion
+    // property. This is only expressible because MatchesPatternTimeoutMilliseconds is an attribute-argument
+    // type; the TimeSpan? property cannot be assigned in attribute usage. A page size is also set so the
+    // collection is materialized while the bounded evaluation runs.
+    [EnableQuery(MatchesPatternTimeoutMilliseconds = 100, PageSize = 100)]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
+public class ClampedProductsController : ODataController
+{
+    [ClampedEnableQuery]
+    public ActionResult<IEnumerable<MatchesPatternProduct>> Get()
+    {
+        return Ok(MatchesPatternTimeoutDataSource.Products);
+    }
+}
+
+/// <summary>
+/// Serves the collection with a configured matchesPattern time span. A page size is also set so the
+/// collection is truncated (and therefore materialized) while the bounded evaluation runs; the limit is
+/// larger than the data set, so benign queries are returned in full.
+/// </summary>
+internal sealed class BoundedEnableQueryAttribute : EnableQueryAttribute
+{
+    public BoundedEnableQueryAttribute()
+    {
+        MatchesPatternTimeout = TimeSpan.FromMilliseconds(100);
+        PageSize = 100;
+    }
+}
+
+/// <summary>
+/// Serves the collection with only a page size configured, so the default matchesPattern time span
+/// applies while the collection is materialized during query execution. The limit is larger than the
+/// data set, so benign queries are returned in full.
+/// </summary>
+internal sealed class PagedEnableQueryAttribute : EnableQueryAttribute
+{
+    public PagedEnableQueryAttribute()
+    {
+        PageSize = 100;
+    }
+}
+
+/// <summary>
+/// Serves the collection with a matchesPattern time span larger than the maximum that <c>Regex</c> accepts.
+/// The setter clamps it to that maximum, so a benign matchesPattern query still executes (rather than
+/// throwing <see cref="System.ArgumentOutOfRangeException"/> once per query). A page size is also set so the
+/// collection is materialized during query execution.
+/// </summary>
+internal sealed class ClampedEnableQueryAttribute : EnableQueryAttribute
+{
+    public ClampedEnableQueryAttribute()
+    {
+        MatchesPatternTimeout = TimeSpan.FromDays(30);
+        PageSize = 100;
+    }
+}

@@ -11,6 +11,8 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
@@ -1163,7 +1165,7 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         var filters = BindFilterAndVerify<Product>(
             "matchesPattern(ProductName, 'A\\wc')",
-            "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript)",
+            "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript, 00:00:00.2500000)",
             NotTesting);
 
         // Arrange & Act & Assert
@@ -1174,6 +1176,134 @@ public class FilterBinderTests
         InvokeFiltersAndVerify(filters, new Product { ProductName = "Abd" }, (false, false));
 
         InvokeFiltersAndVerify(filters, new Product { ProductName = "Aθd" }, (false, false)); // ECMAScript has strict matching of \w
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_WithTimeoutConfigured_BindsToTimeoutOverload()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, 'A\\wc')",
+            NotTesting,
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = TimeSpan.FromMilliseconds(100));
+
+        // Assert - both the false and true null-propagation expressions must bind to the four
+        // argument Regex.IsMatch overload and carry the configured time span as a constant.
+        foreach (var filter in new[] { filters.Item1, filters.Item2 })
+        {
+            var isMatchCall = FindIsMatchCall(filter);
+            Assert.NotNull(isMatchCall);
+
+            var parameters = isMatchCall.Method.GetParameters();
+            Assert.Equal(4, parameters.Length);
+            Assert.Equal(typeof(TimeSpan), parameters[3].ParameterType);
+
+            var timeoutArgument = Assert.IsAssignableFrom<ConstantExpression>(isMatchCall.Arguments[3]);
+            Assert.Equal(TimeSpan.FromMilliseconds(100), timeoutArgument.Value);
+        }
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_DefaultSettings_BindsToTimeoutOverload()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, 'A\\wc')",
+            NotTesting,
+            NotTesting);
+
+        // Assert - without an explicit configuration both expressions bind to the four argument
+        // Regex.IsMatch overload and carry the default time span as a constant.
+        foreach (var filter in new[] { filters.Item1, filters.Item2 })
+        {
+            var isMatchCall = FindIsMatchCall(filter);
+            Assert.NotNull(isMatchCall);
+
+            var parameters = isMatchCall.Method.GetParameters();
+            Assert.Equal(4, parameters.Length);
+            Assert.Equal(typeof(TimeSpan), parameters[3].ParameterType);
+
+            var timeoutArgument = Assert.IsAssignableFrom<ConstantExpression>(isMatchCall.Arguments[3]);
+            Assert.Equal(ODataQuerySettings.DefaultMatchesPatternTimeout, timeoutArgument.Value);
+        }
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_OptedOut_BindsToNoTimeoutOverload()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, 'A\\wc')",
+            NotTesting,
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = null);
+
+        // Assert - opting out of the time span keeps the three argument overload.
+        foreach (var filter in new[] { filters.Item1, filters.Item2 })
+        {
+            var isMatchCall = FindIsMatchCall(filter);
+            Assert.NotNull(isMatchCall);
+            Assert.Equal(3, isMatchCall.Method.GetParameters().Length);
+        }
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_WithTimeoutConfigured_BoundsEvaluation()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, '(a+)+$')",
+            NotTesting,
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = TimeSpan.FromMilliseconds(50));
+
+        // A value that forces extensive backtracking so evaluation runs past the configured limit.
+        var product = new Product { ProductName = new string('a', 40) + "!" };
+
+        // Assert - both null-propagation expressions stop once the configured time span elapses.
+        Assert.Throws<RegexMatchTimeoutException>(() => InvokeFilter(product, filters.Item1));
+        Assert.Throws<RegexMatchTimeoutException>(() => InvokeFilter(product, filters.Item2));
+    }
+
+    [Fact]
+    public void StringFunctions_NonMatchesPatternFilter_WithTimeoutConfigured_Unaffected()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "startswith(ProductName, 'Abc')",
+            "$it => $it.ProductName.StartsWith(\"Abc\")",
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = TimeSpan.FromMilliseconds(100));
+
+        // Assert - the time span only affects matchesPattern, so other functions bind and run unchanged.
+        Assert.Null(FindIsMatchCall(filters.Item1));
+        Assert.Null(FindIsMatchCall(filters.Item2));
+
+        InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (true, true));
+    }
+
+    // Returns the first Regex.IsMatch call found in the expression tree, or null when none is present.
+    private static MethodCallExpression FindIsMatchCall(Expression expression)
+    {
+        var finder = new IsMatchCallFinder();
+        finder.Visit(expression);
+        return finder.IsMatchCall;
+    }
+
+    private sealed class IsMatchCallFinder : ExpressionVisitor
+    {
+        public MethodCallExpression IsMatchCall { get; private set; }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (IsMatchCall == null && node.Method.Name == "IsMatch")
+            {
+                IsMatchCall = node;
+            }
+
+            return base.VisitMethodCall(node);
+        }
     }
 
     [Fact]
