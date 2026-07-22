@@ -1439,8 +1439,10 @@ public class Microsoft.AspNetCore.OData.Query.ApplyQueryOption {
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
 	string RawValue  { public get; }
 	System.Type ResultClrType  { public get; }
+	Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator Validator  { public get; public set; }
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.ComputeQueryOption {
@@ -3271,6 +3273,10 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 	public virtual System.Linq.Expressions.Expression CreateTypeNameExpression (System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmModel model)
 }
 
+public interface Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator {
+	void Validate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
 public interface Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator {
 	void Validate (Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
@@ -3320,6 +3326,12 @@ public abstract class Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorC
 	Microsoft.OData.Edm.IEdmProperty Property  { public get; public set; }
 	Microsoft.OData.Edm.IEdmStructuredType StructuredType  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings ValidationSettings  { public get; public set; }
+}
+
+public class Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator : IApplyQueryValidator {
+	public ApplyQueryValidator ()
+
+	public virtual void Validate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator : IComputeQueryValidator {

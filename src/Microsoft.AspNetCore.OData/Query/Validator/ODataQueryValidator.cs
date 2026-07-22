@@ -42,6 +42,7 @@ public class ODataQueryValidator : IODataQueryValidator
         if (options.Apply?.ApplyClause != null)
         {
             ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
+            options.Apply.Validate(validationSettings);
         }
 
         if (options.Skip != null)
