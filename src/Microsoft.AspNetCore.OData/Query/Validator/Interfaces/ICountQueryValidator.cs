@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -14,9 +16,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator;
 public interface ICountQueryValidator
 {
     /// <summary>
-    /// Validates the OData query.
+    /// Validates the <see cref="CountQueryOption" />.
     /// </summary>
     /// <param name="countQueryOption">The $count query.</param>
     /// <param name="validationSettings">The validation settings.</param>
     void Validate(CountQueryOption countQueryOption, ODataValidationSettings validationSettings);
+
+    /// <summary>
+    /// Attempts to validate the <see cref="CountQueryOption" />.
+    /// </summary>
+    /// <param name="countQueryOption"></param>
+    /// <param name="validationSettings"></param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    bool TryValidate(CountQueryOption countQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors);
 }

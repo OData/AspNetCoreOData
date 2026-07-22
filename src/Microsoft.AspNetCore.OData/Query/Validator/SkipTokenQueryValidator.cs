@@ -5,8 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using Microsoft.OData;
-using Microsoft.OData.ModelBuilder.Config;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
@@ -40,5 +41,48 @@ public class SkipTokenQueryValidator : ISkipTokenQueryValidator
                 throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, "AllowedQueryOptions"));
             }
         }
+    }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="SkipTokenQueryOption" />.
+    /// </summary>
+    /// <param name="skipToken">The $skiptoken query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(SkipTokenQueryOption skipToken, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+    {
+        if(skipToken == null || validationSettings == null)
+        {
+            // Pre-allocate with a reasonable default capacity.
+            List<string> errors = new List<string>(2);
+
+            if (skipToken == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(skipToken)).Message);
+            }
+
+            if (validationSettings == null)
+            {
+                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
+            }
+
+            validationErrors = errors;
+            return false;
+        }
+
+        if (skipToken?.Context != null)
+        {
+            DefaultQueryConfigurations defaultConfigs = skipToken.Context.DefaultQueryConfigurations;
+            if (!defaultConfigs.EnableSkipToken)
+            {
+                validationErrors = new[] { Error.Format(SRResources.NotAllowedQueryOption, AllowedQueryOptions.SkipToken, nameof(AllowedQueryOptions)) };
+                return false;
+            }
+        }
+
+        // If there are any errors, return false
+        validationErrors = Array.Empty<string>();
+        return true;
     }
 }

@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace Microsoft.AspNetCore.OData.Query.Validator;
 
 /// <summary>
@@ -19,4 +21,13 @@ public interface ISkipQueryValidator
     /// <param name="skipQueryOption">The $skip query.</param>
     /// <param name="validationSettings">The validation settings.</param>
     void Validate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings);
+
+    /// <summary>
+    /// Attempts to validate the <see cref="SkipQueryOption" />.
+    /// </summary>
+    /// <param name="skipQueryOption">The $skip query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    bool TryValidate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors);
 }
