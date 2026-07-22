@@ -140,21 +140,7 @@ public class CountQueryOption
     /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
-    {
-        if (validationSettings == null)
-        {
-            validationErrors = new[] { Error.ArgumentNull(nameof(validationSettings)).Message };
-            return false;
-        }
-
-        if (Validator != null && !Validator.TryValidate(this, validationSettings, out validationErrors))
-        {
-            return false;
-        }
-
-        validationErrors = Array.Empty<string>();
-        return true;
-    }
+        => QueryValidatorHelpers.TryValidate(() => Validate(validationSettings), out validationErrors);
 
     /// <summary>
     /// Gets the number of entities that satisfy the given query if the response should include a count query option, or <c>null</c> otherwise.

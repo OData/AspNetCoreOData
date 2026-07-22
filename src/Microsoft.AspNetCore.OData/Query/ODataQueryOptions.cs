@@ -679,23 +679,7 @@ public class ODataQueryOptions
     /// <returns><see langword="true"/> if the validation was successful or no validator is configured; otherwise, <see
     /// langword="false"/> if validation failed.</returns>
     public virtual bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
-    {
-        if(validationSettings == null)
-        {
-            validationErrors = new[] { Error.ArgumentNull(nameof(validationSettings)).Message };
-            return false;
-        }
-
-        this.Context.ValidationSettings = validationSettings;
-
-        if (Validator != null && !Validator.TryValidate(this, validationSettings, out validationErrors))
-        {
-            return false;
-        }
-
-        validationErrors = Array.Empty<string>();
-        return true;
-    }
+        => QueryValidatorHelpers.TryValidate(() => Validate(validationSettings), out validationErrors);
 
     private static void ThrowIfEmpty(string queryValue, string queryName)
     {

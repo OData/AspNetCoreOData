@@ -65,49 +65,5 @@ public class TopQueryValidator : ITopQueryValidator
     /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(TopQueryOption topQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
-    {
-        if (topQueryOption == null || validationSettings == null)
-        {
-            // Pre-allocate with a reasonable default capacity.
-            List<string> errors = new List<string>(2);
-
-            if (topQueryOption == null)
-            {
-                errors.Add(Error.ArgumentNull(nameof(topQueryOption)).Message);
-            }
-
-            if (validationSettings == null)
-            {
-                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-            }
-
-            validationErrors = errors;
-            return false;
-        }
-
-        if (topQueryOption.Value > validationSettings.MaxTop)
-        {
-            validationErrors = new[] { Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxTop, AllowedQueryOptions.Top, topQueryOption.Value) };
-            return false;
-        }
-
-        int maxTop;
-        IEdmProperty property = topQueryOption.Context.TargetProperty;
-        IEdmStructuredType structuredType = topQueryOption.Context.TargetStructuredType;
-
-        if (EdmHelpers.IsTopLimitExceeded(
-            property,
-            structuredType,
-            topQueryOption.Context.Model,
-            topQueryOption.Value, topQueryOption.Context.DefaultQueryConfigurations,
-            out maxTop))
-        {
-            validationErrors = new[] { Error.Format(SRResources.SkipTopLimitExceeded, maxTop, AllowedQueryOptions.Top, topQueryOption.Value) };
-            return false;
-        }
-
-        // If there are any errors, return false
-        validationErrors = Array.Empty<string>();
-        return true;
-    }
+        => QueryValidatorHelpers.TryValidate(() => Validate(topQueryOption, validationSettings), out validationErrors);
 }

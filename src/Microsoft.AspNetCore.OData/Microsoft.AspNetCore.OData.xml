@@ -12632,6 +12632,14 @@
             </summary>
             <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.TryValidate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{System.String}@)">
+            <summary>
+            Attempts to validate the $apply query based on the given <paramref name="validationSettings"/>.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
             <summary>
             Apply the apply query to the given IQueryable.
@@ -13561,6 +13569,15 @@
             <param name="applyQueryOption">The $apply query.</param>
             <param name="validationSettings">The validation settings.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{System.String}@)">
+            <summary>
+            Attempts to validate an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption" />.
+            </summary>
+            <param name="applyQueryOption">The $apply query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -13972,6 +13989,15 @@
             </summary>
             <param name="applyQueryOption">The $apply query.</param>
             <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator.TryValidate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings,System.Collections.Generic.IEnumerable{System.String}@)">
+            <summary>
+            Attempts to validate the <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption" />.
+            </summary>
+            <param name="applyQueryOption">The $apply query.</param>
+            <param name="validationSettings">The validation settings.</param>
+            <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+            <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator">
             <summary>
@@ -14644,6 +14670,18 @@
             <summary>
             Helper methods for validation.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorHelpers.TryValidate(System.Action,System.Collections.Generic.IEnumerable{System.String}@)">
+            <summary>
+            Runs the specified <paramref name="validate"/> action and converts any validation failure into a
+            <c>false</c> result together with the corresponding error message, instead of throwing.
+            </summary>
+            <param name="validate">The validation action to execute (typically a call to a <c>Validate</c> method).</param>
+            <param name="validationErrors">
+            When this method returns <c>false</c>, contains the validation error message(s);
+            otherwise, an empty collection.
+            </param>
+            <returns><c>true</c> if the validation succeeded; otherwise, <c>false</c>.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorHelpers.ValidateFunction(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
             <summary>

@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Microsoft.OData.UriParser;
 using Microsoft.OData.UriParser.Aggregation;
 
@@ -49,6 +50,16 @@ public class ApplyQueryValidator : IApplyQueryValidator
             ValidateTransformation(transformation, applyQueryOption.Context, validationSettings);
         }
     }
+
+    /// <summary>
+    /// Attempts to validate an <see cref="ApplyQueryOption" />.
+    /// </summary>
+    /// <param name="applyQueryOption">The $apply query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(ApplyQueryOption applyQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(applyQueryOption, validationSettings), out validationErrors);
 
     private static void ValidateTransformation(TransformationNode transformation, ODataQueryContext context, ODataValidationSettings validationSettings)
     {

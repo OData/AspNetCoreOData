@@ -1442,6 +1442,7 @@ public class Microsoft.AspNetCore.OData.Query.ApplyQueryOption {
 	Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator Validator  { public get; public set; }
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public bool TryValidate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -3284,6 +3285,7 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 }
 
 public interface Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator {
+	bool TryValidate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	void Validate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
@@ -3351,6 +3353,7 @@ public abstract class Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorC
 public class Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator : IApplyQueryValidator {
 	public ApplyQueryValidator ()
 
+	public virtual bool TryValidate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings, out System.Collections.Generic.IEnumerable`1[[System.String]]& validationErrors)
 	public virtual void Validate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 

@@ -79,65 +79,7 @@ public class SelectExpandQueryValidator : ISelectExpandQueryValidator
     /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
-    {
-        if (selectExpandQueryOption == null || validationSettings == null)
-        {
-            // Pre-allocate with a reasonable default capacity.
-            List<string> errors = new List<string>(2);
-
-            if (selectExpandQueryOption == null)
-            {
-                errors.Add(Error.ArgumentNull(nameof(selectExpandQueryOption)).Message);
-            }
-
-            if (validationSettings == null)
-            {
-                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-            }
-
-            validationErrors = errors;
-            return false;
-        }
-
-        SelectExpandValidatorContext validatorContext = new SelectExpandValidatorContext
-        {
-            SelectExpand = selectExpandQueryOption,
-            Context = selectExpandQueryOption.Context,
-            ValidationSettings = validationSettings,
-            Property = selectExpandQueryOption.Context.TargetProperty,
-            StructuredType = selectExpandQueryOption.Context.TargetStructuredType,
-            CurrentDepth = 0
-        };
-
-        try
-        {
-            ValidateSelectExpand(selectExpandQueryOption.SelectExpandClause, validatorContext);
-
-            if (validationSettings.MaxExpansionDepth > 0)
-            {
-                if (selectExpandQueryOption.LevelsMaxLiteralExpansionDepth < 0)
-                {
-                    selectExpandQueryOption.LevelsMaxLiteralExpansionDepth = validationSettings.MaxExpansionDepth;
-                }
-                else if (selectExpandQueryOption.LevelsMaxLiteralExpansionDepth > validationSettings.MaxExpansionDepth)
-                {
-                    validationErrors = new[] { Error.Format(SRResources.InvalidExpansionDepthValue, "LevelsMaxLiteralExpansionDepth", "MaxExpansionDepth") };
-                    return false;
-                }
-
-                ValidateDepth(selectExpandQueryOption.SelectExpandClause, validationSettings.MaxExpansionDepth);
-            }
-        }
-        catch (Exception ex)
-        {
-            validationErrors = new[] { ex.Message };
-            return false;
-        }
-
-        // If there are any errors, return false
-        validationErrors = Array.Empty<string>();
-        return true;
-    }
+        => QueryValidatorHelpers.TryValidate(() => Validate(selectExpandQueryOption, validationSettings), out validationErrors);
 
     /// <summary>
     /// Validates all select and expand items in $select and $expand.

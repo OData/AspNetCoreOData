@@ -822,6 +822,73 @@ public class ODataQueryOptionTests
             "The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is 1.");
     }
 
+    [Fact]
+    public void TryValidate_ReturnsTrueAndNoErrors_WhenQueryIsValid()
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel(c => c.CustomerId);
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/service/Customers?$orderby=CustomerId");
+
+        ODataQueryContext queryContext = new ODataQueryContext(model, typeof(Customer));
+        queryContext.DefaultQueryConfigurations.EnableOrderBy = true;
+        var options = new ODataQueryOptions(queryContext, request);
+        ODataValidationSettings validationSettings = new ODataValidationSettings { MaxOrderByNodeCount = 1 };
+
+        // Act
+        var result = options.TryValidate(validationSettings, out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.NotNull(errors);
+        Assert.Empty(errors);
+    }
+
+    [Fact]
+    public void TryValidate_ReturnsFalseAndError_WithoutThrowing_WhenValidationFails()
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel(c => c.CustomerId);
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/service/Customers?$orderby=CustomerId,Name");
+
+        ODataQueryContext queryContext = new ODataQueryContext(model, typeof(Customer));
+        queryContext.DefaultQueryConfigurations.EnableOrderBy = true;
+        var options = new ODataQueryOptions(queryContext, request);
+        ODataValidationSettings validationSettings = new ODataValidationSettings { MaxOrderByNodeCount = 1 };
+
+        // Act
+        var result = false;
+        IEnumerable<string> errors = null;
+        var exception = Record.Exception(() => result = options.TryValidate(validationSettings, out errors));
+
+        // Assert
+        Assert.Null(exception); // TryValidate reports the failure instead of throwing.
+        Assert.False(result);
+        var error = Assert.Single(errors);
+        Assert.Equal("The number of clauses in $orderby query option exceeded the maximum number allowed. The maximum number of $orderby clauses allowed is 1.", error);
+    }
+
+    [Fact]
+    public void TryValidate_ReturnsFalseAndError_WithoutThrowing_WhenValidationSettingsIsNull()
+    {
+        // Arrange
+        IEdmModel model = GetEdmModel(c => c.CustomerId);
+        HttpRequest request = RequestFactory.Create(HttpMethods.Get, "http://server/service/Customers?$orderby=CustomerId");
+
+        ODataQueryContext queryContext = new ODataQueryContext(model, typeof(Customer));
+        var options = new ODataQueryOptions(queryContext, request);
+
+        // Act
+        var result = false;
+        IEnumerable<string> errors = null;
+        var exception = Record.Exception(() => result = options.TryValidate(null, out errors));
+
+        // Assert
+        Assert.Null(exception); // TryValidate never throws, even for a null settings argument.
+        Assert.False(result);
+        var error = Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", error);
+    }
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

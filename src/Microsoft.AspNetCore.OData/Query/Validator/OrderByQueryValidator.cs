@@ -66,61 +66,7 @@ public class OrderByQueryValidator : IOrderByQueryValidator
     /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
     /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
     public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
-    {
-        List<string> errors = null;
-
-        if (orderByOption == null || validationSettings == null)
-        {
-            // Pre-allocate with a reasonable default capacity.
-            errors = new List<string>(2);
-
-            if (orderByOption == null)
-            {
-                errors.Add(Error.ArgumentNull(nameof(orderByOption)).Message);
-            }
-
-            if (validationSettings == null)
-            {
-                errors.Add(Error.ArgumentNull(nameof(validationSettings)).Message);
-            }
-
-            validationErrors = errors;
-            return false;
-        }
-
-        OrderByValidatorContext validatorContext = new OrderByValidatorContext
-        {
-            OrderBy = orderByOption,
-            Context = orderByOption.Context,
-            ValidationSettings = validationSettings,
-            Property = orderByOption.Context.TargetProperty,
-            StructuredType = orderByOption.Context.TargetStructuredType,
-            CurrentDepth = 0
-        };
-
-        OrderByClause clause = orderByOption.OrderByClause;
-        while (clause != null)
-        {
-            try
-            {
-                validatorContext.IncrementNodeCount();
-
-                ValidateOrderBy(clause, validatorContext);
-            }
-            catch(Exception ex)
-            {
-                // Pre-allocate with a reasonable default capacity.
-                errors ??= new List<string>(4);
-                errors.Add(ex.Message);
-            }
-
-            clause = clause.ThenBy;
-        }
-
-        // If there are any errors, return false
-        validationErrors = errors ?? Enumerable.Empty<string>();
-        return errors == null;
-    }
+        => QueryValidatorHelpers.TryValidate(() => Validate(orderByOption, validationSettings), out validationErrors);
 
     /// <summary>
     /// Validates a <see cref="OrderByClause" />.

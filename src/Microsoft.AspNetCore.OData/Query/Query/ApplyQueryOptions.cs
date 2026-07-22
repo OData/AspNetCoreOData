@@ -143,6 +143,15 @@ public class ApplyQueryOption
     }
 
     /// <summary>
+    /// Attempts to validate the $apply query based on the given <paramref name="validationSettings"/>.
+    /// </summary>
+    /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public bool TryValidate(ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(validationSettings), out validationErrors);
+
+    /// <summary>
     /// Apply the apply query to the given IQueryable.
     /// </summary>
     /// <remarks>
