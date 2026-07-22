@@ -211,6 +211,24 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_DelegatesToValidate()
+    {
+        // Arrange
+        var validator = new CountingOrderByQueryValidator();
+        var option = new OrderByQueryOption("Id", _context);
+        var settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Id");
+
+        // Act
+        var result = validator.TryValidate(option, settings, out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+        Assert.Equal(1, validator.ValidateCallCount); // TryValidate ran Validate exactly once
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_AllowsOrderByIt()
     {
         // Arrange
@@ -415,5 +433,16 @@ public class OrderByQueryValidatorTests
     {
         public string Name { get; set; }
         public LimitedComplexType SpecializedComplexProperty { get; set; }
+    }
+
+    private class CountingOrderByQueryValidator : OrderByQueryValidator
+    {
+        public int ValidateCallCount { get; private set; }
+
+        public override void Validate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings)
+        {
+            ValidateCallCount++;
+            base.Validate(orderByOption, validationSettings);
+        }
     }
 }

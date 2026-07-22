@@ -400,6 +400,27 @@ public class SelectExpandQueryValidatorTest
     }
 
     [Fact]
+    public void TryValidateSelectExpandQueryValidator_DelegatesToValidate()
+    {
+        // Arrange
+        string expand = "Orders($expand=Customer($expand=Orders($expand=Customer($expand=Orders($expand=Customer)))))";
+        var validator = new CountingSelectExpandQueryValidator();
+        _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+        var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
+
+        // Act
+        var result = validator.TryValidate(
+            selectExpandQueryOption,
+            new ODataValidationSettings { MaxExpansionDepth = 0 },
+            out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+        Assert.Equal(1, validator.ValidateCallCount); // TryValidate ran Validate exactly once
+    }
+
+    [Fact]
     public void ValidateSelectExpandQueryValidator_DoesNotThrow_IfExpansionDepthIsZero_QuerySettings()
     {
         // Arrange
@@ -569,5 +590,16 @@ public class SelectExpandQueryValidatorTest
             .AddSingleton<DefaultQueryConfigurations>().BuildServiceProvider();
         context.RequestContainer = services;
         Assert.NotNull(context.GetSelectExpandQueryValidator());
+    }
+
+    private class CountingSelectExpandQueryValidator : SelectExpandQueryValidator
+    {
+        public int ValidateCallCount { get; private set; }
+
+        public override void Validate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings)
+        {
+            ValidateCallCount++;
+            base.Validate(selectExpandQueryOption, validationSettings);
+        }
     }
 }

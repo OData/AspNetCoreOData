@@ -470,4 +470,31 @@ public class ODataQueryValidatorTest
         ExceptionAssert.Throws<ODataException>(() => _validator.Validate(option, settings), expectedMessage);
     }
 
+    [Fact]
+    public void TryValidate_DelegatesToValidate()
+    {
+        // Arrange
+        var validator = new CountingODataQueryValidator();
+        var message = RequestFactory.Create();
+        var option = new ODataQueryOptions(_context, message);
+
+        // Act
+        var result = validator.TryValidate(option, new ODataValidationSettings(), out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+        Assert.Equal(1, validator.ValidateCallCount); // TryValidate ran Validate exactly once
+    }
+
+    private class CountingODataQueryValidator : ODataQueryValidator
+    {
+        public int ValidateCallCount { get; private set; }
+
+        public override void Validate(ODataQueryOptions options, ODataValidationSettings validationSettings)
+        {
+            ValidateCallCount++;
+            base.Validate(options, validationSettings);
+        }
+    }
 }
