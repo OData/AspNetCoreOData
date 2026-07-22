@@ -7356,6 +7356,11 @@
               Looks up a localized string similar to The HttpActionContext.ActionDescriptor is null..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.ApplyToRequiresModel">
+            <summary>
+              Looks up a localized string similar to The query options were created from query parameters without an IEdmModel and therefore cannot be applied to an IQueryable. Provide an IEdmModel when constructing the ODataQueryOptions to enable ApplyTo..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.ActionDescriptorNotControllerActionDescriptor">
             <summary>
               Looks up a localized string similar to ActionDescriptor is not ControllerActionDescriptor..
@@ -11852,15 +11857,20 @@
             <param name="context">The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> which contains the <see cref="T:Microsoft.OData.Edm.IEdmModel"/> and some type information.</param>
             <param name="request">The incoming request message.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},System.Type,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.ODataPath)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},System.Type,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.ODataPath,System.IServiceProvider)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> class based on the given query parameters and context.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> class based on the given query parameters,
+            without requiring an <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>. This is useful for stand-alone scenarios such as deserializing
+            query options from JSON, testing, or tooling.
             </summary>
             <param name="queryParameters">The OData query parameters as a dictionary.</param>
-            <param name="model">The EdmModel that includes the <see cref="T:Microsoft.OData.Edm.IEdmType"/> corresponding to
-            the given <paramref name="elementClrType"/>.</param>
             <param name="elementClrType">The CLR type of the element of the collection being queried.</param>
-            <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>.</param>
+            <param name="model">The <see cref="T:Microsoft.OData.Edm.IEdmModel"/> that includes the <see cref="T:Microsoft.OData.Edm.IEdmType"/> corresponding to
+            the given <paramref name="elementClrType"/>. When <c>null</c>, only the raw query values are captured and the
+            options cannot be applied to an <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="path">The parsed <see cref="T:Microsoft.OData.UriParser.ODataPath"/>. Optional.</param>
+            <param name="serviceProvider">The <see cref="T:System.IServiceProvider"/> used to resolve OData services such as custom
+            binders, validators, or an <see cref="T:Microsoft.OData.UriParser.ODataUriResolver"/>. Optional; sensible defaults are used when it is <c>null</c>.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.Request">
             <summary>
@@ -12001,6 +12011,15 @@
             <param name="querySettings">The settings to use in query composition.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the query has been applied to.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.GetOrCreateODataFeature">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> used to carry the computed query state (select/expand clause,
+            total count, page size, next link, etc.). Uses the request's feature when an <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>
+            is associated with this instance; otherwise a detached feature is used so the query options can be
+            applied without an <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/> (stand-alone scenarios).
+            </summary>
+            <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> to use.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.GenerateStableOrder">
             <summary>
             Generates the Stable OrderBy query option based on the existing OrderBy and other query options. 
@@ -12091,13 +12110,17 @@
             <param name="request">The incoming request message</param>
             <remarks>This signature uses types that are AspNetCore-specific.</remarks>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.ODataPath)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.#ctor(System.Collections.Generic.IDictionary{System.String,System.String},Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.ODataPath,System.IServiceProvider)">
             <summary>
-            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/> class based on the given query parameters and context.
+            Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1"/> class based on the given query
+            parameters, without requiring an <see cref="T:Microsoft.AspNetCore.Http.HttpRequest"/>.
             </summary>
-            <param name="model">The EDM model (can be null for non-model scenarios).</param>
             <param name="queryParameters">The OData query parameters as a dictionary.</param>
-            <param name="path">The ODataPath (optional, can be null).</param>
+            <param name="model">The EDM model. When <c>null</c> only the raw query values are captured and the options
+            cannot be applied to an <see cref="T:System.Linq.IQueryable"/>.</param>
+            <param name="path">The <see cref="T:Microsoft.OData.UriParser.ODataPath"/>. Optional.</param>
+            <param name="serviceProvider">The <see cref="T:System.IServiceProvider"/> used to resolve OData services such as custom
+            binders, validators, or an <see cref="T:Microsoft.OData.UriParser.ODataUriResolver"/>. Optional; sensible defaults are used when it is <c>null</c>.</param>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQueryOptions`1.IfMatch">
             <summary>

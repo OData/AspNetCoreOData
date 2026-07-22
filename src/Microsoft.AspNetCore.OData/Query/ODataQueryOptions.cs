@@ -55,6 +55,14 @@ public class ODataQueryOptions
 
     private OrderByQueryOption _stableOrderBy;
 
+    // Holds the computed query state (select/expand clause, total count, page size, etc.) when this
+    // instance is not associated with an HttpRequest (stand-alone/detached scenarios).
+    private ODataFeature _detachedODataFeature;
+
+    // Holds the query parameters this instance was constructed from when there is no HttpRequest,
+    // so query re-parsing (e.g. for auto $select/$expand) works in stand-alone/detached scenarios.
+    private IDictionary<string, string> _queryParameters;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the incoming request and some metadata information from
     /// the <see cref="ODataQueryContext"/>.
@@ -84,14 +92,19 @@ public class ODataQueryOptions
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the given query parameters and context.
+    /// Initializes a new instance of the <see cref="ODataQueryOptions"/> class based on the given query parameters,
+    /// without requiring an <see cref="HttpRequest"/>. This is useful for stand-alone scenarios such as deserializing
+    /// query options from JSON, testing, or tooling.
     /// </summary>
     /// <param name="queryParameters">The OData query parameters as a dictionary.</param>
-    /// <param name="model">The EdmModel that includes the <see cref="IEdmType"/> corresponding to
-    /// the given <paramref name="elementClrType"/>.</param>
     /// <param name="elementClrType">The CLR type of the element of the collection being queried.</param>
-    /// <param name="path">The parsed <see cref="ODataPath"/>.</param>
-    public ODataQueryOptions(IDictionary<string, string> queryParameters, Type elementClrType, IEdmModel model = null, ODataPath path = null)
+    /// <param name="model">The <see cref="IEdmModel"/> that includes the <see cref="IEdmType"/> corresponding to
+    /// the given <paramref name="elementClrType"/>. When <c>null</c>, only the raw query values are captured and the
+    /// options cannot be applied to an <see cref="IQueryable"/>.</param>
+    /// <param name="path">The parsed <see cref="ODataPath"/>. Optional.</param>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to resolve OData services such as custom
+    /// binders, validators, or an <see cref="ODataUriResolver"/>. Optional; sensible defaults are used when it is <c>null</c>.</param>
+    public ODataQueryOptions(IDictionary<string, string> queryParameters, Type elementClrType, IEdmModel model = null, ODataPath path = null, IServiceProvider serviceProvider = null)
     {
         if (queryParameters == null)
         {
@@ -103,30 +116,32 @@ public class ODataQueryOptions
             throw Error.ArgumentNull(nameof(elementClrType));
         }
 
+        RawValues = new ODataRawQueryOptions();
+
         if (model == null)
         {
-            RawValues = new ODataRawQueryOptions();
-
+            // Non-model scenario: only capture the raw query values. Without a model the query
+            // options cannot be parsed or applied to an IQueryable.
             BuildQueryOptionsOnly(queryParameters);
             return;
         }
 
-        ODataQueryContext context = new ODataQueryContext(model ?? EdmCoreModel.Instance, elementClrType, path);
+        ODataQueryContext context = new ODataQueryContext(model, elementClrType, path)
+        {
+            RequestContainer = serviceProvider
+        };
 
         Context = context;
-        Request = context.Request;
+        _queryParameters = queryParameters;
 
-        RawValues = new ODataRawQueryOptions();
-
-        // Use the provided dictionary directly
         _queryOptionParser = new ODataQueryOptionParser(
             context.Model,
             context.ElementType,
             context.NavigationSource,
             queryParameters,
-            context.RequestContainer);
+            serviceProvider);
 
-        var uriResolver = context.RequestContainer?.GetService<ODataUriResolver>();
+        ODataUriResolver uriResolver = serviceProvider?.GetService<ODataUriResolver>();
         if (uriResolver != null)
         {
             _queryOptionParser.Resolver = uriResolver;
@@ -264,7 +279,7 @@ public class ODataQueryOptions
     {
         get
         {
-            if (!_etagIfMatchChecked && _etagIfMatch == null)
+            if (!_etagIfMatchChecked && _etagIfMatch == null && Request != null)
             {
                 StringValues ifMatchValues;
                 if (Request.Headers.TryGetValue("If-Match", out ifMatchValues))
@@ -286,7 +301,7 @@ public class ODataQueryOptions
     {
         get
         {
-            if (!_etagIfNoneMatchChecked && _etagIfNoneMatch == null)
+            if (!_etagIfNoneMatchChecked && _etagIfNoneMatch == null && Request != null)
             {
                 StringValues ifNoneMatchValues;
                 if (Request.Headers.TryGetValue("If-None-Match", out ifNoneMatchValues))
@@ -426,8 +441,15 @@ public class ODataQueryOptions
             throw Error.ArgumentNull(nameof(querySettings));
         }
 
+        if (Context == null)
+        {
+            // The instance was created from query parameters without an IEdmModel (raw-values-only).
+            // A model is required to parse and apply the query options to an IQueryable.
+            throw Error.InvalidOperation(SRResources.ApplyToRequiresModel);
+        }
+
         IQueryable result = query;
-        IODataFeature odataFeature = Request.ODataFeature();
+        IODataFeature odataFeature = GetOrCreateODataFeature();
 
         // Update the query setting
         querySettings = Context.UpdateQuerySettings(querySettings, query);
@@ -482,7 +504,7 @@ public class ODataQueryOptions
                 }
             }
 
-            if (Request.IsCountRequest())
+            if (Request != null && Request.IsCountRequest())
             {
                 return result;
             }
@@ -551,6 +573,23 @@ public class ODataQueryOptions
         return result;
     }
 
+    /// <summary>
+    /// Gets the <see cref="IODataFeature"/> used to carry the computed query state (select/expand clause,
+    /// total count, page size, next link, etc.). Uses the request's feature when an <see cref="HttpRequest"/>
+    /// is associated with this instance; otherwise a detached feature is used so the query options can be
+    /// applied without an <see cref="HttpRequest"/> (stand-alone scenarios).
+    /// </summary>
+    /// <returns>The <see cref="IODataFeature"/> to use.</returns>
+    private IODataFeature GetOrCreateODataFeature()
+    {
+        if (Request != null)
+        {
+            return Request.ODataFeature();
+        }
+
+        return _detachedODataFeature ??= new ODataFeature();
+    }
+
     internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings)
     {
         int pageSize = -1;
@@ -564,17 +603,17 @@ public class ODataQueryOptions
         }
 
         int preferredPageSize = -1;
-        if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
+        if (Request != null && RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
         {
             pageSize = Math.Min(pageSize, preferredPageSize);
         }
 
-        ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
+        ODataFeature odataFeature = GetOrCreateODataFeature() as ODataFeature;
         if (pageSize > 0)
         {
             bool resultsLimited;
             result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-            if (resultsLimited && Request.GetEncodedUrl() != null &&
+            if (resultsLimited && Request != null && Request.GetEncodedUrl() != null &&
                 odataFeature.NextLink == null)
             {
                 odataFeature.PageSize = pageSize;
@@ -948,10 +987,16 @@ public class ODataQueryOptions
     {
         Dictionary<string, string> result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (var query in Request.Query)
+        // When there is no HttpRequest (stand-alone/detached scenarios), fall back to the query
+        // parameters this instance was constructed from.
+        IEnumerable<KeyValuePair<string, string>> queryParameters = Request != null
+            ? Request.Query.Select(q => new KeyValuePair<string, string>(q.Key, q.Value.ToString()))
+            : (_queryParameters ?? Enumerable.Empty<KeyValuePair<string, string>>());
+
+        foreach (KeyValuePair<string, string> query in queryParameters)
         {
             string key = query.Key.Trim();
-            string value = query.Value.ToString();
+            string value = query.Value;
             // Check supported system query options per $-sign-prefix option.
             if (!_enableNoDollarSignQueryOptions)
             {
@@ -1248,8 +1293,9 @@ public class ODataQueryOptions
                 SelectExpand.Context,
                 processedClause);
 
-            Request.ODataFeature().SelectExpandClause = processedClause;
-            (Request.ODataFeature() as ODataFeature).QueryOptions = this;
+            IODataFeature odataFeature = GetOrCreateODataFeature();
+            odataFeature.SelectExpandClause = processedClause;
+            (odataFeature as ODataFeature).QueryOptions = this;
 
             if (computeAvailable)
             {

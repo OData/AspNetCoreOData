@@ -50,13 +50,17 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ODataQueryOptions{TEntity}"/> class based on the given query parameters and context.
+    /// Initializes a new instance of the <see cref="ODataQueryOptions{TEntity}"/> class based on the given query
+    /// parameters, without requiring an <see cref="HttpRequest"/>.
     /// </summary>
-    /// <param name="model">The EDM model (can be null for non-model scenarios).</param>
     /// <param name="queryParameters">The OData query parameters as a dictionary.</param>
-    /// <param name="path">The ODataPath (optional, can be null).</param>
-    public ODataQueryOptions(IDictionary<string, string> queryParameters, IEdmModel model = null, ODataPath path = null)
-        : base(queryParameters, typeof(TEntity), model, path)
+    /// <param name="model">The EDM model. When <c>null</c> only the raw query values are captured and the options
+    /// cannot be applied to an <see cref="IQueryable"/>.</param>
+    /// <param name="path">The <see cref="ODataPath"/>. Optional.</param>
+    /// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to resolve OData services such as custom
+    /// binders, validators, or an <see cref="ODataUriResolver"/>. Optional; sensible defaults are used when it is <c>null</c>.</param>
+    public ODataQueryOptions(IDictionary<string, string> queryParameters, IEdmModel model = null, ODataPath path = null, IServiceProvider serviceProvider = null)
+        : base(queryParameters, typeof(TEntity), model, path, serviceProvider)
     {
     }
 
@@ -88,7 +92,7 @@ public class ODataQueryOptions<TEntity> : ODataQueryOptions, IEndpointParameterM
     /// <remarks>This signature uses types that are AspNetCore-specific.</remarks>
     internal override ETag GetETag(EntityTagHeaderValue etagHeaderValue)
     {
-        return Request.GetETag<TEntity>(etagHeaderValue);
+        return Request == null ? null : Request.GetETag<TEntity>(etagHeaderValue);
     }
 
     /// <summary>
