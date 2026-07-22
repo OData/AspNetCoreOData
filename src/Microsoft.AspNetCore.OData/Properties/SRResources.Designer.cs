@@ -70,6 +70,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The query options were created from query parameters without an IEdmModel and therefore cannot be applied to an IQueryable. Provide an IEdmModel when constructing the ODataQueryOptions to enable ApplyTo..
+        /// </summary>
+        internal static string ApplyToRequiresModel {
+            get {
+                return ResourceManager.GetString("ApplyToRequiresModel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ActionDescriptor is not ControllerActionDescriptor..
         /// </summary>
         internal static string ActionDescriptorNotControllerActionDescriptor {

@@ -5,8 +5,11 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -24,6 +27,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query;
 public class ODataQueryOptionsOfTEntityTests
 {
     private static IEdmModel _model = GetEdmModel();
+
+    private static IEdmModel _navModel = GetNavEdmModel();
 
     [Fact]
     public void Ctor_Throws_Argument_IfContextIsofDifferentEntityType()
@@ -68,6 +73,222 @@ public class ODataQueryOptionsOfTEntityTests
 
         // Assert
         Assert.Equal("10", query.Top.RawValue);
+    }
+
+    [Fact]
+    public void Constructor_SetsProperties_FromDictionary()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id eq 1" },
+            { "$top", "5" }
+        };
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Assert
+        Assert.NotNull(options);
+        Assert.Equal("Id eq 1", options.RawValues.Filter);
+        Assert.Equal("5", options.RawValues.Top);
+        Assert.IsType<ODataQueryOptions<QCustomer>>(options);
+    }
+
+    [Fact]
+    public void Constructor_SetsAllSupportedODataOptions()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Name eq 'Test'" },
+            { "$orderby", "Id desc" },
+            { "$top", "10" },
+            { "$skip", "2" },
+            { "$select", "Id,Name" },
+            { "$expand", "Orders" },
+            { "$count", "true" },
+            { "$format", "json" },
+            { "$skiptoken", "abc" },
+            { "$deltatoken", "def" },
+            { "$apply", "aggregate(Id with sum as TotalId)" },
+            { "$compute", "Amount mul 2 as DoubleAmount" },
+            { "$search", "Test" }
+        };
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Assert
+        Assert.Equal("Name eq 'Test'", options.RawValues.Filter);
+        Assert.Equal("Id desc", options.RawValues.OrderBy);
+        Assert.Equal("10", options.RawValues.Top);
+        Assert.Equal("2", options.RawValues.Skip);
+        Assert.Equal("Id,Name", options.RawValues.Select);
+        Assert.Equal("Orders", options.RawValues.Expand);
+        Assert.Equal("true", options.RawValues.Count);
+        Assert.Equal("json", options.RawValues.Format);
+        Assert.Equal("abc", options.RawValues.SkipToken);
+        Assert.Equal("def", options.RawValues.DeltaToken);
+        Assert.Equal("aggregate(Id with sum as TotalId)", options.RawValues.Apply);
+        Assert.Equal("Amount mul 2 as DoubleAmount", options.RawValues.Compute);
+        Assert.Equal("Test", options.RawValues.Search);
+    }
+
+    [Fact]
+    public void Constructor_SetsAllSupportedODataOptions_Where_EdmModel_IsNull()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Name eq 'Test'" },
+            { "$orderby", "Id desc" },
+            { "$top", "10" },
+            { "$skip", "2" },
+            { "$select", "Id,Name" },
+            { "$expand", "Orders" },
+            { "$count", "true" },
+            { "$format", "json" },
+            { "$skiptoken", "abc" },
+            { "$deltatoken", "def" },
+            { "$apply", "aggregate(Id with sum as TotalId)" },
+            { "$compute", "Amount mul 2 as DoubleAmount" },
+            { "$search", "Test" }
+        };
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams);
+
+        // Assert
+        Assert.Equal("Name eq 'Test'", options.RawValues.Filter);
+        Assert.Equal("Id desc", options.RawValues.OrderBy);
+        Assert.Equal("10", options.RawValues.Top);
+        Assert.Equal("2", options.RawValues.Skip);
+        Assert.Equal("Id,Name", options.RawValues.Select);
+        Assert.Equal("Orders", options.RawValues.Expand);
+        Assert.Equal("true", options.RawValues.Count);
+        Assert.Equal("json", options.RawValues.Format);
+        Assert.Equal("abc", options.RawValues.SkipToken);
+        Assert.Equal("def", options.RawValues.DeltaToken);
+        Assert.Equal("aggregate(Id with sum as TotalId)", options.RawValues.Apply);
+        Assert.Equal("Amount mul 2 as DoubleAmount", options.RawValues.Compute);
+        Assert.Equal("Test", options.RawValues.Search);
+    }
+
+    [Fact]
+    public void Constructor_Handles_EmptyDictionary()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>();
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Assert
+        Assert.NotNull(options);
+        Assert.Null(options.RawValues.Filter);
+        Assert.Null(options.RawValues.Top);
+        Assert.Null(options.RawValues.OrderBy);
+        Assert.Null(options.RawValues.Select);
+        Assert.Null(options.RawValues.Expand);
+    }
+
+    [Fact]
+    public void Constructor_Handles_UnknownKeys()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "unknown", "value" },
+            { "$filter", "Id eq 1" }
+        };
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Assert
+        Assert.Equal("Id eq 1", options.RawValues.Filter);
+        // Unknown keys should not throw or affect known options
+    }
+
+    [Fact]
+    public void Constructor_Supports_ODataPath()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id eq 1" }
+        };
+        var entitySet = _model.FindDeclaredEntitySet("Customers");
+        var path = new ODataPath(new EntitySetSegment(entitySet));
+
+        // Act
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model, path);
+
+        // Assert
+        Assert.NotNull(options);
+        Assert.Equal("Id eq 1", options.RawValues.Filter);
+        Assert.Equal(typeof(QCustomer), options.Context.ElementClrType);
+        Assert.Equal(path, options.Context.Path);
+    }
+
+    [Fact]
+    public void JsonConverter_Deserializes_ODataQueryOptions_FromJson()
+    {
+        // Arrange
+        var json = "{\"$filter\":\"Id eq 1\",\"$top\":\"5\"}";
+        var options = new JsonSerializerOptions();
+        options.Converters.Add(new ODataQueryOptionsJsonConverter<QCustomer>(_model));
+
+        // Act
+        var odataOptions = JsonSerializer.Deserialize<ODataQueryOptions<QCustomer>>(json, options);
+
+        // Assert
+        Assert.NotNull(odataOptions);
+        Assert.Equal("Id eq 1", odataOptions.RawValues.Filter);
+        Assert.Equal("5", odataOptions.RawValues.Top);
+    }
+
+    [Fact]
+    public void JsonConverter_Serializes_ODataQueryOptions_ToJson()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id eq 1" },
+            { "$top", "5" },
+            { "$orderby", "Name ASC" },
+            { "$expand", "Orders" },
+            { "$select", "Id,Name" }
+        };
+
+        var odataOptions = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        var options = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull 
+        };
+        options.Converters.Add(new ODataQueryOptionsJsonConverter<QCustomer>(_model));
+
+        // Act
+        var json = JsonSerializer.Serialize(odataOptions, options);
+
+        // Assert
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+        Assert.Equal("Id eq 1", root.GetProperty("$filter").GetString());
+        Assert.Equal("5", root.GetProperty("$top").GetString());
+        Assert.Equal("Name ASC", root.GetProperty("$orderby").GetString());
+        Assert.Equal("Id,Name", root.GetProperty("$select").GetString());
+        Assert.Equal("Orders", root.GetProperty("$expand").GetString());
+    }
+
+    [Fact]
+    public void Constructor_Throws_OnNullDictionary()
+    {
+        var model = GetEdmModel();
+        Assert.Throws<ArgumentNullException>(() =>
+            new ODataQueryOptions<QCustomer>(null, model));
     }
 
     [Theory]
@@ -230,10 +451,324 @@ public class ODataQueryOptionsOfTEntityTests
             () => query.ApplyTo(Enumerable.Empty<QCustomer>().AsQueryable(), new ODataQuerySettings()));
     }
 
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesFilter()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id eq 2" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 2, Name = "Bob" },
+            new QCustomer { Id = 3, Name = "Charlie" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<QCustomer>().ToList();
+
+        // Assert
+        var single = Assert.Single(result);
+        Assert.Equal(2, single.Id);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesOrderByTopAndSkip()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$orderby", "Id desc" },
+            { "$skip", "1" },
+            { "$top", "2" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 2, Name = "Bob" },
+            new QCustomer { Id = 3, Name = "Charlie" },
+            new QCustomer { Id = 4, Name = "Dave" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<QCustomer>().ToList();
+
+        // Assert
+        Assert.Equal(new[] { 3, 2 }, result.Select(c => c.Id));
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesSelect()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$select", "Name" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<object>().ToList();
+
+        // Assert
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithServiceProvider_AppliesFilterAndWiresRequestContainer()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id eq 3" }
+        };
+        var serviceProvider = BuildODataServiceProvider(_model);
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model, path: null, serviceProvider: serviceProvider);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 3, Name = "Charlie" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<QCustomer>().ToList();
+
+        // Assert
+        Assert.Same(serviceProvider, options.Context.RequestContainer);
+        var single = Assert.Single(result);
+        Assert.Equal(3, single.Id);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithNullModel_ThrowsInvalidOperation()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id eq 1" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" }
+        }.AsQueryable();
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => options.ApplyTo(customers));
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesCount()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id gt 1" },
+            { "$count", "true" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 2, Name = "Bob" },
+            new QCustomer { Id = 3, Name = "Charlie" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<QCustomer>().ToList();
+
+        // Assert
+        Assert.Equal(new[] { 2, 3 }, result.Select(c => c.Id));
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesCompute()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$compute", "Id mul 2 as DoubleId" },
+            { "$select", "Name,DoubleId" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 5, Name = "Eve" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<object>().ToList();
+
+        // Assert
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesApply()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$apply", "aggregate(Id with sum as TotalId)" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 2, Name = "Bob" },
+            new QCustomer { Id = 3, Name = "Charlie" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<object>().ToList();
+
+        // Assert
+        // aggregate with no groupby produces a single aggregated row.
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesCombinedOptions()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$filter", "Id gt 1" },
+            { "$orderby", "Name asc" },
+            { "$top", "2" },
+            { "$select", "Name" }
+        };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 2, Name = "Charlie" },
+            new QCustomer { Id = 3, Name = "Bob" },
+            new QCustomer { Id = 4, Name = "Dave" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<object>().ToList();
+
+        // Assert
+        // Id gt 1 -> {Charlie, Bob, Dave}; order by Name asc -> {Bob, Charlie, Dave}; top 2 -> 2 rows.
+        Assert.Equal(2, result.Count);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AppliesExpand()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>
+        {
+            { "$expand", "Order" }
+        };
+        var options = new ODataQueryOptions<NavCustomer>(queryParams, _navModel);
+        var customers = new List<NavCustomer>
+        {
+            new NavCustomer { Id = 1, Name = "Alice", Order = new NavOrder { Id = 10, Amount = 100m } },
+            new NavCustomer { Id = 2, Name = "Bob", Order = new NavOrder { Id = 20, Amount = 200m } }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<object>().ToList();
+
+        // Assert
+        Assert.Equal(2, result.Count);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithoutHttpRequest_AutoExpandsNavigation()
+    {
+        // Arrange
+        // AutoNavCustomer is annotated with [AutoExpand], so ApplyTo must invoke the
+        // auto-select/expand path (AddAutoSelectExpandProperties -> GetODataQueryParameters)
+        // even though no $expand was supplied. This directly regresses the null-Request
+        // NullReferenceException reported for the stand-alone constructor.
+        var queryParams = new Dictionary<string, string>();
+        var options = new ODataQueryOptions<AutoNavCustomer>(queryParams, _navModel);
+        var customers = new List<AutoNavCustomer>
+        {
+            new AutoNavCustomer { Id = 1, Name = "Alice", Order = new NavOrder { Id = 10, Amount = 100m } }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<object>().ToList();
+
+        // Assert
+        Assert.Single(result);
+    }
+
+    [Fact]
+    public void ApplyTo_FromDictionaryConstructor_WithEmptyDictionary_ReturnsAllItems()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string>();
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+        var customers = new List<QCustomer>
+        {
+            new QCustomer { Id = 1, Name = "Alice" },
+            new QCustomer { Id = 2, Name = "Bob" }
+        }.AsQueryable();
+
+        // Act
+        var result = options.ApplyTo(customers).Cast<QCustomer>().ToList();
+
+        // Assert
+        Assert.Equal(new[] { 1, 2 }, result.Select(c => c.Id));
+    }
+
+    [Fact]
+    public void IfMatch_FromDictionaryConstructor_WithoutHttpRequest_ReturnsNull()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string> { { "$filter", "Id eq 1" } };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Act & Assert
+        Assert.Null(options.IfMatch);
+    }
+
+    [Fact]
+    public void IfNoneMatch_FromDictionaryConstructor_WithoutHttpRequest_ReturnsNull()
+    {
+        // Arrange
+        var queryParams = new Dictionary<string, string> { { "$filter", "Id eq 1" } };
+        var options = new ODataQueryOptions<QCustomer>(queryParams, _model);
+
+        // Act & Assert
+        Assert.Null(options.IfNoneMatch);
+    }
+
+    private static IServiceProvider BuildODataServiceProvider(IEdmModel model)
+    {
+        // Build a genuine OData per-route service container (the same kind normally
+        // obtained from HttpRequest.GetRouteServices()).
+        HttpRequest request = RequestFactory.Create(model, opt => opt.AddRouteComponents(model));
+        return request.GetRouteServices();
+    }
+
     private static IEdmModel GetEdmModel()
     {
         ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
         builder.EntitySet<QCustomer>("Customers");
+        return builder.GetEdmModel();
+    }
+
+    private static IEdmModel GetNavEdmModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<NavCustomer>("NavCustomers");
+        builder.EntitySet<AutoNavCustomer>("AutoNavCustomers");
+        builder.EntitySet<NavOrder>("NavOrders");
         return builder.GetEdmModel();
     }
 
@@ -246,5 +781,69 @@ public class ODataQueryOptionsOfTEntityTests
 
     public class SubQCustomer : QCustomer
     {
+    }
+
+    public class NavCustomer
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public NavOrder Order { get; set; }
+    }
+
+    [AutoExpand]
+    public class AutoNavCustomer
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public NavOrder Order { get; set; }
+    }
+
+    public class NavOrder
+    {
+        public int Id { get; set; }
+
+        public decimal Amount { get; set; }
+    }
+
+    public class ODataQueryOptionsJsonConverter<TEntity> : JsonConverter<ODataQueryOptions<TEntity>>
+    {
+        private readonly IEdmModel _edmModel;
+
+        public ODataQueryOptionsJsonConverter(IEdmModel edmModel)
+        {
+            _edmModel = edmModel;
+        }
+
+        public override ODataQueryOptions<TEntity> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(ref reader, options);
+            return new ODataQueryOptions<TEntity>(dict, _edmModel);
+        }
+
+        public override void Write(Utf8JsonWriter writer, ODataQueryOptions<TEntity> value, JsonSerializerOptions options)
+        {
+            var dict = new Dictionary<string, string>
+            {
+                ["$filter"] = value.RawValues.Filter,
+                ["$top"] = value.RawValues.Top,
+                ["$orderby"] = value.RawValues.OrderBy,
+                ["$select"] = value.RawValues.Select,
+                ["$expand"] = value.RawValues.Expand,
+                ["$skip"] = value.RawValues.Skip,
+                ["$count"] = value.RawValues.Count,
+                ["$format"] = value.RawValues.Format,
+                ["$skiptoken"] = value.RawValues.SkipToken,
+                ["$deltatoken"] = value.RawValues.DeltaToken,
+                ["$apply"] = value.RawValues.Apply,
+                ["$compute"] = value.RawValues.Compute,
+                ["$search"] = value.RawValues.Search
+            };
+
+            JsonSerializer.Serialize(writer, dict, options);
+        }
     }
 }

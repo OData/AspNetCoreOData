@@ -56,6 +56,17 @@ public class OrderByQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
+    internal OrderByQueryOption(string rawValue)
+    {
+        if (String.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty("rawValue");
+        }
+
+        RawValue = rawValue;
+    }
+
     internal OrderByQueryOption(string rawValue, ODataQueryContext context, string applyRaw, string computeRaw)
     {
         if (context == null)

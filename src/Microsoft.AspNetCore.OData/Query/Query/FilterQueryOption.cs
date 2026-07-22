@@ -54,6 +54,17 @@ public class FilterQueryOption
         _queryOptionParser = queryOptionParser;
     }
 
+    // Used when only the raw value is known.
+    internal FilterQueryOption(string rawValue)
+    {
+        if (String.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty("rawValue");
+        }
+
+        RawValue = rawValue;
+    }
+
     internal FilterQueryOption(ODataQueryContext context, FilterClause filterClause)
     {
         _filterClause = filterClause;
