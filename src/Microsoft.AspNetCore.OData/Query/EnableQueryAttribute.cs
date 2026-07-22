@@ -369,11 +369,11 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
             }
             catch (RegexMatchTimeoutException e)
             {
-                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+                actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
             }
             catch (TargetInvocationException e) when (e.InnerException is RegexMatchTimeoutException)
             {
-                actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.InnerException.Message), e.InnerException);
+                actionExecutedContext.Result = CreateBadRequestResult(request.HttpContext, Error.Format(SRResources.UriQueryStringInvalid, e.InnerException.Message), e.InnerException);
             }
             catch (NotImplementedException e)
             {
