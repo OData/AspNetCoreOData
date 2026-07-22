@@ -134,26 +134,24 @@ public class ODataQueryOptions
         Context = context;
         _queryParameters = queryParameters;
 
+        ODataUriResolver uriResolver = serviceProvider?.GetService<ODataUriResolver>();
+        _enableNoDollarSignQueryOptions = uriResolver != null && uriResolver.EnableNoDollarQueryOptions;
+
+        // Normalize the query parameters the same way the HttpRequest-based path (Initialize) does:
+        // trim keys and, when EnableNoDollarQueryOptions is set on the resolver, add the '$'-prefix to
+        // no-dollar system query options so inputs such as "filter" are recognized.
+        IDictionary<string, string> normalizedQueryParameters = GetODataQueryParameters();
+
         _queryOptionParser = new ODataQueryOptionParser(
             context.Model,
             context.ElementType,
             context.NavigationSource,
-            queryParameters,
+            normalizedQueryParameters,
             serviceProvider);
 
-        ODataUriResolver uriResolver = serviceProvider?.GetService<ODataUriResolver>();
-        if (uriResolver != null)
-        {
-            _queryOptionParser.Resolver = uriResolver;
-            _enableNoDollarSignQueryOptions = uriResolver.EnableNoDollarQueryOptions;
-        }
-        else
-        {
-            _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
-            _enableNoDollarSignQueryOptions = false;
-        }
+        _queryOptionParser.Resolver = uriResolver ?? ODataQueryContext.DefaultCaseInsensitiveResolver;
 
-        BuildQueryOptions(queryParameters);
+        BuildQueryOptions(normalizedQueryParameters);
 
         Validator = context.GetODataQueryValidator();
     }
@@ -1209,6 +1207,10 @@ public class ODataQueryOptions
 
     private void BuildQueryOptionsOnly(IDictionary<string, string> queryParameters)
     {
+        // Raw-values-only mode (no IEdmModel): capture only the raw query values. The strongly-typed
+        // query option objects (Filter, OrderBy, SelectExpand, etc.) require a model/parser to be usable
+        // (e.g. Filter.FilterClause parses via the parser), so they are intentionally left null here.
+        // Consumers read the values from RawValues instead.
         foreach (KeyValuePair<string, string> kvp in queryParameters)
         {
             switch (kvp.Key.ToLowerInvariant())
@@ -1216,22 +1218,18 @@ public class ODataQueryOptions
                 case "$filter":
                     ThrowIfEmpty(kvp.Value, "$filter");
                     RawValues.Filter = kvp.Value;
-                    Filter = new FilterQueryOption(kvp.Value);
                     break;
                 case "$orderby":
                     ThrowIfEmpty(kvp.Value, "$orderby");
                     RawValues.OrderBy = kvp.Value;
-                    OrderBy = new OrderByQueryOption(kvp.Value);
                     break;
                 case "$top":
                     ThrowIfEmpty(kvp.Value, "$top");
                     RawValues.Top = kvp.Value;
-                    Top = new TopQueryOption(kvp.Value);
                     break;
                 case "$skip":
                     ThrowIfEmpty(kvp.Value, "$skip");
                     RawValues.Skip = kvp.Value;
-                    Skip = new SkipQueryOption(kvp.Value);
                     break;
                 case "$select":
                     RawValues.Select = kvp.Value;
@@ -1239,7 +1237,6 @@ public class ODataQueryOptions
                 case "$count":
                     ThrowIfEmpty(kvp.Value, "$count");
                     RawValues.Count = kvp.Value;
-                    Count = new CountQueryOption(kvp.Value);
                     break;
                 case "$expand":
                     RawValues.Expand = kvp.Value;
@@ -1249,7 +1246,6 @@ public class ODataQueryOptions
                     break;
                 case "$skiptoken":
                     RawValues.SkipToken = kvp.Value;
-                    SkipToken = new SkipTokenQueryOption(kvp.Value);
                     break;
                 case "$deltatoken":
                     RawValues.DeltaToken = kvp.Value;
@@ -1257,27 +1253,19 @@ public class ODataQueryOptions
                 case "$apply":
                     ThrowIfEmpty(kvp.Value, "$apply");
                     RawValues.Apply = kvp.Value;
-                    Apply = new ApplyQueryOption(kvp.Value);
                     break;
                 case "$compute":
                     ThrowIfEmpty(kvp.Value, "$compute");
                     RawValues.Compute = kvp.Value;
-                    Compute = new ComputeQueryOption(kvp.Value);
                     break;
                 case "$search":
                     ThrowIfEmpty(kvp.Value, "$search");
                     RawValues.Search = kvp.Value;
-                    Search = new SearchQueryOption(kvp.Value);
                     break;
                 default:
                     // we don't throw if we can't recognize the query
                     break;
             }
-        }
-
-        if (!string.IsNullOrWhiteSpace(RawValues.Select) || !string.IsNullOrWhiteSpace(RawValues.Expand))
-        {
-            SelectExpand = new SelectExpandQueryOption(RawValues.Select, RawValues.Expand);
         }
     }
 

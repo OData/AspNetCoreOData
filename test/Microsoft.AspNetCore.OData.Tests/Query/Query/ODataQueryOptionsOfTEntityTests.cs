@@ -274,7 +274,13 @@ public class ODataQueryOptionsOfTEntityTests
         var json = JsonSerializer.Serialize(odataOptions, options);
 
         // Assert
-        Assert.Contains("\"$filter\":\"Id eq 1\",\"$top\":\"5\",\"$orderby\":\"Name ASC\",\"$select\":\"Id,Name\",\"$expand\":\"Orders\"", json);
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+        Assert.Equal("Id eq 1", root.GetProperty("$filter").GetString());
+        Assert.Equal("5", root.GetProperty("$top").GetString());
+        Assert.Equal("Name ASC", root.GetProperty("$orderby").GetString());
+        Assert.Equal("Id,Name", root.GetProperty("$select").GetString());
+        Assert.Equal("Orders", root.GetProperty("$expand").GetString());
     }
 
     [Fact]

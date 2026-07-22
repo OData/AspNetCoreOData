@@ -1,2 +1,23 @@
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.get -> System.TimeSpan?
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.set -> void
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.set -> void
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.get -> System.TimeSpan?
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.ApplyQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterFunctionCall() -> void
+Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitFunctionCall() -> void
+Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.get -> int
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.set -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions.ODataQueryOptions(System.Collections.Generic.IDictionary<string, string> queryParameters, System.Type elementClrType, Microsoft.OData.Edm.IEdmModel model = null, Microsoft.OData.UriParser.ODataPath path = null, System.IServiceProvider serviceProvider = null) -> void
 Microsoft.AspNetCore.OData.Query.ODataQueryOptions<TEntity>.ODataQueryOptions(System.Collections.Generic.IDictionary<string, string> queryParameters, Microsoft.OData.Edm.IEdmModel model = null, Microsoft.OData.UriParser.ODataPath path = null, System.IServiceProvider serviceProvider = null) -> void
