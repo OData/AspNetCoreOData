@@ -2,6 +2,16 @@ Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.get 
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.set -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.get -> int
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.set -> void
+Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging.get -> bool
+Microsoft.AspNetCore.OData.ODataMiniOptions.QueryValidationErrorLogLevel.get -> Microsoft.Extensions.Logging.LogLevel
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetQueryValidationErrorLogLevel(Microsoft.Extensions.Logging.LogLevel logLevel) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetQueryValidationErrorLogging(bool enableQueryValidationErrorLogging) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging.get -> bool
+Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging.set -> void
+Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel.get -> Microsoft.Extensions.Logging.LogLevel
+Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging.get -> bool
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging.set -> void
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
 Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.set -> void

@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Results;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
@@ -469,18 +472,50 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
         ArgumentNullException.ThrowIfNull(httpContext, nameof(httpContext));
         ArgumentNullException.ThrowIfNull(queryOptions, nameof(queryOptions));
 
-        IQueryCollection queryParameters = httpContext.Request.Query;
-        foreach (var kvp in queryParameters)
+        try
         {
-            if (!queryOptions.IsSupportedQueryOption(kvp.Key) &&
-                 kvp.Key.StartsWith("$", StringComparison.Ordinal))
+            IQueryCollection queryParameters = httpContext.Request.Query;
+            foreach (var kvp in queryParameters)
             {
-                // we don't support any custom query options that start with $
-                throw new ODataException(Error.Format(SRResources.CustomQueryOptionNotSupportedWithDollarSign, kvp.Key));
+                if (!queryOptions.IsSupportedQueryOption(kvp.Key) &&
+                     kvp.Key.StartsWith("$", StringComparison.Ordinal))
+                {
+                    // we don't support any custom query options that start with $
+                    throw new ODataException(Error.Format(SRResources.CustomQueryOptionNotSupportedWithDollarSign, kvp.Key));
+                }
             }
+
+            queryOptions.Validate(ValidationSettings);
+        }
+        catch (Exception exception)
+        {
+            LogQueryValidationError(httpContext, exception);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Records diagnostic details about a query that failed validation, using the request state that is
+    /// available even when the query options could not be fully parsed. Does nothing unless logging is enabled
+    /// through <see cref="ODataMiniOptions.EnableQueryValidationErrorLogging"/> and a logger is available. The diagnostic
+    /// is written at the level from <see cref="ODataMiniOptions.QueryValidationErrorLogLevel"/>. This never
+    /// changes the response produced for the failed query.
+    /// </summary>
+    /// <param name="httpContext">The <see cref="HttpContext"/> for the current request.</param>
+    /// <param name="exception">The exception raised while validating the query.</param>
+    private static void LogQueryValidationError(HttpContext httpContext, Exception exception)
+    {
+        // The per-endpoint metadata already merges the global options; fall back to the global options when the
+        // endpoint has no metadata.
+        ODataMiniOptions options = httpContext.GetEndpoint()?.Metadata.GetMetadata<ODataMiniMetadata>()?.Options
+            ?? httpContext.RequestServices?.GetService<IOptions<ODataMiniOptions>>()?.Value;
+        if (options == null || !options.EnableQueryValidationErrorLogging)
+        {
+            return;
         }
 
-        queryOptions.Validate(ValidationSettings);
+        ILogger logger = httpContext.RequestServices?.GetService<ILogger<ODataQueryEndpointFilter>>();
+        QueryValidationErrorLogger.LogQueryValidationFailure(logger, options.QueryValidationErrorLogLevel, httpContext, exception);
     }
 
     /// <summary>
