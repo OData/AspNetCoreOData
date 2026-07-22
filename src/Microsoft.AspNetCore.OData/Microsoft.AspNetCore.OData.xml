@@ -12020,6 +12020,13 @@
             </summary>
             <returns>The <see cref="T:Microsoft.AspNetCore.OData.Abstracts.IODataFeature"/> to use.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.EnsureContextForQueryComposition">
+            <summary>
+            Ensures that this instance has an <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryContext"/> (i.e. it was created with an
+            <see cref="T:Microsoft.OData.Edm.IEdmModel"/>). Instances created from query parameters without a model only capture the raw
+            query values and cannot parse, validate, or apply the query options to an <see cref="T:System.Linq.IQueryable"/> or entity.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryOptions.GenerateStableOrder">
             <summary>
             Generates the Stable OrderBy query option based on the existing OrderBy and other query options. 

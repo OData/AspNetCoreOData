@@ -372,6 +372,8 @@ public class ODataQueryOptions
     /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
     public virtual IQueryable ApplyTo(IQueryable query)
     {
+        EnsureContextForQueryComposition();
+
         ODataQuerySettings querySettings = Context.GetODataQuerySettings();
 
         // Only do the following in ApplyTo() without providing 'ODataQuerySettings'.
@@ -393,6 +395,8 @@ public class ODataQueryOptions
     /// <returns>The new <see cref="IQueryable"/> after the query has been applied to.</returns>
     public virtual IQueryable ApplyTo(IQueryable query, AllowedQueryOptions ignoreQueryOptions)
     {
+        EnsureContextForQueryComposition();
+
         ODataQuerySettings querySettings = Context.GetODataQuerySettings();
         querySettings.IgnoredQueryOptions = ignoreQueryOptions;
 
@@ -441,12 +445,7 @@ public class ODataQueryOptions
             throw Error.ArgumentNull(nameof(querySettings));
         }
 
-        if (Context == null)
-        {
-            // The instance was created from query parameters without an IEdmModel (raw-values-only).
-            // A model is required to parse and apply the query options to an IQueryable.
-            throw Error.InvalidOperation(SRResources.ApplyToRequiresModel);
-        }
+        EnsureContextForQueryComposition();
 
         IQueryable result = query;
         IODataFeature odataFeature = GetOrCreateODataFeature();
@@ -590,6 +589,21 @@ public class ODataQueryOptions
         return _detachedODataFeature ??= new ODataFeature();
     }
 
+    /// <summary>
+    /// Ensures that this instance has an <see cref="ODataQueryContext"/> (i.e. it was created with an
+    /// <see cref="IEdmModel"/>). Instances created from query parameters without a model only capture the raw
+    /// query values and cannot parse, validate, or apply the query options to an <see cref="IQueryable"/> or entity.
+    /// </summary>
+    private void EnsureContextForQueryComposition()
+    {
+        if (Context == null)
+        {
+            // The instance was created from query parameters without an IEdmModel (raw-values-only).
+            // A model is required to parse and apply the query options to an IQueryable.
+            throw Error.InvalidOperation(SRResources.ApplyToRequiresModel);
+        }
+    }
+
     internal IQueryable ApplyPaging(IQueryable result, ODataQuerySettings querySettings)
     {
         int pageSize = -1;
@@ -728,6 +742,8 @@ public class ODataQueryOptions
             throw Error.ArgumentNull("querySettings");
         }
 
+        EnsureContextForQueryComposition();
+
         if (Filter != null || OrderBy != null || Top != null || Skip != null || Count != null)
         {
             throw Error.InvalidOperation(SRResources.NonSelectExpandOnSingleEntity);
@@ -761,6 +777,8 @@ public class ODataQueryOptions
         {
             throw Error.ArgumentNull(nameof(validationSettings));
         }
+
+        EnsureContextForQueryComposition();
 
         this.Context.ValidationSettings = validationSettings;
 
