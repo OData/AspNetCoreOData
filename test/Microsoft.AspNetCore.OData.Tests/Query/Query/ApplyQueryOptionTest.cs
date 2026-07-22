@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
@@ -68,6 +69,106 @@ public class ApplyQueryOptionTest
         queryable.Setup(q => q.Provider).Returns(new System.Data.Linq.MyQueryProvider());
         ExceptionAssert.Throws<NotSupportedException>(() => apply.ApplyTo(queryable.Object, new ODataQuerySettings()),
             "$apply query options not supported for LINQ to SQL providers.");
+    }
+
+    // ---------------------------------------------------------------------
+    // $apply validator wiring: the internal test constructor, the Validator
+    // property and Validate(ODataValidationSettings).
+    // ---------------------------------------------------------------------
+
+    [Fact]
+    public void CtorApplyQueryOption_ThrowsArgumentNull_ForInternalTestConstructor()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNullOrEmpty(() => new ApplyQueryOption(null, context), "rawValue");
+        ExceptionAssert.ThrowsArgumentNullOrEmpty(() => new ApplyQueryOption(string.Empty, context), "rawValue");
+        ExceptionAssert.ThrowsArgumentNull(() => new ApplyQueryOption("groupby((Name))", null), "context");
+    }
+
+    [Fact]
+    public void ApplyQueryOption_InternalTestConstructor_ParsesApplyClause()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+
+        // Act - the test constructor builds a parser so ApplyClause is available.
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+
+        // Assert
+        Assert.Equal("groupby((Name))", apply.RawValue);
+        Assert.NotNull(apply.ApplyClause);
+        Assert.Single(apply.ApplyClause.Transformations);
+    }
+
+    [Fact]
+    public void ApplyQueryOption_Validator_IsNonNullApplyQueryValidator_ByDefault()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+
+        // Act
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+
+        // Assert
+        Assert.NotNull(apply.Validator);
+        Assert.IsType<ApplyQueryValidator>(apply.Validator);
+    }
+
+    [Fact]
+    public void ApplyQueryOption_Validator_IsSettable()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+        var validator = new Mock<IApplyQueryValidator>().Object;
+
+        // Act
+        apply.Validator = validator;
+
+        // Assert
+        Assert.Same(validator, apply.Validator);
+    }
+
+    [Fact]
+    public void ValidateApplyQueryOption_ThrowsArgumentNull_ForNullValidationSettings()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => apply.Validate(null), "validationSettings");
+    }
+
+    [Fact]
+    public void ValidateApplyQueryOption_InvokesValidator()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+        var settings = new ODataValidationSettings();
+        var validator = new Mock<IApplyQueryValidator>();
+        apply.Validator = validator.Object;
+
+        // Act
+        apply.Validate(settings);
+
+        // Assert
+        validator.Verify(v => v.Validate(apply, settings), Times.Once);
+    }
+
+    [Fact]
+    public void ValidateApplyQueryOption_DoesNotThrow_WhenValidatorIsNull()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context) { Validator = null };
+
+        // Act & Assert
+        ExceptionAssert.DoesNotThrow(() => apply.Validate(new ODataValidationSettings()));
     }
 
     // Legal apply queries usable against CustomerApplyTestData.
