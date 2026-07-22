@@ -6,11 +6,12 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query.Expressions;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -53,17 +54,39 @@ public class ApplyQueryOption
 
         RawValue = rawValue;
         Context = context;
-        // TODO: Implement and add validator
-        //Validator = new FilterQueryValidator();
+        Validator = context.GetApplyQueryValidator();
         _queryOptionParser = queryOptionParser;
         ResultClrType = Context.ElementClrType;
     }
 
-    // for unit test only
+    // This constructor is intended for unit testing only.
     internal ApplyQueryOption(string rawValue, ODataQueryContext context)
     {
+        if (string.IsNullOrEmpty(rawValue))
+        {
+            throw Error.ArgumentNullOrEmpty(nameof(rawValue));
+        }
+
+        if (context == null)
+        {
+            throw Error.ArgumentNull(nameof(context));
+        }
+
         RawValue = rawValue;
         Context = context;
+        Validator = context.GetApplyQueryValidator();
+        _queryOptionParser = new ODataQueryOptionParser(
+            context.Model,
+            context.ElementType,
+            context.NavigationSource,
+            new Dictionary<string, string> { { "$apply", rawValue } },
+            context.RequestContainer);
+
+        if (context.RequestContainer == null)
+        {
+            // By default, let's enable the property name case-insensitive
+            _queryOptionParser.Resolver = ODataQueryContext.DefaultCaseInsensitiveResolver;
+        }
     }
 
     /// <summary>
@@ -96,6 +119,28 @@ public class ApplyQueryOption
     ///  Gets the raw $apply value.
     /// </summary>
     public string RawValue { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the $apply Query Validator.
+    /// </summary>
+    public IApplyQueryValidator Validator { get; set; }
+
+    /// <summary>
+    /// Validate the $apply query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+    /// </summary>
+    /// <param name="validationSettings">The <see cref="ODataValidationSettings"/> instance which contains all the validation settings.</param>
+    public void Validate(ODataValidationSettings validationSettings)
+    {
+        if (validationSettings == null)
+        {
+            throw Error.ArgumentNull(nameof(validationSettings));
+        }
+
+        if (Validator != null)
+        {
+            Validator.Validate(this, validationSettings);
+        }
+    }
 
     /// <summary>
     /// Apply the apply query to the given IQueryable.

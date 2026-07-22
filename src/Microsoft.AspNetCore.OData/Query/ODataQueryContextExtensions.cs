@@ -184,6 +184,17 @@ internal static class ODataQueryContextExtensions
     }
 
     /// <summary>
+    /// Gets the <see cref="IApplyQueryValidator"/>.
+    /// </summary>
+    /// <param name="context">The query context.</param>
+    /// <returns>The built <see cref="IApplyQueryValidator"/>.</returns>
+    public static IApplyQueryValidator GetApplyQueryValidator(this ODataQueryContext context)
+    {
+        return context?.RequestContainer?.GetService<IApplyQueryValidator>()
+            ?? new ApplyQueryValidator();
+    }
+
+    /// <summary>
     /// Gets the <see cref="IComputeQueryValidator"/>.
     /// </summary>
     /// <param name="context">The query context.</param>

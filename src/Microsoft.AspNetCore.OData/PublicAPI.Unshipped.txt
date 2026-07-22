@@ -4,9 +4,17 @@ Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilli
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.get -> System.TimeSpan?
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.set -> void
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.get -> int
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.ApplyQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.ODataMiniOptions.MaxReceivedMessageSize.get -> long
 Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxReceivedMessageSize(long maxReceivedMessageSize) -> Microsoft.AspNetCore.OData.ODataMiniOptions
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.get -> long
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.set -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void

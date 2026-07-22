@@ -74,7 +74,7 @@ internal static class ODataServiceCollectionExtensions
 
         // QueryValidators.
         services.AddSingleton<ICountQueryValidator, CountQueryValidator>();
-
+        services.AddSingleton<IApplyQueryValidator, ApplyQueryValidator>();
         services.AddSingleton<IFilterQueryValidator, FilterQueryValidator>();
         services.AddSingleton<IODataQueryValidator, ODataQueryValidator>();
         services.AddSingleton<IOrderByQueryValidator, OrderByQueryValidator>();
