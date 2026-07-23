@@ -32,14 +32,16 @@ public class PropertyNameCaseSensitiveTest : WebApiTestBase<PropertyNameCaseSens
     protected static void UpdateConfigureServices(IServiceCollection services)
     {
         IEdmModel edmModel = GetEdmModel();
-        services.ConfigureControllers(typeof(MetadataController), typeof(BillsController));
-        services.AddControllers().AddOData(opt => opt.AddRouteComponents("odata", edmModel));
+        services.ConfigureControllers(typeof(MetadataController), typeof(BillsController), typeof(DifferentPropertyCasesController));
+        services.AddControllers().AddOData(opt => opt.Select().OrderBy().Expand().AddRouteComponents("odata", edmModel));
     }
 
     public static IEdmModel GetEdmModel()
     {
         ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
         builder.EntitySet<Bill>("Bills");
+        builder.EntitySet<DifferentPropertyCase>("DifferentPropertyCases");
+        builder.EntityType<NestedDifferentPropertyCase>().HasKey(e => e.Id);
         var edmModel = builder.GetEdmModel();
         return edmModel;
     }
@@ -160,5 +162,84 @@ public class PropertyNameCaseSensitiveTest : WebApiTestBase<PropertyNameCaseSens
         string responseString = await response.Content.ReadAsStringAsync();
 
         Assert.Equal("{\"@odata.context\":\"http://localhost/odata/$metadata#Edm.Boolean\",\"value\":false}", responseString);
+    }
+
+
+    [Fact]
+    public async Task PropertyNameCaseSensitive_QueryCollection_WorksAsExpected()
+    {
+        // Arrange
+        var requestUri = "odata/DifferentPropertyCases";
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.True(HttpStatusCode.OK == response.StatusCode,
+            string.Format("Response status code, expected: {0}, actual: {1}, request url: {2}",
+            HttpStatusCode.OK, response.StatusCode, requestUri));
+
+        Assert.Contains("\"Field\":\"Pascal\"", responseString);
+        Assert.Contains("\"FIELD\":\"Upper\"", responseString);
+    }
+
+    [Fact]
+    public async Task PropertyNameCaseSensitive_QueryCollectionWithSelect_WorksAsExpected()
+    {
+        // Arrange
+        var requestUri = "odata/DifferentPropertyCases?$select=Field,FIELD";
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.True(HttpStatusCode.OK == response.StatusCode,
+            string.Format("Response status code, expected: {0}, actual: {1}, request url: {2}",
+            HttpStatusCode.OK, response.StatusCode, requestUri));
+
+        Assert.Contains("{\"Field\":\"Pascal\",\"FIELD\":\"Upper\"}", responseString);
+    }
+
+    [Fact]
+    public async Task PropertyNameCaseSensitive_QueryCollectionWithOrderBy_WorksAsExpected()
+    {
+        // Arrange
+        var requestUri = "odata/DifferentPropertyCases?orderBy=Field";
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.True(HttpStatusCode.OK == response.StatusCode,
+            string.Format("Response status code, expected: {0}, actual: {1}, request url: {2}",
+            HttpStatusCode.OK, response.StatusCode, requestUri));
+
+        Assert.Contains("\"Field\":\"Pascal\"", responseString);
+        Assert.Contains("\"FIELD\":\"Upper\"", responseString);
+    }
+
+    [Fact]
+    public async Task PropertyNameCaseSensitive_QueryCollectionWithExpandAndOrderFromPaging_WorksAsExpected()
+    {
+        // Arrange
+        var requestUri = "odata/DifferentPropertyCases?expand=Nested";
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.GetAsync(requestUri);
+        string responseString = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.True(HttpStatusCode.OK == response.StatusCode,
+            string.Format("Response status code, expected: {0}, actual: {1}, request url: {2}",
+            HttpStatusCode.OK, response.StatusCode, requestUri));
+
+        Assert.Contains("{\"Id\":1,\"ID\":\"some old id 2\"}", responseString);
     }
 }
