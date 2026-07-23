@@ -53,7 +53,7 @@ public class PageResultOfTTests
 
         // Assert
         ArgumentOutOfRangeException exception = ExceptionAssert.Throws<ArgumentOutOfRangeException>(test);
-        Assert.Contains("Value must be greater than or equal to 0. (Parameter 'value')\r\nActual value was -1.", exception.Message);
+        Assert.Contains("Value must be greater than or equal to 0. (Parameter 'value')\r\nActual value was -1.".ReplaceLineEndings(), exception.Message);
     }
 
     [Fact]

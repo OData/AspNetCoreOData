@@ -39,7 +39,7 @@ public class SerializableErrorExtensionsTests
 
         // Assert
         Assert.NotNull(error);
-        Assert.Equal("key1:\r\nTest Error 1\r\nTest Error 2\r\n\r\nkey3:\r\nTest Error 3", error.Message);
+        Assert.Equal("key1:\r\nTest Error 1\r\nTest Error 2\r\n\r\nkey3:\r\nTest Error 3", error.Message, ignoreLineEndingDifferences: true);
         Assert.Null(error.Code);
         Assert.Null(error.InnerError);
         Assert.Equal(3, error.Details.Count);
@@ -63,11 +63,11 @@ public class SerializableErrorExtensionsTests
 
         // Assert
         Assert.NotNull(error);
-        Assert.Equal("key1:\r\nTest Error 1\r\n\r\nkey2:\r\nTest Error 2", error.Message);
+        Assert.Equal("key1:\r\nTest Error 1\r\n\r\nkey2:\r\nTest Error 2", error.Message, ignoreLineEndingDifferences: true);
         Assert.Null(error.Code);
         Assert.True(error.InnerError.Properties.TryGetValue(SerializableErrorKeys.MessageKey, out ODataValue odataValue));
         var exceptionMessage = Assert.IsType<ODataPrimitiveValue>(odataValue).Value as string;
-        Assert.Equal("key3:\r\nTest Error 3", exceptionMessage);
+        Assert.Equal("key3:\r\nTest Error 3", exceptionMessage, ignoreLineEndingDifferences: true);
         Assert.Equal(2, error.Details.Count);
     }
 

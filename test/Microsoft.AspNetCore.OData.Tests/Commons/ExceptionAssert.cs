@@ -296,7 +296,7 @@ public class ExceptionAssert
             exceptionMessage = exceptionMessage + " (Parameter '" + paramName + "')";
             if (actualValue != null)
             {
-                exceptionMessage += string.Format(CultureInfo.CurrentCulture, "\r\nActual value was {0}.", actualValue);
+                exceptionMessage += string.Format(CultureInfo.CurrentCulture, Environment.NewLine + "Actual value was {0}.", actualValue);
             }
         }
 
@@ -545,11 +545,11 @@ public class ExceptionAssert
         {
             if (!partialMatch)
             {
-                Assert.Equal(expectedMessage, exception.Message);
+                Assert.Equal(expectedMessage.ReplaceLineEndings(), exception.Message.ReplaceLineEndings());
             }
             else
             {
-                Assert.Contains(expectedMessage, exception.Message);
+                Assert.Contains(expectedMessage.ReplaceLineEndings(), exception.Message.ReplaceLineEndings());
             }
         }
     }
