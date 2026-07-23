@@ -55,7 +55,7 @@ public class CustomersController : ODataController
         return Ok(_context.Customers.AsAsyncEnumerable());
     }
 
-    [EnableQuery]
+    [EnableQuery(PageSize = 2)]
     [HttpGet("v3/Customers")]
     public IActionResult SearchCustomersForV3Route([FromQuery] Variant variant = Variant.None)
     {
