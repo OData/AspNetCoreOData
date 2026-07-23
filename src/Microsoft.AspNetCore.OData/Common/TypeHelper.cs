@@ -386,6 +386,26 @@ internal static class TypeHelper
     }
 
     /// <summary>
+    /// Check whether the given type is a primitive type or known type.
+    /// </summary>
+    /// <param name="type">The type to validate.</param>
+    /// <returns>True if type is primitive or known type, otherwise False.</returns>
+    public static bool IsPrimitiveOrKnownType(Type type)
+    {
+        return type.IsPrimitive 
+               || type == typeof(string)
+               || type == typeof(Uri)
+               || type == typeof(DateTime)
+#if NET6_0_OR_GREATER
+    || type == typeof(DateOnly)
+    || type == typeof(TimeOnly)
+#endif
+               || type == typeof(DateTimeOffset)
+               || type == typeof(Guid)
+               || type == typeof(Decimal);
+    }
+
+    /// <summary>
     /// Determines whether the specified <see cref="Type"/> represents an <see cref="IAsyncEnumerable{T}"/> type.
     /// </summary>
     /// <param name="clrType">The <see cref="Type"/> to evaluate.</param>

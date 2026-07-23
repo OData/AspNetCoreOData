@@ -126,19 +126,36 @@ public class ETag : DynamicObject
             return query;
         }
 
-        Type type = EntityType;
-        ParameterExpression param = Expression.Parameter(type);
-        Expression where = null;
-        foreach (KeyValuePair<string, object> item in ConcurrencyProperties)
-        {
-            MemberExpression name = Expression.Property(param, item.Key);
-            object itemValue = item.Value;
-            Expression value = itemValue != null
-                ? LinqParameterContainer.Parameterize(itemValue.GetType(), itemValue)
-                : Expression.Constant(value: null);
-            BinaryExpression equal = Expression.Equal(name, value);
-            where = where == null ? equal : Expression.AndAlso(where, equal);
-        }
+            Type type = EntityType;
+            ParameterExpression param = Expression.Parameter(type);
+            Expression where = null;
+            foreach (KeyValuePair<string, object> item in ConcurrencyProperties)
+            {
+                MemberExpression name = Expression.Property(param, item.Key);
+                object itemValue = item.Value;
+                
+                Expression equal;
+                if (itemValue != null)
+                {
+                    Type itemType = itemValue.GetType();
+                    Expression value = LinqParameterContainer.Parameterize(itemType, itemValue);
+                    if (itemType.IsArray)
+                    {
+                        equal = ExpressionHelpers.SequenceEquals(name, value);
+                    }
+                    else
+                    {
+                        equal = Expression.Equal(name, value);
+                    }
+                }
+                else
+                {
+                    Expression value = Expression.Constant(value: null);
+                    equal = Expression.Equal(name, value);
+                }
+                
+                where = where == null ? equal : Expression.AndAlso(where, equal);
+            }
 
         if (where == null)
         {
