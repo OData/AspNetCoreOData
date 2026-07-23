@@ -328,19 +328,36 @@ public class QueryBinderContext
         }
     }
 
-    private int _singleFunctionCallDepth = 0;
+    private int _functionCallDepth = 0;
 
-    internal void EnterSingleFunctionCall()
+    internal void EnterFunctionCall()
     {
-        _singleFunctionCallDepth++;
-        if (_singleFunctionCallDepth > QuerySettings.MaxFunctionCallDepth)
+        _functionCallDepth++;
+
+        // QuerySettings is only null for the internal test-only parameterless constructor.
+        // In that case there is no configured limit to enforce.
+        if (QuerySettings == null)
         {
-            throw new ODataException(Error.Format(SRResources.SingleValueFunctionCallTooDeep, _singleFunctionCallDepth, QuerySettings.MaxFunctionCallDepth));
+            return;
+        }
+
+        if (_functionCallDepth > QuerySettings.MaxFunctionCallDepth)
+        {
+            throw new ODataException(Error.Format(
+                SRResources.MaxFunctionCallDepthExceeded,
+                QuerySettings.MaxFunctionCallDepth,
+                nameof(ODataQuerySettings.MaxFunctionCallDepth)));
         }
     }
 
-    internal void LeaveSingleFunctionCall()
+    internal void LeaveFunctionCall()
     {
-        _singleFunctionCallDepth--;
+        if (_functionCallDepth == 0)
+        {
+            Contract.Assert(false, "LeaveFunctionCall called without a matching EnterFunctionCall.");
+            return;
+        }
+
+        _functionCallDepth--;
     }
 }

@@ -120,6 +120,120 @@ public class ServerSidePagingTests : WebApiTestBase<ServerSidePagingTests>
         }
     }
 
+    [Theory]
+    [InlineData("maxpagesize=0")]
+    [InlineData("odata.maxpagesize=0")]
+    public async Task PreferMaxPageSizeZero_DoesNotBypassServerDrivenPaging(string preferValue)
+    {
+        // Arrange
+        // A client must not be able to disable [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize=0.
+        // The response must remain paged (5 items + nextLink), not return the entire collection.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(5, value.GetArrayLength());
+
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=5", nextLink.GetString());
+        }
+    }
+
+    [Theory]
+    [InlineData("maxpagesize=2")]
+    [InlineData("odata.maxpagesize=2")]
+    public async Task PreferMaxPageSizeSmallerThanServerPageSizeButNotZero_DoesBypassServerDrivenPaging(string preferValue)
+    {
+        // Arrange
+        // A client can bypass [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize=2. Where 2 is smaller than the server page size of 5.
+        // The response must return only 2 item and a nextLink.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(2, value.GetArrayLength());
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=2", nextLink.GetString());
+        }
+    }
+
+    [Theory]
+    [InlineData("maxpagesize=6")]
+    [InlineData("odata.maxpagesize=6")]
+    public async Task PreferMaxPageSizeLargerThanServerPageSize_DoesNotBypassServerDrivenPaging(string preferValue)
+    {
+        // Arrange
+        // A client must not be able to bypass [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize=6. Where 6 is larger than the server page size of 5.
+        // The response must remain paged (5 items + nextLink), not return the entire collection.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(5, value.GetArrayLength());
+            bool nextLinkFound = document.RootElement.TryGetProperty("@odata.nextLink", out JsonElement nextLink);
+            Assert.True(nextLinkFound);
+            Assert.Equal("http://localhost/prefix/ServerSidePagingCustomers?$skip=5", nextLink.GetString());
+        }
+    }
+
+    [Theory]
+    [InlineData("maxpagesize")]
+    [InlineData("odata.maxpagesize")]
+    public async Task BareMaxPageSizePreference_DoesNotCause500_AndServerPagingApplies(string preferValue)
+    {
+        // Arrange
+        // A client must not be able to bypass [EnableQuery(PageSize = 5)] by sending Prefer: maxpagesize. Where no value is specified.
+        // It should not cause a 500 error, and the server page size of 5 should still apply.
+        string requestUri = "/prefix/ServerSidePagingCustomers";
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.TryAddWithoutValidation("Prefer", preferValue);
+        HttpClient client = CreateClient();
+
+        // Act
+        HttpResponseMessage response = await client.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        using (JsonDocument document = JsonDocument.Parse(content))
+        {
+            bool found = document.RootElement.TryGetProperty("value", out JsonElement value);
+            Assert.True(found);
+            Assert.Equal(5, value.GetArrayLength());
+        }
+    }
+
     [Fact]
     public async Task VerifyParametersInNextPageLinkInEdmFunctionResponseBodyAreInSameCaseAsInRequestUrl()
     {
@@ -554,7 +668,8 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         services.ConfigureControllers(
             typeof(SkipTokenPagingS1CustomersController),
             typeof(SkipTokenPagingS2CustomersController),
-            typeof(SkipTokenPagingS3CustomersController));
+            typeof(SkipTokenPagingS3CustomersController),
+            typeof(SkipTokenPagingS4CustomersController));
         services.AddControllers().AddOData(opt => opt.Expand().OrderBy().SkipToken().AddRouteComponents("{a}", model));
     }
 
@@ -564,6 +679,7 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS1Customers");
         builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS2Customers");
         builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS3Customers");
+        builder.EntitySet<SkipTokenPagingCustomer>("SkipTokenPagingS4Customers");
 
         return builder.GetEdmModel();
     }
@@ -993,6 +1109,106 @@ public class SkipTokenPagingTests : WebApiTestBase<SkipTokenPagingTests>
         Assert.Single(pageResult);
         Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
         Assert.Null((pageResult[0] as JObject)["CustomerSince"].ToObject<DateTime?>());
+        Assert.Null(content.GetValue("@odata.nextLink"));
+    }
+
+    public static TheoryData<string, int, bool?, int, bool?> NullableBoolAscendingPageData =>
+        new TheoryData<string, int, bool?, int, bool?>
+        {
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified", 1, null, 3, null },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-null,Id-3", 5, null, 2, false },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-false,Id-2", 7, false, 4, true },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-true,Id-4", 6, true, 8, true },
+        };
+
+    [Theory]
+    [MemberData(nameof(NullableBoolAscendingPageData))]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolProperty(string requestUri, int idAt0, bool? isVerifiedAt0, int idAt1, bool? isVerifiedAt1)
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUri));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Equal(2, pageResult.Count);
+        Assert.Equal(idAt0, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(isVerifiedAt0, (pageResult[0] as JObject)["IsVerified"].ToObject<bool?>());
+        Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(isVerifiedAt1, (pageResult[1] as JObject)["IsVerified"].ToObject<bool?>());
+
+        string expectedSkipToken = "$skiptoken=IsVerified-" +
+            (isVerifiedAt1 != null ? isVerifiedAt1.Value.ToString().ToLowerInvariant() : "null") +
+            ",Id-" + idAt1;
+        string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+        Assert.NotNull(nextPageLink);
+        Assert.EndsWith("/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&" + expectedSkipToken, nextPageLink);
+    }
+
+    [Fact]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolProperty_LastPage()
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get,
+            "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified&$skiptoken=IsVerified-true,Id-8"));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Single(pageResult);
+        Assert.Equal(9, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.True((pageResult[0] as JObject)["IsVerified"].ToObject<bool?>());
+        Assert.Null(content.GetValue("@odata.nextLink"));
+    }
+
+    public static TheoryData<string, int, bool?> NullableBoolDescendingPageData =>
+        new TheoryData<string, int, bool?>
+        {
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc", 6, true },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-true,Id-6", 9, true },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-true,Id-9", 7, false },
+            { "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-false,Id-7", 3, null },
+        };
+
+    [Theory]
+    [MemberData(nameof(NullableBoolDescendingPageData))]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolPropertyDescending(string requestUri, int idAt1, bool? isVerifiedAt1)
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, requestUri));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Equal(2, pageResult.Count);
+        Assert.Equal(idAt1, (pageResult[1] as JObject)["Id"].ToObject<int>());
+        Assert.Equal(isVerifiedAt1, (pageResult[1] as JObject)["IsVerified"].ToObject<bool?>());
+
+        string expectedSkipToken = "$skiptoken=IsVerified-" +
+            (isVerifiedAt1 != null ? isVerifiedAt1.Value.ToString().ToLowerInvariant() : "null") +
+            ",Id-" + idAt1;
+        string nextPageLink = content["@odata.nextLink"].ToObject<string>();
+        Assert.NotNull(nextPageLink);
+        Assert.EndsWith("/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&" + expectedSkipToken, nextPageLink);
+    }
+
+    [Fact]
+    public async Task VerifySkipTokenPagingOrderedByNullableBoolPropertyDescending_LastPage()
+    {
+        HttpClient client = CreateClient();
+        HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get,
+            "/prefix/SkipTokenPagingS4Customers?$orderby=IsVerified%20desc&$skiptoken=IsVerified-null,Id-3"));
+        JObject content = await response.Content.ReadAsObject<JObject>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JArray pageResult = content["value"] as JArray;
+        Assert.NotNull(pageResult);
+        Assert.Single(pageResult);
+        Assert.Equal(5, (pageResult[0] as JObject)["Id"].ToObject<int>());
+        Assert.Null((pageResult[0] as JObject)["IsVerified"].ToObject<bool?>());
         Assert.Null(content.GetValue("@odata.nextLink"));
     }
 }

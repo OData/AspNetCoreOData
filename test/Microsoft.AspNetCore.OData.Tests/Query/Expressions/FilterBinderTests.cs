@@ -7,10 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Expressions;
@@ -1163,7 +1166,7 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         var filters = BindFilterAndVerify<Product>(
             "matchesPattern(ProductName, 'A\\wc')",
-            "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript)",
+            "$it => $it.ProductName.IsMatch(\"A\\wc\", ECMAScript, 00:00:00.2500000)",
             NotTesting);
 
         // Arrange & Act & Assert
@@ -1174,6 +1177,134 @@ public class FilterBinderTests
         InvokeFiltersAndVerify(filters, new Product { ProductName = "Abd" }, (false, false));
 
         InvokeFiltersAndVerify(filters, new Product { ProductName = "Aθd" }, (false, false)); // ECMAScript has strict matching of \w
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_WithTimeoutConfigured_BindsToTimeoutOverload()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, 'A\\wc')",
+            NotTesting,
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = TimeSpan.FromMilliseconds(100));
+
+        // Assert - both the false and true null-propagation expressions must bind to the four
+        // argument Regex.IsMatch overload and carry the configured time span as a constant.
+        foreach (var filter in new[] { filters.Item1, filters.Item2 })
+        {
+            var isMatchCall = FindIsMatchCall(filter);
+            Assert.NotNull(isMatchCall);
+
+            var parameters = isMatchCall.Method.GetParameters();
+            Assert.Equal(4, parameters.Length);
+            Assert.Equal(typeof(TimeSpan), parameters[3].ParameterType);
+
+            var timeoutArgument = Assert.IsAssignableFrom<ConstantExpression>(isMatchCall.Arguments[3]);
+            Assert.Equal(TimeSpan.FromMilliseconds(100), timeoutArgument.Value);
+        }
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_DefaultSettings_BindsToTimeoutOverload()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, 'A\\wc')",
+            NotTesting,
+            NotTesting);
+
+        // Assert - without an explicit configuration both expressions bind to the four argument
+        // Regex.IsMatch overload and carry the default time span as a constant.
+        foreach (var filter in new[] { filters.Item1, filters.Item2 })
+        {
+            var isMatchCall = FindIsMatchCall(filter);
+            Assert.NotNull(isMatchCall);
+
+            var parameters = isMatchCall.Method.GetParameters();
+            Assert.Equal(4, parameters.Length);
+            Assert.Equal(typeof(TimeSpan), parameters[3].ParameterType);
+
+            var timeoutArgument = Assert.IsAssignableFrom<ConstantExpression>(isMatchCall.Arguments[3]);
+            Assert.Equal(ODataQuerySettings.DefaultMatchesPatternTimeout, timeoutArgument.Value);
+        }
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_OptedOut_BindsToNoTimeoutOverload()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, 'A\\wc')",
+            NotTesting,
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = null);
+
+        // Assert - opting out of the time span keeps the three argument overload.
+        foreach (var filter in new[] { filters.Item1, filters.Item2 })
+        {
+            var isMatchCall = FindIsMatchCall(filter);
+            Assert.NotNull(isMatchCall);
+            Assert.Equal(3, isMatchCall.Method.GetParameters().Length);
+        }
+    }
+
+    [Fact]
+    public void StringFunctions_StringMatchesPattern_WithTimeoutConfigured_BoundsEvaluation()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "matchesPattern(ProductName, '(a+)+$')",
+            NotTesting,
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = TimeSpan.FromMilliseconds(50));
+
+        // A value that forces extensive backtracking so evaluation runs past the configured limit.
+        var product = new Product { ProductName = new string('a', 40) + "!" };
+
+        // Assert - both null-propagation expressions stop once the configured time span elapses.
+        Assert.Throws<RegexMatchTimeoutException>(() => InvokeFilter(product, filters.Item1));
+        Assert.Throws<RegexMatchTimeoutException>(() => InvokeFilter(product, filters.Item2));
+    }
+
+    [Fact]
+    public void StringFunctions_NonMatchesPatternFilter_WithTimeoutConfigured_Unaffected()
+    {
+        // Arrange & Act
+        var filters = BindFilterAndVerify<Product>(
+            "startswith(ProductName, 'Abc')",
+            "$it => $it.ProductName.StartsWith(\"Abc\")",
+            NotTesting,
+            settingsCustomizer: s => s.MatchesPatternTimeout = TimeSpan.FromMilliseconds(100));
+
+        // Assert - the time span only affects matchesPattern, so other functions bind and run unchanged.
+        Assert.Null(FindIsMatchCall(filters.Item1));
+        Assert.Null(FindIsMatchCall(filters.Item2));
+
+        InvokeFiltersAndVerify(filters, new Product { ProductName = "Abcd" }, (true, true));
+    }
+
+    // Returns the first Regex.IsMatch call found in the expression tree, or null when none is present.
+    private static MethodCallExpression FindIsMatchCall(Expression expression)
+    {
+        var finder = new IsMatchCallFinder();
+        finder.Visit(expression);
+        return finder.IsMatchCall;
+    }
+
+    private sealed class IsMatchCallFinder : ExpressionVisitor
+    {
+        public MethodCallExpression IsMatchCall { get; private set; }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            if (IsMatchCall == null && node.Method.Name == "IsMatch")
+            {
+                IsMatchCall = node;
+            }
+
+            return base.VisitMethodCall(node);
+        }
     }
 
     [Fact]
@@ -3085,9 +3216,257 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>("length(123) eq 12"));
     }
-#endregion
+    #endregion
 
-#region Helpers
+    #region Open type EDM model-boundary binding
+
+    [Fact]
+    public void NestedDynamicSegment_ResolvesDeclaredAndDynamicProperties_ButNotIgnoredClrProperty()
+    {
+        // Arrange
+        var model = GetModelBoundaryModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            DeclaredCode = "DC",
+            IgnoredCode = "ClrValue",
+            DynamicProperties = new Dictionary<string, object>
+            {
+                { "DynamicCode", "DynVal" },
+                { "IgnoredCode", "DynIgnored" }
+            }
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // Declared property (in the model) binds directly.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/DeclaredCode eq 'DC'", catalog));
+        // Genuinely dynamic property resolves from the container.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/DynamicCode eq 'DynVal'", catalog));
+        // A name that exists on the CLR type but is not declared in the model resolves the
+        // dynamic-container value, not the CLR member value.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/IgnoredCode eq 'DynIgnored'", catalog));
+        Assert.False(BindAndInvoke(model, "DynamicInfo/IgnoredCode eq 'ClrValue'", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicSegment_IgnoredClrProperty_WithoutDynamicValue_IsTreatedAsAbsent()
+    {
+        // Arrange
+        var model = GetModelBoundaryModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            DeclaredCode = "DC",
+            IgnoredCode = "ClrOnly",
+            DynamicProperties = new Dictionary<string, object>()
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // The CLR-only value is not reachable; the declared sibling still resolves.
+        Assert.False(BindAndInvoke(model, "DynamicInfo/IgnoredCode eq 'ClrOnly'", catalog));
+        Assert.True(BindAndInvoke(model, "DynamicInfo/DeclaredCode eq 'DC'", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicSegment_ResolvesDeclaredProperty_WhenEdmNameDiffersFromClrName()
+    {
+        // Arrange
+        var model = GetRenamedPropertyModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            DeclaredCode = "DC",
+            RenamedCode = "ClrRenamedValue",
+            DynamicProperties = new Dictionary<string, object>()
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // Addressed by its EDM name, the declared property binds to the CLR member value
+        // (RenamedCode), not the empty dynamic container.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/EdmRenamedCode eq 'ClrRenamedValue'", catalog));
+        Assert.False(BindAndInvoke(model, "DynamicInfo/EdmRenamedCode eq 'other'", catalog));
+
+        // The CLR name is not the EDM name, so it's an undeclared open member read from the empty
+        // container -> no match. Confirms binding goes through EDM->CLR mapping.
+        Assert.False(BindAndInvoke(model, "DynamicInfo/RenamedCode eq 'ClrRenamedValue'", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicCollectionSegment_ResolvesDeclaredAndDynamicCollections_ButNotIgnoredClrCollection()
+    {
+        // Arrange
+        var model = GetModelBoundaryModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            DeclaredCode = "DC",
+            DeclaredTags = new List<ModelBoundaryCatalogTag> { new ModelBoundaryCatalogTag { DeclaredLabel = "D1" } },
+            IgnoredTags = new List<ModelBoundaryCatalogTag> { new ModelBoundaryCatalogTag { DeclaredLabel = "H1" } },
+            DynamicProperties = new Dictionary<string, object>
+            {
+                { "DynamicTags", new List<ModelBoundaryCatalogTag> { new ModelBoundaryCatalogTag { DeclaredLabel = "Y1" } } }
+            }
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        Assert.True(BindAndInvoke(model, "DynamicInfo/DeclaredTags/any(t:t/DeclaredLabel eq 'D1')", catalog));
+        Assert.True(BindAndInvoke(model, "DynamicInfo/DynamicTags/any(t:t/DeclaredLabel eq 'Y1')", catalog));
+        // The ignored CLR collection is not reachable, so any() over it matches nothing.
+        Assert.False(BindAndInvoke(model, "DynamicInfo/IgnoredTags/any(t:t/DeclaredLabel eq 'H1')", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicSegment_RenamedDeclaredProperty_TakesPrecedenceOverDynamicEntryWithSameEdmName()
+    {
+        // Arrange
+        var model = GetRenamedPropertyModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            RenamedCode = "ClrWins",
+            DynamicProperties = new Dictionary<string, object>
+            {
+                // A dynamic entry keyed by the EDM name must not shadow the declared (renamed) property.
+                { "EdmRenamedCode", "DynLoses" }
+            }
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // The declared property binds to the CLR member value, not the shadowing dynamic entry.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/EdmRenamedCode eq 'ClrWins'", catalog));
+        Assert.False(BindAndInvoke(model, "DynamicInfo/EdmRenamedCode eq 'DynLoses'", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicSegment_RenamedDeclaredProperty_WithNullClrValue_DoesNotThrow()
+    {
+        // Arrange
+        var model = GetRenamedPropertyModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            RenamedCode = null,
+            DynamicProperties = new Dictionary<string, object>()
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // A null CLR member value binds and compares without throwing; it simply does not match.
+        Assert.False(BindAndInvoke(model, "DynamicInfo/EdmRenamedCode eq 'anything'", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicCollectionSegment_ResolvesRenamedDeclaredCollection_ByEdmName()
+    {
+        // Arrange
+        var model = GetRenamedPropertyModel();
+        var info = new ModelBoundaryCatalogInfo
+        {
+            RenamedTags = new List<ModelBoundaryCatalogTag> { new ModelBoundaryCatalogTag { DeclaredLabel = "R1" } },
+            DynamicProperties = new Dictionary<string, object>()
+        };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // The renamed declared collection resolves to the CLR member when addressed by its EDM name.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/EdmRenamedTags/any(t:t/DeclaredLabel eq 'R1')", catalog));
+        Assert.False(BindAndInvoke(model, "DynamicInfo/EdmRenamedTags/any(t:t/DeclaredLabel eq 'nope')", catalog));
+        // Addressed by the raw CLR name it is an undeclared open member -> empty container -> no match.
+        Assert.False(BindAndInvoke(model, "DynamicInfo/RenamedTags/any(t:t/DeclaredLabel eq 'R1')", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicSegment_ResolvesDeclaredProperty_WhenRenamedViaDataMemberAttribute()
+    {
+        // Arrange
+        var model = GetDataMemberRenamedModel();
+        var info = new ModelBoundaryDataMemberInfo { DataMemberCode = "DmValue" };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // The property is declared under its [DataMember(Name=...)] EDM name; binding maps it back to
+        // the CLR member instead of falling through to the dynamic container.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/EdmDataMemberCode eq 'DmValue'", catalog));
+        Assert.False(BindAndInvoke(model, "DynamicInfo/EdmDataMemberCode eq 'other'", catalog));
+        // Addressed by the raw CLR name it is an undeclared open member -> empty container -> no match.
+        Assert.False(BindAndInvoke(model, "DynamicInfo/DataMemberCode eq 'DmValue'", catalog));
+    }
+
+    [Fact]
+    public void NestedDynamicSegment_DoesNotExposeNotMappedClrProperty_OnNonOpenRuntimeType()
+    {
+        // Arrange
+        var model = GetClosedNestedTypeModel();
+
+        // The runtime type is in the model but is not open; SecretCode is excluded from the model
+        // via [NotMapped] while DeclaredCode is a normal declared member. These preconditions are
+        // asserted so the test fails loudly if the model shape ever changes.
+        var closedType = model.SchemaElements.OfType<IEdmComplexType>().Single(t => t.Name == nameof(ModelBoundaryClosedInfo));
+        Assert.False(closedType.IsOpen);
+        Assert.NotNull(closedType.FindProperty(nameof(ModelBoundaryClosedInfo.DeclaredCode)));
+        Assert.Null(closedType.FindProperty(nameof(ModelBoundaryClosedInfo.SecretCode)));
+
+        var info = new ModelBoundaryClosedInfo { DeclaredCode = "DC", SecretCode = "TopSecret" };
+        var catalog = new ModelBoundaryCatalog
+        {
+            Id = 1,
+            DynamicProperties = new Dictionary<string, object> { { "DynamicInfo", info } }
+        };
+
+        // Assert
+        // A declared member on the non-open runtime type still binds and compares.
+        Assert.True(BindAndInvoke(model, "DynamicInfo/DeclaredCode eq 'DC'", catalog));
+
+        // The [NotMapped] member is not read from the CLR instance. Because the runtime type is not
+        // open it cannot carry a dynamic member of that name, so the segment is rejected at the model
+        // boundary instead of exposing the CLR value - the same outcome as a genuinely dynamic name
+        // on a non-open type.
+        var exception = Assert.Throws<NotSupportedException>(
+            () => BindAndInvoke(model, "DynamicInfo/SecretCode eq 'TopSecret'", catalog));
+        Assert.Equal(
+            string.Format(SRResources.TypeMustBeOpenType, typeof(ModelBoundaryClosedInfo).FullName),
+            exception.Message);
+
+        // A name that is not a CLR member at all behaves identically, proving the excluded CLR member
+        // receives no special treatment.
+        Assert.Throws<NotSupportedException>(
+            () => BindAndInvoke(model, "DynamicInfo/SecretCode eq 'AnyValue'", catalog));
+    }
+
+    #endregion
+
+    #region Helpers
     internal static void InvokeFiltersAndThrows<T>((Expression, Expression) filters, T instance, (Type, bool) expectedValue)
     {
         ExceptionAssert.Throws(expectedValue.Item1, () => InvokeFilter(instance, filters.Item1));
@@ -3227,7 +3606,114 @@ public class FilterBinderTests
         return str.PadRight(number);
     }
 
+    // A complex/entity type is open when it exposes a single IDictionary<string, object> as its
+    // dynamic container. IgnoredCode / IgnoredTags are CLR members that are excluded from the
+    // EDM model via Ignore(), so segments that name them must resolve from the dynamic container
+    // (or be treated as absent) instead of binding to the CLR member.
+    private static IEdmModel GetModelBoundaryModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<ModelBoundaryCatalog>("Entities");
+        ComplexTypeConfiguration<ModelBoundaryCatalogInfo> info = builder.ComplexType<ModelBoundaryCatalogInfo>();
+        info.Ignore(c => c.IgnoredCode);
+        info.Ignore(c => c.IgnoredTags);
+        builder.ComplexType<ModelBoundaryCatalogTag>();
+        return builder.GetEdmModel();
+    }
+
+    // Like GetModelBoundaryModel, but RenamedCode is declared under a different EDM name
+    // (EdmRenamedCode) than its CLR name, to exercise EDM->CLR name mapping.
+    private static IEdmModel GetRenamedPropertyModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<ModelBoundaryCatalog>("Entities");
+        ComplexTypeConfiguration<ModelBoundaryCatalogInfo> info = builder.ComplexType<ModelBoundaryCatalogInfo>();
+        info.Ignore(c => c.IgnoredCode);
+        info.Ignore(c => c.IgnoredTags);
+        info.Property(c => c.RenamedCode).Name = "EdmRenamedCode";
+        info.CollectionProperty(c => c.RenamedTags).Name = "EdmRenamedTags";
+        builder.ComplexType<ModelBoundaryCatalogTag>();
+        return builder.GetEdmModel();
+    }
+
+    // Like GetRenamedPropertyModel, but the rename comes from [DataMember(Name=...)] on the CLR type
+    // rather than the builder .Name API, to exercise EDM->CLR mapping for attribute-based renames.
+    private static IEdmModel GetDataMemberRenamedModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<ModelBoundaryCatalog>("Entities");
+        builder.ComplexType<ModelBoundaryDataMemberInfo>();
+        return builder.GetEdmModel();
+    }
+
+    // A model whose nested runtime type (ModelBoundaryClosedInfo) is in the model but not open, with
+    // a SecretCode member excluded from the model via [NotMapped]. Used to prove that naming that
+    // excluded member on a non-open runtime type does not bind to the CLR member.
+    private static IEdmModel GetClosedNestedTypeModel()
+    {
+        ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+        builder.EntitySet<ModelBoundaryCatalog>("Entities");
+        builder.ComplexType<ModelBoundaryClosedInfo>();
+        return builder.GetEdmModel();
+    }
+
+    private static bool BindAndInvoke<T>(IEdmModel model, string filter, T instance) where T : class
+    {
+        IEdmEntityType entityType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == typeof(T).Name);
+        IEdmEntitySet entitySet = model.EntityContainer.FindEntitySet("Entities");
+        ODataQueryOptionParser parser = new ODataQueryOptionParser(model, entityType, entitySet,
+            new Dictionary<string, string> { { "$filter", filter } });
+        FilterClause filterClause = parser.ParseFilter();
+
+        ODataQuerySettings settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.True };
+        Expression filterExpr = BindFilter(model, filterClause, typeof(T), settings);
+        return InvokeFilter(instance, filterExpr);
+    }
+
     #endregion
+}
+
+public class ModelBoundaryCatalog
+{
+    public int Id { get; set; }
+    public string DeclaredName { get; set; }
+    public string IgnoredName { get; set; }
+    public IDictionary<string, object> DynamicProperties { get; set; }
+}
+
+public class ModelBoundaryCatalogInfo
+{
+    public string DeclaredCode { get; set; }
+    public string RenamedCode { get; set; }
+    public string IgnoredCode { get; set; }
+    public List<ModelBoundaryCatalogTag> DeclaredTags { get; set; }
+    public List<ModelBoundaryCatalogTag> RenamedTags { get; set; }
+    public List<ModelBoundaryCatalogTag> IgnoredTags { get; set; }
+    public IDictionary<string, object> DynamicProperties { get; set; }
+}
+
+public class ModelBoundaryCatalogTag
+{
+    public string DeclaredLabel { get; set; }
+}
+
+[DataContract]
+public class ModelBoundaryDataMemberInfo
+{
+    [DataMember(Name = "EdmDataMemberCode")]
+    public string DataMemberCode { get; set; }
+
+    public IDictionary<string, object> DynamicProperties { get; set; }
+}
+
+// A non-open type (no dynamic-property container) whose SecretCode member is excluded from the EDM
+// model via [NotMapped]. DeclaredCode remains a normal declared member.
+public class ModelBoundaryClosedInfo
+{
+    public string DeclaredCode { get; set; }
+
+    [NotMapped]
+    public string SecretCode { get; set; }
 }
 
 // Used by Custom Method binder tests - by reflection

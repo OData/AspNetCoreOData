@@ -9,17 +9,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -68,6 +73,97 @@ public class EnableQueryAttributeTests
         // Act & Assert
         Assert.Equal(HandleNullPropagationOption.Default, attribute.HandleNullPropagation);
         Assert.True(attribute.EnsureStableOrdering);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeout_RoundTripsThroughQuerySettings()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromMilliseconds(100) };
+
+        // Assert
+        Assert.Equal(TimeSpan.FromMilliseconds(100), attribute.MatchesPatternTimeout);
+        Assert.Equal(ODataQuerySettings.DefaultMatchesPatternTimeout, new EnableQueryAttribute().MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Default_IsTwoHundredFifty()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute();
+
+        // Assert - the default 250 milliseconds surfaces through the attribute-compatible property.
+        Assert.Equal(250, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_RoundTripsThroughQuerySettings()
+    {
+        // Arrange & Act - assigning the millisecond companion mirrors the [EnableQuery(...)] attribute-argument path.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = 250 };
+
+        // Assert - both properties reflect the same underlying setting.
+        Assert.Equal(250, attribute.MatchesPatternTimeoutMilliseconds);
+        Assert.Equal(TimeSpan.FromMilliseconds(250), attribute.MatchesPatternTimeout);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Zero_AppliesNoLimit()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = 0 };
+
+        // Assert - zero opts out, mirroring a null time span.
+        Assert.Null(attribute.MatchesPatternTimeout);
+        Assert.Equal(0, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Negative_AppliesNoLimit()
+    {
+        // Arrange & Act
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeoutMilliseconds = -5 };
+
+        // Assert - any non-positive value opts out.
+        Assert.Null(attribute.MatchesPatternTimeout);
+        Assert.Equal(0, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeout_And_Milliseconds_ShareTheSameSetting()
+    {
+        // Arrange
+        var attribute = new EnableQueryAttribute();
+
+        // Act & Assert - setting the time span property surfaces through the millisecond property.
+        attribute.MatchesPatternTimeout = TimeSpan.FromMilliseconds(500);
+        Assert.Equal(500, attribute.MatchesPatternTimeoutMilliseconds);
+
+        // Act & Assert - clearing the time span property surfaces as zero milliseconds (no limit).
+        attribute.MatchesPatternTimeout = null;
+        Assert.Equal(0, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Getter_TruncatesSubMillisecondFractions()
+    {
+        // Arrange - a span carrying a sub-millisecond fraction that was not set through the millisecond companion.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromTicks(TimeSpan.TicksPerMillisecond * 250 + 5000) };
+
+        // Act & Assert - the getter truncates the fractional part, so the round-trip through milliseconds is lossy.
+        Assert.Equal(250, attribute.MatchesPatternTimeoutMilliseconds);
+    }
+
+    [Fact]
+    public void MatchesPatternTimeoutMilliseconds_Getter_ReflectsSetTimeClampToRegexMaximum()
+    {
+        // Arrange - a span whose total milliseconds exceeds Regex's maximum match timeout.
+        var attribute = new EnableQueryAttribute { MatchesPatternTimeout = TimeSpan.FromDays(30) };
+
+        // Act & Assert - the time span setter clamps to Regex's maximum (int.MaxValue - 1 milliseconds)
+        // so the value is always a valid regex timeout; the millisecond getter therefore reflects that
+        // clamped maximum rather than overflowing.
+        Assert.Equal(int.MaxValue - 1, attribute.MatchesPatternTimeoutMilliseconds);
     }
 
     [Fact]
@@ -386,6 +482,417 @@ public class EnableQueryAttributeTests
         {
             Called = true;
             return null;
+        }
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_UnknownSelectProperty_WritesDiagnostic()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=NoSuchProperty", BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal(LogLevel.Warning, entry.Level);
+        Assert.Equal(typeof(EnableQueryAttribute).FullName, entry.Category);
+        Assert.Equal("Customers({key})", entry.GetFieldValue("Endpoint"));
+        Assert.Contains("QCustomer", entry.GetFieldValue("QueryType"));
+        Assert.Equal("$select=NoSuchProperty", entry.GetFieldValue("QueryOptions"));
+        Assert.Contains("NoSuchProperty", entry.GetFieldValue("Reason"));
+        Assert.NotNull(entry.Exception);
+        Assert.Contains("ODataException", entry.Exception.GetType().FullName);
+        Assert.Contains("NoSuchProperty", entry.Exception.Message);
+        Assert.Contains(" at ", entry.Exception.ToString());
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_UnknownExpandProperty_WritesDiagnostic()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$expand=NoSuchNavigation", BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal("$expand=NoSuchNavigation", entry.GetFieldValue("QueryOptions"));
+        Assert.NotNull(entry.Exception);
+        Assert.Contains("NoSuchNavigation", entry.Exception.Message);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_UnknownPropertyAmongMany_CapturesFullAttemptedSelectSet()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=Name,NoSuchProperty", BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal("$select=Name,NoSuchProperty", entry.GetFieldValue("QueryOptions"));
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithDefaultConfiguration_UnknownSelectProperty_WritesNoDiagnostic()
+    {
+        // Arrange
+        // Logging is off by default and no global configuration enables it, so nothing is written.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model); // EnableQueryValidationErrorLogging is off by default.
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=NoSuchProperty", BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithGlobalLoggingEnabled_UnknownSelectProperty_WritesDiagnostic()
+    {
+        // Arrange
+        // The attribute leaves the flag unset, so the global ODataOptions value enables logging for it.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model); // Flag unset -> defers to global.
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: true));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal(LogLevel.Warning, entry.Level);
+        Assert.Equal("$select=NoSuchProperty", entry.GetFieldValue("QueryOptions"));
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithGlobalLoggingEnabled_AttributeOptOut_WritesNoDiagnostic()
+    {
+        // Arrange
+        // An explicit false on the attribute overrides the global enabled value.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = false };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: true));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithGlobalLoggingDisabled_AttributeEnabled_WritesDiagnostic()
+    {
+        // Arrange
+        // An explicit true on the attribute overrides the global disabled value.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: false));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        Assert.Single(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingDisabled_UnknownSelectProperty_WritesNoDiagnostic()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = false }; // Explicitly disabled on the attribute.
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=NoSuchProperty", BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_ValidSelectProperty_WritesNoDiagnostic()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=Name", BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.Null(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_NoQueryOptions_WritesNoDiagnostic()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(string.Empty, BuildLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.Null(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_NoLoggerFactoryRegistered_DoesNotThrowAndReturnsBadRequest()
+    {
+        // Arrange
+        IServiceProvider emptyServices = new ServiceCollection().BuildServiceProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=NoSuchProperty", emptyServices);
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_WarningLevelDisabled_WritesNoDiagnostic()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=NoSuchProperty", BuildLoggerServices(loggerProvider, LogLevel.Error));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_CustomLogLevel_WritesDiagnosticAtThatLevel()
+    {
+        // Arrange
+        // The global level selects a non-default level; the diagnostic is written at that level.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: true, globalLogLevel: LogLevel.Error));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal(LogLevel.Error, entry.Level);
+        Assert.Equal("$select=NoSuchProperty", entry.GetFieldValue("QueryOptions"));
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_InformationLogLevel_WritesDiagnosticAtThatLevel()
+    {
+        // Arrange
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: true, globalLogLevel: LogLevel.Information));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal(LogLevel.Information, entry.Level);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithGlobalLogLevel_WritesDiagnosticAtGlobalLevel()
+    {
+        // Arrange
+        // The global ODataOptions level applies to the diagnostic.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: true, globalLogLevel: LogLevel.Error));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        CapturedLogEntry entry = Assert.Single(loggerProvider.Entries);
+        Assert.Equal(LogLevel.Error, entry.Level);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_CustomLevelDisabled_WritesNoDiagnostic()
+    {
+        // Arrange
+        // The effective level is Information but the logger only accepts Warning and above, so nothing is written.
+        CapturingLoggerProvider loggerProvider = new CapturingLoggerProvider();
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext(
+            "?$select=NoSuchProperty",
+            BuildLoggerServicesWithGlobalOption(loggerProvider, globalEnableQueryValidationErrorLogging: true, globalLogLevel: LogLevel.Information, minimumLevel: LogLevel.Warning));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+        Assert.Empty(loggerProvider.Entries);
+    }
+
+    [Fact]
+    public void EnableQueryValidationErrorLogging_DefaultsToFalse()
+    {
+        // The attribute leaves the value unset by default, which resolves to false.
+        Assert.False(new EnableQueryAttribute().EnableQueryValidationErrorLogging);
+    }
+
+    [Fact]
+    public void OnActionExecuting_WithLoggingEnabled_WhenLoggerThrows_ResponseIsUnchanged()
+    {
+        // Arrange
+        // A logging provider that throws while writing the diagnostic must never change the response produced
+        // for the failed query: the same 400 result is returned and no exception surfaces from the action filter.
+        ThrowingLoggerProvider loggerProvider = new ThrowingLoggerProvider(typeof(EnableQueryAttribute).FullName);
+        LoggingEnableQueryAttribute attribute = new LoggingEnableQueryAttribute(_model) { EnableQueryValidationErrorLogging = true };
+        ActionExecutingContext context = CreateLoggingActionExecutingContext("?$select=NoSuchProperty", BuildThrowingLoggerServices(loggerProvider));
+
+        // Act
+        attribute.OnActionExecuting(context);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(context.Result);
+    }
+
+    private static IServiceProvider BuildLoggerServices(CapturingLoggerProvider loggerProvider)
+    {
+        return BuildLoggerServices(loggerProvider, LogLevel.Trace);
+    }
+
+    private static IServiceProvider BuildLoggerServices(CapturingLoggerProvider loggerProvider, LogLevel minimumLevel)
+    {
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging(builder =>
+        {
+            builder.SetMinimumLevel(minimumLevel);
+            builder.AddProvider(loggerProvider);
+        });
+
+        return services.BuildServiceProvider();
+    }
+
+    private static IServiceProvider BuildLoggerServicesWithGlobalOption(CapturingLoggerProvider loggerProvider, bool globalEnableQueryValidationErrorLogging, LogLevel? globalLogLevel = null, LogLevel minimumLevel = LogLevel.Trace)
+    {
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging(builder =>
+        {
+            builder.SetMinimumLevel(minimumLevel);
+            builder.AddProvider(loggerProvider);
+        });
+        services.Configure<ODataOptions>(options =>
+        {
+            options.EnableQueryValidationErrorLogging = globalEnableQueryValidationErrorLogging;
+            if (globalLogLevel.HasValue)
+            {
+                options.QueryValidationErrorLogLevel = globalLogLevel.Value;
+            }
+        });
+
+        return services.BuildServiceProvider();
+    }
+
+    private static IServiceProvider BuildThrowingLoggerServices(ThrowingLoggerProvider loggerProvider)
+    {
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging(builder =>
+        {
+            builder.SetMinimumLevel(LogLevel.Trace);
+            builder.AddProvider(loggerProvider);
+        });
+
+        return services.BuildServiceProvider();
+    }
+
+    private static ActionExecutingContext CreateLoggingActionExecutingContext(string queryString, IServiceProvider requestServices)
+    {
+        DefaultHttpContext httpContext = new DefaultHttpContext();
+        httpContext.RequestServices = requestServices;
+        httpContext.Request.Path = "/Customers";
+        httpContext.Request.QueryString = new QueryString(queryString);
+
+        // Match a routed endpoint so the diagnostic records the endpoint's route template rather than the
+        // concrete request path. The template uses "{key}" placeholders for entity keys, so the same endpoint
+        // is reported consistently across requests.
+        httpContext.SetEndpoint(new RouteEndpoint(
+            context => Task.CompletedTask,
+            RoutePatternFactory.Parse("Customers({key})"),
+            order: 0,
+            metadata: new EndpointMetadataCollection(Array.Empty<object>()),
+            displayName: "Customers"));
+
+        ActionContext actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+        return new ActionExecutingContext(
+            actionContext,
+            new List<IFilterMetadata>(),
+            new Dictionary<string, object>(),
+            controller: new object());
+    }
+
+    private class LoggingEnableQueryAttribute : EnableQueryAttribute
+    {
+        private readonly IEdmModel _edmModel;
+
+        public LoggingEnableQueryAttribute(IEdmModel edmModel)
+        {
+            _edmModel = edmModel;
+        }
+
+        protected override ODataQueryOptions CreateQueryOptionsOnExecuting(ActionExecutingContext actionExecutingContext)
+        {
+            HttpRequest request = actionExecutingContext.HttpContext.Request;
+            ODataQueryContext queryContext = new ODataQueryContext(_edmModel, typeof(QCustomer));
+            queryContext.DefaultQueryConfigurations.EnableSelect = true;
+            queryContext.DefaultQueryConfigurations.EnableExpand = true;
+            return new ODataQueryOptions(queryContext, request);
         }
     }
 

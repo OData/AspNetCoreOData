@@ -6884,6 +6884,19 @@
             Default is 100 MB (104,857,600 bytes). Please call 'SetMaxReceivedMessageSize()' to config.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging">
+            <summary>
+            Gets a value indicating whether diagnostic details are recorded when an incoming query fails validation.
+            Please call 'SetQueryValidationErrorLogging()' to config. The default value is <c>false</c>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryValidationErrorLogLevel">
+            <summary>
+            Gets the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written when
+            <see cref="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging"/> is enabled. Please call 'SetQueryValidationErrorLogLevel()' to
+            config. The default value is <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetNoDollarQueryOptions(System.Boolean)">
             <summary>
             Config whether or not no '$' sign query option.
@@ -6896,6 +6909,22 @@
             Config the case insensitive.
             </summary>
             <param name="enableCaseInsensitive">Case insensitive or not.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetQueryValidationErrorLogging(System.Boolean)">
+            <summary>
+            Config whether or not diagnostic details are recorded when an incoming query fails validation. When
+            enabled, the endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the
+            failure reason are written.
+            </summary>
+            <param name="enableQueryValidationErrorLogging">Whether to record query validation diagnostics.</param>
+            <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetQueryValidationErrorLogLevel(Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Config the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written.
+            </summary>
+            <param name="logLevel">The level at which query validation diagnostics are written.</param>
             <returns>The current <see cref="T:Microsoft.AspNetCore.OData.ODataMiniOptions"/> instance to enable further configuration.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.ODataMiniOptions.SetContinueOnErrorHeader(System.Boolean)">
@@ -7218,6 +7247,25 @@
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableNoDollarQueryOptions">
             <summary>
             Gets or sets whether or not the OData system query options should be prefixed with '$'.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging">
+            <summary>
+            Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+            fails validation for actions annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. When enabled, the
+            endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the failure
+            reason are written. This value provides
+            the default for every such action, allowing the behavior to be configured once instead of on each
+            attribute; an individual <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> overrides it by setting
+            <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging"/> explicitly. The default value is <c>false</c>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel">
+            <summary>
+            Gets or sets the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written for actions
+            annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> when <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is enabled.
+            This value applies to every such action, so the level can be configured once. The default value is
+            <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
@@ -7850,7 +7898,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxAnyAllExpressionLimitExceeded">
             <summary>
-              Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataQuerySettings or EnableQueryAttribute..
+              Looks up a localized string similar to The Any/All nesting limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings or EnableQueryAttribute..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxExpandDepthExceeded">
@@ -7858,9 +7906,19 @@
               Looks up a localized string similar to The request includes a $expand path which is too deep. The maximum depth allowed is {0}. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings, or set the &apos;MaxDepth&apos; property in ExpandAttribute..
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxFunctionCallDepthExceeded">
+            <summary>
+              Looks up a localized string similar to The function call depth limit of &apos;{0}&apos; has been exceeded. &apos;{1}&apos; can be configured on ODataValidationSettings, ODataQuerySettings or EnableQueryAttribute..
+            </summary>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxNodeLimitExceeded">
             <summary>
               Looks up a localized string similar to The node count limit of &apos;{0}&apos; has been exceeded. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings..
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxReceivedMessageSizeExceeded">
+            <summary>
+              Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.MissingNonODataContainer">
@@ -8303,11 +8361,6 @@
               Looks up a localized string similar to The action &apos;{0}&apos; on controller &apos;{1}&apos; returned a {2} containing more than one element. {2} must have zero or one elements..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.SingleValueFunctionCallTooDeep">
-            <summary>
-              Looks up a localized string similar to Current single value function call depth &apos;{0}&apos; exceeded the maximum allowed depth of &apos;{1}&apos;..
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.SRResources.SkipTokenNotSupportedOrderByExpression">
             <summary>
               Looks up a localized string similar to SkipToken doesn&apos;t support $orderby expression kind &apos;{0}&apos;. Only support property or simple property path with $orderby when SkipToken enabled..
@@ -8448,9 +8501,14 @@
               Looks up a localized string similar to The OData formatter requires an attached request in order to serialize..
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.SRResources.MaxReceivedMessageSizeExceeded">
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchRequestUriAuthorityMismatch">
             <summary>
-              Looks up a localized string similar to The maximum number of bytes allowed to be read from the stream has been exceeded. After the last read operation, a total of {0} bytes has been read from the stream; however a maximum of {1} bytes is allowed..
+              Looks up a localized string similar to The batch sub-request URI '{0}' has a different authority (scheme, host, or port) than the outer batch request '{1}'. Batch sub-requests must target the same service as the outer batch request.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.BatchSubRequestPathNotUnderServiceRoot">
+            <summary>
+              Looks up a localized string similar to The batch sub-request URI '{0}' targets a path that is not within the OData service root '{1}'. Batch sub-requests must address resources within the OData service.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">
@@ -9156,6 +9214,30 @@
             </summary>
             <value>The default value is <c>true</c>.</value>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout">
+            <summary>
+            Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
+            not per request). The default is 250 milliseconds; a <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value
+            applies no limit.
+            </summary>
+            <remarks>
+            <see cref="T:System.TimeSpan"/> is not a valid attribute-argument type, so use <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>
+            to configure the bound in <c>[EnableQuery(...)]</c> usage. Both are backed by the same setting.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds">
+            <summary>
+            Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
+            This is the attribute-compatible companion of <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout"/> and shares the same
+            setting; because <see cref="T:System.Int32"/> is a valid attribute-argument type, it can be set in
+            <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 250 (a quarter second); a
+            value of <c>0</c> or less applies no limit.
+            </summary>
+            <remarks>
+            The getter is lossy: sub-millisecond fractions are truncated and durations of <see cref="F:System.Int32.MaxValue"/>
+            milliseconds or more are clamped to <see cref="F:System.Int32.MaxValue"/>.
+            </remarks>
+        </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableCorrelatedSubqueryBuffering">
             <summary>
             Gets or sets a value indicating whether queries with expanded navigations should be formulated
@@ -9164,6 +9246,12 @@
             by buffering results from the sub-query.
             </summary>
             <value>The default value is <c>false</c>.</value>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth">
+            <summary>
+            Gets or sets the maximum depth of function call expressions inside the query.
+            For example: 'length(tolower(name)) eq 5', the depth of function call expressions is 2.
+            </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxAnyAllExpressionDepth">
             <summary>
@@ -9277,6 +9365,20 @@
             Gets or sets the maximum number of expressions that can be present in the $orderby.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging">
+            <summary>
+            Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+            fails validation. When enabled, the endpoint's route template, the queried type, the attempted
+            <c>$select</c> and <c>$expand</c> options, and the failure reason are written, together with the
+            validation exception, to an <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> resolved from the request services
+            and categorized for <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. This information is captured from the request
+            even when the query options cannot be fully parsed. When this property is not set on the attribute,
+            the value of <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is used, so the behavior can be
+            configured once for all actions; setting it here overrides that global value for this action. The
+            diagnostic is written at the level from <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel"/>
+            (default <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>). The default value is <c>false</c>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
             <summary>
             Performs the query composition before action is executing.
@@ -9323,13 +9425,27 @@
             <param name="actionDescriptor">The action context, i.e. action and controller name.</param>
             <param name="request">The request.</param>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(System.String,System.Exception)">
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateBadRequestResult(Microsoft.AspNetCore.Http.HttpContext,System.String,System.Exception)">
             <summary>
             Create a BadRequestObjectResult.
             </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
             <param name="message">The error message.</param>
             <param name="exception">The exception.</param>
             <returns>A BadRequestObjectResult.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.LogQueryValidationError(Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+            <summary>
+            Records diagnostic details about a query that failed validation, using the request state that is
+            available even when the query options could not be fully parsed. Does nothing unless logging is
+            enabled for the action — either on the attribute or through the global
+            <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> value — and a logger is available. The diagnostic
+            is written at the level from the global <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel"/>
+            (default <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>). This never changes the response produced for
+            the failed query.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <param name="exception">The exception raised while validating the query.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.CreateErrorResponse(System.String,System.Exception)">
             <summary>
@@ -9936,6 +10052,18 @@
             The helper class for all expression binders.
             </summary>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.ExpressionBinderHelper.BoolToIntExpression(System.Linq.Expressions.Expression)">
+            <summary>
+            Converts a <see cref="T:System.Boolean"/> or <see cref="T:System.Nullable`1"/> expression to a
+            <see cref="T:System.Nullable`1"/> expression using the mapping
+            <c>false → 0</c>, <c>true → 1</c> (and <c>null → null</c> for the nullable form).
+            Always returns <see cref="T:System.Nullable`1"/> so that mixed bool / bool? pairs produce
+            matching types and <see cref="M:System.Linq.Expressions.Expression.MakeBinary(System.Linq.Expressions.ExpressionType,System.Linq.Expressions.Expression,System.Linq.Expressions.Expression)"/> never receives mismatched operands.
+            This is needed because .NET expression trees do not define ordering operators
+            for <see cref="T:System.Boolean"/>, yet OData allows <c>$orderby</c> on boolean properties
+            with the conventional ordering <c>false &lt; true</c>.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Expressions.FilterBinder">
             <summary>
             The default implementation to bind an OData $filter represented by <see cref="T:Microsoft.OData.UriParser.FilterClause"/> to a <see cref="T:System.Linq.Expressions.Expression"/>.
@@ -10532,6 +10660,22 @@
             <param name="queryNodeKind">Query node kind.</param>
             <param name="model">The Edm model.</param>
             <returns>Returns CLR property for dynamic properties container.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.GetDeclaredClrProperty(System.Type,System.String,Microsoft.OData.Edm.IEdmModel)">
+            <summary>
+            Gets the CLR <see cref="T:System.Reflection.PropertyInfo"/> that a property segment binds to, mapping the
+            segment's EDM name to the CLR property name. Returns null for a dynamic (open) property, which
+            the caller then reads from the dynamic property container.
+            </summary>
+            <param name="instanceType">The runtime CLR type of the value being accessed.</param>
+            <param name="propertyName">The property name from the URI segment (the EDM name).</param>
+            <param name="model">The Edm model.</param>
+            <returns>
+            The <see cref="T:System.Reflection.PropertyInfo"/> to bind for a property declared in the model (resolved by its
+            CLR name), or null when the segment is an undeclared member of a type that is in the model
+            (whether open or not), so the caller resolves it from the dynamic container or treats it as
+            absent rather than binding a CLR member that is not part of the model.
+            </returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.ApplyNullPropagationForFilterBody(System.Linq.Expressions.Expression,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>
@@ -11562,6 +11706,13 @@
             <param name="context">The query context.</param>
             <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IODataQueryValidator"/>.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetApplyQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
+            <summary>
+            Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator"/>.
+            </summary>
+            <param name="context">The query context.</param>
+            <returns>The built <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator"/>.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryContextExtensions.GetComputeQueryValidator(Microsoft.AspNetCore.OData.Query.ODataQueryContext)">
             <summary>
             Gets the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator"/>.
@@ -11753,6 +11904,17 @@
             <param name="queryOptions">
             The <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryOptions"/> instance constructed based on the incoming request.
             </param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.LogQueryValidationError(Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+            <summary>
+            Records diagnostic details about a query that failed validation, using the request state that is
+            available even when the query options could not be fully parsed. Does nothing unless logging is enabled
+            through <see cref="P:Microsoft.AspNetCore.OData.ODataMiniOptions.EnableQueryValidationErrorLogging"/> and a logger is available. The diagnostic
+            is written at the level from <see cref="P:Microsoft.AspNetCore.OData.ODataMiniOptions.QueryValidationErrorLogLevel"/>. This never
+            changes the response produced for the failed query.
+            </summary>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <param name="exception">The exception raised while validating the query.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter.CreateQueryOptionsOnExecuting(Microsoft.AspNetCore.OData.Extensions.ODataQueryFilterInvocationContext)">
             <summary>
@@ -12103,6 +12265,19 @@
             This class describes the settings to use during query composition.
             </summary>
         </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.DefaultMatchesPatternTimeout">
+            <summary>
+            The default time span applied to a single <c>matchesPattern</c> filter function evaluation
+            when <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> is not explicitly configured.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxMatchesPatternTimeout">
+            <summary>
+            The largest time span that <see cref="T:System.Text.RegularExpressions.Regex"/> accepts as a match
+            timeout. A configured <see cref="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout"/> above this bound is clamped to it so it can
+            always be handed to <c>Regex.IsMatch</c> without throwing <see cref="T:System.ArgumentOutOfRangeException"/>.
+            </summary>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:Microsoft.AspNetCore.OData.Query.ODataQuerySettings" /> class.
@@ -12161,7 +12336,7 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth">
             <summary>
-            Gets or sets the maximum depth for function calls in a query.
+            Gets or sets the maximum depth for function calls in a query binding.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.IgnoredQueryOptions">
@@ -12188,6 +12363,26 @@
             The expanded property is only populated when the filter evaluates to true.
             This setting is false by default.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout">
+            <summary>
+            Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation. The bound is per
+            evaluation, not per request, so a <c>$filter</c> over <c>N</c> elements may take up to <c>N</c> times this
+            duration.
+            </summary>
+            <remarks>
+            The evaluation is always stopped when the bound elapses, but the request completes as
+            <c>400 (Bad Request)</c> only where the results are materialized during query execution (a configured page
+            size or <c>$count</c>, or a <c>SingleResult</c> action). For a page-less <c>[EnableQuery]</c> action the
+            predicate runs later, during response serialization, so the bound still applies but does not surface as
+            <c>400</c>.
+            </remarks>
+            <value>
+            The default is 250 milliseconds. A <c>null</c>, <see cref="F:System.TimeSpan.Zero"/>, or negative value applies no limit,
+            consistent with <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>. A value larger than
+            <see cref="T:System.Text.RegularExpressions.Regex"/>'s maximum match timeout (~24.86 days) is clamped to that
+            maximum so it is always a valid regex timeout.
+            </value>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator">
             <summary>
@@ -12477,6 +12672,32 @@
             <param name="type">The type</param>
             <returns><c>true</c> if the type is IQueryable.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger">
+            <summary>
+            Writes structured diagnostics about a query that failed validation, using request state that is available
+            even when the query options could not be fully parsed. This is shared by the controller
+            (<see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>) and minimal API (<see cref="T:Microsoft.AspNetCore.OData.Query.ODataQueryEndpointFilter"/>) paths so both
+            report the same information. It never changes the response produced for the failed query.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.LogQueryValidationFailure(Microsoft.Extensions.Logging.ILogger,Microsoft.Extensions.Logging.LogLevel,Microsoft.AspNetCore.Http.HttpContext,System.Exception)">
+            <summary>
+            Writes the diagnostic entry for a failed query validation at the specified level. Does nothing when no
+            logger is available or the level is not enabled.
+            </summary>
+            <param name="logger">The logger to write to, or <c>null</c> when none is available.</param>
+            <param name="logLevel">The level at which the diagnostic is written.</param>
+            <param name="httpContext">The <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> for the current request.</param>
+            <param name="exception">The exception raised while validating the query.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.FormatRequestedQueryOptions(Microsoft.AspNetCore.OData.Query.ODataRawQueryOptions)">
+            <summary>
+            Builds a compact description of the requested query options that reference properties, including only
+            the options that were supplied so empty options are not reported.
+            </summary>
+            <param name="rawValues">The raw query option values, or <c>null</c> when unavailable.</param>
+            <returns>The requested query options, or an empty string when none apply.</returns>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption">
             <summary>
             This defines a $apply OData query option for querying.
@@ -12510,6 +12731,17 @@
             <summary>
              Gets the raw $apply value.
             </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator">
+            <summary>
+            Gets or sets the $apply Query Validator.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validate the $apply query based on the given <paramref name="validationSettings"/>. It throws an ODataException if validation failed.
+            </summary>
+            <param name="validationSettings">The <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/> instance which contains all the validation settings.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ApplyQueryOption.ApplyTo(System.Linq.IQueryable,Microsoft.AspNetCore.OData.Query.ODataQuerySettings)">
             <summary>
@@ -12669,6 +12901,44 @@
             <param name="querySettings">The query settings to use while applying this query option, not null.</param>
             <param name="queryOptions">Information about the other query options, could be null.</param>
             <returns>The new <see cref="T:System.Linq.IQueryable"/> after the skiptoken query has been applied to.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.BuildSkipTokenFilterExpression(System.Collections.Generic.IList{Microsoft.OData.UriParser.OrderByClause},System.Collections.Generic.IList{System.String},Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Builds the skip-token filter expression as an OData AST.
+            <para>
+            For a 2-column stable order (Prop1 asc, Prop2 asc) with token values (v1, v2), the
+            expression is: <c>(Prop1 gt v1) OR ((Prop1 eq v1) AND (Prop2 gt v2))</c>
+            </para>
+            <para>
+            For descending columns the comparison flips:
+            <c>((Prop1 lt v1) OR (Prop1 eq null)) OR ((Prop1 eq v1) AND ((Prop2 lt v2) OR (Prop2 eq null)))</c>
+            </para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.BuildTypedConstantNode(System.String,Microsoft.OData.Edm.IEdmTypeReference,Microsoft.OData.Edm.IEdmModel,System.String)">
+            <summary>
+            Parses a raw skip-token string value into a typed <see cref="T:Microsoft.OData.UriParser.ConstantNode"/> for use in an AST.
+            </summary>
+            <remarks>
+            Three cases are handled:
+            <list type="bullet">
+              <item><description>
+                <b>Enum</b> — <c>ConvertFromUriLiteral</c> fails for CLR-formatted enum literals
+                (<c>'+'</c>-separated nested type names). The member name is extracted directly from
+                <c>"TypeName'MemberName'"</c> and validated against the EDM enum's declared members.
+                An <see cref="T:Microsoft.OData.ODataException"/> is thrown if the closing quote is missing, the member
+                name is not a declared member, or the member name is not a valid integer underlying value.
+              </description></item>
+              <item><description>
+                <b>Null <see cref="T:Microsoft.OData.Edm.IEdmTypeReference"/> (open-type dynamic property)</b> — the value is
+                parsed without a type reference.
+              </description></item>
+              <item><description>
+                <b>All other primitives</b> — <c>ConvertFromUriLiteral</c> is called with the declared EDM type.
+                Any trailing characters beyond the valid literal are rejected by the parser.
+              </description></item>
+            </list>
+            </remarks>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler.GetOrderByClauses(System.Object,Microsoft.OData.Edm.IEdmModel,Microsoft.OData.UriParser.OrderByClause)">
             <summary>
@@ -13311,6 +13581,24 @@
             <param name="remainingSegments">The remaining segments after the first non type segment.</param>
             <returns>First non-type cast segment.</returns>
         </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator">
+            <summary>
+            Represents a validator used to validate an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+            <remarks>
+            The <c>filter</c> transformation is validated with the same <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.IFilterQueryValidator"/> used by
+            <c>$filter</c>, so a property marked as not filterable is rejected consistently. The <c>groupby</c>,
+            <c>aggregate</c> and <c>compute</c> transformations reject any referenced property that the model marks as
+            not filterable or configures as not selectable, consistent with <c>$filter</c> and <c>$select</c>.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption" />.
+            </summary>
+            <param name="applyQueryOption">The $apply query.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator">
             <summary>
             Represents a validator used to validate a <see cref="T:Microsoft.AspNetCore.OData.Query.ComputeQueryOption"/> based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
@@ -13589,6 +13877,41 @@
             <param name="node">The single value node.</param>
             <param name="validatorContext">The validator context.</param>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateFunctionAllowed(System.String,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates that a function is allowed by the <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedFunctions"/> allow-list.
+            </summary>
+            <remarks>
+            Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+            transformations enforce the same function allow-list as <c>$filter</c>.
+            </remarks>
+            <param name="functionName">The function name.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateBinaryOperatorAllowed(Microsoft.OData.UriParser.BinaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates that a binary operator is allowed by the <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedLogicalOperators"/>
+            or <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedArithmeticOperators"/> allow-lists.
+            </summary>
+            <remarks>
+            Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+            transformations enforce the same operator allow-lists as <c>$filter</c>.
+            </remarks>
+            <param name="binaryOperatorNode">The binary operator node.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateUnaryOperatorAllowed(Microsoft.OData.UriParser.UnaryOperatorNode,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates that a unary operator ('not'/negate) is allowed by the
+            <see cref="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.AllowedLogicalOperators"/> allow-list.
+            </summary>
+            <remarks>
+            Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+            transformations enforce the same operator allow-list as <c>$filter</c>.
+            </remarks>
+            <param name="unaryOperatorNode">The unary operator node.</param>
+            <param name="validationSettings">The validation settings.</param>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext">
             <summary>
             The metadata context for $filter validator.
@@ -13607,6 +13930,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentAnyAllExpressionDepth">
             <summary>
             Gets current any and all expression depth.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentFunctionCallDepth">
+            <summary>
+            This depth is for function call expressions recursively in a query, such as 'length(tolower(name)) eq 5', the depth is 2.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.Clone">
@@ -13631,6 +13959,30 @@
             <summary>
             Exit lambda expression.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterFunctionCall">
+            <summary>
+            Enter function call.
+            </summary>
+            <exception cref="T:Microsoft.OData.ODataException">Throw OData exception.</exception>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitFunctionCall">
+            <summary>
+            Exit function call.
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator">
+            <summary>
+            Provide the interface used to validate an <see cref="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption"/>
+            based on the <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates the OData query.
+            </summary>
+            <param name="applyQueryOption">The $apply query.</param>
+            <param name="validationSettings">The validation settings.</param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator">
             <summary>
@@ -13829,6 +14181,11 @@
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxOrderByNodeCount">
             <summary>
             Gets or sets the maximum number of expressions that can be present in the $orderby.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth">
+            <summary>
+            Gets or sets the maximum depth of function call expressions that can be present in the query.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxAnyAllExpressionDepth">
@@ -14130,6 +14487,26 @@
             <param name="transformationExpressionType">The type to validate.</param>
             <exception cref="T:System.InvalidOperationException">Thrown if <paramref name="transformationExpressionType"/>
             does not implement the required interface or inherit from the required base class.</exception>
+        </member>
+        <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryNodeRestrictionValidator">
+            <summary>
+            Walks the query nodes referenced by <c>$apply</c> (groupby/aggregate/compute) and top-level
+            <c>$compute</c> expressions and rejects any property that the model marks as not filterable or
+            configures as not selectable, so those properties are enforced consistently with how they are
+            enforced for <c>$filter</c> and <c>$select</c>. The same walk also enforces the operator and
+            function allow-lists and the node-count limit from <see cref="T:Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings"/>, so those
+            limits apply to the groupby/aggregate/compute/$compute expressions exactly as they do to <c>$filter</c>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.QueryNodeRestrictionValidator.Validate(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.ODataQueryContext,Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings)">
+            <summary>
+            Validates a single <see cref="T:Microsoft.OData.UriParser.QueryNode"/> and its descendants.
+            </summary>
+            <param name="node">The query node to validate. A <c>null</c> node is a no-op.</param>
+            <param name="context">The query context used to resolve the model and query configurations.</param>
+            <param name="validationSettings">
+            The validation settings whose operator/function allow-lists and node-count/depth limits are enforced.
+            </param>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorContext">
             <summary>

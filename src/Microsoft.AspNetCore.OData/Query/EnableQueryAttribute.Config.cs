@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -20,6 +21,7 @@ public partial class EnableQueryAttribute
     // validation settings
     private ODataValidationSettings _validationSettings;
     private string _allowedOrderByProperties;
+    private bool? _enableQueryValidationErrorLogging;
 
     // query settings
     private ODataQuerySettings _querySettings;
@@ -74,6 +76,49 @@ public partial class EnableQueryAttribute
     }
 
     /// <summary>
+    /// Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation (per evaluation,
+    /// not per request). The default is 250 milliseconds; a <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value
+    /// applies no limit.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="TimeSpan"/> is not a valid attribute-argument type, so use <see cref="MatchesPatternTimeoutMilliseconds"/>
+    /// to configure the bound in <c>[EnableQuery(...)]</c> usage. Both are backed by the same setting.
+    /// </remarks>
+    public TimeSpan? MatchesPatternTimeout
+    {
+        get => _querySettings.MatchesPatternTimeout;
+        set => _querySettings.MatchesPatternTimeout = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the duration, in milliseconds, that bounds a single <c>matchesPattern</c> filter evaluation.
+    /// This is the attribute-compatible companion of <see cref="MatchesPatternTimeout"/> and shares the same
+    /// setting; because <see cref="int"/> is a valid attribute-argument type, it can be set in
+    /// <c>[EnableQuery(MatchesPatternTimeoutMilliseconds = ...)]</c> usage. The default is 250 (a quarter second); a
+    /// value of <c>0</c> or less applies no limit.
+    /// </summary>
+    /// <remarks>
+    /// The getter is lossy: sub-millisecond fractions are truncated and durations of <see cref="int.MaxValue"/>
+    /// milliseconds or more are clamped to <see cref="int.MaxValue"/>.
+    /// </remarks>
+    public int MatchesPatternTimeoutMilliseconds
+    {
+        get
+        {
+            TimeSpan? timeout = _querySettings.MatchesPatternTimeout;
+            if (!timeout.HasValue)
+            {
+                return 0;
+            }
+
+            double milliseconds = timeout.Value.TotalMilliseconds;
+            return milliseconds >= int.MaxValue ? int.MaxValue : (int)milliseconds;
+        }
+
+        set => _querySettings.MatchesPatternTimeout = value <= 0 ? null : (TimeSpan?)TimeSpan.FromMilliseconds(value);
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether queries with expanded navigations should be formulated
     /// to encourage correlated sub-query results to be buffered.
     /// Buffering correlated sub-query results can reduce the number of queries from N + 1 to 2
@@ -84,6 +129,20 @@ public partial class EnableQueryAttribute
     {
         get => _querySettings.EnableCorrelatedSubqueryBuffering;
         set => _querySettings.EnableCorrelatedSubqueryBuffering = value;
+    }
+
+    /// <summary>
+    /// Gets or sets the maximum depth of function call expressions inside the query.
+    /// For example: 'length(tolower(name)) eq 5', the depth of function call expressions is 2.
+    /// </summary>
+    public int MaxFunctionCallDepth
+    {
+        get => _validationSettings.MaxFunctionCallDepth;
+        set
+        {
+            _validationSettings.MaxFunctionCallDepth = value;
+            _querySettings.MaxFunctionCallDepth = value;
+        }
     }
 
     /// <summary>
@@ -265,5 +324,23 @@ public partial class EnableQueryAttribute
     {
         get => _validationSettings.MaxOrderByNodeCount;
         set => _validationSettings.MaxOrderByNodeCount = value;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+    /// fails validation. When enabled, the endpoint's route template, the queried type, the attempted
+    /// <c>$select</c> and <c>$expand</c> options, and the failure reason are written, together with the
+    /// validation exception, to an <see cref="ILogger{TCategoryName}"/> resolved from the request services
+    /// and categorized for <see cref="EnableQueryAttribute"/>. This information is captured from the request
+    /// even when the query options cannot be fully parsed. When this property is not set on the attribute,
+    /// the value of <see cref="ODataOptions.EnableQueryValidationErrorLogging"/> is used, so the behavior can be
+    /// configured once for all actions; setting it here overrides that global value for this action. The
+    /// diagnostic is written at the level from <see cref="ODataOptions.QueryValidationErrorLogLevel"/>
+    /// (default <see cref="LogLevel.Warning"/>). The default value is <c>false</c>.
+    /// </summary>
+    public bool EnableQueryValidationErrorLogging
+    {
+        get => _enableQueryValidationErrorLogging ?? false;
+        set => _enableQueryValidationErrorLogging = value;
     }
 }

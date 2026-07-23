@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Conventions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder.Config;
@@ -311,6 +312,25 @@ public class ODataOptions
     /// Gets or sets whether or not the OData system query options should be prefixed with '$'.
     /// </summary>
     public bool EnableNoDollarQueryOptions { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+    /// fails validation for actions annotated with <see cref="EnableQueryAttribute"/>. When enabled, the
+    /// endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the failure
+    /// reason are written. This value provides
+    /// the default for every such action, allowing the behavior to be configured once instead of on each
+    /// attribute; an individual <see cref="EnableQueryAttribute"/> overrides it by setting
+    /// <see cref="EnableQueryAttribute.EnableQueryValidationErrorLogging"/> explicitly. The default value is <c>false</c>.
+    /// </summary>
+    public bool EnableQueryValidationErrorLogging { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="LogLevel"/> at which query validation diagnostics are written for actions
+    /// annotated with <see cref="EnableQueryAttribute"/> when <see cref="EnableQueryValidationErrorLogging"/> is enabled.
+    /// This value applies to every such action, so the level can be configured once. The default value is
+    /// <see cref="LogLevel.Warning"/>.
+    /// </summary>
+    public LogLevel QueryValidationErrorLogLevel { get; set; } = LogLevel.Warning;
 
     /// <summary>
     /// Gets the query settings.

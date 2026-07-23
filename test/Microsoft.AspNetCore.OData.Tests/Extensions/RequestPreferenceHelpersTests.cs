@@ -42,4 +42,43 @@ public class RequestPreferenceHelpersTests
         Assert.True(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out int pageSize));
         Assert.Equal(5, pageSize);
     }
+
+    [Theory]
+    [InlineData("maxpagesize=0")]
+    [InlineData("odata.maxpagesize=0")]
+    public void RequestPrefersMaxPageSize_ReturnsFalse_WhenPreferredMaxPageSizeIsZero(string preferValue)
+    {
+        // Arrange
+        // A client-supplied max page size of 0 must not be treated as a valid preference.
+        HeaderDictionary headers = new HeaderDictionary(
+            new Dictionary<string, StringValues>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Prefer", preferValue }
+            });
+
+        // Act & Assert
+        Assert.False(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out int pageSize));
+        Assert.Equal(0, pageSize);
+    }
+
+    [Theory]
+    [InlineData("maxpagesize")]
+    [InlineData("odata.maxpagesize")]
+    [InlineData("maxpagesize=")]
+    [InlineData("odata.maxpagesize=")]
+    public void RequestPrefersMaxPageSize_ReturnsFalse_AndDoesNotThrow_ForMalformedPreference(string preferValue)
+    {
+        // Arrange
+        // A bare token (no "=value") or a trailing "=" with no digits must not throw
+        // (reliability: previously an IndexOutOfRangeException surfaced as an unhandled 500).
+        HeaderDictionary headers = new HeaderDictionary(
+            new Dictionary<string, StringValues>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "Prefer", preferValue }
+            });
+
+        // Act & Assert
+        Assert.False(RequestPreferenceHelpers.RequestPrefersMaxPageSize(headers, out int pageSize));
+        Assert.Equal(-1, pageSize);
+    }
 }

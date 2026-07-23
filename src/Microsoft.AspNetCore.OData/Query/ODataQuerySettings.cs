@@ -14,9 +14,26 @@ namespace Microsoft.AspNetCore.OData.Query;
 /// </summary>
 public class ODataQuerySettings
 {
+    internal const int DefaultMaxFunctionCallDepth = 15;// the depth of function call expressions recursively in a query, such as 'length(tolower(name)) eq 5', the depth is 2.
+
+    /// <summary>
+    /// The default time span applied to a single <c>matchesPattern</c> filter function evaluation
+    /// when <see cref="MatchesPatternTimeout"/> is not explicitly configured.
+    /// </summary>
+    internal static readonly TimeSpan DefaultMatchesPatternTimeout = TimeSpan.FromMilliseconds(250);
+
+    /// <summary>
+    /// The largest time span that <see cref="System.Text.RegularExpressions.Regex"/> accepts as a match
+    /// timeout. A configured <see cref="MatchesPatternTimeout"/> above this bound is clamped to it so it can
+    /// always be handed to <c>Regex.IsMatch</c> without throwing <see cref="ArgumentOutOfRangeException"/>.
+    /// </summary>
+    internal static readonly TimeSpan MaxMatchesPatternTimeout = TimeSpan.FromMilliseconds(int.MaxValue - 1);
+
     private HandleNullPropagationOption _handleNullPropagationOption = HandleNullPropagationOption.Default;
     private int? _pageSize;
     private int? _modelBoundPageSize;
+    private int _maxFunctionCallDepth = DefaultMaxFunctionCallDepth;
+    private TimeSpan? _matchesPatternTimeout = DefaultMatchesPatternTimeout;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ODataQuerySettings" /> class.
@@ -105,9 +122,21 @@ public class ODataQuerySettings
     public bool EnableCorrelatedSubqueryBuffering { get; set; }
 
     /// <summary>
-    /// Gets or sets the maximum depth for function calls in a query.
+    /// Gets or sets the maximum depth for function calls in a query binding.
     /// </summary>
-    public int MaxFunctionCallDepth { get; set; } = 15;
+    public int MaxFunctionCallDepth
+    {
+        get => _maxFunctionCallDepth;
+        set
+        {
+            if (value < 1)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo("value", value, 1);
+            }
+
+            _maxFunctionCallDepth = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating which query options should be ignored when applying queries.
@@ -149,6 +178,45 @@ public class ODataQuerySettings
     /// </summary>
     public bool HandleReferenceNavigationPropertyExpandFilter { get; set; }
 
+    /// <summary>
+    /// Gets or sets the time span that bounds a single <c>matchesPattern</c> filter evaluation. The bound is per
+    /// evaluation, not per request, so a <c>$filter</c> over <c>N</c> elements may take up to <c>N</c> times this
+    /// duration.
+    /// </summary>
+    /// <remarks>
+    /// The evaluation is always stopped when the bound elapses, but the request completes as
+    /// <c>400 (Bad Request)</c> only where the results are materialized during query execution (a configured page
+    /// size or <c>$count</c>, or a <c>SingleResult</c> action). For a page-less <c>[EnableQuery]</c> action the
+    /// predicate runs later, during response serialization, so the bound still applies but does not surface as
+    /// <c>400</c>.
+    /// </remarks>
+    /// <value>
+    /// The default is 250 milliseconds. A <c>null</c>, <see cref="TimeSpan.Zero"/>, or negative value applies no limit,
+    /// consistent with <see cref="EnableQueryAttribute.MatchesPatternTimeoutMilliseconds"/>. A value larger than
+    /// <see cref="System.Text.RegularExpressions.Regex"/>'s maximum match timeout (~24.86 days) is clamped to that
+    /// maximum so it is always a valid regex timeout.
+    /// </value>
+    public TimeSpan? MatchesPatternTimeout
+    {
+        get => _matchesPatternTimeout;
+
+        set
+        {
+            if (!value.HasValue || value.Value <= TimeSpan.Zero)
+            {
+                // A null or non-positive span opts out of the bound (no limit), consistent with
+                // EnableQueryAttribute.MatchesPatternTimeoutMilliseconds treating 0 (or any non-positive value) as opting out.
+                _matchesPatternTimeout = null;
+            }
+            else
+            {
+                // Clamp to Regex's maximum accepted match timeout so the value can always be handed to
+                // Regex.IsMatch without throwing ArgumentOutOfRangeException once per query at execution time.
+                _matchesPatternTimeout = value.Value > MaxMatchesPatternTimeout ? MaxMatchesPatternTimeout : value.Value;
+            }
+        }
+    }
+
     internal void CopyFrom(ODataQuerySettings settings)
     {
         TimeZone = settings.TimeZone;
@@ -162,5 +230,6 @@ public class ODataQuerySettings
         IgnoredQueryOptions = settings.IgnoredQueryOptions;
         IgnoredNestedQueryOptions = settings.IgnoredNestedQueryOptions;
         MaxFunctionCallDepth = settings.MaxFunctionCallDepth;
+        MatchesPatternTimeout = settings.MatchesPatternTimeout;
     }
 }

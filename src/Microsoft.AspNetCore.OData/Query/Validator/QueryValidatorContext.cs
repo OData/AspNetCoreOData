@@ -37,7 +37,7 @@ public abstract class QueryValidatorContext
     /// <summary>
     /// The current depth.
     /// </summary>
-    public int CurrentDepth { get; set; }
+    public int CurrentDepth { get; set; } // This depth is used for $expand and $filter with navigation properties so far.
 
     /// <summary>
     /// Gets the Edm model.

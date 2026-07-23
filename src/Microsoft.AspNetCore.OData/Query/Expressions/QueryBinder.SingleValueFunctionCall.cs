@@ -38,117 +38,97 @@ public abstract partial class QueryBinder
     {
         CheckArgumentNull(node, context);
 
-        context.EnterSingleFunctionCall();
+        context.EnterFunctionCall();
 
-        Expression result = null;
-        switch (node.Name)
+        try
         {
-            case ClrCanonicalFunctions.StartswithFunctionName:
-                result = BindStartsWith(node, context);
-                break;
+            switch (node.Name)
+            {
+                case ClrCanonicalFunctions.StartswithFunctionName:
+                    return BindStartsWith(node, context);
 
-            case ClrCanonicalFunctions.EndswithFunctionName:
-                result = BindEndsWith(node, context);
-                break;
+                case ClrCanonicalFunctions.EndswithFunctionName:
+                    return BindEndsWith(node, context);
 
-            case ClrCanonicalFunctions.ContainsFunctionName:
-                result = BindContains(node, context);
-                break;
+                case ClrCanonicalFunctions.ContainsFunctionName:
+                    return BindContains(node, context);
 
-            case ClrCanonicalFunctions.SubstringFunctionName:
-                result = BindSubstring(node, context);
-                break;
+                case ClrCanonicalFunctions.SubstringFunctionName:
+                    return BindSubstring(node, context);
 
-            case ClrCanonicalFunctions.LengthFunctionName:
-                result = BindLength(node, context);
-                break;
+                case ClrCanonicalFunctions.LengthFunctionName:
+                    return BindLength(node, context);
 
-            case ClrCanonicalFunctions.IndexofFunctionName:
-                result = BindIndexOf(node, context);
-                break;
+                case ClrCanonicalFunctions.IndexofFunctionName:
+                    return BindIndexOf(node, context);
 
-            case ClrCanonicalFunctions.TolowerFunctionName:
-                result = BindToLower(node, context);
-                break;
+                case ClrCanonicalFunctions.TolowerFunctionName:
+                    return BindToLower(node, context);
 
-            case ClrCanonicalFunctions.ToupperFunctionName:
-                result = BindToUpper(node, context);
-                break;
+                case ClrCanonicalFunctions.ToupperFunctionName:
+                    return BindToUpper(node, context);
 
-            case ClrCanonicalFunctions.TrimFunctionName:
-                result = BindTrim(node, context);
-                break;
+                case ClrCanonicalFunctions.TrimFunctionName:
+                    return BindTrim(node, context);
 
-            case ClrCanonicalFunctions.ConcatFunctionName:
-                result = BindConcat(node, context);
-                break;
+                case ClrCanonicalFunctions.ConcatFunctionName:
+                    return BindConcat(node, context);
 
-            case ClrCanonicalFunctions.MatchesPatternFunctionName:
-                result = BindMatchesPattern(node, context);
-                break;
+                case ClrCanonicalFunctions.MatchesPatternFunctionName:
+                    return BindMatchesPattern(node, context);
 
-            case ClrCanonicalFunctions.YearFunctionName:
-            case ClrCanonicalFunctions.MonthFunctionName:
-            case ClrCanonicalFunctions.DayFunctionName:
-                result = BindDateRelatedProperty(node, context); // Date & DateTime & DateTimeOffset
-                break;
+                case ClrCanonicalFunctions.YearFunctionName:
+                case ClrCanonicalFunctions.MonthFunctionName:
+                case ClrCanonicalFunctions.DayFunctionName:
+                    return BindDateRelatedProperty(node, context); // Date & DateTime & DateTimeOffset
 
-            case ClrCanonicalFunctions.HourFunctionName:
-            case ClrCanonicalFunctions.MinuteFunctionName:
-            case ClrCanonicalFunctions.SecondFunctionName:
-                result = BindTimeRelatedProperty(node, context); // TimeOfDay & DateTime & DateTimeOffset
-                break;
+                case ClrCanonicalFunctions.HourFunctionName:
+                case ClrCanonicalFunctions.MinuteFunctionName:
+                case ClrCanonicalFunctions.SecondFunctionName:
+                    return BindTimeRelatedProperty(node, context); // TimeOfDay & DateTime & DateTimeOffset
 
-            case ClrCanonicalFunctions.FractionalSecondsFunctionName:
-                result = BindFractionalSeconds(node, context);
-                break;
+                case ClrCanonicalFunctions.FractionalSecondsFunctionName:
+                    return BindFractionalSeconds(node, context);
 
-            case ClrCanonicalFunctions.RoundFunctionName:
-                result = BindRound(node, context);
-                break;
+                case ClrCanonicalFunctions.RoundFunctionName:
+                    return BindRound(node, context);
 
-            case ClrCanonicalFunctions.FloorFunctionName:
-                result = BindFloor(node, context);
-                break;
+                case ClrCanonicalFunctions.FloorFunctionName:
+                    return BindFloor(node, context);
 
-            case ClrCanonicalFunctions.CeilingFunctionName:
-                result = BindCeiling(node, context);
-                break;
+                case ClrCanonicalFunctions.CeilingFunctionName:
+                    return BindCeiling(node, context);
 
-            case ClrCanonicalFunctions.CastFunctionName:
-                result = BindCastSingleValue(node, context);
-                break;
+                case ClrCanonicalFunctions.CastFunctionName:
+                    return BindCastSingleValue(node, context);
 
-            case ClrCanonicalFunctions.IsofFunctionName:
-                result = BindIsOf(node, context);
-                break;
+                case ClrCanonicalFunctions.IsofFunctionName:
+                    return BindIsOf(node, context);
 
-            case ClrCanonicalFunctions.DateFunctionName:
-                result = BindDate(node, context);
-                break;
+                case ClrCanonicalFunctions.DateFunctionName:
+                    return BindDate(node, context);
 
-            case ClrCanonicalFunctions.TimeFunctionName:
-                result = BindTime(node, context);
-                break;
+                case ClrCanonicalFunctions.TimeFunctionName:
+                    return BindTime(node, context);
 
-            case ClrCanonicalFunctions.NowFunctionName:
-                result = BindNow(node, context);
-                break;
+                case ClrCanonicalFunctions.NowFunctionName:
+                    return BindNow(node, context);
 
-            default:
-                // Get Expression of custom binded method.
-                Expression expression = BindCustomMethodExpressionOrNull(node, context);
-                if (expression != null)
-                {
-                    result = expression;
-                    break;
-                }
+                default:
+                    // Get Expression of custom binded method.
+                    Expression expression = BindCustomMethodExpressionOrNull(node, context);
+                    if (expression != null)
+                    {
+                        return expression;
+                    }
 
-                throw new NotImplementedException(Error.Format(SRResources.ODataFunctionNotSupported, node.Name));
+                    throw new NotImplementedException(Error.Format(SRResources.ODataFunctionNotSupported, node.Name));
+            }
         }
-
-        context.LeaveSingleFunctionCall();
-        return result;
+        finally
+        {
+            context.LeaveFunctionCall();
+        }
     }
 
     /// <summary>
@@ -386,10 +366,20 @@ public abstract partial class QueryBinder
 
         Contract.Assert(arguments.Length == 2 && arguments[0].Type == typeof(string) && arguments[1].Type == typeof(string));
 
-        //add argument that must be ECMAScript compatible regex
+        // Add the ECMAScript-compatible regex option. When a match time span is configured, bind to the
+        // Regex.IsMatch overload that also accepts a TimeSpan so the evaluation is bounded; otherwise keep
+        // the existing overload so the default behavior is unchanged.
+        TimeSpan? matchTimeout = context.QuerySettings.MatchesPatternTimeout;
+        if (matchTimeout.HasValue)
+        {
+            arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript), Expression.Constant(matchTimeout.Value) };
+
+            return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesPatternWithTimeout, context.QuerySettings, arguments);
+        }
+
         arguments = new[] { arguments[0], arguments[1], Expression.Constant(RegexOptions.ECMAScript) };
 
-        return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesMattern, context.QuerySettings, arguments);
+        return ExpressionBinderHelper.MakeFunctionCall(ClrCanonicalFunctions.MatchesPattern, context.QuerySettings, arguments);
     }
 
     /// <summary>

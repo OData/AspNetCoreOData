@@ -208,8 +208,10 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	bool EnableCaseInsensitive  { public get; }
 	bool EnableContinueOnErrorHeader  { public get; }
 	bool EnableNoDollarQueryOptions  { public get; }
+	bool EnableQueryValidationErrorLogging  { public get; }
 	long MaxReceivedMessageSize  { public get; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
+	Microsoft.Extensions.Logging.LogLevel QueryValidationErrorLogLevel  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; }
 	Microsoft.OData.ODataVersion Version  { public get; }
 
@@ -224,6 +226,8 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxReceivedMessageSize (long maxReceivedMessageSize)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetNoDollarQueryOptions (bool enableNoDollarQueryOptions)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetQueryValidationErrorLogging (bool enableQueryValidationErrorLogging)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetQueryValidationErrorLogLevel (Microsoft.Extensions.Logging.LogLevel logLevel)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetTimeZoneInfo (System.TimeZoneInfo tzi)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetVersion (Microsoft.OData.ODataVersion version)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SkipToken ()
@@ -242,6 +246,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
+	bool EnableQueryValidationErrorLogging  { public get; public set; }
 	long MaxReceivedMessageSize  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	[
@@ -249,6 +254,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	]
 	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
 
+	Microsoft.Extensions.Logging.LogLevel QueryValidationErrorLogLevel  { public get; public set; }
 	[
 	TupleElementNamesAttribute(),
 	]
@@ -1439,8 +1445,10 @@ public class Microsoft.AspNetCore.OData.Query.ApplyQueryOption {
 	Microsoft.AspNetCore.OData.Query.ODataQueryContext Context  { public get; }
 	string RawValue  { public get; }
 	System.Type ResultClrType  { public get; }
+	Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator Validator  { public get; public set; }
 
 	public System.Linq.IQueryable ApplyTo (System.Linq.IQueryable query, Microsoft.AspNetCore.OData.Query.ODataQuerySettings querySettings)
+	public void Validate (Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
 
 public class Microsoft.AspNetCore.OData.Query.ComputeQueryOption {
@@ -1502,11 +1510,15 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions  { public get; public set; }
 	bool EnableConstantParameterization  { public get; public set; }
 	bool EnableCorrelatedSubqueryBuffering  { public get; public set; }
+	bool EnableQueryValidationErrorLogging  { public get; public set; }
 	bool EnsureStableOrdering  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption HandleNullPropagation  { public get; public set; }
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
+	System.Nullable`1[[System.TimeSpan]] MatchesPatternTimeout  { public get; public set; }
+	int MatchesPatternTimeoutMilliseconds  { public get; public set; }
 	int MaxAnyAllExpressionDepth  { public get; public set; }
 	int MaxExpansionDepth  { public get; public set; }
+	int MaxFunctionCallDepth  { public get; public set; }
 	int MaxNodeCount  { public get; public set; }
 	int MaxOrderByNodeCount  { public get; public set; }
 	int MaxSkip  { public get; public set; }
@@ -1683,6 +1695,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQuerySettings {
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions IgnoredNestedQueryOptions  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions IgnoredQueryOptions  { public get; public set; }
+	System.Nullable`1[[System.TimeSpan]] MatchesPatternTimeout  { public get; public set; }
 	int MaxFunctionCallDepth  { public get; public set; }
 	System.Nullable`1[[System.Int32]] PageSize  { public get; public set; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
@@ -3267,6 +3280,10 @@ public class Microsoft.AspNetCore.OData.Query.Expressions.SelectExpandBinder : M
 	public virtual System.Linq.Expressions.Expression CreateTypeNameExpression (System.Linq.Expressions.Expression source, Microsoft.OData.Edm.IEdmStructuredType elementType, Microsoft.OData.Edm.IEdmModel model)
 }
 
+public interface Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator {
+	void Validate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
 public interface Microsoft.AspNetCore.OData.Query.Validator.IComputeQueryValidator {
 	void Validate (Microsoft.AspNetCore.OData.Query.ComputeQueryOption computeQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
 }
@@ -3318,6 +3335,12 @@ public abstract class Microsoft.AspNetCore.OData.Query.Validator.QueryValidatorC
 	Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings ValidationSettings  { public get; public set; }
 }
 
+public class Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator : IApplyQueryValidator {
+	public ApplyQueryValidator ()
+
+	public virtual void Validate (Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings)
+}
+
 public class Microsoft.AspNetCore.OData.Query.Validator.ComputeQueryValidator : IComputeQueryValidator {
 	public ComputeQueryValidator ()
 
@@ -3363,11 +3386,14 @@ public class Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext :
 	public FilterValidatorContext ()
 
 	int CurrentAnyAllExpressionDepth  { public get; }
+	int CurrentFunctionCallDepth  { public get; }
 	int CurrentNodeCount  { public get; }
 	Microsoft.AspNetCore.OData.Query.FilterQueryOption Filter  { public get; public set; }
 
 	public Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext Clone ()
+	public void EnterFunctionCall ()
 	public void EnterLambda ()
+	public void ExitFunctionCall ()
 	public void ExitLambda ()
 	public void IncrementNodeCount ()
 }
@@ -3388,6 +3414,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions  { public get; public set; }
 	int MaxAnyAllExpressionDepth  { public get; public set; }
 	int MaxExpansionDepth  { public get; public set; }
+	int MaxFunctionCallDepth  { public get; public set; }
 	int MaxNodeCount  { public get; public set; }
 	int MaxOrderByNodeCount  { public get; public set; }
 	System.Nullable`1[[System.Int32]] MaxSkip  { public get; public set; }

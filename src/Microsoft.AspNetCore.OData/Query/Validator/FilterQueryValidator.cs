@@ -478,9 +478,18 @@ public class FilterQueryValidator : IFilterQueryValidator
 
         ValidateFunction(node.Name, validatorContext);
 
-        foreach (QueryNode argumentNode in node.Parameters)
+        validatorContext.EnterFunctionCall();
+
+        try
         {
-            ValidateQueryNode(argumentNode, validatorContext);
+            foreach (QueryNode argumentNode in node.Parameters)
+            {
+                ValidateQueryNode(argumentNode, validatorContext);
+            }
+        }
+        finally
+        {
+            validatorContext.ExitFunctionCall();
         }
     }
 
@@ -501,9 +510,18 @@ public class FilterQueryValidator : IFilterQueryValidator
 
         ValidateFunction(node.Name, validatorContext);
 
-        foreach (QueryNode argumentNode in node.Parameters)
+        validatorContext.EnterFunctionCall();
+
+        try
         {
-            ValidateQueryNode(argumentNode, validatorContext);
+            foreach (QueryNode argumentNode in node.Parameters)
+            {
+                ValidateQueryNode(argumentNode, validatorContext);
+            }
+        }
+        finally
+        {
+            validatorContext.ExitFunctionCall();
         }
     }
 
@@ -736,11 +754,103 @@ public class FilterQueryValidator : IFilterQueryValidator
     {
         Contract.Assert(validatorContext != null);
 
+        ValidateFunctionAllowed(functionName, validatorContext.ValidationSettings);
+    }
+
+    /// <summary>
+    /// Validates that a function is allowed by the <see cref="ODataValidationSettings.AllowedFunctions"/> allow-list.
+    /// </summary>
+    /// <remarks>
+    /// Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+    /// transformations enforce the same function allow-list as <c>$filter</c>.
+    /// </remarks>
+    /// <param name="functionName">The function name.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    internal static void ValidateFunctionAllowed(string functionName, ODataValidationSettings validationSettings)
+    {
+        Contract.Assert(validationSettings != null);
+
         AllowedFunctions convertedFunction = ToODataFunction(functionName);
-        if ((validatorContext.ValidationSettings.AllowedFunctions & convertedFunction) != convertedFunction)
+        if ((validationSettings.AllowedFunctions & convertedFunction) != convertedFunction)
         {
             // this means the given function is not allowed
             throw new ODataException(Error.Format(SRResources.NotAllowedFunction, functionName, "AllowedFunctions"));
+        }
+    }
+
+    /// <summary>
+    /// Validates that a binary operator is allowed by the <see cref="ODataValidationSettings.AllowedLogicalOperators"/>
+    /// or <see cref="ODataValidationSettings.AllowedArithmeticOperators"/> allow-lists.
+    /// </summary>
+    /// <remarks>
+    /// Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+    /// transformations enforce the same operator allow-lists as <c>$filter</c>.
+    /// </remarks>
+    /// <param name="binaryOperatorNode">The binary operator node.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    internal static void ValidateBinaryOperatorAllowed(BinaryOperatorNode binaryOperatorNode, ODataValidationSettings validationSettings)
+    {
+        Contract.Assert(binaryOperatorNode != null);
+        Contract.Assert(validationSettings != null);
+
+        switch (binaryOperatorNode.OperatorKind)
+        {
+            case BinaryOperatorKind.Equal:
+            case BinaryOperatorKind.NotEqual:
+            case BinaryOperatorKind.And:
+            case BinaryOperatorKind.GreaterThan:
+            case BinaryOperatorKind.GreaterThanOrEqual:
+            case BinaryOperatorKind.LessThan:
+            case BinaryOperatorKind.LessThanOrEqual:
+            case BinaryOperatorKind.Or:
+            case BinaryOperatorKind.Has:
+                AllowedLogicalOperators logicalOperator = ToLogicalOperator(binaryOperatorNode);
+                if ((validationSettings.AllowedLogicalOperators & logicalOperator) != logicalOperator)
+                {
+                    throw new ODataException(Error.Format(SRResources.NotAllowedLogicalOperator, logicalOperator, "AllowedLogicalOperators"));
+                }
+
+                break;
+
+            default:
+                AllowedArithmeticOperators arithmeticOperator = ToArithmeticOperator(binaryOperatorNode);
+                if ((validationSettings.AllowedArithmeticOperators & arithmeticOperator) != arithmeticOperator)
+                {
+                    throw new ODataException(Error.Format(SRResources.NotAllowedArithmeticOperator, arithmeticOperator, "AllowedArithmeticOperators"));
+                }
+
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Validates that a unary operator ('not'/negate) is allowed by the
+    /// <see cref="ODataValidationSettings.AllowedLogicalOperators"/> allow-list.
+    /// </summary>
+    /// <remarks>
+    /// Shared with the <c>$apply</c> (groupby/aggregate/compute) and <c>$compute</c> node walk so those
+    /// transformations enforce the same operator allow-list as <c>$filter</c>.
+    /// </remarks>
+    /// <param name="unaryOperatorNode">The unary operator node.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    internal static void ValidateUnaryOperatorAllowed(UnaryOperatorNode unaryOperatorNode, ODataValidationSettings validationSettings)
+    {
+        Contract.Assert(unaryOperatorNode != null);
+        Contract.Assert(validationSettings != null);
+
+        switch (unaryOperatorNode.OperatorKind)
+        {
+            case UnaryOperatorKind.Negate:
+            case UnaryOperatorKind.Not:
+                if ((validationSettings.AllowedLogicalOperators & AllowedLogicalOperators.Not) != AllowedLogicalOperators.Not)
+                {
+                    throw new ODataException(Error.Format(SRResources.NotAllowedLogicalOperator, unaryOperatorNode.OperatorKind, "AllowedLogicalOperators"));
+                }
+
+                break;
+
+            default:
+                throw Error.NotSupported(SRResources.UnaryNodeValidationNotSupported, unaryOperatorNode.OperatorKind, typeof(FilterQueryValidator).Name);
         }
     }
 
