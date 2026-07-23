@@ -489,7 +489,14 @@ public class ODataQueryOptions
         int preferredPageSize = -1;
         if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(Request.Headers, out preferredPageSize))
         {
-            pageSize = Math.Min(pageSize, preferredPageSize);
+            if (pageSize == -1)
+            {
+                pageSize = preferredPageSize;
+            }
+            else
+            {
+                pageSize = Math.Min(pageSize, preferredPageSize);
+            }
         }
 
         ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;

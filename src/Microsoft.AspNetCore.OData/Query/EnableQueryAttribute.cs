@@ -333,6 +333,7 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         bool shouldApplyQuery = responseValue != null &&
            request.GetEncodedUrl() != null &&
            (!String.IsNullOrWhiteSpace(request.QueryString.Value) ||
+           request.Headers.ContainsKey("Prefer") ||
            _querySettings.PageSize.HasValue ||
            _querySettings.ModelBoundPageSize.HasValue ||
            singleResultCollection != null ||
