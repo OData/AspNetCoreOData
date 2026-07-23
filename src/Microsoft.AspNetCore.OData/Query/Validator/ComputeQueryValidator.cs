@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator;
@@ -44,4 +47,14 @@ public class ComputeQueryValidator : IComputeQueryValidator
             }
         }
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="ComputeQueryOption" />.
+    /// </summary>
+    /// <param name="computeQueryOption">The $compute query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(ComputeQueryOption computeQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(computeQueryOption, validationSettings), out validationErrors);
 }

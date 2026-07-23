@@ -43,10 +43,33 @@ public class FilterQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateFilterQueryValidator_ReturnsFalseOnNullOption()
+    {
+        //  Arrange & Act
+        bool result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.NotNull(validationErrors);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'filterQueryOption')", validationErrors.First());
+    }
+
+    [Fact]
     public void ValidateFilterQueryValidator_ThrowsOnNullSettings()
     {
         // Arrange & Act & Assert
         ExceptionAssert.ThrowsArgumentNull(() => _validator.Validate(new FilterQueryOption("Name eq 'abc'", _context), null), "settings");
+    }
+
+    [Fact]
+    public void TryValidateFilterQueryValidator_ReturnsFalseOnNullSettings()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(new FilterQueryOption("Name eq 'abc'", _context), null, out IEnumerable<string> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'settings')", validationErrors.First());
     }
 
     // want to test if all the virtual methods are being invoked correctly
@@ -62,6 +85,29 @@ public class FilterQueryValidatorTests
         // Assert
         Assert.Equal(7, _validator.Times.Keys.Count);
         Assert.Equal(1, _validator.Times["Validate"]); // entry
+        Assert.Equal(1, _validator.Times["ValidateAllQueryNode"]); // all
+        Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
+        Assert.Equal(1, _validator.Times["ValidateCollectionPropertyAccessNode"]); // Tags
+        Assert.Equal(1, _validator.Times["ValidateConstantQueryNode"]); // 42
+        Assert.Equal(1, _validator.Times["ValidateBinaryOperatorQueryNode"]); // eq
+        Assert.Equal(2, _validator.Times["ValidateParameterQueryNode"]); // $it, t
+    }
+
+    [Fact]
+    public void TryValidateFilterQueryValidator_VisitAll()
+    {
+        // Arrange
+        FilterQueryOption option = new FilterQueryOption("Tags/all(t: t eq '42')", _context);
+
+        // Act
+        var result = _validator.TryValidate(option, _settings, out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        Assert.Equal(8, _validator.Times.Keys.Count);
+        Assert.Equal(1, _validator.Times["TryValidate"]); // entry
+        Assert.Equal(1, _validator.Times["Validate"]); // TryValidate delegates to Validate
         Assert.Equal(1, _validator.Times["ValidateAllQueryNode"]); // all
         Assert.Equal(1, _validator.Times["ValidateLogicalOperator"]); // eq
         Assert.Equal(1, _validator.Times["ValidateCollectionPropertyAccessNode"]); // Tags
@@ -101,6 +147,21 @@ public class FilterQueryValidatorTests
                 new FilterQueryOption(string.Format("{0} eq 'David'", property), _context),
                 new ODataValidationSettings()),
             string.Format("The property '{0}' cannot be used in the $filter query option.", property));
+    }
+
+    [Theory]
+    [InlineData("NotFilterableProperty")]
+    [InlineData("NonFilterableProperty")]
+    public void TryValidateFilterQueryValidator_ReturnsFalseIfNotFilterableProperty(string property)
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(
+            new FilterQueryOption(string.Format("{0} eq 'David'", property), _context),
+            new ODataValidationSettings(),
+            out IEnumerable<string> validationErrors);
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(string.Format("The property '{0}' cannot be used in the $filter query option.", property), validationErrors.First());
     }
 
     [Theory]
@@ -1344,6 +1405,12 @@ public class FilterQueryValidatorTests
         {
             IncrementCount("Validate");
             base.Validate(filterQueryOption, settings);
+        }
+
+        public override bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        {
+            IncrementCount("TryValidate");
+            return base.TryValidate(filterQueryOption, validationSettings, out validationErrors);
         }
 
         protected override void ValidateAllNode(AllNode allQueryNode, FilterValidatorContext context)

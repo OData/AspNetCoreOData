@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
@@ -57,4 +58,14 @@ public class CountQueryValidator : ICountQueryValidator
             }
         }
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="CountQueryOption" />.
+    /// </summary>
+    /// <param name="countQueryOption"></param>
+    /// <param name="validationSettings"></param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(CountQueryOption countQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(countQueryOption, validationSettings), out validationErrors);
 }

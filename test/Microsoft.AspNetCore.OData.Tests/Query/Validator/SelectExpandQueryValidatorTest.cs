@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
@@ -49,6 +50,21 @@ public class SelectExpandQueryValidatorTest
     }
 
     [Fact]
+    public void TryValidateSelectExpandQueryValidator_ReturnsFalseWithError_NullOption()
+    {
+        // Arrange
+        SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
+
+        // Act
+        var result = validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'selectExpandQueryOption')",errors.First());
+    }
+
+    [Fact]
     public void ValidateSelectExpandQueryValidator_Throws_NullSettings()
     {
         // Arrange
@@ -58,6 +74,23 @@ public class SelectExpandQueryValidatorTest
 
         // Act & Assert
         ExceptionAssert.ThrowsArgumentNull(() => validator.Validate(option, null), "validationSettings");
+    }
+
+    [Fact]
+    public void TryValidateSelectExpandQueryValidator_ReturnsFalseWithError_NullSettings()
+    {
+        // Arrange
+        SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
+        ODataQueryContext context = new ODataQueryContext(EdmCoreModel.Instance, typeof(int));
+        SelectExpandQueryOption option = new SelectExpandQueryOption("any", null, _queryContext);
+
+        // Act
+        var result = validator.TryValidate(option, null, out IEnumerable<string> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Theory]
@@ -347,6 +380,47 @@ public class SelectExpandQueryValidatorTest
     }
 
     [Fact]
+    public void TryValidateSelectExpandQueryValidator_ReturnsTrueWithNoError_IfExpansionDepthIsZero()
+    {
+        // Arrange
+        string expand = "Orders($expand=Customer($expand=Orders($expand=Customer($expand=Orders($expand=Customer)))))";
+        SelectExpandQueryValidator validator = new SelectExpandQueryValidator();
+        _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+        SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
+
+        // Act
+        var result = validator.TryValidate(
+            selectExpandQueryOption,
+            new ODataValidationSettings { MaxExpansionDepth = 0 },
+            out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+    }
+
+    [Fact]
+    public void TryValidateSelectExpandQueryValidator_DelegatesToValidate()
+    {
+        // Arrange
+        string expand = "Orders($expand=Customer($expand=Orders($expand=Customer($expand=Orders($expand=Customer)))))";
+        var validator = new CountingSelectExpandQueryValidator();
+        _queryContext.DefaultQueryConfigurations.EnableExpand = true;
+        var selectExpandQueryOption = new SelectExpandQueryOption(null, expand, _queryContext);
+
+        // Act
+        var result = validator.TryValidate(
+            selectExpandQueryOption,
+            new ODataValidationSettings { MaxExpansionDepth = 0 },
+            out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+        Assert.Equal(1, validator.ValidateCallCount); // TryValidate ran Validate exactly once
+    }
+
+    [Fact]
     public void ValidateSelectExpandQueryValidator_DoesNotThrow_IfExpansionDepthIsZero_QuerySettings()
     {
         // Arrange
@@ -431,6 +505,29 @@ public class SelectExpandQueryValidatorTest
     }
 
     [Fact]
+    public void TryValidateSelectExpandQueryValidator_ReturnsFalseWithError_IfNotExpandable()
+    {
+        // Arrange
+        CustomersModelWithInheritance model = new CustomersModelWithInheritance();
+        model.Model.SetAnnotationValue(model.Customer, new ClrTypeAnnotation(typeof(Customer)));
+        ODataQueryContext queryContext = new ODataQueryContext(model.Model, typeof(Customer));
+        queryContext.RequestContainer = new MockServiceProvider();
+        model.Model.SetAnnotationValue(model.Customer.FindProperty("Orders"), new QueryableRestrictionsAnnotation(new QueryableRestrictions { NotExpandable = true }));
+
+        string expand = "Orders";
+        ISelectExpandQueryValidator validator = queryContext.GetSelectExpandQueryValidator();
+        SelectExpandQueryOption selectExpandQueryOption = new SelectExpandQueryOption(null, expand, queryContext);
+
+        // Act
+        var result = validator.TryValidate(selectExpandQueryOption, new ODataValidationSettings(), out IEnumerable<string> errors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("The property 'Orders' cannot be used in the $expand query option.",errors.First());
+    }
+
+    [Fact]
     public void ValidateSelectExpandQueryValidator_ThrowException_IfNotExpandable_QuerySettings()
     {
         // Arrange
@@ -493,5 +590,16 @@ public class SelectExpandQueryValidatorTest
             .AddSingleton<DefaultQueryConfigurations>().BuildServiceProvider();
         context.RequestContainer = services;
         Assert.NotNull(context.GetSelectExpandQueryValidator());
+    }
+
+    private class CountingSelectExpandQueryValidator : SelectExpandQueryValidator
+    {
+        public int ValidateCallCount { get; private set; }
+
+        public override void Validate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings)
+        {
+            ValidateCallCount++;
+            base.Validate(selectExpandQueryOption, validationSettings);
+        }
     }
 }

@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
@@ -48,6 +50,16 @@ public class FilterQueryValidator : IFilterQueryValidator
 
         ValidateFilter(filterQueryOption.FilterClause, validatorContext);
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="FilterQueryOption" />.
+    /// </summary>
+    /// <param name="filterQueryOption">The $filter query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(FilterQueryOption filterQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(filterQueryOption, validationSettings), out validationErrors);
 
     /// <summary>
     /// Validates a <see cref="FilterClause" />.

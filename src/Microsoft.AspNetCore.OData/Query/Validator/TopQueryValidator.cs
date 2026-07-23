@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -54,4 +56,14 @@ public class TopQueryValidator : ITopQueryValidator
                 AllowedQueryOptions.Top, topQueryOption.Value));
         }
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="TopQueryOption" />.
+    /// </summary>
+    /// <param name="topQueryOption">The $top query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(TopQueryOption topQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(topQueryOption, validationSettings), out validationErrors);
 }

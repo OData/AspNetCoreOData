@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData.Query.Validator;
@@ -36,4 +38,14 @@ public class SkipQueryValidator : ISkipQueryValidator
             throw new ODataException(Error.Format(SRResources.SkipTopLimitExceeded, validationSettings.MaxSkip, AllowedQueryOptions.Skip, skipQueryOption.Value));
         }
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="SkipQueryOption" />.
+    /// </summary>
+    /// <param name="skipQueryOption">The $skip query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(SkipQueryOption skipQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(skipQueryOption, validationSettings), out validationErrors);
 }

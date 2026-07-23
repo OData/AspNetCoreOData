@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Models;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -169,6 +170,74 @@ public class ApplyQueryOptionTest
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => apply.Validate(new ODataValidationSettings()));
+    }
+
+    [Fact]
+    public void TryValidateApplyQueryOption_ReturnsValidationError_ForNullValidationSettings()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+
+        // Act
+        var result = apply.TryValidate(null, out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", Assert.Single(validationErrors));
+    }
+
+    [Fact]
+    public void TryValidateApplyQueryOption_InvokesValidator_AndReturnsTrue()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+        var settings = new ODataValidationSettings();
+        var validator = new Mock<IApplyQueryValidator>();
+        apply.Validator = validator.Object;
+
+        // Act
+        var result = apply.TryValidate(settings, out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+        validator.Verify(v => v.Validate(apply, settings), Times.Once);
+    }
+
+    [Fact]
+    public void TryValidateApplyQueryOption_ReturnsTrue_WhenValidatorIsNull()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context) { Validator = null };
+
+        // Act
+        var result = apply.TryValidate(new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
+    }
+
+    [Fact]
+    public void TryValidateApplyQueryOption_ReturnsFalseAndError_WithoutThrowing_WhenValidatorThrows()
+    {
+        // Arrange
+        var context = new ODataQueryContext(_model, typeof(ApplyCustomer));
+        var apply = new ApplyQueryOption("groupby((Name))", context);
+        var settings = new ODataValidationSettings();
+        var validator = new Mock<IApplyQueryValidator>();
+        validator.Setup(v => v.Validate(apply, settings)).Throws(new ODataException("Apply failed."));
+        apply.Validator = validator.Object;
+
+        // Act
+        var result = apply.TryValidate(settings, out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Equal("Apply failed.", Assert.Single(validationErrors));
     }
 
     // Legal apply queries usable against CustomerApplyTestData.

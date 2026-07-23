@@ -72,6 +72,16 @@ public class SelectExpandQueryValidator : ISelectExpandQueryValidator
     }
 
     /// <summary>
+    /// Attempts to validate the <see cref="SelectExpandQueryOption"/>.
+    /// </summary>
+    /// <param name="selectExpandQueryOption">The $select and $expand query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(SelectExpandQueryOption selectExpandQueryOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(selectExpandQueryOption, validationSettings), out validationErrors);
+
+    /// <summary>
     /// Validates all select and expand items in $select and $expand.
     /// For example, ~/Customers?$expand=Nav($expand=subNav;$select=Prop;$top=2)&amp;$select=Addresses($select=City;$top=1)
     /// </summary>

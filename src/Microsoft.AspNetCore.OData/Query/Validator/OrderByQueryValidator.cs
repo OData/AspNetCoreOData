@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
@@ -54,6 +57,16 @@ public class OrderByQueryValidator : IOrderByQueryValidator
             clause = clause.ThenBy;
         }
     }
+
+    /// <summary>
+    /// Attempts to validate the <see cref="OrderByQueryOption" />.
+    /// </summary>
+    /// <param name="orderByOption">The $orderby query.</param>
+    /// <param name="validationSettings">The validation settings.</param>
+    /// <param name="validationErrors">Contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns><see langword="true"/> if the validation succeeded; otherwise, <see langword="false"/>.</returns>
+    public virtual bool TryValidate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(orderByOption, validationSettings), out validationErrors);
 
     /// <summary>
     /// Validates a <see cref="OrderByClause" />.

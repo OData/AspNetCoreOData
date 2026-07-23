@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -51,6 +52,66 @@ public class ApplyQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.ThrowsArgumentNull(() => _validator.Validate(apply, null), "validationSettings");
+    }
+
+    #endregion
+
+    #region TryValidate reports errors instead of throwing
+
+    [Fact]
+    public void TryValidate_ReturnsValidationError_ForNullApplyQueryOption()
+    {
+        // Arrange & Act
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'applyQueryOption')", validationErrors.First());
+    }
+
+    [Fact]
+    public void TryValidate_ReturnsValidationError_ForNullValidationSettings()
+    {
+        // Arrange
+        var option = new ApplyQueryOption("groupby((Name))", CreateContext());
+
+        // Act
+        var result = _validator.TryValidate(option, null, out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')", validationErrors.First());
+    }
+
+    [Fact]
+    public void TryValidate_ReturnsFalseAndError_WithoutThrowing_ForRestrictedProperty()
+    {
+        // Arrange - a not-filterable property referenced through compute is rejected without throwing.
+        var option = new ApplyQueryOption("compute(NotFilterableProperty eq 'x' as F)", CreateContext());
+
+        // Act
+        var result = _validator.TryValidate(option, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.False(result);
+        Assert.Single(validationErrors);
+        Assert.Equal(NotFilterableMessage, validationErrors.First());
+    }
+
+    [Fact]
+    public void TryValidate_ReturnsTrueAndNoErrors_ForUnrestrictedApply()
+    {
+        // Arrange
+        var option = new ApplyQueryOption("groupby((Name),aggregate(AmountSpent with sum as Total))", CreateContext());
+
+        // Act
+        var result = _validator.TryValidate(option, new ODataValidationSettings(), out IEnumerable<string> validationErrors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(validationErrors);
     }
 
     #endregion

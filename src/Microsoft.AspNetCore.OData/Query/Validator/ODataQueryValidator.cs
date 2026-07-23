@@ -5,6 +5,9 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.OData;
 
@@ -124,19 +127,50 @@ public class ODataQueryValidator : IODataQueryValidator
         }
     }
 
+    /// <summary>
+    /// Try validates the OData query.
+    /// </summary>
+    /// <param name="options">The OData query to validate.</param>
+    /// <param name="validationSettings">The settings used for validation.</param>
+    /// <param name="validationErrors">When this method returns, contains a collection of validation errors encountered, or an empty collection if validation succeeds.</param>
+    /// <returns>True if validation is successful; otherwise, false.</returns>
+    public virtual bool TryValidate(ODataQueryOptions options, ODataValidationSettings validationSettings, out IEnumerable<string> validationErrors)
+        => QueryValidatorHelpers.TryValidate(() => Validate(options, validationSettings), out validationErrors);
+
+
     private static void ValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed)
     {
         if ((queryOption & allowed) == AllowedQueryOptions.None)
         {
-            throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, "AllowedQueryOptions"));
+            throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, nameof(AllowedQueryOptions)));
         }
     }
-        
+
+    private static void TryValidateQueryOptionAllowed(AllowedQueryOptions queryOption, AllowedQueryOptions allowed, out IEnumerable<string> validationErrors)
+    {
+        validationErrors = Array.Empty<string>();
+        if ((queryOption & allowed) == AllowedQueryOptions.None)
+        {
+            validationErrors = new[] { Error.Format(SRResources.NotAllowedQueryOption, queryOption, nameof(AllowedQueryOptions)) };
+        }
+    }
+
     private static void ValidateNotEmptyOrWhitespace(string rawValue)
     {
         if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
         {
             throw new ODataException(SRResources.SelectExpandEmptyOrWhitespace);
+        }
+    }
+
+    private static void TryValidateNotEmptyOrWhitespace(string rawValue, ref List<string> validationErrors)
+    {
+        if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))
+        {
+            // If validationErrors is null, initialize it with a new list.
+            // Pre-allocate with a reasonable default capacity.
+            validationErrors ??= new List<string>(1);
+            validationErrors.Add(SRResources.SelectExpandEmptyOrWhitespace);
         }
     }
 }

@@ -38,10 +38,30 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_OnNullOption()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(null, new ODataValidationSettings(), out IEnumerable<string> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'orderByOption')", errors.First());
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_ThrowsOnNullSettings()
     {
         // Arrange & Act & Assert
         ExceptionAssert.Throws<ArgumentNullException>(() => _validator.Validate(new OrderByQueryOption("Name eq 'abc'", _context), null));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_OnNullSettings()
+    {
+        // Arrange & Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption("Name eq 'abc'", _context), null, out IEnumerable<string> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal("Value cannot be null. (Parameter 'validationSettings')",errors.First());
     }
 
     [Theory]
@@ -120,6 +140,22 @@ public class OrderByQueryValidatorTests
     }
 
     [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsFalseWithError_ForNotAllowedAndSortableUnlimitedProperty()
+    {
+        // Arrange
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Address");
+
+        // Act & Assert
+        var result = _validator.TryValidate(new OrderByQueryOption("Name asc", _context), settings, out IEnumerable<string> errors);
+        Assert.False(result);
+        Assert.Single(errors);
+        Assert.Equal(
+            "Order by 'Name' is not allowed. To allow it, set the 'AllowedOrderByProperties' property on EnableQueryAttribute or QueryValidationSettings.",
+           errors.First());
+    }
+
+    [Fact]
     public void ValidateOrderByQueryValidator_WillNotAllowName()
     {
         // Arrange
@@ -158,6 +194,38 @@ public class OrderByQueryValidatorTests
 
         // Act & Assert
         ExceptionAssert.DoesNotThrow(() => _validator.Validate(option, settings));
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_ReturnsTrueWithNoError_ForAllowedId()
+    {
+        // Arrange
+        OrderByQueryOption option = new OrderByQueryOption("Id", _context);
+        ODataValidationSettings settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Id");
+
+        // Act & Assert
+        var result = _validator.TryValidate(option, settings, out IEnumerable<string> errors);
+        Assert.True(result);
+        Assert.Empty(errors);
+    }
+
+    [Fact]
+    public void TryValidateOrderByQueryValidator_DelegatesToValidate()
+    {
+        // Arrange
+        var validator = new CountingOrderByQueryValidator();
+        var option = new OrderByQueryOption("Id", _context);
+        var settings = new ODataValidationSettings();
+        settings.AllowedOrderByProperties.Add("Id");
+
+        // Act
+        var result = validator.TryValidate(option, settings, out IEnumerable<string> errors);
+
+        // Assert
+        Assert.True(result);
+        Assert.Empty(errors);
+        Assert.Equal(1, validator.ValidateCallCount); // TryValidate ran Validate exactly once
     }
 
     [Fact]
@@ -365,5 +433,16 @@ public class OrderByQueryValidatorTests
     {
         public string Name { get; set; }
         public LimitedComplexType SpecializedComplexProperty { get; set; }
+    }
+
+    private class CountingOrderByQueryValidator : OrderByQueryValidator
+    {
+        public int ValidateCallCount { get; private set; }
+
+        public override void Validate(OrderByQueryOption orderByOption, ODataValidationSettings validationSettings)
+        {
+            ValidateCallCount++;
+            base.Validate(orderByOption, validationSettings);
+        }
     }
 }

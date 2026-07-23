@@ -5,6 +5,8 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 
@@ -15,6 +17,42 @@ namespace Microsoft.AspNetCore.OData.Query.Validator;
 /// </summary>
 internal class QueryValidatorHelpers
 {
+    /// <summary>
+    /// Runs the specified <paramref name="validate"/> action and converts any validation failure into a
+    /// <c>false</c> result together with the corresponding error message, instead of throwing.
+    /// </summary>
+    /// <param name="validate">The validation action to execute (typically a call to a <c>Validate</c> method).</param>
+    /// <param name="validationErrors">
+    /// When this method returns <c>false</c>, contains the validation error message(s);
+    /// otherwise, an empty collection.
+    /// </param>
+    /// <returns><c>true</c> if the validation succeeded; otherwise, <c>false</c>.</returns>
+    public static bool TryValidate(Action validate, out IEnumerable<string> validationErrors)
+    {
+        if (validate == null)
+        {
+            throw Error.ArgumentNull(nameof(validate));
+        }
+
+        try
+        {
+            validate();
+        }
+        catch (Exception ex) when (
+            ex is ODataException ||
+            ex is InvalidOperationException ||
+            ex is NotSupportedException ||
+            ex is NotImplementedException ||
+            ex is ArgumentException)
+        {
+            validationErrors = new[] { ex.Message };
+            return false;
+        }
+
+        validationErrors = Array.Empty<string>();
+        return true;
+    }
+
     /// <summary>
     /// Validates a single value function call.
     /// </summary>
