@@ -9,6 +9,7 @@ using System;
 using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.Extensions.Logging;
 using Microsoft.OData;
 
 namespace Microsoft.AspNetCore.OData;
@@ -25,6 +26,8 @@ public class ODataMiniOptions
     private TimeZoneInfo _timeZone = TimeZoneInfo.Local;
     private ODataVersion _version = ODataVersionConstraint.DefaultODataVersion;
     private long _maxReceivedMessageSize = ODataBatchHandler.DefaultMaxReceivedMessageSize;
+    private bool _enableQueryValidationErrorLogging = false;
+    private LogLevel _queryValidationErrorLogLevel = LogLevel.Warning;
 
     /// <summary>
     /// Gets the query configurations. for example, enable '$select' or not.
@@ -68,6 +71,19 @@ public class ODataMiniOptions
     public long MaxReceivedMessageSize { get => _maxReceivedMessageSize; }
 
     /// <summary>
+    /// Gets a value indicating whether diagnostic details are recorded when an incoming query fails validation.
+    /// Please call 'SetQueryValidationErrorLogging()' to config. The default value is <c>false</c>.
+    /// </summary>
+    public bool EnableQueryValidationErrorLogging { get => _enableQueryValidationErrorLogging; }
+
+    /// <summary>
+    /// Gets the <see cref="LogLevel"/> at which query validation diagnostics are written when
+    /// <see cref="EnableQueryValidationErrorLogging"/> is enabled. Please call 'SetQueryValidationErrorLogLevel()' to
+    /// config. The default value is <see cref="LogLevel.Warning"/>.
+    /// </summary>
+    public LogLevel QueryValidationErrorLogLevel { get => _queryValidationErrorLogLevel; }
+
+    /// <summary>
     /// Config whether or not no '$' sign query option.
     /// </summary>
     /// <param name="enableNoDollarQueryOptions">Case insensitive or not.</param>
@@ -86,6 +102,30 @@ public class ODataMiniOptions
     public ODataMiniOptions SetCaseInsensitive(bool enableCaseInsensitive)
     {
         _enableCaseInsensitive = enableCaseInsensitive;
+        return this;
+    }
+
+    /// <summary>
+    /// Config whether or not diagnostic details are recorded when an incoming query fails validation. When
+    /// enabled, the endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the
+    /// failure reason are written.
+    /// </summary>
+    /// <param name="enableQueryValidationErrorLogging">Whether to record query validation diagnostics.</param>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
+    public ODataMiniOptions SetQueryValidationErrorLogging(bool enableQueryValidationErrorLogging)
+    {
+        _enableQueryValidationErrorLogging = enableQueryValidationErrorLogging;
+        return this;
+    }
+
+    /// <summary>
+    /// Config the <see cref="LogLevel"/> at which query validation diagnostics are written.
+    /// </summary>
+    /// <param name="logLevel">The level at which query validation diagnostics are written.</param>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
+    public ODataMiniOptions SetQueryValidationErrorLogLevel(LogLevel logLevel)
+    {
+        _queryValidationErrorLogLevel = logLevel;
         return this;
     }
 
@@ -240,5 +280,7 @@ public class ODataMiniOptions
         this._enableContinueOnErrorHeader = otherOptions.EnableContinueOnErrorHeader;
         this._timeZone = otherOptions.TimeZone;
         this._maxReceivedMessageSize = otherOptions.MaxReceivedMessageSize;
+        this._enableQueryValidationErrorLogging = otherOptions.EnableQueryValidationErrorLogging;
+        this._queryValidationErrorLogLevel = otherOptions.QueryValidationErrorLogLevel;
     }
 }
