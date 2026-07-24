@@ -218,8 +218,10 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	bool EnableCaseInsensitive  { public get; }
 	bool EnableContinueOnErrorHeader  { public get; }
 	bool EnableNoDollarQueryOptions  { public get; }
+	bool EnableQueryValidationErrorLogging  { public get; }
 	long MaxReceivedMessageSize  { public get; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
+	Microsoft.Extensions.Logging.LogLevel QueryValidationErrorLogLevel  { public get; }
 	System.TimeZoneInfo TimeZone  { public get; }
 	Microsoft.OData.ODataVersion Version  { public get; }
 
@@ -234,6 +236,8 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxReceivedMessageSize (long maxReceivedMessageSize)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetNoDollarQueryOptions (bool enableNoDollarQueryOptions)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetQueryValidationErrorLogging (bool enableQueryValidationErrorLogging)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetQueryValidationErrorLogLevel (Microsoft.Extensions.Logging.LogLevel logLevel)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetTimeZoneInfo (System.TimeZoneInfo tzi)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetVersion (Microsoft.OData.ODataVersion version)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SkipToken ()
@@ -252,6 +256,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
+	bool EnableQueryValidationErrorLogging  { public get; public set; }
 	long MaxReceivedMessageSize  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	[
@@ -259,6 +264,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	]
 	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
 
+	Microsoft.Extensions.Logging.LogLevel QueryValidationErrorLogLevel  { public get; public set; }
 	[
 	TupleElementNamesAttribute(),
 	]
@@ -1512,6 +1518,7 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions  { public get; public set; }
 	bool EnableConstantParameterization  { public get; public set; }
 	bool EnableCorrelatedSubqueryBuffering  { public get; public set; }
+	bool EnableQueryValidationErrorLogging  { public get; public set; }
 	bool EnsureStableOrdering  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption HandleNullPropagation  { public get; public set; }
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }

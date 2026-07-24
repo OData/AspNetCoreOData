@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.OData.Query;
 
@@ -20,6 +21,7 @@ public partial class EnableQueryAttribute
     // validation settings
     private ODataValidationSettings _validationSettings;
     private string _allowedOrderByProperties;
+    private bool? _enableQueryValidationErrorLogging;
 
     // query settings
     private ODataQuerySettings _querySettings;
@@ -308,5 +310,23 @@ public partial class EnableQueryAttribute
     {
         get => _validationSettings.MaxOrderByNodeCount;
         set => _validationSettings.MaxOrderByNodeCount = value;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
+    /// fails validation. When enabled, the endpoint's route template, the queried type, the attempted
+    /// <c>$select</c> and <c>$expand</c> options, and the failure reason are written, together with the
+    /// validation exception, to an <see cref="ILogger{TCategoryName}"/> resolved from the request services
+    /// and categorized for <see cref="EnableQueryAttribute"/>. This information is captured from the request
+    /// even when the query options cannot be fully parsed. When this property is not set on the attribute,
+    /// the value of <see cref="ODataOptions.EnableQueryValidationErrorLogging"/> is used, so the behavior can be
+    /// configured once for all actions; setting it here overrides that global value for this action. The
+    /// diagnostic is written at the level from <see cref="ODataOptions.QueryValidationErrorLogLevel"/>
+    /// (default <see cref="LogLevel.Warning"/>). The default value is <c>false</c>.
+    /// </summary>
+    public bool EnableQueryValidationErrorLogging
+    {
+        get => _enableQueryValidationErrorLogging ?? false;
+        set => _enableQueryValidationErrorLogging = value;
     }
 }

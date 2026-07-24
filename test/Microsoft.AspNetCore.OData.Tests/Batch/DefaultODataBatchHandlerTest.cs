@@ -665,7 +665,7 @@ Accept-Charset: UTF-8
         HttpRequestMessage customerRequest = new HttpRequestMessage(HttpMethod.Get, $"{endpoint}/BatchTestCustomers(2)?$expand=Orders");
         customerRequest.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(acceptJson));
 
-        var customerResponse = client.SendAsync(customerRequest).Result;
+        var customerResponse = await client.SendAsync(customerRequest);
         var objAsJsonString = await customerResponse.Content.ReadAsStringAsync();
         var customer = JsonConvert.DeserializeObject<BatchTestCustomer>(objAsJsonString);
 
