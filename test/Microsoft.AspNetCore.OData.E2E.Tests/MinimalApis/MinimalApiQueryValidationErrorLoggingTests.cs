@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -59,6 +60,15 @@ public class MinimalApiQueryValidationErrorLoggingTests : IClassFixture<MinimalT
             .WithODataModel(model)
             .WithODataOptions(o => o.Select().Expand().SetQueryValidationErrorLogging(true));
 
+        // Handler declared to return ODataResult, so the query options cannot be created before the handler
+        // runs and validation defers to the post-execution path
+        // (ODataQueryEndpointFilter.CreateAndValidateQueryOptions).
+        app.MapGet("logging/odataresult/todos", () => new ODataResult(GetTodos()))
+            .AddODataQueryEndpointFilter()
+            .WithODataResult()
+            .WithODataModel(model)
+            .WithODataOptions(o => o.Select().Expand().SetQueryValidationErrorLogging(true));
+
         // Logging left at its default (off) on the endpoint.
         app.MapGet("plain/todos", () => GetTodos())
             .AddODataQueryEndpointFilter()
@@ -85,6 +95,48 @@ public class MinimalApiQueryValidationErrorLoggingTests : IClassFixture<MinimalT
         Assert.NotNull(entry.Exception);
         Assert.Contains("NoSuchProperty", entry.Exception.Message);
         Assert.Contains(" at ", entry.Exception.ToString());
+    }
+
+    [Fact]
+    public async Task LoggingEnabledEndpoint_ODataResultHandler_PostExecutionPath_CapturesTypeAndOptions()
+    {
+        // A handler declared to return ODataResult defers validation to the post-execution path. The diagnostic
+        // must still report the element type and the attempted query options, matching the pre-execution path
+        // and the controller pipeline (regression test for the missing ProcessedQueryOptions assignment).
+        LoggerProvider.Clear();
+
+        await Assert.ThrowsAsync<ODataException>(() => _client.GetAsync("/logging/odataresult/todos?$select=NoSuchProperty"));
+
+        CapturedLogEntry entry = Assert.Single(GetQueryValidationEntries());
+        Assert.Equal(LogLevel.Warning, entry.Level);
+        Assert.Contains("logging/odataresult/todos", entry.GetFieldValue("Endpoint"));
+        Assert.Contains("MiniTodo", entry.GetFieldValue("QueryType"));
+        Assert.Equal("$select=NoSuchProperty", entry.GetFieldValue("QueryOptions"));
+        Assert.Contains("NoSuchProperty", entry.GetFieldValue("Reason"));
+    }
+
+    [Fact]
+    public async Task LoggingEnabledEndpoint_SelectWithControlCharacters_NeutralizesLogForging()
+    {
+        // A request-supplied value containing CR/LF (percent-encoded, so it is URL-decoded to real control
+        // characters) must never appear verbatim in the logged fields, otherwise it could forge additional log
+        // lines (CWE-117). The neutralized value still reports the attempted option.
+        LoggerProvider.Clear();
+
+        await Assert.ThrowsAsync<ODataException>(
+            () => _client.GetAsync("/logging/todos?$select=NoSuchProperty%0d%0aInjectedLogLine"));
+
+        CapturedLogEntry entry = Assert.Single(GetQueryValidationEntries());
+
+        string queryOptions = entry.GetFieldValue("QueryOptions");
+        Assert.DoesNotContain("\r", queryOptions);
+        Assert.DoesNotContain("\n", queryOptions);
+        Assert.Contains("NoSuchProperty", queryOptions);
+
+        // The exception message is request-derived too, so it must not carry the injected control characters.
+        string reason = entry.GetFieldValue("Reason");
+        Assert.DoesNotContain("\r", reason);
+        Assert.DoesNotContain("\n", reason);
     }
 
     [Fact]

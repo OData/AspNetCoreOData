@@ -7244,21 +7244,16 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging">
             <summary>
-            Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
-            fails validation for actions annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. When enabled, the
-            endpoint's route template, the queried type, the requested <c>$select</c> and <c>$expand</c>, and the failure
-            reason are written. This value provides
-            the default for every such action, allowing the behavior to be configured once instead of on each
-            attribute; an individual <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> overrides it by setting
-            <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging"/> explicitly. The default value is <c>false</c>.
+            Gets or sets a value indicating whether diagnostic details (endpoint, queried type, requested
+            <c>$select</c>/<c>$expand</c>, and failure reason) are recorded when a query fails validation for actions
+            annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. Provides the default for every such action; an individual
+            <see cref="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging"/> overrides it. The default value is <c>false</c>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel">
             <summary>
-            Gets or sets the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written for actions
-            annotated with <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/> when <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is enabled.
-            This value applies to every such action, so the level can be configured once. The default value is
-            <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>.
+            Gets or sets the <see cref="T:Microsoft.Extensions.Logging.LogLevel"/> at which query validation diagnostics are written when
+            <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is enabled. The default value is <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>.
             </summary>
         </member>
         <member name="P:Microsoft.AspNetCore.OData.ODataOptions.QuerySettings">
@@ -9351,16 +9346,11 @@
         </member>
         <member name="P:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.EnableQueryValidationErrorLogging">
             <summary>
-            Gets or sets a value indicating whether diagnostic details are recorded when an incoming query
-            fails validation. When enabled, the endpoint's route template, the queried type, the attempted
-            <c>$select</c> and <c>$expand</c> options, and the failure reason are written, together with the
-            validation exception, to an <see cref="T:Microsoft.Extensions.Logging.ILogger`1"/> resolved from the request services
-            and categorized for <see cref="T:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute"/>. This information is captured from the request
-            even when the query options cannot be fully parsed. When this property is not set on the attribute,
-            the value of <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is used, so the behavior can be
-            configured once for all actions; setting it here overrides that global value for this action. The
-            diagnostic is written at the level from <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel"/>
-            (default <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>). The default value is <c>false</c>.
+            Gets or sets a value indicating whether diagnostic details are recorded when a query fails validation.
+            When not set on the attribute, <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.EnableQueryValidationErrorLogging"/> is used; setting
+            it here overrides that global value for this action. The diagnostic is written at the level from
+            <see cref="P:Microsoft.AspNetCore.OData.ODataOptions.QueryValidationErrorLogLevel"/> (default <see cref="F:Microsoft.Extensions.Logging.LogLevel.Warning"/>).
+            The default value is <c>false</c>.
             </summary>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext)">
@@ -12646,6 +12636,17 @@
             </summary>
             <param name="rawValues">The raw query option values, or <c>null</c> when unavailable.</param>
             <returns>The requested query options, or an empty string when none apply.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.QueryValidationErrorLogger.Sanitize(System.String)">
+            <summary>
+            Neutralizes untrusted request-supplied text so it cannot forge additional log entries (CWE-117).
+            Carriage returns, line feeds and other control characters, along with the Unicode line (U+2028) and
+            paragraph (U+2029) separators, are replaced with a space, and the result is capped to bound oversized
+            values. The query option values and the exception message originate from the request, so they are
+            sanitized before being written as structured log arguments.
+            </summary>
+            <param name="value">The value to sanitize, or <c>null</c>.</param>
+            <returns>The sanitized value, or the original value when it is null or empty.</returns>
         </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.ApplyQueryOption">
             <summary>

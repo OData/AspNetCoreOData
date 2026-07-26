@@ -419,6 +419,13 @@ public class ODataQueryEndpointFilter : IODataQueryEndpointFilter
 
         ODataQueryOptions queryOptions = new ODataQueryOptions(queryContext, httpContext.Request);
 
+        if (requestQueryData != null)
+        {
+            // Capture the options so diagnostics on the post-execution validation path can report the element
+            // type and the attempted query, consistent with the pre-execution path.
+            requestQueryData.ProcessedQueryOptions = queryOptions;
+        }
+
         ValidateQuery(httpContext, queryOptions);
 
         return queryOptions;

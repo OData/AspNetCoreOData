@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -34,24 +35,31 @@ internal static class QueryValidationErrorLogger
     /// <param name="exception">The exception raised while validating the query.</param>
     internal static void LogQueryValidationFailure(ILogger logger, LogLevel logLevel, HttpContext httpContext, Exception exception)
     {
-        if (logger == null || httpContext == null || !logger.IsEnabled(logLevel))
+        if (logger == null || httpContext == null)
         {
             return;
         }
 
-        // The processed query options are captured before validation runs; they carry the raw values that
-        // were normalized during parsing, so the requested set is reported regardless of whether the request
-        // used the '$' prefix. They may be null when the query options could not be built, in which case the
-        // element type and requested options are omitted.
-        ODataQueryOptions processedQueryOptions = null;
-        if (httpContext.Items.TryGetValue(nameof(RequestQueryData), out object item) &&
-            item is RequestQueryData requestQueryData)
-        {
-            processedQueryOptions = requestQueryData.ProcessedQueryOptions;
-        }
-
         try
         {
+            // The IsEnabled check and the request-state lookup below are inside the guarded region so a
+            // misbehaving logging provider or an unexpected state read can never change the request outcome.
+            if (!logger.IsEnabled(logLevel))
+            {
+                return;
+            }
+
+            // The processed query options are captured before validation runs; they carry the raw values that
+            // were normalized during parsing, so the requested set is reported regardless of whether the request
+            // used the '$' prefix. They may be null when the query options could not be built, in which case the
+            // element type and requested options are omitted.
+            ODataQueryOptions processedQueryOptions = null;
+            if (httpContext.Items.TryGetValue(nameof(RequestQueryData), out object item) &&
+                item is RequestQueryData requestQueryData)
+            {
+                processedQueryOptions = requestQueryData.ProcessedQueryOptions;
+            }
+
             // Record the matched endpoint's route template (for example, "v1.0/Users({key})") rather than the
             // concrete request path. The template identifies the endpoint and keeps the route prefix while
             // representing entity keys as placeholders, so the same endpoint is reported consistently across
@@ -65,7 +73,7 @@ internal static class QueryValidationErrorLogger
                 endpoint,
                 processedQueryOptions?.Context?.ElementType?.FullTypeName(),
                 FormatRequestedQueryOptions(processedQueryOptions?.RawValues),
-                exception?.Message);
+                Sanitize(exception?.Message));
         }
         catch (Exception)
         {
@@ -93,19 +101,48 @@ internal static class QueryValidationErrorLogger
 
         if (hasSelect && hasExpand)
         {
-            return string.Concat("$select=", rawValues.Select, "&$expand=", rawValues.Expand);
+            return string.Concat("$select=", Sanitize(rawValues.Select), "&$expand=", Sanitize(rawValues.Expand));
         }
 
         if (hasSelect)
         {
-            return string.Concat("$select=", rawValues.Select);
+            return string.Concat("$select=", Sanitize(rawValues.Select));
         }
 
         if (hasExpand)
         {
-            return string.Concat("$expand=", rawValues.Expand);
+            return string.Concat("$expand=", Sanitize(rawValues.Expand));
         }
 
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Neutralizes untrusted request-supplied text so it cannot forge additional log entries (CWE-117).
+    /// Carriage returns, line feeds and other control characters, along with the Unicode line (U+2028) and
+    /// paragraph (U+2029) separators, are replaced with a space, and the result is capped to bound oversized
+    /// values. The query option values and the exception message originate from the request, so they are
+    /// sanitized before being written as structured log arguments.
+    /// </summary>
+    /// <param name="value">The value to sanitize, or <c>null</c>.</param>
+    /// <returns>The sanitized value, or the original value when it is null or empty.</returns>
+    private static string Sanitize(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
+        }
+
+        const int MaxLength = 2048;
+        int length = Math.Min(value.Length, MaxLength);
+
+        StringBuilder builder = new StringBuilder(length);
+        for (int i = 0; i < length; i++)
+        {
+            char c = value[i];
+            builder.Append(char.IsControl(c) || c == '\u2028' || c == '\u2029' ? ' ' : c);
+        }
+
+        return builder.ToString();
     }
 }
