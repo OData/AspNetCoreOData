@@ -1,35 +1,35 @@
 <#
 .SYNOPSIS
-Validates the package versions in the .csproj file against the lower bound of the ODataLibPackageDependency version range in the builder.versions.settings.targets.
+Validates the package versions in the directory.packages.props file against the lower bound of the ODataLibPackageDependency version range in the builder.versions.settings.targets.
 
 .PARAMETER builderVersionTargetsPath
 Specifies the path to the builder.versions.settings.targets file.
 
-.PARAMETER csprojPath
-Specifies the path to the .csproj file.
+.PARAMETER directoryPackagesPropsPath
+Specifies the path to the directory.packages.props file.
 #>
 
 Param(
   [string]
   $builderVersionTargetsPath,
   [string]
-  $csprojPath
+  $directoryPackagesPropsPath
 )
 
 # Constants
 $ODATA_LIB_PACKAGE_DEPENDENCY_KEY = "ODataLibPackageDependency"
 $ODATA_MODEL_BUILDER_PACKAGE_DEPENDENCY_KEY = "ODataModelBuilderPackageDependency"
 $BUILDER_VERSION_TARGETS_FILENAME = "builder.versions.settings.targets"
-$CSPROJ_FILENAME = "Microsoft.AspNetCore.OData.csproj"
+$DIRECTORY_PACKAGES_PROPS = "Directory.Packages.props"
 
 # Path to your builder.versions.settings.targets file
 if ($builderVersionTargetsPath -eq "") {
     $builderVersionTargetsPath = "$PSScriptRoot\$BUILDER_VERSION_TARGETS_FILENAME"
 }
 
-# Path to your .csproj file
-if ($csprojPath -eq "") {
-    $csprojPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath "src/Microsoft.AspNetCore.OData/$CSPROJ_FILENAME"
+# Path to your directory.packages.props file
+if ($directoryPackagesPropsPath -eq "") {
+    $directoryPackagesPropsPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath $DIRECTORY_PACKAGES_PROPS
 }
 
 # Function to extract the OData package dependency version range from the targets file
@@ -64,11 +64,11 @@ $odataPackageDependenciesDict.Add($ODATA_MODEL_BUILDER_PACKAGE_DEPENDENCY_KEY, $
 # Extract the lower bound version from the version range
 $lowerBoundVersion = $odataPackageDependenciesDict[$ODATA_LIB_PACKAGE_DEPENDENCY_KEY] 
 
-# Load the .csproj file
-[xml]$csproj = Get-Content $csprojPath
+# Load the directory.packages.props file
+[xml]$packagesProps = Get-Content $directoryPackagesPropsPath
 
 # Extract the PackageReference versions
-$PackageReference = $csproj.Project.ItemGroup.PackageReference
+$PackageReference = $packagesProps.Project.ItemGroup.PackageVersion
 
 # Dictionary to store the PackageReferences
 $csprojPackageReferencesDict = @{
@@ -82,13 +82,13 @@ foreach ($key in $odataPackageDependenciesDict.Keys) {
     $packageReferences = $PackageReference | Where-Object { $_.Include -match $csprojPackageReferencesDict[$key] }
     $packageVersions = $packageReferences.Version
 
-    Write-Host "Validating the package versions of '$key' in '$CSPROJ_FILENAME' against the lower bound of the '$key' version range in '$BUILDER_VERSION_TARGETS_FILENAME'."
+    Write-Host "Validating the package versions of '$key' in '$DIRECTORY_PACKAGES_PROPS' against the lower bound of the '$key' version range in '$BUILDER_VERSION_TARGETS_FILENAME'."
 
     # Validate the versions
     foreach ($version in $packageVersions) {
         if ($version -ne $lowerBoundVersion) {
             $exception = New-Object System.Exception(
-                "Error.VersionMismatch: '$key' version '$version' in '$csprojPath' do not match the lower bound '$lowerBoundVersion' of '$key' in '$builderVersionTargetsPath'.")
+                "Error.VersionMismatch: '$key' version '$version' in '$directoryPackagesPropsPath' do not match the lower bound '$lowerBoundVersion' of '$key' in '$builderVersionTargetsPath'.")
             throw $exception
         }
     }
