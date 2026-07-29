@@ -18,12 +18,12 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageVersion Include="Microsoft.OData.Core" Version="8.4.0" />
-    <PackageVersion Include="Microsoft.OData.Edm" Version="8.4.0" />
+    <PackageVersion Include="Microsoft.OData.Core" Version="8.4.4" />
+    <PackageVersion Include="Microsoft.OData.Edm" Version="8.4.4" />
+    <PackageVersion Include="Microsoft.Spatial" Version="8.4.4" />
     <PackageVersion Include="Microsoft.OData.ModelBuilder" Version="2.0.0" />
     <PackageVersion Include="Microsoft.OpenApi.OData" Version="1.6.9" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-    <PackageVersion Include="Microsoft.Spatial" Version="8.4.0" />
     <PackageVersion Include="Moq" Version="4.13.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.4.0" />
