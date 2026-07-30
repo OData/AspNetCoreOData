@@ -394,15 +394,22 @@ internal static class TypeHelper
     /// <returns>True if type is primitive or known type, otherwise False.</returns>
     public static bool IsPrimitiveOrKnownType(Type type)
     {
-        return type.IsPrimitive
-               || type == typeof(string)
-               || type == typeof(Uri)
-               || type == typeof(DateTime)
-               || type == typeof(DateOnly)
-               || type == typeof(TimeOnly)
-               || type == typeof(DateTimeOffset)
-               || type == typeof(Guid)
-               || type == typeof(Decimal);
+        if (type == null)
+        {
+            throw Error.ArgumentNull(nameof(type));
+        }
+
+        Type underlyingType = GetUnderlyingTypeOrSelf(type);
+
+        return underlyingType.IsPrimitive
+               || underlyingType == typeof(string)
+               || underlyingType == typeof(Uri)
+               || underlyingType == typeof(DateTime)
+               || underlyingType == typeof(DateOnly)
+               || underlyingType == typeof(TimeOnly)
+               || underlyingType == typeof(DateTimeOffset)
+               || underlyingType == typeof(Guid)
+               || underlyingType == typeof(Decimal);
     }
 
     /// <summary>
