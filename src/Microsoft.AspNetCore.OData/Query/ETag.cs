@@ -41,12 +41,10 @@ public class ETag : DynamicObject
             {
                 throw Error.InvalidOperation(SRResources.ETagNotWellFormed);
             }
+
             return ConcurrencyProperties[key];
         }
-        set
-        {
-            ConcurrencyProperties[key] = value;
-        }
+        set { ConcurrencyProperties[key] = value; }
     }
 
     /// <summary>
@@ -71,14 +69,8 @@ public class ETag : DynamicObject
 
     internal IDictionary<string, object> ConcurrencyProperties
     {
-        get
-        {
-            return _concurrencyProperties;
-        }
-        set
-        {
-            _concurrencyProperties = value;
-        }
+        get { return _concurrencyProperties; }
+        set { _concurrencyProperties = value; }
     }
 
     /// <summary>
@@ -126,36 +118,38 @@ public class ETag : DynamicObject
             return query;
         }
 
-            Type type = EntityType;
-            ParameterExpression param = Expression.Parameter(type);
-            Expression where = null;
-            foreach (KeyValuePair<string, object> item in ConcurrencyProperties)
+        Type type = EntityType;
+        ParameterExpression param = Expression.Parameter(type);
+        Expression where = null;
+        foreach (KeyValuePair<string, object> item in ConcurrencyProperties)
+        {
+            MemberExpression name = Expression.Property(param, item.Key);
+            object itemValue = item.Value;
+
+            Expression equal;
+            if (itemValue != null)
             {
-                MemberExpression name = Expression.Property(param, item.Key);
-                object itemValue = item.Value;
-                
-                Expression equal;
-                if (itemValue != null)
+                Type itemType = itemValue.GetType();
+                Expression value = LinqParameterContainer.Parameterize(itemType, itemValue);
+                if (itemType.IsArray)
                 {
-                    Type itemType = itemValue.GetType();
-                    Expression value = LinqParameterContainer.Parameterize(itemType, itemValue);
-                    if (itemType.IsArray)
-                    {
-                        equal = ExpressionHelpers.SequenceEquals(name, value);
-                    }
-                    else
-                    {
-                        equal = Expression.Equal(name, value);
-                    }
+                    equal = Expression.AndAlso(
+                        Expression.NotEqual(name, Expression.Constant(null, name.Type)),
+                        ExpressionHelpers.SequenceEquals(name, value));
                 }
                 else
                 {
-                    Expression value = Expression.Constant(value: null);
                     equal = Expression.Equal(name, value);
                 }
-                
-                where = where == null ? equal : Expression.AndAlso(where, equal);
             }
+            else
+            {
+                Expression value = Expression.Constant(value: null);
+                equal = Expression.Equal(name, value);
+            }
+
+            where = where == null ? equal : Expression.AndAlso(where, equal);
+        }
 
         if (where == null)
         {
