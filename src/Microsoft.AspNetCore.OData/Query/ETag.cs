@@ -41,12 +41,10 @@ public class ETag : DynamicObject
             {
                 throw Error.InvalidOperation(SRResources.ETagNotWellFormed);
             }
+
             return ConcurrencyProperties[key];
         }
-        set
-        {
-            ConcurrencyProperties[key] = value;
-        }
+        set { ConcurrencyProperties[key] = value; }
     }
 
     /// <summary>
@@ -71,14 +69,8 @@ public class ETag : DynamicObject
 
     internal IDictionary<string, object> ConcurrencyProperties
     {
-        get
-        {
-            return _concurrencyProperties;
-        }
-        set
-        {
-            _concurrencyProperties = value;
-        }
+        get { return _concurrencyProperties; }
+        set { _concurrencyProperties = value; }
     }
 
     /// <summary>
@@ -133,10 +125,29 @@ public class ETag : DynamicObject
         {
             MemberExpression name = Expression.Property(param, item.Key);
             object itemValue = item.Value;
-            Expression value = itemValue != null
-                ? LinqParameterContainer.Parameterize(itemValue.GetType(), itemValue)
-                : Expression.Constant(value: null);
-            BinaryExpression equal = Expression.Equal(name, value);
+
+            Expression equal;
+            if (itemValue != null)
+            {
+                Type itemType = itemValue.GetType();
+                Expression value = LinqParameterContainer.Parameterize(itemType, itemValue);
+                if (itemType.IsArray)
+                {
+                    equal = Expression.AndAlso(
+                        Expression.NotEqual(name, Expression.Constant(null, name.Type)),
+                        ExpressionHelpers.SequenceEquals(name, value));
+                }
+                else
+                {
+                    equal = Expression.Equal(name, value);
+                }
+            }
+            else
+            {
+                Expression value = Expression.Constant(value: null);
+                equal = Expression.Equal(name, value);
+            }
+
             where = where == null ? equal : Expression.AndAlso(where, equal);
         }
 
