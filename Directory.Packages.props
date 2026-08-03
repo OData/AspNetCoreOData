@@ -16,10 +16,10 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqLite" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="Microsoft.OData.Core" Version="9.0.0-preview.4" />
-    <PackageVersion Include="Microsoft.OData.Edm" Version="9.0.0-preview.4" />
-    <PackageVersion Include="Microsoft.Spatial" Version="9.0.0-preview.4" />
-    <PackageVersion Include="Microsoft.OData.ModelBuilder" Version="3.0.0-preview.1" />
+    <PackageVersion Include="Microsoft.OData.Core" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.OData.Edm" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Spatial" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.OData.ModelBuilder" Version="3.0.0" />
     <PackageVersion Include="Microsoft.OpenApi.OData" Version="1.6.9" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageVersion Include="Moq" Version="4.13.1" />

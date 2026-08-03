@@ -1969,7 +1969,7 @@ public class FilterBinderTests
         // Arrange & Act & Assert
         ExceptionAssert.Throws<ODataException>(
             () => BindFilterAndVerify<DataTypes>("SimpleEnumProp in ('First', null)"),
-            "A null value was found with the expected type 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum[Nullable=False]'. The expected type 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum[Nullable=False]' does not allow null values.");
+            "Cannot bind the literal 'null' to the non-nullable type 'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'. Non-nullable types must have a value.");
     }
 
     [Fact]
