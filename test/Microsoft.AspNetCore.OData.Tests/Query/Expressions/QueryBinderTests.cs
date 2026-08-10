@@ -582,6 +582,246 @@ public class QueryBinderTests
         // Assert
         Assert.Equal("Address\\ZipCode", fullPropertyPath);
     }
+    #region ResourceConstantNode / CollectionConstantNode (ODL 9.0)
+
+    [Fact]
+    public void BindResourceConstantNode_ThrowsArgumentNull_ForInputs()
+    {
+        // Arrange
+        QueryBinder binder = new MyQueryBinder();
+        ResourceConstantNode node = new ResourceConstantNode(GetAddressTypeReference());
+
+        // Act & Assert
+        ExceptionAssert.ThrowsArgumentNull(() => binder.BindResourceConstantNode(null, null), "node");
+        ExceptionAssert.ThrowsArgumentNull(() => binder.BindResourceConstantNode(node, null), "context");
+    }
+
+    [Fact]
+    public void BindResourceConstantNode_ConstructsClrObject_FromProperties()
+    {
+        // Arrange
+        QueryBinder binder = new MyQueryBinder();
+        IEdmComplexTypeReference addressTypeRef = GetAddressTypeReference();
+        ResourceConstantNode node = new ResourceConstantNode(addressTypeRef);
+        node.Properties.Add(new KeyValuePair<string, QueryNode>("Street", Const("NE 24th St.", EdmCoreModel.Instance.GetString(true))));
+        node.Properties.Add(new KeyValuePair<string, QueryNode>("City", Const("Redmond", EdmCoreModel.Instance.GetString(true))));
+        node.Properties.Add(new KeyValuePair<string, QueryNode>("HouseNumber", Const(42, EdmCoreModel.Instance.GetInt32(false))));
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindResourceConstantNode(node, context);
+
+        // Assert
+        Assert.Equal(ExpressionType.MemberInit, expression.NodeType);
+        Address address = (Address)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.NotNull(address);
+        Assert.Equal("NE 24th St.", address.Street);
+        Assert.Equal("Redmond", address.City);
+        Assert.Equal(42, address.HouseNumber);
+    }
+
+    [Fact]
+    public void BindResourceConstantNode_BuildsDictionary_ForUntypedResourceLiteral()
+    {
+        // Arrange - an untyped resource literal (null ExpectedStructuredType) is materialized into a dictionary.
+        QueryBinder binder = new MyQueryBinder();
+        ResourceConstantNode node = new ResourceConstantNode(null);
+        node.Properties.Add(new KeyValuePair<string, QueryNode>("Name", Const("John", EdmCoreModel.Instance.GetString(true))));
+        node.Properties.Add(new KeyValuePair<string, QueryNode>("Age", Const(30, EdmCoreModel.Instance.GetInt32(false))));
+        node.Properties.Add(new KeyValuePair<string, QueryNode>("@odata.type", Const("#Some.Type", EdmCoreModel.Instance.GetString(true))));
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindResourceConstantNode(node, context);
+
+        // Assert - annotation keys (starting with '@') are excluded.
+        Dictionary<string, object> values = (Dictionary<string, object>)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Equal(2, values.Count);
+        Assert.Equal("John", values["Name"]);
+        Assert.Equal(30, values["Age"]);
+    }
+
+    [Fact]
+    public void BindCollectionConstantNode_BuildsListOfResources_FromItems()
+    {
+        // Arrange
+        QueryBinder binder = new MyQueryBinder();
+        IEdmComplexTypeReference addressTypeRef = GetAddressTypeReference();
+
+        ResourceConstantNode first = new ResourceConstantNode(addressTypeRef);
+        first.Properties.Add(new KeyValuePair<string, QueryNode>("City", Const("Redmond", EdmCoreModel.Instance.GetString(true))));
+
+        ResourceConstantNode second = new ResourceConstantNode(addressTypeRef);
+        second.Properties.Add(new KeyValuePair<string, QueryNode>("City", Const("Seattle", EdmCoreModel.Instance.GetString(true))));
+
+        EdmCollectionTypeReference collectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(addressTypeRef));
+        CollectionConstantNode node = new CollectionConstantNode(collectionTypeRef);
+        node.Items.Add(first);
+        node.Items.Add(second);
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindCollectionConstantNode(node, context);
+
+        // Assert
+        List<Address> addresses = (List<Address>)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Equal(2, addresses.Count);
+        Assert.Equal("Redmond", addresses[0].City);
+        Assert.Equal("Seattle", addresses[1].City);
+    }
+
+    [Fact]
+    public void BindCollectionConstantNode_BuildsEmptyListOfResources_ForEmptyItems()
+    {
+        // Arrange
+        QueryBinder binder = new MyQueryBinder();
+        IEdmComplexTypeReference addressTypeRef = GetAddressTypeReference();
+        EdmCollectionTypeReference collectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(addressTypeRef));
+        CollectionConstantNode node = new CollectionConstantNode(collectionTypeRef);
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindCollectionConstantNode(node, context);
+
+        // Assert
+        List<Address> addresses = (List<Address>)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Empty(addresses);
+    }
+
+    [Fact]
+    public void BindCollectionConstantNode_BuildsListOfPrimitives_FromConstantItems()
+    {
+        // Arrange
+        QueryBinder binder = new MyQueryBinder();
+        EdmCollectionTypeReference collectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetInt32(false)));
+        CollectionConstantNode node = new CollectionConstantNode(collectionTypeRef);
+        node.Items.Add(Const(1, EdmCoreModel.Instance.GetInt32(false)));
+        node.Items.Add(Const(2, EdmCoreModel.Instance.GetInt32(false)));
+        node.Items.Add(Const(3, EdmCoreModel.Instance.GetInt32(false)));
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindCollectionConstantNode(node, context);
+
+        // Assert
+        List<int> values = (List<int>)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Equal(new[] { 1, 2, 3 }, values);
+    }
+
+    [Fact]
+    public void BindCollectionConstantNode_BuildsListWithMixedResourceAndNullItems()
+    {
+        // Arrange - Items contains a ResourceConstantNode and a null ConstantNode.
+        QueryBinder binder = new MyQueryBinder();
+        IEdmComplexTypeReference addressTypeRef = GetAddressTypeReference();
+
+        ResourceConstantNode resource = new ResourceConstantNode(addressTypeRef);
+        resource.Properties.Add(new KeyValuePair<string, QueryNode>("City", Const("Redmond", EdmCoreModel.Instance.GetString(true))));
+
+        EdmCollectionTypeReference collectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(addressTypeRef));
+        CollectionConstantNode node = new CollectionConstantNode(collectionTypeRef);
+        node.Items.Add(resource);
+        node.Items.Add(new ConstantNode(null, "null", addressTypeRef));
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindCollectionConstantNode(node, context);
+
+        // Assert
+        List<Address> addresses = (List<Address>)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Equal(2, addresses.Count);
+        Assert.Equal("Redmond", addresses[0].City);
+        Assert.Null(addresses[1]);
+    }
+
+    [Fact]
+    public void BindCollectionConstantNode_BuildsNestedListOfCollections_FromNestedItems()
+    {
+        // Arrange - Items contains nested CollectionConstantNode instances (collection of collections).
+        QueryBinder binder = new MyQueryBinder();
+        IEdmTypeReference int32 = EdmCoreModel.Instance.GetInt32(false);
+        EdmCollectionTypeReference innerCollectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(int32));
+        EdmCollectionTypeReference outerCollectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(innerCollectionTypeRef));
+
+        CollectionConstantNode inner1 = new CollectionConstantNode(innerCollectionTypeRef);
+        inner1.Items.Add(Const(1, int32));
+        inner1.Items.Add(Const(2, int32));
+
+        CollectionConstantNode inner2 = new CollectionConstantNode(innerCollectionTypeRef);
+        inner2.Items.Add(Const(3, int32));
+
+        CollectionConstantNode outer = new CollectionConstantNode(outerCollectionTypeRef);
+        outer.Items.Add(inner1);
+        outer.Items.Add(inner2);
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindCollectionConstantNode(outer, context);
+
+        // Assert - the outer list contains two inner integer lists.
+        System.Collections.IList outerList = (System.Collections.IList)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Equal(2, outerList.Count);
+        Assert.Equal(new[] { 1, 2 }, ((IEnumerable<int>)outerList[0]).ToArray());
+        Assert.Equal(new[] { 3 }, ((IEnumerable<int>)outerList[1]).ToArray());
+    }
+
+    [Fact]
+    public void BindCollectionConstantNode_BuildsHeterogeneousList_ForUntypedCollectionWithMixedItemKinds()
+    {
+        // Arrange - an untyped collection literal such as [1, {"Name":"John"}, [2, 3]] whose Items contain a
+        // ConstantNode, a ResourceConstantNode and a nested CollectionConstantNode.
+        QueryBinder binder = new MyQueryBinder();
+        IEdmTypeReference int32 = EdmCoreModel.Instance.GetInt32(false);
+
+        ResourceConstantNode resource = new ResourceConstantNode(null);
+        resource.Properties.Add(new KeyValuePair<string, QueryNode>("Name", Const("John", EdmCoreModel.Instance.GetString(true))));
+
+        EdmCollectionTypeReference innerCollectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(int32));
+        CollectionConstantNode inner = new CollectionConstantNode(innerCollectionTypeRef);
+        inner.Items.Add(Const(2, int32));
+        inner.Items.Add(Const(3, int32));
+
+        EdmCollectionTypeReference untypedCollectionTypeRef = new EdmCollectionTypeReference(new EdmCollectionType(EdmCoreModel.Instance.GetUntyped()));
+        CollectionConstantNode node = new CollectionConstantNode(untypedCollectionTypeRef);
+        node.Items.Add(Const(1, int32));
+        node.Items.Add(resource);
+        node.Items.Add(inner);
+
+        QueryBinderContext context = new QueryBinderContext(TestModel, new ODataQuerySettings(), typeof(Employee));
+
+        // Act
+        Expression expression = binder.BindCollectionConstantNode(node, context);
+
+        // Assert
+        System.Collections.IList list = (System.Collections.IList)Expression.Lambda(expression).Compile().DynamicInvoke();
+        Assert.Equal(3, list.Count);
+        Assert.Equal(1, list[0]);
+        Dictionary<string, object> dictionary = Assert.IsType<Dictionary<string, object>>(list[1]);
+        Assert.Equal("John", dictionary["Name"]);
+        Assert.Equal(new[] { 2, 3 }, ((IEnumerable<int>)list[2]).ToArray());
+    }
+
+    private static IEdmComplexTypeReference GetAddressTypeReference()
+    {
+        IEdmComplexType addressType = GetEdmComplexTypeFor("Microsoft.AspNetCore.OData.Tests.Models.Address");
+        Assert.NotNull(addressType);
+        return new EdmComplexTypeReference(addressType, true);
+    }
+
+    private static ConstantNode Const(object value, IEdmTypeReference typeReference)
+    {
+        return new ConstantNode(value, value?.ToString(), typeReference);
+    }
+
+    #endregion
+
     private static SingleValueNode CreateEmployeeRangeVariableReferenceNode()
     {
         // Create the type reference and navigation source

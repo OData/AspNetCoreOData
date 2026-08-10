@@ -3480,6 +3480,26 @@ public class FilterBinderTests
 
     #endregion
 
+    #region ResourceConstantNode / CollectionConstantNode (ODL 9.0) end-to-end
+
+    [Fact]
+    public void BindFilter_ParsesBindsAndInvokes_CollectionOfResourceLiterals_UsingInOperator()
+    {
+        // Arrange & Act - a collection of inline resource (JSON object) literals is parsed by ODL 9.0 into a
+        // CollectionConstantNode whose Items are ResourceConstantNode instances, then bound by QueryBinder.
+        (Expression, Expression) filters = BindFilterAndVerify<Product>(
+            "SupplierAddress in [{\"City\":\"Redmond\",\"Street\":\"NE 24th St.\"},{\"City\":\"Seattle\",\"Street\":\"Pine St.\"}]",
+            NotTesting,
+            NotTesting);
+
+        // Assert - the filter binds and can be invoked. Membership uses the CLR type's default (reference)
+        // equality for the freshly constructed instances, so an equivalent-but-distinct instance is not matched.
+        Product product = new Product { SupplierAddress = new Address { City = "Redmond", Street = "NE 24th St." } };
+        Assert.False(InvokeFilter(product, filters.Item1));
+    }
+
+    #endregion
+
     #region Helpers
     internal static void InvokeFiltersAndThrows<T>((Expression, Expression) filters, T instance, (Type, bool) expectedValue)
     {

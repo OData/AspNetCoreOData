@@ -35,3 +35,6 @@ Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.EnterFunctionC
 Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.ExitFunctionCall() -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.get -> int
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxFunctionCallDepth.set -> void
+virtual Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindResourceConstantNode(Microsoft.OData.UriParser.ResourceConstantNode node, Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext context) -> System.Linq.Expressions.Expression
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateResourceConstantNode(Microsoft.OData.UriParser.ResourceConstantNode resourceConstantNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionConstantNode(Microsoft.OData.UriParser.CollectionConstantNode collectionConstantNode, Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext validatorContext) -> void

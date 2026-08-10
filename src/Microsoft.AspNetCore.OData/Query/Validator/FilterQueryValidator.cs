@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.OData.Edm;
@@ -223,6 +224,51 @@ public class FilterQueryValidator : IFilterQueryValidator
     protected virtual void ValidateConstantNode(ConstantNode constantNode, FilterValidatorContext validatorContext)
     {
         // No default validation logic here.
+    }
+
+    /// <summary>
+    /// Override this method to restrict the resource (inline JSON object) literal inside the filter query.
+    /// </summary>
+    /// <remarks>
+    /// A <see cref="ResourceConstantNode"/> represents an inline resource literal (e.g. <c>{"Name":"John"}</c>)
+    /// introduced in OData Library (ODL) 9.0. This method recursively validates each of its property value nodes.
+    /// </remarks>
+    /// <param name="resourceConstantNode">The resource constant node to validate.</param>
+    /// <param name="validatorContext">The validator context.</param>
+    protected virtual void ValidateResourceConstantNode(ResourceConstantNode resourceConstantNode, FilterValidatorContext validatorContext)
+    {
+        if (resourceConstantNode == null)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, QueryNode> property in resourceConstantNode.Properties)
+        {
+            ValidateQueryNode(property.Value, validatorContext);
+        }
+    }
+
+    /// <summary>
+    /// Override this method to restrict the collection (inline JSON array) literal inside the filter query.
+    /// </summary>
+    /// <remarks>
+    /// This method recursively validates each item node of a <see cref="CollectionConstantNode"/>. As of
+    /// OData Library (ODL) 9.0 those items may include <see cref="ResourceConstantNode"/> and nested
+    /// <see cref="CollectionConstantNode"/> instances.
+    /// </remarks>
+    /// <param name="collectionConstantNode">The collection constant node to validate.</param>
+    /// <param name="validatorContext">The validator context.</param>
+    protected virtual void ValidateCollectionConstantNode(CollectionConstantNode collectionConstantNode, FilterValidatorContext validatorContext)
+    {
+        if (collectionConstantNode == null)
+        {
+            return;
+        }
+
+        foreach (QueryNode item in collectionConstantNode.Items)
+        {
+            ValidateQueryNode(item, validatorContext);
+        }
     }
 
     /// <summary>
@@ -653,6 +699,10 @@ public class FilterQueryValidator : IFilterQueryValidator
                 ValidateCollectionResourceCastNode(node as CollectionResourceCastNode, validatorContext);
                 break;
 
+            case QueryNodeKind.CollectionConstant:
+                ValidateCollectionConstantNode(node as CollectionConstantNode, validatorContext);
+                break;
+
             case QueryNodeKind.CollectionFunctionCall:
             case QueryNodeKind.CollectionResourceFunctionCall:
             // Unused or have unknown uses.
@@ -676,6 +726,10 @@ public class FilterQueryValidator : IFilterQueryValidator
 
             case QueryNodeKind.Constant:
                 ValidateConstantNode(node as ConstantNode, validatorContext);
+                break;
+
+            case QueryNodeKind.ResourceConstant:
+                ValidateResourceConstantNode(node as ResourceConstantNode, validatorContext);
                 break;
 
             case QueryNodeKind.Convert:

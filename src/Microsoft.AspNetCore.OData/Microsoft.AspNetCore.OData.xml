@@ -1217,19 +1217,19 @@
             <param name="elementType">out: the element type of the collection.</param>
             <returns>True if the type is an enumeration; false otherwise.</returns>
         </member>
-        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsAsyncEnumerableType(System.Type)">
-            <summary>
-            Determines whether the specified <see cref="T:System.Type"/> represents an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> type.
-            </summary>
-            <param name="clrType">The <see cref="T:System.Type"/> to evaluate.</param>
-            <returns>True if the type is an enumeration; false otherwise.</returns>
-        </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsPrimitiveOrKnownType(System.Type)">
             <summary>
             Check whether the given type is a primitive type or known type.
             </summary>
             <param name="type">The type to validate.</param>
             <returns>True if type is primitive or known type, otherwise False.</returns>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.IsAsyncEnumerableType(System.Type)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Type"/> represents an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/> type.
+            </summary>
+            <param name="clrType">The <see cref="T:System.Type"/> to evaluate.</param>
+            <returns>True if the type is an enumeration; false otherwise.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Common.TypeHelper.GetImplementedIEnumerableType(System.Type)">
             <summary>
@@ -10561,6 +10561,32 @@
             <param name="context">The query binder context.</param>
             <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindResourceConstantNode(Microsoft.OData.UriParser.ResourceConstantNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds a <see cref="T:Microsoft.OData.UriParser.ResourceConstantNode"/> to create a LINQ <see cref="T:System.Linq.Expressions.Expression"/> that
+            represents the semantics of the <see cref="T:Microsoft.OData.UriParser.ResourceConstantNode"/>.
+            </summary>
+            <param name="node">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> created.</returns>
+            <remarks>
+            A <see cref="T:Microsoft.OData.UriParser.ResourceConstantNode"/> represents an inline JSON object literal (e.g. <c>{"Name":"John"}</c>)
+            introduced in OData Library (ODL) 9.0. When the node has a valid (non-untyped) expected structured type,
+            it is materialized into a CLR instance of that type using a member-initialization expression, binding each
+            property value recursively. When the expected type is missing or untyped (e.g. a literal against an open
+            or untyped property), the node is materialized into a <see cref="T:System.Collections.Generic.Dictionary`2"/> keyed by
+            property name.
+            </remarks>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindResourceConstantNodeAsDictionary(Microsoft.OData.UriParser.ResourceConstantNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Materializes an untyped <see cref="T:Microsoft.OData.UriParser.ResourceConstantNode"/> into a
+            <see cref="T:System.Collections.Generic.Dictionary`2"/> keyed by property name, binding each property value recursively.
+            </summary>
+            <param name="node">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The LINQ <see cref="T:System.Linq.Expressions.Expression"/> that builds the dictionary.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindAccessExpression(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext,System.Linq.Expressions.Expression)">
             <summary>
             Creates an <see cref="T:System.Linq.Expressions.Expression"/> from the <see cref="T:Microsoft.OData.UriParser.QueryNode"/>.
@@ -12469,6 +12495,13 @@
             <param name="nodeIn">The node to be translated.</param>
             <returns>The original node.</returns>
         </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.ResourceConstantNode)">
+            <summary>
+            Translate a ResourceConstantNode.
+            </summary>
+            <param name="nodeIn">The node to be translated.</param>
+            <returns>The original node.</returns>
+        </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.ParameterAliasNodeTranslator.Visit(Microsoft.OData.UriParser.ConvertNode)">
             <summary>
             Translate a ConvertNode.
@@ -13718,6 +13751,29 @@
             </remarks>
             <param name="constantNode">The constant node to validate.</param>
             <param name="validatorContext">The validation context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateResourceConstantNode(Microsoft.OData.UriParser.ResourceConstantNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
+            <summary>
+            Override this method to restrict the resource (inline JSON object) literal inside the filter query.
+            </summary>
+            <remarks>
+            A <see cref="T:Microsoft.OData.UriParser.ResourceConstantNode"/> represents an inline resource literal (e.g. <c>{"Name":"John"}</c>)
+            introduced in OData Library (ODL) 9.0. This method recursively validates each of its property value nodes.
+            </remarks>
+            <param name="resourceConstantNode">The resource constant node to validate.</param>
+            <param name="validatorContext">The validator context.</param>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateCollectionConstantNode(Microsoft.OData.UriParser.CollectionConstantNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
+            <summary>
+            Override this method to restrict the collection (inline JSON array) literal inside the filter query.
+            </summary>
+            <remarks>
+            This method recursively validates each item node of a <see cref="T:Microsoft.OData.UriParser.CollectionConstantNode"/>. As of
+            OData Library (ODL) 9.0 those items may include <see cref="T:Microsoft.OData.UriParser.ResourceConstantNode"/> and nested
+            <see cref="T:Microsoft.OData.UriParser.CollectionConstantNode"/> instances.
+            </remarks>
+            <param name="collectionConstantNode">The collection constant node to validate.</param>
+            <param name="validatorContext">The validator context.</param>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Validator.FilterQueryValidator.ValidateConvertNode(Microsoft.OData.UriParser.ConvertNode,Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext)">
             <summary>
