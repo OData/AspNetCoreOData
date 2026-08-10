@@ -20,6 +20,7 @@ internal class EnumsEdmModel
         employee.Property(c => c.Name);
         employee.CollectionProperty<Skill>(c => c.SkillSet);
         employee.EnumProperty<Gender>(c => c.Gender);
+        employee.EnumProperty<MaritalStatus>(c => c.MaritalStatus);
         employee.EnumProperty<AccessLevel>(c => c.AccessLevel);
         employee.EnumProperty<EmployeeType>(c => c.EmployeeType);
         employee.ComplexProperty<FavoriteSports>(c => c.FavoriteSports);
@@ -32,6 +33,12 @@ internal class EnumsEdmModel
         var gender = builder.EnumType<Gender>();
         gender.Member(Gender.Female);
         gender.Member(Gender.Male);
+
+        var maritalStatus = builder.EnumType<MaritalStatus>();
+        maritalStatus.Member(MaritalStatus.Single);
+        maritalStatus.Member(MaritalStatus.Married);
+        maritalStatus.Member(MaritalStatus.Divorced);
+        maritalStatus.Member(MaritalStatus.Widowed);
 
         var accessLevel = builder.EnumType<AccessLevel>();
         accessLevel.Member(AccessLevel.None);

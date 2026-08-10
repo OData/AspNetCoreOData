@@ -83,7 +83,7 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         var employee = edmModel.SchemaElements.SingleOrDefault(e => e.Name == "Employee") as IEdmEntityType;
         Assert.Single(employee.Key());
         Assert.Equal("ID", employee.Key().First().Name);
-        Assert.Equal(7, employee.Properties().Count());
+        Assert.Equal(8, employee.Properties().Count());
 
         //Entity Enum Collection Property
         var skillSet = employee.Properties().SingleOrDefault(p => p.Name == "SkillSet");
@@ -94,6 +94,11 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
         Assert.True(gender.Type.IsEnum());
         var edmEnumType = gender.Type.Definition as IEdmEnumType;
         Assert.False(edmEnumType.IsFlags);
+
+        //Entity Nullable Enum Property
+        var maritalStatus = employee.Properties().SingleOrDefault(p => p.Name == "MaritalStatus");
+        Assert.True(maritalStatus.Type.IsEnum());
+        Assert.True(maritalStatus.Type.IsNullable);
 
         var accessLevel = employee.Properties().SingleOrDefault(p => p.Name == "AccessLevel") as IEdmStructuralProperty;
         edmEnumType = accessLevel.Type.Definition as IEdmEnumType;
@@ -438,6 +443,27 @@ public class EnumsTest : WebApiTestBase<EnumsTest>
             var value = result.GetValue("value") as JArray;
             Assert.NotNull(value);
             Assert.Equal(2, value.Count);
+        }
+    }
+
+    [Fact]
+    public async Task QueryEntitiesFilterByNullableEnumInOperatorWithNullValueFirst()
+    {
+        await ResetDatasource();
+        HttpClient client = CreateClient();
+
+        string requestUri = "/convention/Employees?$filter=MaritalStatus in (null,'Married')&$format=application/json;odata.metadata=none";
+
+        using(var response = await client.GetAsync(requestUri))
+        {
+            Assert.True(response.IsSuccessStatusCode);
+
+            var json = await response.Content.ReadAsObject<JObject>();
+            var value = json.GetValue("value") as JArray;
+            Assert.NotNull(value);
+
+            var ids = value.Select(v => (int)v["ID"]).OrderBy(id => id).ToArray();
+            Assert.Equal(new[] { 1, 2 }, ids);
         }
     }
 
