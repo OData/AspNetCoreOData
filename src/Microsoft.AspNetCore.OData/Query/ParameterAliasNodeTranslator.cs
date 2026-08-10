@@ -209,6 +209,16 @@ internal class ParameterAliasNodeTranslator : QueryNodeVisitor<QueryNode>
     }
 
     /// <summary>
+    /// Translate a ResourceConstantNode.
+    /// </summary>
+    /// <param name="nodeIn">The node to be translated.</param>
+    /// <returns>The original node.</returns>
+    public override QueryNode Visit(ResourceConstantNode nodeIn)
+    {
+        return nodeIn;
+    }
+
+    /// <summary>
     /// Translate a ConvertNode.
     /// </summary>
     /// <param name="nodeIn">The node to be translated.</param>

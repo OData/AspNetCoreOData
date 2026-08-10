@@ -137,6 +137,9 @@ public abstract partial class QueryBinder
             case QueryNodeKind.Constant:
                 return BindConstantNode(node as ConstantNode, context);
 
+            case QueryNodeKind.ResourceConstant:
+                return BindResourceConstantNode(node as ResourceConstantNode, context);
+
             case QueryNodeKind.Convert:
                 return BindConvertNode(node as ConvertNode, context);
 
@@ -937,8 +940,54 @@ public abstract partial class QueryBinder
     {
         CheckArgumentNull(node, context);
 
+        // ODL 9.0 replaced the (now [Obsolete]) 'Collection' property (IList<ConstantNode>) with the
+        // 'Items' property (IList<QueryNode>). The 'Items' collection can be heterogeneous: besides
+        // primitive/enum ConstantNode items, it may contain ResourceConstantNode (a JSON object literal)
+        // and nested CollectionConstantNode items, in any combination.
+        //
+        // When every item is a plain ConstantNode we keep the original behavior and materialize a constant
+        // List<T> (which is friendly to LINQ providers such as Entity Framework). Otherwise we build the
+        // list with a ListInit expression, binding each item recursively so that ConstantNode,
+        // ResourceConstantNode and nested CollectionConstantNode items are all handled.
+        if (!node.Items.All(item => item is ConstantNode))
+        {
+            // Bind each item first so that ConstantNode, ResourceConstantNode and nested
+            // CollectionConstantNode items are all materialized into expressions.
+            List<Expression> itemExpressions = node.Items.Select(item => Bind(item, context)).ToList();
+
+            // Prefer the CLR type mapped from the EDM item type. The model cannot map some item types
+            // (e.g. a nested Collection(...) type or an untyped item type), so fall back to the common CLR
+            // type of the bound items, using object when the items are heterogeneous.
+            Type elementClrType = context.Model.GetClrType(node.ItemType, context.AssembliesResolver);
+            if (elementClrType == null)
+            {
+                Type firstType = itemExpressions.FirstOrDefault()?.Type;
+                bool uniform = firstType != null && itemExpressions.All(e => firstType.IsAssignableFrom(e.Type));
+                elementClrType = uniform ? firstType : typeof(object);
+            }
+
+            Type listType = typeof(List<>).MakeGenericType(elementClrType);
+            NewExpression newList = Expression.New(listType);
+            List<ElementInit> elementInits = new List<ElementInit>();
+            MethodInfo addMethod = listType.GetMethod("Add", new[] { elementClrType });
+
+            foreach (Expression itemExpression in itemExpressions)
+            {
+                Expression element = itemExpression;
+                if (element.Type != elementClrType && (!elementClrType.IsAssignableFrom(element.Type) || element.Type.IsValueType))
+                {
+                    element = Expression.Convert(element, elementClrType);
+                }
+
+                elementInits.Add(Expression.ElementInit(addMethod, element));
+            }
+
+            return elementInits.Count == 0 ? (Expression)newList : Expression.ListInit(newList, elementInits);
+        }
+
         // It's fine if the collection is empty; the returned value will be an empty list.
-        ConstantNode firstNode = node.Collection.FirstOrDefault();
+        IList<ConstantNode> constantItems = node.Items.OfType<ConstantNode>().ToList();
+        ConstantNode firstNode = constantItems.FirstOrDefault();
         object value = null;
         if (firstNode != null)
         {
@@ -949,12 +998,12 @@ public abstract partial class QueryBinder
         Type nullableConstantType = node.ItemType.IsNullable && constantType.IsValueType && Nullable.GetUnderlyingType(constantType) == null
             ? typeof(Nullable<>).MakeGenericType(constantType)
             : constantType;
-        Type listType = typeof(List<>).MakeGenericType(nullableConstantType);
-        IList castedList = Activator.CreateInstance(listType) as IList;
+        Type listConstantType = typeof(List<>).MakeGenericType(nullableConstantType);
+        IList castedList = Activator.CreateInstance(listConstantType) as IList;
 
         // Getting a LINQ expression to dynamically cast each item in the Collection during runtime is tricky,
         // so using a foreach loop and doing an implicit cast from object to the CLR type of ItemType.
-        foreach (ConstantNode item in node.Collection)
+        foreach (ConstantNode item in constantItems)
         {
             object member;
             if (item.Value == null)
@@ -975,10 +1024,112 @@ public abstract partial class QueryBinder
 
         if (context.QuerySettings.EnableConstantParameterization)
         {
-            return LinqParameterContainer.Parameterize(listType, castedList);
+            return LinqParameterContainer.Parameterize(listConstantType, castedList);
         }
 
-        return Expression.Constant(castedList, listType);
+        return Expression.Constant(castedList, listConstantType);
+    }
+
+    /// <summary>
+    /// Binds a <see cref="ResourceConstantNode"/> to create a LINQ <see cref="Expression"/> that
+    /// represents the semantics of the <see cref="ResourceConstantNode"/>.
+    /// </summary>
+    /// <param name="node">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> created.</returns>
+    /// <remarks>
+    /// A <see cref="ResourceConstantNode"/> represents an inline JSON object literal (e.g. <c>{"Name":"John"}</c>)
+    /// introduced in OData Library (ODL) 9.0. When the node has a valid (non-untyped) expected structured type,
+    /// it is materialized into a CLR instance of that type using a member-initialization expression, binding each
+    /// property value recursively. When the expected type is missing or untyped (e.g. a literal against an open
+    /// or untyped property), the node is materialized into a <see cref="Dictionary{TKey, TValue}"/> keyed by
+    /// property name.
+    /// </remarks>
+    public virtual Expression BindResourceConstantNode(ResourceConstantNode node, QueryBinderContext context)
+    {
+        CheckArgumentNull(node, context);
+
+        IEdmStructuredTypeReference structuredTypeReference = node.ExpectedStructuredType;
+
+        // No expected type (or an untyped one): materialize the literal into a Dictionary<string, object>.
+        if (structuredTypeReference == null || structuredTypeReference.IsUntyped())
+        {
+            return BindResourceConstantNodeAsDictionary(node, context);
+        }
+
+        IEdmStructuredType structuredType = structuredTypeReference.StructuredDefinition();
+        Type clrType = context.Model.GetClrType(structuredTypeReference, context.AssembliesResolver);
+        if (clrType == null)
+        {
+            throw new ODataException(Error.Format(SRResources.ClrTypeNotInModel, structuredTypeReference.FullName()));
+        }
+
+        List<MemberBinding> memberBindings = new List<MemberBinding>();
+        foreach (KeyValuePair<string, QueryNode> property in node.Properties)
+        {
+            // Skip control information such as the "@odata.type" annotation.
+            if (property.Key == null || property.Key.StartsWith("@", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            IEdmProperty edmProperty = structuredType.FindProperty(property.Key);
+            if (edmProperty == null)
+            {
+                continue;
+            }
+
+            string clrPropertyName = context.Model.GetClrPropertyName(edmProperty);
+            PropertyInfo propertyInfo = clrType.GetProperty(clrPropertyName);
+            if (propertyInfo == null || !propertyInfo.CanWrite)
+            {
+                continue;
+            }
+
+            Expression valueExpression = Bind(property.Value, context);
+            if (!propertyInfo.PropertyType.IsAssignableFrom(valueExpression.Type))
+            {
+                valueExpression = Expression.Convert(valueExpression, propertyInfo.PropertyType);
+            }
+
+            memberBindings.Add(Expression.Bind(propertyInfo, valueExpression));
+        }
+
+        return Expression.MemberInit(Expression.New(clrType), memberBindings);
+    }
+
+    /// <summary>
+    /// Materializes an untyped <see cref="ResourceConstantNode"/> into a
+    /// <see cref="Dictionary{TKey, TValue}"/> keyed by property name, binding each property value recursively.
+    /// </summary>
+    /// <param name="node">The query node to bind.</param>
+    /// <param name="context">The query binder context.</param>
+    /// <returns>The LINQ <see cref="Expression"/> that builds the dictionary.</returns>
+    private Expression BindResourceConstantNodeAsDictionary(ResourceConstantNode node, QueryBinderContext context)
+    {
+        Type dictionaryType = typeof(Dictionary<string, object>);
+        NewExpression newDictionary = Expression.New(dictionaryType);
+        MethodInfo addMethod = dictionaryType.GetMethod("Add", new[] { typeof(string), typeof(object) });
+
+        List<ElementInit> elementInits = new List<ElementInit>();
+        foreach (KeyValuePair<string, QueryNode> property in node.Properties)
+        {
+            // Skip control information such as the "@odata.type" annotation.
+            if (property.Key == null || property.Key.StartsWith("@", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            Expression valueExpression = Bind(property.Value, context);
+            if (valueExpression.Type != typeof(object))
+            {
+                valueExpression = Expression.Convert(valueExpression, typeof(object));
+            }
+
+            elementInits.Add(Expression.ElementInit(addMethod, Expression.Constant(property.Key, typeof(string)), valueExpression));
+        }
+
+        return elementInits.Count == 0 ? (Expression)newDictionary : Expression.ListInit(newDictionary, elementInits);
     }
 
     /// <summary>
