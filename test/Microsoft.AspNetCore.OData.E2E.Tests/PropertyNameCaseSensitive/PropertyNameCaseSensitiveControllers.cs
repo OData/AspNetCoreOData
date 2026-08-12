@@ -5,12 +5,13 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive;
@@ -18,7 +19,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.PropertyNameCaseSensitive;
 public class BillsController : ODataController
 {
     [EnableQuery]
-    public IActionResult Post([FromBody]Bill bill)
+    public IActionResult Post([FromBody] Bill bill)
     {
         Assert.NotNull(bill);
 
@@ -82,5 +83,33 @@ public class BillsController : ODataController
             });
 
         return Ok(false);
+    }
+}
+
+
+public class DifferentPropertyCasesController : ODataController
+{
+    [EnableQuery(PageSize = 1)]
+    public ActionResult<IQueryable<DifferentPropertyCase>> Get()
+    {
+        return Ok(new DifferentPropertyCase[]
+        {
+            new DifferentPropertyCase
+            {
+                Id = 1,
+                Field = "Pascal",
+                FIELD = "Upper",
+                Nested = [
+                    new NestedDifferentPropertyCase{
+                        Id = 1,
+                        ID = "some old id 2",
+                    },
+                    new NestedDifferentPropertyCase{
+                        Id = 2,
+                        ID = "some old id 1",
+                    }
+                ]
+            }
+        }.AsQueryable());
     }
 }
