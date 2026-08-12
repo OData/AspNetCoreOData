@@ -52,6 +52,26 @@ public class ServerSidePagingCustomersController : ODataController
     }
 }
 
+public class ServerSidePagingCustomersWithoutPagesizeController : ODataController
+{
+    private readonly IList<ServerSidePagingCustomerWithoutPagesize> _serverSidePagingCustomersWithoutPageSize;
+
+    public ServerSidePagingCustomersWithoutPagesizeController()
+    {
+        _serverSidePagingCustomersWithoutPageSize = Enumerable.Range(1, 7)
+            .Select(i => new ServerSidePagingCustomerWithoutPagesize
+            {
+                Id = i,
+            }).ToList();
+    }
+
+    [EnableQuery]
+    public IActionResult Get()
+    {
+        return Ok(_serverSidePagingCustomersWithoutPageSize);
+    }
+}
+
 public class ServerSidePagingEmployeesController : ODataController
 {
     private static List<ServerSidePagingEmployee> employees = new List<ServerSidePagingEmployee>(

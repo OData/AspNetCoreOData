@@ -30,6 +30,12 @@ public class ServerSidePagingOrder
     public ServerSidePagingCustomer ServerSidePagingCustomer { get; set; }
 }
 
+public class ServerSidePagingCustomerWithoutPagesize
+{
+    [Key]
+    public int Id { get; set; }
+}
+
 public class ServerSidePagingEmployee
 {
     public int Id { get; set; }
