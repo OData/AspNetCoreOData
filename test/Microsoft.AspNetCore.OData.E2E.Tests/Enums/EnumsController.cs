@@ -44,6 +44,7 @@ public class EmployeesController : ODataController
                 Name="Name1",
                 SkillSet=new List<Skill> { Skill.CSharp, Skill.Sql },
                 Gender=Gender.Female,
+                MaritalStatus=null,
                 AccessLevel=AccessLevel.Execute,
                 EmployeeType = EmployeeType.FullTime | EmployeeType.PartTime,
                 FavoriteSports=new FavoriteSports()
@@ -57,6 +58,7 @@ public class EmployeesController : ODataController
                 ID=2,Name="Name2",
                 SkillSet=new List<Skill>(),
                 Gender=Gender.Female,
+                MaritalStatus=MaritalStatus.Married,
                 AccessLevel=AccessLevel.Read,
                 EmployeeType = EmployeeType.Contract,
                 FavoriteSports=new FavoriteSports()
@@ -70,6 +72,7 @@ public class EmployeesController : ODataController
                 ID=3,Name="Name3",
                 SkillSet=new List<Skill> { Skill.Web, Skill.Sql },
                 Gender=Gender.Female,
+                MaritalStatus=MaritalStatus.Single,
                 AccessLevel=AccessLevel.Read|AccessLevel.Write,
                 EmployeeType = EmployeeType.Intern | EmployeeType.FullTime | EmployeeType.PartTime,
                 FavoriteSports=new FavoriteSports()

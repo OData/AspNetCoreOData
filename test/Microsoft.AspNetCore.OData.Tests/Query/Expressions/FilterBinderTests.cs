@@ -2001,6 +2001,20 @@ public class FilterBinderTests
     }
 
     [Fact]
+    public void EnumInExpression_NullableEnum_WithNullValueFirst()
+    {
+        // Arrange & Act & Assert
+        var result = BindFilterAndVerify<DataTypes>(
+            "NullableSimpleEnumProp in (null, 'First')",
+            "$it => System.Collections.Generic.List`1[System.Nullable`1[Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum]].Contains($it.NullableSimpleEnumProp)");
+        Expression<Func<DataTypes, bool>> expression = result.Item2 as Expression<Func<DataTypes, bool>>;
+
+        var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
+        var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
+        Assert.Equal(new SimpleEnum?[] {null, SimpleEnum.First}, values);
+    }
+
+    [Fact]
     public void RealLiteralSuffixes()
     {
         // Arrange & Act & Assert - Float F
