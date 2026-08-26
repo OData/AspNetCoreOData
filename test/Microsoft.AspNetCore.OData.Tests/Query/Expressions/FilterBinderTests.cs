@@ -209,6 +209,9 @@ public class FilterBinderTests
     [InlineData("DateOnlyProperty gt DateProperty",
         "$it => (((($it.DateOnlyProperty.Year * 10000) + ($it.DateOnlyProperty.Month * 100)) + $it.DateOnlyProperty.Day) > ((($it.DateProperty.Year * 10000) + ($it.DateProperty.Month * 100)) + $it.DateProperty.Day))",
         null)]
+    [InlineData("DateOnlyProperty gt Birthday",
+        "$it => (((($it.DateOnlyProperty.Year * 10000) + ($it.DateOnlyProperty.Month * 100)) + $it.DateOnlyProperty.Day) > ((($it.Birthday.Year * 10000) + ($it.Birthday.Month * 100)) + $it.Birthday.Day))",
+        null)]
     public void LogicalOperators_WithDateOnlyAndDateOrDateTimeOffsetInEqualities(string clause, string expectedFalseNullPropagation, string expectedTrueNullPropagation)
     {
         // Arrange & Act & Assert
