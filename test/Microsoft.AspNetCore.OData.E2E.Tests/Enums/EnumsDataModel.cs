@@ -21,6 +21,8 @@ public class Employee
 
     public Gender Gender { get; set; }
 
+    public MaritalStatus? MaritalStatus { get; set; }
+
     public AccessLevel AccessLevel { get; set; }
 
     public EmployeeType EmployeeType { get; set; }
@@ -64,6 +66,17 @@ public enum Gender
     Male = 1,
 
     Female = 2
+}
+
+public enum MaritalStatus
+{
+    Single,
+
+    Married,
+
+    Divorced,
+
+    Widowed
 }
 
 public enum Skill
