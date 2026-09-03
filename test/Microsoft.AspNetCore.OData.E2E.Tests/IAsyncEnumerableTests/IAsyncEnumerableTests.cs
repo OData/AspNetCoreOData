@@ -46,6 +46,9 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
                 {
                     opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
+
+            services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(null)
+                .AddRouteComponents("v4", IAsyncEnumerableEdmModel.GetEdmModel()));
         }
    }
 
@@ -143,5 +146,39 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
         var json = await response.Content.ReadAsStringAsync();
         List<Customer> customers = JToken.Parse(json)["value"].ToObject<List<Customer>>();
         Assert.Equal(3, customers.Count);
+    }
+
+    [Fact]
+    public async Task IQueryableWithPageSize_IsEnumeratedAsynchronouslyAndTruncated()
+    {
+        // Arrange
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "v4/Customers");
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+        // Act
+        HttpResponseMessage response = await Client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JObject payload = JObject.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Equal(2, ((JArray)payload["value"]).Count);
+        Assert.NotNull(payload["@odata.nextLink"]);
+    }
+
+    [Fact]
+    public async Task IQueryableWithPageSize_DoesNotWriteNextLinkWithoutLookaheadItem()
+    {
+        // Arrange
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "v4/Customers?$skip=2");
+        request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+        // Act
+        HttpResponseMessage response = await Client.SendAsync(request);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        JObject payload = JObject.Parse(await response.Content.ReadAsStringAsync());
+        Assert.Single((JArray)payload["value"]);
+        Assert.Null(payload["@odata.nextLink"]);
     }
 }

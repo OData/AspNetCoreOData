@@ -17,6 +17,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
@@ -679,7 +680,7 @@ public class ODataQueryOptionTests
     [Theory]
     [InlineData(null, 1)]
     [InlineData(1, null)]
-    public void ApplyToODataQueryOptions_Builds_Default_OrderBy_With_Paging(int? pageSize, int? modelBoundPageSize)
+    public void ApplyToODataQueryOptions_Builds_Default_OrderBy_AndLookahead_With_Paging(int? pageSize, int? modelBoundPageSize)
     {
         // Arrange
         IEdmModel model = GetEdmModel(c => c.CustomerId);
@@ -704,8 +705,10 @@ public class ODataQueryOptionTests
         Customer[] results = (query as IQueryable<Customer>).ToArray();
 
         // Assert
-        Assert.Equal(querySettings.PageSize ?? querySettings.ModelBoundPageSize, results.Length);
+        int effectivePageSize = (querySettings.PageSize ?? querySettings.ModelBoundPageSize).Value;
+        Assert.Equal(effectivePageSize + 1, results.Length);
         Assert.Equal(customers.OrderBy(c => c.CustomerId).First().CustomerId, results[0].CustomerId);
+        Assert.Equal(effectivePageSize, (request.ODataFeature() as ODataFeature).PageSize);
     }
 
     [Fact]

@@ -495,12 +495,26 @@ public class ODataQueryOptions
         ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
         if (pageSize > 0)
         {
-            bool resultsLimited;
-            result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-            if (resultsLimited && Request.GetEncodedUrl() != null &&
-                odataFeature.NextLink == null)
+            if (Context.ElementType.TypeKind == EdmTypeKind.Entity ||
+                Context.ElementType.TypeKind == EdmTypeKind.Complex ||
+                Context.ElementType.TypeKind == EdmTypeKind.Untyped)
             {
+                result = ExpressionHelpers.Take(
+                    result,
+                    checked(pageSize + 1),
+                    result.ElementType,
+                    querySettings.EnableConstantParameterization);
                 odataFeature.PageSize = pageSize;
+            }
+            else
+            {
+                bool resultsLimited;
+                result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
+                if (resultsLimited && Request.GetEncodedUrl() != null &&
+                    odataFeature.NextLink == null)
+                {
+                    odataFeature.PageSize = pageSize;
+                }
             }
         }
 
