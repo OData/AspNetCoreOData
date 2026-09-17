@@ -199,6 +199,31 @@ public class FilterBinderTests
         BindFilterAndVerify<DataTypes>(clause, expectedExpression);
     }
 
+    [Theory]
+    [InlineData("DateOnlyProperty gt NonNullableDiscontinuedDate",
+        "$it => (((($it.DateOnlyProperty.Year * 10000) + ($it.DateOnlyProperty.Month * 100)) + $it.DateOnlyProperty.Day) > ((($it.NonNullableDiscontinuedDate.Year * 10000) + ($it.NonNullableDiscontinuedDate.Month * 100)) + $it.NonNullableDiscontinuedDate.Day))",
+        null)]
+    [InlineData("NullableDateOnlyProperty gt DiscontinuedDate",
+        "$it => (((($it.NullableDateOnlyProperty.Value.Year * 10000) + ($it.NullableDateOnlyProperty.Value.Month * 100)) + $it.NullableDateOnlyProperty.Value.Day) > ((($it.DiscontinuedDate.Value.Year * 10000) + ($it.DiscontinuedDate.Value.Month * 100)) + $it.DiscontinuedDate.Value.Day))",
+        "$it => ((IIF((IIF(($it.NullableDateOnlyProperty == null), null, $it.NullableDateOnlyProperty) == null), null, Convert(((($it.NullableDateOnlyProperty.Value.Year * 10000) + ($it.NullableDateOnlyProperty.Value.Month * 100)) + $it.NullableDateOnlyProperty.Value.Day))) > IIF(($it.DiscontinuedDate == null), null, Convert(((($it.DiscontinuedDate.Value.Year * 10000) + ($it.DiscontinuedDate.Value.Month * 100)) + $it.DiscontinuedDate.Value.Day)))) == True)")]
+    [InlineData("DateOnlyProperty gt DateProperty",
+        "$it => (((($it.DateOnlyProperty.Year * 10000) + ($it.DateOnlyProperty.Month * 100)) + $it.DateOnlyProperty.Day) > ((($it.DateProperty.Year * 10000) + ($it.DateProperty.Month * 100)) + $it.DateProperty.Day))",
+        null)]
+    [InlineData("DateOnlyProperty gt Birthday",
+        "$it => (((($it.DateOnlyProperty.Year * 10000) + ($it.DateOnlyProperty.Month * 100)) + $it.DateOnlyProperty.Day) > ((($it.Birthday.Year * 10000) + ($it.Birthday.Month * 100)) + $it.Birthday.Day))",
+        null)]
+    [InlineData("DateOnlyProperty ge 2020-01-01T00:00:00Z",
+        "$it => (((($it.DateOnlyProperty.Year * 10000) + ($it.DateOnlyProperty.Month * 100)) + $it.DateOnlyProperty.Day) >= (((01/01/2020 00:00:00 +00:00.Year * 10000) + (01/01/2020 00:00:00 +00:00.Month * 100)) + 01/01/2020 00:00:00 +00:00.Day))",
+        null)]
+    [InlineData("NullableDateOnlyProperty ge 2020-01-01T00:00:00Z",
+        "$it => (((($it.NullableDateOnlyProperty.Value.Year * 10000) + ($it.NullableDateOnlyProperty.Value.Month * 100)) + $it.NullableDateOnlyProperty.Value.Day) >= (((01/01/2020 00:00:00 +00:00.Year * 10000) + (01/01/2020 00:00:00 +00:00.Month * 100)) + 01/01/2020 00:00:00 +00:00.Day))",
+        "$it => ((IIF((IIF(($it.NullableDateOnlyProperty == null), null, $it.NullableDateOnlyProperty) == null), null, Convert(((($it.NullableDateOnlyProperty.Value.Year * 10000) + ($it.NullableDateOnlyProperty.Value.Month * 100)) + $it.NullableDateOnlyProperty.Value.Day))) >= IIF((Convert(01/01/2020 00:00:00 +00:00) == null), null, Convert((((Convert(01/01/2020 00:00:00 +00:00).Value.Year * 10000) + (Convert(01/01/2020 00:00:00 +00:00).Value.Month * 100)) + Convert(01/01/2020 00:00:00 +00:00).Value.Day)))) == True)")]
+    public void LogicalOperators_WithDateOnlyAndDateOrDateTimeOffsetInEqualities(string clause, string expectedFalseNullPropagation, string expectedTrueNullPropagation)
+    {
+        // Arrange & Act & Assert
+        BindFilterAndVerify<Product>(clause, expectedFalseNullPropagation, expectedTrueNullPropagation);
+    }
+
     [Fact]
     [ReplaceCulture]
     public void LogicalOperators_BooleanOperatorNullableTypes()

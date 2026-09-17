@@ -41,6 +41,9 @@ public class Product
     public Date DateProperty { get; set; }
     public Date? NullableDateProperty { get; set; }
 
+    public DateOnly DateOnlyProperty { get; set; }
+    public DateOnly? NullableDateOnlyProperty { get; set; }
+
     public Guid GuidProperty { get; set; }
     public Guid? NullableGuidProperty { get; set; }
 

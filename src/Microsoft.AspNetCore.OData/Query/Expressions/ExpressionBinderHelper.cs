@@ -129,8 +129,8 @@ internal static class ExpressionBinderHelper
             right = CreateTimeBinaryExpression(right, querySettings);
         }
 
-        if ((IsType<DateOnly>(leftUnderlyingType) && IsDate(rightUnderlyingType)) ||
-            (IsDate(leftUnderlyingType) && IsType<DateOnly>(rightUnderlyingType)))
+        if ((IsType<DateOnly>(leftUnderlyingType) && (IsDate(rightUnderlyingType) || IsDateOrOffset(rightUnderlyingType))) ||
+            ((IsDate(leftUnderlyingType) || IsDateOrOffset(leftUnderlyingType)) && IsType<DateOnly>(rightUnderlyingType)))
         {
             left = CreateDateBinaryExpression(left, querySettings);
             right = CreateDateBinaryExpression(right, querySettings);
