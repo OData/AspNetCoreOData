@@ -15,6 +15,7 @@ using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -542,6 +544,13 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         // Create and validate the query options.
         ODataQueryOptions queryOptions = CreateAndValidateQueryOptions(request, queryContext);
 
+        if (TypeHelper.IsAsyncEnumerableType(responseValue.GetType()) &&
+            (_querySettings.PageSize.HasValue || _querySettings.ModelBoundPageSize.HasValue))
+        {
+            ValidateSelectExpandOnly(queryOptions);
+            return ApplyAsyncPaging(responseValue, queryContext.ElementClrType, queryOptions, request);
+        }
+
         // apply the query
         IEnumerable enumerable = responseValue as IEnumerable;
         if (enumerable == null || responseValue is string || responseValue is byte[])
@@ -554,6 +563,7 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
                 // response is a single entity.
                 return ApplyQuery(entity: responseValue, queryOptions: queryOptions);
             }
+
             else
             {
                 IQueryable queryable = singleResultCollection as IQueryable;
@@ -580,6 +590,31 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
 
             return queryable;
         }
+    }
+
+    private object ApplyAsyncPaging(
+        object responseValue,
+        Type elementClrType,
+        ODataQueryOptions queryOptions,
+        HttpRequest request)
+    {
+        int pageSize = _querySettings.PageSize ?? _querySettings.ModelBoundPageSize ?? -1;
+        if (RequestPreferenceHelpers.RequestPrefersMaxPageSize(request.Headers, out int preferredPageSize))
+        {
+            pageSize = Math.Min(pageSize, preferredPageSize);
+        }
+
+        if (pageSize <= 0)
+        {
+            return responseValue;
+        }
+
+        ODataFeature odataFeature = request.ODataFeature() as ODataFeature;
+        odataFeature.PageSize = pageSize;
+        odataFeature.QueryOptions = queryOptions;
+
+        Type truncatedType = typeof(TruncatedAsyncEnumerable<>).MakeGenericType(elementClrType);
+        return Activator.CreateInstance(truncatedType, responseValue, pageSize);
     }
 
     /// <summary>
@@ -763,6 +798,15 @@ public partial class EnableQueryAttribute : ActionFilterAttribute
         {
             if (singleResultCollection == null)
             {
+                Type asyncEnumerableType = responseValue.GetType()
+                    .GetInterfaces()
+                    .Append(responseValue.GetType())
+                    .SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>));
+                if (asyncEnumerableType != null)
+                {
+                    return asyncEnumerableType.GetGenericArguments()[0];
+                }
+
                 return responseValue.GetType();
             }
 

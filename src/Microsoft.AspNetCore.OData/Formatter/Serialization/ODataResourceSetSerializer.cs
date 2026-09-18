@@ -590,6 +590,12 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
             {
                 SkipTokenHandler handler = writeContext.QueryContext.GetSkipTokenHandler();
                 return (obj) => {
+                    if (resourceSetInstance is ITruncatedAsyncEnumerable truncatedAsyncEnumerable &&
+                        !truncatedAsyncEnumerable.IsTruncated)
+                    {
+                        return null;
+                    }
+
                     return handler.GenerateNextPageLink(new System.Uri(writeContext.Request.GetEncodedUrl()),
                     (writeContext.Request.ODataFeature() as ODataFeature).PageSize, obj, writeContext);
                 };

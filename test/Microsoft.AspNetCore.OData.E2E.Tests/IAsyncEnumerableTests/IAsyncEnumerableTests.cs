@@ -126,7 +126,7 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
     {
         // Arrange
         string queryUrl = $"v3/Customers?variant={variant}";
-        var expectedResult = "{\"@odata.context\":\"http://localhost/v3/$metadata#Customers\",\"value\":[{\"Id\":1,\"Name\":\"Customer0\",\"Address\":{\"Name\":\"City1\",\"Street\":\"Street1\"}},{\"Id\":2,\"Name\":\"Customer1\",\"Address\":{\"Name\":\"City0\",\"Street\":\"Street0\"}},{\"Id\":3,\"Name\":\"Customer0\",\"Address\":{\"Name\":\"City1\",\"Street\":\"Street1\"}}]}";
+        var expectedResult = "{\"@odata.context\":\"http://localhost/v3/$metadata#Customers\",\"value\":[{\"Id\":1,\"Name\":\"Customer0\",\"Address\":{\"Name\":\"City1\",\"Street\":\"Street1\"}},{\"Id\":2,\"Name\":\"Customer1\",\"Address\":{\"Name\":\"City0\",\"Street\":\"Street0\"}}],\"@odata.nextLink\":\"http://localhost/v3/Customers?variant=" + variant + "&$skip=2\"}";
         
         HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, queryUrl);
         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -142,6 +142,6 @@ public class IAsyncEnumerableTests : WebODataTestBase<IAsyncEnumerableTests.Test
 
         var json = await response.Content.ReadAsStringAsync();
         List<Customer> customers = JToken.Parse(json)["value"].ToObject<List<Customer>>();
-        Assert.Equal(3, customers.Count);
+        Assert.Equal(2, customers.Count);
     }
 }
