@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <ODataLibPackageVersion>8.4.0</ODataLibPackageVersion>
     <ODataLibPackageDependency>[$(ODataLibPackageVersion), 9.0.0)</ODataLibPackageDependency>
-    <ODataModelBuilderPackageVersion>2.0.0</ODataModelBuilderPackageVersion>
+    <ODataModelBuilderPackageVersion>1.0.9</ODataModelBuilderPackageVersion>
     <ODataModelBuilderPackageDependency>[$(ODataModelBuilderPackageVersion), 3.0.0)</ODataModelBuilderPackageDependency>
   </PropertyGroup>
   <ItemGroup>
