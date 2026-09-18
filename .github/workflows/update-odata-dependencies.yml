@@ -41,30 +41,20 @@ jobs:
         id: framework
         shell: pwsh
         run: |
-          $project = Get-Content target/src/Microsoft.AspNetCore.OData/Microsoft.AspNetCore.OData.csproj -Raw
-          $frameworkMatches = [regex]::Matches($project, "<TargetFramework(?:s)?>(?<TargetFrameworkValues>[^<]+)")
+          [xml] $project = Get-Content target/src/Microsoft.AspNetCore.OData/Microsoft.AspNetCore.OData.csproj
+          $propertyGroups = $project.Project.PropertyGroup
           $targetFrameworks = @(
-              $frameworkMatches |
-                  ForEach-Object { $_.Groups['TargetFrameworkValues'].Value -split ';' } |
-                  ForEach-Object { $_.Trim() } |
-                  Where-Object { $_ } |
-                  Select-Object -Unique
+              @($propertyGroups.TargetFramework) + @($propertyGroups.TargetFrameworks) |
+                  ForEach-Object { $_ -split ';' } | ForEach-Object { $_.Trim() } |
+                  Where-Object { $_ } | Select-Object -Unique
           )
-
-          if ($targetFrameworks.Count -eq 0) {
-              throw "Could not find TargetFramework or TargetFrameworks in the project."
-          }
-
           $dotnetVersions = @(
-              $targetFrameworks | ForEach-Object {
-                      if ($_ -match '^net(?<Major>\d+)\.') { "$($Matches['Major']).0.x" }
-                  } |
+              $targetFrameworks |
+                  ForEach-Object { if ($_ -match '^net(?<Major>\d+)\.') { "$($Matches['Major']).0.x" } } |
                   Sort-Object -Unique
           )
 
-          if ($dotnetVersions.Count -eq 0) {
-              throw "Could not determine a .NET SDK version from: $($targetFrameworks -join ', ')."
-          }
+          if ($dotnetVersions.Count -eq 0) { throw "No supported TargetFramework was found." }
 
           "target-frameworks=$($targetFrameworks -join ', ')" >> $env:GITHUB_OUTPUT
           "dotnet-versions<<EOF" >> $env:GITHUB_OUTPUT
@@ -118,25 +108,14 @@ jobs:
           cat > "${body_file}" <<EOF
           ## Summary
 
-          Updates the stable OData dependencies used by \`${TARGET_FRAMEWORKS}\` on \`${TARGET_BRANCH}\`.
-
           | Dependency | Previous | Updated |
           | --- | --- | --- |
           | Microsoft.OData.Core, Microsoft.OData.Edm, Microsoft.Spatial | \`${PREVIOUS_ODATA_LIB_VERSION}\` | \`${ODATA_LIB_VERSION}\` |
           | Microsoft.OData.ModelBuilder | \`${PREVIOUS_MODEL_BUILDER_VERSION}\` | \`${MODEL_BUILDER_VERSION}\` |
 
-          ## Version policy
-
-          - Includes stable NuGet versions only; prerelease versions are excluded.
-          - Keeps each dependency within the major-version range configured in \`Directory.Packages.props\`.
-          - Keeps Microsoft.OData.Core, Microsoft.OData.Edm, and Microsoft.Spatial on the same version.
-          - Uses one ODataLib version and one ModelBuilder version across all target frameworks.
-
           ## Validation
 
-          - Restored all target frameworks in \`src/Microsoft.AspNetCore.OData/Microsoft.AspNetCore.OData.csproj\`: \`${TARGET_FRAMEWORKS}\`.
-
-          _Created automatically by the Update OData dependencies workflow._
+          Restored \`${TARGET_FRAMEWORKS}\` using one stable ODataLib version and one stable ModelBuilder version within their configured ranges.
           EOF
 
           existing_pr="$(gh pr list \
