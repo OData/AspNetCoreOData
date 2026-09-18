@@ -83,8 +83,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TARGET_BRANCH: ${{ matrix.target-branch }}
           TARGET_FRAMEWORKS: ${{ steps.framework.outputs['target-frameworks'] }}
+          ODATA_LIB_CHANGED: ${{ steps.update.outputs['odata-lib-changed'] }}
           PREVIOUS_ODATA_LIB_VERSION: ${{ steps.update.outputs['previous-odata-lib-version'] }}
           ODATA_LIB_VERSION: ${{ steps.update.outputs['odata-lib-version'] }}
+          MODEL_BUILDER_CHANGED: ${{ steps.update.outputs['model-builder-changed'] }}
           PREVIOUS_MODEL_BUILDER_VERSION: ${{ steps.update.outputs['previous-model-builder-version'] }}
           MODEL_BUILDER_VERSION: ${{ steps.update.outputs['model-builder-version'] }}
         shell: bash
@@ -103,19 +105,35 @@ jobs:
           git fetch origin "${update_branch}:refs/remotes/origin/${update_branch}" || true
           git push --force-with-lease origin "HEAD:refs/heads/${update_branch}"
 
-          title="Update ODataLib to ${ODATA_LIB_VERSION} and ModelBuilder to ${MODEL_BUILDER_VERSION} on ${TARGET_BRANCH}"
+          changes=()
+          rows=""
+
+          if [[ "${ODATA_LIB_CHANGED}" == "true" ]]; then
+            changes+=("ODataLib to ${ODATA_LIB_VERSION}")
+            rows+="| Microsoft.OData.Core, Microsoft.OData.Edm, Microsoft.Spatial | \`${PREVIOUS_ODATA_LIB_VERSION}\` | \`${ODATA_LIB_VERSION}\` |"$'\n'
+          fi
+
+          if [[ "${MODEL_BUILDER_CHANGED}" == "true" ]]; then
+            changes+=("ModelBuilder to ${MODEL_BUILDER_VERSION}")
+            rows+="| Microsoft.OData.ModelBuilder | \`${PREVIOUS_MODEL_BUILDER_VERSION}\` | \`${MODEL_BUILDER_VERSION}\` |"$'\n'
+          fi
+
+          title="Update ${changes[0]}"
+          if [[ "${#changes[@]}" -eq 2 ]]; then
+            title+=" and ${changes[1]}"
+          fi
+          title+=" on ${TARGET_BRANCH}"
           body_file="${RUNNER_TEMP}/odata-dependency-pr.md"
           cat > "${body_file}" <<EOF
           ## Summary
 
           | Dependency | Previous | Updated |
           | --- | --- | --- |
-          | Microsoft.OData.Core, Microsoft.OData.Edm, Microsoft.Spatial | \`${PREVIOUS_ODATA_LIB_VERSION}\` | \`${ODATA_LIB_VERSION}\` |
-          | Microsoft.OData.ModelBuilder | \`${PREVIOUS_MODEL_BUILDER_VERSION}\` | \`${MODEL_BUILDER_VERSION}\` |
+          ${rows}
 
           ## Validation
 
-          Restored \`${TARGET_FRAMEWORKS}\` using one stable ODataLib version and one stable ModelBuilder version within their configured ranges.
+          Restored \`${TARGET_FRAMEWORKS}\` after updating the listed stable dependencies within their configured ranges.
           EOF
 
           existing_pr="$(gh pr list \

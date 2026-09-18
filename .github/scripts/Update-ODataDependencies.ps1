@@ -66,7 +66,9 @@ $updatedContent = [regex]::Replace(
     $originalContent, "(<ODataLibPackageVersion>)[^<]+", "`${1}$odataLibVersion", 1)
 $updatedContent = [regex]::Replace(
     $updatedContent, "(<ODataModelBuilderPackageVersion>)[^<]+", "`${1}$modelBuilderVersion", 1)
-$changed = $updatedContent -ne $originalContent
+$odataLibChanged = $odataLibVersion -ne $previousODataLibVersion
+$modelBuilderChanged = $modelBuilderVersion -ne $previousModelBuilderVersion
+$changed = $odataLibChanged -or $modelBuilderChanged
 
 if ($changed) {
     Set-Content $PackagesFile $updatedContent -NoNewline
@@ -77,8 +79,10 @@ Write-Host "ModelBuilder: $previousModelBuilderVersion -> $modelBuilderVersion"
 
 if ($env:GITHUB_OUTPUT) {
     "changed=$($changed.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+    "odata-lib-changed=$($odataLibChanged.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
     "previous-odata-lib-version=$previousODataLibVersion" >> $env:GITHUB_OUTPUT
     "odata-lib-version=$odataLibVersion" >> $env:GITHUB_OUTPUT
+    "model-builder-changed=$($modelBuilderChanged.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
     "previous-model-builder-version=$previousModelBuilderVersion" >> $env:GITHUB_OUTPUT
     "model-builder-version=$modelBuilderVersion" >> $env:GITHUB_OUTPUT
 }
