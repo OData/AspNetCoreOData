@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <ODataLibPackageVersion>8.4.0</ODataLibPackageVersion>
+    <ODataLibPackageVersion>8.4.4</ODataLibPackageVersion>
     <ODataLibPackageDependency>[$(ODataLibPackageVersion), 9.0.0)</ODataLibPackageDependency>
-    <ODataModelBuilderPackageVersion>1.0.9</ODataModelBuilderPackageVersion>
+    <ODataModelBuilderPackageVersion>2.0.0</ODataModelBuilderPackageVersion>
     <ODataModelBuilderPackageDependency>[$(ODataModelBuilderPackageVersion), 3.0.0)</ODataModelBuilderPackageDependency>
   </PropertyGroup>
   <ItemGroup>
