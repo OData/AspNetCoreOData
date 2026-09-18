@@ -93,30 +93,34 @@ jobs:
         run: |
           set -euo pipefail
 
-          branch_suffix="${TARGET_BRANCH//[^a-zA-Z0-9-]/-}"
-          update_branch="automation/update-odata-dependencies-${branch_suffix}"
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "${update_branch}"
-          git add Directory.Packages.props
-          git commit -m "chore: update OData dependencies for ${TARGET_BRANCH}"
-
-          git fetch origin "${update_branch}:refs/remotes/origin/${update_branch}" || true
-          git push --force-with-lease origin "HEAD:refs/heads/${update_branch}"
-
+          branch_versions=()
           changes=()
           rows=""
 
           if [[ "${ODATA_LIB_CHANGED}" == "true" ]]; then
+            branch_versions+=("odatalib-${ODATA_LIB_VERSION}")
             changes+=("ODataLib to ${ODATA_LIB_VERSION}")
             rows+="| Microsoft.OData.Core, Microsoft.OData.Edm, Microsoft.Spatial | \`${PREVIOUS_ODATA_LIB_VERSION}\` | \`${ODATA_LIB_VERSION}\` |"$'\n'
           fi
 
           if [[ "${MODEL_BUILDER_CHANGED}" == "true" ]]; then
+            branch_versions+=("modelbuilder-${MODEL_BUILDER_VERSION}")
             changes+=("ModelBuilder to ${MODEL_BUILDER_VERSION}")
             rows+="| Microsoft.OData.ModelBuilder | \`${PREVIOUS_MODEL_BUILDER_VERSION}\` | \`${MODEL_BUILDER_VERSION}\` |"$'\n'
           fi
+
+          branch_suffix="${TARGET_BRANCH//[^a-zA-Z0-9-]/-}"
+          version_suffix="$(IFS=-; printf '%s' "${branch_versions[*]}")"
+          update_branch_name="auto/update-odata-dependencies-${branch_suffix}-${version_suffix}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "${update_branch_name}"
+          git add Directory.Packages.props
+          git commit -m "chore: update OData dependencies for ${TARGET_BRANCH}"
+
+          git fetch origin "${update_branch_name}:refs/remotes/origin/${update_branch_name}" || true
+          git push --force-with-lease origin "HEAD:refs/heads/${update_branch_name}"
 
           title="Update ${changes[0]}"
           if [[ "${#changes[@]}" -eq 2 ]]; then
@@ -137,11 +141,11 @@ jobs:
           EOF
 
           existing_pr="$(gh pr list \
-            --repo "${GITHUB_REPOSITORY}" --base "${TARGET_BRANCH}" --head "${update_branch}" --state open --json number --jq '.[0].number')"
+            --repo "${GITHUB_REPOSITORY}" --base "${TARGET_BRANCH}" --head "${update_branch_name}" --state open --json number --jq '.[0].number')"
 
           if [[ -z "${existing_pr}" ]]; then
             gh pr create \
-              --repo "${GITHUB_REPOSITORY}" --base "${TARGET_BRANCH}" --head "${update_branch}" --title "${title}" --body-file "${body_file}"
+              --repo "${GITHUB_REPOSITORY}" --base "${TARGET_BRANCH}" --head "${update_branch_name}" --title "${title}" --body-file "${body_file}"
           else
             gh pr edit "${existing_pr}" \
               --repo "${GITHUB_REPOSITORY}" --title "${title}" --body-file "${body_file}"
