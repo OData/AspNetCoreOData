@@ -2,8 +2,11 @@ name: Update OData dependencies
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - automation/update-odata-dependencies
   schedule:
-    - cron: "17 7 * * 1"
+    - cron: "*/5 * * * *"
 
 permissions:
   contents: write
@@ -21,8 +24,7 @@ jobs:
       fail-fast: false
       matrix:
         target-branch:
-          - main
-          - dev-10.x
+          - automation/update-odata-dependencies
 
     steps:
       - name: Check out automation
