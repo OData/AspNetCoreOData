@@ -177,12 +177,12 @@ public class SkipTokenQueryTests : WebApiTestBase<SkipTokenQueryTests>
             },
             {
                 "odata/orders?$orderby=RegId desc",
-                new string[] { "A9|5", "A9|11" },
-                "http://localhost/odata/orders?$orderby=RegId%20desc&$skiptoken=RegId-%27A9%27,Id-11"
+                new string[] { "A9|83", "A9|65" },
+                "http://localhost/odata/orders?$orderby=RegId%20desc&$skiptoken=RegId-%27A9%27,Id-65"
             },
             {
                 "odata/orders?$orderby=Location/city desc",
-                new string[] { "A9|5", "A9|11"},
+                new string[] { "A9|65", "A9|11"},
                 "http://localhost/odata/orders?$orderby=Location%2Fcity%20desc&$skiptoken=%27Settle%27,Id-11,RegId-%27A9%27"
             },
             {
@@ -213,7 +213,7 @@ public class SkipTokenQueryTests : WebApiTestBase<SkipTokenQueryTests>
         JObject payloadBody = await response.Content.ReadAsObject<JObject>();
         (string[] actualIds, string actualNextLink) = GetOrderActual(payloadBody);
 
-        Assert.True(keys.SequenceEqual(actualIds));
+        Assert.Equal(keys, actualIds);
         Assert.Equal(nextLink, actualNextLink);
     }
 
