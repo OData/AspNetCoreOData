@@ -1227,12 +1227,10 @@ public class SelectExpandBinder : QueryBinder, ISelectExpandBinder
         return source;
     }
 
-    private QueryBinderContext CreateSubContext(QueryBinderContext context, ComputeClause computeClause, Type clrElementType,
-        HandleNullPropagationOption option = HandleNullPropagationOption.True)
+    private QueryBinderContext CreateSubContext(QueryBinderContext context, ComputeClause computeClause, Type clrElementType)
     {
         ODataQuerySettings newSettings = new ODataQuerySettings();
         newSettings.CopyFrom(context.QuerySettings);
-        newSettings.HandleNullPropagation = option;
         QueryBinderContext binderContext = new QueryBinderContext(context, newSettings, clrElementType);
         if (computeClause != null)
         {
