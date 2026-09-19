@@ -147,6 +147,40 @@ public class DeltaTest
     }
 
     [Fact]
+    public void TrySetPropertyValue_ReturnsTrue_AndTracksChange_WhenInt64ValueSetOnInt32Property()
+    {
+        // Arrange - simulates a boxed Int64 value arriving for an Int32 property (e.g. from JSON deserialization)
+        Delta<DeltaModel> delta = new Delta<DeltaModel>();
+        long int64Value = 42L;
+
+        // Act
+        bool result = delta.TrySetPropertyValue("IntProperty", int64Value);
+
+        // Assert
+        Assert.True(result, "TrySetPropertyValue should return true when an Int64 value can be coerced to the Int32 property type.");
+        Assert.Contains("IntProperty", delta.GetChangedPropertyNames());
+        delta.TryGetPropertyValue("IntProperty", out object retrievedValue);
+        Assert.Equal(42, retrievedValue);
+    }
+
+    [Fact]
+    public void TrySetPropertyValue_ReturnsTrue_AndTracksChange_WhenInt64ValueSetOnNullableInt32Property()
+    {
+        // Arrange - simulates a boxed Int64 value arriving for a nullable Int32 property
+        Delta<DeltaModel> delta = new Delta<DeltaModel>();
+        long int64Value = 42L;
+
+        // Act
+        bool result = delta.TrySetPropertyValue("NullableIntProperty", int64Value);
+
+        // Assert
+        Assert.True(result, "TrySetPropertyValue should return true when an Int64 value can be coerced to the nullable Int32 property type.");
+        Assert.Contains("NullableIntProperty", delta.GetChangedPropertyNames());
+        delta.TryGetPropertyValue("NullableIntProperty", out object retrievedValue);
+        Assert.Equal((int?)42, retrievedValue);
+    }
+
+    [Fact]
     public void TrySetPropertyValue_ThrowsInvalidOperation_IfDynamicContainerWithoutSetter()
     {
         // Arrange

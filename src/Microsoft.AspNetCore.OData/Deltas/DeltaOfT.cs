@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -19,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Common;
+using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 
 namespace Microsoft.AspNetCore.OData.Deltas;
@@ -859,12 +861,47 @@ public class Delta<T> : Delta, IDelta, ITypedDelta where T : class
         Type propertyType = cacheHit.Property.PropertyType;
         if (value != null && !TypeHelper.IsCollection(propertyType) && !propertyType.IsAssignableFrom(value.GetType()))
         {
-            return false;
+            if (!TryConvertPropertyValue(propertyType, value, out object convertedValue))
+            {
+                return false;
+            }
+
+            value = convertedValue;
         }
 
         cacheHit.SetValue(_instance, value);
         _changedProperties.Add(name);
         return true;
+    }
+
+    private static bool TryConvertPropertyValue(Type propertyType, object value, out object convertedValue)
+    {
+        Debug.Assert(propertyType != null, "Argument propertyType is null");
+        Debug.Assert(value != null, "Argument value is null");
+
+        convertedValue = value;
+
+        Type targetType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+        if (!targetType.IsValueType)
+        {
+            return false;
+        }
+
+        try
+        {
+            convertedValue = EdmPrimitiveHelper.ConvertPrimitiveValue(value, propertyType);
+        }
+        catch (ValidationException)
+        {
+            return false;
+        }
+
+        if (convertedValue == null)
+        {
+            return propertyType.IsNullable();
+        }
+
+        return propertyType.IsAssignableFrom(convertedValue.GetType());
     }
 
     private bool TrySetNestedResourceInternal(string name, object deltaNestedResource)
