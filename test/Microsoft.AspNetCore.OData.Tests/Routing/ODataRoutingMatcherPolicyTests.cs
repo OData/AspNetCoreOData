@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
@@ -89,6 +90,94 @@ public class ODataRoutingMatcherPolicyTests
         Assert.False(candidateSet.IsValidCandidate(2));
     }
 
+    [Fact]
+    public async Task ApplyAsync_UsesFirstRoutingMetadataThatTranslates()
+    {
+        // Arrange
+        IEdmModel firstModel = new EdmModel();
+        IEdmModel secondModel = new EdmModel();
+        IEdmModel thirdModel = new EdmModel();
+        ODataPathTemplate firstTemplate = new ODataPathTemplate();
+        ODataPathTemplate secondTemplate = new ODataPathTemplate();
+        ODataPathTemplate thirdTemplate = new ODataPathTemplate();
+        IODataRoutingMetadata firstMetadata = new ODataRoutingMetadata("first", firstModel, firstTemplate);
+        IODataRoutingMetadata secondMetadata = new ODataRoutingMetadata("second", secondModel, secondTemplate);
+        IODataRoutingMetadata thirdMetadata = new ODataRoutingMetadata("third", thirdModel, thirdTemplate);
+        ODataPath expectedPath = new ODataPath();
+
+        var translator = new Mock<IODataTemplateTranslator>();
+        translator
+            .Setup(a => a.Translate(firstTemplate, It.IsAny<ODataTemplateTranslateContext>()))
+            .Returns((ODataPath)null);
+        translator
+            .Setup(a => a.Translate(secondTemplate, It.IsAny<ODataTemplateTranslateContext>()))
+            .Returns((ODataPathTemplate _, ODataTemplateTranslateContext context) =>
+            {
+                context.UpdatedValues["key"] = "updated";
+                return expectedPath;
+            });
+
+        Endpoint[] endpoints = new[]
+        {
+            CreateEndpoint("/", firstMetadata, secondMetadata, thirdMetadata)
+        };
+        CandidateSet candidateSet = CreateCandidateSet(endpoints);
+        HttpContext httpContext = CreateHttpContext("GET");
+        ODataRoutingMatcherPolicy policy = CreatePolicy(translator.Object);
+
+        // Act
+        await policy.ApplyAsync(httpContext, candidateSet);
+
+        // Assert
+        Assert.True(candidateSet.IsValidCandidate(0));
+        Assert.Equal("second", httpContext.ODataFeature().RoutePrefix);
+        Assert.Same(secondModel, httpContext.ODataFeature().Model);
+        Assert.Same(expectedPath, httpContext.ODataFeature().Path);
+        Assert.Equal("updated", candidateSet[0].Values["key"]);
+        translator.Verify(
+            a => a.Translate(firstTemplate, It.Is<ODataTemplateTranslateContext>(c => c.Model == firstModel)),
+            Times.Once);
+        translator.Verify(
+            a => a.Translate(secondTemplate, It.Is<ODataTemplateTranslateContext>(c => c.Model == secondModel)),
+            Times.Once);
+        translator.Verify(
+            a => a.Translate(thirdTemplate, It.IsAny<ODataTemplateTranslateContext>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task ApplyAsync_InvalidatesCandidateWhenAllRoutingMetadataFailToTranslate()
+    {
+        // Arrange
+        IODataRoutingMetadata firstMetadata =
+            new ODataRoutingMetadata("first", new EdmModel(), new ODataPathTemplate());
+        IODataRoutingMetadata secondMetadata =
+            new ODataRoutingMetadata("second", new EdmModel(), new ODataPathTemplate());
+
+        var translator = new Mock<IODataTemplateTranslator>();
+        translator
+            .Setup(a => a.Translate(It.IsAny<ODataPathTemplate>(), It.IsAny<ODataTemplateTranslateContext>()))
+            .Returns((ODataPath)null);
+
+        Endpoint[] endpoints = new[]
+        {
+            CreateEndpoint("/", firstMetadata, secondMetadata)
+        };
+        CandidateSet candidateSet = CreateCandidateSet(endpoints);
+        HttpContext httpContext = CreateHttpContext("GET");
+        ODataRoutingMatcherPolicy policy = CreatePolicy(translator.Object);
+
+        // Act
+        await policy.ApplyAsync(httpContext, candidateSet);
+
+        // Assert
+        Assert.False(candidateSet.IsValidCandidate(0));
+        Assert.Null(httpContext.ODataFeature().Path);
+        translator.Verify(
+            a => a.Translate(It.IsAny<ODataPathTemplate>(), It.IsAny<ODataTemplateTranslateContext>()),
+            Times.Exactly(2));
+    }
+
     private static RouteEndpoint CreateEndpoint(string template, IODataRoutingMetadata odataMetadata, params object[] more)
     {
         var metadata = new List<object>();
@@ -122,14 +211,18 @@ public class ODataRoutingMatcherPolicyTests
         return candidateSet;
     }
 
-    private static ODataRoutingMatcherPolicy CreatePolicy()
+    private static ODataRoutingMatcherPolicy CreatePolicy(IODataTemplateTranslator translator = null)
     {
-        var translator = new Mock<IODataTemplateTranslator>();
-        translator
-            .Setup(a => a.Translate(It.IsAny<ODataPathTemplate>(), It.IsAny<ODataTemplateTranslateContext>()))
-            .Returns(new ODataPath());
+        if (translator == null)
+        {
+            var translatorMock = new Mock<IODataTemplateTranslator>();
+            translatorMock
+                .Setup(a => a.Translate(It.IsAny<ODataPathTemplate>(), It.IsAny<ODataTemplateTranslateContext>()))
+                .Returns(new ODataPath());
+            translator = translatorMock.Object;
+        }
 
-        return new ODataRoutingMatcherPolicy(translator.Object);
+        return new ODataRoutingMatcherPolicy(translator);
     }
 
     private static HttpContext CreateHttpContext(string httpMethod)

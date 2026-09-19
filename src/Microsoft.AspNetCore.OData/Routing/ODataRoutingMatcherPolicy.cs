@@ -83,8 +83,8 @@ internal class ODataRoutingMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
                 continue;
             }
 
-            IODataRoutingMetadata metadata = candidate.Endpoint.Metadata.OfType<IODataRoutingMetadata>().FirstOrDefault();
-            if (metadata == null)
+            IODataRoutingMetadata[] metadataItems = candidate.Endpoint.Metadata.OfType<IODataRoutingMetadata>().ToArray();
+            if (metadataItems.Length == 0)
             {
                 continue;
             }
@@ -96,14 +96,28 @@ internal class ODataRoutingMatcherPolicy : MatcherPolicy, IEndpointSelectorPolic
                 continue;
             }
 
-            ODataTemplateTranslateContext translatorContext =
-                new ODataTemplateTranslateContext(httpContext, candidate.Endpoint, candidate.Values, metadata.Model);
+            IODataRoutingMetadata matchedMetadata = null;
+            ODataTemplateTranslateContext translatorContext = null;
+            ODataPath odataPath = null;
 
-            ODataPath odataPath = _translator.Translate(metadata.Template, translatorContext);
+            foreach (IODataRoutingMetadata metadata in metadataItems)
+            {
+                ODataTemplateTranslateContext currentContext =
+                    new ODataTemplateTranslateContext(httpContext, candidate.Endpoint, candidate.Values, metadata.Model);
+
+                odataPath = _translator.Translate(metadata.Template, currentContext);
+                if (odataPath != null)
+                {
+                    matchedMetadata = metadata;
+                    translatorContext = currentContext;
+                    break;
+                }
+            }
+
             if (odataPath != null)
             {
-                odataFeature.RoutePrefix = metadata.Prefix;
-                odataFeature.Model = metadata.Model;
+                odataFeature.RoutePrefix = matchedMetadata.Prefix;
+                odataFeature.Model = matchedMetadata.Model;
                 odataFeature.Path = odataPath;
 
                 MergeRouteValues(translatorContext.UpdatedValues, candidate.Values);
