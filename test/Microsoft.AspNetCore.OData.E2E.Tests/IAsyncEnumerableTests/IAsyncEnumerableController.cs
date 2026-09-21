@@ -55,7 +55,7 @@ public class CustomersController : ODataController
         return Ok(_context.Customers.AsAsyncEnumerable());
     }
 
-    [EnableQuery(PageSize = 2)]
+    [EnableQuery]
     [HttpGet("v3/Customers")]
     public IActionResult SearchCustomersForV3Route([FromQuery] Variant variant = Variant.None)
     {
@@ -70,6 +70,13 @@ public class CustomersController : ODataController
         }
 
         return Ok(asyncEnumerable);
+    }
+
+    [EnableQuery(PageSize = 2)]
+    [HttpGet("v4/Customers")]
+    public IQueryable<Customer> CustomersWithServerDrivenPaging()
+    {
+        return _context.Customers;
     }
 
     public async IAsyncEnumerable<Customer> CreateCollectionAsync<T>()

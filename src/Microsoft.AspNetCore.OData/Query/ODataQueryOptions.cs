@@ -15,10 +15,12 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Validator;
+using Microsoft.AspNetCore.OData.Query.Wrapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -510,14 +512,35 @@ public class ODataQueryOptions
         }
 
         ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
+        odataFeature.PageSizeUsesLookahead = false;
         if (pageSize > 0)
         {
-            bool resultsLimited;
-            result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
-            if (resultsLimited && Request.GetEncodedUrl() != null &&
-                odataFeature.NextLink == null)
+            bool canDeferTruncation =
+                !result.ElementType.IsDynamicTypeWrapper() &&
+                !typeof(ISelectExpandWrapper).IsAssignableFrom(result.ElementType) &&
+                (Context.ElementType.TypeKind == EdmTypeKind.Entity ||
+                 Context.ElementType.TypeKind == EdmTypeKind.Complex ||
+                 Context.ElementType.TypeKind == EdmTypeKind.Untyped);
+
+            if (canDeferTruncation)
             {
+                result = ExpressionHelpers.Take(
+                    result,
+                    checked(pageSize + 1),
+                    result.ElementType,
+                    querySettings.EnableConstantParameterization);
                 odataFeature.PageSize = pageSize;
+                odataFeature.PageSizeUsesLookahead = true;
+            }
+            else
+            {
+                bool resultsLimited;
+                result = LimitResults(result, pageSize, querySettings.EnableConstantParameterization, out resultsLimited);
+                if (resultsLimited && Request.GetEncodedUrl() != null &&
+                    odataFeature.NextLink == null)
+                {
+                    odataFeature.PageSize = pageSize;
+                }
             }
         }
 

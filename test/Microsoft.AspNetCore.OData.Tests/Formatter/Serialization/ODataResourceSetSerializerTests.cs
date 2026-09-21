@@ -14,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -612,6 +613,87 @@ public class ODataResourceSetSerializerTests
 
         // Assert
         mockWriter.Verify();
+    }
+
+    [Fact]
+    public async Task WriteObjectInlineAsync_UsesRuntimeAsyncEnumerable_AndWritesOnlyPageSize()
+    {
+        // Arrange
+        var instance = new AsyncOnlyResourceSet(_customers.Cast<object>());
+        var request = RequestFactory.Create();
+        (request.ODataFeature() as ODataFeature).PageSize = 1;
+        (request.ODataFeature() as ODataFeature).PageSizeUsesLookahead = true;
+        _writeContext.Request = request;
+        _writeContext.Type = typeof(IQueryable<Customer>);
+
+        Mock<IODataSerializerProvider> serializerProvider = new Mock<IODataSerializerProvider>();
+        Mock<ODataResourceSerializer> resourceSerializer = new Mock<ODataResourceSerializer>(serializerProvider.Object);
+        resourceSerializer
+            .Setup(s => s.WriteObjectInlineAsync(
+                It.IsAny<object>(),
+                It.IsAny<IEdmTypeReference>(),
+                It.IsAny<ODataWriter>(),
+                _writeContext))
+            .Returns(Task.CompletedTask);
+        serializerProvider.Setup(s => s.GetEdmTypeSerializer(It.IsAny<IEdmTypeReference>())).Returns(resourceSerializer.Object);
+
+        Mock<ODataResourceSetSerializer> serializer = new Mock<ODataResourceSetSerializer>(serializerProvider.Object);
+        serializer.CallBase = true;
+        serializer
+            .Setup(s => s.CreateResourceSet((IEnumerable)instance, _customersType, _writeContext))
+            .Returns(new ODataResourceSet())
+            .Verifiable();
+        var mockWriter = new Mock<ODataWriter>();
+        mockWriter.Setup(m => m.WriteStartAsync(It.IsAny<ODataResourceSet>())).Returns(Task.CompletedTask);
+        mockWriter.Setup(m => m.WriteEndAsync()).Returns(Task.CompletedTask);
+
+        // Act
+        await serializer.Object.WriteObjectInlineAsync(instance, _customersType, mockWriter.Object, _writeContext);
+
+        // Assert
+        resourceSerializer.Verify(
+            s => s.WriteObjectInlineAsync(
+                It.IsAny<object>(),
+                It.IsAny<IEdmTypeReference>(),
+                mockWriter.Object,
+                _writeContext),
+            Times.Once);
+        Assert.Equal(2, instance.ItemsRead);
+        serializer.Verify();
+    }
+
+    private sealed class AsyncOnlyResourceSet : IEnumerable<object>, IAsyncEnumerable<object>
+    {
+        private readonly IEnumerable<object> _items;
+
+        public AsyncOnlyResourceSet(IEnumerable<object> items)
+        {
+            _items = items;
+        }
+
+        public int ItemsRead { get; private set; }
+
+        public IEnumerator<object> GetEnumerator()
+        {
+            throw new InvalidOperationException("Synchronous enumeration should not be used.");
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public async IAsyncEnumerator<object> GetAsyncEnumerator(
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            foreach (object item in _items)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                ItemsRead++;
+                yield return item;
+                await Task.Yield();
+            }
+        }
     }
 
     private class TruncatedEnumerable(int pageSize) : IEnumerable, ITruncatedCollection

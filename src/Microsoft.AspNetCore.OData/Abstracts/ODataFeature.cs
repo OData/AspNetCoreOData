@@ -144,6 +144,11 @@ public class ODataFeature : IODataFeature
     internal int PageSize { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the serializer should use a lookahead item to determine truncation.
+    /// </summary>
+    internal bool PageSizeUsesLookahead { get; set; }
+
+    /// <summary>
     /// Gets the body values from OData request.
     /// </summary>
     internal IDictionary<string, object> BodyValues { get; set; }
