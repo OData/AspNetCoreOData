@@ -271,11 +271,6 @@
             Page size to be used by skiptoken implementation for the top-level resource for the request. 
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.PageSizeUsesLookahead">
-            <summary>
-            Gets or sets a value indicating whether the serializer should use a lookahead item to determine truncation.
-            </summary>
-        </member>
         <member name="P:Microsoft.AspNetCore.OData.Abstracts.ODataFeature.BodyValues">
             <summary>
             Gets the body values from OData request.

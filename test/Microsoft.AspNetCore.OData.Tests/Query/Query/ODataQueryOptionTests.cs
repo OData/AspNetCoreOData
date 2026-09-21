@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Abstracts;
 using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Container;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.OData.TestCommon;
@@ -706,7 +707,8 @@ public class ODataQueryOptionTests
 
         // Assert
         int effectivePageSize = (querySettings.PageSize ?? querySettings.ModelBoundPageSize).Value;
-        Assert.Equal(effectivePageSize + 1, results.Length);
+        Assert.Equal(effectivePageSize, results.Length);
+        Assert.True(Assert.IsAssignableFrom<ITruncatedCollection>(query).IsTruncated);
         Assert.Equal(customers.OrderBy(c => c.CustomerId).First().CustomerId, results[0].CustomerId);
         Assert.Equal(effectivePageSize, (request.ODataFeature() as ODataFeature).PageSize);
     }

@@ -132,44 +132,13 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
         object lastResource = null;
         CancellationToken cancellationToken = writeContext.CancellationToken;
-        int pageSize = GetPageSize(writeContext);
-        bool hasMore = (enumerable as ITruncatedCollection)?.IsTruncated ?? false;
 
-        if (pageSize > 0)
+        foreach (object item in enumerable)
         {
-            IEnumerator enumerator = enumerable.GetEnumerator();
-            try
-            {
-                int count = 0;
-                while (count < pageSize && enumerator.MoveNext())
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    lastResource = enumerator.Current;
-                    count++;
+            cancellationToken.ThrowIfCancellationRequested();
+            lastResource = item;
 
-                    await WriteResourceSetItemAsync(lastResource, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
-                }
-
-                cancellationToken.ThrowIfCancellationRequested();
-                if (!hasMore)
-                {
-                    hasMore = count == pageSize && enumerator.MoveNext();
-                }
-            }
-            finally
-            {
-                (enumerator as IDisposable)?.Dispose();
-            }
-        }
-        else
-        {
-            foreach (object item in enumerable)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                lastResource = item;
-
-                await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
-            }
+            await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
         }
 
         // Subtle and surprising behavior: If the NextPageLink property is set before calling WriteStart(resourceSet),
@@ -178,7 +147,7 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         // object before calling WriteEnd(), the next page link will be written at the end, as required for
         // odata.streaming=true support.
 
-        resourceSet.NextPageLink = pageSize <= 0 || hasMore || hasExplicitNextLink
+        resourceSet.NextPageLink = ShouldGenerateNextLink(enumerable, hasExplicitNextLink)
             ? nextLinkGenerator(lastResource)
             : null;
 
@@ -207,30 +176,12 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
 
         await writer.WriteStartAsync(resourceSet).ConfigureAwait(false);
         object lastResource = null;
-        int pageSize = GetPageSize(writeContext);
-        bool hasMore = (enumerable as ITruncatedCollection)?.IsTruncated ?? false;
 
-        if (pageSize > 0)
+        await foreach (object item in asyncEnumerable.WithCancellation(writeContext.CancellationToken).ConfigureAwait(false))
         {
-            var truncationState = new TruncationState();
-            var truncatedAsyncEnumerable = new TruncatedAsyncEnumerable<object>(asyncEnumerable, pageSize, truncationState);
-            await foreach (object item in truncatedAsyncEnumerable.WithCancellation(writeContext.CancellationToken).ConfigureAwait(false))
-            {
-                lastResource = item;
+            lastResource = item;
 
-                await WriteResourceSetItemAsync(lastResource, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
-            }
-
-            hasMore = hasMore || truncationState.IsTruncated;
-        }
-        else
-        {
-            await foreach (object item in asyncEnumerable.WithCancellation(writeContext.CancellationToken).ConfigureAwait(false))
-            {
-                lastResource = item;
-
-                await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
-            }
+            await WriteResourceSetItemAsync(item, elementType, isUntypedCollection, resourceSetType, writer, resourceSerializer, writeContext).ConfigureAwait(false);
         }
 
         // Subtle and surprising behavior: If the NextPageLink property is set before calling WriteStart(resourceSet),
@@ -239,22 +190,19 @@ public class ODataResourceSetSerializer : ODataEdmTypeSerializer
         // object before calling WriteEnd(), the next page link will be written at the end, as required for
         // odata.streaming=true support.
 
-        resourceSet.NextPageLink = pageSize <= 0 || hasMore || hasExplicitNextLink
+        object resourceSetInstance = enumerable != null ? enumerable : asyncEnumerable;
+        resourceSet.NextPageLink = ShouldGenerateNextLink(resourceSetInstance, hasExplicitNextLink)
             ? nextLinkGenerator(lastResource)
             : null;
 
         await writer.WriteEndAsync().ConfigureAwait(false);
     }
 
-    private static int GetPageSize(ODataSerializerContext writeContext)
+    private static bool ShouldGenerateNextLink(object resourceSetInstance, bool hasExplicitNextLink)
     {
-        if (writeContext.ExpandedResource != null || writeContext.Request == null)
-        {
-            return 0;
-        }
-
-        ODataFeature odataFeature = writeContext.Request.ODataFeature() as ODataFeature;
-        return odataFeature?.PageSizeUsesLookahead == true ? odataFeature.PageSize : 0;
+        return hasExplicitNextLink ||
+            resourceSetInstance is not ITruncatedCollection truncatedCollection ||
+            truncatedCollection.IsTruncated;
     }
 
     private void WriteResourceSetInternal(

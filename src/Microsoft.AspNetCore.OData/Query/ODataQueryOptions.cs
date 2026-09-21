@@ -512,7 +512,6 @@ public class ODataQueryOptions
         }
 
         ODataFeature odataFeature = Request.ODataFeature() as ODataFeature;
-        odataFeature.PageSizeUsesLookahead = false;
         if (pageSize > 0)
         {
             bool canDeferTruncation =
@@ -524,13 +523,13 @@ public class ODataQueryOptions
 
             if (canDeferTruncation)
             {
-                result = ExpressionHelpers.Take(
+                IQueryable limitedResult = ExpressionHelpers.Take(
                     result,
                     checked(pageSize + 1),
                     result.ElementType,
                     querySettings.EnableConstantParameterization);
+                result = TruncatedQueryable.Create(limitedResult, pageSize);
                 odataFeature.PageSize = pageSize;
-                odataFeature.PageSizeUsesLookahead = true;
             }
             else
             {

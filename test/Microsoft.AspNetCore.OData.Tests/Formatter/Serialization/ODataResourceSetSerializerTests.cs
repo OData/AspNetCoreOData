@@ -619,10 +619,9 @@ public class ODataResourceSetSerializerTests
     public async Task WriteObjectInlineAsync_UsesRuntimeAsyncEnumerable_AndWritesOnlyPageSize()
     {
         // Arrange
-        var instance = new AsyncOnlyResourceSet(_customers.Cast<object>());
+        var instance = new AsyncOnlyResourceSet(_customers.Cast<object>(), pageSize: 1);
         var request = RequestFactory.Create();
         (request.ODataFeature() as ODataFeature).PageSize = 1;
-        (request.ODataFeature() as ODataFeature).PageSizeUsesLookahead = true;
         _writeContext.Request = request;
         _writeContext.Type = typeof(IQueryable<Customer>);
 
@@ -662,16 +661,22 @@ public class ODataResourceSetSerializerTests
         serializer.Verify();
     }
 
-    private sealed class AsyncOnlyResourceSet : IEnumerable<object>, IAsyncEnumerable<object>
+    private sealed class AsyncOnlyResourceSet : IEnumerable<object>, IAsyncEnumerable<object>, ITruncatedCollection
     {
         private readonly IEnumerable<object> _items;
+        private readonly int _pageSize;
 
-        public AsyncOnlyResourceSet(IEnumerable<object> items)
+        public AsyncOnlyResourceSet(IEnumerable<object> items, int pageSize)
         {
             _items = items;
+            _pageSize = pageSize;
         }
 
         public int ItemsRead { get; private set; }
+
+        public int PageSize => _pageSize;
+
+        public bool IsTruncated { get; private set; }
 
         public IEnumerator<object> GetEnumerator()
         {
@@ -683,16 +688,26 @@ public class ODataResourceSetSerializerTests
             return GetEnumerator();
         }
 
-        public async IAsyncEnumerator<object> GetAsyncEnumerator(
-            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerator<object> GetAsyncEnumerator(CancellationToken cancellationToken = default)
         {
+            int count = 0;
             foreach (object item in _items)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ItemsRead++;
+
+                if (count == _pageSize)
+                {
+                    IsTruncated = true;
+                    yield break;
+                }
+
                 yield return item;
+                count++;
                 await Task.Yield();
             }
+
+            IsTruncated = false;
         }
     }
 
