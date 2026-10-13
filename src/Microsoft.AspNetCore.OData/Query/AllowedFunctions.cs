@@ -156,6 +156,11 @@ public enum AllowedFunctions
     MatchesPattern = 0x20000000,
 
     /// <summary>
+    /// A value that corresponds to allowing 'case' function in $filter.
+    /// </summary>
+    Case = 0x40000000,
+
+    /// <summary>
     /// A value that corresponds to allowing all string related functions in $filter.
     /// </summary>
     AllStringFunctions = StartsWith | EndsWith | Contains | Length | IndexOf | Concat | Substring | ToLower | ToUpper | Trim | MatchesPattern,
@@ -173,5 +178,5 @@ public enum AllowedFunctions
     /// <summary>
     /// A value that corresponds to allowing all functions in $filter.
     /// </summary>
-    AllFunctions = AllStringFunctions | AllDateTimeFunctions | AllMathFunctions | Cast | IsOf | Any | All
+    AllFunctions = AllStringFunctions | AllDateTimeFunctions | AllMathFunctions | Cast | IsOf | Any | All | Case
 }

@@ -44,6 +44,9 @@ public abstract partial class QueryBinder
         {
             switch (node.Name)
             {
+                case ClrCanonicalFunctions.CaseFunctionName:
+                    return BindCase(node, context);
+
                 case ClrCanonicalFunctions.StartswithFunctionName:
                     return BindStartsWith(node, context);
 

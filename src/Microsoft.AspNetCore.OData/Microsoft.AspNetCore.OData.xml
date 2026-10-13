@@ -8513,6 +8513,26 @@
               Looks up a localized string similar to The batch sub-request URI '{0}' targets a path that is not within the OData service root '{1}'. Batch sub-requests must address resources within the OData service.
             </summary>
         </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CaseRequiresConditionResultPairs">
+            <summary>
+              Looks up a localized string similar to The 'case' function requires one or more condition:result pairs.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CaseRequiresBooleanConditions">
+            <summary>
+              Looks up a localized string similar to The 'case' function requires Boolean conditions.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CaseRequiresScalarResults">
+            <summary>
+              Looks up a localized string similar to The 'case' function requires primitive or enumeration results.
+            </summary>
+        </member>
+        <member name="P:Microsoft.AspNetCore.OData.SRResources.CaseRequiresCompatibleResults">
+            <summary>
+              Looks up a localized string similar to The 'case' function requires compatible result types.
+            </summary>
+        </member>
         <member name="T:Microsoft.AspNetCore.OData.Query.AllowedArithmeticOperators">
             <summary>
             Arithmetic operators to allow for querying using $filter.
@@ -8696,6 +8716,11 @@
         <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.MatchesPattern">
             <summary>
             A value that corresponds to allowing 'MatchesPattern' function in $filter.
+            </summary>
+        </member>
+        <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.Case">
+            <summary>
+            A value that corresponds to allowing 'case' function in $filter.
             </summary>
         </member>
         <member name="F:Microsoft.AspNetCore.OData.Query.AllowedFunctions.AllStringFunctions">
@@ -10345,6 +10370,14 @@
             <summary>
             The base class for all expression binders.
             </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.BindCase(Microsoft.OData.UriParser.SingleValueFunctionCallNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
+            <summary>
+            Binds a 'case' function with compatible scalar results to a LINQ <see cref="T:System.Linq.Expressions.Expression"/>.
+            </summary>
+            <param name="node">The query node to bind.</param>
+            <param name="context">The query binder context.</param>
+            <returns>The first matching result, or null if no condition matches.</returns>
         </member>
         <member name="M:Microsoft.AspNetCore.OData.Query.Expressions.QueryBinder.Bind(Microsoft.OData.UriParser.QueryNode,Microsoft.AspNetCore.OData.Query.Expressions.QueryBinderContext)">
             <summary>

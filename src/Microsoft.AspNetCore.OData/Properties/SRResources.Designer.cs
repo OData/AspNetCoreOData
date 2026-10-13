@@ -2057,5 +2057,41 @@ namespace Microsoft.AspNetCore.OData {
                 return ResourceManager.GetString("BatchSubRequestPathNotUnderServiceRoot", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The 'case' function requires one or more condition:result pairs.
+        /// </summary>
+        internal static string CaseRequiresConditionResultPairs {
+            get {
+                return ResourceManager.GetString("CaseRequiresConditionResultPairs", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The 'case' function requires Boolean conditions.
+        /// </summary>
+        internal static string CaseRequiresBooleanConditions {
+            get {
+                return ResourceManager.GetString("CaseRequiresBooleanConditions", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The 'case' function requires primitive or enumeration results.
+        /// </summary>
+        internal static string CaseRequiresScalarResults {
+            get {
+                return ResourceManager.GetString("CaseRequiresScalarResults", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The 'case' function requires compatible result types.
+        /// </summary>
+        internal static string CaseRequiresCompatibleResults {
+            get {
+                return ResourceManager.GetString("CaseRequiresCompatibleResults", resourceCulture);
+            }
+        }
     }
 }

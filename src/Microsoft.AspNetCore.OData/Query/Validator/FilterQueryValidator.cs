@@ -860,6 +860,9 @@ public class FilterQueryValidator : IFilterQueryValidator
 
         switch (functionName)
         {
+            case ClrCanonicalFunctions.CaseFunctionName:
+                result = AllowedFunctions.Case;
+                break;
             case "any":
                 result = AllowedFunctions.Any;
                 break;

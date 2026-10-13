@@ -784,4 +784,16 @@
   <data name="BatchSubRequestPathNotUnderServiceRoot" xml:space="preserve">
     <value>The batch sub-request URI '{0}' targets a path that is not within the OData service root '{1}'. Batch sub-requests must address resources within the OData service.</value>
   </data>
+  <data name="CaseRequiresConditionResultPairs" xml:space="preserve">
+    <value>The 'case' function requires one or more condition:result pairs.</value>
+  </data>
+  <data name="CaseRequiresBooleanConditions" xml:space="preserve">
+    <value>The 'case' function requires Boolean conditions.</value>
+  </data>
+  <data name="CaseRequiresScalarResults" xml:space="preserve">
+    <value>The 'case' function requires primitive or enumeration results.</value>
+  </data>
+  <data name="CaseRequiresCompatibleResults" xml:space="preserve">
+    <value>The 'case' function requires compatible result types.</value>
+  </data>
 </root>

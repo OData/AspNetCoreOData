@@ -466,6 +466,7 @@ public class FilterQueryValidatorTests
                 { AllowedFunctions.Any, "Category/EnumerableProducts/any(t : null eq 'Name')", "any" },
                 { AllowedFunctions.Any, "Category/EnumerableProducts/any(t : t/ProductName eq 'Name')", "any" },
 
+                { AllowedFunctions.Case, "case(true:ProductName) eq 'Name'", "case" },
                 { AllowedFunctions.Cast, "cast('Edm.Int64') eq 0", "cast" },
                 { AllowedFunctions.Cast, "cast(Edm.String) eq 'Name'", "cast" },
                 { AllowedFunctions.Cast, "cast('Edm.String') eq 'Name'", "cast" },

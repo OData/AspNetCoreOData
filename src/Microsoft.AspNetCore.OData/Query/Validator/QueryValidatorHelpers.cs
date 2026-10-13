@@ -48,6 +48,9 @@ internal class QueryValidatorHelpers
         AllowedFunctions result = AllowedFunctions.None;
         switch (functionName)
         {
+            case ClrCanonicalFunctions.CaseFunctionName:
+                result = AllowedFunctions.Case;
+                break;
             case "any":
                 result = AllowedFunctions.Any;
                 break;

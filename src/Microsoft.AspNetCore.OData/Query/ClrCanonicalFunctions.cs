@@ -54,6 +54,7 @@ internal class ClrCanonicalFunctions
     internal const string DateFunctionName = "date";
     internal const string TimeFunctionName = "time";
     internal const string NowFunctionName = "now";
+    internal const string CaseFunctionName = "case";
 
     // string functions
     public static readonly MethodInfo StartsWith = MethodOf(_ => _defaultString.StartsWith(default(string)));

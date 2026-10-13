@@ -111,6 +111,22 @@ public class DollarComputeTests : WebApiTestBase<DollarComputeTests>
         return ids;
     }
 
+    [Theory]
+    [InlineData("$compute=case(indexof(Name,'e') eq -1:10000,true:indexof(Name,'e')) as rank&$select=Name&$orderby=rank", new[] { "Peter", "Kerry", "Alex", "Sam", "John" })]
+    [InlineData("$compute=case(indexof(Name,'e') eq -1:10000,true:indexof(Name,'e')) as rank&$select=Name&$filter=rank lt 10000&$orderby=rank&$skip=1&$top=1", new[] { "Kerry" })]
+    [InlineData("$select=Name&$orderby=case(indexof(Name,'e') eq -1:10000,true:indexof(Name,'e'))", new[] { "Peter", "Kerry", "Alex", "Sam", "John" })]
+    public async Task QueryForResourceSet_CaseRanksAndSelectsNames(string query, string[] expectedNames)
+    {
+        HttpClient client = CreateClient();
+        using HttpResponseMessage response = await client.GetAsync("odata/Customers?" + query);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        JObject payload = await response.Content.ReadAsObject<JObject>();
+        JArray rows = Assert.IsType<JArray>(payload["value"]);
+        Assert.Equal(expectedNames, rows.Select(row => (string)row["Name"]));
+        Assert.All(rows, row => Assert.Single(Assert.IsType<JObject>(row).Properties()));
+    }
+
     [Fact]
     public async Task QueryForResourceSet_IncludesDollarCompute_UsedInDollarSelect()
     {
