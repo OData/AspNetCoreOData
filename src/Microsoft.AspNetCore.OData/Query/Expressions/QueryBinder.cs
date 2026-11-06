@@ -294,8 +294,21 @@ public abstract partial class QueryBinder
 
         if (context.ElementClrType.IsDynamicTypeWrapper())
         {
-            return GetFlattenedPropertyExpression(openCollectionNode.Name, context) ?? Expression.Property(
-                Bind(openCollectionNode.Source, context), openCollectionNode.Name);
+            string sourcePath = GetFullPropertyPath(openCollectionNode.Source);
+            string propertyPath = sourcePath == null ? openCollectionNode.Name : sourcePath + "\\" + openCollectionNode.Name;
+            Expression flattenedProperty = GetFlattenedPropertyExpression(propertyPath, context);
+            if (flattenedProperty != null)
+            {
+                return flattenedProperty;
+            }
+
+            Expression source = Bind(openCollectionNode.Source, context);
+            if (source.Type.IsDynamicTypeWrapper())
+            {
+                throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, propertyPath));
+            }
+
+            return CreateNestedCollectionOpenPropertyAccessExpression(source, openCollectionNode, context);
         }
 
         if (context.ComputedProperties.TryGetValue(openCollectionNode.Name, out ComputeExpression computedProperty))
@@ -329,7 +342,7 @@ public abstract partial class QueryBinder
 
         if (context.ElementClrType.IsDynamicTypeWrapper())
         {
-            return GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
+            return BindAccessExpression(openNode, context);
         }
 
         if (context.ComputedProperties.TryGetValue(openNode.Name, out ComputeExpression computedProperty))
@@ -1032,7 +1045,7 @@ public abstract partial class QueryBinder
 
             case QueryNodeKind.SingleValueOpenPropertyAccess:
                 SingleValueOpenPropertyAccessNode openNode = node as SingleValueOpenPropertyAccessNode;
-                return GetFlattenedPropertyExpression(openNode.Name, context) ?? CreateOpenPropertyAccessExpression(openNode, context);
+                return GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context) ?? CreateOpenPropertyAccessExpression(openNode, context);
 
             case QueryNodeKind.None:
             case QueryNodeKind.SingleNavigationNode:
@@ -1088,6 +1101,12 @@ public abstract partial class QueryBinder
     public virtual Expression CreateOpenPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
         Expression source = BindAccessExpression(openNode.Source, context);
+
+        // Transformation aliases are resolved from FlattenedProperties, never from the wrapper's CLR surface.
+        if (source.Type.IsDynamicTypeWrapper())
+        {
+            throw new ODataException(Error.Format(SRResources.PropertyOrPathWasRemovedFromContext, GetFullPropertyPath(openNode)));
+        }
 
         // If the segment names a property declared in the model, bind to it directly (e.g. it exists
         // on the source type after an earlier $apply transformation), mapping the EDM name to the CLR
@@ -1917,9 +1936,8 @@ public abstract partial class QueryBinder
             return null;
         }
 
-        // A type that is not in the model (e.g. an intermediate transformation result such as a
-        // grouping or flattening wrapper): bind the CLR property directly by the segment name.
-        return instanceType.GetProperty(propertyName);
+        // Unmodeled types, including transformation wrappers, have no query-visible CLR members.
+        return null;
     }
 
     /// <summary>
