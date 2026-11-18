@@ -78,6 +78,8 @@ extends:
         - checkout: self
           fetchTags: true
 
+        - template: /pipelines/templates/ensure-nuget-config.yml@self
+
         - task: NuGetAuthenticate@1
           displayName: 'Authenticate to the feed'
           
@@ -139,7 +141,7 @@ extends:
           displayName: Use .NET Core SDK 2.x
           inputs:
             version: 2.x
-        - task: EsrpCodeSigning@5
+        - task: EsrpCodeSigning@6
           displayName: ESRP CodeSigning - WebAPI OData Product Signing
           inputs:
             ConnectedServiceName: $(ODataEsrpConnectionServiceName)
@@ -236,7 +238,7 @@ extends:
           inputs:
             command: custom
             arguments: pack $(Build.SourcesDirectory)\src\Microsoft.AspNetCore.OData.NewtonsoftJson.Release.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory)\Nuget -Properties Configuration=$(BuildConfiguration);ProductRoot=$(ProductBinPath);SourcesRoot=$(Build.SourcesDirectory);VersionFullSemantic=$(VersionFullSemantic);NightlyBuildVersion=$(VersionNugetNightlyBuild);VersionNuGetSemantic=$(VersionNuGetSemantic) -Verbosity Detailed -Symbols  -SymbolPackageFormat snupkg
-        - task: EsrpCodeSigning@5
+        - task: EsrpCodeSigning@6
           displayName: ESRP CodeSigning - WebAPI OData Packages Signing
           inputs:
             ConnectedServiceName: $(ODataEsrpConnectionServiceName)
@@ -267,3 +269,7 @@ extends:
                   }
               ]
             VersboseLogin: true
+        - task: NuGetToolInstaller@1
+          displayName: 'Use NuGet 7.x (minimum 7.6.0) for package publishing'
+          inputs:
+            versionSpec: '>=7.6.0 <8.0.0'
