@@ -4,6 +4,7 @@ schedules:
   branches:
     include:
     - main
+    - release-8.x
 resources:
   repositories:
   - repository: self
@@ -23,7 +24,11 @@ variables:
   value: anycpu
 - name: ProductBinPath
   value: $(Build.SourcesDirectory)\bin\$(BuildPlatform)\$(BuildConfiguration)
-- group: OData-ESRP-CodeSigning
+- group: OData-Shared
+- name: AZURE_ARTIFACTS_FEED 
+  value: $(ODataFeed)
+- name: PackagesToPush
+  value: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*nupkg
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
@@ -60,6 +65,14 @@ extends:
             packagesToPush: $(Build.ArtifactStagingDirectory)\Nuget\*Nightly*.nupkg
             nuGetFeedType: external
             publishFeedCredentials: 'MyGet.org - AspNetCoreOData Feed'
+          - output: nuget
+            displayName: 'NuGet push - Packages to Internal Feed'
+            packageParentPath: '$(Build.ArtifactStagingDirectory)\Nuget'
+            packagesToPush: '$(PackagesToPush)'
+            nuGetFeedType: internal
+            publishVstsFeed: $(ODataPublishFeed)
+            allowPackageConflicts: true
+            publishPackageMetadata: true
         steps:
         - checkout: self
           fetchTags: true
