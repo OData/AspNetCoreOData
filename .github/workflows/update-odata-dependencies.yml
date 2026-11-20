@@ -1,0 +1,152 @@
+name: Update OData dependencies
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 7 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-odata-dependencies
+  cancel-in-progress: false
+
+jobs:
+  update:
+    name: Update ${{ matrix.target-branch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target-branch:
+          - main
+          - dev-10.x
+
+    steps:
+      - name: Check out automation
+        uses: actions/checkout@v4
+        with:
+          path: automation
+
+      - name: Check out target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.target-branch }}
+          fetch-depth: 0
+          path: target
+
+      - name: Determine .NET SDK
+        id: framework
+        shell: pwsh
+        run: |
+          [xml] $project = Get-Content target/src/Microsoft.AspNetCore.OData/Microsoft.AspNetCore.OData.csproj
+          $propertyGroups = $project.Project.PropertyGroup
+          $targetFrameworks = @(
+              @($propertyGroups.TargetFramework) + @($propertyGroups.TargetFrameworks) |
+                  ForEach-Object { $_ -split ';' } | ForEach-Object { $_.Trim() } |
+                  Where-Object { $_ } | Select-Object -Unique
+          )
+          $dotnetVersions = @(
+              $targetFrameworks |
+                  ForEach-Object { if ($_ -match '^net(?<Major>\d+)\.') { "$($Matches['Major']).0.x" } } |
+                  Sort-Object -Unique
+          )
+
+          if ($dotnetVersions.Count -eq 0) { throw "No supported TargetFramework was found." }
+
+          "target-frameworks=$($targetFrameworks -join ', ')" >> $env:GITHUB_OUTPUT
+          "dotnet-versions<<EOF" >> $env:GITHUB_OUTPUT
+          $dotnetVersions >> $env:GITHUB_OUTPUT
+          "EOF" >> $env:GITHUB_OUTPUT
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ steps.framework.outputs['dotnet-versions'] }}
+
+      - name: Find stable compatible dependency versions
+        id: update
+        shell: pwsh
+        run: |
+          ./automation/.github/scripts/Update-ODataDependencies.ps1 -PackagesFile target/Directory.Packages.props
+
+      - name: Verify dependency compatibility
+        if: steps.update.outputs.changed == 'true'
+        run: dotnet restore target/src/Microsoft.AspNetCore.OData/Microsoft.AspNetCore.OData.csproj
+
+      - name: Create or update pull request
+        if: steps.update.outputs.changed == 'true'
+        working-directory: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_BRANCH: ${{ matrix.target-branch }}
+          TARGET_FRAMEWORKS: ${{ steps.framework.outputs['target-frameworks'] }}
+          ODATA_LIB_CHANGED: ${{ steps.update.outputs['odata-lib-changed'] }}
+          PREVIOUS_ODATA_LIB_VERSION: ${{ steps.update.outputs['previous-odata-lib-version'] }}
+          ODATA_LIB_VERSION: ${{ steps.update.outputs['odata-lib-version'] }}
+          MODEL_BUILDER_CHANGED: ${{ steps.update.outputs['model-builder-changed'] }}
+          PREVIOUS_MODEL_BUILDER_VERSION: ${{ steps.update.outputs['previous-model-builder-version'] }}
+          MODEL_BUILDER_VERSION: ${{ steps.update.outputs['model-builder-version'] }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          branch_versions=()
+          changes=()
+          rows=""
+
+          if [[ "${ODATA_LIB_CHANGED}" == "true" ]]; then
+            branch_versions+=("odatalib-${ODATA_LIB_VERSION}")
+            changes+=("ODataLib to ${ODATA_LIB_VERSION}")
+            rows+="| Microsoft.OData.Core, Microsoft.OData.Edm, Microsoft.Spatial | \`${PREVIOUS_ODATA_LIB_VERSION}\` | \`${ODATA_LIB_VERSION}\` |"$'\n'
+          fi
+
+          if [[ "${MODEL_BUILDER_CHANGED}" == "true" ]]; then
+            branch_versions+=("modelbuilder-${MODEL_BUILDER_VERSION}")
+            changes+=("ModelBuilder to ${MODEL_BUILDER_VERSION}")
+            rows+="| Microsoft.OData.ModelBuilder | \`${PREVIOUS_MODEL_BUILDER_VERSION}\` | \`${MODEL_BUILDER_VERSION}\` |"$'\n'
+          fi
+
+          branch_suffix="${TARGET_BRANCH//[^a-zA-Z0-9-]/-}"
+          version_suffix="$(IFS=-; printf '%s' "${branch_versions[*]}")"
+          update_branch_name="auto/update-odata-dependencies-${branch_suffix}-${version_suffix}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "${update_branch_name}"
+          git add Directory.Packages.props
+          git commit -m "chore: update OData dependencies for ${TARGET_BRANCH}"
+
+          git fetch origin "${update_branch_name}:refs/remotes/origin/${update_branch_name}" || true
+          git push --force-with-lease origin "HEAD:refs/heads/${update_branch_name}"
+
+          title="Update ${changes[0]}"
+          if [[ "${#changes[@]}" -eq 2 ]]; then
+            title+=" and ${changes[1]}"
+          fi
+          title+=" on ${TARGET_BRANCH}"
+          body_file="${RUNNER_TEMP}/odata-dependency-pr.md"
+          cat > "${body_file}" <<EOF
+          ## Summary
+
+          | Dependency | Previous | Updated |
+          | --- | --- | --- |
+          ${rows}
+
+          ## Validation
+
+          Restored \`${TARGET_FRAMEWORKS}\` after updating the listed stable dependencies within their configured ranges.
+          EOF
+
+          existing_pr="$(gh pr list \
+            --repo "${GITHUB_REPOSITORY}" --base "${TARGET_BRANCH}" --head "${update_branch_name}" --state open --json number --jq '.[0].number')"
+
+          if [[ -z "${existing_pr}" ]]; then
+            gh pr create \
+              --repo "${GITHUB_REPOSITORY}" --base "${TARGET_BRANCH}" --head "${update_branch_name}" --title "${title}" --body-file "${body_file}"
+          else
+            gh pr edit "${existing_pr}" \
+              --repo "${GITHUB_REPOSITORY}" --title "${title}" --body-file "${body_file}"
+          fi

@@ -1,6 +1,10 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ODataLibPackageVersion>8.4.4</ODataLibPackageVersion>
+    <ODataLibPackageDependency>[$(ODataLibPackageVersion), 9.0.0)</ODataLibPackageDependency>
+    <ODataModelBuilderPackageVersion>2.0.0</ODataModelBuilderPackageVersion>
+    <ODataModelBuilderPackageDependency>[$(ODataModelBuilderPackageVersion), 3.0.0)</ODataModelBuilderPackageDependency>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Azure.Identity" Version="1.13.1" />
@@ -18,10 +22,10 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
-    <PackageVersion Include="Microsoft.OData.Core" Version="8.4.4" />
-    <PackageVersion Include="Microsoft.OData.Edm" Version="8.4.4" />
-    <PackageVersion Include="Microsoft.Spatial" Version="8.4.4" />
-    <PackageVersion Include="Microsoft.OData.ModelBuilder" Version="2.0.0" />
+    <PackageVersion Include="Microsoft.OData.Core" Version="$(ODataLibPackageVersion)" />
+    <PackageVersion Include="Microsoft.OData.Edm" Version="$(ODataLibPackageVersion)" />
+    <PackageVersion Include="Microsoft.Spatial" Version="$(ODataLibPackageVersion)" />
+    <PackageVersion Include="Microsoft.OData.ModelBuilder" Version="$(ODataModelBuilderPackageVersion)" />
     <PackageVersion Include="Microsoft.OpenApi.OData" Version="1.6.9" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.13.1" />
