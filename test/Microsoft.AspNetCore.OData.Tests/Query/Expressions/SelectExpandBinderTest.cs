@@ -1948,6 +1948,59 @@ public class SelectExpandBinderTest
         var customer = Expression.Lambda(filterInExpand).Compile().DynamicInvoke() as QueryCustomer;
         Assert.Null(customer);
     }
+
+    [Theory]
+    [InlineData(HandleNullPropagationOption.True)]
+    [InlineData(HandleNullPropagationOption.False)]
+    public void CreatePropertyValueExpression_Collection_WorksWithNavigationPropertyFilter_HandleNullPropagationOption(HandleNullPropagationOption nullOption)
+    {
+        // Arrange
+        _settings.HandleNullPropagation = nullOption;
+        var source = Expression.Constant(new QueryCustomer
+        {
+            Orders = new[]
+            {
+                new QueryOrder { Id = 1, Customer = new QueryCustomer { Name = "TestCustomer" } },
+                new QueryOrder { Id = 2, Customer = new QueryCustomer { Name = "OtherCustomer" } }
+            }
+        });
+
+        SelectExpandBinder binder = GetBinder<QueryCustomer>(_model);
+        var ordersProperty = _customer.NavigationProperties().Single(p => p.Name == "Orders");
+
+        SelectExpandClause selectExpand = ParseSelectExpand(null, "Orders($filter=Customer/Name eq 'TestCustomer')", _model, _customer, _customers);
+        ExpandedNavigationSelectItem expandItem = Assert.Single(selectExpand.SelectedItems) as ExpandedNavigationSelectItem;
+        Assert.NotNull(expandItem);
+        Assert.NotNull(expandItem.FilterOption);
+
+        // Act
+        var filterInExpand = binder.CreatePropertyValueExpression(_queryBinderContext, _customer, ordersProperty, source, expandItem.FilterOption);
+
+        // Assert
+        if (nullOption == HandleNullPropagationOption.True)
+        {
+            Assert.Equal(
+                string.Format(
+                    "IIF((value({0}) == null), null, IIF((value({0}).Orders == null), null, " +
+                    "value({0}).Orders.Where($it => (IIF(($it.Customer == null), null, $it.Customer.Name) == value({1}).TypedProperty))))",
+                    source.Type,
+                    "Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer+TypedLinqParameterContainer`1[System.String]"),
+                filterInExpand.ToString());
+        }
+        else
+        {
+            Assert.Equal(
+                string.Format(
+                    "value({0}).Orders.Where($it => ($it.Customer.Name == value({1}).TypedProperty))",
+                    source.Type,
+                    "Microsoft.AspNetCore.OData.Query.Container.LinqParameterContainer+TypedLinqParameterContainer`1[System.String]"),
+                filterInExpand.ToString());
+        }
+
+        var orders = Expression.Lambda(filterInExpand).Compile().DynamicInvoke() as IEnumerable<QueryOrder>;
+        QueryOrder order = Assert.Single(orders);
+        Assert.Equal(1, order.Id);
+    }
     #endregion
 
     [Fact]
