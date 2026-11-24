@@ -43,7 +43,7 @@ public class MinimalAPITodoEndpointsTest : IClassFixture<MinimalTestFixture<Mini
 
     protected static void ConfigureAPIs(WebApplication app)
     {
-        app.UseODataMiniBatching("odata/$batch", MinimalEdmModel.GetEdmModel());
+        app.UseODataMiniBatching("$batch", MinimalEdmModel.GetEdmModel());
 
         app.MapGet("v0/todos", (IMiniTodoTaskRepository db) => db.GetTodos());
 
@@ -198,7 +198,7 @@ public class MinimalAPITodoEndpointsTest : IClassFixture<MinimalTestFixture<Mini
     public async Task PostBatchRequest_WithMinimalBatchMiddleware_JsonBatch()
     {
         // Arrange & Act
-        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "odata/$batch");
+        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "$batch");
         request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
         HttpContent content = new StringContent(@"
     {
