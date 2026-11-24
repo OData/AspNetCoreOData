@@ -26,6 +26,12 @@ public static class ODataApplicationBuilderExtensions
     /// <summary>
     /// Use OData batching middleware.
     /// </summary>
+    /// <remarks>
+    /// Register this middleware immediately before <c>UseRouting()</c>. Middleware that handles
+    /// requests based on their path and can terminate the pipeline should be registered before
+    /// <c>UseODataBatching()</c>, so rewritten batch sub-requests cannot reach it before endpoint
+    /// routing validates the selected endpoint.
+    /// </remarks>
     /// <param name="app">The <see cref="IApplicationBuilder "/> to use.</param>
     /// <returns>The <see cref="IApplicationBuilder "/>.</returns>
     public static IApplicationBuilder UseODataBatching(this IApplicationBuilder app)
