@@ -76,6 +76,7 @@ public class ApplyQueryValidatorTests
     [InlineData("aggregate(NotFilterableProperty with countdistinct as R)")]
     [InlineData("aggregate(NonFilterableProperty with countdistinct as R)")]
     [InlineData("groupby((Id),aggregate(NotFilterableProperty with countdistinct as R))")]
+    [InlineData("aggregate(Contacts/$count($filter=NotFilterableProperty eq 'x') with sum as R)")]
     public void Validate_Throws_ForRestrictedPropertyInAggregate(string apply)
     {
         // Arrange
@@ -90,6 +91,7 @@ public class ApplyQueryValidatorTests
     [InlineData("compute(length(NotFilterableProperty) as L)")]
     [InlineData("compute(Name eq 'a' or NotFilterableProperty eq 'b' as F)")]
     [InlineData("compute(Address/NotFilterableProperty eq 'x' as F)")]
+    [InlineData("compute(Contacts/$count($filter=NotFilterableProperty eq 'x') as C)")]
     public void Validate_Throws_ForRestrictedPropertyInCompute(string apply)
     {
         // Arrange
@@ -160,12 +162,14 @@ public class ApplyQueryValidatorTests
     [InlineData("groupby((Name),aggregate(AmountSpent with sum as Total))")]
     [InlineData("aggregate(AmountSpent with sum as Total)")]
     [InlineData("aggregate($count as Count)")]
+    [InlineData("aggregate(Contacts/$count($filter=Name eq 'x') with sum as R)")]
     [InlineData("aggregate(Contacts(Name with countdistinct as R))")]
     [InlineData("compute(AmountSpent mul 2 as Double)")]
     [InlineData("compute(length(Name) as L)")]
     [InlineData("compute(Contacts/any(c: c/Name ne null) as HasNamed)")]
     [InlineData("compute(Contacts/all(c: c/Name ne null) as AllNamed)")]
     [InlineData("compute(RelationshipManager/Name eq 'x' as F)")]
+    [InlineData("compute(Contacts/$count($filter=Name eq 'x') as C)")]
     public void Validate_DoesNotThrow_ForUnrestrictedPropertyInGroupByAggregateCompute(string apply)
     {
         // Arrange
