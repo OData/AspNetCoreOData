@@ -321,5 +321,20 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 this.FlattenedProperties = QueryBinder.GetFlattenedProperties(source, this, query);
             }
         }
+        private int _singleFunctionCallDepth = 0;
+
+        internal void EnterSingleFunctionCall()
+        {
+            _singleFunctionCallDepth++;
+            if (_singleFunctionCallDepth > QuerySettings.MaxFunctionCallDepth)
+            {
+                throw new ODataException(Error.Format(SRResources.SingleValueFunctionCallTooDeep, _singleFunctionCallDepth, QuerySettings.MaxFunctionCallDepth));
+            }
+        }
+
+        internal void LeaveSingleFunctionCall()
+        {
+            _singleFunctionCallDepth--;
+        }
     }
 }
