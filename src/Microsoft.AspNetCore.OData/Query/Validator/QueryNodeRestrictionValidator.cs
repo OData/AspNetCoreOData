@@ -190,7 +190,19 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                     // underlying property to restrict, so it is left as a no-op.
                     if (node is CountNode countNode)
                     {
+                        if (countNode.FilterClause != null)
+                        {
+                            Validate(countNode.FilterClause.Expression, validatorContext);
+                        }
+
+                        if (countNode.SearchClause != null)
+                        {
+                            Validate(countNode.SearchClause.Expression, validatorContext);
+                        }
+
                         Validate(countNode.Source, validatorContext);
+                        // $count($filter=...) can contain lambdas too; keep the enclosing expression's lambda depth.
+                        QueryValidatorHelpers.ValidateAnyAllExpressionDepth(countNode.FilterClause?.Expression, validationSettings, validatorContext.CurrentAnyAllExpressionDepth);
                     }
 
                     break;

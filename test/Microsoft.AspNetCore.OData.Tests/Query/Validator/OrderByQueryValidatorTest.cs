@@ -30,6 +30,63 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             _validator = new OrderByQueryValidator();
         }
 
+        [Theory]
+        [MemberData(nameof(FilterQueryValidatorTests.NestedAnyAllInputs), MemberType = typeof(FilterQueryValidatorTests))]
+        public void AnyAllExpressionDepth_ValidatesEveryOrderByClauseAndCurrentSetting(string expression)
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
+            var option = new OrderByQueryOption($"ProductName,{expression}", context);
+            var settings = new ODataValidationSettings();
+
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(option, settings));
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            settings.MaxAnyAllExpressionDepth = 2;
+            _validator.Validate(option, settings);
+            settings.MaxAnyAllExpressionDepth = 1;
+            Assert.Throws<ODataException>(() => _validator.Validate(option, settings));
+        }
+
+        [Theory]
+        [InlineData("not Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))")]
+        [InlineData("Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) eq true")]
+        [InlineData("Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) in (true)")]
+        [InlineData("cast(Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')),Edm.Boolean)")]
+        [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')))")]
+        public void AnyAllExpressionDepth_OrderByChecksWrappedExpressions(string expression)
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
+            var option = new OrderByQueryOption(expression, context);
+
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(option, new ODataValidationSettings()));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            _validator.Validate(option, new ODataValidationSettings { MaxAnyAllExpressionDepth = 2 });
+        }
+
+        [Theory]
+        [InlineData("Contacts/any()")]
+        [InlineData("Contacts/any(c:c/Name eq 'x'),Contacts/all(c:c/Name ne 'x')")]
+        [InlineData("Contacts/any(c:c/Name eq 'x') or Contacts/all(c:c/Name ne 'x')")]
+        public void AnyAllExpressionDepth_OrderByDoesNotAccumulateSiblingDepth(string expression)
+        {
+            _validator.Validate(new OrderByQueryOption(expression, _context), new ODataValidationSettings());
+        }
+
+        [Fact]
+        public void AnyAllExpressionDepth_OrderByDoesNotIntroduceOtherPolicies()
+        {
+            var settings = new ODataValidationSettings { AllowedFunctions = AllowedFunctions.None, AllowedLogicalOperators = AllowedLogicalOperators.None, MaxNodeCount = 1 };
+            var valid = new OrderByQueryOption("Contacts/any(a:a/Name eq 'x')", _context);
+            var invalid = new OrderByQueryOption("Contacts/any(a:a/Contacts/any(b:b/Name eq 'x'))", _context);
+
+            _validator.Validate(valid, settings);
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(invalid, settings));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+        }
+
         [Fact]
         public void ValidateOrderByQueryValidator_ThrowsOnNullOption()
         {

@@ -41,6 +41,101 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             _queryContext.DefaultQueryConfigurations.EnableExpand = true;
         }
 
+        [Theory]
+        [InlineData("Category($expand=QueryableProducts($orderby=ProductName,Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))))")]
+        [InlineData("Category($expand=QueryableProducts($compute=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) as Flag))")]
+        [InlineData("Category($expand=QueryableProducts($compute=1 as First,Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x')) as Flag))")]
+        [InlineData("Category($expand=QueryableProducts/$ref($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x'))))")]
+        [InlineData("Category($expand=QueryableProducts/$ref($orderby=ProductName,Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))))")]
+        [InlineData("Category($expand=QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))))")]
+        [InlineData("Category($expand=QueryableProducts/$ref($compute=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) as Flag))")]
+        [InlineData("Category($expand=QueryableProducts/$ref($compute=1 as First,Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) as Flag))")]
+        [InlineData("Category($expand=QueryableProducts($expand=Category($expand=EnumerableProducts($compute=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) as Flag))))")]
+        public void AnyAllExpressionDepth_ExpandChecksNestedOptions(string expand)
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            context.DefaultQueryConfigurations.EnableExpand = true;
+            context.DefaultQueryConfigurations.EnableOrderBy = true;
+            var option = new SelectExpandQueryOption(null, expand, context);
+            var validator = new SelectExpandQueryValidator();
+            var settings = new ODataValidationSettings { MaxExpansionDepth = 0 };
+
+            var error = Assert.Throws<ODataException>(() => validator.Validate(option, settings));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            settings.MaxAnyAllExpressionDepth = 2;
+            validator.Validate(option, settings);
+            settings.MaxAnyAllExpressionDepth = 1;
+            Assert.Throws<ODataException>(() => validator.Validate(option, settings));
+        }
+
+        [Theory]
+        [InlineData("Addresses($compute=Children/any(a:a/Children/any(b:b/Name eq 'x')) as Flag)")]
+        [InlineData("Addresses($orderby=Name,Children/any(a:a/Children/any(b:b/Name eq 'x')))")]
+        [InlineData("Addresses($select=Children($compute=Children/any(a:a/Children/any(b:b/Name eq 'x')) as Flag))")]
+        public void AnyAllExpressionDepth_SelectChecksComplexCollectionOptions(string select)
+        {
+            var context = ValidationTestHelper.CreateCustomerContext();
+            var model = Assert.IsType<EdmModel>(context.Model);
+            var customer = Assert.IsType<EdmEntityType>(model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == "QueryCompositionCustomer"));
+            var complex = new EdmComplexType("NS", "DepthComplex");
+            var collection = new EdmCollectionTypeReference(new EdmCollectionType(new EdmComplexTypeReference(complex, false)));
+            complex.AddStructuralProperty("Name", EdmPrimitiveTypeKind.String);
+            complex.AddStructuralProperty("Children", collection);
+            model.AddElement(complex);
+            customer.AddStructuralProperty("Addresses", collection);
+            context.DefaultQueryConfigurations.EnableSelect = true;
+            var option = new SelectExpandQueryOption(select, null, context);
+            var validator = new SelectExpandQueryValidator();
+            var settings = new ODataValidationSettings();
+
+            var error = Assert.Throws<ODataException>(() => validator.Validate(option, settings));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            settings.MaxAnyAllExpressionDepth = 2;
+            validator.Validate(option, settings);
+        }
+
+        [Theory]
+        [InlineData("Category($expand=QueryableProducts/$ref)")]
+        [InlineData("Category($expand=QueryableProducts/$count)")]
+        public void AnyAllExpressionDepth_ExpandAllowsAbsentExpressionOptions(string expand)
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            context.DefaultQueryConfigurations.EnableExpand = true;
+            var option = new SelectExpandQueryOption(null, expand, context);
+
+            new SelectExpandQueryValidator().Validate(option, new ODataValidationSettings { MaxExpansionDepth = 0 });
+        }
+
+        [Fact]
+        public void AnyAllExpressionDepth_ExpandDoesNotAccumulateSiblingDepth()
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            context.DefaultQueryConfigurations.EnableExpand = true;
+            var settings = new ODataValidationSettings { MaxExpansionDepth = 0 };
+            var validator = new SelectExpandQueryValidator();
+            var valid = new SelectExpandQueryOption(null, "Category($expand=QueryableProducts($compute=Category/EnumerableProducts/any(a:a/ProductName eq 'x') as Flag),EnumerableProducts($compute=Category/EnumerableProducts/all(a:a/ProductName eq 'x') as Flag))", context);
+            var invalid = new SelectExpandQueryOption(null, "Category($expand=QueryableProducts($compute=Category/EnumerableProducts/any(a:a/ProductName eq 'x') as Flag),EnumerableProducts($compute=Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) as Flag))", context);
+
+            validator.Validate(valid, settings);
+            var error = Assert.Throws<ODataException>(() => validator.Validate(invalid, settings));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            validator.Validate(valid, settings);
+        }
+
+        [Fact]
+        public void AnyAllExpressionDepth_NestedComputeDoesNotIntroduceOtherPolicies()
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            context.DefaultQueryConfigurations.EnableExpand = true;
+            var settings = new ODataValidationSettings { MaxExpansionDepth = 0, AllowedFunctions = AllowedFunctions.None, AllowedLogicalOperators = AllowedLogicalOperators.None, MaxNodeCount = 1 };
+            var option = new SelectExpandQueryOption(null, "Category($expand=QueryableProducts($compute=Category/EnumerableProducts/any(a:a/ProductName eq 'x') as Flag))", context);
+
+            new SelectExpandQueryValidator().Validate(option, settings);
+        }
+
         [Fact]
         public void ValidateSelectExpandQueryValidator_Throws_NullOption()
         {

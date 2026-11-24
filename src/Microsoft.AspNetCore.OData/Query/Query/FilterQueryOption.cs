@@ -132,6 +132,8 @@ namespace Microsoft.AspNetCore.OData.Query
         /// </summary>
         public string RawValue { get; private set; }
 
+        internal bool HasParameterAliases => _queryOptionParser?.ParameterAliasNodes.Count > 0;
+
         /// <summary>
         /// Apply the filter query to the given IQueryable.
         /// </summary>
@@ -187,6 +189,12 @@ namespace Microsoft.AspNetCore.OData.Query
             {
                 Validator.Validate(this, validationSettings);
             }
+        }
+
+        internal QueryNode GetFilterExpressionForDepthValidation()
+        {
+            // Use a fresh translation rather than re-enumerating the cached filter's translated arguments.
+            return _queryOptionParser.ParseFilter().Expression.Accept(new ParameterAliasNodeTranslator(_queryOptionParser.ParameterAliasNodes));
         }
     }
 }

@@ -270,7 +270,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="validatorContext">The validator context.</param>
         protected virtual void ValidateExpandedCountSelectItem(ExpandedCountSelectItem expandCountItem, SelectExpandValidatorContext validatorContext)
         {
-            // So far, No default validation logic here.
+            ValidateExpandedExpressionDepth(expandCountItem, validatorContext);
         }
 
         /// <summary>
@@ -280,7 +280,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="validatorContext">The validator context.</param>
         protected virtual void ValidateExpandedReferenceSelectItem(ExpandedReferenceSelectItem expandReferItem, SelectExpandValidatorContext validatorContext)
         {
-            // So far, No default validation logic here.
+            ValidateExpandedExpressionDepth(expandReferItem, validatorContext);
+        }
+
+        private static void ValidateExpandedExpressionDepth(ExpandedReferenceSelectItem expandItem, SelectExpandValidatorContext validatorContext)
+        {
+            if (expandItem != null)
+            {
+                // $ref and $count use their own validation methods, so check their expression options here.
+                QueryValidatorHelpers.ValidateAnyAllExpressionDepth(expandItem.FilterOption?.Expression, validatorContext.ValidationSettings);
+                QueryValidatorHelpers.ValidateAnyAllExpressionDepth(expandItem.OrderByOption, validatorContext.ValidationSettings);
+                QueryValidatorHelpers.ValidateAnyAllExpressionDepth(expandItem.ComputeOption, validatorContext.ValidationSettings);
+            }
         }
 
         /// <summary>
@@ -439,6 +450,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             if (orderByClause != null)
             {
+                // Include ThenBy entries in the depth check before applying the existing model checks.
+                QueryValidatorHelpers.ValidateAnyAllExpressionDepth(orderByClause, validatorContext.ValidationSettings);
                 // TODO: OrderByModelLimitationsValidator is used already. but we should use IOrderbyQueryValidator to validate.
                 // Should change it later.
                 OrderByModelLimitationsValidator orderByQueryValidator =
@@ -563,7 +576,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         /// <param name="validatorContext">The validator context.</param>
         protected virtual void ValidateNestedCompute(ComputeClause computeClause, SelectExpandValidatorContext validatorContext)
         {
-            // Add logics here to verify nested $compute. So far, No default validation logic here.
+            // Nested compute must check lambda depth even though it does not use the top-level compute validator.
+            QueryValidatorHelpers.ValidateAnyAllExpressionDepth(computeClause, validatorContext.ValidationSettings);
         }
 
         /// <summary>
