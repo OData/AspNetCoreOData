@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
@@ -73,6 +74,83 @@ public class ParameterAliasNodeTranslatorTest
     }
 
     [Fact]
+    public void ReturnsNull_ParameterAliasMappedToNull()
+    {
+        // Arrange
+        var translator = new ParameterAliasNodeTranslator(
+            new Dictionary<string, SingleValueNode> { { "@p", null } });
+        var parameterAliasNode = new ParameterAliasNode("@p", null);
+
+        // Act
+        QueryNode translatedNode = parameterAliasNode.Accept(translator);
+
+        // Assert
+        var constantNode = Assert.IsType<ConstantNode>(translatedNode);
+        Assert.Null(constantNode.Value);
+    }
+
+    [Fact]
+    public void ReturnsNull_WhenParameterAliasNodesAreCleared()
+    {
+        // Arrange
+        var parameterAliasNodes = new Dictionary<string, SingleValueNode>
+        {
+            { "@p", _parameterAliasMappedNode }
+        };
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+        var parameterAliasNode = new ParameterAliasNode("@p", null);
+        parameterAliasNodes.Clear();
+
+        // Act
+        QueryNode translatedNode = parameterAliasNode.Accept(translator);
+
+        // Assert
+        var constantNode = Assert.IsType<ConstantNode>(translatedNode);
+        Assert.Null(constantNode.Value);
+    }
+
+    [Fact]
+    public void ReturnsNull_WhenParameterAliasIsRemoved()
+    {
+        // Arrange
+        var parameterAliasNodes = new Dictionary<string, SingleValueNode>
+        {
+            { "@p", _parameterAliasMappedNode }
+        };
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+        var parameterAliasNode = new ParameterAliasNode("@p", null);
+        parameterAliasNodes.Remove("@p");
+
+        // Act
+        QueryNode translatedNode = parameterAliasNode.Accept(translator);
+
+        // Assert
+        var constantNode = Assert.IsType<ConstantNode>(translatedNode);
+        Assert.Null(constantNode.Value);
+    }
+
+    [Fact]
+    public void UsesCurrentValue_WhenParameterAliasIsRemovedThenReAdded()
+    {
+        // Arrange
+        var parameterAliasNodes = new Dictionary<string, SingleValueNode>
+        {
+            { "@p", _parameterAliasMappedNode }
+        };
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+        var parameterAliasNode = new ParameterAliasNode("@p", null);
+        var updatedNode = new ConstantNode(456);
+        parameterAliasNodes.Remove("@p");
+        parameterAliasNodes.Add("@p", updatedNode);
+
+        // Act
+        QueryNode translatedNode = parameterAliasNode.Accept(translator);
+
+        // Assert
+        Assert.Same(updatedNode, translatedNode);
+    }
+
+    [Fact]
     public void CanTranslate_ParameterAliasNode()
     {
         // Arrange
@@ -85,6 +163,116 @@ public class ParameterAliasNodeTranslatorTest
 
         // Assert
         Assert.Same(_parameterAliasMappedNode, translatedNode);
+    }
+
+    [Fact]
+    public void CanTranslate_MultipleParameterAliasNodes()
+    {
+        // Arrange
+        var firstNode = new ConstantNode(123);
+        var secondNode = new ConstantNode(456);
+        var translator = new ParameterAliasNodeTranslator(
+            new Dictionary<string, SingleValueNode>
+            {
+                { "@first", firstNode },
+                { "@second", secondNode }
+            });
+
+        // Act
+        QueryNode firstTranslatedNode = new ParameterAliasNode("@first", null).Accept(translator);
+        QueryNode secondTranslatedNode = new ParameterAliasNode("@second", null).Accept(translator);
+
+        // Assert
+        Assert.Same(firstNode, firstTranslatedNode);
+        Assert.Same(secondNode, secondTranslatedNode);
+    }
+
+    [Fact]
+    public void CanTranslate_ParameterAliasChainAtExpansionLimit()
+    {
+        // Arrange
+        var parameterAliasNode = new ParameterAliasNode("@p0", null);
+        IDictionary<string, SingleValueNode> parameterAliasNodes = CreateParameterAliasChain(ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount);
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+
+        // Act
+        QueryNode translatedNode = parameterAliasNode.Accept(translator);
+
+        // Assert
+        var constantNode = Assert.IsType<ConstantNode>(translatedNode);
+        Assert.Equal(123, constantNode.Value);
+    }
+
+    [Fact]
+    public void ThrowsODataException_ParameterAliasChainBeyondExpansionLimit()
+    {
+        // Arrange
+        var parameterAliasNode = new ParameterAliasNode("@p0", null);
+        IDictionary<string, SingleValueNode> parameterAliasNodes = CreateParameterAliasChain(ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount + 1);
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => parameterAliasNode.Accept(translator), $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.");
+    }
+
+    [Fact]
+    public void ThrowsODataException_CyclicParameterAliases()
+    {
+        // Arrange
+        var parameterAliasNodes = new Dictionary<string, SingleValueNode>
+        {
+            { "@first", new ParameterAliasNode("@second", null) },
+            { "@second", new ParameterAliasNode("@first", null) }
+        };
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+        var parameterAliasNode = new ParameterAliasNode("@first", null);
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => parameterAliasNode.Accept(translator), $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.");
+    }
+
+    [Fact]
+    public void NonAliasNodes_DoNotConsumeParameterAliasExpansionCount()
+    {
+        // Arrange
+        var parameterAliasNode = new ParameterAliasNode("@p0", null);
+        IDictionary<string, SingleValueNode> parameterAliasNodes = CreateParameterAliasChain(ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount);
+        var translator = new ParameterAliasNodeTranslator(parameterAliasNodes);
+
+        for (int i = 0; i < ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount + 1; i++)
+        {
+            new ConstantNode(i).Accept(translator);
+        }
+
+        // Act
+        QueryNode translatedNode = parameterAliasNode.Accept(translator);
+
+        // Assert
+        Assert.IsType<ConstantNode>(translatedNode);
+    }
+
+    [Fact]
+    public void ParameterAliasExpansionCount_IsIsolatedBetweenTranslators()
+    {
+        // Arrange
+        var firstParameterAliasNode = new ParameterAliasNode("@p0", null);
+        IDictionary<string, SingleValueNode> firstParameterAliasNodes = CreateParameterAliasChain(ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount);
+
+        var secondParameterAliasNode = new ParameterAliasNode("@p0", null);
+        IDictionary<string, SingleValueNode> secondParameterAliasNodes = CreateParameterAliasChain(ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount);
+
+        var firstTranslator = new ParameterAliasNodeTranslator(firstParameterAliasNodes);
+        var secondTranslator = new ParameterAliasNodeTranslator(secondParameterAliasNodes);
+
+        // Act
+        QueryNode firstTranslatedNode = firstParameterAliasNode.Accept(firstTranslator);
+        QueryNode secondTranslatedNode = secondParameterAliasNode.Accept(secondTranslator);
+
+        // Assert
+        Assert.IsType<ConstantNode>(firstTranslatedNode);
+        Assert.IsType<ConstantNode>(secondTranslatedNode);
     }
 
     [Fact]
@@ -360,6 +548,19 @@ public class ParameterAliasNodeTranslatorTest
             new Dictionary<string, SingleValueNode> { { "@p", _parameterAliasMappedNode } });
         QueryNode translatedNode = filterClause.Expression.Accept(translator);
         return translatedNode;
+    }
+
+    private static IDictionary<string, SingleValueNode> CreateParameterAliasChain(int expansionCount)
+    {
+        var parameterAliasNodes = new Dictionary<string, SingleValueNode>();
+
+        for (int i = 0; i < expansionCount - 1; i++)
+        {
+            parameterAliasNodes.Add($"@p{i}", new ParameterAliasNode($"@p{i + 1}", null));
+        }
+
+        parameterAliasNodes.Add($"@p{expansionCount - 1}", new ConstantNode(123));
+        return parameterAliasNodes;
     }
 
     private class ParameterAliasCustomer
