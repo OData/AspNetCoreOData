@@ -478,9 +478,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             ValidateFunction(node.Name, validatorContext);
 
-            foreach (QueryNode argumentNode in node.Parameters)
+            validatorContext.EnterFunctionCall();
+
+            try
             {
-                ValidateQueryNode(argumentNode, validatorContext);
+                foreach (QueryNode argumentNode in node.Parameters)
+                {
+                    ValidateQueryNode(argumentNode, validatorContext);
+                }
+            }
+            finally
+            {
+                validatorContext.ExitFunctionCall();
             }
         }
 
@@ -501,9 +510,18 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             ValidateFunction(node.Name, validatorContext);
 
-            foreach (QueryNode argumentNode in node.Parameters)
+            validatorContext.EnterFunctionCall();
+
+            try
             {
-                ValidateQueryNode(argumentNode, validatorContext);
+                foreach (QueryNode argumentNode in node.Parameters)
+                {
+                    ValidateQueryNode(argumentNode, validatorContext);
+                }
+            }
+            finally
+            {
+                validatorContext.ExitFunctionCall();
             }
         }
 

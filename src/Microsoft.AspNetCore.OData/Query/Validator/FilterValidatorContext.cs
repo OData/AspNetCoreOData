@@ -17,6 +17,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
     {
         private int _currentNodeCount = 0;
         private int _currentAnyAllExpressionDepth = 0;
+        private int _currentFunctionCallDepth = 0;
 
         /// <summary>
         /// The top level $filter query option.
@@ -34,6 +35,11 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         public int CurrentAnyAllExpressionDepth => _currentAnyAllExpressionDepth;
 
         /// <summary>
+        /// This depth is for function call expressions recursively in a query, such as 'length(tolower(name)) eq 5', the depth is 2.
+        /// </summary>
+        public int CurrentFunctionCallDepth => _currentFunctionCallDepth;
+
+        /// <summary>
         /// Clone the context.
         /// </summary>
         /// <returns>The cloned context.</returns>
@@ -48,7 +54,8 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 StructuredType = this.StructuredType,
                 CurrentDepth = this.CurrentDepth,
                 _currentNodeCount = this._currentNodeCount,
-                _currentAnyAllExpressionDepth = this._currentAnyAllExpressionDepth
+                _currentAnyAllExpressionDepth = this._currentAnyAllExpressionDepth,
+                _currentFunctionCallDepth = this._currentFunctionCallDepth
             };
         }
 
@@ -88,6 +95,29 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
         {
             Contract.Assert(_currentAnyAllExpressionDepth > 0);
             _currentAnyAllExpressionDepth--;
+        }
+
+        /// <summary>
+        /// Enter function call.
+        /// </summary>
+        /// <exception cref="ODataException">Throw OData exception.</exception>
+        public void EnterFunctionCall()
+        {
+            if (_currentFunctionCallDepth >= ValidationSettings.MaxFunctionCallDepth)
+            {
+                throw new ODataException(Error.Format(SRResources.MaxFunctionCallDepthExceeded, ValidationSettings.MaxFunctionCallDepth, "MaxFunctionCallDepth"));
+            }
+
+            _currentFunctionCallDepth++;
+        }
+
+        /// <summary>
+        /// Exit function call.
+        /// </summary>
+        public void ExitFunctionCall()
+        {
+            Contract.Assert(_currentFunctionCallDepth > 0);
+            _currentFunctionCallDepth--;
         }
     }
 }
