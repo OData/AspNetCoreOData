@@ -45,6 +45,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                     Name="Name1",
                     SkillSet=new List<Skill> { Skill.CSharp, Skill.Sql },
                     Gender=Gender.Female,
+                MaritalStatus=null,
                     AccessLevel=AccessLevel.Execute,
                     FavoriteSports=new FavoriteSports()
                     {
@@ -57,6 +58,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                     ID=2,Name="Name2",
                     SkillSet=new List<Skill>(),
                     Gender=Gender.Female,
+                MaritalStatus=MaritalStatus.Married,
                     AccessLevel=AccessLevel.Read,
                     FavoriteSports=new FavoriteSports()
                     {
@@ -69,6 +71,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
                     ID=3,Name="Name3",
                     SkillSet=new List<Skill> { Skill.Web, Skill.Sql },
                     Gender=Gender.Female,
+                MaritalStatus=MaritalStatus.Single,
                     AccessLevel=AccessLevel.Read|AccessLevel.Write,
                     FavoriteSports=new FavoriteSports()
                     {
@@ -128,7 +131,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(firstOrDefault.FavoriteSports.LikeMost);
         }
 
-        public IActionResult Post([FromBody]Employee employee)
+        public IActionResult Post([FromBody] Employee employee)
         {
             employee.ID = Employees.Count + 1;
             Employees.Add(employee);
@@ -137,7 +140,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         [HttpPost("Employees({key})/FavoriteSports/LikeMost")]
-        public IActionResult PostToSkillSet(int key, [FromBody]Skill newSkill)
+        public IActionResult PostToSkillSet(int key, [FromBody] Skill newSkill)
         {
             Employee employee = Employees.FirstOrDefault(e => e.ID == key);
             if (employee == null)
@@ -148,7 +151,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Updated(employee.SkillSet);
         }
 
-        public IActionResult Put(int key, [FromBody]Employee employee)
+        public IActionResult Put(int key, [FromBody] Employee employee)
         {
             employee.ID = key;
             Employee originalEmployee = Employees.SingleOrDefault(c => c.ID == key);
@@ -165,7 +168,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             return Ok(employee);
         }
 
-        public IActionResult Patch(int key, [FromBody]Delta<Employee> delta)
+        public IActionResult Patch(int key, [FromBody] Delta<Employee> delta)
         {
             Employee originalEmployee = Employees.SingleOrDefault(c => c.ID == key);
 
@@ -196,7 +199,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         [HttpPost]
-        public IActionResult AddSkill([FromODataUri] int key, [FromBody]ODataActionParameters parameters)
+        public IActionResult AddSkill([FromODataUri] int key, [FromBody] ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
             {
@@ -228,7 +231,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         }
 
         [HttpPost("SetAccessLevel")]
-        public IActionResult SetAccessLevel([FromBody]ODataActionParameters parameters)
+        public IActionResult SetAccessLevel([FromBody] ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
             {

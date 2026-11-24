@@ -31,8 +31,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
             services.ConfigureControllers(typeof(EmployeesController), typeof(MetadataController));
 
-                IEdmModel model1 = EnumsEdmModel.GetConventionModel();
-                IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
+            IEdmModel model1 = EnumsEdmModel.GetConventionModel();
+            IEdmModel model2 = EnumsEdmModel.GetExplicitModel();
 
             services.AddControllers().AddOData(opt => opt.Count().Filter().Expand().Select().OrderBy().SetMaxTop(5)
                 .AddRouteComponents("convention", model1)
@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         {
         }
 
-#region ModelBuilder
+        #region ModelBuilder
         [Theory]
         [InlineData("convention")]
         [InlineData("explicit")]
@@ -82,7 +82,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             var employee = edmModel.SchemaElements.SingleOrDefault(e => e.Name == "Employee") as IEdmEntityType;
             Assert.Single(employee.Key());
             Assert.Equal("ID", employee.Key().First().Name);
-            Assert.Equal(6, employee.Properties().Count());
+            Assert.Equal(7, employee.Properties().Count());
 
             //Entity Enum Collection Property
             var skillSet = employee.Properties().SingleOrDefault(p => p.Name == "SkillSet");
@@ -93,6 +93,11 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.True(gender.Type.IsEnum());
             var edmEnumType = gender.Type.Definition as IEdmEnumType;
             Assert.False(edmEnumType.IsFlags);
+
+            //Entity Nullable Enum Property
+            var maritalStatus = employee.Properties().SingleOrDefault(p => p.Name == "MaritalStatus");
+            Assert.True(maritalStatus.Type.IsEnum());
+            Assert.True(maritalStatus.Type.IsNullable);
 
             var accessLevel = employee.Properties().SingleOrDefault(p => p.Name == "AccessLevel") as IEdmStructuralProperty;
             edmEnumType = accessLevel.Type.Definition as IEdmEnumType;
@@ -129,7 +134,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(EdmTypeKind.Enum, iEdmOperationParameterOfHasAccessLevel.Type.Definition.TypeKind);
         }
 
-#endregion
+        #endregion
         [Theory]
         [InlineData("application/json;odata.metadata=full")]
         [InlineData("application/json;odata.metadata=minimal")]
@@ -372,6 +377,27 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
+        [Fact]
+        public async Task QueryEntitiesFilterByNullableEnumInOperatorWithNullValueFirst()
+        {
+            await ResetDatasource();
+            HttpClient client = CreateClient();
+
+            string requestUri = "/convention/Employees?$filter=MaritalStatus in (null,'Married')&$format=application/json;odata.metadata=none";
+
+            using (var response = await client.GetAsync(requestUri))
+            {
+                Assert.True(response.IsSuccessStatusCode);
+
+                var json = await response.Content.ReadAsObject<JObject>();
+                var value = json.GetValue("value") as JArray;
+                Assert.NotNull(value);
+
+                var ids = value.Select(v => (int)v["ID"]).OrderBy(id => id).ToArray();
+                Assert.Equal(new[] { 1, 2 }, ids);
+            }
+        }
+
         [Theory]
         [InlineData("application/json;odata.metadata=full")]
         [InlineData("application/json;odata.metadata=minimal")]
@@ -417,7 +443,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(3, secondEmployee["ID"]);
         }
 
-#region Update
+        #region Update
 
         //[Fact]
         //public async Task AddEntity()
@@ -598,9 +624,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-#endregion
+        #endregion
 
-#region Delete
+        #region Delete
 
         [Fact]
         public async Task DeleteEntity()
@@ -634,9 +660,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             }
         }
 
-#endregion
+        #endregion
 
-#region Enum with action
+        #region Enum with action
 
         [Fact]
         public async Task EnumInActionParameter()
@@ -676,9 +702,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal("Read, Write", value);
         }
 
-#endregion
+        #endregion
 
-#region Enum with function
+        #region Enum with function
 
         [Fact]
         public async Task EnumInFunctionOutput()
@@ -713,7 +739,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             Assert.Equal(expectedValue, actualValue);
         }
 
-#endregion
+        #endregion
 
         private async Task<HttpResponseMessage> ResetDatasource()
         {

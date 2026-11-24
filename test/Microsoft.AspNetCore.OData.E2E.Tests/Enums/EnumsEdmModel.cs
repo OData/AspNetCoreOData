@@ -20,6 +20,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             employee.Property(c => c.Name);
             employee.CollectionProperty<Skill>(c => c.SkillSet);
             employee.EnumProperty<Gender>(c => c.Gender);
+            employee.EnumProperty<MaritalStatus>(c => c.MaritalStatus);
             employee.EnumProperty<AccessLevel>(c => c.AccessLevel);
             employee.ComplexProperty<FavoriteSports>(c => c.FavoriteSports);
 
@@ -31,6 +32,12 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
             var gender = builder.EnumType<Gender>();
             gender.Member(Gender.Female);
             gender.Member(Gender.Male);
+
+            var maritalStatus = builder.EnumType<MaritalStatus>();
+            maritalStatus.Member(MaritalStatus.Single);
+            maritalStatus.Member(MaritalStatus.Married);
+            maritalStatus.Member(MaritalStatus.Divorced);
+            maritalStatus.Member(MaritalStatus.Widowed);
 
             var accessLevel = builder.EnumType<AccessLevel>();
             accessLevel.Member(AccessLevel.Execute);
