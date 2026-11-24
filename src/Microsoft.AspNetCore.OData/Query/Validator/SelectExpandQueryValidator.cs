@@ -41,6 +41,12 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 throw Error.ArgumentNull(nameof(validationSettings));
             }
 
+            // Resolve the effective projection item limit: the endpoint (ODataValidationSettings) value overrides the
+            // global DefaultQueryConfigurations value, which overrides the built-in default. A non-positive value disables the check.
+            int maxSelectExpandNodeCount = validationSettings.MaxSelectExpandNodeCount
+                ?? selectExpandQueryOption.Context?.DefaultQueryConfigurations?.MaxSelectExpandNodeCount
+                ?? ODataValidationSettings.DefaultMaxSelectExpandNodeCount;
+
             SelectExpandValidatorContext validatorContext = new SelectExpandValidatorContext
             {
                 SelectExpand = selectExpandQueryOption,
@@ -50,6 +56,10 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 StructuredType = selectExpandQueryOption.Context.TargetStructuredType,
                 CurrentDepth = 0
             };
+
+            // A single counter is shared across every level of the projection tree (SelectExpandValidatorContext.Clone
+            // copies it by reference) so the whole $select/$expand tree is counted once. A non-positive limit disables the check.
+            validatorContext.InitializeSelectExpandNodeCount(maxSelectExpandNodeCount);
 
             ValidateSelectExpand(selectExpandQueryOption.SelectExpandClause, validatorContext);
 
@@ -86,37 +96,69 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
 
             foreach (SelectItem selectItem in selectExpandClause.SelectedItems)
             {
+                // $levels repeats this $expand node and its subtree once per level, so count and validate it through
+                // a context weighted by that level count. Sibling items keep the unweighted context.
+                long levels = GetProjectionLevels(selectItem, validatorContext);
+                SelectExpandValidatorContext itemContext = validatorContext.WithProjectionWeightForLevels(levels);
+
+                itemContext.IncrementSelectExpandNodeCount();
+
                 if (selectItem is ExpandedNavigationSelectItem expandedSelectItem)
                 {
                     // $expand=Nav
-                    ValidateExpandedNavigationSelectItem(expandedSelectItem, validatorContext);
+                    ValidateExpandedNavigationSelectItem(expandedSelectItem, itemContext);
                 }
                 else if (selectItem is ExpandedCountSelectItem expandedCountSelectItem)
                 {
                     // $expand=Nav/$count
-                    ValidateExpandedCountSelectItem(expandedCountSelectItem, validatorContext);
+                    ValidateExpandedCountSelectItem(expandedCountSelectItem, itemContext);
                 }
                 else if (selectItem is PathSelectItem pathSelectItem)
                 {
                     // $select=Prop
-                    ValidatePathSelectItem(pathSelectItem, validatorContext);
+                    ValidatePathSelectItem(pathSelectItem, itemContext);
                 }
                 else if (selectItem is WildcardSelectItem wildCardSelectItem)
                 {
                     // $select=*
-                    ValidateWildcardSelectItem(wildCardSelectItem, validatorContext);
+                    ValidateWildcardSelectItem(wildCardSelectItem, itemContext);
                 }
                 else if (selectItem is NamespaceQualifiedWildcardSelectItem namespaceQualifiedWildcardSelectItem)
                 {
                     // $select=NS.*
-                    ValidateNamespaceQualifiedWildcardSelectItem(namespaceQualifiedWildcardSelectItem, validatorContext);
+                    ValidateNamespaceQualifiedWildcardSelectItem(namespaceQualifiedWildcardSelectItem, itemContext);
                 }
                 else if (selectItem is ExpandedReferenceSelectItem referSelectItem) // Let ExpandedReferenceSelectItem be the last one.
                 {
                     // $expand=Nav/$ref
-                    ValidateExpandedReferenceSelectItem(referSelectItem, validatorContext);
+                    ValidateExpandedReferenceSelectItem(referSelectItem, itemContext);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the number of times $levels repeats this item (1 when it is not a $levels $expand). Only $expand is levels-expanded.
+        /// $levels=max resolves to MaxExpansionDepth, and counted levels are capped at MaxExpansionDepth because the depth validator already rejects anything deeper.
+        /// </summary>
+        /// <param name="selectItem">The select item to evaluate.</param>
+        /// <param name="validatorContext">The validator context.</param>
+        /// <returns>The number of times $levels repeats this item.</returns>
+        private static long GetProjectionLevels(SelectItem selectItem, SelectExpandValidatorContext validatorContext)
+        {
+            if (selectItem is ExpandedNavigationSelectItem expandItem && expandItem.LevelsOption != null)
+            {
+                int maxExpansionDepth = validatorContext.ValidationSettings.MaxExpansionDepth;
+                long levels = expandItem.LevelsOption.IsMaxLevel ? maxExpansionDepth : expandItem.LevelsOption.Level;
+
+                if (maxExpansionDepth > 0 && levels > maxExpansionDepth)
+                {
+                    levels = maxExpansionDepth;
+                }
+
+                return levels > 1 ? levels : 1;
+            }
+
+            return 1;
         }
 
         /// <summary>
