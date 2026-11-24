@@ -17,6 +17,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
     /// <summary>
     /// Tests to UriFunctions binder.
     /// </summary>
+    [Collection(nameof(UriFunctionBinderTests))]
     public class UriFunctionBinderTests
     {
         #region BindUriFunctionName

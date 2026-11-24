@@ -327,7 +327,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter.Deserialization
 
             // Assert
             Assert.Equal(EdmTypeKind.Primitive, typeKind);
-            Assert.Equal((decimal)42.6, value);
+            Assert.Equal(42.6m, value);
         }
 
         [Fact]
