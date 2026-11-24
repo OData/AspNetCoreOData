@@ -154,7 +154,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Act & Assert
             ExceptionAssert.Throws<ODataException>(
                 () => _validator.Validate(new FilterQueryOption(filter, _productContext), settings),
-                "The Any/All nesting limit of '1' has been exceeded. 'MaxAnyAllExpressionDepth' can be configured on ODataQuerySettings or EnableQueryAttribute.");
+            "The Any/All nesting limit of '1' has been exceeded. 'MaxAnyAllExpressionDepth' can be configured on ODataValidationSettings or EnableQueryAttribute.");
         }
 
         [Theory]
@@ -184,7 +184,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             ODataValidationSettings settings = new ODataValidationSettings
             {
-                MaxAnyAllExpressionDepth = Int32.MaxValue
+                MaxAnyAllExpressionDepth = Int32.MaxValue,
+                MaxFunctionCallDepth = 100
             };
 
             FilterQueryOption option = new FilterQueryOption(filter, _productContext);
@@ -202,6 +203,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             ODataValidationSettings settings = new ODataValidationSettings
             {
                 MaxAnyAllExpressionDepth = Int32.MaxValue,
+                MaxFunctionCallDepth = 100,
                 MaxNodeCount = 105,
             };
 
@@ -226,6 +228,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             // Arrange
             ODataValidationSettings settings = new ODataValidationSettings
             {
+                MaxFunctionCallDepth = 100,
                 MaxAnyAllExpressionDepth = Int32.MaxValue
             };
 
