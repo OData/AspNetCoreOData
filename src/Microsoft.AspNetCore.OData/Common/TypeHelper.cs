@@ -394,6 +394,12 @@ namespace Microsoft.AspNetCore.OData.Common
         /// <returns>True if type is primitive or known type, otherwise False.</returns>
         public static bool IsPrimitiveOrKnownType(Type type)
         {
+            if (type == null)
+            {
+                throw Error.ArgumentNull(nameof(type));
+            }
+
+            type = GetUnderlyingTypeOrSelf(type);
             return type.IsPrimitive 
                    || type == typeof(string)
                    || type == typeof(Uri)

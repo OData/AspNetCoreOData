@@ -50,9 +50,9 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
             return Created(Product);
         }
 
-        public IActionResult Put(int key, [FromBody] Product Product)
+        public IActionResult Put(string key, [FromBody] Product Product)
         {
-            Product.ProductId = key+"";
+            Product.ProductId = key;
             Product originalProduct = _dbContext.Products.Find(key);
 
             if (originalProduct == null)
@@ -67,7 +67,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
             return Ok(Product);
         }
 
-        public IActionResult Patch(int key, [FromBody] Delta<Product> delta)
+        public IActionResult Patch(string key, [FromBody] Delta<Product> delta)
         {
             Product originalProduct = _dbContext.Products.Find(key);
 
@@ -83,7 +83,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Lists
             return Ok(delta);
         }
 
-        public IActionResult Delete(int key)
+        public IActionResult Delete(string key)
         {
             Product Product = _dbContext.Products.Find(key);
 

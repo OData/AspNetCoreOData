@@ -141,7 +141,7 @@ namespace Microsoft.AspNetCore.OData.Query
                     Expression value = LinqParameterContainer.Parameterize(itemType, itemValue);
                     if (itemType.IsArray)
                     {
-                        equal = ExpressionHelpers.SequenceEquals(name, value);
+                        equal = Expression.AndAlso(Expression.NotEqual(name, Expression.Constant(null, name.Type)), ExpressionHelpers.SequenceEquals(name, value));
                     }
                     else
                     {
