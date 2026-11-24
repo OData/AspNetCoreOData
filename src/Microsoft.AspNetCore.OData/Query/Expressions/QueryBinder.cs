@@ -1145,7 +1145,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             PropertyInfo declaredClrProperty = GetDeclaredClrProperty(source.Type, openNode.Name, context.Model);
             if (declaredClrProperty != null)
             {
-                return Expression.Property(source, declaredClrProperty);
+            IEdmProperty edmProperty = (context.Model.GetEdmType(source.Type) as IEdmStructuredType)?.FindProperty(openNode.Name);
+            return edmProperty == null ? Expression.Property(source, declaredClrProperty) : CreatePropertyAccessExpression(source, context, edmProperty, GetFullPropertyPath(openNode));
             }
 
             // Property doesn't exists go for dynamic properties dictionary
@@ -1154,28 +1155,8 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                 openNode.Kind,
                 context.Model);
             MemberExpression propertyAccessExpression = Expression.Property(source, prop.Name);
-            IndexExpression readDictionaryIndexerExpression = Expression.Property(propertyAccessExpression,
-                            DictionaryStringObjectIndexerName, Expression.Constant(openNode.Name));
-            MethodCallExpression containsKeyExpression = Expression.Call(propertyAccessExpression,
-                propertyAccessExpression.Type.GetMethod("ContainsKey"), Expression.Constant(openNode.Name));
-            ConstantExpression nullExpression = Expression.Constant(null);
 
-            if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
-            {
-                BinaryExpression dynamicDictIsNotNull = Expression.NotEqual(propertyAccessExpression, Expression.Constant(null));
-                BinaryExpression dynamicDictIsNotNullAndContainsKey = Expression.AndAlso(dynamicDictIsNotNull, containsKeyExpression);
-                return Expression.Condition(
-                    dynamicDictIsNotNullAndContainsKey,
-                    readDictionaryIndexerExpression,
-                    nullExpression);
-            }
-            else
-            {
-                return Expression.Condition(
-                    containsKeyExpression,
-                    readDictionaryIndexerExpression,
-                    nullExpression);
-            }
+            return CreateDynamicPropertyAccessExpression(propertyAccessExpression, openNode.Name, context, source);
         }
 
         private static Expression UnwrapComputeWrapper(Expression source)
@@ -2070,7 +2051,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             PropertyInfo prop = GetDynamicPropertyContainer(source.Type, openNode.Kind, context.Model);
             Expression containerPropertyAccessExpression = Expression.Property(source, prop);
 
-            return CreateDynamicPropertyAccessExpression(containerPropertyAccessExpression, openNode.Name, context);
+        return CreateDynamicPropertyAccessExpression(containerPropertyAccessExpression, openNode.Name, context, source);
         }
 
         /// <summary>
@@ -2079,11 +2060,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="containerPropertyAccessExpr">The container property access expression.</param>
         /// <param name="propertyName">The dynamic property name.</param>
         /// <param name="context">The query binder context.</param>
+    /// <param name="source">The optional source to guard before accessing its container.</param>
         /// <returns>The LINQ <see cref="Expression"/> created.</returns>
         private static Expression CreateDynamicPropertyAccessExpression(
             Expression containerPropertyAccessExpr,
             string propertyName,
-            QueryBinderContext context)
+        QueryBinderContext context,
+        Expression source = null)
         {
             // Get dynamic property value
             IndexExpression dictionaryIndexExpr = Expression.Property(
@@ -2099,10 +2082,15 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             // Handle null propagation
             if (context.QuerySettings.HandleNullPropagation == HandleNullPropagationOption.True)
             {
-                BinaryExpression dictIonaryIsNotNullExpr = Expression.NotEqual(containerPropertyAccessExpr, NullConstant);
-                BinaryExpression dictIonaryIsNotNullAndContainsKeyExpr = Expression.AndAlso(dictIonaryIsNotNullExpr, containsKeyExpression);
+                BinaryExpression dictionaryIsNotNullExpr = Expression.NotEqual(containerPropertyAccessExpr, NullConstant);
+                BinaryExpression dictionaryIsNotNullAndContainsKeyExpr = Expression.AndAlso(dictionaryIsNotNullExpr, containsKeyExpression);
+                if (source != null && source != context.CurrentParameter && ExpressionBinderHelper.IsNullable(source.Type))
+                {
+                    dictionaryIsNotNullAndContainsKeyExpr = Expression.AndAlso(Expression.NotEqual(source, Expression.Constant(null, source.Type)), dictionaryIsNotNullAndContainsKeyExpr);
+                }
+
                 return Expression.Condition(
-                    dictIonaryIsNotNullAndContainsKeyExpr,
+                    dictionaryIsNotNullAndContainsKeyExpr,
                     dictionaryIndexExpr,
                     NullConstant);
             }

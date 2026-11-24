@@ -12,8 +12,10 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Models;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Microsoft.OData.UriParser;
 using Xunit;
 
@@ -70,11 +72,20 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
             Assert.Equal(2, _validator.Times["ValidateParameterQueryNode"]); // $it, t
         }
 
-        [Fact]
-        public void ValidateFilterQueryValidator_VisitAny()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void ValidateFilterQueryValidator_VisitAny(bool useAlias)
         {
             // Arrange
-            FilterQueryOption option = new FilterQueryOption("Tags/any(t: t eq '42')", _context);
+            string expression = useAlias ? "Tags/any(t: t eq @value)" : "Tags/any(t: t eq '42')";
+            var queryOptions = new Dictionary<string, string> { { "$filter", expression } };
+            if (useAlias)
+            {
+                queryOptions.Add("@value", "'42'");
+            }
+            var parser = new ODataQueryOptionParser(_context.Model, _context.ElementType, _context.NavigationSource, queryOptions);
+            FilterQueryOption option = new FilterQueryOption(expression, _context, parser);
 
             // Act
             _validator.Validate(option, _settings);
@@ -167,6 +178,131 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
 
             // Act & Assert
             ExceptionAssert.DoesNotThrow(() => _validator.Validate(new FilterQueryOption(filter, _productContext), settings));
+        }
+
+        [Theory]
+        [MemberData(nameof(NestedAnyAllInputs))]
+        public void AnyAllExpressionDepth_FilterInChecksNestedExpressions(string expression)
+        {
+            var option = new FilterQueryOption($"{expression} in (true)", _productContext);
+            var settings = new ODataValidationSettings();
+
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(option, settings));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            settings.MaxAnyAllExpressionDepth = 2;
+            _validator.Validate(option, settings);
+            settings.MaxAnyAllExpressionDepth = 1;
+            Assert.Throws<ODataException>(() => _validator.Validate(option, settings));
+        }
+
+        [Theory]
+        [InlineData("Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x') in (true))")]
+        [InlineData("Category/QueryableProducts/any(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x') in (true))")]
+        [InlineData("Category/QueryableProducts/all(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x') in (true))")]
+        [InlineData("Category/QueryableProducts/all(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x') in (true))")]
+        public void AnyAllExpressionDepth_FilterInRetainsEnclosingDepth(string expression)
+        {
+            var option = new FilterQueryOption(expression, _productContext);
+
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(option, new ODataValidationSettings()));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            _validator.Validate(option, new ODataValidationSettings { MaxAnyAllExpressionDepth = 2 });
+        }
+
+        [Fact]
+        public void AnyAllExpressionDepth_FilterInDoesNotIntroduceOtherPolicies()
+        {
+            var settings = new ODataValidationSettings { AllowedFunctions = AllowedFunctions.None, AllowedLogicalOperators = AllowedLogicalOperators.None, MaxNodeCount = 1 };
+            var valid = new FilterQueryOption("Contacts/any(a:a/Name eq 'x') in (true)", _context);
+            var invalid = new FilterQueryOption("Contacts/any(a:a/Contacts/any(b:b/Name eq 'x')) in (true)", _context);
+
+            _validator.Validate(valid, settings);
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(invalid, settings));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+        }
+
+        [Theory]
+        [InlineData(1, false)]
+        [InlineData(50, false)]
+        [InlineData(51, false)]
+        [InlineData(99, false)]
+        [InlineData(100, false)]
+        [InlineData(101, false)]
+        [InlineData(50, true)]
+        [InlineData(51, true)]
+        public void FilterInDepthValidation_PreservesParameterAliasBindingLimit(int references, bool multipleOperands)
+        {
+            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+            var context = new ODataQueryContext(model, typeof(Customer));
+            context.DefaultQueryConfigurations.EnableFilter = true;
+            var terms = Enumerable.Repeat("@value", references).ToList();
+            // Keep the concat tree balanced so larger alias counts do not create a long chain of nested functions.
+            while (terms.Count > 1)
+            {
+                var next = new List<string>();
+                for (int i = 0; i < terms.Count; i += 2)
+                {
+                    next.Add(i + 1 == terms.Count ? terms[i] : $"concat({terms[i]},{terms[i + 1]})");
+                }
+                terms = next;
+            }
+            string expectedValue = new string('x', references);
+            string query = multipleOperands ? $"({terms[0]} in ('{expectedValue}')) and ({terms[0]} in ('{expectedValue}'))" : $"{terms[0]} in ('{expectedValue}')";
+            var parser = new ODataQueryOptionParser(model, context.ElementType, context.NavigationSource, new Dictionary<string, string> { { "$filter", query }, { "@value", "'x'" } });
+            var option = new FilterQueryOption(query, context, parser);
+            var settings = new ODataValidationSettings { AllowedFunctions = AllowedFunctions.None, AllowedLogicalOperators = multipleOperands ? AllowedLogicalOperators.And : AllowedLogicalOperators.None, MaxNodeCount = multipleOperands ? 3 : 1 };
+            var validator = new FilterQueryValidator();
+            if (references * (multipleOperands ? 2 : 1) > ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount)
+            {
+                ExceptionAssert.Throws<ODataException>(() => validator.Validate(option, settings), $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.");
+                return;
+            }
+
+            validator.Validate(option, settings);
+
+            var customers = new[] { new Customer { Id = 1 }, new Customer { Id = 2 } }.AsQueryable();
+            Assert.Equal(new[] { 1, 2 }, option.ApplyTo(customers, new ODataQuerySettings()).Cast<Customer>().Select(customer => customer.Id));
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void FilterInDepthValidation_PreservesClearedAndRestoredAliases(bool restoreAlias)
+        {
+            var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+            var context = new ODataQueryContext(model, typeof(Customer));
+            context.DefaultQueryConfigurations.EnableFilter = true;
+            var parser = new ODataQueryOptionParser(model, context.ElementType, context.NavigationSource, new Dictionary<string, string> { { "$filter", "Id eq @value" }, { "@value", "1" } });
+            var option = new FilterQueryOption("Id eq @value", context, parser);
+            var clause = option.FilterClause;
+            IDictionary<string, SingleValueNode> aliases = parser.ParameterAliasNodes;
+            aliases.Clear();
+            if (restoreAlias)
+            {
+                aliases.Add("@value", new ConstantNode(1));
+            }
+
+            new FilterQueryValidator().Validate(option, new ODataValidationSettings());
+
+            var customers = new[] { new Customer { Id = 1 }, new Customer { Id = 2 } }.AsQueryable();
+            Assert.Same(clause, option.FilterClause);
+            Assert.Equal(new[] { 1 }, option.ApplyTo(customers, new ODataQuerySettings()).Cast<Customer>().Select(customer => customer.Id));
+        }
+
+        [Theory]
+        [MemberData(nameof(NestedAnyAllInputs))]
+        public void FilterInDepthValidation_ResolvesLambdaAliases(string expression)
+        {
+            var parser = new ODataQueryOptionParser(_productContext.Model, _productContext.ElementType, _productContext.NavigationSource, new Dictionary<string, string> { { "$filter", "@value in (true)" }, { "@value", expression } });
+            var option = new FilterQueryOption("@value in (true)", _productContext, parser);
+
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(option, new ODataValidationSettings()));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            _validator.Validate(option, new ODataValidationSettings { MaxAnyAllExpressionDepth = 2 });
         }
 
         public static TheoryDataSet<string> LongInputs

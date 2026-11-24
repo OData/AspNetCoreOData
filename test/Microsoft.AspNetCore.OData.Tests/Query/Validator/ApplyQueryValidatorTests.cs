@@ -30,6 +30,23 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
     {
         private readonly ApplyQueryValidator _validator = new ApplyQueryValidator();
 
+        [Theory]
+        [InlineData("filter(Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) in (true))")]
+        [InlineData("compute(cast(Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))),Edm.Int64) as Total)")]
+        [InlineData("aggregate(cast(Category/QueryableProducts/$count($filter=Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))),Edm.Int64) with sum as Total)")]
+        [InlineData("groupby((ProductName),aggregate(cast(Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x'))),Edm.Int64) with sum as Total))")]
+        [InlineData("compute(Category/QueryableProducts/any(a:a/Category/EnumerableProducts/$count($filter=Category/QueryableProducts/any(b:b/ProductName eq 'x')) gt 0) as Flag)")]
+        public void AnyAllExpressionDepth_ApplyChecksFilterOperandsAndCountFilters(string expression)
+        {
+            var context = ValidationTestHelper.CreateDerivedProductsContext();
+            var option = new ApplyQueryOption(expression, context);
+
+            var error = Assert.Throws<ODataException>(() => _validator.Validate(option, new ODataValidationSettings()));
+
+            Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+            _validator.Validate(option, new ODataValidationSettings { MaxAnyAllExpressionDepth = 2 });
+        }
+
         private const string NotFilterableMessage =
             "The property 'NotFilterableProperty' cannot be used in the $filter query option.";
 
@@ -75,6 +92,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         [InlineData("aggregate(NotFilterableProperty with countdistinct as R)")]
         [InlineData("aggregate(NonFilterableProperty with countdistinct as R)")]
         [InlineData("groupby((Id),aggregate(NotFilterableProperty with countdistinct as R))")]
+        [InlineData("aggregate(Contacts/$count($filter=NotFilterableProperty eq 'x') with sum as R)")]
         public void Validate_Throws_ForRestrictedPropertyInAggregate(string apply)
         {
             // Arrange
@@ -89,6 +107,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         [InlineData("compute(length(NotFilterableProperty) as L)")]
         [InlineData("compute(Name eq 'a' or NotFilterableProperty eq 'b' as F)")]
         [InlineData("compute(Address/NotFilterableProperty eq 'x' as F)")]
+        [InlineData("compute(Contacts/$count($filter=NotFilterableProperty eq 'x') as C)")]
         public void Validate_Throws_ForRestrictedPropertyInCompute(string apply)
         {
             // Arrange
@@ -159,12 +178,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Validator
         [InlineData("groupby((Name),aggregate(AmountSpent with sum as Total))")]
         [InlineData("aggregate(AmountSpent with sum as Total)")]
         [InlineData("aggregate($count as Count)")]
+        [InlineData("aggregate(Contacts/$count($filter=Name eq 'x') with sum as R)")]
         [InlineData("aggregate(Contacts(Name with countdistinct as R))")]
         [InlineData("compute(AmountSpent mul 2 as Double)")]
         [InlineData("compute(length(Name) as L)")]
         [InlineData("compute(Contacts/any(c: c/Name ne null) as HasNamed)")]
         [InlineData("compute(Contacts/all(c: c/Name ne null) as AllNamed)")]
         [InlineData("compute(RelationshipManager/Name eq 'x' as F)")]
+        [InlineData("compute(Contacts/$count($filter=Name eq 'x') as C)")]
         public void Validate_DoesNotThrow_ForUnrestrictedPropertyInGroupByAggregateCompute(string apply)
         {
             // Arrange
