@@ -1643,7 +1643,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 string filter = string.Format("padright(ProductName, {0}) eq '{1}'", totalWidth, expectedProductName);
 
                 Action filterToExpression = () => BindFilterAndVerify<Product>(filter);
-                ExceptionAssert.Throws(typeof(NotImplementedException),filterToExpression);
+                ExceptionAssert.Throws(typeof(NotImplementedException), filterToExpression);
             }
             finally
             {
@@ -1829,7 +1829,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
             var values = (IList<SimpleEnum>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
-            Assert.Equal(new[] {SimpleEnum.First, SimpleEnum.Second}, values);
+            Assert.Equal(new[] { SimpleEnum.First, SimpleEnum.Second }, values);
         }
 
         [Fact]
@@ -1852,9 +1852,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
             var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
-            Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, SimpleEnum.Second}, values);
+            Assert.Equal(new SimpleEnum?[] { SimpleEnum.First, SimpleEnum.Second }, values);
         }
-        
+
         [Fact]
         public void EnumInExpression_NullableEnum_WithNullValue()
         {
@@ -1866,7 +1866,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             var memberAccess = (MemberExpression)((MethodCallExpression)expression.Body).Arguments[0];
             var values = (IList<SimpleEnum?>)ExpressionBinderHelper.ExtractParameterizedConstant(memberAccess);
-            Assert.Equal(new SimpleEnum?[] {SimpleEnum.First, null}, values);
+            Assert.Equal(new SimpleEnum?[] { SimpleEnum.First, null }, values);
         }
 
         [Fact]
@@ -2067,36 +2067,36 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         [InlineData("cast(null,Edm.Duration) eq duration'P8DT23H59M59.9999S'", "$it => (null == Convert(8.23:59:59.9999000))")]
         [InlineData("cast(null,'Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum') eq null", "$it => (null == null)")]
         [InlineData("cast(null,'Microsoft.AspNetCore.OData.Tests.Models.FlagsEnum') eq null", "$it => (null == null)")]
-        [InlineData("cast(IntProp,Edm.String) eq '123'", "$it => (Convert($it.IntProp.ToString()) == \"123\")")]
-        [InlineData("cast(LongProp,Edm.String) eq '123'", "$it => (Convert($it.LongProp.ToString()) == \"123\")")]
-        [InlineData("cast(SingleProp,Edm.String) eq '123'", "$it => (Convert($it.SingleProp.ToString()) == \"123\")")]
-        [InlineData("cast(DoubleProp,Edm.String) eq '123'", "$it => (Convert($it.DoubleProp.ToString()) == \"123\")")]
-        [InlineData("cast(DecimalProp,Edm.String) eq '123'", "$it => (Convert($it.DecimalProp.ToString()) == \"123\")")]
-        [InlineData("cast(BoolProp,Edm.String) eq '123'", "$it => (Convert($it.BoolProp.ToString()) == \"123\")")]
-        [InlineData("cast(ByteProp,Edm.String) eq '123'", "$it => (Convert($it.ByteProp.ToString()) == \"123\")")]
-        [InlineData("cast(GuidProp,Edm.String) eq '123'", "$it => (Convert($it.GuidProp.ToString()) == \"123\")")]
-        [InlineData("cast(StringProp,Edm.String) eq '123'", "$it => (Convert($it.StringProp) == \"123\")")]
-        [InlineData("cast(DateTimeOffsetProp,Edm.String) eq '123'", "$it => (Convert($it.DateTimeOffsetProp.ToString()) == \"123\")")]
-        [InlineData("cast(TimeSpanProp,Edm.String) eq '123'", "$it => (Convert($it.TimeSpanProp.ToString()) == \"123\")")]
-        [InlineData("cast(SimpleEnumProp,Edm.String) eq '123'", "$it => (Convert(Convert($it.SimpleEnumProp).ToString()) == \"123\")")]
-        [InlineData("cast(FlagsEnumProp,Edm.String) eq '123'", "$it => (Convert(Convert($it.FlagsEnumProp).ToString()) == \"123\")")]
-        [InlineData("cast(LongEnumProp,Edm.String) eq '123'", "$it => (Convert(Convert($it.LongEnumProp).ToString()) == \"123\")")]
-        [InlineData("cast(NullableIntProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableIntProp.HasValue, $it.NullableIntProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableLongProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableLongProp.HasValue, $it.NullableLongProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableSingleProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableSingleProp.HasValue, $it.NullableSingleProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableDoubleProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableDoubleProp.HasValue, $it.NullableDoubleProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableDecimalProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableDecimalProp.HasValue, $it.NullableDecimalProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableBoolProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableBoolProp.HasValue, $it.NullableBoolProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableByteProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableByteProp.HasValue, $it.NullableByteProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableGuidProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableGuidProp.HasValue, $it.NullableGuidProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableDateTimeOffsetProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableDateTimeOffsetProp.HasValue, $it.NullableDateTimeOffsetProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableTimeSpanProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableTimeSpanProp.HasValue, $it.NullableTimeSpanProp.Value.ToString(), null)) == \"123\")")]
-        [InlineData("cast(NullableSimpleEnumProp,Edm.String) eq '123'", "$it => (Convert(IIF($it.NullableSimpleEnumProp.HasValue, Convert($it.NullableSimpleEnumProp.Value).ToString(), null)) == \"123\")")]
+        [InlineData("cast(IntProp,Edm.String) eq '123'", "$it => ($it.IntProp.ToString() == \"123\")")]
+        [InlineData("cast(LongProp,Edm.String) eq '123'", "$it => ($it.LongProp.ToString() == \"123\")")]
+        [InlineData("cast(SingleProp,Edm.String) eq '123'", "$it => ($it.SingleProp.ToString() == \"123\")")]
+        [InlineData("cast(DoubleProp,Edm.String) eq '123'", "$it => ($it.DoubleProp.ToString() == \"123\")")]
+        [InlineData("cast(DecimalProp,Edm.String) eq '123'", "$it => ($it.DecimalProp.ToString() == \"123\")")]
+        [InlineData("cast(BoolProp,Edm.String) eq '123'", "$it => ($it.BoolProp.ToString() == \"123\")")]
+        [InlineData("cast(ByteProp,Edm.String) eq '123'", "$it => ($it.ByteProp.ToString() == \"123\")")]
+        [InlineData("cast(GuidProp,Edm.String) eq '123'", "$it => ($it.GuidProp.ToString() == \"123\")")]
+        [InlineData("cast(StringProp,Edm.String) eq '123'", "$it => ($it.StringProp == \"123\")")]
+        [InlineData("cast(DateTimeOffsetProp,Edm.String) eq '123'", "$it => ($it.DateTimeOffsetProp.ToString() == \"123\")")]
+        [InlineData("cast(TimeSpanProp,Edm.String) eq '123'", "$it => ($it.TimeSpanProp.ToString() == \"123\")")]
+        [InlineData("cast(SimpleEnumProp,Edm.String) eq '123'", "$it => (Convert($it.SimpleEnumProp).ToString() == \"123\")")]
+        [InlineData("cast(FlagsEnumProp,Edm.String) eq '123'", "$it => (Convert($it.FlagsEnumProp).ToString() == \"123\")")]
+        [InlineData("cast(LongEnumProp,Edm.String) eq '123'", "$it => (Convert($it.LongEnumProp).ToString() == \"123\")")]
+        [InlineData("cast(NullableIntProp,Edm.String) eq '123'", "$it => (IIF($it.NullableIntProp.HasValue, $it.NullableIntProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableLongProp,Edm.String) eq '123'", "$it => (IIF($it.NullableLongProp.HasValue, $it.NullableLongProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableSingleProp,Edm.String) eq '123'", "$it => (IIF($it.NullableSingleProp.HasValue, $it.NullableSingleProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableDoubleProp,Edm.String) eq '123'", "$it => (IIF($it.NullableDoubleProp.HasValue, $it.NullableDoubleProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableDecimalProp,Edm.String) eq '123'", "$it => (IIF($it.NullableDecimalProp.HasValue, $it.NullableDecimalProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableBoolProp,Edm.String) eq '123'", "$it => (IIF($it.NullableBoolProp.HasValue, $it.NullableBoolProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableByteProp,Edm.String) eq '123'", "$it => (IIF($it.NullableByteProp.HasValue, $it.NullableByteProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableGuidProp,Edm.String) eq '123'", "$it => (IIF($it.NullableGuidProp.HasValue, $it.NullableGuidProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableDateTimeOffsetProp,Edm.String) eq '123'", "$it => (IIF($it.NullableDateTimeOffsetProp.HasValue, $it.NullableDateTimeOffsetProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableTimeSpanProp,Edm.String) eq '123'", "$it => (IIF($it.NullableTimeSpanProp.HasValue, $it.NullableTimeSpanProp.Value.ToString(), null) == \"123\")")]
+        [InlineData("cast(NullableSimpleEnumProp,Edm.String) eq '123'", "$it => (IIF($it.NullableSimpleEnumProp.HasValue, Convert($it.NullableSimpleEnumProp.Value).ToString(), null) == \"123\")")]
         [InlineData("cast(IntProp,Edm.Int64) eq 123", "$it => (Convert($it.IntProp) == 123)")]
         [InlineData("cast(NullableLongProp,Edm.Double) eq 1.23", "$it => (Convert($it.NullableLongProp) == Convert(1.23))")]
         [InlineData("cast(2147483647,Edm.Int16) ne null", "$it => (Convert(Convert(2147483647)) != null)")]
-        [InlineData("cast(Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'1',Edm.String) eq '1'", "$it => (Convert(Convert(Second).ToString()) == \"1\")")]
-        [InlineData("cast(cast(cast(IntProp,Edm.Int64),Edm.Int16),Edm.String) eq '123'", "$it => (Convert(Convert(Convert($it.IntProp)).ToString()) == \"123\")")]
+        [InlineData("cast(Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum'1',Edm.String) eq '1'", "$it => (Convert(Second).ToString() == \"1\")")]
+        [InlineData("cast(cast(cast(IntProp,Edm.Int64),Edm.Int16),Edm.String) eq '123'", "$it => (Convert(Convert($it.IntProp)).ToString() == \"123\")")]
         [InlineData("cast('123',Microsoft.AspNetCore.OData.Tests.Models.SimpleEnum) ne null", "$it => (Convert(123) != null)")]
         public void CastMethod_Succeeds(string filter, string expectedResult)
         {
@@ -2388,7 +2388,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
 
             // Act & Assert
             var filters = BindFilterAndVerify<DataTypes>(filter);
-            InvokeFiltersAndVerify(filters, model, (true,true));
+            InvokeFiltersAndVerify(filters, model, (true, true));
         }
 
         public static TheoryDataSet<string> CastToUnquotedComplexType
@@ -2481,7 +2481,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         }
 
         [Theory]
-        [InlineData("cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq null", "$it => (($it As DerivedProduct).DerivedProductName == null)","$it => (IIF((($it As DerivedProduct) == null), null, ($it As DerivedProduct).DerivedProductName) == null)")]
+        [InlineData("cast('Microsoft.AspNetCore.OData.Tests.Models.DerivedProduct')/DerivedProductName eq null", "$it => (($it As DerivedProduct).DerivedProductName == null)", "$it => (IIF((($it As DerivedProduct) == null), null, ($it As DerivedProduct).DerivedProductName) == null)")]
         [InlineData("cast(Category,'Microsoft.AspNetCore.OData.Tests.Models.DerivedCategory')/DerivedCategoryName eq null", "$it => (($it.Category As DerivedCategory).DerivedCategoryName == null)", "$it => (IIF((($it.Category As DerivedCategory) == null), null, ($it.Category As DerivedCategory).DerivedCategoryName) == null)")]
         public void CastToQuotedEntityOrComplexType_DerivedProductName(string filter, string expectedExpression, string expectedExpressionWithNullCheck)
         {
@@ -2784,7 +2784,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
         }
 #endif
 
-#region parameter alias for filter query option
+        #region parameter alias for filter query option
 
         [Theory]
         // Parameter alias value is not null.
@@ -2930,7 +2930,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 () => parser.ParseFilter(),
                 "Syntax error: character '#' is not valid at position 11 in 'IntProp eq #p'.");
         }
-#endregion
+        #endregion
 
         [Theory]
         [InlineData("ByteArrayProp eq binary'I6v/'", "$it => ($it.ByteArrayProp == System.Byte[])", true, true)]
@@ -3101,7 +3101,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
                 expectedExpressionWithNullPropagation);
         }
 
-#region Negative Tests
+        #region Negative Tests
 
         [Fact]
         public void TypeMismatchInComparison()
@@ -3109,9 +3109,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions
             // Arrange & Act & Assert
             ExceptionAssert.Throws<ODataException>(() => BindFilterAndVerify<Product>("length(123) eq 12"));
         }
-#endregion
+        #endregion
 
-#region Helpers
+        #region Helpers
         internal static void InvokeFiltersAndThrows<T>((Expression, Expression) filters, T instance, (Type, bool) expectedValue)
         {
             ExceptionAssert.Throws(expectedValue.Item1, () => InvokeFilter(instance, filters.Item1));

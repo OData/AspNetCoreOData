@@ -1242,7 +1242,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                     path = navNode.NavigationProperty.Name;
                     parent = navNode.Source;
                     break;
-           }
+            }
 
             if (parent != null)
             {
@@ -1408,6 +1408,13 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         internal static Expression CreateConvertExpression(ConvertNode convertNode, Expression source, QueryBinderContext context)
         {
             Type conversionType = context.Model.GetClrType(convertNode.TypeReference, context.AssembliesResolver);
+
+            // If the source type is the same as the conversion type, we can skip the conversion
+            // No sense to create a convert expression.
+            if (conversionType == source.Type)
+            {
+                return source;
+            }
 
             if (conversionType == typeof(bool?) && source.Type == typeof(bool))
             {
