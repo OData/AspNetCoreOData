@@ -608,6 +608,76 @@ public class OrderByQueryOptionTest
         Assert.Equal(1, results[2].Id);
     }
 
+    [Fact]
+    public void OrderByClause_ThrowsODataExceptionOnEveryAccess_WhenCombinedParameterAliasExpansionExceedsLimit()
+    {
+        // Arrange
+        var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+        var queryOptions = new Dictionary<string, string> { { "$orderby", "@a0,@b0" } };
+        AddBranchingParameterAliases(queryOptions, "a", 6);
+        AddBranchingParameterAliases(queryOptions, "b", 6);
+
+        var parser = new ODataQueryOptionParser(
+            model,
+            model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
+            model.FindDeclaredNavigationSource("Default.Container.Customers"),
+            queryOptions);
+        var context = new ODataQueryContext(model, typeof(Customer)) { RequestContainer = new MockServiceProvider() };
+        var orderByOption = new OrderByQueryOption("@a0,@b0", context, parser);
+
+        // Act & Assert
+        string expectedMessage = $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.";
+        ExceptionAssert.Throws<ODataException>(() => orderByOption.OrderByClause, expectedMessage);
+        ExceptionAssert.Throws<ODataException>(() => orderByOption.OrderByClause, expectedMessage);
+    }
+
+    [Fact]
+    public void OrderByClause_AllowsCombinedParameterAliasExpansionAtLimit()
+    {
+        // Arrange
+        var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+        var queryOptions = new Dictionary<string, string> { { "$orderby", "@a0,@b0" } };
+        AddParameterAliasChain(queryOptions, "a", ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount / 2, "Id");
+        AddParameterAliasChain(queryOptions, "b", ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount / 2, "Name");
+
+        var parser = new ODataQueryOptionParser(
+            model,
+            model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
+            model.FindDeclaredNavigationSource("Default.Container.Customers"),
+            queryOptions);
+        var context = new ODataQueryContext(model, typeof(Customer)) { RequestContainer = new MockServiceProvider() };
+        var orderByOption = new OrderByQueryOption("@a0,@b0", context, parser);
+
+        // Act
+        OrderByClause orderByClause = orderByOption.OrderByClause;
+
+        // Assert
+        Assert.NotNull(orderByClause);
+        Assert.NotNull(orderByClause.ThenBy);
+    }
+
+    [Fact]
+    public void OrderByClause_ThrowsODataException_WhenCombinedParameterAliasExpansionIsOneOverLimit()
+    {
+        // Arrange
+        var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+        var queryOptions = new Dictionary<string, string> { { "$orderby", "@a0,@b0" } };
+        AddParameterAliasChain(queryOptions, "a", ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount / 2, "Id");
+        AddParameterAliasChain(queryOptions, "b", (ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount / 2) + 1, "Name");
+
+        var parser = new ODataQueryOptionParser(
+            model,
+            model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
+            model.FindDeclaredNavigationSource("Default.Container.Customers"),
+            queryOptions);
+        var context = new ODataQueryContext(model, typeof(Customer)) { RequestContainer = new MockServiceProvider() };
+        var orderByOption = new OrderByQueryOption("@a0,@b0", context, parser);
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => orderByOption.OrderByClause, $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.");
+    }
+
     [Theory]
     [InlineData("Orders/$count")]
     [InlineData("Addresses/$count")]
@@ -721,5 +791,25 @@ public class OrderByQueryOptionTest
         Assert.Equal("Address/City", rawValues[0]); // Here, without 'asc' since it's omitted by default
         Assert.Equal("substring(Name,2,1)", rawValues[1]);
         Assert.Equal("tolower(substring(Name,2,1))", rawValues[2]);
+    }
+
+    private static void AddBranchingParameterAliases(IDictionary<string, string> queryOptions, string prefix, int depth)
+    {
+        for (int i = 0; i < depth - 1; i++)
+        {
+            queryOptions.Add($"@{prefix}{i}", $"@{prefix}{i + 1} add @{prefix}{i + 1}");
+        }
+
+        queryOptions.Add($"@{prefix}{depth - 1}", "Id");
+    }
+
+    private static void AddParameterAliasChain(IDictionary<string, string> queryOptions, string prefix, int length, string propertyName)
+    {
+        for (int i = 0; i < length - 1; i++)
+        {
+            queryOptions.Add($"@{prefix}{i}", $"@{prefix}{i + 1}");
+        }
+
+        queryOptions.Add($"@{prefix}{length - 1}", propertyName);
     }
 }

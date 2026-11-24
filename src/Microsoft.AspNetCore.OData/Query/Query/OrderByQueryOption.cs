@@ -192,8 +192,8 @@ public class OrderByQueryOption
         {
             if (_orderByClause == null)
             {
-                _orderByClause = _queryOptionParser.ParseOrderBy();
-                _orderByClause = TranslateParameterAlias(_orderByClause);
+                OrderByClause orderByClause = _queryOptionParser.ParseOrderBy();
+                _orderByClause = TranslateParameterAlias(orderByClause);
             }
 
             return _orderByClause;
@@ -400,17 +400,25 @@ public class OrderByQueryOption
 
     private OrderByClause TranslateParameterAlias(OrderByClause orderBy)
     {
+        // Share one translator so the expansion limit applies to the complete clause chain.
+        ParameterAliasNodeTranslator translator = new ParameterAliasNodeTranslator(
+            _queryOptionParser.ParameterAliasNodes);
+        return TranslateParameterAlias(orderBy, translator);
+    }
+
+    private static OrderByClause TranslateParameterAlias(OrderByClause orderBy, ParameterAliasNodeTranslator translator)
+    {
         if (orderBy == null)
         {
             return null;
         }
 
         SingleValueNode orderByExpression = orderBy.Expression.Accept(
-            new ParameterAliasNodeTranslator(_queryOptionParser.ParameterAliasNodes)) as SingleValueNode;
+            translator) as SingleValueNode;
         orderByExpression = orderByExpression ?? new ConstantNode(null, "null");
 
         return new OrderByClause(
-            TranslateParameterAlias(orderBy.ThenBy),
+            TranslateParameterAlias(orderBy.ThenBy, translator),
             orderByExpression,
             orderBy.Direction,
             orderBy.RangeVariable);

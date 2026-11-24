@@ -115,11 +115,11 @@ public class FilterQueryOption
         {
             if (_filterClause == null)
             {
-                _filterClause = _queryOptionParser.ParseFilter();
-                SingleValueNode filterExpression = _filterClause.Expression.Accept(
+                FilterClause filterClause = _queryOptionParser.ParseFilter();
+                SingleValueNode filterExpression = filterClause.Expression.Accept(
                     new ParameterAliasNodeTranslator(_queryOptionParser.ParameterAliasNodes)) as SingleValueNode;
                 filterExpression = filterExpression ?? new ConstantNode(null);
-                _filterClause = new FilterClause(filterExpression, _filterClause.RangeVariable);
+                _filterClause = new FilterClause(filterExpression, filterClause.RangeVariable);
             }
 
             return _filterClause;
