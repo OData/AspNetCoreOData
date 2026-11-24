@@ -105,6 +105,11 @@ namespace Microsoft.AspNetCore.OData.Query
         public bool EnableCorrelatedSubqueryBuffering { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum depth for function calls in a query.
+        /// </summary>
+        public int MaxFunctionCallDepth { get; set; } = 15;
+
+        /// <summary>
         /// Gets or sets a value indicating which query options should be ignored when applying queries.
         /// </summary>
         public AllowedQueryOptions IgnoredQueryOptions { get; set; } = AllowedQueryOptions.None;
@@ -156,6 +161,7 @@ namespace Microsoft.AspNetCore.OData.Query
             EnableCorrelatedSubqueryBuffering = settings.EnableCorrelatedSubqueryBuffering;
             IgnoredQueryOptions = settings.IgnoredQueryOptions;
             IgnoredNestedQueryOptions = settings.IgnoredNestedQueryOptions;
+            MaxFunctionCallDepth = settings.MaxFunctionCallDepth;
         }
     }
 }

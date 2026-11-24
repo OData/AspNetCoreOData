@@ -1452,6 +1452,7 @@ public class Microsoft.AspNetCore.OData.Query.ODataQuerySettings {
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions IgnoredNestedQueryOptions  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions IgnoredQueryOptions  { public get; public set; }
+	int MaxFunctionCallDepth  { public get; public set; }
 	System.Nullable`1[[System.Int32]] PageSize  { public get; public set; }
 	System.TimeZoneInfo TimeZone  { public get; public set; }
 }
@@ -3681,4 +3682,3 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate : 
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
-
