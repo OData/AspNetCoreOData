@@ -224,6 +224,7 @@ public class Microsoft.AspNetCore.OData.ODataMiniOptions {
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetCaseInsensitive (bool enableCaseInsensitive)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetContinueOnErrorHeader (bool enableContinueOnErrorHeader)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxReceivedMessageSize (long maxReceivedMessageSize)
+	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxSelectExpandNodeCount (int maxSelectExpandNodeCount)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetNoDollarQueryOptions (bool enableNoDollarQueryOptions)
 	public Microsoft.AspNetCore.OData.ODataMiniOptions SetQueryValidationErrorLogging (bool enableQueryValidationErrorLogging)
@@ -277,6 +278,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	public System.IServiceProvider GetRouteServices (string routePrefix)
 	public Microsoft.AspNetCore.OData.ODataOptions OrderBy ()
 	public Microsoft.AspNetCore.OData.ODataOptions Select ()
+	public Microsoft.AspNetCore.OData.ODataOptions SetMaxSelectExpandNodeCount (int maxSelectExpandNodeCount)
 	public Microsoft.AspNetCore.OData.ODataOptions SetMaxTop (System.Nullable`1[[System.Int32]] maxTopValue)
 	public Microsoft.AspNetCore.OData.ODataOptions SkipToken ()
 }
@@ -1487,6 +1489,8 @@ public class Microsoft.AspNetCore.OData.Query.DefaultODataQueryRequestParser : I
 
 public class Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations : Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings {
 	public DefaultQueryConfigurations ()
+
+	int MaxSelectExpandNodeCount  { public get; public set; }
 }
 
 public class Microsoft.AspNetCore.OData.Query.DefaultSkipTokenHandler : Microsoft.AspNetCore.OData.Query.SkipTokenHandler {
@@ -1521,6 +1525,7 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	int MaxFunctionCallDepth  { public get; public set; }
 	int MaxNodeCount  { public get; public set; }
 	int MaxOrderByNodeCount  { public get; public set; }
+	int MaxSelectExpandNodeCount  { public get; public set; }
 	int MaxSkip  { public get; public set; }
 	int MaxTop  { public get; public set; }
 	int PageSize  { public get; public set; }
@@ -3417,6 +3422,7 @@ public class Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings 
 	int MaxFunctionCallDepth  { public get; public set; }
 	int MaxNodeCount  { public get; public set; }
 	int MaxOrderByNodeCount  { public get; public set; }
+	System.Nullable`1[[System.Int32]] MaxSelectExpandNodeCount  { public get; public set; }
 	System.Nullable`1[[System.Int32]] MaxSkip  { public get; public set; }
 	System.Nullable`1[[System.Int32]] MaxTop  { public get; public set; }
 }

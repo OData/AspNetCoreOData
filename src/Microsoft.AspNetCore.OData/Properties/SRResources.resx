@@ -447,6 +447,9 @@
   <data name="MaxNodeLimitExceeded" xml:space="preserve">
     <value>The node count limit of '{0}' has been exceeded. To increase the limit, set the '{1}' property on EnableQueryAttribute or ODataValidationSettings.</value>
   </data>
+  <data name="MaxSelectExpandNodeCountExceeded" xml:space="preserve">
+    <value>The number of $select and $expand items in the request exceeds the maximum number allowed of '{0}'. To increase the limit, set the '{1}' property on EnableQueryAttribute or ODataValidationSettings.</value>
+  </data>
   <data name="QueryNodeValidationNotSupported" xml:space="preserve">
     <value>Validating OData QueryNode of kind {0} is not supported by {1}.</value>
   </data>
