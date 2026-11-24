@@ -95,7 +95,7 @@ public abstract class ODataBatchHandler
             throw new ArgumentNullException(nameof(request));
         }
 
-        return request.GetODataBatchBaseUri(PrefixName);
+        return request.GetODataBatchBaseUri(request.ODataFeature().RoutePrefix ?? PrefixName);
     }
 
     /// <summary>

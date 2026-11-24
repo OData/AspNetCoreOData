@@ -76,6 +76,9 @@ public class ODataMiniBatchMiddleware
             RouteValueDictionary routeData = new RouteValueDictionary();
             if (_routeMatcher.TryMatch(path, routeData))
             {
+                PathString pathString = (PathString)path;
+                context.ODataFeature().RoutePrefix = pathString.GetRoutePrefix();
+
                 if (routeData.Count > 0)
                 {
                     Merge(context.ODataFeature().BatchRouteData, routeData);
