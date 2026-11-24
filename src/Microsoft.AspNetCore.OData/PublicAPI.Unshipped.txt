@@ -1,0 +1,8 @@
+Microsoft.AspNetCore.OData.ODataMiniOptions.SetMaxSelectExpandNodeCount(int maxSelectExpandNodeCount) -> Microsoft.AspNetCore.OData.ODataMiniOptions
+Microsoft.AspNetCore.OData.ODataOptions.SetMaxSelectExpandNodeCount(int maxSelectExpandNodeCount) -> Microsoft.AspNetCore.OData.ODataOptions
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxSelectExpandNodeCount.get -> int
+Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations.MaxSelectExpandNodeCount.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxSelectExpandNodeCount.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxSelectExpandNodeCount.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxSelectExpandNodeCount.get -> int?
+Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxSelectExpandNodeCount.set -> void
