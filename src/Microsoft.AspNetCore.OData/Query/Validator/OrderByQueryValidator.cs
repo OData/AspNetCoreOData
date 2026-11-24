@@ -45,13 +45,17 @@ public class OrderByQueryValidator : IOrderByQueryValidator
         };
 
         OrderByClause clause = orderByOption.OrderByClause;
+        // Use a separate clause for the depth walk, leaving the cached clause for normal validation and binding.
+        OrderByClause depthValidationClause = orderByOption.GetOrderByClauseForDepthValidation();
         while (clause != null)
         {
+            QueryValidatorHelpers.ValidateAnyAllExpressionDepth(depthValidationClause.Expression, validationSettings);
             validatorContext.IncrementNodeCount();
 
             ValidateOrderBy(clause, validatorContext);
 
             clause = clause.ThenBy;
+            depthValidationClause = depthValidationClause.ThenBy;
         }
     }
 

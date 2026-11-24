@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.OData.Tests.Models;
@@ -606,6 +607,83 @@ public class OrderByQueryOptionTest
         Assert.Equal(2, results[0].Id);
         Assert.Equal(3, results[1].Id);
         Assert.Equal(1, results[2].Id);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(32)]
+    [InlineData(34)]
+    [InlineData(49)]
+    [InlineData(50)]
+    [InlineData(51)]
+    [InlineData(101)]
+    public void OrderByDepthValidation_PreservesParameterAliasBindingLimit(int references)
+    {
+        var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+        var context = new ODataQueryContext(model, typeof(Customer));
+        context.DefaultQueryConfigurations.EnableOrderBy = true;
+        var terms = Enumerable.Repeat("@value", references).ToList();
+        // Keep the concat tree balanced so larger alias counts do not create a long chain of nested functions.
+        while (terms.Count > 1)
+        {
+            var next = new List<string>();
+            for (int i = 0; i < terms.Count; i += 2)
+            {
+                next.Add(i + 1 == terms.Count ? terms[i] : $"concat({terms[i]},{terms[i + 1]})");
+            }
+            terms = next;
+        }
+        string query = $"{terms[0]},Id desc";
+        var parser = new ODataQueryOptionParser(model, context.ElementType, context.NavigationSource, new Dictionary<string, string> { { "$orderby", query }, { "@value", "'x'" } });
+        var option = new OrderByQueryOption(query, context, parser);
+        var customers = new[] { new Customer { Id = 1 }, new Customer { Id = 2 } }.AsQueryable();
+        string expectedMessage = $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.";
+
+        if (references > ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount)
+        {
+            ExceptionAssert.Throws<ODataException>(() => option.Validate(new ODataValidationSettings()), expectedMessage);
+            return;
+        }
+
+        option.Validate(new ODataValidationSettings());
+        if (references == 51)
+        {
+            ExceptionAssert.Throws<ODataException>(() => option.ApplyTo(customers, new ODataQuerySettings()).Cast<Customer>().ToArray(), expectedMessage);
+        }
+        else
+        {
+            Assert.Equal(new[] { 2, 1 }, option.ApplyTo(customers, new ODataQuerySettings()).Cast<Customer>().Select(customer => customer.Id));
+        }
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("null")]
+    [InlineData("'x'")]
+    public void OrderByDepthValidation_PreservesMissingAndNullFunctionAliases(string value)
+    {
+        var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+        var context = new ODataQueryContext(model, typeof(Customer));
+        context.DefaultQueryConfigurations.EnableOrderBy = true;
+        var queryOptions = new Dictionary<string, string> { { "$orderby", "tolower(@value),Id desc" } };
+        if (value != null)
+        {
+            queryOptions.Add("@value", value);
+        }
+        var parser = new ODataQueryOptionParser(model, context.ElementType, context.NavigationSource, queryOptions);
+        var option = new OrderByQueryOption(queryOptions["$orderby"], context, parser);
+        var customers = new[] { new Customer { Id = 1 }, new Customer { Id = 2 } }.AsQueryable();
+
+        option.Validate(new ODataValidationSettings());
+
+        if (value == null || value == "null")
+        {
+            ExceptionAssert.Throws<ODataException>(() => option.ApplyTo(customers, new ODataQuerySettings()).Cast<Customer>().ToArray(), "The 'tolower' function cannot be applied to an enumeration-typed argument.");
+        }
+        else
+        {
+            Assert.Equal(new[] { 2, 1 }, option.ApplyTo(customers, new ODataQuerySettings()).Cast<Customer>().Select(customer => customer.Id));
+        }
     }
 
     [Fact]
