@@ -42,6 +42,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
             if (options.Apply?.ApplyClause != null)
             {
                 ValidateQueryOptionAllowed(AllowedQueryOptions.Apply, validationSettings.AllowedQueryOptions);
+                options.Apply.Validate(validationSettings);
             }
 
             if (options.Skip != null)
@@ -129,7 +130,7 @@ namespace Microsoft.AspNetCore.OData.Query.Validator
                 throw new ODataException(Error.Format(SRResources.NotAllowedQueryOption, queryOption, "AllowedQueryOptions"));
             }
         }
-        
+
         private static void ValidateNotEmptyOrWhitespace(string rawValue)
         {
             if (rawValue != null && string.IsNullOrWhiteSpace(rawValue))

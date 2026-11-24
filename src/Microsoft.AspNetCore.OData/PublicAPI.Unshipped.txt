@@ -1,3 +1,11 @@
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validate(Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.get -> Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.ApplyQueryOption.Validator.set -> void
+Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.ApplyQueryValidator() -> void
+Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator
+Microsoft.AspNetCore.OData.Query.Validator.IApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
+virtual Microsoft.AspNetCore.OData.Query.Validator.ApplyQueryValidator.Validate(Microsoft.AspNetCore.OData.Query.ApplyQueryOption applyQueryOption, Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings validationSettings) -> void
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.get -> long
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.set -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.get -> System.TimeSpan?
