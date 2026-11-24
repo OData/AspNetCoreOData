@@ -45,7 +45,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionStartYear Condition="'$(VersionStartYear)' == ''">2020</VersionStartYear>
+    <VersionStartYear Condition="'$(VersionStartYear)' == ''">2022</VersionStartYear>
     <VersionMajor Condition="'$(VersionMajor)' == '0'">INVALID_VersionMajor</VersionMajor>
     <VersionMajor Condition="'$(VersionMajor)' == ''">INVALID_VersionMajor</VersionMajor>
     <VersionMinor Condition="'$(VersionMinor)' == ''">INVALID_VersionMinor</VersionMinor>
