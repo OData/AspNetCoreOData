@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -68,68 +69,120 @@ public class DataSource
                 {
                     Id = 1,
                     Name = "Nancy Davolio",
+                    AlternateName = "Nancy D.",
+                    Aliases = new[] { "Nancy" },
                     BaseSalary = 1300,
                     Address = new Address
                     {
                         City = "Seattle",
-                        State = "WA"
+                        State = "WA",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 10 },
+                            { "Aliases", new[] { "local" } }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = null,
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 250 },
-                        { "Gender", "Female" }
+                        { "Gender", "Female" },
+                        { "Aliases", new[] { "ND" } }
                     }
                 },
                 new Employee
                 {
                     Id = 2,
                     Name = "Andrew Fuller",
+                    AlternateName = "Andrew F.",
+                    Aliases = new[] { "Andrew" },
                     BaseSalary = 1500,
                     Address = new Address
                     {
                         City = "Tacoma",
-                        State = "WA"
+                        State = "WA",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 20 },
+                            { "Aliases", Array.Empty<string>() }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = "Profile 2",
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 190 },
-                        { "Gender", "Male" }
+                        { "Gender", "Male" },
+                        { "Aliases", new[] { "AF" } }
                     }
                 },
                 new Employee
                 {
                     Id = 3,
                     Name = "Janet Leverling",
+                    AlternateName = "Janet L.",
+                    Aliases = new[] { "Janet" },
                     BaseSalary = 1100,
                     Address = new Address
                     {
                         City = "Kirkland",
-                        State = "WA"
+                        State = "WA",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 30 },
+                            { "Aliases", Array.Empty<string>() }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = "Profile 3",
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 370 },
-                        { "Gender", "Female" }
+                        { "Gender", "Female" },
+                        { "Aliases", new[] { "JL" } }
                     }
                 },
                 new Employee
                 {
                     Id = 9,
                     Name = "Anne Dodsworth",
+                    AlternateName = "Anne D.",
+                    Aliases = new[] { "Anne" },
                     BaseSalary = 1000,
                     Address = new Address
                     {
                         City = "London",
-                        State = "UK"
+                        State = "UK",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 40 },
+                            { "Aliases", Array.Empty<string>() }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = "Profile 9",
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 310 },
-                        { "Gender", "Female" }
+                        { "Gender", "Female" },
+                        { "Aliases", new[] { "AD" } }
                     }
                 },
             };
