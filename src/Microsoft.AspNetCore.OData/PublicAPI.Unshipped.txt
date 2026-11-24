@@ -1,7 +1,13 @@
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.get -> long
 Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.get -> System.TimeSpan?
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeout.set -> void
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.get -> int
+Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MatchesPatternTimeoutMilliseconds.set -> void
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.get -> int
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxFunctionCallDepth.set -> void
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.get -> System.TimeSpan?
+Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MatchesPatternTimeout.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.get -> int
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.set -> void
 Microsoft.AspNetCore.OData.Query.Validator.FilterValidatorContext.CurrentFunctionCallDepth.get -> int
