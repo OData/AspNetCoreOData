@@ -8,7 +8,9 @@
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Query.Models;
 using Microsoft.OData;
+using Microsoft.OData.ModelBuilder;
 using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Validator;
@@ -126,6 +128,34 @@ public class ComputeQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(
             () => _validator.Validate(new ComputeQueryOption("Name eq 'x' as Flag", _context), settings),
             "Logical operator 'Equal' is not allowed. To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsWhenFunctionCallDepthExceeded()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<QueryCompositionCustomer>("Customers");
+        var context = new ODataQueryContext(builder.GetEdmModel(), typeof(QueryCompositionCustomer), null);
+        var option = new ComputeQueryOption("tolower(toupper(Name)) as Normalized", context);
+        var settings = new ODataValidationSettings { MaxFunctionCallDepth = 1 };
+
+        var exception = Assert.Throws<ODataException>(() => _validator.Validate(option, settings));
+
+        Assert.Contains("MaxFunctionCallDepth", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("tolower(toupper(Name)) as Normalized", 2)]
+    [InlineData("tolower(Name) as Lower,toupper(Name) as Upper", 1)]
+    public void ValidateComputeQueryValidator_DoesNotThrowWhenFunctionCallDepthPermits(string compute, int maxFunctionCallDepth)
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<QueryCompositionCustomer>("Customers");
+        var context = new ODataQueryContext(builder.GetEdmModel(), typeof(QueryCompositionCustomer), null);
+        var option = new ComputeQueryOption(compute, context);
+        var settings = new ODataValidationSettings { MaxFunctionCallDepth = maxFunctionCallDepth };
+
+        _validator.Validate(option, settings);
     }
 
     [Fact]

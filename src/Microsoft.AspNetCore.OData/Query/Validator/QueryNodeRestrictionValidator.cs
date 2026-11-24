@@ -33,9 +33,9 @@ internal static class QueryNodeRestrictionValidator
     /// </param>
     internal static void Validate(QueryNode node, ODataQueryContext context, ODataValidationSettings validationSettings)
     {
-        // A FilterValidatorContext carries the same node-count and lambda-depth bookkeeping used by
-        // $filter, so the compute/aggregate/groupby walk enforces MaxNodeCount and
-        // MaxAnyAllExpressionDepth identically. Function-call depth is enforced at bind time.
+        // A FilterValidatorContext carries the same node-count / function-call-depth / lambda-depth
+        // bookkeeping used by $filter, so the compute/aggregate/groupby walk enforces MaxNodeCount,
+        // MaxFunctionCallDepth and MaxAnyAllExpressionDepth identically.
         FilterValidatorContext validatorContext = new FilterValidatorContext
         {
             Context = context,
@@ -202,12 +202,19 @@ internal static class QueryNodeRestrictionValidator
 
     private static void ValidateFunctionCall(string functionName, IEnumerable<QueryNode> parameters, FilterValidatorContext validatorContext)
     {
-        // Enforce the function allow-list, consistent with $filter. Function-call depth is enforced at
-        // bind time (QueryBinderContext) on this branch, so it is not tracked during validation here.
+        // Enforce the function allow-list and the function-call depth limit, consistent with $filter.
         FilterQueryValidator.ValidateFunctionAllowed(functionName, validatorContext.ValidationSettings);
-        foreach (QueryNode parameter in parameters)
+        validatorContext.EnterFunctionCall();
+        try
         {
-            Validate(parameter, validatorContext);
+            foreach (QueryNode parameter in parameters)
+            {
+                Validate(parameter, validatorContext);
+            }
+        }
+        finally
+        {
+            validatorContext.ExitFunctionCall();
         }
     }
 
