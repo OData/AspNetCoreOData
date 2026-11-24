@@ -121,8 +121,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
                             return expression;
                         }
 
-                        // Unsupported user-supplied function name should be treated as a query validation error (4xx), not a server bug (500).
-                        throw new ODataException(Error.Format(SRResources.ODataFunctionNotSupported, node.Name));
+                        throw new NotImplementedException(Error.Format(SRResources.ODataFunctionNotSupported, node.Name));
                 }
             }
             finally
