@@ -190,7 +190,8 @@ public static class ODataBatchReaderExtensions
         // other paths and Content-ID references that resolve outside the service root via
         // dot-segment traversal (e.g. $1/../../../other) are both rejected here.
         string routePrefix = originalContext.ODataFeature()?.RoutePrefix;
-        if (!IsPathWithinServiceRoot(requestUri.AbsolutePath, routePrefix, originalContext.Request.PathBase))
+        PathString absolutePath = requestUri.AbsolutePath;
+        if (!absolutePath.IsPathWithinServiceRoot(routePrefix, originalContext.Request.PathBase))
         {
             string serviceRoot = BuildServiceRootPath(routePrefix, originalContext.Request.PathBase);
             throw Error.InvalidOperation(
@@ -199,6 +200,10 @@ public static class ODataBatchReaderExtensions
                 $"{outerScheme}://{outerHost}{serviceRoot}");
         }
 
+        // CreateHttpContext intentionally does not copy the original OData feature. Preserve the
+        // route prefix so the URI produced by later Content-ID resolution is validated against
+        // the same OData service root as the original sub-request.
+        context.ODataFeature().RoutePrefix = routePrefix;
         request.CopyAbsoluteUrl(requestUri);
 
         // Not using bufferContentStream. Unlike AspNet, AspNetCore cannot guarantee the disposal
@@ -473,16 +478,23 @@ public static class ODataBatchReaderExtensions
         }
     }
 
-    // Returns true when the sub-request's absolute path falls within the OData service root.
-    // Batch sub-requests are intended to address resources within the same OData service;
-    // this check prevents requests that pass the authority check from reaching unrelated
-    // in-process routes via a same-authority absolute URL or via dot-segment traversal in a
-    // Content-ID reference ($1/../../../other), which the .NET Uri constructor normalises.
-    //
-    // Only when both routePrefix and pathBase are absent (true host-root service) is every
-    // path in scope.  If the app is mounted under a PathBase (e.g. "/base") sub-requests
-    // must still fall under that base even when there is no OData route prefix.
-    private static bool IsPathWithinServiceRoot(string requestPath, string routePrefix, PathString pathBase)
+    /// <summary>
+    /// Determines whether a request path falls within the OData service root.
+    /// </summary>
+    /// <remarks>
+    /// <para>This path-prefix check prevents requests from escaping a configured route prefix or
+    /// application path base via a same-authority absolute URL or via dot-segment traversal in a
+    /// Content-ID reference ($1/../../../other), which the .NET Uri constructor normalises.
+    /// Endpoint routing separately ensures that the selected destination is an OData endpoint.</para>
+    /// <para>Only when both routePrefix and pathBase are absent (true host-root service) is every
+    /// path in scope. If the app is mounted under a PathBase (e.g. "/base"), sub-requests
+    /// must still fall under that base even when there is no OData route prefix.</para>
+    /// </remarks>
+    /// <param name="requestPath">The absolute path of the request.</param>
+    /// <param name="routePrefix">The OData route prefix.</param>
+    /// <param name="pathBase">The application path base.</param>
+    /// <returns><see langword="true"/> if the request path is within the service root; otherwise, <see langword="false"/>.</returns>
+    internal static bool IsPathWithinServiceRoot(this PathString requestPath, string routePrefix, PathString pathBase)
     {
         if (string.IsNullOrEmpty(routePrefix) && !pathBase.HasValue)
         {
@@ -494,8 +506,8 @@ public static class ODataBatchReaderExtensions
         // The request path must equal the service root exactly OR begin with the service root
         // followed by '/' (a child resource).  The trailing-slash requirement prevents a prefix
         // like '/odata' from accidentally matching '/odata-admin'.
-        return string.Equals(requestPath, serviceRoot, StringComparison.OrdinalIgnoreCase)
-            || requestPath.StartsWith(serviceRoot + "/", StringComparison.OrdinalIgnoreCase);
+        return string.Equals(requestPath.Value, serviceRoot, StringComparison.OrdinalIgnoreCase)
+            || requestPath.Value.StartsWith(serviceRoot + "/", StringComparison.OrdinalIgnoreCase);
     }
 
     // Builds the expected path prefix for the OData service root, combining the ASP.NET Core
