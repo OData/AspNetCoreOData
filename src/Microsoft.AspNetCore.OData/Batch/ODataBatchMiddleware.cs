@@ -9,6 +9,7 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
@@ -68,6 +69,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 && _batchMapping.TryGetPrefixName(context, out prefixName, out batchHandler))
             {
                 Contract.Assert(batchHandler != null);
+                context.ODataFeature().RoutePrefix = context.Request.Path.GetRoutePrefix();
                 await batchHandler.ProcessBatchAsync(context, _next).ConfigureAwait(false);
             }
             else
@@ -95,7 +97,7 @@ namespace Microsoft.AspNetCore.OData.Batch
                 if (batchHandler != null)
                 {
                     batchHandler.PrefixName = model.Key;
-                    string batchPath = string.IsNullOrEmpty(model.Key)  ? "/$batch" : $"/{model.Key}/$batch";
+                    string batchPath = string.IsNullOrEmpty(model.Key) ? "/$batch" : $"/{model.Key}/$batch";
 
                     if (_batchMapping == null)
                     {
