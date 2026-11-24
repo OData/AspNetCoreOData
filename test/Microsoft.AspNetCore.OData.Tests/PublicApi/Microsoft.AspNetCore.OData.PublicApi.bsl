@@ -10,6 +10,11 @@ public sealed class Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions
 	[
 	ExtensionAttribute(),
 	]
+	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataMessageSizeLimit (Microsoft.AspNetCore.Builder.IApplicationBuilder app)
+
+	[
+	ExtensionAttribute(),
+	]
 	public static Microsoft.AspNetCore.Builder.IApplicationBuilder UseODataMiniBatching (Microsoft.AspNetCore.Builder.IApplicationBuilder app, string routePattern, Microsoft.OData.Edm.IEdmModel model)
 
 	[

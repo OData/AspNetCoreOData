@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -91,10 +92,9 @@ public class MinimalApiMessageSizeLimitConfiguredTests : IClassFixture<MinimalTe
             Content = content
         };
 
-        // Act & Assert
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 
     [Fact]
@@ -158,10 +158,9 @@ public class MinimalApiMessageSizeLimitConfiguredTests : IClassFixture<MinimalTe
             Content = content
         };
 
-        // Act & Assert
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 }
 
@@ -236,10 +235,9 @@ public class MinimalApiMessageSizeLimitDefaultTests : IClassFixture<MinimalTestF
             Content = content
         };
 
-        // Act & Assert
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 }
 
@@ -317,10 +315,9 @@ public class MinimalApiPerEndpointMessageSizeLimitTests : IClassFixture<MinimalT
             Content = content
         };
 
-        // Act & Assert
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 }
 
@@ -421,9 +418,8 @@ public class MinimalApiRaisedPerEndpointMessageSizeLimitTests : IClassFixture<Mi
             Content = content
         };
 
-        // Act & Assert
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 }
