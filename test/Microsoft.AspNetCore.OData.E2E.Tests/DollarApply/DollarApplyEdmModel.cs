@@ -24,7 +24,10 @@ public class DollarApplyEdmModel
         builder.EntitySet<Product>("Products");
         builder.EntitySet<Customer>("Customers");
         builder.EntitySet<Sale>("Sales");
-        builder.EntitySet<Employee>("Employees");
+        var employees = builder.EntitySet<Employee>("Employees");
+        employees.EntityType.Ignore(employee => employee.AlternateName);
+        employees.EntityType.Ignore(employee => employee.Aliases);
+        employees.EntityType.Ignore(employee => employee.Profile);
         builder.ComplexType<Address>();
         builder.Singleton<Company>("Company");
 

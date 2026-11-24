@@ -294,8 +294,18 @@ public abstract partial class QueryBinder
 
         if (context.ElementClrType.IsDynamicTypeWrapper())
         {
-            return GetFlattenedPropertyExpression(openCollectionNode.Name, context) ?? Expression.Property(
-                Bind(openCollectionNode.Source, context), openCollectionNode.Name);
+            Expression flattenedProperty = GetFlattenedPropertyExpression(openCollectionNode.Name, context);
+            if (flattenedProperty != null)
+            {
+                return flattenedProperty;
+            }
+
+            if (!context.ElementClrType.IsComputeWrapper(out _))
+            {
+                throw new ODataException(Error.Format(
+                    SRResources.PropertyOrPathWasRemovedFromContext,
+                    openCollectionNode.Name));
+            }
         }
 
         if (context.ComputedProperties.TryGetValue(openCollectionNode.Name, out ComputeExpression computedProperty))
@@ -329,7 +339,18 @@ public abstract partial class QueryBinder
 
         if (context.ElementClrType.IsDynamicTypeWrapper())
         {
-            return GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context) ?? Expression.Property(Bind(openNode.Source, context), openNode.Name);
+            Expression flattenedProperty = GetFlattenedPropertyExpression(GetFullPropertyPath(openNode), context);
+            if (flattenedProperty != null)
+            {
+                return flattenedProperty;
+            }
+
+            if (!context.ElementClrType.IsComputeWrapper(out _))
+            {
+                throw new ODataException(Error.Format(
+                    SRResources.PropertyOrPathWasRemovedFromContext,
+                    GetFullPropertyPath(openNode)));
+            }
         }
 
         if (context.ComputedProperties.TryGetValue(openNode.Name, out ComputeExpression computedProperty))
@@ -1003,6 +1024,12 @@ public abstract partial class QueryBinder
         switch (node.Kind)
         {
             case QueryNodeKind.ResourceRangeVariableReference:
+                if (baseElement != null)
+                {
+                    // The range variable represents the supplied root when binding relative to an unwrapped wrapper.
+                    return baseElement;
+                }
+
                 return context.CurrentParameter.Type.IsFlatteningWrapper()
                     ? (Expression)Expression.Property(context.CurrentParameter, QueryConstants.FlatteningWrapperSourceProperty)
                     : context.CurrentParameter;
@@ -1032,7 +1059,16 @@ public abstract partial class QueryBinder
 
             case QueryNodeKind.SingleValueOpenPropertyAccess:
                 SingleValueOpenPropertyAccessNode openNode = node as SingleValueOpenPropertyAccessNode;
-                return GetFlattenedPropertyExpression(openNode.Name, context) ?? CreateOpenPropertyAccessExpression(openNode, context);
+                if (baseElement != null
+                    && openNode.Name == QueryConstants.ComputeWrapperInstanceProperty
+                    && openNode.Source is ResourceRangeVariableReferenceNode)
+                {
+                    // The wrapper's Instance segment is already represented by the unwrapped base expression.
+                    return baseElement;
+                }
+
+                return GetFlattenedPropertyExpression(openNode.Name, context)
+                    ?? CreateOpenPropertyAccessExpression(openNode, context, baseElement);
 
             case QueryNodeKind.None:
             case QueryNodeKind.SingleNavigationNode:
@@ -1087,7 +1123,37 @@ public abstract partial class QueryBinder
     /// <returns>The LINQ <see cref="Expression"/> created.</returns>
     public virtual Expression CreateOpenPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
-        Expression source = BindAccessExpression(openNode.Source, context);
+        return CreateOpenPropertyAccessExpression(openNode, context, baseElement: null);
+    }
+
+    private Expression CreateOpenPropertyAccessExpression(
+        SingleValueOpenPropertyAccessNode openNode,
+        QueryBinderContext context,
+        Expression baseElement)
+    {
+        Expression source;
+        if (baseElement != null)
+        {
+            source = BindAccessExpression(openNode.Source, context, baseElement);
+        }
+        else if (context.ElementClrType.IsDynamicTypeWrapper())
+        {
+            source = BindAccessExpression(
+                openNode.Source,
+                context,
+                UnwrapComputeWrapper(context.CurrentParameter));
+        }
+        else
+        {
+            source = BindAccessExpression(openNode.Source, context);
+        }
+
+        if (source.Type.IsDynamicTypeWrapper())
+        {
+            throw new ODataException(Error.Format(
+                SRResources.PropertyOrPathWasRemovedFromContext,
+                openNode.Name));
+        }
 
         // If the segment names a property declared in the model, bind to it directly (e.g. it exists
         // on the source type after an earlier $apply transformation), mapping the EDM name to the CLR
@@ -1099,10 +1165,23 @@ public abstract partial class QueryBinder
         }
 
         // Property doesn't exists go for dynamic properties dictionary
-        PropertyInfo prop = GetDynamicPropertyContainer(openNode, context);
+        PropertyInfo prop = GetDynamicPropertyContainer(
+            source.Type,
+            openNode.Kind,
+            context.Model);
         MemberExpression propertyAccessExpression = Expression.Property(source, prop.Name);
 
         return CreateDynamicPropertyAccessExpression(propertyAccessExpression, openNode.Name, context);
+    }
+
+    private static Expression UnwrapComputeWrapper(Expression source)
+    {
+        while (source.Type.IsComputeWrapper(out _))
+        {
+            source = Expression.Property(source, QueryConstants.ComputeWrapperInstanceProperty);
+        }
+
+        return source;
     }
     #endregion
 
@@ -1184,6 +1263,12 @@ public abstract partial class QueryBinder
         }
 
         return GetDynamicPropertyContainer(openCollectionNode.Source.TypeReference, openCollectionNode.Kind, context.Model);
+    }
+
+    private static PropertyInfo GetDynamicPropertyContainer(Type sourceType, QueryNodeKind queryNodeKind, IEdmModel model)
+    {
+        IEdmTypeReference edmTypeReference = model.GetEdmTypeReference(sourceType);
+        return GetDynamicPropertyContainer(edmTypeReference, queryNodeKind, model);
     }
 
     /// <summary>
@@ -1917,8 +2002,12 @@ public abstract partial class QueryBinder
             return null;
         }
 
-        // A type that is not in the model (e.g. an intermediate transformation result such as a
-        // grouping or flattening wrapper): bind the CLR property directly by the segment name.
+        if (instanceType.IsDynamicTypeWrapper())
+        {
+            return null;
+        }
+
+        // A type that is not in the model: bind the CLR property directly by the segment name.
         return instanceType.GetProperty(propertyName);
     }
 
@@ -1958,9 +2047,22 @@ public abstract partial class QueryBinder
     /// <returns>The LINQ <see cref="Expression"/> created.</returns>
     private Expression BindDynamicPropertyAccessExpression(SingleValueOpenPropertyAccessNode openNode, QueryBinderContext context)
     {
-        PropertyInfo prop = GetDynamicPropertyContainer(openNode, context);
+        Expression source;
+        if (context.ElementClrType.IsDynamicTypeWrapper())
+        {
+            // Bind the original path against the unwrapped instance so nested segments are preserved.
+            source = BindAccessExpression(
+                openNode.Source,
+                context,
+                UnwrapComputeWrapper(context.CurrentParameter));
+        }
+        else
+        {
+            source = Bind(openNode.Source, context);
+        }
 
-        Expression containerPropertyAccessExpression = BindPropertyAccessExpression(openNode.Source, prop, context);
+        PropertyInfo prop = GetDynamicPropertyContainer(source.Type, openNode.Kind, context.Model);
+        Expression containerPropertyAccessExpression = Expression.Property(source, prop);
 
         return CreateDynamicPropertyAccessExpression(containerPropertyAccessExpression, openNode.Name, context);
     }
@@ -2025,6 +2127,14 @@ public abstract partial class QueryBinder
         // Similarly, for %filter=DynamicProperty/Level1Property/Level2Property,
         // both Level1Property and Level2Property will be SingleValueOpenPropertyAccessNode but
         // can resolve into either declared or dynamic properties
+
+        if (context.ElementClrType.IsDynamicTypeWrapper()
+            && openNode.Name == QueryConstants.ComputeWrapperInstanceProperty
+            && openNode.Source is ResourceRangeVariableReferenceNode)
+        {
+            // Nested open-property paths can also expose Instance as the wrapper's synthetic root segment.
+            return UnwrapComputeWrapper(context.CurrentParameter);
+        }
 
         Expression sourceExpr = null;
 
@@ -2118,9 +2228,22 @@ public abstract partial class QueryBinder
     /// <returns>The LINQ <see cref="Expression"/> created.</returns>
     private Expression BindCollectionOpenPropertyAccessExpression(CollectionOpenPropertyAccessNode openCollectionNode, QueryBinderContext context)
     {
-        PropertyInfo containerProperty = GetDynamicPropertyContainer(openCollectionNode, context);
+        Expression source;
+        if (context.ElementClrType.IsDynamicTypeWrapper())
+        {
+            // Bind the original path against the unwrapped instance so nested segments are preserved.
+            source = BindAccessExpression(
+                openCollectionNode.Source,
+                context,
+                UnwrapComputeWrapper(context.CurrentParameter));
+        }
+        else
+        {
+            source = Bind(openCollectionNode.Source, context);
+        }
 
-        Expression containerPropertyAccessExpr = BindPropertyAccessExpression(openCollectionNode.Source, containerProperty, context);
+        PropertyInfo containerProperty = GetDynamicPropertyContainer(source.Type, openCollectionNode.Kind, context.Model);
+        Expression containerPropertyAccessExpr = Expression.Property(source, containerProperty);
 
         IndexExpression dynamicPropertyValueExpr = Expression.Property(containerPropertyAccessExpr,
             DictionaryStringObjectIndexerName, Expression.Constant(openCollectionNode.Name));
