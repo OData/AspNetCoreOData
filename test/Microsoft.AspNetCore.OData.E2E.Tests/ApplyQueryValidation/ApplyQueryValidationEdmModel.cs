@@ -23,6 +23,9 @@ public static class ApplyQueryValidationEdmModel
         var builder = new ODataConventionModelBuilder();
         builder.EntitySet<ApplyValidationItem>("ApplyValidationItems");
         builder.EntitySet<ApplyValidationItem>("RestrictedLimitItems");
+        builder.EntitySet<ApplyValidationItem>("DepthValidationItems").HasManyBinding(item => item.Related, "DepthValidationItems");
+        builder.EntitySet<ApplyValidationItem>("DepthTwoValidationItems").HasManyBinding(item => item.Related, "DepthTwoValidationItems");
+        builder.EntitySet<ApplyValidationItem>("DepthValidationCollectionShapes").HasManyBinding(item => item.Related, "DepthValidationCollectionShapes");
         var model = builder.GetEdmModel();
 
         var entityType = model.SchemaElements.OfType<IEdmEntityType>().Single(t => t.Name == nameof(ApplyValidationItem));

@@ -201,6 +201,8 @@ internal static class QueryNodeRestrictionValidator
                     }
 
                     Validate(countNode.Source, validatorContext);
+                    // $count($filter=...) can contain lambdas too; keep the enclosing expression's lambda depth.
+                    QueryValidatorHelpers.ValidateAnyAllExpressionDepth(countNode.FilterClause?.Expression, validationSettings, validatorContext.CurrentAnyAllExpressionDepth);
                 }
 
                 break;

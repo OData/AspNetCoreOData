@@ -386,6 +386,13 @@ public class OrderByQueryOption
         return clauses;
     }
 
+    internal OrderByClause GetOrderByClauseForDepthValidation()
+    {
+        OrderByClause orderByClause = _queryOptionParser.ParseOrderBy();
+        // Reuse the parsed tree when there are no aliases; otherwise use a new translator for this depth check.
+        return _queryOptionParser.ParameterAliasNodes.Count == 0 ? orderByClause : TranslateParameterAlias(orderByClause);
+    }
+
     private static IQueryable AddOrderByQueryForProperty(IOrderByBinder orderByBinder,
         OrderByClause orderbyClause, IQueryable querySoFar, QueryBinderContext binderContext, bool alreadyOrdered)
     {

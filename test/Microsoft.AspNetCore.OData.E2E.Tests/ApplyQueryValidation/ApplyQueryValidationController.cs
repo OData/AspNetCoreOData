@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
@@ -32,5 +33,32 @@ public class RestrictedLimitItemsController : ODataController
     public ActionResult<IEnumerable<ApplyValidationItem>> Get()
     {
         return Ok(ApplyValidationDataSource.Items);
+    }
+}
+
+public class DepthValidationItemsController : ODataController
+{
+    [EnableQuery]
+    public IQueryable<ApplyValidationItem> Get()
+    {
+        return DepthValidationDataSource.Items;
+    }
+}
+
+public class DepthTwoValidationItemsController : ODataController
+{
+    [EnableQuery(MaxAnyAllExpressionDepth = 2)]
+    public IQueryable<ApplyValidationItem> Get()
+    {
+        return DepthValidationDataSource.Items;
+    }
+}
+
+public class DepthValidationCollectionShapesController : ODataController
+{
+    [EnableQuery]
+    public IQueryable<ApplyValidationItem> Get()
+    {
+        return DepthValidationDataSource.CollectionShapeItems;
     }
 }
