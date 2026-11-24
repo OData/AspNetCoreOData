@@ -110,6 +110,56 @@ public class ODataMiniOptionsTests
     }
 
     [Fact]
+    public void SetMaxSelectExpandNodeCount_SetsValue()
+    {
+        // Arrange
+        ODataMiniOptions options = new ODataMiniOptions();
+
+        // Act
+        options.SetMaxSelectExpandNodeCount(25);
+
+        // Assert
+        Assert.Equal(25, options.QueryConfigurations.MaxSelectExpandNodeCount);
+    }
+
+    [Fact]
+    public void SetMaxSelectExpandNodeCount_ReturnsSelf()
+    {
+        // Arrange
+        ODataMiniOptions options = new ODataMiniOptions();
+
+        // Act
+        ODataMiniOptions result = options.SetMaxSelectExpandNodeCount(25);
+
+        // Assert
+        Assert.Same(options, result);
+    }
+
+    [Fact]
+    public void SetMaxSelectExpandNodeCount_Throws_ForNegative()
+    {
+        // Arrange
+        ODataMiniOptions options = new ODataMiniOptions();
+
+        // Act & Assert
+        ArgumentOutOfRangeException exception = ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => options.SetMaxSelectExpandNodeCount(-1));
+        Assert.Contains("Value must be greater than or equal to 0", exception.Message);
+    }
+
+    [Fact]
+    public void SetMaxSelectExpandNodeCount_AcceptsZero_ToDisableTheCheck()
+    {
+        // Arrange
+        ODataMiniOptions options = new ODataMiniOptions();
+
+        // Act
+        options.SetMaxSelectExpandNodeCount(0);
+
+        // Assert
+        Assert.Equal(0, options.QueryConfigurations.MaxSelectExpandNodeCount);
+    }
+
+    [Fact]
     public void UpdateFrom_CopiesAllFields()
     {
         // Arrange
@@ -121,6 +171,7 @@ public class ODataMiniOptionsTests
         source.SetVersion(ODataVersion.V401);
         source.SetMaxReceivedMessageSize(42 * 1024 * 1024);
         source.SetMaxTop(100);
+        source.SetMaxSelectExpandNodeCount(42);
 
         ODataMiniOptions target = new ODataMiniOptions();
 
@@ -135,5 +186,6 @@ public class ODataMiniOptionsTests
         Assert.Equal(ODataVersion.V401, target.Version);
         Assert.Equal(42 * 1024 * 1024, target.MaxReceivedMessageSize);
         Assert.Equal(100, target.QueryConfigurations.MaxTop.Value);
+        Assert.Equal(42, target.QueryConfigurations.MaxSelectExpandNodeCount);
     }
 }

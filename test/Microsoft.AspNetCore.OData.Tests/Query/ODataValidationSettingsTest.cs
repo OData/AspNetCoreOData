@@ -180,4 +180,19 @@ public class ODataValidationSettingsTest
          illegalUpperValue: null,
          roundTripTestValue: 100);
     }
+
+    [Fact]
+    public void MaxSelectExpandNodeCount_Property_RoundTrips()
+    {
+        // Arrange & Act & Assert
+        ReflectionAssert.NullableIntegerProperty<ODataValidationSettings, int>(
+            new ODataValidationSettings(),
+            o => o.MaxSelectExpandNodeCount,
+            expectedDefaultValue: null,
+            minLegalValue: 0,
+            maxLegalValue: int.MaxValue,
+            illegalLowerValue: -1,
+            illegalUpperValue: null,
+            roundTripTestValue: 100);
+    }
 }

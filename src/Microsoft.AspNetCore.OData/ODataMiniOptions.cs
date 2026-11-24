@@ -271,6 +271,23 @@ public class ODataMiniOptions
         return this;
     }
 
+    /// <summary>
+    /// Sets the global maximum number of projection ($select and $expand) items allowed across the whole projection
+    /// tree of a single request. Set to 0 to disable the check. The default is 500.
+    /// </summary>
+    /// <param name="maxSelectExpandNodeCount">The maximum number of $select and $expand items.</param>
+    /// <returns>The current <see cref="ODataMiniOptions"/> instance to enable further configuration.</returns>
+    public ODataMiniOptions SetMaxSelectExpandNodeCount(int maxSelectExpandNodeCount)
+    {
+        if (maxSelectExpandNodeCount < 0)
+        {
+            throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxSelectExpandNodeCount), maxSelectExpandNodeCount, 0);
+        }
+
+        _queryConfigurations.MaxSelectExpandNodeCount = maxSelectExpandNodeCount;
+        return this;
+    }
+
     internal void UpdateFrom(ODataMiniOptions otherOptions)
     {
         this._queryConfigurations.UpdateAll(otherOptions.QueryConfigurations);
