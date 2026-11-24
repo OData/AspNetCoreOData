@@ -46,7 +46,15 @@ public class FilterQueryValidator : IFilterQueryValidator
             CurrentDepth = 0
         };
 
-        ValidateFilter(filterQueryOption.FilterClause, validatorContext);
+        // Parse the filter before checking aliases because parsing populates the alias dictionary.
+        FilterClause filterClause = filterQueryOption.FilterClause;
+        if (filterQueryOption.HasParameterAliases)
+        {
+            // Check the whole aliased filter once, without reusing the translation used for query binding.
+            QueryValidatorHelpers.ValidateAnyAllExpressionDepth(filterQueryOption.GetFilterExpressionForDepthValidation(), settings);
+        }
+
+        ValidateFilter(filterClause, validatorContext);
     }
 
     /// <summary>
@@ -736,7 +744,11 @@ public class FilterQueryValidator : IFilterQueryValidator
                 break;
 
             case QueryNodeKind.In:
-                // No setting validations
+                // Aliased filters were checked from the root; otherwise continue from the enclosing lambda depth.
+                if (validatorContext.Filter?.HasParameterAliases != true)
+                {
+                    QueryValidatorHelpers.ValidateAnyAllExpressionDepth(node, validatorContext.ValidationSettings, validatorContext.CurrentAnyAllExpressionDepth);
+                }
                 break;
 
             case QueryNodeKind.NamedFunctionParameter:

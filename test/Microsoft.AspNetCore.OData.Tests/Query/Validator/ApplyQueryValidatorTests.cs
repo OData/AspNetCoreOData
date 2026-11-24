@@ -31,6 +31,23 @@ public class ApplyQueryValidatorTests
 {
     private readonly ApplyQueryValidator _validator = new ApplyQueryValidator();
 
+    [Theory]
+    [InlineData("filter(Category/QueryableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) in (true))")]
+    [InlineData("compute(cast(Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))),Edm.Int64) as Total)")]
+    [InlineData("aggregate(cast(Category/QueryableProducts/$count($filter=Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))),Edm.Int64) with sum as Total)")]
+    [InlineData("groupby((ProductName),aggregate(cast(Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x'))),Edm.Int64) with sum as Total))")]
+    [InlineData("compute(Category/QueryableProducts/any(a:a/Category/EnumerableProducts/$count($filter=Category/QueryableProducts/any(b:b/ProductName eq 'x')) gt 0) as Flag)")]
+    public void AnyAllExpressionDepth_ApplyChecksFilterOperandsAndCountFilters(string expression)
+    {
+        var context = ValidationTestHelper.CreateDerivedProductsContext();
+        var option = new ApplyQueryOption(expression, context);
+
+        var error = Assert.Throws<ODataException>(() => _validator.Validate(option, new ODataValidationSettings()));
+
+        Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+        _validator.Validate(option, new ODataValidationSettings { MaxAnyAllExpressionDepth = 2 });
+    }
+
     private const string NotFilterableMessage =
         "The property 'NotFilterableProperty' cannot be used in the $filter query option.";
 

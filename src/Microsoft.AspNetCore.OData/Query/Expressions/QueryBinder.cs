@@ -1161,7 +1161,8 @@ public abstract partial class QueryBinder
         PropertyInfo declaredClrProperty = GetDeclaredClrProperty(source.Type, openNode.Name, context.Model);
         if (declaredClrProperty != null)
         {
-            return Expression.Property(source, declaredClrProperty);
+            IEdmProperty edmProperty = (context.Model.GetEdmType(source.Type) as IEdmStructuredType)?.FindProperty(openNode.Name);
+            return edmProperty == null ? Expression.Property(source, declaredClrProperty) : CreatePropertyAccessExpression(source, context, edmProperty, GetFullPropertyPath(openNode));
         }
 
         // Property doesn't exists go for dynamic properties dictionary
@@ -1171,7 +1172,7 @@ public abstract partial class QueryBinder
             context.Model);
         MemberExpression propertyAccessExpression = Expression.Property(source, prop.Name);
 
-        return CreateDynamicPropertyAccessExpression(propertyAccessExpression, openNode.Name, context);
+        return CreateDynamicPropertyAccessExpression(propertyAccessExpression, openNode.Name, context, source);
     }
 
     private static Expression UnwrapComputeWrapper(Expression source)
@@ -2064,7 +2065,7 @@ public abstract partial class QueryBinder
         PropertyInfo prop = GetDynamicPropertyContainer(source.Type, openNode.Kind, context.Model);
         Expression containerPropertyAccessExpression = Expression.Property(source, prop);
 
-        return CreateDynamicPropertyAccessExpression(containerPropertyAccessExpression, openNode.Name, context);
+        return CreateDynamicPropertyAccessExpression(containerPropertyAccessExpression, openNode.Name, context, source);
     }
 
     /// <summary>
@@ -2073,11 +2074,13 @@ public abstract partial class QueryBinder
     /// <param name="containerPropertyAccessExpr">The container property access expression.</param>
     /// <param name="propertyName">The dynamic property name.</param>
     /// <param name="context">The query binder context.</param>
+    /// <param name="source">The optional source to guard before accessing its container.</param>
     /// <returns>The LINQ <see cref="Expression"/> created.</returns>
     private static Expression CreateDynamicPropertyAccessExpression(
         Expression containerPropertyAccessExpr,
         string propertyName,
-        QueryBinderContext context)
+        QueryBinderContext context,
+        Expression source = null)
     {
         // Get dynamic property value
         IndexExpression dictionaryIndexExpr = Expression.Property(
@@ -2095,6 +2098,11 @@ public abstract partial class QueryBinder
         {
             BinaryExpression dictionaryIsNotNullExpr = Expression.NotEqual(containerPropertyAccessExpr, NullConstant);
             BinaryExpression dictionaryIsNotNullAndContainsKeyExpr = Expression.AndAlso(dictionaryIsNotNullExpr, containsKeyExpression);
+            if (source != null && source != context.CurrentParameter && ExpressionBinderHelper.IsNullable(source.Type))
+            {
+                dictionaryIsNotNullAndContainsKeyExpr = Expression.AndAlso(Expression.NotEqual(source, Expression.Constant(null, source.Type)), dictionaryIsNotNullAndContainsKeyExpr);
+            }
+
             return Expression.Condition(
                 dictionaryIsNotNullAndContainsKeyExpr,
                 dictionaryIndexExpr,
