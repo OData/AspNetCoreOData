@@ -275,7 +275,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Formatter
                     { (ulong?)123, "123" },
                     { (float)123.123, "123.123" },
                     { (double)123.123, "123.123" },
-                    { (decimal)123.123, "123.123" },
+                    { 123.123m, "123.123" },
                     { Guid.Empty, "00000000-0000-0000-0000-000000000000" },
                     { new DateTimeOffset(1,1,1,0,0,0,TimeSpan.Zero), "0001-01-01T00:00:00Z" },
                     { TimeSpan.FromSeconds(86456), "duration'P1DT56S'" },
