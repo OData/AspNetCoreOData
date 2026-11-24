@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Batch
                             string.IsNullOrEmpty(value) ? "<absent>" : value;
                     }
 
-                    context.Response.Headers["X-Observed-Accept"] = context.Request.Headers.Accept.ToString();
+                    context.Response.Headers["X-Observed-Accept"] = context.Request.Headers["Accept"].ToString();
                 }
 
                 await next();
