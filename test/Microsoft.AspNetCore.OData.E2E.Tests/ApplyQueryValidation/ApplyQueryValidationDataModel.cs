@@ -59,3 +59,24 @@ public static class ApplyValidationDataSource
 
     public static IQueryable<ApplyValidationItem> Items => Data.AsQueryable();
 }
+
+public static class DepthValidationDataSource
+{
+    private static readonly List<ApplyValidationItem> Data;
+
+    static DepthValidationDataSource()
+    {
+        var nullCollection = new ApplyValidationItem { Id = 1, Name = "Null", Amount = 10 };
+        var emptyCollection = new ApplyValidationItem { Id = 2, Name = "Empty", Amount = 20, Related = new List<ApplyValidationItem>() };
+        var singleCollection = new ApplyValidationItem { Id = 3, Name = "Single", Amount = 30, Related = new List<ApplyValidationItem> { emptyCollection } };
+        var multipleCollection = new ApplyValidationItem { Id = 4, Name = "Multiple", Amount = 40, Related = new List<ApplyValidationItem> { emptyCollection, singleCollection } };
+        var cyclicCollection = new ApplyValidationItem { Id = 5, Name = "Cyclic", Amount = 50 };
+        cyclicCollection.Related = new List<ApplyValidationItem> { cyclicCollection, multipleCollection };
+
+        Data = new List<ApplyValidationItem> { nullCollection, emptyCollection, singleCollection, multipleCollection, cyclicCollection };
+    }
+
+    public static IQueryable<ApplyValidationItem> Items => Data.Where(item => item.Id >= 3).AsQueryable();
+
+    public static IQueryable<ApplyValidationItem> CollectionShapeItems => Data.AsQueryable();
+}

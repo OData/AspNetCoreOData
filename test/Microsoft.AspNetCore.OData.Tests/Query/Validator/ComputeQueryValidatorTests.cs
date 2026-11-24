@@ -18,6 +18,36 @@ public class ComputeQueryValidatorTests
     private ComputeQueryValidator _validator = new ComputeQueryValidator();
     private ODataQueryContext _context = ValidationTestHelper.CreateCustomerContext();
 
+    [Theory]
+    [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))) as Total")]
+    [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x'))) as Total")]
+    [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/all(b:b/ProductName eq 'x'))) as Total")]
+    [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/all(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x'))) as Total")]
+    [InlineData("Category/QueryableProducts/any(a:a/Category/EnumerableProducts/$count($filter=Category/QueryableProducts/any(b:b/ProductName eq 'x')) gt 0) as Flag")]
+    [InlineData("1 as First,Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/Category/EnumerableProducts/any(b:b/ProductName eq 'x')) in (true)) as Total")]
+    public void AnyAllExpressionDepth_ComputeChecksCountFiltersAtInheritedDepth(string expression)
+    {
+        var context = ValidationTestHelper.CreateDerivedProductsContext();
+        var option = new ComputeQueryOption(expression, context);
+
+        var error = Assert.Throws<ODataException>(() => _validator.Validate(option, new ODataValidationSettings()));
+
+        Assert.Contains("The Any/All nesting limit of '1' has been exceeded.", error.Message);
+        _validator.Validate(option, new ODataValidationSettings { MaxAnyAllExpressionDepth = 2 });
+    }
+
+    [Theory]
+    [InlineData("Category/QueryableProducts/$count as Total")]
+    [InlineData("Category/QueryableProducts/$count($filter=ProductName eq 'x') as Total")]
+    [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any()) as Total")]
+    [InlineData("Category/QueryableProducts/$count($filter=Category/EnumerableProducts/any(a:a/ProductName eq 'x')) as First,Category/QueryableProducts/$count($filter=Category/EnumerableProducts/all(a:a/ProductName eq 'x')) as Second")]
+    public void AnyAllExpressionDepth_ComputeAllowsIndependentCountFilters(string expression)
+    {
+        var context = ValidationTestHelper.CreateDerivedProductsContext();
+
+        _validator.Validate(new ComputeQueryOption(expression, context), new ODataValidationSettings());
+    }
+
     [Fact]
     public void ValidateComputeQueryValidator_ThrowsOnNullOption()
     {
