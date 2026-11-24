@@ -1650,6 +1650,203 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         [InlineData("default")]
         [InlineData("custom")]
         [InlineData("nonflattening")]
+    public async Task ApplyComputeReturnsNullForUnknownScalarPropertyAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/compute(substring(Instance/AlternateName,0,20) as Result)";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.All(result, item => Assert.Equal(JTokenType.Null, item["Result"].Type));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyComputeReturnsNullForUnknownNestedPropertyAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/compute(substring(Instance/Profile/Label,0,20) as Result)";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.All(result, item => Assert.Equal(JTokenType.Null, item["Result"].Type));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyFilterDoesNotUseUnknownNestedCollectionPropertyAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/filter(Instance/Profile/Aliases/any(alias: alias eq 'admin'))";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Empty(result);
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyComputeRetainsDynamicPropertiesAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/compute(Commission add 1 as Result)";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Equal(new[] { 251, 191, 371, 311 }, result.Select(item => item.Value<int>("Result")));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyComputeRetainsDynamicPropertiesAcrossMultipleTransformationsAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/compute(ItemId add 1 as NextId)/compute(Commission add NextId as Result)";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Equal(new[] { 252, 193, 374, 320 }, result.Select(item => item.Value<int>("Result")));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyFilterUsesDynamicCollectionPropertyAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/filter(Aliases/any(alias: alias eq 'ND'))";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Equal(1, Assert.Single(result).Value<int>("ItemId"));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyComputeUsesNestedDynamicPropertySourceAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/compute(Instance/Address/Commission add 1 as Result)";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Equal(new[] { 11, 21, 31, 41 }, result.Select(item => item.Value<int>("Result")));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyFilterUsesNestedDynamicCollectionPropertySourceAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/filter(Instance/Address/Aliases/any(alias: alias eq 'local'))";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Equal(1, Assert.Single(result).Value<int>("ItemId"));
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyGroupByReturnsNullForUnknownPropertyAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Employees?$apply=compute(Id as ItemId)/groupby((Instance/AlternateName))";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadAsObject<JObject>();
+        var result = Assert.IsType<JArray>(content.GetValue("value"));
+        Assert.Single(result);
+        Assert.Equal(JTokenType.Null, result[0]["AlternateName"].Type);
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
+    public async Task ApplyGroupByRejectsUnknownTransformedPropertyAsync(string routePrefix)
+    {
+        // Arrange
+        var queryUrl = $"{routePrefix}/Sales?$apply=groupby((Quarter))/groupby((Values))";
+
+        // Act
+        var response = await SetupAndFireRequestAsync(queryUrl);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("default")]
+    [InlineData("custom")]
+    [InlineData("nonflattening")]
         [InlineData("defaultsql")]
         [InlineData("customsql")]
         [InlineData("nonflatteningsql")]

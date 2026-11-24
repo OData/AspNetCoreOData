@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Entity<Sale>(d => d.Property(p => p.Id).ValueGeneratedNever());
         }
 
@@ -68,68 +69,120 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
                 {
                     Id = 1,
                     Name = "Nancy Davolio",
+                    AlternateName = "Nancy D.",
+                    Aliases = new[] { "Nancy" },
                     BaseSalary = 1300,
                     Address = new Address
                     {
                         City = "Seattle",
-                        State = "WA"
+                        State = "WA",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 10 },
+                            { "Aliases", new[] { "local" } }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = null,
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 250 },
-                        { "Gender", "Female" }
+                        { "Gender", "Female" },
+                        { "Aliases", new[] { "ND" } }
                     }
                 },
                 new Employee
                 {
                     Id = 2,
                     Name = "Andrew Fuller",
+                    AlternateName = "Andrew F.",
+                    Aliases = new[] { "Andrew" },
                     BaseSalary = 1500,
                     Address = new Address
                     {
                         City = "Tacoma",
-                        State = "WA"
+                        State = "WA",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 20 },
+                            { "Aliases", Array.Empty<string>() }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = "Profile 2",
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 190 },
-                        { "Gender", "Male" }
+                        { "Gender", "Male" },
+                        { "Aliases", new[] { "AF" } }
                     }
                 },
                 new Employee
                 {
                     Id = 3,
                     Name = "Janet Leverling",
+                    AlternateName = "Janet L.",
+                    Aliases = new[] { "Janet" },
                     BaseSalary = 1100,
                     Address = new Address
                     {
                         City = "Kirkland",
-                        State = "WA"
+                        State = "WA",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 30 },
+                            { "Aliases", Array.Empty<string>() }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = "Profile 3",
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 370 },
-                        { "Gender", "Female" }
+                        { "Gender", "Female" },
+                        { "Aliases", new[] { "JL" } }
                     }
                 },
                 new Employee
                 {
                     Id = 9,
                     Name = "Anne Dodsworth",
+                    AlternateName = "Anne D.",
+                    Aliases = new[] { "Anne" },
                     BaseSalary = 1000,
                     Address = new Address
                     {
                         City = "London",
-                        State = "UK"
+                        State = "UK",
+                        DynamicProperties = new Dictionary<string, object>
+                        {
+                            { "Commission", 40 },
+                            { "Aliases", Array.Empty<string>() }
+                        }
                     },
                     Company = company,
+                    Profile = new EmployeeProfile
+                    {
+                        Label = "Profile 9",
+                        Aliases = new[] { "admin" }
+                    },
                     DynamicProperties = new Dictionary<string, object>
                     {
                         { "Commission", 310 },
-                        { "Gender", "Female" }
+                        { "Gender", "Female" },
+                        { "Aliases", new[] { "AD" } }
                     }
                 },
             };
@@ -149,7 +202,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             if (!db.Sales.Any())
             {
                 var (categories, products, customers, sales) = Generate();
-                
+
                 db.Categories.AddRange(categories);
                 db.Products.AddRange(products);
                 db.Customers.AddRange(customers);
@@ -181,7 +234,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             var pg1Category = new Category { Id = "PG1", Name = "Food" };
             var pg2Category = new Category { Id = "PG2", Name = "Non-Food" };
 
-            Category[] categories = new []
+            Category[] categories = new[]
             {
                 pg1Category,
                 pg2Category
@@ -192,7 +245,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             var p3Product = new Product { Id = "P3", Name = "Paper", Category = pg2Category, TaxRate = 0.14m };
             var p4Product = new Product { Id = "P4", Name = "Pencil", Category = pg2Category, TaxRate = 0.14m };
 
-            Product[] products = new []
+            Product[] products = new[]
             {
                 p1Product,
                 p2Product,
@@ -205,7 +258,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
             var c3Customer = new Customer { Id = "C3", Name = "Sue" };
             var c4Customer = new Customer { Id = "C4", Name = "Luc" };
 
-            Customer[] customers = new []
+            Customer[] customers = new[]
             {
                 c1Customer,
                 c2Customer,
@@ -213,7 +266,7 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
                 c4Customer
             };
 
-            Sale[] sales = new [] 
+            Sale[] sales = new[]
             {
                 new Sale { Id = 1, Year = 2022, Quarter = "2022-1", Customer = c1Customer, Product = p3Product, Amount = 1 },
                 new Sale { Id = 2, Year = 2022, Quarter = "2022-2", Customer = c1Customer, Product = p1Product, Amount = 2 },
