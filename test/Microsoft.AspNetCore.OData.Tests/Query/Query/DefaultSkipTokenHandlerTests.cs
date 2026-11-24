@@ -285,7 +285,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             ApplyToSkipTokenHandler_ThrowsODataException_InvalidSkipTokenValue_Implementation(_modelLowerCamelCased);
         }
-        
+
         [Fact]
         public void ApplyToSkipTokenHandler_ThrowsODataException_WithAlias_InvalidSkipTokenValue()
         {
@@ -366,14 +366,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
         private static IEdmModel GetEdmModel()
         {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = false};
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder { ModelAliasingEnabled = false };
             builder.EntitySet<SkipCustomer>("Customers");
             return builder.GetEdmModel();
         }
 
         private static IEdmModel GetEdmModelLowerCamelCased()
         {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = false};
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder { ModelAliasingEnabled = false };
             builder.EntitySet<SkipCustomer>("Customers");
             builder.EnableLowerCamelCase();
             return builder.GetEdmModel();
@@ -381,11 +381,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
 
         private static IEdmModel GetEdmModelAliased()
         {
-            ODataConventionModelBuilder builder = new ODataConventionModelBuilder {ModelAliasingEnabled = true};
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder { ModelAliasingEnabled = true };
             var entitySetConfiguration = builder.EntitySet<SkipCustomer>("Customers");
             return builder.GetEdmModel();
         }
-        
+
         private void GetNextPageLinkDefaultSkipTokenHandler_Returns_CorrectSkipTokenLink_Implementation(
             string baseUri,
             string expectedUri,
@@ -396,7 +396,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 edmModel,
                 true);
             DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
-            SkipCustomer instance = new SkipCustomer {Id = 42, Name = "ZX"};
+            SkipCustomer instance = new SkipCustomer { Id = 42, Name = "ZX" };
 
             // Act
             Uri uri = handler.GenerateNextPageLink(
@@ -411,11 +411,11 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 expectedUri,
                 actualUri);
         }
-        
+
         private static void GenerateSkipTokenValue_Returns_SkipTokenValue_Implementation(IEdmModel edmModel, string expectedSkipToken)
         {
             // Arrange
-            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX"};
+            SkipCustomer lastMember = new SkipCustomer { Id = 42, Name = "ZX" };
 
             // Act
             string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(
@@ -436,7 +436,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string expectedSkipToken)
         {
             // Arrange
-            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX"};
+            SkipCustomer lastMember = new SkipCustomer { Id = 42, Name = "ZX" };
 
             IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
                 .First(c => c.Name == "SkipCustomer");
@@ -476,7 +476,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string expectedSkipToken)
         {
             // Arrange
-            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = null};
+            SkipCustomer lastMember = new SkipCustomer { Id = 42, Name = null };
 
             OrderByClause clause = BuildOrderByClause(edmModel, propertyName);
 
@@ -499,9 +499,9 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             SkipCustomer lastMember = new SkipCustomer
-                {
-                    Id = 42,
-                    Birthday = new DateTime(
+            {
+                Id = 42,
+                Birthday = new DateTime(
                         2021,
                         01,
                         20,
@@ -509,7 +509,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                         4,
                         5,
                         DateTimeKind.Utc)
-                };
+            };
 
             TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time"); // -8
             IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
@@ -533,14 +533,14 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                 expectedSkipToken,
                 skipTokenValue);
         }
-        
+
         private static void GenerateSkipTokenValue_Returns_SkipTokenValue_WithOrderby_WithEnumValue_Implementation(
             IEdmModel edmModel,
             string propertyName,
             string expectedSkipToken)
         {
             // Arrange
-            SkipCustomer lastMember = new SkipCustomer {Id = 42, Name = "ZX", Gender = Gender.Male};
+            SkipCustomer lastMember = new SkipCustomer { Id = 42, Name = "ZX", Gender = Gender.Male };
 
             OrderByClause clause = BuildOrderByClause(edmModel, propertyName);
 
@@ -561,7 +561,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
         {
             // Arrange
             DefaultSkipTokenHandler handler = new DefaultSkipTokenHandler();
-            ODataQuerySettings settings = new ODataQuerySettings {HandleNullPropagation = HandleNullPropagationOption.False};
+            ODataQuerySettings settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
@@ -582,13 +582,13 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
                     queryOptions),
                 "Could not find a property named 'abc' on type 'Microsoft.AspNetCore.OData.Tests.Query.SkipCustomer'.");
         }
-        
+
         private static void ApplyToOfTDefaultSkipTokenHandler_Applies_ToQueryable_Implementation(
             IEdmModel edmModel,
             string skipTokenQueryOptionRawValue)
         {
             // Arrange
-            ODataQuerySettings settings = new ODataQuerySettings {HandleNullPropagation = HandleNullPropagationOption.False};
+            ODataQuerySettings settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
@@ -630,7 +630,7 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             string skipTokenQueryOptionRawValue)
         {
             // Arrange
-            ODataQuerySettings settings = new ODataQuerySettings {HandleNullPropagation = HandleNullPropagationOption.False};
+            ODataQuerySettings settings = new ODataQuerySettings { HandleNullPropagation = HandleNullPropagationOption.False };
             ODataQueryContext context = new ODataQueryContext(
                 edmModel,
                 typeof(SkipCustomer));
@@ -669,6 +669,92 @@ namespace Microsoft.AspNetCore.OData.Tests.Query
             Assert.Equal(
                 "Aaron",
                 skipTokenCustomer.Name);
+        }
+
+        // ---- Tests for properties excluded from the EDM model ----
+
+        private static IEdmModel _openModelWithIgnoredProp = GetOpenEdmModelWithIgnoredProp();
+
+        [Fact]
+        public void GenerateSkipTokenValue_DoesNotInclude_IgnoredCLRProperty_WhenOrderedByUndeclaredOpenProperty()
+        {
+            // Arrange: open entity type where ExcludedToken is omitted from the EDM model via .Ignore().
+            // Ordering by an undeclared open property name must not include its CLR value in the skip token.
+            IgnoredPropertyCustomer lastMember = new IgnoredPropertyCustomer
+            {
+                Id = 42,
+                Name = "Alice",
+                ExcludedToken = "clr-only-value",
+                DynamicProperties = new System.Collections.Generic.Dictionary<string, object>()
+            };
+
+            OrderByClause clause = BuildOpenPropertyOrderByClause(_openModelWithIgnoredProp, "ExcludedToken", "Customers");
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _openModelWithIgnoredProp, clause);
+
+            // Assert: the CLR value of the excluded property must not appear in the skip token
+            Assert.NotNull(skipTokenValue);
+            Assert.DoesNotContain("clr-only-value", skipTokenValue, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void GenerateSkipTokenValue_StillWorks_ForDeclaredProperty_WhenUndeclaredPropertyIsIgnored()
+        {
+            // Regression guard: the fix must not break skip token generation for declared EDM properties.
+            IgnoredPropertyCustomer lastMember = new IgnoredPropertyCustomer { Id = 7, Name = "Bob" };
+
+            OrderByClause clause = BuildDeclaredPropertyOrderByClause(_openModelWithIgnoredProp, "Name", "Customers");
+
+            // Act
+            string skipTokenValue = DefaultSkipTokenHandler.GenerateSkipTokenValue(lastMember, _openModelWithIgnoredProp, clause);
+
+            // Assert: skip token contains the declared Name value followed by the key
+            Assert.Equal("Name-%27Bob%27,Id-7", skipTokenValue);
+        }
+
+        private static OrderByClause BuildOpenPropertyOrderByClause(IEdmModel edmModel, string openPropertyName, string entitySetName)
+        {
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "IgnoredPropertyCustomer");
+            IEdmNavigationSource entitySet = edmModel.FindDeclaredEntitySet(entitySetName);
+            ResourceRangeVariable rangeVariable = new ResourceRangeVariable(
+                "$it", new EdmEntityTypeReference(entityType, true), entitySet);
+            ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+
+            // This is the node the OData URI parser emits for an undeclared property name on an open type
+            SingleValueOpenPropertyAccessNode openNode = new SingleValueOpenPropertyAccessNode(source, openPropertyName);
+            return new OrderByClause(null, openNode, OrderByDirection.Ascending, rangeVariable);
+        }
+
+        private static OrderByClause BuildDeclaredPropertyOrderByClause(IEdmModel edmModel, string propertyName, string entitySetName)
+        {
+            IEdmEntityType entityType = edmModel.SchemaElements.OfType<IEdmEntityType>()
+                .First(c => c.Name == "IgnoredPropertyCustomer");
+            IEdmProperty property = entityType.FindProperty(propertyName);
+            IEdmNavigationSource entitySet = edmModel.FindDeclaredEntitySet(entitySetName);
+            ResourceRangeVariable rangeVariable = new ResourceRangeVariable(
+                "$it", new EdmEntityTypeReference(entityType, true), entitySet);
+            ResourceRangeVariableReferenceNode source = new ResourceRangeVariableReferenceNode("$it", rangeVariable);
+            SingleValuePropertyAccessNode node = new SingleValuePropertyAccessNode(source, property);
+            return new OrderByClause(null, node, OrderByDirection.Ascending, rangeVariable);
+        }
+
+        private static IEdmModel GetOpenEdmModelWithIgnoredProp()
+        {
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder { ModelAliasingEnabled = false };
+            var entitySet = builder.EntitySet<IgnoredPropertyCustomer>("Customers");
+            entitySet.EntityType.Ignore(c => c.ExcludedToken); // omitted from the EDM model
+            return builder.GetEdmModel();
+        }
+
+        public class IgnoredPropertyCustomer
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public IDictionary<string, object> DynamicProperties { get; set; }
+            // Omitted from the EDM model via .Ignore()
+            public string ExcludedToken { get; set; }
         }
 
         [DataContract]
