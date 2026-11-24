@@ -13,6 +13,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -74,7 +75,7 @@ namespace Microsoft.AspNetCore.OData.Query
                 // Create and validate the query options.
                 requestQueryData.QueryValidationRunBeforeActionExecution = true;
                 requestQueryData.ProcessedQueryOptions = queryOptions;
-                
+
                 HttpRequest request = actionExecutingContext.HttpContext.Request;
                 ValidateQuery(request, requestQueryData.ProcessedQueryOptions);
             }
@@ -359,6 +360,14 @@ namespace Microsoft.AspNetCore.OData.Query
                 catch (ArgumentOutOfRangeException e)
                 {
                     actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.QueryParameterNotSupported, e.Message), e);
+                }
+                catch (RegexMatchTimeoutException e)
+                {
+                    actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.Message), e);
+                }
+                catch (TargetInvocationException e) when (e.InnerException is RegexMatchTimeoutException)
+                {
+                    actionExecutedContext.Result = CreateBadRequestResult(Error.Format(SRResources.UriQueryStringInvalid, e.InnerException.Message), e.InnerException);
                 }
                 catch (NotImplementedException e)
                 {
