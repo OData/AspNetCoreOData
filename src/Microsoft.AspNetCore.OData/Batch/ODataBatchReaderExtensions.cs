@@ -44,6 +44,9 @@ namespace Microsoft.AspNetCore.OData.Batch
         private static readonly HashSet<string> blockedBatchSubRequestHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         "Host",
+        "Authorization",
+        "Cookie",
+        "Proxy-Authorization",
         "Forwarded",
         "X-Forwarded-For",
         "X-Forwarded-Host",
@@ -53,9 +56,12 @@ namespace Microsoft.AspNetCore.OData.Batch
         "X-Real-IP",
         "X-ARR-ClientCert",
         "X-ARR-LOG-ID",
+        "X-MS-Client-Principal",
         "X-MS-Client-Principal-Id",
         "X-MS-Client-Principal-Name",
         "X-MS-Client-Principal-IdP",
+        "X-MS-API-ROLE",
+        "X-MS-REQ-AUTHENTICATED",
     };
 
         /// <summary>

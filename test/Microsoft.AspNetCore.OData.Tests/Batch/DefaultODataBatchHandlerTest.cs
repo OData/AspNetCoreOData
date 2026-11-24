@@ -42,6 +42,19 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
     {
         private static IServiceProvider _serviceProvider = BuildServiceProvider();
 
+        public static IEnumerable<object[]> BlockedBatchSubRequestHeaderNames
+        {
+            get
+            {
+                yield return new object[] { "Authorization" };
+                yield return new object[] { "Cookie" };
+                yield return new object[] { "Proxy-Authorization" };
+                yield return new object[] { "X-MS-Client-Principal" };
+                yield return new object[] { "X-MS-API-ROLE" };
+                yield return new object[] { "X-MS-REQ-AUTHENTICATED" };
+            }
+        }
+
         [Fact]
         public void Parameter_Constructor()
         {
@@ -1194,6 +1207,157 @@ X-MS-Client-Principal-Id: test-user-id
             Assert.Empty(capturedXForwardedFor);
             Assert.Empty(capturedPrincipalId);
             Assert.Equal("application/json", capturedAccept);
+        }
+
+        [Fact]
+        public async Task ProcessBatchAsync_DoesNotOverrideInheritedRequestContextHeadersFromSubRequest()
+        {
+            // Arrange
+            string capturedAuthorization = null;
+            string capturedCookie = null;
+            string capturedProxyAuthorization = null;
+            string capturedClientPrincipal = null;
+            string capturedApiRole = null;
+            string capturedRequestAuthenticated = null;
+            string capturedAccept = null;
+
+            RequestDelegate handler = context =>
+            {
+                capturedAuthorization = context.Request.Headers["Authorization"].ToString();
+                capturedCookie = context.Request.Headers["Cookie"].ToString();
+                capturedProxyAuthorization = context.Request.Headers["Proxy-Authorization"].ToString();
+                capturedClientPrincipal = context.Request.Headers["X-MS-Client-Principal"].ToString();
+                capturedApiRole = context.Request.Headers["X-MS-API-ROLE"].ToString();
+                capturedRequestAuthenticated = context.Request.Headers["X-MS-REQ-AUTHENTICATED"].ToString();
+                capturedAccept = context.Request.Headers["Accept"].ToString();
+                return Task.CompletedTask;
+            };
+
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            string batchRequest = @"
+--batch-authentication-headers
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products HTTP/1.1
+Host: example.com
+Authorization: Bearer inner-user
+Cookie: session=inner
+Proxy-Authorization: Basic inner-proxy
+X-MS-Client-Principal: inner-principal
+X-MS-API-ROLE: inner-role
+X-MS-REQ-AUTHENTICATED: false
+Accept: application/json
+
+
+--batch-authentication-headers--
+";
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            httpContext.Request.Headers["Authorization"] = "Bearer outer-user";
+            httpContext.Request.Headers["Cookie"] = "session=outer";
+            httpContext.Request.Headers["Proxy-Authorization"] = "Basic outer-proxy";
+            httpContext.Request.Headers["X-MS-Client-Principal"] = "outer-principal";
+            httpContext.Request.Headers["X-MS-API-ROLE"] = "outer-role";
+            httpContext.Request.Headers["X-MS-REQ-AUTHENTICATED"] = "true";
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=batch-authentication-headers";
+            httpContext.Request.ContentLength = requestBytes.Length;
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RoutePrefix = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.PrefixName = "odata";
+
+            // Act
+            await batchHandler.ProcessBatchAsync(httpContext, handler);
+
+            // Assert
+            Assert.Equal("Bearer outer-user", capturedAuthorization);
+            Assert.Equal("session=outer", capturedCookie);
+            Assert.Equal("Basic outer-proxy", capturedProxyAuthorization);
+            Assert.Equal("outer-principal", capturedClientPrincipal);
+            Assert.Equal("outer-role", capturedApiRole);
+            Assert.Equal("true", capturedRequestAuthenticated);
+            Assert.Equal("application/json", capturedAccept);
+        }
+
+        [Theory]
+        [MemberData(nameof(BlockedBatchSubRequestHeaderNames))]
+        public async Task ProcessBatchAsync_DoesNotAddBlockedHeaderWhenOuterValueIsNull(string headerName)
+        {
+            string capturedValue = await ProcessBatchHeaderAsync(headerName, outerValue: null, removeOuterValue: false);
+
+            Assert.Empty(capturedValue);
+        }
+
+        [Theory]
+        [MemberData(nameof(BlockedBatchSubRequestHeaderNames))]
+        public async Task ProcessBatchAsync_PreservesEmptyOuterValue(string headerName)
+        {
+            string capturedValue = await ProcessBatchHeaderAsync(headerName, string.Empty, removeOuterValue: false);
+
+            Assert.Empty(capturedValue);
+        }
+
+        [Theory]
+        [MemberData(nameof(BlockedBatchSubRequestHeaderNames))]
+        public async Task ProcessBatchAsync_DoesNotRestoreRemovedOuterValue(string headerName)
+        {
+            string capturedValue = await ProcessBatchHeaderAsync(headerName, "outer-value", removeOuterValue: true);
+
+            Assert.Empty(capturedValue);
+        }
+
+        private static async Task<string> ProcessBatchHeaderAsync(
+            string headerName,
+            string outerValue,
+            bool removeOuterValue)
+        {
+            string capturedValue = null;
+            RequestDelegate handler = context =>
+            {
+                capturedValue = context.Request.Headers[headerName].ToString();
+                return Task.CompletedTask;
+            };
+
+            DefaultODataBatchHandler batchHandler = new DefaultODataBatchHandler();
+            string batchRequest = $@"
+--batch-single-header
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+
+GET http://example.com/odata/Products HTTP/1.1
+Host: example.com
+{headerName}: inner-value
+
+
+--batch-single-header--
+";
+            HttpContext httpContext = HttpContextHelper.Create("Post", "http://example.com/$batch");
+            if (outerValue != null)
+            {
+                httpContext.Request.Headers[headerName] = outerValue;
+            }
+
+            if (removeOuterValue)
+            {
+                httpContext.Request.Headers.Remove(headerName);
+            }
+
+            byte[] requestBytes = Encoding.UTF8.GetBytes(batchRequest);
+            httpContext.Request.Body = new MemoryStream(requestBytes);
+            httpContext.Request.ContentType = "multipart/mixed;boundary=batch-single-header";
+            httpContext.Request.ContentLength = requestBytes.Length;
+            IEdmModel model = new EdmModel();
+            httpContext.ODataFeature().RoutePrefix = "odata";
+            httpContext.RequestServices = BuildServiceProvider(opt => opt.AddRouteComponents("odata", model));
+            httpContext.Response.Body = new MemoryStream();
+            batchHandler.PrefixName = "odata";
+
+            await batchHandler.ProcessBatchAsync(httpContext, handler);
+
+            return capturedValue;
         }
 
         [Fact]
