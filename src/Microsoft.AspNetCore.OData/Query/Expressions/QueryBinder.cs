@@ -1490,13 +1490,16 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         {
             Type constantType = context.Model.GetClrType(edmTypeReference, context.AssembliesResolver);
 
+            if (edmTypeReference != null && edmTypeReference.IsEnum())
+            {
+                constantType = Nullable.GetUnderlyingType(constantType) ?? constantType;
+            }
+
             if (value != null && edmTypeReference != null && edmTypeReference.IsEnum())
             {
                 ODataEnumValue odataEnumValue = (ODataEnumValue)value;
                 string strValue = odataEnumValue.Value;
                 Contract.Assert(strValue != null);
-
-                constantType = Nullable.GetUnderlyingType(constantType) ?? constantType;
 
                 IEdmEnumType enumType = edmTypeReference.AsEnum().EnumDefinition();
                 ClrEnumMemberAnnotation memberMapAnnotation = context.Model.GetClrEnumMemberAnnotation(enumType);

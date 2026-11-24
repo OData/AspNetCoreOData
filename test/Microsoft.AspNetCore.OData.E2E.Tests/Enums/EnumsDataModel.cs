@@ -21,6 +21,8 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
 
         public Gender Gender { get; set; }
 
+        public MaritalStatus? MaritalStatus { get; set; }
+
         public AccessLevel AccessLevel { get; set; }
 
         public FavoriteSports FavoriteSports { get; set; }
@@ -41,6 +43,17 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.Enums
         Male = 1,
 
         Female = 2
+    }
+
+    public enum MaritalStatus
+    {
+        Single,
+
+        Married,
+
+        Divorced,
+
+        Widowed
     }
 
     public enum Skill
