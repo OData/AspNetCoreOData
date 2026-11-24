@@ -47,16 +47,26 @@ namespace Microsoft.AspNetCore.OData.E2E.Tests.DollarApply
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string AlternateName { get; set; }
+        public IList<string> Aliases { get; set; }
         public decimal BaseSalary { get; set; }
         public Address Address { get; set; }
         public Company Company { get; set; }
+        public EmployeeProfile Profile { get; set; }
         public Dictionary<string, object> DynamicProperties { get; set; }
+    }
+
+    public class EmployeeProfile
+    {
+        public string Label { get; set; }
+        public IList<string> Aliases { get; set; }
     }
 
     public class Address
     {
         public string City { get; set; }
         public string State { get; set; }
+        public Dictionary<string, object> DynamicProperties { get; set; }
     }
 
     public class Company
