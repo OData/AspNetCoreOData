@@ -8,7 +8,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using Microsoft.AspNetCore.OData.Routing;
+using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
 
@@ -19,7 +19,10 @@ namespace Microsoft.AspNetCore.OData.Query;
 /// </summary>
 internal class ParameterAliasNodeTranslator : QueryNodeVisitor<QueryNode>
 {
+    internal const int MaxParameterAliasExpansionCount = 100;
+
     private IDictionary<string, SingleValueNode> _parameterAliasNode;
+    private int _parameterAliasExpansionCount;
 
     /// <summary>
     /// Initialize a new instance of <see cref="ParameterAliasNodeTranslator"/>.
@@ -293,16 +296,22 @@ internal class ParameterAliasNodeTranslator : QueryNodeVisitor<QueryNode>
     /// <returns>The translated node.</returns>
     public override QueryNode Visit(ParameterAliasNode nodeIn)
     {
-        SingleValueNode node = ODataPathSegmentTranslator.TranslateParameterAlias(nodeIn, _parameterAliasNode);
+        Contract.Assert(nodeIn != null);
 
-        if (node == null)
+        if (!_parameterAliasNode.TryGetValue(nodeIn.Alias, out SingleValueNode node) || node == null)
         {
             return new ConstantNode(null);
         }
-        else
+
+        // Count every successful resolution because the resolved node can contain more aliases.
+        _parameterAliasExpansionCount++;
+        if (_parameterAliasExpansionCount > MaxParameterAliasExpansionCount)
         {
-            return node.Accept(this);
+            throw new ODataException(Error.Format(
+                SRResources.ParameterAliasExpansionLimitExceeded, MaxParameterAliasExpansionCount));
         }
+
+        return node.Accept(this);
     }
 
     /// <summary>
