@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Tests.Commons;
+using Microsoft.AspNetCore.OData.Tests.Query.Models;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -375,6 +376,34 @@ public class ApplyQueryValidatorTests
     }
 
     #endregion
+
+    [Fact]
+    public void Validate_Throws_WhenFunctionCallDepthExceeded()
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<QueryCompositionCustomer>("Customers");
+        var context = new ODataQueryContext(builder.GetEdmModel(), typeof(QueryCompositionCustomer), null);
+        var option = new ApplyQueryOption("compute(tolower(toupper(Name)) as Normalized)", context);
+        var settings = new ODataValidationSettings { MaxFunctionCallDepth = 1 };
+
+        var exception = Assert.Throws<ODataException>(() => _validator.Validate(option, settings));
+
+        Assert.Contains("MaxFunctionCallDepth", exception.Message);
+    }
+
+    [Theory]
+    [InlineData("compute(tolower(toupper(Name)) as Normalized)", 2)]
+    [InlineData("compute(tolower(Name) as Lower,toupper(Name) as Upper)", 1)]
+    public void Validate_DoesNotThrow_WhenFunctionCallDepthPermits(string apply, int maxFunctionCallDepth)
+    {
+        var builder = new ODataConventionModelBuilder();
+        builder.EntitySet<QueryCompositionCustomer>("Customers");
+        var context = new ODataQueryContext(builder.GetEdmModel(), typeof(QueryCompositionCustomer), null);
+        var option = new ApplyQueryOption(apply, context);
+        var settings = new ODataValidationSettings { MaxFunctionCallDepth = maxFunctionCallDepth };
+
+        _validator.Validate(option, settings);
+    }
 
     #region Helpers
 
