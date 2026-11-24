@@ -6,9 +6,12 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.AspNetCore.Routing;
@@ -21,6 +24,81 @@ namespace Microsoft.AspNetCore.OData.Tests;
 
 public class ODataApplicationBuilderExtensionsTests
 {
+    [Fact]
+    public void UseODataMessageSizeLimit_ThrowsArgumentNull_AppBuilder()
+    {
+        IApplicationBuilder builder = null;
+        ExceptionAssert.ThrowsArgumentNull(() => builder.UseODataMessageSizeLimit(), "app");
+    }
+
+    [Theory]
+    [InlineData(false, null, 8)]
+    [InlineData(true, null, 8)]
+    [InlineData(false, 4, 4)]
+    [InlineData(true, 4, 4)]
+    [InlineData(false, 0, 0)]
+    [InlineData(true, 0, 0)]
+    [InlineData(false, 16, 8)]
+    public async Task UseODataMessageSizeLimit_ProtectsMiddlewareWhenServerEnforcementIsUnavailable(bool readOnlyFeature, int? endpointLimit, int expectedLimit)
+    {
+        using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
+        ApplicationBuilder builder = new ApplicationBuilder(services);
+        DefaultHttpContext context = new DefaultHttpContext();
+        context.Request.Method = "POST";
+        using var requestBody = new MemoryStream(new byte[expectedLimit + 1]);
+        context.Request.Body = requestBody;
+        if (readOnlyFeature)
+        {
+            Mock<IHttpMaxRequestBodySizeFeature> feature = new Mock<IHttpMaxRequestBodySizeFeature>();
+            feature.SetupGet(value => value.IsReadOnly).Returns(true);
+            feature.SetupGet(value => value.MaxRequestBodySize).Returns((long?)null);
+            context.Features.Set(feature.Object);
+        }
+
+        ODataMiniMetadata metadata = new ODataMiniMetadata();
+        metadata.Options.SetMaxReceivedMessageSize(8);
+        EndpointMetadataCollection endpointMetadata = endpointLimit.HasValue ? new EndpointMetadataCollection(metadata, new RequestSizeLimitAttribute(endpointLimit.Value)) : new EndpointMetadataCollection(metadata);
+        context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, endpointMetadata, "odata"));
+        using var consumedBody = new MemoryStream();
+        builder.UseODataMessageSizeLimit();
+        builder.UseODataMessageSizeLimit();
+        builder.Run(httpContext => httpContext.Request.Body.CopyToAsync(consumedBody));
+
+        await builder.Build()(context);
+
+        Assert.Equal(StatusCodes.Status413PayloadTooLarge, context.Response.StatusCode);
+        Assert.True(consumedBody.Length <= expectedLimit);
+    }
+
+    [Theory]
+    [InlineData("GET", true)]
+    [InlineData("POST", false)]
+    public async Task UseODataMessageSizeLimit_LeavesRequestsOutsideItsScopeUnchanged(string method, bool odataEndpoint)
+    {
+        using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
+        ApplicationBuilder builder = new ApplicationBuilder(services);
+        DefaultHttpContext context = new DefaultHttpContext();
+        context.Request.Method = method;
+        using var requestBody = new MemoryStream(new byte[9]);
+        context.Request.Body = requestBody;
+        if (odataEndpoint)
+        {
+            ODataMiniMetadata metadata = new ODataMiniMetadata();
+            metadata.Options.SetMaxReceivedMessageSize(8);
+            context.SetEndpoint(new Endpoint(_ => Task.CompletedTask, new EndpointMetadataCollection(metadata), "odata"));
+        }
+
+        using var consumedBody = new MemoryStream();
+        builder.UseODataMessageSizeLimit();
+        builder.Run(httpContext => httpContext.Request.Body.CopyToAsync(consumedBody));
+
+        await builder.Build()(context);
+
+        Assert.Equal(StatusCodes.Status200OK, context.Response.StatusCode);
+        Assert.Equal(9, consumedBody.Length);
+        Assert.Same(requestBody, context.Request.Body);
+    }
+
     [Fact]
     public void UseODataBatching_ThrowsArgumentNull_AppBuilder()
     {

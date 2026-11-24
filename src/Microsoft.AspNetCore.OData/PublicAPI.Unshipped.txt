@@ -6,3 +6,4 @@ Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxSelectExpandNodeCount.g
 Microsoft.AspNetCore.OData.Query.EnableQueryAttribute.MaxSelectExpandNodeCount.set -> void
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxSelectExpandNodeCount.get -> int?
 Microsoft.AspNetCore.OData.Query.Validator.ODataValidationSettings.MaxSelectExpandNodeCount.set -> void
+static Microsoft.AspNetCore.OData.ODataApplicationBuilderExtensions.UseODataMessageSizeLimit(this Microsoft.AspNetCore.Builder.IApplicationBuilder app) -> Microsoft.AspNetCore.Builder.IApplicationBuilder

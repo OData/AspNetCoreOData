@@ -5,6 +5,7 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -94,7 +95,7 @@ public class MinimalApiPutPatchMessageSizeLimitTests : IClassFixture<MinimalTest
     }
 
     [Fact]
-    public async Task Put_PayloadExceedingConfiguredLimit_ThrowsException()
+    public async Task Put_PayloadExceedingConfiguredLimit_Returns413()
     {
         // Arrange — 5 MB exceeds the 1 MB configured limit.
         var payload = new string('X', 5 * 1024 * 1024);
@@ -107,10 +108,9 @@ public class MinimalApiPutPatchMessageSizeLimitTests : IClassFixture<MinimalTest
             Content = content
         };
 
-        // Act & Assert — middleware throws ODataException with the same message as OData.NET's stream-level enforcement.
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class MinimalApiPutPatchMessageSizeLimitTests : IClassFixture<MinimalTest
     }
 
     [Fact]
-    public async Task Patch_PayloadExceedingConfiguredLimit_ThrowsException()
+    public async Task Patch_PayloadExceedingConfiguredLimit_Returns413()
     {
         // Arrange — 5 MB exceeds the 1 MB configured limit.
         var payload = new string('X', 5 * 1024 * 1024);
@@ -147,10 +147,9 @@ public class MinimalApiPutPatchMessageSizeLimitTests : IClassFixture<MinimalTest
             Content = content
         };
 
-        // Act & Assert — middleware throws ODataException with the same message as OData.NET's stream-level enforcement.
-        var exception = await Record.ExceptionAsync(async () => await _client.SendAsync(request));
-        Assert.NotNull(exception);
-        Assert.Contains("maximum number of bytes allowed to be read from the stream has been exceeded", exception.ToString());
+        using HttpResponseMessage response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
     }
 
     [Fact]

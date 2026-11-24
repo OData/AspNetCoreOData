@@ -8,9 +8,12 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.OData.Common;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Query.Validator;
 using Microsoft.AspNetCore.OData.Results;
@@ -28,6 +31,10 @@ namespace Microsoft.AspNetCore.OData;
 /// </summary>
 public static class ODataEndpointConventionBuilderExtensions
 {
+    // Allocated once for this static class, not per endpoint or request.
+    // The same private instance marks each endpoint whose delegate has already been wrapped.
+    private static readonly object _messageSizeLimitMarker = new();
+
     /// <summary>
     /// Adds a <see cref="RouteEndpoint"/> to the <see cref="IEndpointRouteBuilder"/> that matches HTTP GET requests to get the OData service document.
     /// </summary>
@@ -137,20 +144,7 @@ public static class ODataEndpointConventionBuilderExtensions
     /// <returns>A <see cref="IEndpointConventionBuilder"/> that can be used to further customize the endpoint.</returns>
     public static TBuilder WithODataResult<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
     {
-        // Message size enforcement filter — runs before the handler reads the body.
-        builder.AddEndpointFilter(async (invocationContext, next) =>
-        {
-            HttpContext httpContext = invocationContext.HttpContext;
-
-            if (HttpMethods.IsPost(httpContext.Request.Method) ||
-                HttpMethods.IsPut(httpContext.Request.Method) ||
-                HttpMethods.IsPatch(httpContext.Request.Method))
-            {
-                EnforceMaxReceivedMessageSize(httpContext);
-            }
-
-            return await next(invocationContext);
-        });
+        AddMessageSizeLimit(builder);
 
         // Result wrapping filter
         builder.AddEndpointFilter(async (invocationContext, next) =>
@@ -191,9 +185,9 @@ public static class ODataEndpointConventionBuilderExtensions
     /// <remarks>
     /// When <see cref="ODataMiniOptions.SetMaxReceivedMessageSize"/> is called in <paramref name="setupAction"/>,
     /// the per-endpoint limit overrides the global default set in <c>AddOData</c>. This allows both tightening
-    /// and raising the limit per endpoint. On hosts without <see cref="IHttpMaxRequestBodySizeFeature"/>
-    /// (non-Kestrel), the enforcement falls back to checking the Content-Length header; chunked requests
-    /// without Content-Length will not be enforced on those hosts.
+    /// and raising the limit per endpoint. The limit is applied before endpoint parameter binding.
+    /// When <see cref="IHttpMaxRequestBodySizeFeature"/> cannot be updated, unknown-length bodies
+    /// are limited as they are read. Oversized requests are rejected with HTTP status 413.
     /// </remarks>
     public static TBuilder WithODataOptions<TBuilder>(this TBuilder builder, Action<ODataMiniOptions> setupAction) where TBuilder : IEndpointConventionBuilder
     {
@@ -201,22 +195,7 @@ public static class ODataEndpointConventionBuilderExtensions
 
         builder.Add(b => ConfigureODataMetadata(b, m => setupAction.Invoke(m.Options)));
 
-        // Endpoint filter to enforce per-endpoint MaxReceivedMessageSize override.
-        // This complements the enforcement in WithODataResult() for cases where
-        // WithODataOptions is used without WithODataResult.
-        builder.AddEndpointFilter(async (invocationContext, next) =>
-        {
-            HttpContext httpContext = invocationContext.HttpContext;
-
-            if (HttpMethods.IsPost(httpContext.Request.Method) ||
-                HttpMethods.IsPut(httpContext.Request.Method) ||
-                HttpMethods.IsPatch(httpContext.Request.Method))
-            {
-                EnforceMaxReceivedMessageSize(httpContext);
-            }
-
-            return await next(invocationContext);
-        });
+        AddMessageSizeLimit(builder);
 
         return builder;
     }
@@ -304,6 +283,28 @@ public static class ODataEndpointConventionBuilderExtensions
         return builder;
     }
 
+    private static void AddMessageSizeLimit(IEndpointConventionBuilder builder)
+    {
+        // Endpoint filters run after parameter binding: JSON may already be deserialized, and bound Stream/PipeReader
+        // parameters may already reference the original body. Wrap the generated delegate to enforce limits before binding.
+        // Finally runs during endpoint construction, after delegate generation, not after request execution.
+        // This protects binding and the handler; UseODataMessageSizeLimit protects earlier, post-routing middleware.
+        builder.Finally(endpointBuilder =>
+        {
+            // Skip endpoints without a delegate. The marker prevents groups, WithODataResult,
+            // and WithODataOptions from wrapping the same endpoint repeatedly.
+            // Compare identity so unrelated metadata with an Equals override cannot suppress enforcement.
+            RequestDelegate next = endpointBuilder.RequestDelegate;
+            if (next == null || endpointBuilder.Metadata.Any(static metadata => ReferenceEquals(metadata, _messageSizeLimitMarker)))
+            {
+                return;
+            }
+
+            endpointBuilder.RequestDelegate = context => InvokeWithMessageSizeLimitAsync(context, next);
+            endpointBuilder.Metadata.Add(_messageSizeLimitMarker);
+        });
+    }
+
     /// <summary>
     /// Enforces MaxReceivedMessageSize for the current request using the endpoint's OData metadata.
     /// </summary>
@@ -317,22 +318,84 @@ public static class ODataEndpointConventionBuilderExtensions
         }
 
         long limit = metadata.Options.MaxReceivedMessageSize;
+        long? endpointLimit = endpoint.Metadata.GetMetadata<IRequestSizeLimitMetadata>()?.MaxRequestBodySize;
+        if (endpointLimit.HasValue && endpointLimit.Value < limit)
+        {
+            limit = endpointLimit.Value;
+        }
+
+        long? contentLength = httpContext.Request.ContentLength;
+        if (contentLength > limit)
+        {
+            throw new BadHttpRequestException(
+                Error.Format(
+                    SRResources.MaxReceivedMessageSizeExceeded,
+                    contentLength.Value,
+                    limit), StatusCodes.Status413PayloadTooLarge);
+        }
 
         IHttpMaxRequestBodySizeFeature maxBodySizeFeature = httpContext.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        bool serverEnforcesLimit = maxBodySizeFeature?.IsReadOnly == true && maxBodySizeFeature.MaxRequestBodySize is long enforcedLimit && enforcedLimit <= limit;
+
         if (maxBodySizeFeature != null && !maxBodySizeFeature.IsReadOnly)
         {
+            // Prefer server enforcement without a wrapper, preserving any stricter server limit.
             long? currentLimit = maxBodySizeFeature.MaxRequestBodySize;
             if (currentLimit == null || currentLimit > limit)
             {
                 maxBodySizeFeature.MaxRequestBodySize = limit;
             }
+
+            serverEnforcesLimit = true;
         }
-        else if (httpContext.Request.ContentLength > limit)
+
+        // Binding can swallow a quota exception. Observe reads only when stale response length needs cleanup.
+        bool observeLimitFailures = !httpContext.Response.HasStarted && httpContext.Response.ContentLength > 0;
+        if (serverEnforcesLimit && !observeLimitFailures)
         {
-            throw new ODataException(
-                Error.Format(SRResources.MaxReceivedMessageSizeExceeded,
-                    httpContext.Request.ContentLength.Value,
-                    limit));
+            return;
+        }
+
+        // Leave the server's quota in charge when the wrapper is needed only to observe failures.
+        long streamLimit = serverEnforcesLimit ? long.MaxValue : limit;
+        // A missing Content-Length cannot validate chunked bodies when the server limit is unavailable or read-only.
+        if ((!contentLength.HasValue || observeLimitFailures) && (httpContext.Request.Body is not MaxReceivedMessageSizeStream stream || stream.MaxReceivedMessageSize > streamLimit))
+        {
+            httpContext.Request.Body = new MaxReceivedMessageSizeStream(httpContext.Request.Body, streamLimit, () =>
+            {
+                if (!httpContext.Response.HasStarted)
+                {
+                    httpContext.Response.Clear();
+                }
+            });
+        }
+    }
+
+    internal static Task InvokeWithMessageSizeLimitAsync(HttpContext context, RequestDelegate next)
+    {
+        // Share the existing method scope with the optional post-routing middleware.
+        if (!HttpMethods.IsPost(context.Request.Method) &&
+            !HttpMethods.IsPut(context.Request.Method) &&
+            !HttpMethods.IsPatch(context.Request.Method))
+        {
+            return next(context);
+        }
+
+        return InvokeWithMessageSizeLimitCoreAsync(context, next);
+    }
+
+    private static async Task InvokeWithMessageSizeLimitCoreAsync(HttpContext context, RequestDelegate next)
+    {
+        try
+        {
+            // Both the middleware and endpoint wrapper enforce before invoking the next pipeline stage.
+            EnforceMaxReceivedMessageSize(context);
+            await next(context);
+        }
+        catch (BadHttpRequestException exception) when (exception.StatusCode == StatusCodes.Status413PayloadTooLarge && !context.Response.HasStarted)
+        {
+            context.Response.Clear();
+            context.Response.StatusCode = StatusCodes.Status413PayloadTooLarge;
         }
     }
 

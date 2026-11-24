@@ -24,6 +24,27 @@ public static class ODataApplicationBuilderExtensions
     private const string DefaultODataRouteDebugMiddlewareRoutePattern = "$odata";
 
     /// <summary>
+    /// Enforces the OData minimal API message-size limit before subsequent middleware reads the request body.
+    /// </summary>
+    /// <remarks>
+    /// Register immediately after <c>UseRouting()</c> and before middleware that reads or buffers request bodies.
+    /// The selected endpoint's limit applies to POST, PUT, and PATCH requests without raising a stricter server limit.
+    /// Unknown-length bodies are limited as they are read when server enforcement is unavailable.
+    /// This middleware cannot protect body reads that occur before it, including reads before routing.
+    /// </remarks>
+    /// <param name="app">The <see cref="IApplicationBuilder"/> to use.</param>
+    /// <returns>The <see cref="IApplicationBuilder"/>.</returns>
+    public static IApplicationBuilder UseODataMessageSizeLimit(this IApplicationBuilder app)
+    {
+        if (app == null)
+        {
+            throw Error.ArgumentNull(nameof(app));
+        }
+
+        return app.Use(next => context => ODataEndpointConventionBuilderExtensions.InvokeWithMessageSizeLimitAsync(context, next));
+    }
+
+    /// <summary>
     /// Use OData batching middleware.
     /// </summary>
     /// <remarks>
