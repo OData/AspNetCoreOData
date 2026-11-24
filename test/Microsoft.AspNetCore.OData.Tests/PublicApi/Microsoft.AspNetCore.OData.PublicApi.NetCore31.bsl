@@ -102,6 +102,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	bool EnableAttributeRouting  { public get; public set; }
 	bool EnableContinueOnErrorHeader  { public get; public set; }
 	bool EnableNoDollarQueryOptions  { public get; public set; }
+	bool EnableQueryValidationErrorLogging  { public get; public set; }
 	long MaxReceivedMessageSize  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.DefaultQueryConfigurations QueryConfigurations  { public get; }
 	[
@@ -109,6 +110,7 @@ public class Microsoft.AspNetCore.OData.ODataOptions {
 	]
 	Microsoft.OData.ModelBuilder.Config.DefaultQuerySettings QuerySettings  { public get; }
 
+	Microsoft.Extensions.Logging.LogLevel QueryValidationErrorLogLevel  { public get; public set; }
 	[
 	TupleElementNamesAttribute(),
 	]
@@ -1310,6 +1312,7 @@ public class Microsoft.AspNetCore.OData.Query.EnableQueryAttribute : Microsoft.A
 	Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions  { public get; public set; }
 	bool EnableConstantParameterization  { public get; public set; }
 	bool EnableCorrelatedSubqueryBuffering  { public get; public set; }
+	bool EnableQueryValidationErrorLogging  { public get; public set; }
 	bool EnsureStableOrdering  { public get; public set; }
 	Microsoft.AspNetCore.OData.Query.HandleNullPropagationOption HandleNullPropagation  { public get; public set; }
 	bool HandleReferenceNavigationPropertyExpandFilter  { public get; public set; }
