@@ -7,6 +7,7 @@
 
 using System;
 using Microsoft.AspNetCore.OData.Abstracts;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Tests.Commons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
@@ -133,6 +134,22 @@ namespace Microsoft.AspNetCore.OData.Tests.Abstracts
             Assert.Equal(o21, o22);
 
             Assert.NotEqual(o11, o21);
+        }
+
+        [Theory]
+        [InlineData(ODataBatchHandler.DefaultMaxReceivedMessageSize)]
+        [InlineData(50L * 1024 * 1024)]
+        public void MessageSettingsUseConfiguredMaxReceivedMessageSize(long maxReceivedMessageSize)
+        {
+            DefaultContainerBuilder builder = new DefaultContainerBuilder();
+            builder.AddDefaultODataServices();
+            builder.AddDefaultWebApiServices(maxReceivedMessageSize);
+            IServiceProvider container = builder.BuildContainer();
+            using (IServiceScope scope = container.CreateScope())
+            {
+                Assert.Equal(maxReceivedMessageSize, scope.ServiceProvider.GetRequiredService<ODataMessageReaderSettings>().MessageQuotas.MaxReceivedMessageSize);
+                Assert.Equal(maxReceivedMessageSize, scope.ServiceProvider.GetRequiredService<ODataMessageWriterSettings>().MessageQuotas.MaxReceivedMessageSize);
+            }
         }
 
         private interface ITestService { }

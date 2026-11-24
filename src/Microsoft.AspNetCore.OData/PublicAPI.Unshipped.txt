@@ -1,2 +1,4 @@
+Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.get -> long
+Microsoft.AspNetCore.OData.ODataOptions.MaxReceivedMessageSize.set -> void
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.get -> int
 Microsoft.AspNetCore.OData.Query.ODataQuerySettings.MaxFunctionCallDepth.set -> void

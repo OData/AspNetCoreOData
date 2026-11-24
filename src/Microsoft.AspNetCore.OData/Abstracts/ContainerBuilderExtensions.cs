@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using Microsoft.AspNetCore.OData.Batch;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Formatter.Deserialization;
 using Microsoft.AspNetCore.OData.Formatter.Serialization;
@@ -24,8 +25,9 @@ namespace Microsoft.AspNetCore.OData.Abstracts
         /// Injects the default Web API OData services.
         /// </summary>
         /// <param name="builder">The container builder.</param>
+        /// <param name="maxReceivedMessageSize">The maximum message size in bytes. Defaults to 100 MB.</param>
         /// <returns>The calling itself.</returns>
-        public static IContainerBuilder AddDefaultWebApiServices(this IContainerBuilder builder)
+        public static IContainerBuilder AddDefaultWebApiServices(this IContainerBuilder builder, long maxReceivedMessageSize = ODataBatchHandler.DefaultMaxReceivedMessageSize)
         {
             if (builder == null)
             {
@@ -41,7 +43,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddServicePrototype(new ODataMessageReaderSettings
             {
                 EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = maxReceivedMessageSize },
 
                 // WebAPI should read untyped values as structural values by setting ReadUntypedAsString=false.
                 // In ODL 8.x, ReadUntypedAsString option will be deleted.
@@ -54,7 +56,7 @@ namespace Microsoft.AspNetCore.OData.Abstracts
             builder.AddServicePrototype(new ODataMessageWriterSettings
             {
                 EnableMessageStreamDisposal = false,
-                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = Int64.MaxValue },
+                MessageQuotas = new ODataMessageQuotas { MaxReceivedMessageSize = maxReceivedMessageSize },
             });
 
             builder.AddServicePrototype(new ODataSimplifiedOptions
