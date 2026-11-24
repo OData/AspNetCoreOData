@@ -65,6 +65,7 @@ public class ComputeQueryValidatorTests
     [InlineData("Address/NotFilterableProperty eq 'x' as Flag")]
     [InlineData("Contacts/all(c: c/NotFilterableProperty ne null) as AllRestricted")]
     [InlineData("Contacts/any(c: c/NotFilterableProperty ne null) as HasRestricted")]
+    [InlineData("Contacts/$count($filter=NotFilterableProperty eq 'x') as C")]
     public void ValidateComputeQueryValidator_ThrowsForRestrictedPropertyInComputeClause(string compute)
     {
         // Arrange & Act & Assert - a not-filterable property referenced through $compute is rejected
@@ -82,6 +83,10 @@ public class ComputeQueryValidatorTests
     [InlineData("length(Name) as Length")]
     [InlineData("Address/City eq 'a' as Flag")]
     [InlineData("Contacts/any(c: c/Name ne null) as HasNamed")]
+    [InlineData("Contacts/$count as C")]
+    [InlineData("Contacts/$count($filter=Name eq 'x') as C")]
+    [InlineData("Contacts/$count($search=red AND blue) as C")]
+    [InlineData("Contacts/$count($filter=Name eq 'x';$search=red AND blue) as C")]
     public void ValidateComputeQueryValidator_DoesNotThrowForUnrestrictedPropertyInComputeClause(string compute)
     {
         // Arrange & Act & Assert - an unrestricted property keeps validating even though the context
@@ -168,5 +173,85 @@ public class ComputeQueryValidatorTests
         ExceptionAssert.Throws<ODataException>(
             () => _validator.Validate(new ComputeQueryOption("AmountSpent mul 2 as D", _context), settings),
             "The node count limit of '1' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsForDisallowedLogicalOperatorInCountFilter()
+    {
+        // Arrange
+        var option = new ComputeQueryOption("Contacts/$count($filter=Name eq 'x') as C", _context);
+        var settings = new ODataValidationSettings { AllowedLogicalOperators = AllowedLogicalOperators.All & ~AllowedLogicalOperators.Equal };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Logical operator 'Equal' is not allowed. To allow it, set the 'AllowedLogicalOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsForDisallowedArithmeticOperatorInCountFilter()
+    {
+        // Arrange
+        var option = new ComputeQueryOption("Contacts/$count($filter=AmountSpent mul 2 gt 10) as C", _context);
+        var settings = new ODataValidationSettings { AllowedArithmeticOperators = AllowedArithmeticOperators.All & ~AllowedArithmeticOperators.Multiply };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Arithmetic operator 'Multiply' is not allowed. To allow it, set the 'AllowedArithmeticOperators' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsForDisallowedFunctionInCountFilter()
+    {
+        // Arrange
+        var option = new ComputeQueryOption("Contacts/$count($filter=length(Name) gt 1) as C", _context);
+        var settings = new ODataValidationSettings { AllowedFunctions = AllowedFunctions.AllFunctions & ~AllowedFunctions.Length };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "Function 'length' is not allowed. To allow it, set the 'AllowedFunctions' property on EnableQueryAttribute or QueryValidationSettings.");
+    }
+
+    [Theory]
+    [InlineData("Contacts/$count($filter=Name eq 'x') as C")]
+    [InlineData("Contacts/$count($search=red AND blue) as C")]
+    public void ValidateComputeQueryValidator_ThrowsWhenNodeCountExceededInCountClause(string compute)
+    {
+        // Arrange - the count, collection navigation and range variable alone fit within this limit.
+        var option = new ComputeQueryOption(compute, _context);
+        var settings = new ODataValidationSettings { MaxNodeCount = 3 };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "The node count limit of '3' has been exceeded. To increase the limit, set the 'MaxNodeCount' property on EnableQueryAttribute or ODataValidationSettings.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsWhenFunctionCallDepthExceededInCountFilter()
+    {
+        // Arrange
+        var option = new ComputeQueryOption("Contacts/$count($filter=length(trim(Name)) gt 1) as C", _context);
+        var settings = new ODataValidationSettings { MaxFunctionCallDepth = 1 };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "The function call depth limit of '1' has been exceeded. 'MaxFunctionCallDepth' can be configured on ODataValidationSettings, ODataQuerySettings or EnableQueryAttribute.");
+    }
+
+    [Fact]
+    public void ValidateComputeQueryValidator_ThrowsWhenAnyAllDepthExceededInCountFilter()
+    {
+        // Arrange
+        var option = new ComputeQueryOption("Contacts/any(c: c/Contacts/$count($filter=Contacts/any(d: d/Name ne null)) gt 0) as C", _context);
+        var settings = new ODataValidationSettings { MaxAnyAllExpressionDepth = 1 };
+
+        // Act & Assert
+        ExceptionAssert.Throws<ODataException>(
+            () => _validator.Validate(option, settings),
+            "The Any/All nesting limit of '1' has been exceeded. 'MaxAnyAllExpressionDepth' can be configured on ODataValidationSettings or EnableQueryAttribute.");
     }
 }
