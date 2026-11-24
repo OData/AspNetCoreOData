@@ -510,6 +510,18 @@ namespace Microsoft.AspNetCore.OData.Batch
                 || requestPath.Value.StartsWith(serviceRoot + "/", StringComparison.OrdinalIgnoreCase);
         }
 
+        internal static string GetRoutePrefix(this PathString path)
+        {
+            int endIndex = path.Value.Length - 1;
+            while (endIndex > 0 && path.Value[endIndex] == '/')
+            {
+                endIndex--;
+            }
+
+            int lastSeparatorIndex = path.Value.LastIndexOf('/', endIndex);
+            return lastSeparatorIndex <= 0 ? string.Empty : path.Value.Substring(1, lastSeparatorIndex - 1);
+        }
+
         // Builds the expected path prefix for the OData service root, combining the ASP.NET Core
         // path base (for apps mounted under a sub-path) with the OData route prefix.
         private static string BuildServiceRootPath(string routePrefix, PathString pathBase)

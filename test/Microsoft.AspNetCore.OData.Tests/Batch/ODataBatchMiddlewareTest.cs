@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Batch;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Tests.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
@@ -107,6 +108,37 @@ namespace Microsoft.AspNetCore.OData.Test.Batch
             // Assert
             Assert.False(called);
             Assert.True(processed);
+        }
+
+        [Theory]
+        [InlineData("odata", "/odata/$batch", "odata")]
+        [InlineData("", "/$batch", "")]
+        [InlineData("v2{data}", "/v2Customers/$batch", "v2Customers")]
+        public async Task Invoke_SetsRoutePrefixBeforeCallingBatchHandler(string routePrefix, string batchPath, string expectedRoutePrefix)
+        {
+            // Arrange
+            string capturedRoutePrefix = null;
+            Mock<ODataBatchHandler> batchHandler = new Mock<ODataBatchHandler>();
+            batchHandler.Setup(handler => handler.ProcessBatchAsync(It.IsAny<HttpContext>(), It.IsAny<RequestDelegate>()))
+                .Returns<HttpContext, RequestDelegate>((batchContext, _) =>
+                {
+                    capturedRoutePrefix = batchContext.ODataFeature().RoutePrefix;
+                    return Task.CompletedTask;
+                });
+            IServiceCollection services = new ServiceCollection();
+            services.Configure<ODataOptions>(options => options.AddRouteComponents(routePrefix, EdmCoreModel.Instance, batchHandler.Object));
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+            ODataBatchMiddleware middleware = new ODataBatchMiddleware(serviceProvider, _ => Task.CompletedTask);
+            DefaultHttpContext context = new DefaultHttpContext();
+            context.Request.Path = batchPath;
+            context.Request.Method = HttpMethods.Post;
+            context.ODataFeature().RoutePrefix = "stale";
+
+            // Act
+            await middleware.Invoke(context);
+
+            // Assert
+            Assert.Equal(expectedRoutePrefix, capturedRoutePrefix);
         }
 
         [Fact]
