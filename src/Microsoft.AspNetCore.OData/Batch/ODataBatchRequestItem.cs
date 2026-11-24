@@ -12,7 +12,10 @@ using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.OData.Extensions;
 using Microsoft.AspNetCore.OData.Formatter;
+using Microsoft.AspNetCore.OData.Routing;
 
 namespace Microsoft.AspNetCore.OData.Batch
 {
@@ -41,6 +44,8 @@ namespace Microsoft.AspNetCore.OData.Batch
                 throw new ArgumentNullException(nameof(context));
             }
 
+            context.Features.Set<IEndpointFeature>(new ODataEndpointFeature());
+
             if (contentIdToLocationMapping != null)
             {
                 string encodedUrl = context.Request.GetEncodedUrl();
@@ -50,6 +55,17 @@ namespace Microsoft.AspNetCore.OData.Batch
                     && Uri.TryCreate(resolvedRequestUrl, UriKind.Absolute, out resolvedUri)
                     && IsSameAuthority(resolvedUri, context.Request))
                 {
+                    // Content-ID resolution can replace the original URL prefix with a mapped
+                    // Location. URI normalization can then change the path, so validate the final
+                    // resolved path against the OData service root before dispatching the sub-request.
+                    string routePrefix = context.ODataFeature()?.RoutePrefix;
+                    PathString absolutePath = resolvedUri.AbsolutePath;
+                    if (!absolutePath.IsPathWithinServiceRoot(routePrefix, context.Request.PathBase))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        return;
+                    }
+
                     context.Request.CopyAbsoluteUrl(resolvedUri);
                 }
 
@@ -113,6 +129,37 @@ namespace Microsoft.AspNetCore.OData.Batch
         {
             Uri requestBaseUri = new Uri($"{request.Scheme}://{request.Host}/");
             return Uri.Compare(resolvedUri, requestBaseUri, UriComponents.SchemeAndServer, UriFormat.SafeUnescaped, StringComparison.OrdinalIgnoreCase) == 0;
+        }
+
+        // Endpoint routing stores the selected endpoint in IEndpointFeature. Batch sub-requests use
+        // this feature to prevent a root-mounted or broadly prefixed OData service from dispatching
+        // to an unrelated application endpoint that happens to share the same path prefix.
+        private sealed class ODataEndpointFeature : IEndpointFeature
+        {
+            // EndpointMiddleware executes this endpoint instead of a non-OData endpoint selected by
+            // routing, ensuring the unrelated application handler is never invoked.
+            private static readonly Endpoint RejectedEndpoint = new Endpoint(RejectedEndpointHandler, EndpointMetadataCollection.Empty, "OData batch endpoint validation failure");
+            private Endpoint _endpoint;
+
+            public Endpoint Endpoint
+            {
+                get => _endpoint;
+                set
+                {
+                    // A null value means routing has not selected an endpoint. OData controller
+                    // endpoints carry IODataRoutingMetadata. Any other selected endpoint is outside the OData service.
+                    bool isODataEndpoint = value?.Metadata.GetMetadata<IODataRoutingMetadata>() != null;
+                    _endpoint = value == null || isODataEndpoint ? value : RejectedEndpoint;
+                }
+            }
+
+            // Batch responses need only the failure status. An empty body works for both JSON and
+            // multipart batch responses and avoids introducing a response payload contract.
+            private static RequestDelegate RejectedEndpointHandler => context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                return Task.CompletedTask;
+            };
         }
     }
 }
