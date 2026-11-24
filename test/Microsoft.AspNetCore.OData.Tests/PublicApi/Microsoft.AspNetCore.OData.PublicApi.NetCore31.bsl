@@ -3711,3 +3711,4 @@ public class Microsoft.AspNetCore.OData.Routing.Template.ValueSegmentTemplate : 
 	public virtual System.Collections.Generic.IEnumerable`1[[System.String]] GetTemplates (Microsoft.AspNetCore.OData.Routing.ODataRouteOptions options)
 	public virtual bool TryTranslate (Microsoft.AspNetCore.OData.Routing.Template.ODataTemplateTranslateContext context)
 }
+
