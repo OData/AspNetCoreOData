@@ -1420,6 +1420,15 @@ namespace Microsoft.AspNetCore.OData {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The parameter alias expansion count exceeds the maximum allowed value of &apos;{0}&apos;..
+        /// </summary>
+        internal static string ParameterAliasExpansionLimitExceeded {
+            get {
+                return ResourceManager.GetString("ParameterAliasExpansionLimitExceeded", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Parameter template &apos;{0}&apos; in segment &apos;{1}&apos; does not start with &apos;{{&apos; or ends with &apos;}}&apos;..
         /// </summary>
         internal static string ParameterTemplateMustBeInCurlyBraces {

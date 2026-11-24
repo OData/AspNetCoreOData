@@ -891,6 +891,33 @@ public class FilterQueryOptionTest
             actualResult.Select(result => result.IntProp));
     }
 
+    [Fact]
+    public void FilterClause_ThrowsODataExceptionOnEveryAccess_WhenParameterAliasExpansionExceedsLimit()
+    {
+        // Arrange
+        var model = new ODataModelBuilder().Add_Customer_EntityType().Add_Customers_EntitySet().GetEdmModel();
+        int length = ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount + 1;
+        var queryOptions = new Dictionary<string, string> { { "$filter", "@p0 eq 1" } };
+        for (int i = 0; i < length - 1; i++)
+        {
+            queryOptions.Add($"@p{i}", $"@p{i + 1}");
+        }
+        queryOptions.Add($"@p{length - 1}", "Id");
+
+        var parser = new ODataQueryOptionParser(
+            model,
+            model.FindType("Microsoft.AspNetCore.OData.Tests.Models.Customer"),
+            model.FindDeclaredNavigationSource("Default.Container.Customers"),
+            queryOptions);
+        var context = new ODataQueryContext(model, typeof(Customer)) { RequestContainer = new MockServiceProvider() };
+        var filterOption = new FilterQueryOption("@p0 eq 1", context, parser);
+
+        // Act & Assert
+        string expectedMessage = $"The parameter alias expansion count exceeds the maximum allowed value of '{ParameterAliasNodeTranslator.MaxParameterAliasExpansionCount}'.";
+        ExceptionAssert.Throws<ODataException>(() => filterOption.FilterClause, expectedMessage);
+        ExceptionAssert.Throws<ODataException>(() => filterOption.FilterClause, expectedMessage);
+    }
+
     [Theory]
     [MemberData(nameof(PropertyAliasTestFilters))]
     public void ApplyTo_ReturnsCorrectQueryable_PropertyAlias(string filter, int[] propertyAliasIds)
