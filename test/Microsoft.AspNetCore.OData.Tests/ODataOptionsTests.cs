@@ -295,6 +295,45 @@ namespace Microsoft.AspNetCore.OData.Tests
         }
 
         [Fact]
+        public void SetMaxSelectExpandNodeCount_Throws_ForNegativeValue()
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+
+            // Act & Assert
+            ArgumentOutOfRangeException exception = ExceptionAssert.Throws<ArgumentOutOfRangeException>(() => options.SetMaxSelectExpandNodeCount(-1));
+            Assert.Contains("Value must be greater than or equal to 0", exception.Message);
+        }
+
+        [Fact]
+        public void SetMaxSelectExpandNodeCount_SetsQueryConfigurationValue()
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+            Assert.Equal(500, options.QueryConfigurations.MaxSelectExpandNodeCount); // Guard: built-in default
+
+            // Act
+            ODataOptions result = options.SetMaxSelectExpandNodeCount(25);
+
+            // Assert
+            Assert.Equal(25, options.QueryConfigurations.MaxSelectExpandNodeCount);
+            Assert.Same(options, result);
+        }
+
+        [Fact]
+        public void SetMaxSelectExpandNodeCount_AcceptsZero_ToDisableTheCheck()
+        {
+            // Arrange
+            ODataOptions options = new ODataOptions();
+
+            // Act
+            options.SetMaxSelectExpandNodeCount(0);
+
+            // Assert
+            Assert.Equal(0, options.QueryConfigurations.MaxSelectExpandNodeCount);
+        }
+
+        [Fact]
         public void MaxReceivedMessageSize_DefaultIsOneHundredMB()
         {
             // Arrange & Act

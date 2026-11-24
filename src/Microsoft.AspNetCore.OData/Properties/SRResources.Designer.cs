@@ -988,6 +988,15 @@ namespace Microsoft.AspNetCore.OData {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to The number of $select and $expand items in the request exceeds the maximum number allowed of &apos;{0}&apos;. To increase the limit, set the &apos;{1}&apos; property on EnableQueryAttribute or ODataValidationSettings..
+        /// </summary>
+        internal static string MaxSelectExpandNodeCountExceeded {
+            get {
+                return ResourceManager.GetString("MaxSelectExpandNodeCountExceeded", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find the services container for the non-OData route. This can occur when using OData components on the non-OData route and is usually a configuration issue. Call EnableDependencyInjection() to enable OData components on non-OData routes. This may also occur when a request was mistakenly handled by the ASP.NET Core routing layer instead of the OData routing layer, for instance the URL does not include the OData route prefix configured via a call to MapODataServiceRoute()..
         /// </summary>
         internal static string MissingNonODataContainer {

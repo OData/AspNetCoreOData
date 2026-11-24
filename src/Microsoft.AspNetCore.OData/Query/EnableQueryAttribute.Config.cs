@@ -169,6 +169,21 @@ namespace Microsoft.AspNetCore.OData.Query
         }
 
         /// <summary>
+        /// Gets or sets the maximum number of projection ($select and $expand) items allowed across the whole
+        /// projection tree of a single request, including items nested under an expanded navigation property and
+        /// items projected from a $compute alias.
+        /// </summary>
+        /// <value>
+        /// The default value is 500. Set this property to 0 to disable the check. Setting this property overrides the
+        /// global limit configured through <c>ODataOptions.SetMaxSelectExpandNodeCount</c> for this endpoint.
+        /// </value>
+        public int MaxSelectExpandNodeCount
+        {
+            get => _validationSettings.MaxSelectExpandNodeCount ?? ODataValidationSettings.DefaultMaxSelectExpandNodeCount;
+            set => _validationSettings.MaxSelectExpandNodeCount = value;
+        }
+
+        /// <summary>
         /// Gets or sets the maximum number of query results to send back to clients.
         /// </summary>
         /// <value>

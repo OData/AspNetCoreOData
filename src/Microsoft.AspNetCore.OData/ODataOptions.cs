@@ -284,6 +284,24 @@ namespace Microsoft.AspNetCore.OData
         }
 
         /// <summary>
+        /// Sets the global maximum number of projection ($select and $expand) items allowed across the whole projection
+        /// tree of a single request. Individual endpoints can override this value through
+        /// <c>EnableQueryAttribute.MaxSelectExpandNodeCount</c> or <c>ODataValidationSettings.MaxSelectExpandNodeCount</c>.
+        /// </summary>
+        /// <param name="maxSelectExpandNodeCount">The maximum number of $select and $expand items. Set to 0 to disable the check. The default is 500.</param>
+        /// <returns>The current <see cref="ODataOptions"/> instance to enable fluent configuration.</returns>
+        public ODataOptions SetMaxSelectExpandNodeCount(int maxSelectExpandNodeCount)
+        {
+            if (maxSelectExpandNodeCount < 0)
+            {
+                throw Error.ArgumentMustBeGreaterThanOrEqualTo(nameof(maxSelectExpandNodeCount), maxSelectExpandNodeCount, 0);
+            }
+
+            QueryConfigurations.MaxSelectExpandNodeCount = maxSelectExpandNodeCount;
+            return this;
+        }
+
+        /// <summary>
         /// Gets or sets the maximum size, in bytes, of an OData request or response message body.
         /// Default is 100 MB (104,857,600 bytes). Must be greater than or equal to 1.
         /// </summary>
