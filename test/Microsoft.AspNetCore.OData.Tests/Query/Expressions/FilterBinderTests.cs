@@ -29,6 +29,7 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.OData.Tests.Query.Expressions;
 
+[Collection(nameof(UriFunctionBinderTests))]
 public class FilterBinderTests
 {
     private const string NotTesting = "";

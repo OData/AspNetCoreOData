@@ -61,7 +61,7 @@ public partial class ODataReaderExtensionsTests
             var data = new TheoryDataSet<string, object>
             {
                 { "42", 42 },
-                { "9.19", (decimal)9.19 },
+                { "9.19", 9.19m },
                 { "3.1415926535897931", 3.1415926535897931m },
                 { "true", true },
                 { "false", false },
