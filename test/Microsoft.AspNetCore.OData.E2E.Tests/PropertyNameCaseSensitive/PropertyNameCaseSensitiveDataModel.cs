@@ -57,3 +57,16 @@ public class BillDetail
 
     public IList<int> DimensionInCentimeter { get; set; }
 }
+
+public class DifferentPropertyCase
+{
+    public int Id { get; set; }
+    public string Field { get; set; }
+    public string FIELD { get; set; }
+    public ICollection<NestedDifferentPropertyCase> Nested { get; set; }
+}
+public class NestedDifferentPropertyCase
+{
+    public int Id { get; set; }
+    public string ID { get; set; }
+}
