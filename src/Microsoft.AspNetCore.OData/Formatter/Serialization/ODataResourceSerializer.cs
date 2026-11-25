@@ -25,6 +25,7 @@ using NavigationSourceLinkBuilderAnnotation = Microsoft.AspNetCore.OData.Edm.Nav
 using Microsoft.AspNetCore.OData.Common;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Formatter.Attributes;
 
 namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 {
@@ -550,6 +551,20 @@ namespace Microsoft.AspNetCore.OData.Formatter.Serialization
 
             // Try to add the dynamic properties if the structural type is open.
             AppendDynamicProperties(resource, selectExpandNode, resourceContext);
+
+            // check if the type is annotated with ReplaceIllegalFieldNameCharactersAttribute and replace the illegal characters in the field names
+            var resourceInstance = resourceContext.ResourceInstance;
+            if (resourceInstance != null)
+            {
+                var replaceIllegalFieldNameCharactersAttribute = resourceInstance.GetType().GetCustomAttribute<ReplaceIllegalFieldNameCharactersAttribute>();
+                if (replaceIllegalFieldNameCharactersAttribute != null)
+                {
+                    foreach (var property in resource.Properties)
+                    {
+                        property.Name = replaceIllegalFieldNameCharactersAttribute.Replace(property.Name);
+                    }
+                }
+            }
 
             if (selectExpandNode.SelectedActions != null)
             {
