@@ -202,6 +202,12 @@ namespace Microsoft.AspNetCore.OData.Edm
             Contract.Assert(edmModel != null);
             Contract.Assert(clrType != null);
 
+            // Be noted, let's treat the 'object' as structured untyped.
+            if (clrType == typeof(object))
+            {
+                return EdmUntypedStructuredType.Instance;
+            }
+
             IEdmPrimitiveTypeReference primitiveType = GetEdmPrimitiveType(clrType);
             if (primitiveType != null)
             {
@@ -251,6 +257,11 @@ namespace Microsoft.AspNetCore.OData.Edm
                         IEdmType elementType = GetEdmType(edmModel, elementClrType, testCollections: false);
                         if (elementType != null)
                         {
+                            if (elementType.IsUntyped())
+                            {
+                                return EdmUntypedHelpers.NullableUntypedCollectionReference.Definition;
+                            }
+
                             return new EdmCollectionType(elementType.ToEdmTypeReference(elementClrType.IsNullable()));
                         }
                     }
@@ -275,7 +286,7 @@ namespace Microsoft.AspNetCore.OData.Edm
                 // default to the EdmType with the same name as the ClrType name
                 returnType = returnType ?? edmModel.FindType(clrType.EdmFullName());
 
-                if (clrType.BaseType != null)
+                if (clrType.BaseType != null && clrType.BaseType != typeof(object))
                 {
                     // go up the inheritance tree to see if we have a mapping defined for the base type.
                     returnType = returnType ?? GetEdmType(edmModel, clrType.BaseType, testCollections);
@@ -305,6 +316,11 @@ namespace Microsoft.AspNetCore.OData.Edm
             if (edmType.TypeKind == EdmTypeKind.Primitive)
             {
                 return GetClrPrimitiveType((IEdmPrimitiveType)edmType, nullable);
+            }
+
+            if (edmType.IsUntyped())
+            {
+                return typeof(object);
             }
 
             if (edmModel == null)

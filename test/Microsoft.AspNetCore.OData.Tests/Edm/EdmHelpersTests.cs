@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Data;
 using Microsoft.AspNetCore.OData.Edm;
 using Microsoft.AspNetCore.OData.TestCommon;
 using Microsoft.AspNetCore.OData.Tests.Commons;
@@ -160,6 +159,8 @@ namespace Microsoft.AspNetCore.OData.Tests.Edm
                     { typeDefinition, false, typeof(IEdmTypeDefinitionReference) },
                     { entityReferenceType, true, typeof(IEdmEntityReferenceTypeReference) },
                     { entityReferenceType, true, typeof(IEdmEntityReferenceTypeReference) },
+                    { EdmUntypedStructuredType.Instance, true, typeof(IEdmUntypedTypeReference) },
+                    { EdmUntypedStructuredType.Instance, false, typeof(IEdmUntypedTypeReference) }
                 };
             }
         }
