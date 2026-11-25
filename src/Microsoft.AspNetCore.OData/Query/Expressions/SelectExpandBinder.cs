@@ -44,7 +44,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <summary>
         /// For unit test only.
         /// </summary>
-        internal SelectExpandBinder()
+        public SelectExpandBinder()
             : this(new FilterBinder(), new OrderByBinder())
         { }
 
@@ -89,7 +89,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
             return projectionLambdaExpression;
         }
 
-        internal Expression ProjectAsWrapper(QueryBinderContext context, Expression source, SelectExpandClause selectExpandClause,
+        public Expression ProjectAsWrapper(QueryBinderContext context, Expression source, SelectExpandClause selectExpandClause,
             IEdmStructuredType structuredType, IEdmNavigationSource navigationSource, OrderByClause orderByClause = null,
             ComputeClause computeClause = null,
             long? topOption = null,
@@ -341,7 +341,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
 
         // Generates the expression
         //      source => new Wrapper { Instance = source, Container = new PropertyContainer { ..expanded properties.. } }
-        internal Expression ProjectElement(QueryBinderContext context, Expression source, SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource)
+        public Expression ProjectElement(QueryBinderContext context, Expression source, SelectExpandClause selectExpandClause, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource)
         {
             Contract.Assert(source != null);
 
@@ -481,7 +481,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="propertiesToExpand">The out properties to expand at current level, could be null.</param>
         /// <param name="autoSelectedProperties">The out auto selected properties to include at current level, could be null.</param>
         /// <returns>true if the select contains dynamic property selection, false if it's not.</returns>
-        internal static IList<DynamicPathSegment> GetSelectExpandProperties(IEdmModel model, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource,
+        public static IList<DynamicPathSegment> GetSelectExpandProperties(IEdmModel model, IEdmStructuredType structuredType, IEdmNavigationSource navigationSource,
             SelectExpandClause selectExpandClause,
             out IDictionary<IEdmStructuralProperty, PathSelectItem> propertiesToInclude,
             out IDictionary<IEdmNavigationProperty, ExpandedReferenceSelectItem> propertiesToExpand,
@@ -838,7 +838,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="navigationProperty">The expanded navigation property.</param>
         /// <param name="expandedItem">The expanded navigation select item. It may contain the nested query options.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildExpandedProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
+        public void BuildExpandedProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
             IEdmNavigationProperty navigationProperty, ExpandedReferenceSelectItem expandedItem,
             IList<NamedPropertyExpression> includedProperties)
         {
@@ -918,7 +918,7 @@ namespace Microsoft.AspNetCore.OData.Query.Expressions
         /// <param name="structuralProperty">The selected structural property.</param>
         /// <param name="pathSelectItem">The selected item. It may contain the nested query options and could be null.</param>
         /// <param name="includedProperties">The container to hold the created property.</param>
-        internal void BuildSelectedProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
+        public void BuildSelectedProperty(QueryBinderContext context, Expression source, IEdmStructuredType structuredType,
             IEdmStructuralProperty structuralProperty, PathSelectItem pathSelectItem,
             IList<NamedPropertyExpression> includedProperties)
         {
