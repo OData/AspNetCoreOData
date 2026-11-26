@@ -7,12 +7,6 @@
     <VersionRelease Condition="'$(VersionRelease)' == ''"></VersionRelease>
   </PropertyGroup>
   
-    <!-- For NuGet Package Dependencies -->
-  <PropertyGroup>
-    <ODataLibPackageDependency>[8.4.4, 9.0.0)</ODataLibPackageDependency>
-    <ODataModelBuilderPackageDependency>[2.0.0, 3.0.0)</ODataModelBuilderPackageDependency>
-  </PropertyGroup>
-
   <!--
     The revision number is a date code. Note that this only work for 6 years before the year part (year minus 2022)
     overflows the UInt16. The system conversion below will throw errors when this happens.
